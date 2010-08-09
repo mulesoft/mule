@@ -10,6 +10,13 @@
 
 package org.mule.routing;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -23,17 +30,9 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.management.stats.RouterStatistics;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-
 public abstract class AbstractSelectiveRouter implements SelectiveRouter, RouterStatisticsRecorder
 {
-    private final List<ConditionalMessageProcessor> conditionalMessageProcessors = new ArrayList<ConditionalMessageProcessor>();
+    private final List<MessageProcessorFilterPair> conditionalMessageProcessors = new ArrayList<MessageProcessorFilterPair>();
     private final RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
     private MessageProcessor defaultProcessor;
     private RouterStatistics routerStatistics;
@@ -45,14 +44,9 @@ public abstract class AbstractSelectiveRouter implements SelectiveRouter, Router
 
     public void addRoute(MessageProcessor processor, Filter filter)
     {
-        addRoute(new ConditionalMessageProcessor(processor, filter));
-    }
-
-    public void addRoute(ConditionalMessageProcessor cmp)
-    {
         synchronized (conditionalMessageProcessors)
         {
-            conditionalMessageProcessors.add(cmp);
+            conditionalMessageProcessors.add(new MessageProcessorFilterPair(processor, filter));
         }
     }
 
@@ -73,7 +67,7 @@ public abstract class AbstractSelectiveRouter implements SelectiveRouter, Router
         {
             public void updateAt(int index)
             {
-                conditionalMessageProcessors.set(index, new ConditionalMessageProcessor(processor, filter));
+                conditionalMessageProcessors.set(index, new MessageProcessorFilterPair(processor, filter));
             }
         });
     }
@@ -151,9 +145,9 @@ public abstract class AbstractSelectiveRouter implements SelectiveRouter, Router
         }
     }
 
-    protected List<ConditionalMessageProcessor> getConditionalMessageProcessors()
+    protected List<MessageProcessorFilterPair> getConditionalMessageProcessors()
     {
-        return conditionalMessageProcessors;
+        return Collections.unmodifiableList(conditionalMessageProcessors);
     }
 
     private interface RoutesUpdater
@@ -185,7 +179,7 @@ public abstract class AbstractSelectiveRouter implements SelectiveRouter, Router
     {
         this.routerStatistics = routerStatistics;
     }
-    
+
     @Override
     public String toString()
     {

@@ -12,8 +12,8 @@ package org.mule.config.spring.factories;
 
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
-import org.mule.routing.ConditionalMessageProcessor;
-
+import org.mule.routing.MessageProcessorFilterPair;
+import org.mule.routing.filters.AcceptAllFilter;
 import org.springframework.beans.factory.FactoryBean;
 
 public class ConditionalMessageProcessorFactoryBean implements FactoryBean
@@ -34,13 +34,13 @@ public class ConditionalMessageProcessorFactoryBean implements FactoryBean
     public Object getObject() throws Exception
     {
         return filter == null
-                             ? new ConditionalMessageProcessor(messageProcessor)
-                             : new ConditionalMessageProcessor(messageProcessor, filter);
+                             ? new MessageProcessorFilterPair(messageProcessor, AcceptAllFilter.INSTANCE)
+                             : new MessageProcessorFilterPair(messageProcessor, filter);
     }
 
     public Class<?> getObjectType()
     {
-        return ConditionalMessageProcessor.class;
+        return MessageProcessorFilterPair.class;
     }
 
     public boolean isSingleton()

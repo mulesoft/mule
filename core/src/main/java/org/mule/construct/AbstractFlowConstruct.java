@@ -94,7 +94,14 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
                     injectFlowConstructMuleContext(messageProcessorChain);
                     initialiseIfInitialisable(messageSource);
                     initialiseIfInitialisable(messageProcessorChain);
+
                     doInitialise();
+
+                    if (exceptionListener == null)
+                    {
+                        exceptionListener = getMuleContext().getExceptionListener();
+                    }
+
                     validateConstruct();
                 }
             });
@@ -126,7 +133,6 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
 
     public final void stop() throws MuleException
     {
-
         lifecycleManager.fireStopPhase(new LifecycleCallback<FlowConstruct>()
         {
             public void onTransition(String phaseName, FlowConstruct object) throws MuleException

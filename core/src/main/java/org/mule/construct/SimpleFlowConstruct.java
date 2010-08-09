@@ -10,14 +10,14 @@
 
 package org.mule.construct;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.mule.api.MuleContext;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Simple implementation of {@link AbstractFlowConstruct} that allows a list of
@@ -30,14 +30,14 @@ import java.util.List;
  */
 public class SimpleFlowConstruct extends AbstractFlowConstruct
 {
-    protected List messageProcessors = Collections.emptyList();
+    protected List<MessageProcessor> messageProcessors = Collections.emptyList();
 
-    public void setMessageProcessors(List messageProcessors)
+    public void setMessageProcessors(List<MessageProcessor> messageProcessors)
     {
         this.messageProcessors = messageProcessors;
     }
 
-    public List getMessageProcessors()
+    public List<MessageProcessor> getMessageProcessors()
     {
         return messageProcessors;
     }

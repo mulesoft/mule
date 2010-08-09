@@ -17,20 +17,12 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 
 /**
- * A holder for a 2-tuple
+ * A holder for a pair of MessageProcessor and Filter.
  */
 public class MessageProcessorFilterPair
 {
     private final MessageProcessor messageProcessor;
     private final Filter filter;
-
-    // FIXME (DDO) try remove
-    public MessageProcessorFilterPair(MessageProcessor messageProcessor)
-    {
-        Validate.notNull(messageProcessor, "messageProcessor can't be null");
-        this.messageProcessor = messageProcessor;
-        this.filter = null;
-    }
 
     public MessageProcessorFilterPair(MessageProcessor messageProcessor, Filter filter)
     {

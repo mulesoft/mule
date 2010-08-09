@@ -14,25 +14,25 @@ import java.util.Collection;
 
 import org.mule.api.processor.MessageProcessor;
 import org.mule.routing.AbstractSelectiveRouter;
-import org.mule.routing.ConditionalMessageProcessor;
+import org.mule.routing.MessageProcessorFilterPair;
 import org.springframework.beans.factory.FactoryBean;
 
 public abstract class AbstractSelectiveRouterFactoryBean implements FactoryBean
 {
     private MessageProcessor defaultProcessor;
-    private Collection<ConditionalMessageProcessor> conditionalMessageProcessors;
+    private Collection<MessageProcessorFilterPair> conditionalMessageProcessors;
 
     public AbstractSelectiveRouterFactoryBean()
     {
         super();
     }
 
-    public void setDefaultRoute(ConditionalMessageProcessor conditionalProcessor)
+    public void setDefaultRoute(MessageProcessorFilterPair conditionalProcessor)
     {
         defaultProcessor = conditionalProcessor.getMessageProcessor();
     }
 
-    public void setRoutes(Collection<ConditionalMessageProcessor> conditionalMessageProcessors)
+    public void setRoutes(Collection<MessageProcessorFilterPair> conditionalMessageProcessors)
     {
         this.conditionalMessageProcessors = conditionalMessageProcessors;
     }
@@ -42,9 +42,9 @@ public abstract class AbstractSelectiveRouterFactoryBean implements FactoryBean
         final AbstractSelectiveRouter router = newAbstractSelectiveRouter();
         router.setDefaultRoute(defaultProcessor);
 
-        for (final ConditionalMessageProcessor cmp : conditionalMessageProcessors)
+        for (final MessageProcessorFilterPair mpfp : conditionalMessageProcessors)
         {
-            router.addRoute(cmp);
+            router.addRoute(mpfp.getMessageProcessor(), mpfp.getFilter());
         }
 
         return router;
