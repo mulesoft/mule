@@ -12,7 +12,6 @@ package org.mule.transport.jms.transformers;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.util.ClassUtils;
 
@@ -47,6 +46,7 @@ public class JMSMessageToObject extends AbstractJmsTransformer
         super();
     }
 
+    @Override
     protected void declareInputOutputClasses()
     {
         registerSourceType(Message.class);

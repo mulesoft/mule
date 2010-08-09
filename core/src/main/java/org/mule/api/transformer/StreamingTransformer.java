@@ -35,7 +35,7 @@ public interface StreamingTransformer extends BaseTransformer
     void setNextTransformer(StreamingTransformer nextTransformer);
 
     /**
-     * Thransforms the supllied data and returns the result
+     * Thransforms the supplied data and returns the result
      * 
      * @param src the inputStream
      * @param encoding the encoding to use in this transformation (if necessary)
