@@ -54,7 +54,6 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
     
     public void initialise() throws InitialisationException
     {
-        statistics = new RouterStatistics(RouterStatistics.TYPE_INBOUND);
         if (catchAllStrategy != null)
         {
             for (MessageProcessor processor : processors)
