@@ -42,7 +42,7 @@ public class TransformerException extends EndpointException
         addInfo(TRANSFORMER, transformer.toString());
     }
 
-    public TransformerException(Message message, List transformers)
+    public TransformerException(Message message, List<Transformer> transformers)
     {
         super(message);
         this.transformer = TransformerUtils.firstOrNull(transformers);
@@ -60,7 +60,7 @@ public class TransformerException extends EndpointException
         addInfo(TRANSFORMER, transformer.toString());
     }
 
-    public TransformerException(Message message, List transformers, Throwable cause)
+    public TransformerException(Message message, List<Transformer> transformers, Throwable cause)
     {
         super(message, cause);
         this.transformer = TransformerUtils.firstOrNull(transformers);
@@ -74,7 +74,7 @@ public class TransformerException extends EndpointException
         addInfo(TRANSFORMER, (transformer == null ? "null" : transformer.toString()));
     }
 
-     public TransformerException(List transformers, Throwable cause)
+     public TransformerException(List<Transformer> transformers, Throwable cause)
     {
         super(cause);
         this.transformer = TransformerUtils.firstOrNull(transformers);
