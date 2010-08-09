@@ -105,7 +105,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         catch (Exception e)
         {
             throw new DispatchException(CoreMessages.failedToDispatchToReplyto(endpoint),
-                replyToEvent, replyToEvent.getEndpoint(), e);
+                replyToEvent, endpoint, e);
         }
 
     }

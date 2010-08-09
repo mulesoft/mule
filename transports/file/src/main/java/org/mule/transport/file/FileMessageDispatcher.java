@@ -16,7 +16,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.transformer.DataType;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.AbstractMessageDispatcher;
@@ -57,7 +56,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         // Wrap the transformed message before passing it to the filename parser
         MuleMessage message = new DefaultMuleMessage(data, event.getMessage(), event.getMuleContext());
 
-        FileOutputStream fos = (FileOutputStream) connector.getOutputStream(event.getEndpoint(), message);
+        FileOutputStream fos = (FileOutputStream) connector.getOutputStream((OutboundEndpoint) endpoint, message);
         try
         {
             if (event.getMessage().getOutboundProperty(FileConnector.PROPERTY_FILENAME) == null)

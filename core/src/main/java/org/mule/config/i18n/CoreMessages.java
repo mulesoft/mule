@@ -19,7 +19,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.OutboundRouter;
-import org.mule.api.routing.RoutingTarget;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
@@ -130,7 +129,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 23);
     }
 
-    public static Message failedToRouterViaEndpoint(RoutingTarget target)
+    public static Message failedToRouterViaEndpoint(MessageProcessor target)
     {
         return factory.createMessage(BUNDLE_PATH, 30, target);
     }

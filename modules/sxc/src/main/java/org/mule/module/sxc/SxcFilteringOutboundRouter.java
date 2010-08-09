@@ -10,7 +10,6 @@
 
 package org.mule.module.sxc;
 
-import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionRuntimeException;
@@ -166,7 +165,7 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
         }
         catch (Exception e)
         {
-            throw new RoutingException(message, RequestContext.getEvent().getEndpoint(), e);
+            throw new RoutingException(message, this, e);
         }
         finally
         {

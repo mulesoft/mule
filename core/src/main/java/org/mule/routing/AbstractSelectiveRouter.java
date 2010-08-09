@@ -104,7 +104,7 @@ public abstract class AbstractSelectiveRouter implements SelectiveRouter
 
         throw new RoutePathNotFoundException(
             MessageFactory.createStaticMessage("Can't process message because no route has been found matching any filter and no default route is defined"),
-            event.getMessage(), event.getEndpoint());
+            event, this);
     }
 
     /**

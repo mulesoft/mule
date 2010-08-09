@@ -46,7 +46,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         if (endpointUri == null)
         {
             throw new DispatchException(CoreMessages.objectIsNull("Endpoint"), event,
-                event.getEndpoint());
+                (OutboundEndpoint) endpoint);
         }
         QueueSession session = connector.getQueueSession();
         Queue queue = session.getQueue(endpointUri.getAddress());
@@ -54,7 +54,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         {
             // queue is full
             throw new DispatchException(VMMessages.queueIsFull(queue.getName(), queue.size()),
-                    event, event.getEndpoint());
+                    event, (OutboundEndpoint) endpoint);
         }
         if (logger.isDebugEnabled())
         {

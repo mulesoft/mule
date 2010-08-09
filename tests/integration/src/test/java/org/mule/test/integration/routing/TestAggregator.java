@@ -44,7 +44,7 @@ public class TestAggregator extends AbstractAggregator
                     }
                     catch (TransformerException e)
                     {
-                        throw new AggregationException(events, event.getEndpoint(), e);
+                        throw new AggregationException(events, null, e);
                     }
                 }
 

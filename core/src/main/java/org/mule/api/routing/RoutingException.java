@@ -13,6 +13,7 @@ package org.mule.api.routing;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 
@@ -29,19 +30,19 @@ public class RoutingException extends MessagingException
      */
     private static final long serialVersionUID = 2478458847072048645L;
 
-    protected final transient RoutingTarget route;
+    protected final transient MessageProcessor route;
 
     /**
      * @deprecated use RoutingException(MuleEvent, RoutingTarget)
      */
     @Deprecated
-    public RoutingException(MuleMessage message, RoutingTarget route)
+    public RoutingException(MuleMessage message, MessageProcessor route)
     {
         super(generateMessage(null, route), message);
         this.route = route;
     }
 
-    public RoutingException(MuleEvent event, RoutingTarget route)
+    public RoutingException(MuleEvent event, MessageProcessor route)
     {
         super(generateMessage(null, route), event);
         this.route = route;
@@ -51,13 +52,13 @@ public class RoutingException extends MessagingException
      * @deprecated use RoutingException(MuleEvent, RoutingTarget, Throwable)
      */
     @Deprecated
-    public RoutingException(MuleMessage message, RoutingTarget route, Throwable cause)
+    public RoutingException(MuleMessage message, MessageProcessor route, Throwable cause)
     {
         super(generateMessage(null, route), message, cause);
         this.route = route;
     }
 
-    public RoutingException(MuleEvent event, RoutingTarget route, Throwable cause)
+    public RoutingException(MuleEvent event, MessageProcessor route, Throwable cause)
     {
         super(generateMessage(null, route), event, cause);
         this.route = route;
@@ -67,13 +68,13 @@ public class RoutingException extends MessagingException
      * @deprecated use RoutingException(Message, MuleEvent, RoutingTarget)
      */
     @Deprecated
-    public RoutingException(Message message, MuleMessage muleMessage, RoutingTarget route)
+    public RoutingException(Message message, MuleMessage muleMessage, MessageProcessor route)
     {
         super(generateMessage(message, route), muleMessage);
         this.route = route;
     }
 
-    public RoutingException(Message message, MuleEvent event, RoutingTarget route)
+    public RoutingException(Message message, MuleEvent event, MessageProcessor route)
     {
         super(generateMessage(message, route), event);
         this.route = route;
@@ -83,24 +84,24 @@ public class RoutingException extends MessagingException
      * @deprecated use RoutingException(Message, MuleEvent, RoutingTarget, Throwable)
      */
     @Deprecated
-    public RoutingException(Message message, MuleMessage muleMessage, RoutingTarget route, Throwable cause)
+    public RoutingException(Message message, MuleMessage muleMessage, MessageProcessor route, Throwable cause)
     {
         super(generateMessage(message, route), muleMessage, cause);
         this.route = route;
     }
 
-    public RoutingException(Message message, MuleEvent event, RoutingTarget route, Throwable cause)
+    public RoutingException(Message message, MuleEvent event, MessageProcessor route, Throwable cause)
     {
         super(generateMessage(message, route), event, cause);
         this.route = route;
     }
 
-    public RoutingTarget getRoute()
+    public MessageProcessor getRoute()
     {
         return route;
     }
 
-    private static Message generateMessage(Message message, RoutingTarget target)
+    private static Message generateMessage(Message message, MessageProcessor target)
     {
         Message m = CoreMessages.failedToRouterViaEndpoint(target);
         if (message != null)

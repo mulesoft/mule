@@ -386,7 +386,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         if (method == null)
         {
             throw new DispatchException(SoapMessages.cannotInvokeCallWithoutOperation(), 
-                event, event.getEndpoint());
+                event, this);
         }
         else if (method instanceof SoapMethod)
         {

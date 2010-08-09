@@ -19,7 +19,6 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
@@ -95,7 +94,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         }
         catch (Exception e)
         {
-            throw new DispatchException(event, endpoint, e);
+            throw new DispatchException(event, (OutboundEndpoint) endpoint, e);
         }
         return resultEvent;
     }

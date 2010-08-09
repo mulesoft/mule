@@ -113,7 +113,7 @@ public class AggregatorTestCase extends AbstractMuleTestCase
                         }
                         catch (MuleException e)
                         {
-                            throw new AggregationException(events, event.getEndpoint(), e);
+                            throw new AggregationException(events, next, e);
                         }
                     }
 

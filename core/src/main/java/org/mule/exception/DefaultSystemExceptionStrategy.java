@@ -12,7 +12,7 @@ package org.mule.exception;
 
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.routing.RoutingTarget;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.message.DefaultExceptionPayload;
 
 /**
@@ -30,7 +30,7 @@ public class DefaultSystemExceptionStrategy extends AbstractExceptionListener
     }
 
     @Override
-    public void handleRoutingException(MuleMessage message, RoutingTarget target, Throwable e)
+    public void handleRoutingException(MuleMessage message, MessageProcessor target, Throwable e)
     {
         if (RequestContext.getEvent() != null)
         {

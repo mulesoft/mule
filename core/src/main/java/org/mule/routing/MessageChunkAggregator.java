@@ -93,7 +93,7 @@ public class MessageChunkAggregator extends AbstractAggregator
                 }
                 catch (Exception e)
                 {
-                    throw new AggregationException(events, firstEvent.getEndpoint(), e);
+                    throw new AggregationException(events,MessageChunkAggregator.this, e);
                 }
                 finally
                 {

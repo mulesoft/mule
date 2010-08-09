@@ -10,10 +10,8 @@
 
 package org.mule.routing;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
 
@@ -52,7 +50,7 @@ public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
         }
         catch (MuleException e)
         {
-            throw new RoutingException(event, event.getEndpoint(), e);
+            throw new RoutingException(event, this, e);
         }
     }
 }

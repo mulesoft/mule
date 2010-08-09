@@ -18,6 +18,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.ConnectorException;
 import org.mule.api.transport.DispatchException;
@@ -509,7 +510,7 @@ public class FtpConnector extends AbstractConnector
      *         does not support streaming
      * @throws org.mule.api.MuleException
      */
-    public OutputStream getOutputStream(ImmutableEndpoint endpoint, MuleMessage message)
+    public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleMessage message)
         throws MuleException
     {
         try

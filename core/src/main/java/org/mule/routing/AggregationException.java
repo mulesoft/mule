@@ -10,7 +10,7 @@
 
 package org.mule.routing;
 
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.Message;
 
@@ -27,25 +27,25 @@ public class AggregationException extends RoutingException
 
     private EventGroup eventGroup = null;
 
-    public AggregationException(EventGroup eventGroup, ImmutableEndpoint endpoint)
+    public AggregationException(EventGroup eventGroup, MessageProcessor endpoint)
     {
         super(eventGroup.getMessageCollectionEvent(), endpoint);
         this.eventGroup = eventGroup;
     }
 
-    public AggregationException(EventGroup eventGroup, ImmutableEndpoint endpoint, Throwable cause)
+    public AggregationException(EventGroup eventGroup, MessageProcessor endpoint, Throwable cause)
     {
         super(eventGroup.getMessageCollectionEvent(), endpoint, cause);
         this.eventGroup = eventGroup;
     }
 
-    public AggregationException(Message message, EventGroup eventGroup, ImmutableEndpoint endpoint)
+    public AggregationException(Message message, EventGroup eventGroup, MessageProcessor endpoint)
     {
         super(message, eventGroup.getMessageCollectionEvent(), endpoint);
         this.eventGroup = eventGroup;
     }
 
-    public AggregationException(Message message, EventGroup eventGroup, ImmutableEndpoint endpoint,
+    public AggregationException(Message message, EventGroup eventGroup, MessageProcessor endpoint,
         Throwable cause)
     {
         super(message, eventGroup.getMessageCollectionEvent(), endpoint, cause);

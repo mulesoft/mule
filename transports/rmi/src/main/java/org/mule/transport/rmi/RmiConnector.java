@@ -10,6 +10,7 @@
 
 package org.mule.transport.rmi;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -20,7 +21,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
@@ -221,8 +221,7 @@ public class RmiConnector extends AbstractJndiConnector
 
             if (null == methodName)
             {
-                throw new DispatchException(RmiMessages.messageParamServiceMethodNotSet(), 
-                    event, event.getEndpoint());
+                throw new MessagingException(RmiMessages.messageParamServiceMethodNotSet(), event);
             }
         }
 

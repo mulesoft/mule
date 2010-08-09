@@ -32,7 +32,6 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.RoutingException;
-import org.mule.api.routing.RoutingTarget;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -270,7 +269,7 @@ public abstract class AbstractExceptionListener
      * @param t the exception thrown. This will be sent with the ExceptionMessage
      * @see ExceptionMessage
      */
-    protected void routeException(MuleMessage message, RoutingTarget target, Throwable t)
+    protected void routeException(MuleMessage message, MessageProcessor target, Throwable t)
     {
         List endpoints = getEndpoints(t);
         if (CollectionUtils.isNotEmpty(endpoints))
@@ -550,7 +549,7 @@ public abstract class AbstractExceptionListener
      *            some wrapper exception
      * @see RoutingException
      */
-    public abstract void handleRoutingException(MuleMessage message, RoutingTarget target, Throwable e);
+    public abstract void handleRoutingException(MuleMessage message, MessageProcessor target, Throwable e);
 
     /**
      * DefaultLifecyclePhase exceptions are thrown when an error occurs during an

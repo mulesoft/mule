@@ -15,7 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.routing.RoutingTarget;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.management.stats.ServiceStatistics;
@@ -61,7 +61,7 @@ public class DefaultServiceExceptionStrategy extends DefaultMessagingExceptionSt
     }
 
     @Override
-    protected void routeException(MuleMessage message, RoutingTarget target, Throwable t)
+    protected void routeException(MuleMessage message, MessageProcessor target, Throwable t)
     {
         super.routeException(message, target, t);
         List<OutboundEndpoint> endpoints = getEndpoints(t);

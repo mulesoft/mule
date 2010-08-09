@@ -40,7 +40,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
     {
         if (event.getEndpoint().getEndpointURI().toString().equals("test://AlwaysFail"))
         {
-            throw new RoutingException(event, event.getEndpoint());
+            throw new RoutingException(event, (OutboundEndpoint) endpoint);
         }
     }
 
@@ -49,7 +49,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
     {
         if (event.getEndpoint().getEndpointURI().toString().equals("test://AlwaysFail"))
         {
-            throw new RoutingException(event, event.getEndpoint());
+            throw new RoutingException(event, (OutboundEndpoint) endpoint);
         }
         return event.getMessage();
     }

@@ -61,6 +61,7 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -279,7 +280,7 @@ public class MuleClient implements Disposable
         catch (Exception e)
         {
             throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event,
-                event.getEndpoint(), e);
+                endpoint, e);
         }
     }
 
@@ -864,7 +865,7 @@ public class MuleClient implements Disposable
         catch (Exception e)
         {
             throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event,
-                event.getEndpoint(), e);
+                endpoint, e);
         }
     }
 

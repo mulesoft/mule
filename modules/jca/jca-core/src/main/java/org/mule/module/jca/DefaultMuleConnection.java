@@ -81,7 +81,7 @@ public class DefaultMuleConnection implements MuleConnection
         catch (Exception e)
         {
             throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event, 
-                event.getEndpoint(), e);
+                endpoint, e);
         }
     }
 
@@ -123,7 +123,7 @@ public class DefaultMuleConnection implements MuleConnection
         catch (Exception e)
         {
             throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event, 
-                event.getEndpoint(), e);
+                endpoint, e);
         }
     }
 

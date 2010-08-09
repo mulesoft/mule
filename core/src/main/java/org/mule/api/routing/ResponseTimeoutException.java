@@ -12,6 +12,7 @@ package org.mule.api.routing;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.Message;
 
 /**
@@ -30,12 +31,12 @@ public class ResponseTimeoutException extends RoutingException
      * @deprecated use ResponseTimeoutException(Message, MuleEvent, RoutingTarget)
      */
     @Deprecated
-    public ResponseTimeoutException(Message message, MuleMessage muleMessage, RoutingTarget target)
+    public ResponseTimeoutException(Message message, MuleMessage muleMessage, MessageProcessor target)
     {
         super(message, muleMessage, target);
     }
 
-    public ResponseTimeoutException(Message message, MuleEvent event, RoutingTarget target)
+    public ResponseTimeoutException(Message message, MuleEvent event, MessageProcessor target)
     {
         super(message, event, target);
     }
@@ -44,13 +45,13 @@ public class ResponseTimeoutException extends RoutingException
      * @deprecated use ResponseTimeoutException(Message, MuleEvent, RoutingTarget, Throwable)
      */
     @Deprecated
-    public ResponseTimeoutException(Message message, MuleMessage muleMessage, RoutingTarget target,
+    public ResponseTimeoutException(Message message, MuleMessage muleMessage, MessageProcessor target,
         Throwable cause)
     {
         super(message, muleMessage, target, cause);
     }
 
-    public ResponseTimeoutException(Message message, MuleEvent event, RoutingTarget target,
+    public ResponseTimeoutException(Message message, MuleEvent event, MessageProcessor target,
         Throwable cause)
     {
         super(message, event, target, cause);

@@ -10,6 +10,7 @@
 package org.mule.module.ibeans.spi.support;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
@@ -17,7 +18,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DynamicURIInboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
@@ -74,7 +74,7 @@ public class DynamicRequestEndpoint extends DynamicURIInboundEndpoint
         return props;
     }
 
-    protected EndpointURI getEndpointURIForMessage(MuleMessage message) throws DispatchException
+    protected EndpointURI getEndpointURIForMessage(MuleMessage message) throws MessagingException
     {
         if (logger.isDebugEnabled())
         {
@@ -104,17 +104,17 @@ public class DynamicRequestEndpoint extends DynamicURIInboundEndpoint
 
             if (!getLocalConnector().supportsProtocol(getEndpointURI().getScheme()))
             {
-                throw new DispatchException(CoreMessages.schemeCannotChangeForRouter(
-                        this.getEndpointURI().getScheme(), getEndpointURI().getScheme()), message, this);
+                throw new MessagingException(CoreMessages.schemeCannotChangeForRouter(
+                        this.getEndpointURI().getScheme(), getEndpointURI().getScheme()), message);
             }
             getEndpointURI().initialise();
             return getEndpointURI();
         }
         catch (Exception e)
         {
-            throw new DispatchException(
+            throw new MessagingException(
                     CoreMessages.templateCausedMalformedEndpoint(uri, newUriString),
-                    message, this, e);
+                    message, e);
         }
 
     }

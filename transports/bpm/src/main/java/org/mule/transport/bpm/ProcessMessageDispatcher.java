@@ -58,7 +58,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         {
             throw new DispatchException(
                 MessageFactory.createStaticMessage("Synchronous process invocation must return the new process state."),
-                event, event.getEndpoint());
+                event, this);
         }
     }
 

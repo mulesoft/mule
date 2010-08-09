@@ -13,13 +13,13 @@ package org.mule.transport.file;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.routing.RoutingException;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.Message;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -352,7 +352,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             Message msg = FileMessages.exceptionWhileProcessing(sourceFile.getName(),
                 (fileWasRolledBack ? "successful" : "unsuccessful"));
             MuleEvent event = new DefaultMuleEvent(message, endpoint, null);
-            Exception ex = new RoutingException(msg, event, endpoint, e);
+            Exception ex = new MessagingException(msg, event, e);
             getFlowConstruct().getExceptionListener().exceptionThrown(ex);
         }
     }

@@ -58,7 +58,7 @@ public class StdioMessageDispatcher extends AbstractMessageDispatcher
         if (out == null)
         {
             throw new DispatchException(StdioMessages.couldNotFindStreamWithName(event.getEndpoint()), 
-                event, event.getEndpoint());
+                event, (OutboundEndpoint) endpoint);
         }
 
         if (connector instanceof PromptStdioConnector)

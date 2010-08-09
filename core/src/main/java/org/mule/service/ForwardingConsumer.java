@@ -61,7 +61,7 @@ public class ForwardingConsumer extends MessageFilter
             }
             catch (MuleException e)
             {
-                throw new RoutingException(event, event.getEndpoint(), e);
+                throw new RoutingException(event, this, e);
             }
         }
     }

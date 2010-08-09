@@ -419,7 +419,7 @@ public class RemoteDispatcher implements Disposable
         }
         catch (Exception e)
         {
-            throw new DispatchException(event, event.getEndpoint(), e);
+            throw new DispatchException(event, serverEndpoint, e);
         }
 
         if (logger.isDebugEnabled())

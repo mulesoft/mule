@@ -12,7 +12,6 @@ package org.mule.api.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.routing.RoutingTarget;
 
 /**
  * Processes {@link MuleEvent}'s. Implementations that do not mutate the
@@ -21,7 +20,7 @@ import org.mule.api.routing.RoutingTarget;
  * 
  * @since 3.0
  */
-public interface MessageProcessor extends RoutingTarget
+public interface MessageProcessor
 {
     /**
      * Invokes the MessageProcessor.

@@ -12,6 +12,7 @@ package org.mule.api.routing;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.Message;
 
 /**
@@ -30,12 +31,12 @@ public class CouldNotRouteOutboundMessageException extends RoutingException
      * @deprecated use CouldNotRouteOutboundMessageException(MuleEvent, RoutingTarget)
      */
     @Deprecated
-    public CouldNotRouteOutboundMessageException(MuleMessage message, RoutingTarget target)
+    public CouldNotRouteOutboundMessageException(MuleMessage message, MessageProcessor target)
     {
         super(message, target);
     }
 
-    public CouldNotRouteOutboundMessageException(MuleEvent event, RoutingTarget target)
+    public CouldNotRouteOutboundMessageException(MuleEvent event, MessageProcessor target)
     {
         super(event, target);
     }
@@ -44,12 +45,12 @@ public class CouldNotRouteOutboundMessageException extends RoutingException
      * @deprecated use CouldNotRouteOutboundMessageException(MuleEvent, RoutingTarget, Throwable)
      */
     @Deprecated
-    public CouldNotRouteOutboundMessageException(MuleMessage muleMessage, RoutingTarget target, Throwable cause)
+    public CouldNotRouteOutboundMessageException(MuleMessage muleMessage, MessageProcessor target, Throwable cause)
     {
         super(muleMessage, target, cause);
     }
 
-    public CouldNotRouteOutboundMessageException(MuleEvent event, RoutingTarget target, Throwable cause)
+    public CouldNotRouteOutboundMessageException(MuleEvent event, MessageProcessor target, Throwable cause)
     {
         super(event, target, cause);
     }
@@ -58,12 +59,12 @@ public class CouldNotRouteOutboundMessageException extends RoutingException
      * @deprecated use CouldNotRouteOutboundMessageException(Message, MuleEvent, RoutingTarget)
      */
     @Deprecated
-    public CouldNotRouteOutboundMessageException(Message message, MuleMessage muleMessage, RoutingTarget target)
+    public CouldNotRouteOutboundMessageException(Message message, MuleMessage muleMessage, MessageProcessor target)
     {
         super(message, muleMessage, target);
     }
 
-    public CouldNotRouteOutboundMessageException(Message message, MuleEvent event, RoutingTarget target)
+    public CouldNotRouteOutboundMessageException(Message message, MuleEvent event, MessageProcessor target)
     {
         super(message, event, target);
     }
@@ -73,13 +74,13 @@ public class CouldNotRouteOutboundMessageException extends RoutingException
      */
     @Deprecated
     public CouldNotRouteOutboundMessageException(Message message, MuleMessage muleMessage,
-        RoutingTarget target, Throwable cause)
+                                                 MessageProcessor target, Throwable cause)
     {
         super(message, muleMessage, target, cause);
     }
 
     public CouldNotRouteOutboundMessageException(Message message, MuleEvent event,
-                                                 RoutingTarget target, Throwable cause)
+                                                 MessageProcessor target, Throwable cause)
     {
         super(message, event, target, cause);
     }
