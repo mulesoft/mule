@@ -46,7 +46,11 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
             
             boolean isGet = HttpConstants.METHOD_GET.equalsIgnoreCase(httpMethod);
             boolean isPost = HttpConstants.METHOD_POST.equalsIgnoreCase(httpMethod);
-            boolean isUrlEncoded = contentType.startsWith("application/x-www-form-urlencoded");
+            boolean isUrlEncoded = false;
+            if (contentType != null)
+            {
+                isUrlEncoded = contentType.startsWith("application/x-www-form-urlencoded");
+            }
 
             if (!(isGet || (isPost && isUrlEncoded)))
             {
