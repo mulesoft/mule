@@ -21,7 +21,6 @@ import org.mule.tck.FunctionalTestCase;
  */
 public class InboundTransformingCatchAllTestCase extends FunctionalTestCase
 {
-
     public void testNormal() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -36,6 +35,7 @@ public class InboundTransformingCatchAllTestCase extends FunctionalTestCase
         assertTrue(msg.getPayload() instanceof byte[]);
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/usecases/routing/inbound-transforming-catchall.xml";
