@@ -9,9 +9,7 @@
  */
 package org.mule.transformer.simple;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -27,7 +25,7 @@ public class MuleMessageToByteArray extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent e) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String outputEncoding)
     {
         return SerializationUtils.serialize(message);
     }

@@ -9,14 +9,12 @@
  */
 package org.mule.config.transformer;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.annotations.param.Payload;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.expression.ExpressionAnnotationsHelper;
 import org.mule.config.i18n.AnnotationsMessages;
 import org.mule.expression.transformers.ExpressionTransformer;
@@ -121,7 +119,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageTransformer implem
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         Object firstArg = null;
         Object[] params = new Object[transformMethod.getParameterTypes().length];
@@ -131,7 +129,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageTransformer implem
         //parameter
         if (paramTransformer != null)
         {
-            Object paramArgs = paramTransformer.transformMessage(message, outputEncoding, null);
+            Object paramArgs = paramTransformer.transformMessage(message, outputEncoding);
 
             if (paramArgs != null && paramArgs.getClass().isArray())
             {
@@ -170,7 +168,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageTransformer implem
             }
             catch (TransformerException e)
             {
-                throw new TransformerMessagingException(e.getI18nMessage(), event, this, e);
+                throw new TransformerException(e.getI18nMessage(), this, e);
             }
         }
 
@@ -212,7 +210,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageTransformer implem
                     }
                     catch (Exception e)
                     {
-                        throw new TransformerMessagingException(event, this, e);
+                        throw new TransformerException(this, e);
                     }
 
                 }
@@ -229,7 +227,7 @@ public class AnnotatedTransformerProxy extends AbstractMessageTransformer implem
         catch (Exception e)
         {
             e.printStackTrace();
-            throw new TransformerMessagingException(event, this, e);
+            throw new TransformerException(this, e);
         }
     }
 

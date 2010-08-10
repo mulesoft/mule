@@ -9,7 +9,6 @@
  */
 package org.mule.expression.transformers;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionRuntimeException;
@@ -17,7 +16,6 @@ import org.mule.api.expression.RequiredValueException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.transformer.types.DataTypeFactory;
@@ -87,7 +85,7 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         Object bean;
         try
@@ -96,7 +94,7 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerMessagingException(event, this, e);
+            throw new TransformerException(this, e);
         }
 
 
@@ -116,13 +114,13 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
             }
             catch (ExpressionRuntimeException e)
             {
-                throw new TransformerMessagingException(event, this, e);
+                throw new TransformerException(this, e);
             }
 
             if (!argument.isOptional() && value == null)
             {
-                throw new TransformerMessagingException(CoreMessages.expressionEvaluatorReturnedNull(
-                        argument.getExpressionConfig().getEvaluator(), argument.getExpressionConfig().getExpression()), event, this);
+                throw new TransformerException(CoreMessages.expressionEvaluatorReturnedNull(
+                        argument.getExpressionConfig().getEvaluator(), argument.getExpressionConfig().getExpression()), this);
 
             }
             args.put(argument.getName(), value);
@@ -134,11 +132,11 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
         }
         catch (IllegalAccessException e)
         {
-            throw new TransformerMessagingException(event, this, e);
+            throw new TransformerException(this, e);
         }
         catch (InvocationTargetException e)
         {
-            throw new TransformerMessagingException(event, this, e.getTargetException());
+            throw new TransformerException(this, e.getTargetException());
         }
 
         return bean;

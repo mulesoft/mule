@@ -79,18 +79,6 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
         return instance;
     }
 
-    public final XStream getXStream(MuleEvent event) throws TransformerMessagingException
-    {
-        try
-        {
-            return getXStream();
-        }
-        catch (TransformerException e)
-        {
-            throw new TransformerMessagingException(e.getI18nMessage(), event, this, e);
-        }
-    }
-
     public Object clone() throws CloneNotSupportedException
     {
         AbstractXStreamTransformer clone = (AbstractXStreamTransformer) super.clone();

@@ -9,12 +9,10 @@
  */
 package org.mule.expression.transformers;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.i18n.CoreMessages;
 
 import java.util.Iterator;
@@ -43,7 +41,7 @@ public class ExpressionTransformer extends AbstractExpressionTransformer
     private boolean returnSourceIfNull = false;
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         Object results[] = new Object[arguments.size()];
         int i = 0;
@@ -64,13 +62,13 @@ public class ExpressionTransformer extends AbstractExpressionTransformer
             }
             catch (ExpressionRuntimeException e)
             {
-                throw new TransformerMessagingException(event, this, e);
+                throw new TransformerException(this, e);
             }
 
             if (!argument.isOptional() && results[i] == null)
             {
-                throw new TransformerMessagingException(CoreMessages.expressionEvaluatorReturnedNull(
-                        argument.getExpressionConfig().getEvaluator(), argument.getExpressionConfig().getExpression()), event, this);
+                throw new TransformerException(CoreMessages.expressionEvaluatorReturnedNull(
+                        argument.getExpressionConfig().getEvaluator(), argument.getExpressionConfig().getExpression()), this);
 
             }
 

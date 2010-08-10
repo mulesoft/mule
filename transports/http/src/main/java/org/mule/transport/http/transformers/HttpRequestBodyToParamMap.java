@@ -10,9 +10,8 @@
 
 package org.mule.transport.http.transformers;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConstants;
@@ -35,7 +34,7 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String encoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String encoding) throws TransformerException
     {
         Map<String, Object> paramMap = new HashMap<String, Object>();
 
@@ -85,7 +84,7 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerMessagingException(event, this, e);
+            throw new TransformerException(this, e);
         }
 
         return paramMap;

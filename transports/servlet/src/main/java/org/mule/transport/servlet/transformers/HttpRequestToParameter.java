@@ -10,9 +10,8 @@
 
 package org.mule.transport.servlet.transformers;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.servlet.AbstractReceiverServlet;
@@ -34,7 +33,7 @@ public class HttpRequestToParameter extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         String payloadParam = message.getOutboundProperty(AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME,
                                                           AbstractReceiverServlet.DEFAULT_PAYLOAD_PARAMETER_NAME);
@@ -75,7 +74,7 @@ public class HttpRequestToParameter extends AbstractMessageTransformer
                 }
                 catch (IOException e)
                 {
-                    throw new TransformerMessagingException(event, this, e);
+                    throw new TransformerException(this, e);
                 }
             }
             // HTTP Form
@@ -89,7 +88,7 @@ public class HttpRequestToParameter extends AbstractMessageTransformer
                 }
                 catch (IOException e)
                 {
-                    throw new TransformerMessagingException(event, this, e);
+                    throw new TransformerException(this, e);
                 }
                 finally
                 {
@@ -99,7 +98,7 @@ public class HttpRequestToParameter extends AbstractMessageTransformer
                     }
                     catch (IOException e2)
                     {
-                        throw new TransformerMessagingException(event, this, e2);
+                        throw new TransformerException(this, e2);
                     }
                 }
                 return props.get(payloadParam);

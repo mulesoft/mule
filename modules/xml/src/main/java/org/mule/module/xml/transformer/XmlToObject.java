@@ -10,10 +10,8 @@
 
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.store.DeserializationPostInitialisable;
 
@@ -49,7 +47,7 @@ public class XmlToObject extends AbstractXStreamTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         Object src = message.getPayload();
         Object result;
@@ -58,11 +56,11 @@ public class XmlToObject extends AbstractXStreamTransformer
             try
             {
                 Reader xml = new InputStreamReader(new ByteArrayInputStream((byte[]) src), outputEncoding);
-                result = getXStream(event).fromXML(xml);
+                result = getXStream().fromXML(xml);
             }
             catch (UnsupportedEncodingException e)
             {
-                throw new TransformerMessagingException(event, this, e);
+                throw new TransformerException(this, e);
             }
         }
         else if (src instanceof InputStream)
@@ -71,11 +69,11 @@ public class XmlToObject extends AbstractXStreamTransformer
             try
             {
                 Reader xml = new InputStreamReader(input, outputEncoding);
-                result = getXStream(event).fromXML(xml);
+                result = getXStream().fromXML(xml);
             }
             catch (Exception e)
             {
-                throw new TransformerMessagingException(event, this, e);
+                throw new TransformerException(this, e);
             }
             finally
             {
@@ -91,11 +89,11 @@ public class XmlToObject extends AbstractXStreamTransformer
         }
         else if (src instanceof String)
         {
-            result = getXStream(event).fromXML(src.toString());
+            result = getXStream().fromXML(src.toString());
         }
         else
         {
-            result = getXStream(event).fromXML((String) domTransformer.transform(src, event));
+            result = getXStream().fromXML((String) domTransformer.transform(src));
         }
 
         try
@@ -105,7 +103,7 @@ public class XmlToObject extends AbstractXStreamTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerMessagingException(event, this, e);
+            throw new TransformerException(this, e);
         }
     }
 

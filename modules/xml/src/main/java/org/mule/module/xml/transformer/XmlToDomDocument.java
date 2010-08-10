@@ -10,11 +10,9 @@
 
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.module.xml.util.XMLUtils;
 
 import javax.xml.stream.XMLStreamReader;
@@ -32,7 +30,7 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
     private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
     @Override
-    public Object transformMessage(MuleMessage message, String encoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String encoding) throws TransformerException
     {
         Object src = message.getPayload();
         try
@@ -68,7 +66,7 @@ public class XmlToDomDocument extends AbstractXmlTransformer implements Discover
         }
         catch (Exception e)
         {
-            throw new TransformerMessagingException(event, this, e);
+            throw new TransformerException(this, e);
         }
     }
 

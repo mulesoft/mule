@@ -10,11 +10,9 @@
 
 package org.mule.module.spring.events;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
@@ -391,7 +389,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         }
 
         @Override
-        public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+        public Object transformMessage(MuleMessage message, String outputEncoding)
         {
             assertNotNull(message);
 

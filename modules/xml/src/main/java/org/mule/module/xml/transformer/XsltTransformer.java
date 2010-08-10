@@ -10,12 +10,10 @@
 
 package org.mule.module.xml.transformer;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.xml.util.LocalURIResolver;
 import org.mule.module.xml.util.XMLUtils;
@@ -157,7 +155,7 @@ public class XsltTransformer extends AbstractXmlTransformer
      * @return The result in the type specified by the user
      */
     @Override
-    public Object transformMessage(MuleMessage message, String encoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String encoding) throws TransformerException
     {
         Object src = message.getPayload();
         try
@@ -189,7 +187,7 @@ public class XsltTransformer extends AbstractXmlTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerMessagingException(event, this, e);
+            throw new TransformerException(this, e);
         }
     }
 

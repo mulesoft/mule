@@ -10,9 +10,8 @@
 
 package org.mule.example.loanbroker.transformers;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.example.loanbroker.messages.Customer;
 import org.mule.example.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.transformer.AbstractMessageTransformer;
@@ -30,7 +29,7 @@ public class RestRequestToCustomerRequest extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         String name;
         int ssn;
@@ -46,7 +45,7 @@ public class RestRequestToCustomerRequest extends AbstractMessageTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerMessagingException(event, this, e);
+            throw new TransformerException(this, e);
         }
 
         Customer c = new Customer(name, ssn);

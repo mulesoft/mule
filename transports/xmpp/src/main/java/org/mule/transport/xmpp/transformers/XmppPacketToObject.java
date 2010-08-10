@@ -10,9 +10,7 @@
 
 package org.mule.transport.xmpp.transformers;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.xmpp.XmppConnector;
@@ -29,7 +27,7 @@ public class XmppPacketToObject extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage muleMessage, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage muleMessage, String outputEncoding)
     {
         Message xmppMessage = (Message) muleMessage.getPayload();
         copySubject(xmppMessage, muleMessage);

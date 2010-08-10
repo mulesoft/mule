@@ -12,10 +12,8 @@ package org.mule.transformer.simple;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transformer.AbstractMessageTransformer;
@@ -90,7 +88,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer imp
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String outputEncoding)
     {
         if (deleteProperties != null && deleteProperties.size() > 0)
         {

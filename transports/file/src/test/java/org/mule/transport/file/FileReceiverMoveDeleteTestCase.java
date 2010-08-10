@@ -10,14 +10,12 @@
 
 package org.mule.transport.file;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.model.seda.SedaService;
@@ -242,7 +240,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         }
 
         @Override
-        public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+        public Object transformMessage(MuleMessage message, String outputEncoding)
         {
             assertEquals(expectedPayload, message.getPayload().getClass());
 

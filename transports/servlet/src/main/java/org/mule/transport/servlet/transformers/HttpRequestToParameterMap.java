@@ -10,9 +10,7 @@
 
 package org.mule.transport.servlet.transformers;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.servlet.ServletConnector;
@@ -32,7 +30,7 @@ public class HttpRequestToParameterMap extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String outputEncoding)
     {
         return message.getOutboundProperty(ServletConnector.PARAMETER_MAP_PROPERTY_KEY);
     }

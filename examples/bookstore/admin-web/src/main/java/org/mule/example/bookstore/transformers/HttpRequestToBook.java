@@ -10,9 +10,8 @@
 
 package org.mule.example.bookstore.transformers;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.example.bookstore.Book;
 import org.mule.example.bookstore.BookstoreAdminMessages;
 import org.mule.transformer.AbstractMessageTransformer;
@@ -34,7 +33,7 @@ public class HttpRequestToBook extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         String author = message.getOutboundProperty("author");
         String title = message.getOutboundProperty("title");
@@ -42,15 +41,15 @@ public class HttpRequestToBook extends AbstractMessageTransformer
 
         if (StringUtils.isBlank(author))
         {
-            throw new TransformerMessagingException(BookstoreAdminMessages.missingAuthor(), event, this);
+            throw new TransformerException(BookstoreAdminMessages.missingAuthor(), this);
         }
         if (StringUtils.isBlank(title))
         {
-            throw new TransformerMessagingException(BookstoreAdminMessages.missingTitle(), event, this);
+            throw new TransformerException(BookstoreAdminMessages.missingTitle(), this);
         }
         if (StringUtils.isBlank(price))
         {
-            throw new TransformerMessagingException(BookstoreAdminMessages.missingPrice(), event, this);
+            throw new TransformerException(BookstoreAdminMessages.missingPrice(), this);
         }
 
         return new Book(author, title, Double.parseDouble(price));

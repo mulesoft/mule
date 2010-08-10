@@ -12,8 +12,7 @@
 package org.mule.transport.${ModuleNameLower}.transformers;
 
 import org.mule.transformer.AbstractMessageTransformer;
-import org.mule.api.transformer.TransformerMessagingException;
-import org.mule.api.MuleEvent;
+import org.mule.api.transformer.TransformerException;
 import org.mule.api.MuleMessage;
 
 /**
@@ -43,7 +42,7 @@ public class ${outboundTransformer} extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         // TODO Transformer the message here. See comments in {@link AbstractMessageAwareTransformer}
 

@@ -10,9 +10,8 @@
 
 package org.mule.module.scripting.transformer;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.module.scripting.component.Scriptable;
 import org.mule.transformer.AbstractMessageTransformer;
 
@@ -27,7 +26,7 @@ public class ScriptTransformer extends AbstractMessageTransformer
     private Scriptable script;
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         Bindings bindings = script.getScriptEngine().createBindings();
         script.populateBindings(bindings, message);
@@ -37,7 +36,7 @@ public class ScriptTransformer extends AbstractMessageTransformer
         }
         catch (ScriptException e)
         {
-            throw new TransformerMessagingException(event, this, e);
+            throw new TransformerException(this, e);
         }
     }
 

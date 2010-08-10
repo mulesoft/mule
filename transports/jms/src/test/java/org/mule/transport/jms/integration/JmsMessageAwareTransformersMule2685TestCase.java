@@ -12,9 +12,7 @@ package org.mule.transport.jms.integration;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transport.jms.transformers.AbstractJmsTransformer;
@@ -96,7 +94,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
         }
 
         @Override
-        public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+        public Object transformMessage(MuleMessage message, String outputEncoding)
         {
 
             String recipients = "vm://recipient1, vm://recipient1, vm://recipient3";

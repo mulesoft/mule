@@ -77,6 +77,16 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
         }
         catch (TransformerMessagingException e)
         {
+            // Try to avoid double-wrapping
+            Throwable cause = e.getCause();
+            if (cause instanceof TransformerException)
+            {
+                TransformerException te = (TransformerException) cause;
+                if (te.getTransformer() == this)
+                {
+                    throw te;
+                }
+            }
             throw new TransformerException(e.getI18nMessage(), this, e);
         }
     }
@@ -146,7 +156,17 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
                 throw new IllegalStateException("Transform payload does not match current event");
             }
         }
-        Object result = transformMessage(message, enc, event);
+
+        Object result;
+        try
+        {
+            result = transformMessage(message, enc);
+        }
+        catch (TransformerException e)
+        {
+            throw new TransformerMessagingException(e.getI18nMessage(), event, this, e);
+        }
+
         if (result == null)
         {
             result = NullPayload.getInstance();
@@ -235,9 +255,8 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
      * Transform the message
      * @param message
      * @param outputEncoding
-     * @param event
      * @return
      * @throws TransformerMessagingException
      */
-    public abstract Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException;
+    public abstract Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException;
 }

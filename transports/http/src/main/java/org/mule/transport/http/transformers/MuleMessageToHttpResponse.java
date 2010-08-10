@@ -10,12 +10,10 @@
 
 package org.mule.transport.http.transformers;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.MuleManifest;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
@@ -67,7 +65,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage msg, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage msg, String outputEncoding) throws TransformerException
     {
         Object src = msg.getPayload();
 
@@ -161,7 +159,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerMessagingException(event, this, e);
+            throw new TransformerException(this, e);
         }
 
     }

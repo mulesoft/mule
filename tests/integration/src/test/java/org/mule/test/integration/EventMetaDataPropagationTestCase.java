@@ -20,11 +20,10 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.service.Service;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.session.DefaultMuleSession;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transformer.AbstractMessageAwareTransformer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,24 +93,28 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
             else
             {
                 MuleMessage msg = context.getMessage();
-                assertEquals("param1", msg.getOutboundProperty("stringParam"));
-                final Object o = msg.getOutboundProperty("objectParam");
+                assertEquals("param1", msg.getInboundProperty("stringParam"));
+                final Object o = msg.getInboundProperty("objectParam");
                 assertTrue(o instanceof Apple);
-                assertEquals(12345.6, 12345.6, msg.<Double>getOutboundProperty("doubleParam", 0d));
-                assertEquals(12345, msg.<Integer>getOutboundProperty("integerParam", 0).intValue());
-                assertEquals(123456789, msg.<Long>getOutboundProperty("longParam", 0L).longValue());
-                assertEquals(Boolean.TRUE, msg.getOutboundProperty("booleanParam", Boolean.FALSE));
+                assertEquals(12345.6, 12345.6, msg.<Double>getInboundProperty("doubleParam", 0d));
+                assertEquals(12345, msg.<Integer>getInboundProperty("integerParam", 0).intValue());
+                assertEquals(123456789, msg.<Long>getInboundProperty("longParam", 0L).longValue());
+                assertEquals(Boolean.TRUE, msg.getInboundProperty("booleanParam", Boolean.FALSE));
                 assertNotNull(msg.getAttachment("test1"));
             }
             return null;
         }
     }
 
-    public static class DummyTransformer extends AbstractMessageTransformer
+    /**
+     * Extend AbstractMessageAwareTransformer, even though it's deprecated, to ensure that it
+     * keeps working for compatibility with older user-written transformers.
+     */
+    public static class DummyTransformer extends AbstractMessageAwareTransformer
     {
 
         @Override
-        public Object transformMessage(MuleMessage msg, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+        public Object transform(MuleMessage msg, String outputEncoding)
         {
             assertEquals("param1", msg.getOutboundProperty("stringParam"));
             final Object o = msg.getOutboundProperty("objectParam");

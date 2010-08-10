@@ -15,7 +15,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
@@ -124,7 +123,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage msg, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage msg, String outputEncoding) throws TransformerException
     {
         Object src = msg.getPayload();
 
@@ -135,9 +134,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         }
         if (endpointString == null)
         {
-            throw new TransformerMessagingException(
+            throw new TransformerException(
                     HttpMessages.eventPropertyNotSetCannotProcessRequest(
-                            MuleProperties.MULE_ENDPOINT_PROPERTY), event, this);
+                            MuleProperties.MULE_ENDPOINT_PROPERTY), this);
         }
 
         String method = msg.getInvocationProperty(HttpConnector.HTTP_METHOD_PROPERTY);
@@ -282,7 +281,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerMessagingException(event, this, e);
+            throw new TransformerException(this, e);
         }
     }
 

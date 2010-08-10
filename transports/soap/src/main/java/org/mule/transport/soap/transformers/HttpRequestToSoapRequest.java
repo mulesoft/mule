@@ -10,10 +10,9 @@
 
 package org.mule.transport.soap.transformers;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
@@ -49,7 +48,7 @@ public class HttpRequestToSoapRequest extends AbstractMessageTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         Object src = message.getPayload();
 
@@ -71,7 +70,7 @@ public class HttpRequestToSoapRequest extends AbstractMessageTransformer
             }
             catch (IOException e)
             {
-                throw new TransformerMessagingException(event, this, e);
+                throw new TransformerException(this, e);
             }
             
             src = bos.toByteArray();
@@ -85,7 +84,7 @@ public class HttpRequestToSoapRequest extends AbstractMessageTransformer
             }
             catch (UnsupportedEncodingException e)
             {
-                throw new TransformerMessagingException(event, this, e);
+                throw new TransformerException(this, e);
             }
             // Data is already Xml
             if (data.startsWith("<") || data.startsWith("&lt;"))
@@ -104,8 +103,8 @@ public class HttpRequestToSoapRequest extends AbstractMessageTransformer
         String method = (String)p.remove(MuleProperties.MULE_METHOD_PROPERTY);
         if (method == null)
         {
-            throw new TransformerMessagingException(
-                CoreMessages.propertiesNotSet(MuleProperties.MULE_METHOD_PROPERTY), event, this);
+            throw new TransformerException(
+                CoreMessages.propertiesNotSet(MuleProperties.MULE_METHOD_PROPERTY), this);
         }
 
         if (httpMethod.equals("POST"))

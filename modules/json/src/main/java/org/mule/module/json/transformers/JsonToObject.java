@@ -9,11 +9,9 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.json.JsonData;
 import org.mule.transformer.types.DataTypeFactory;
@@ -74,7 +72,7 @@ public class JsonToObject extends AbstractJsonTransformer
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String outputEncoding, MuleEvent event) throws TransformerMessagingException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         Object src = message.getPayload();
         Object returnValue;
@@ -135,7 +133,7 @@ public class JsonToObject extends AbstractJsonTransformer
         }
         catch (Exception e)
         {
-            throw new TransformerMessagingException(CoreMessages.transformFailed("json", getReturnClass().getName()), event, this, e);
+            throw new TransformerException(CoreMessages.transformFailed("json", getReturnClass().getName()), this, e);
         }
         finally
         {
