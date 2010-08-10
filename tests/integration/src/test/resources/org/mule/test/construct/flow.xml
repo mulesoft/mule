@@ -203,29 +203,27 @@
             <vm:outbound-endpoint path="multicaster-out3" exchange-pattern="one-way" />
         </recipient-list>    
     </flow>
-    
+
     <model>
         <service name="service">
             <inbound>
-                <vm:inbound-endpoint path="service-in"/>
+                <vm:inbound-endpoint path="service-in" />
             </inbound>
-            <vm:outbound-endpoint path="service-out"/>
+            <vm:outbound-endpoint path="service-out" />
         </service>
-    </model>
-    
-        <model>
+        
         <service name="service2">
-            <vm:inbound-endpoint path="service2-in"/>
-            <vm:outbound-endpoint path="service2-out"/>
+            <vm:inbound-endpoint path="service2-in" />
+            <vm:outbound-endpoint path="service2-out" />
         </service>
 
-    <service name="service3">
-        <vm:inbound-endpoint path="service3-in" />
-        <multicasting-router>
-            <vm:outbound-endpoint path="service3-out1" />
-            <vm:outbound-endpoint path="service3-out2" />
-            <vm:outbound-endpoint path="service3-out3" />
-        </multicasting-router>
+        <service name="service3">
+            <vm:inbound-endpoint path="service3-in" />
+            <multicasting-router>
+                <vm:outbound-endpoint path="service3-out1" />
+                <vm:outbound-endpoint path="service3-out2" />
+                <vm:outbound-endpoint path="service3-out3" />
+            </multicasting-router>
         </service>
     </model>
 

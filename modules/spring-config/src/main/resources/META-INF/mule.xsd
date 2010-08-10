@@ -4186,7 +4186,7 @@
 
     <xsd:complexType name="idempotentReceiverType">
         <xsd:complexContent>
-            <xsd:extension base="filteredInboundRouterType">
+            <xsd:extension base="abstractInboundRouterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-object-store" maxOccurs="1" minOccurs="0"/>
                 </xsd:sequence>
@@ -4203,7 +4203,7 @@
 
     <xsd:complexType name="idempotentSecureHashReceiverType">
         <xsd:complexContent>
-            <xsd:extension base="filteredInboundRouterType">
+            <xsd:extension base="abstractInboundRouterType">
                 <xsd:sequence>
                     <xsd:element ref="abstract-object-store" maxOccurs="1" minOccurs="0"/>
                 </xsd:sequence>
@@ -4235,7 +4235,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="forwarding-router" type="selectiveConsumerRouterType"
+    <xsd:element name="forwarding-router" type="abstractInboundRouterType"
                  substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
@@ -4244,7 +4244,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="selective-consumer-router" type="selectiveConsumerRouterType"
+    <xsd:element name="selective-consumer-router" type="filteredInboundRouterType"
                  substitutionGroup="abstract-inbound-router">
         <xsd:annotation>
             <xsd:documentation>
@@ -4261,16 +4261,6 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-
-    <xsd:complexType name="selectiveConsumerRouterType">
-        <xsd:complexContent>
-            <xsd:extension base="filteredInboundRouterType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-transformer" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:element name="message-chunking-aggregator-router" type="messageChunkingAggregatorRouterType"
                  substitutionGroup="abstract-inbound-router">
@@ -4338,7 +4328,7 @@
 
     <xsd:complexType name="customInboundRouterType">
         <xsd:complexContent>
-            <xsd:extension base="filteredInboundRouterType">
+            <xsd:extension base="abstractInboundRouterType">
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
@@ -4361,7 +4351,7 @@
 
     <xsd:complexType name="baseAggregatorRouterType">
         <xsd:complexContent>
-            <xsd:extension base="filteredInboundRouterType">
+            <xsd:extension base="abstractInboundRouterType">
                 <xsd:attribute name="timeout" type="substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
