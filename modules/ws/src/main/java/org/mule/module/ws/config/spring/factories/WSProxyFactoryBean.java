@@ -10,16 +10,17 @@
 
 package org.mule.module.ws.config.spring.factories;
 
-import java.io.File;
-import java.net.URI;
-
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.factories.AbstractFlowConstructFactoryBean;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
 import org.mule.module.ws.construct.WSProxy;
 import org.mule.module.ws.construct.builder.WSProxyBuilder;
+
+import java.io.File;
+import java.net.URI;
 
 public class WSProxyFactoryBean extends AbstractFlowConstructFactoryBean
 {
@@ -39,6 +40,11 @@ public class WSProxyFactoryBean extends AbstractFlowConstructFactoryBean
     public void setEndpoint(OutboundEndpoint endpoint)
     {
         wsProxyBuilder.outboundEndpoint(endpoint);
+    }
+    
+    public void setMessageProcessor(MessageProcessor processor)
+    {
+        wsProxyBuilder.outboundEndpoint((OutboundEndpoint) processor);
     }
 
     public void setInboundAddress(String inboundAddress)

@@ -13,6 +13,7 @@ package org.mule.config.spring.factories;
 import org.mule.MessageExchangePattern;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.Transformer;
 import org.mule.construct.Bridge;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
@@ -36,6 +37,11 @@ public class BridgeFactoryBean extends AbstractFlowConstructFactoryBean
     public void setEndpoint(OutboundEndpoint endpoint)
     {
         bridgeBuilder.outboundEndpoint(endpoint);
+    }
+    
+    public void setMessageProcessor(MessageProcessor processor)
+    {
+        bridgeBuilder.outboundEndpoint((OutboundEndpoint) processor);
     }
 
     public void setInboundAddress(String inboundAddress)
