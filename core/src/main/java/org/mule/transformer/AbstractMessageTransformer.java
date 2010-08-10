@@ -182,47 +182,6 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     }
 
     /**
-     * Call the specified transformer to transform  message
-     * @param transformer
-     * @param src
-     * @param event
-     * @return
-     * @throws TransformerMessagingException
-     */
-    public final Object callTransformer(Transformer transformer, Object src, MuleEvent event) throws TransformerMessagingException
-    {
-        return callTransformer(transformer, src, getEncoding(src), event);
-    }
-
-    /**
-     * Call the specified transformer to transform  message
-     * @param transformer
-     * @param src
-     * @param enc
-     * @param event
-     * @return
-     * @throws TransformerMessagingException
-     */
-    public Object callTransformer(Transformer transformer, Object src, String enc, MuleEvent event) throws TransformerMessagingException
-    {
-        if (transformer instanceof MessageTransformer)
-        {
-            return ((MessageTransformer)transformer).transform(src, enc, event);
-        }
-        else
-        {
-            try
-            {
-                return transformer.transform(src, enc);
-            }
-            catch (TransformerException e)
-            {
-                throw new TransformerMessagingException(e.getI18nMessage(), event, this, e);
-            }
-        }
-    }
-
-    /**
      * Check if the return class is supported by this transformer
      * @param object
      * @param event
