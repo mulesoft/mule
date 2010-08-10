@@ -78,7 +78,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         List<MatchableMessageProcessor> list = new ArrayList<MatchableMessageProcessor>();
         list.add(router1);
         list.add(router2);
-        messageRouter.setRoutes(list);
+        messageRouter.setMessageProcessors(list);
 
         MuleEvent event = getTestInboundEvent("test event", (MuleSession) session.proxy());
 

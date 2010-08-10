@@ -169,14 +169,14 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
         }
     }
 
-    public void setRoutes(List<MatchableMessageProcessor> routers)
+    public void setMessageProcessors(List<MatchableMessageProcessor> routers)
     {
         for (MatchableMessageProcessor router : routers)
         {
             addRoute(router);
         }
     }
-
+    
     public void addRoute(MatchableMessageProcessor router)
     {
         if (router instanceof RouterStatisticsRecorder)

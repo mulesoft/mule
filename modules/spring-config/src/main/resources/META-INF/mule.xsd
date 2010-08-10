@@ -1177,13 +1177,18 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element name="outbound" type="outboundCollectionType" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>
-                                The elements within 'outbound' describe how a service sends or dispatches messages.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
+                    <xsd:choice minOccurs="0">
+                        <xsd:element name="outbound" type="outboundCollectionType">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    The elements within 'outbound' describe how a service sends or dispatches messages.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element ref="abstract-outbound-endpoint"/>
+                        <xsd:element ref="abstract-outbound-router"/>
+                        <xsd:element ref="abstract-routing-message-processor"/>
+                    </xsd:choice>
                     <xsd:element name="async-reply" type="asyncReplyCollectionType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>

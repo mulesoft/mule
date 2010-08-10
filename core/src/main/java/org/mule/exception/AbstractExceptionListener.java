@@ -75,7 +75,7 @@ public abstract class AbstractExceptionListener
     protected transient Log logger = LogFactory.getLog(getClass());
 
     @SuppressWarnings("unchecked")
-    protected List<OutboundEndpoint> endpoints = new CopyOnWriteArrayList();
+    protected List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList();
 
     protected AtomicBoolean initialised = new AtomicBoolean(false);
 
@@ -91,17 +91,17 @@ public abstract class AbstractExceptionListener
         this.muleContext = context;
     }
 
-    public List<OutboundEndpoint> getEndpoints()
+    public List<MessageProcessor> getMessageProcessors()
     {
-        return endpoints;
+        return messageProcessors;
     }
 
-    public void setEndpoints(List<OutboundEndpoint> endpoints)
+    public void setMessageProcessors(List<OutboundEndpoint> processors)
     {
-        if (endpoints != null)
+        if (processors != null)
         {
-            this.endpoints.clear();
-            this.endpoints.addAll(endpoints);
+            this.messageProcessors.clear();
+            this.messageProcessors.addAll(processors);
         }
         else
         {
@@ -109,17 +109,17 @@ public abstract class AbstractExceptionListener
         }
     }
 
-    public void addEndpoint(OutboundEndpoint endpoint)
+    public void addEndpoint(MessageProcessor processor)
     {
-        if (endpoint != null)
+        if (processor != null)
         {
-            endpoints.add(endpoint);
+            messageProcessors.add(processor);
         }
     }
 
-    public boolean removeEndpoint(OutboundEndpoint endpoint)
+    public boolean removeMessageProcessor(MessageProcessor processor)
     {
-        return endpoints.remove(endpoint);
+        return messageProcessors.remove(processor);
     }
 
     public void exceptionThrown(Exception e)
@@ -271,7 +271,7 @@ public abstract class AbstractExceptionListener
      */
     protected void routeException(MuleMessage message, MessageProcessor target, Throwable t)
     {
-        List endpoints = getEndpoints(t);
+        List endpoints = getMessageProcessors(t);
         if (CollectionUtils.isNotEmpty(endpoints))
         {
             try
@@ -347,9 +347,9 @@ public abstract class AbstractExceptionListener
         // This is required because we don't always have the service available which
         // is required to use an outbound route. This approach doesn't
         // support everything but rather is an intermediate improvement.
-        for (int i = 0; i < endpoints.size(); i++)
+        for (int i = 0; i < messageProcessors.size(); i++)
         {
-            OutboundEndpoint endpoint = endpoints.get(i);
+            MessageProcessor processor = messageProcessors.get(i);
             if (((DefaultMuleMessage) exceptionMessage).isConsumable())
             {
                 throw new MessagingException(
@@ -359,15 +359,24 @@ public abstract class AbstractExceptionListener
 
             MuleMessage clonedMessage = new DefaultMuleMessage(exceptionMessage.getPayload(),
                 exceptionMessage, muleContext);
-            MuleEvent exceptionEvent = new DefaultMuleEvent(clonedMessage, endpoint, 
-                new DefaultMuleSession(muleContext));
+            MuleEvent exceptionEvent = null;
+            if (processor instanceof OutboundEndpoint)
+            {
+                exceptionEvent = new DefaultMuleEvent(clonedMessage, (OutboundEndpoint) processor,
+                    new DefaultMuleSession(muleContext));
+            }
+            else
+            {
+                exceptionEvent = new DefaultMuleEvent(clonedMessage, RequestContext.getEvent().getEndpoint(),
+                    new DefaultMuleSession(muleContext));
+            }
             exceptionEvent = RequestContext.setEvent(exceptionEvent);
 
-            endpoint.process(exceptionEvent);
+            processor.process(exceptionEvent);
 
             if (logger.isDebugEnabled())
             {
-                logger.debug("routed Exception message via " + endpoint);
+                logger.debug("routed Exception message via " + processor);
             }
         }
     }
@@ -390,7 +399,7 @@ public abstract class AbstractExceptionListener
                 // now anyway.
             }
         };
-        router.setRoutes(new ArrayList<MessageProcessor>(getEndpoints()));
+        router.setRoutes(new ArrayList<MessageProcessor>(getMessageProcessors()));
         router.setMuleContext(muleContext);
         return router;
     }
@@ -419,11 +428,11 @@ public abstract class AbstractExceptionListener
      * @return The endpoint used to dispatch an exception message on or null if there
      *         are no targets registered
      */
-    protected List<OutboundEndpoint> getEndpoints(Throwable t)
+    protected List<MessageProcessor> getMessageProcessors(Throwable t)
     {
-        if (!endpoints.isEmpty())
+        if (!messageProcessors.isEmpty())
         {
-            return endpoints;
+            return messageProcessors;
         }
         else
         {

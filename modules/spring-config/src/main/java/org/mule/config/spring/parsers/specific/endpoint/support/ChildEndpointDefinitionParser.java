@@ -21,14 +21,14 @@ import org.w3c.dom.Element;
 /**
  * A parser for "embedded" endpoints - ie inbound, outbound and response endpoints.
  * Because we have automatic String -> MuleEnpointURI conversion via property editors
- * this can be used in a variety of ways.  It should work directly with a simple String
- * address attribute or, in combination with a child element (handled by
- * {@link ChildAddressDefinitionParser},
- * or embedded in
- * {@link AddressedEndpointDefinitionParser}
- * for a more compact single-element approach.
- *
- * <p>This class does support references to other endpoints.</p>
+ * this can be used in a variety of ways. It should work directly with a simple
+ * String address attribute or, in combination with a child element (handled by
+ * {@link ChildAddressDefinitionParser}, or embedded in
+ * {@link AddressedEndpointDefinitionParser} for a more compact single-element
+ * approach.
+ * <p>
+ * This class does support references to other endpoints.
+ * </p>
  * TODO - check that references are global!
  */
 public class ChildEndpointDefinitionParser extends ChildDefinitionParser
@@ -36,7 +36,7 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
 
     public ChildEndpointDefinitionParser(Class endpoint)
     {
-        super("endpoint", endpoint);
+        super("messageProcessor", endpoint);
         addIgnored(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF);
         EndpointUtils.addProperties(this);
         EndpointUtils.addPostProcess(this);
@@ -63,14 +63,13 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
         {
             return "messageSource";
         }
-        else if ("composite-processor".equals(parent) || "flow".equals(parent) || "async".equals(parent)
-                 || "transactional".equals(parent) || "when".equals(parent) || "otherwise".equals(parent))
-        {
-            return "messageProcessor";
-        }
         else if ("wire-tap".equals(parent) || "wire-tap-router".equals(parent))
         {
             return "tap";
+        }
+        else if ("forwarding-catch-all-strategy".equals(parent) || "binding".equals(parent))
+        {
+            return "endpoint";
         }
         else
         {
@@ -83,7 +82,8 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
     {
         if (null != element.getAttributeNode(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF))
         {
-            return AutoIdUtils.uniqueValue("ref:" + element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF));
+            return AutoIdUtils.uniqueValue("ref:"
+                                           + element.getAttribute(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF));
         }
         else
         {

@@ -15,6 +15,7 @@ import org.mule.api.component.InterfaceBinding;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouter;
@@ -109,8 +110,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(muleContext.getRegistry().lookupModel("main").getExceptionListener());
         assertNotNull(service.getExceptionListener());
 
-        assertTrue(((AbstractExceptionListener) service.getExceptionListener()).getEndpoints().size() > 0);
-        ImmutableEndpoint ep = ((AbstractExceptionListener) service.getExceptionListener()).getEndpoints().get(0);
+        assertTrue(((AbstractExceptionListener) service.getExceptionListener()).getMessageProcessors().size() > 0);
+        OutboundEndpoint ep = (OutboundEndpoint) ((AbstractExceptionListener) service.getExceptionListener()).getMessageProcessors().get(0);
 
         assertEquals("test://orange.exceptions", ep.getEndpointURI().toString());
     }
@@ -139,8 +140,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         }
         assertTrue(model.getExceptionListener() instanceof TestExceptionStrategy);
 
-        assertTrue(((AbstractExceptionListener) model.getExceptionListener()).getEndpoints().size() > 0);
-        ImmutableEndpoint ep = ((AbstractExceptionListener) model.getExceptionListener()).getEndpoints().get(0);
+        assertTrue(((AbstractExceptionListener) model.getExceptionListener()).getMessageProcessors().size() > 0);
+        OutboundEndpoint ep = (OutboundEndpoint) ((AbstractExceptionListener) model.getExceptionListener()).getMessageProcessors().get(0);
 
         assertEquals("test://component.exceptions", ep.getEndpointURI().toString());
 

@@ -90,6 +90,6 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         assertTrue(service.getExceptionListener() instanceof DefaultServiceExceptionStrategy);
         DefaultServiceExceptionStrategy exceptionListener = 
             (DefaultServiceExceptionStrategy) service.getExceptionListener();
-        assertEquals(numberOfEndpoints, exceptionListener.getEndpoints().size());
+        assertEquals(numberOfEndpoints, exceptionListener.getMessageProcessors().size());
     }
 }

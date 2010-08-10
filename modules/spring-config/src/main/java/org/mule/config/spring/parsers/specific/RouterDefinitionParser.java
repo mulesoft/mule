@@ -18,7 +18,7 @@ import org.mule.routing.AbstractAggregator;
 public class RouterDefinitionParser extends ChildDefinitionParser
 {
 
-    public static final String ROUTER = "route";
+    public static final String ROUTER = "messageProcessor";
 
     public RouterDefinitionParser(Class clazz)
     {

@@ -276,7 +276,7 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
     /*
      * For spring access
      */
-    public void setEndpoints(List<MessageProcessor> routes)
+    public void setMessageProcessors(List<MessageProcessor> routes)
     {
         setRoutes(routes);
     }
