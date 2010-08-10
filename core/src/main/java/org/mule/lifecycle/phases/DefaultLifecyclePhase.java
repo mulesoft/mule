@@ -7,16 +7,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.lifecycle.phases;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecyclePhase;
-import org.mule.api.lifecycle.LifecycleStateEnabled;
-import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.lifecycle.LifecycleObject;
+package org.mule.lifecycle.phases;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -28,30 +20,42 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.lifecycle.LifecyclePhase;
+import org.mule.api.lifecycle.LifecycleStateEnabled;
+import org.mule.config.ExceptionHelper;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.lifecycle.LifecycleObject;
 
 /**
- * Represents a configurable lifecycle phase. This is a default implementation of a 'generic phase' in that is
- * can be configured to represnt any phase. Instances of this phase can then be registered with a
- * {@link org.mule.api.lifecycle.LifecycleManager} and by used to enforce a lifecycle phase on an object.
- * Usually, Lifecycle phases have a fixed configuration in which case a specialisation of this class should be
- * created that initialises its configuration internally.
- *
- * <p>Note that this class and {@link org.mule.api.lifecycle.LifecycleTransitionResult} both make assumptions about
- * the interfaces used - the return values and exceptions.  These are, currently, that the return value is either
- * void or {@link org.mule.api.lifecycle.LifecycleTransitionResult} and either 0 or 1 exceptions can be
- * thrown which are either {@link InstantiationException} or {@link org.mule.api.lifecycle.LifecycleException}.
- *
+ * Represents a configurable lifecycle phase. This is a default implementation of a
+ * 'generic phase' in that is can be configured to represnt any phase. Instances of
+ * this phase can then be registered with a
+ * {@link org.mule.api.lifecycle.LifecycleManager} and by used to enforce a lifecycle
+ * phase on an object. Usually, Lifecycle phases have a fixed configuration in which
+ * case a specialisation of this class should be created that initialises its
+ * configuration internally.
+ * <p>
+ * Note that this class and {@link org.mule.api.lifecycle.LifecycleTransitionResult}
+ * both make assumptions about the interfaces used - the return values and
+ * exceptions. These are, currently, that the return value is either void or
+ * {@link org.mule.api.lifecycle.LifecycleTransitionResult} and either 0 or 1
+ * exceptions can be thrown which are either {@link InstantiationException} or
+ * {@link org.mule.api.lifecycle.LifecycleException}.
+ * 
  * @see org.mule.api.lifecycle.LifecyclePhase
  */
 public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
 {
     protected transient final Log logger = LogFactory.getLog(DefaultLifecyclePhase.class);
     private Class<?> lifecycleClass;
-    private Method lifecycleMethod;
+    private final Method lifecycleMethod;
     private Set<LifecycleObject> orderedLifecycleObjects = new LinkedHashSet<LifecycleObject>(6);
     private Class<?>[] ignorredObjectTypes;
-    private String name;
-    private String oppositeLifecyclePhase;
+    private final String name;
+    private final String oppositeLifecyclePhase;
     private Set<String> supportedPhases;
     private MuleContext muleContext;
 
@@ -59,7 +63,7 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
     {
         this.name = name;
         this.lifecycleClass = lifecycleClass;
-        //DefaultLifecyclePhase interface only has one method
+        // DefaultLifecyclePhase interface only has one method
         lifecycleMethod = lifecycleClass.getMethods()[0];
         this.oppositeLifecyclePhase = oppositeLifecyclePhase;
     }
@@ -70,10 +74,9 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
     }
 
     /**
-     * Subclasses can override this method to order <code>objects</code> before
-     * the lifecycle method is applied to them.
-     * 
-     * This method does not apply any special ordering to <code>objects</code>.
+     * Subclasses can override this method to order <code>objects</code> before the
+     * lifecycle method is applied to them. This method does not apply any special
+     * ordering to <code>objects</code>.
      * 
      * @param objects
      * @param lo
@@ -201,32 +204,37 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
         {
             return;
         }
-        if(o instanceof LifecycleStateEnabled)
+        if (o instanceof LifecycleStateEnabled)
         {
-            //If an object has its own lifecycle manager "LifecycleStateEnabled" it is possible that
-            //its state can be controlled outside the registry i.e. via JMX, double check here that we are
-            //not calling the same lifecycle twice
-            if(((LifecycleStateEnabled)o).getLifecycleState().isPhaseComplete(this.getName()))
+            // If an object has its own lifecycle manager "LifecycleStateEnabled" it
+            // is possible that
+            // its state can be controlled outside the registry i.e. via JMX, double
+            // check here that we are
+            // not calling the same lifecycle twice
+            if (((LifecycleStateEnabled) o).getLifecycleState().isPhaseComplete(this.getName()))
             {
                 return;
             }
-            else if(!((LifecycleStateEnabled)o).getLifecycleState().isValidTransition(this.getName()))
+            else if (!((LifecycleStateEnabled) o).getLifecycleState().isValidTransition(this.getName()))
             {
-                return;   
+                return;
             }
         }
         try
         {
             lifecycleMethod.invoke(o);
         }
-        catch (Exception e)
+        catch (final Exception e)
         {
-            e = ExceptionHelper.unwrap(e);
-            if(e instanceof LifecycleException)
+            Throwable t = ExceptionHelper.unwrap(e);
+
+            if (t instanceof LifecycleException)
             {
-                throw (LifecycleException)e;
+                throw (LifecycleException) t;
             }
-            throw new LifecycleException(CoreMessages.failedToInvokeLifecycle(lifecycleMethod.getName(), o), e, this);
+
+            throw new LifecycleException(CoreMessages.failedToInvokeLifecycle(lifecycleMethod.getName(), o),
+                t, this);
         }
     }
 
@@ -235,7 +243,3 @@ public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
         return oppositeLifecyclePhase;
     }
 }
-
-
-
-
