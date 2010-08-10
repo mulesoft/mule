@@ -12,7 +12,6 @@ package org.mule;
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.InitialisationException;
 
 import java.util.Collections;
 import java.util.List;
