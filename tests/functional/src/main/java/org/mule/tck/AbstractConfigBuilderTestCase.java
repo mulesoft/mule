@@ -141,8 +141,8 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         // test outbound message router
         Service service = muleContext.getRegistry().lookupService("appleComponent");
-        assertNotNull(service.getOutboundRouter());
-        OutboundRouterCollection router = service.getOutboundRouter();
+        assertNotNull(service.getOutboundMessageProcessor());
+        OutboundRouterCollection router = (OutboundRouterCollection) service.getOutboundMessageProcessor();
         assertNotNull(router.getCatchAllStrategy());
         assertEquals(2, router.getRoutes().size());
         // check first Router
@@ -184,7 +184,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         Service service = muleContext.getRegistry().lookupService("appleComponent");
         assertNotNull(service.getMessageSource());
-        ServiceCompositeMessageSource messageRouter = service.getMessageSource();
+        ServiceCompositeMessageSource messageRouter = (ServiceCompositeMessageSource) service.getMessageSource();
         assertNotNull(messageRouter.getCatchAllStrategy());
         assertEquals(2, messageRouter.getMessageProcessors().size());
         MessageProcessor router = messageRouter.getMessageProcessors().get(0);
@@ -310,7 +310,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         // test transaction config
         Service service = muleContext.getRegistry().lookupService("appleComponent2");
-        InboundEndpoint inEndpoint = service.getMessageSource().getEndpoint(
+        InboundEndpoint inEndpoint = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoint(
                 "transactedInboundEndpoint");
         assertNotNull(inEndpoint);
         assertNotNull(inEndpoint.getProperties());
@@ -321,15 +321,15 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         // test transaction config
         Service apple = muleContext.getRegistry().lookupService("appleComponent2");
-        InboundEndpoint inEndpoint = apple.getMessageSource().getEndpoint("transactedInboundEndpoint");
+        InboundEndpoint inEndpoint = ((ServiceCompositeMessageSource) apple.getMessageSource()).getEndpoint("transactedInboundEndpoint");
         assertNotNull(inEndpoint);
-        assertEquals(1, apple.getOutboundRouter().getRoutes().size());
+        assertEquals(1, ((OutboundRouterCollection) apple.getOutboundMessageProcessor()).getRoutes().size());
         assertNotNull(inEndpoint.getTransactionConfig());
         assertEquals(TransactionConfig.ACTION_ALWAYS_BEGIN, inEndpoint.getTransactionConfig().getAction());
         assertTrue(inEndpoint.getTransactionConfig().getFactory() instanceof TestTransactionFactory);
         assertNull(inEndpoint.getTransactionConfig().getConstraint());
 
-        OutboundRouter outRouter = (OutboundRouter) apple.getOutboundRouter().getRoutes().get(0);
+        OutboundRouter outRouter = (OutboundRouter) ((OutboundRouterCollection)apple.getOutboundMessageProcessor()).getRoutes().get(0);
         MessageProcessor outEndpoint = outRouter.getRoutes().get(0);
         assertNotNull(outEndpoint);
     }

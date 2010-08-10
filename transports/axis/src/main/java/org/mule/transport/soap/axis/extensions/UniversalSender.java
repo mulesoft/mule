@@ -284,7 +284,7 @@ public class UniversalSender extends BasicHandler
                 ep = (OutboundEndpoint) endpointsCache.get(endpoint.getAddress());
                 if (ep == null)
                 {
-                    updateEndpointCache(axis.getOutboundRouter());
+                    updateEndpointCache((OutboundRouterCollection) axis.getOutboundMessageProcessor());
                     ep = (OutboundEndpoint) endpointsCache.get(endpoint.getAddress());
                     if (ep == null)
                     {

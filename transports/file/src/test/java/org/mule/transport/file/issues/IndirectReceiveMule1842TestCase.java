@@ -13,6 +13,7 @@ package org.mule.transport.file.issues;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.file.AbstractFileFunctionalTestCase;
 
@@ -36,7 +37,7 @@ public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestC
         
         InboundEndpoint endpoint = 
             muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(url);
-        relay.getMessageSource().addSource(endpoint);
+        ((CompositeMessageSource) relay.getMessageSource()).addSource(endpoint);
         relay.stop();
         relay.start();
 

@@ -22,6 +22,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.service.Service;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.config.ExceptionHelper;
@@ -33,6 +34,7 @@ import org.mule.endpoint.SecurityFilterMessageProcessorBuilder;
 import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.routing.MessageFilter;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.service.TransportFactory;
 import org.mule.transport.servlet.ServletConnector;
@@ -326,7 +328,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
     {
         String endpointKey = getCounterEndpointKey(receiver.getEndpointURI());
 
-        for (Iterator iterator = axisComponent.getMessageSource().getEndpoints().iterator(); iterator.hasNext();)
+        for (Iterator iterator = ((ServiceCompositeMessageSource) axisComponent.getMessageSource()).getEndpoints().iterator(); iterator.hasNext();)
         {
             ImmutableEndpoint endpoint = (ImmutableEndpoint) iterator.next();
             if (endpointKey.startsWith(endpoint.getEndpointURI().getAddress()))
@@ -426,7 +428,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         receiver.setEndpoint(receiverEndpoint);
 
         
-        axisComponent.getMessageSource().addSource(serviceEndpoint);
+        ((CompositeMessageSource) axisComponent.getMessageSource()).addSource(serviceEndpoint);
     }
 
     private String getCounterEndpointKey(EndpointURI endpointURI)

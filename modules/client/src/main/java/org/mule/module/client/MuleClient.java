@@ -46,6 +46,7 @@ import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.module.client.i18n.ClientMessages;
 import org.mule.security.MuleCredentials;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.NullPayload;
@@ -795,8 +796,14 @@ public class MuleClient implements Disposable
     protected ImmutableEndpoint getDefaultClientEndpoint(Service service, Object payload, boolean sync)
         throws MuleException
     {
+        if (!(service.getMessageSource() instanceof ServiceCompositeMessageSource))
+        {
+            throw new IllegalStateException(
+                "Only 'CompositeMessageSource' is supported with MuleClient.sendDirect() and MuleClient.dispatchDirect()");
+        }
+    
         // as we are bypassing the message transport layer we need to check that
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getMessageSource().getEndpoints().get(0);
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
         if (endpoint != null)
         {
             if (endpoint.getTransformers() != null)

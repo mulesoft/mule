@@ -26,7 +26,7 @@ import org.mule.api.endpoint.EndpointNotFoundException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -493,13 +493,13 @@ public class DefaultMuleEventContext implements MuleEventContext
         }
         else
         {
-            OutboundRouterCollection router = ((Service) flowConstruct).getOutboundRouter();
-            if (router == null)
+            MessageProcessor processor = ((Service) flowConstruct).getOutboundMessageProcessor();
+            if (processor == null)
             {
                 throw new EndpointNotFoundException(
                     CoreMessages.noOutboundRouterSetOn(flowConstruct.getName()));
             }
-            router.process(new DefaultMuleEvent(message, RequestContext.getEvent()));
+            processor.process(new DefaultMuleEvent(message, RequestContext.getEvent()));
         }
     }
 

@@ -14,6 +14,7 @@ import org.mule.api.service.Service;
 import org.mule.routing.IdempotentMessageFilter;
 import org.mule.routing.IdempotentSecureHashMessageFilter;
 import org.mule.routing.MessageFilter;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.TextFileObjectStore;
@@ -70,7 +71,7 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
     {
         Service c = muleContext.getRegistry().lookupService(serviceName);
         assertNotNull(c);
-        List routers = c.getMessageSource().getMessageProcessors();
+        List routers = ((ServiceCompositeMessageSource) c.getMessageSource()).getMessageProcessors();
         assertEquals(1, routers.size());
         assertTrue(routers.get(0) instanceof MessageProcessor);
         return (MessageProcessor) routers.get(0);

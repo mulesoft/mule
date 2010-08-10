@@ -19,6 +19,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.service.Service;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.DeployableMuleXmlContextListener;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
@@ -286,7 +287,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
         String name = "JcaService#" + endpointFactory.hashCode();
         Service service = new JcaService(muleContext);
         service.setName(name);
-        service.getMessageSource().addSource(endpoint);
+        ((CompositeMessageSource) service.getMessageSource()).addSource(endpoint);
 
         // Set endpointFactory rather than endpoint here, so we can obtain a
         // new endpoint instance from factory for each incoming message in

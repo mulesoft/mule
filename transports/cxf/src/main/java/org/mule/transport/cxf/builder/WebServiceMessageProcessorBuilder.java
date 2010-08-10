@@ -11,6 +11,7 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.AbstractFlowConstruct;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.transport.cxf.CxfConstants;
 import org.mule.transport.cxf.i18n.CxfMessages;
 
@@ -120,17 +121,26 @@ public class WebServiceMessageProcessorBuilder
         {
             if (flowConstruct instanceof Service)
             {
-                List<InboundEndpoint> endpoints = muleService.getMessageSource().getEndpoints();
-                
-                if (endpoints.size() > 0)
+                MessageSource source = ((Service) flowConstruct).getMessageSource();
+
+                if (source instanceof InboundEndpoint)
                 {
-                    return endpoints.get(0).getEndpointURI().toString();
+                    return ((InboundEndpoint) source).getEndpointURI().toString();
+                }
+                else if (source instanceof ServiceCompositeMessageSource)
+                {
+                    List<InboundEndpoint> endpoints = ((ServiceCompositeMessageSource) muleService.getMessageSource()).getEndpoints();
+
+                    if (endpoints.size() > 0)
+                    {
+                        return endpoints.get(0).getEndpointURI().toString();
+                    }
                 }
             }
             else if (flowConstruct instanceof AbstractFlowConstruct)
             {
-                MessageSource source = ((AbstractFlowConstruct)flowConstruct).getMessageSource();
-                
+                MessageSource source = ((AbstractFlowConstruct) flowConstruct).getMessageSource();
+
                 if (source instanceof InboundEndpoint)
                 {
                     return ((InboundEndpoint) source).getEndpointURI().toString();

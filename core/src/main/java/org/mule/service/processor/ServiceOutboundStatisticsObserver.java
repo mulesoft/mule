@@ -11,6 +11,7 @@
 package org.mule.service.processor;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.processor.AbstractMessageObserver;
@@ -29,15 +30,19 @@ public class ServiceOutboundStatisticsObserver extends AbstractMessageObserver
     public void observe(MuleEvent event)
     {
         ServiceStatistics stats = service.getStatistics();
-        if (service.getOutboundRouter().hasEndpoints() && stats.isEnabled())
+        if (stats.isEnabled())
         {
-            if (event.getEndpoint().getExchangePattern().hasResponse())
+            if (!(service.getOutboundMessageProcessor() instanceof OutboundRouterCollection)
+                || (service.getOutboundMessageProcessor() instanceof OutboundRouterCollection && ((OutboundRouterCollection) service.getOutboundMessageProcessor()).hasEndpoints()))
             {
-                stats.incSentEventSync();
-            }
-            else
-            {
-                stats.incSentEventASync();
+                if (event.getEndpoint().getExchangePattern().hasResponse())
+                {
+                    stats.incSentEventSync();
+                }
+                else
+                {
+                    stats.incSentEventASync();
+                }
             }
         }
     }

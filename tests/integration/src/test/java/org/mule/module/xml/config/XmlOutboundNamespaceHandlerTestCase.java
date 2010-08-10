@@ -10,6 +10,7 @@
 
 package org.mule.module.xml.config;
 
+import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.module.xml.routing.XmlMessageSplitter;
 import org.mule.routing.CorrelationMode;
@@ -44,7 +45,7 @@ public class XmlOutboundNamespaceHandlerTestCase extends FunctionalTestCase
     protected Object getRouter(String name, Class clazz)
     {
         Service service = muleContext.getRegistry().lookupService(name);
-        List routers = service.getOutboundRouter().getRoutes();
+        List routers = ((OutboundRouterCollection) service.getOutboundMessageProcessor()).getRoutes();
         assertEquals(1, routers.size());
         assertTrue(routers.get(0).getClass().getName(), clazz.isAssignableFrom(routers.get(0).getClass()));
         return routers.get(0);

@@ -10,8 +10,6 @@
 
 package org.mule.test.construct;
 
-import java.util.List;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -25,6 +23,8 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
+
+import java.util.List;
 
 public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 {
@@ -289,8 +289,55 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertNotSame(result2, result3);
 
         assertEquals(TEST_MESSAGE, result1.getPayload());
+        assertEquals(TEST_MESSAGE, result2.getPayload());
+        assertEquals(TEST_MESSAGE, result3.getPayload());
+
+    }
+
+    public void testService() throws MuleException, Exception
+    {
+        muleContext.getClient().send("vm://service-in", new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+
+        MuleMessage result = muleContext.getClient().request("vm://service-out", RECEIVE_TIMEOUT);
+
+        assertNotNull(result);
+        assertEquals(TEST_MESSAGE, result.getPayload());
+
+    }
+    
+    public void testService2() throws MuleException, Exception
+    {
+        muleContext.getClient().send("vm://service2-in", new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+
+        MuleMessage result = muleContext.getClient().request("vm://service2-out", RECEIVE_TIMEOUT);
+
+        assertNotNull(result);
+        assertEquals(TEST_MESSAGE, result.getPayload());
+
+    }
+    
+    public void testService3() throws MuleException, Exception
+    {
+        muleContext.getClient().send("vm://service3-in",
+            new DefaultMuleMessage(TEST_MESSAGE, muleContext));
+
+        final MuleMessage result1 = muleContext.getClient().request("vm://service3-out1",
+            RECEIVE_TIMEOUT);
+        final MuleMessage result2 = muleContext.getClient().request("vm://service3-out2",
+            RECEIVE_TIMEOUT);
+        final MuleMessage result3 = muleContext.getClient().request("vm://service3-out3",
+            RECEIVE_TIMEOUT);
+
+        assertNotNull(result1);
+        assertNotNull(result2);
+        assertNotNull(result3);
+        assertNotSame(result1, result2);
+        assertNotSame(result1, result3);
+        assertNotSame(result2, result3);
+
         assertEquals(TEST_MESSAGE, result1.getPayload());
-        assertEquals(TEST_MESSAGE, result1.getPayload());
+        assertEquals(TEST_MESSAGE, result2.getPayload());
+        assertEquals(TEST_MESSAGE, result3.getPayload());
 
     }
 

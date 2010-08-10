@@ -12,6 +12,7 @@ package org.mule.module.atom;
 import org.mule.api.service.Service;
 import org.mule.module.atom.endpoint.AtomInboundEndpoint;
 import org.mule.module.atom.routing.InboundFeedSplitter;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.FunctionalTestCase;
 
 import java.text.SimpleDateFormat;
@@ -27,8 +28,8 @@ public class NamespaceTestCase extends FunctionalTestCase
     {
         Service service = muleContext.getRegistry().lookupService("test");
         assertNotNull(service);
-        assertTrue(service.getMessageSource().getEndpoints().get(0) instanceof AtomInboundEndpoint);
-        AtomInboundEndpoint ep = (AtomInboundEndpoint) service.getMessageSource().getEndpoints().get(0);
+        assertTrue(((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0) instanceof AtomInboundEndpoint);
+        AtomInboundEndpoint ep = (AtomInboundEndpoint) ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
         assertEquals(InboundFeedSplitter.class, ep.getMessageProcessors().get(0).getClass());
         assertNotNull(ep.getLastUpdate());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

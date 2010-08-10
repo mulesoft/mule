@@ -20,6 +20,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.service.Service;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.session.DefaultMuleSession;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
@@ -47,7 +48,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
         Service service = muleContext.getRegistry().lookupService("component1");
         MuleSession session = new DefaultMuleSession(service, muleContext);
         MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
-            (ImmutableEndpoint) service.getMessageSource().getEndpoints().get(0), session);
+            (ImmutableEndpoint) ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0), session);
         service.sendEvent(event);
     }
 

@@ -28,7 +28,9 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.PreInitProcessor;
 import org.mule.api.routing.OutboundRouter;
+import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.AnnotationsParserFactory;
 import org.mule.config.endpoint.AnnotatedEndpointHelper;
@@ -36,6 +38,7 @@ import org.mule.config.i18n.AnnotationsMessages;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.registry.RegistryMap;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.util.TemplateParser;
 import org.mule.util.annotation.AnnotationMetaData;
 import org.mule.util.annotation.AnnotationUtils;
@@ -148,7 +151,7 @@ public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, Mu
                 {
                     inboundEndpoint.getProperties().put(MuleProperties.MULE_METHOD_PROPERTY, annotation.getElementName());
                 }
-                service.getMessageSource().addSource(inboundEndpoint);
+                ((CompositeMessageSource) service.getMessageSource()).addSource(inboundEndpoint);
             }
         }
 
@@ -167,7 +170,7 @@ public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, Mu
                 MessageProcessorAnnotationParser parser = parserFactory.getRouterParser(annotation, componentFactoryClass, null);
                 if (parser != null)
                 {
-                    service.getMessageSource().addMessageProcessor(parser.parseMessageProcessor(annotation));
+                    ((ServiceCompositeMessageSource) service.getMessageSource()).addMessageProcessor(parser.parseMessageProcessor(annotation));
                 }
                 else
                 {
@@ -279,7 +282,7 @@ public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, Mu
             ((MuleContextAware) router).setMuleContext(context);
         }
         router.initialise();
-        service.getOutboundRouter().addRoute(router);
+        ((OutboundRouterCollection) service.getOutboundMessageProcessor()).addRoute(router);
     }
 
     protected InboundEndpoint tryInboundEndpointAnnotation(AnnotationMetaData metaData, ChannelType channelType) throws MuleException

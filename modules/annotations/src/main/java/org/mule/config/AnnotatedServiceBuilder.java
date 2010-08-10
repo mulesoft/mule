@@ -29,6 +29,8 @@ import org.mule.api.model.Model;
 import org.mule.api.object.ObjectFactory;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouter;
+import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
 import org.mule.config.endpoint.AnnotatedEndpointHelper;
@@ -38,6 +40,7 @@ import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.registry.RegistryMap;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.util.BeanUtils;
 import org.mule.util.TemplateParser;
 import org.mule.util.annotation.AnnotationMetaData;
@@ -157,7 +160,7 @@ public class AnnotatedServiceBuilder
                 {
                     inboundEndpoint.getProperties().put(MuleProperties.MULE_METHOD_PROPERTY, annotation.getElementName());
                 }
-                service.getMessageSource().addSource(inboundEndpoint);
+                ((CompositeMessageSource) service.getMessageSource()).addSource(inboundEndpoint);
             }
         }
 
@@ -176,7 +179,7 @@ public class AnnotatedServiceBuilder
                 MessageProcessorAnnotationParser parser = parserFactory.getRouterParser(annotation, componentFactoryClass, null);
                 if (parser != null)
                 {
-                    service.getMessageSource().addMessageProcessor(parser.parseMessageProcessor(annotation));
+                    ((ServiceCompositeMessageSource) service.getMessageSource()).addMessageProcessor(parser.parseMessageProcessor(annotation));
                 }
                 else
                 {
@@ -285,7 +288,7 @@ public class AnnotatedServiceBuilder
             ((MuleContextAware) router).setMuleContext(context);
         }
         router.initialise();
-        service.getOutboundRouter().addRoute(router);
+        ((OutboundRouterCollection) service.getOutboundMessageProcessor()).addRoute(router);
     }
 
     protected InboundEndpoint tryInboundEndpointAnnotation(AnnotationMetaData metaData, ChannelType channelType) throws MuleException

@@ -15,6 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transformer.Transformer;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
@@ -200,7 +201,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         }
         InboundEndpoint endpoint = 
             muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
-        service.getMessageSource().addSource(endpoint);
+        ((CompositeMessageSource) service.getMessageSource()).addSource(endpoint);
         
         final Latch latch = new Latch();
         FunctionalTestComponent testComponent = new FunctionalTestComponent();

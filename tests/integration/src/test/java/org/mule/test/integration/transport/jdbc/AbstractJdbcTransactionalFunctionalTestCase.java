@@ -16,7 +16,9 @@ import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionFactory;
@@ -126,11 +128,11 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         OutboundEndpoint outProvider = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
             endpointBuilder2);
         
-        service.setOutboundRouter(new DefaultOutboundRouterCollection());
+        service.setOutboundMessageProcessor(new DefaultOutboundRouterCollection());
         OutboundPassThroughRouter router = new OutboundPassThroughRouter();
         router.addRoute(outProvider);
-        service.getOutboundRouter().addRoute(router);
-        service.getMessageSource().addSource(endpoint);
+        ((OutboundRouterCollection) service.getOutboundMessageProcessor()).addRoute(router);
+        ((CompositeMessageSource) service.getMessageSource()).addSource(endpoint);
 
         // these tests no longer work - they need replacing with config driven tests
         // furthemore, nothing is read from service properties any more

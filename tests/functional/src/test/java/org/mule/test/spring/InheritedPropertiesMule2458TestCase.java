@@ -12,6 +12,7 @@ package org.mule.test.spring;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.FunctionalTestCase;
 
 public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
@@ -26,7 +27,7 @@ public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
     {
         Service service = muleContext.getRegistry().lookupService("service");
         assertNotNull(service);
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) service.getMessageSource().getEndpoints().get(0);
+        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
         assertNotNull(endpoint);
 
         assertProperty(endpoint, "global-only", "global");

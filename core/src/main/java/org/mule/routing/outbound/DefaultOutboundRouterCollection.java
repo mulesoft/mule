@@ -168,7 +168,9 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
             }
         }
     }
-
+    
+    // TODO Use spring factory bean
+    @Deprecated
     public void setMessageProcessors(List<MatchableMessageProcessor> routers)
     {
         for (MatchableMessageProcessor router : routers)

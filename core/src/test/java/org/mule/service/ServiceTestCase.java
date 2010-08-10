@@ -14,6 +14,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.model.Model;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.service.Service;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transport.Connector;
 import org.mule.config.QueueProfile;
 import org.mule.model.seda.SedaModel;
@@ -43,8 +44,8 @@ public class ServiceTestCase extends AbstractMuleTestCase
 
         service = new SedaService(muleContext);
         service.setName("testService");
-        service.getMessageSource().addSource(inboundEndpoint1);
-        service.getMessageSource().addSource(inboundEndpoint2);
+        ((CompositeMessageSource) service.getMessageSource()).addSource(inboundEndpoint1);
+        ((CompositeMessageSource) service.getMessageSource()).addSource(inboundEndpoint2);
         Model model = new SedaModel();
         model.setMuleContext(muleContext);
         model.initialise();

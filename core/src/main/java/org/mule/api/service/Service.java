@@ -13,17 +13,17 @@ package org.mule.api.service;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.NamedObject;
 import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.model.Model;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.source.MessageSource;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
-import org.mule.service.ServiceCompositeMessageSource;
 
 import java.beans.ExceptionListener;
 import java.io.Serializable;
@@ -85,7 +85,7 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
      */
     boolean isPaused();
     
-    ServiceCompositeMessageSource getMessageSource();
+    MessageSource getMessageSource();
 
     /**
      * Outbound Routers control how events are published by a service once. the
@@ -95,7 +95,7 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
      * @return the outbound router for this service
      * @see OutboundRouterCollection
      */
-    OutboundRouterCollection getOutboundRouter();
+    MessageProcessor getOutboundMessageProcessor();
 
     /**
      * Returns the initial state of this service
@@ -111,7 +111,7 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
      */
     Model getModel();
 
-    void setMessageSource(ServiceCompositeMessageSource messageSource);
+    void setMessageSource(MessageSource messageSource);
 
     /**
      * Outbound Routers control how events are published by a service once. the
@@ -121,7 +121,7 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
      * @param router the outbound router for this service
      * @see OutboundRouterCollection
      */
-    void setOutboundRouter(OutboundRouterCollection router);
+    void setOutboundMessageProcessor(MessageProcessor processor);
 
     /**
      * Sets the initial state of this service

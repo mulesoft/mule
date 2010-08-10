@@ -10,6 +10,7 @@
 
 package org.mule.module.xml.config;
 
+import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.module.xml.filters.IsXmlFilter;
 import org.mule.module.xml.filters.JXPathFilter;
@@ -34,7 +35,7 @@ public class XmlFilterNamespaceHandlerTestCase extends FunctionalTestCase
     public void testIsXmlFilter()
     {
         Service service = muleContext.getRegistry().lookupService("test for xml");
-        List routers = service.getOutboundRouter().getRoutes();
+        List routers = ((OutboundRouterCollection) service.getOutboundMessageProcessor()).getRoutes();
         assertEquals(2, routers.size());
         assertTrue(routers.get(0).getClass().getName(), routers.get(0) instanceof FilteringOutboundRouter);
         assertTrue(((FilteringOutboundRouter) routers.get(0)).getFilter() instanceof IsXmlFilter);
@@ -46,7 +47,7 @@ public class XmlFilterNamespaceHandlerTestCase extends FunctionalTestCase
     public void testJXPathFilter()
     {
         Service service = muleContext.getRegistry().lookupService("filter xml for content");
-        List routers = service.getOutboundRouter().getRoutes();
+        List routers = ((OutboundRouterCollection) service.getOutboundMessageProcessor()).getRoutes();
         assertEquals(1, routers.size());
         assertTrue(routers.get(0).getClass().getName(), routers.get(0) instanceof FilteringOutboundRouter);
         assertTrue(((FilteringOutboundRouter) routers.get(0)).getFilter() instanceof JXPathFilter);

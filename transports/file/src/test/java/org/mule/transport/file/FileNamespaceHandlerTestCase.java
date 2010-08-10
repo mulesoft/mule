@@ -12,6 +12,7 @@ package org.mule.transport.file;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.file.filters.FilenameRegexFilter;
 import org.mule.transport.file.transformers.FileToByteArray;
@@ -96,7 +97,7 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
     {
         Service service = muleContext.getRegistry().lookupService("Test");
         assertNotNull(service);
-        List endpoints = service.getMessageSource().getEndpoints();
+        List endpoints = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints();
         assertEquals(1, endpoints.size());
 
         InboundEndpoint endpoint = (InboundEndpoint) endpoints.get(0);

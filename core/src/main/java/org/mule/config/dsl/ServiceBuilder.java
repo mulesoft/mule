@@ -10,6 +10,7 @@
 package org.mule.config.dsl;
 
 import org.mule.api.MuleContext;
+import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.model.seda.SedaService;
 
@@ -52,7 +53,8 @@ public class ServiceBuilder
 
     public OutRouteBuilder to(String uri)
     {
-        OutRouteBuilder rb = new OutRouteBuilder(service.getOutboundRouter(), muleContext);
+        OutRouteBuilder rb = new OutRouteBuilder(
+            (OutboundRouterCollection) service.getOutboundMessageProcessor(), muleContext);
         rb.to(uri);
         return rb;
     }

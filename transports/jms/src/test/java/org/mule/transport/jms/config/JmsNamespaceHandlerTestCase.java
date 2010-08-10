@@ -16,6 +16,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.routing.filters.logic.NotFilter;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transaction.MuleTransactionConfig;
@@ -152,7 +153,7 @@ public class JmsNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(filter3);
         assertTrue(filter3 instanceof JmsPropertyFilter);
 
-        InboundEndpoint inboundEndpoint = (InboundEndpoint) muleContext.getRegistry().lookupService("testService").getMessageSource().getEndpoints().get(0);
+        InboundEndpoint inboundEndpoint = (InboundEndpoint) ((ServiceCompositeMessageSource) muleContext.getRegistry().lookupService("testService").getMessageSource()).getEndpoints().get(0);
         assertNotNull(inboundEndpoint);
         assertEquals(1, inboundEndpoint.getProperties().size());
         assertEquals("testCustomDurableName", inboundEndpoint.getProperty(JmsConstants.DURABLE_NAME_PROPERTY));

@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.OutboundRouter;
+import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.service.ServiceAware;
 import org.mule.config.i18n.CoreMessages;
@@ -178,8 +179,22 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
     public void initialise() throws InitialisationException
     {
         if (service != null)
-        {        
-            OutboundRouter router = (OutboundRouter)service.getOutboundRouter().getRoutes().get(0);
+        {
+            OutboundRouter router = null;
+            if (service.getOutboundMessageProcessor() instanceof OutboundRouterCollection)
+            {
+                router = (OutboundRouter) ((OutboundRouterCollection) service.getOutboundMessageProcessor()).getRoutes()
+                    .get(0);
+            }
+            else if (service.getOutboundMessageProcessor() instanceof OutboundRouter)
+            {
+                router = (OutboundRouter) service.getOutboundMessageProcessor();
+            }
+            else
+            {
+                throw new IllegalStateException(
+                    "WSProxyService is only supported when using an OutboundRouter");
+            }
             ImmutableEndpoint endpoint = (ImmutableEndpoint) router.getRoutes().get(0);
             this.urlWebservice = endpoint.getEndpointURI().getAddress();
     

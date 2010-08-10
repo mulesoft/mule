@@ -16,6 +16,7 @@ import org.mule.api.service.ServiceAware;
 import org.mule.example.loanbroker.LocaleMessage;
 import org.mule.example.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.example.loanbroker.messages.LoanQuote;
+import org.mule.service.ServiceCompositeMessageSource;
 
 import java.io.Serializable;
 import java.util.List;
@@ -68,7 +69,12 @@ public class Bank implements ServiceAware, Serializable, BankService
     {
         this.bankName = service.getName(); 
 
-        List endpoints = service.getMessageSource().getEndpoints();
+        if (!(service.getMessageSource() instanceof ServiceCompositeMessageSource))
+        {
+            throw new IllegalStateException("Only 'ServiceCompositeMessageSource' is supported");
+        }
+
+        List endpoints = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints();
         if ((endpoints == null) || (endpoints.size() != 1))
         {
             throw new IllegalArgumentException("Bank is expected to have exactly 1 incoming endpoint.");

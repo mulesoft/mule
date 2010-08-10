@@ -15,6 +15,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -70,7 +71,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
         EndpointBuilder eb = muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(getTestEndpointURI());
         eb.setDisableTransportTransformer(true);
         InboundEndpoint ep = eb.buildInboundEndpoint();
-        service.getMessageSource().addSource(ep);
+        ((CompositeMessageSource) service.getMessageSource()).addSource(ep);
         muleContext.getRegistry().registerService(service);
         if (!muleContext.isStarted())
         {

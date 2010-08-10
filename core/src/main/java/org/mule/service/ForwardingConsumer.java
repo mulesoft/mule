@@ -13,7 +13,7 @@ package org.mule.service;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
 import org.mule.routing.MessageFilter;
@@ -34,13 +34,13 @@ public class ForwardingConsumer extends MessageFilter
             throw new UnsupportedOperationException("ForwardingConsumer is only supported with Service");
         }
 
-        OutboundRouterCollection router = ((Service) event.getFlowConstruct()).getOutboundRouter();
+        MessageProcessor processor = ((Service) event.getFlowConstruct()).getOutboundMessageProcessor();
 
         // Set the stopFurtherProcessing flag to true to inform the
         // DefaultInboundRouterCollection not to route these events to the service
         event.setStopFurtherProcessing(true);
 
-        if (router == null)
+        if (processor == null)
         {
             logger.debug("Descriptor has no outbound router configured to forward to, continuing with normal processing");
             return event;
@@ -49,7 +49,7 @@ public class ForwardingConsumer extends MessageFilter
         {
             try
             {
-                MuleEvent resultEvent = router.process(event);
+                MuleEvent resultEvent = processor.process(event);
                 if (resultEvent != null)
                 {
                     return resultEvent;

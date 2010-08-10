@@ -92,7 +92,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
     {
         Service d = muleContext.getRegistry().lookupService("testPropertiesComponent");
         assertNotNull(d);
-        final ServiceCompositeMessageSource router = d.getMessageSource();
+        final ServiceCompositeMessageSource router = (ServiceCompositeMessageSource) d.getMessageSource();
         assertNotNull(router);
         final List endpoints = router.getEndpoints();
         assertNotNull(endpoints);

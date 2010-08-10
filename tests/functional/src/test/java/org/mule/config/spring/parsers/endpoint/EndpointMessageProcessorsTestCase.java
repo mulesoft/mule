@@ -13,7 +13,9 @@ package org.mule.config.spring.parsers.endpoint;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
+import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
@@ -62,7 +64,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
     public void testLocalEndpoints() throws MuleException
     {
         ImmutableEndpoint endpoint = 
-            muleContext.getRegistry().lookupService("localEndpoints").getMessageSource().getEndpoint("ep3");
+            ((ServiceCompositeMessageSource) muleContext.getRegistry().lookupService("localEndpoints").getMessageSource()).getEndpoint("ep3");
 
         List <MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
@@ -77,8 +79,8 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         assertEquals("D", ((TestMessageProcessor) processors.get(1)).getLabel());
 
         MessageProcessor mp =
-            ((OutboundPassThroughRouter) muleContext.getRegistry().lookupService("localEndpoints").
-                getOutboundRouter().getRoutes().get(0)).getRoute("ep4");
+            ((OutboundPassThroughRouter) ((OutboundRouterCollection)muleContext.getRegistry().lookupService("localEndpoints").
+                getOutboundMessageProcessor()).getRoutes().get(0)).getRoute("ep4");
 
         endpoint = (ImmutableEndpoint) mp;
         processors = endpoint.getMessageProcessors();

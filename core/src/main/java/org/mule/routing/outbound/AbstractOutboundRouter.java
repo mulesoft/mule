@@ -276,6 +276,8 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
     /*
      * For spring access
      */
+    // TODO Use spring factory bean
+    @Deprecated
     public void setMessageProcessors(List<MessageProcessor> routes)
     {
         setRoutes(routes);

@@ -156,7 +156,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         testEndpoint(service);
 
         // Check endpoint
-        ImmutableEndpoint endpoint2 = service.getMessageSource().getEndpoints().get(0);
+        ImmutableEndpoint endpoint2 = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
         assertEquals(endpoint, endpoint2);
 
         // Check service implementation
@@ -231,7 +231,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
 
     protected void testEndpoint(Service service)
     {
-        ServiceCompositeMessageSource inboundRouterCollection = service.getMessageSource();
+        ServiceCompositeMessageSource inboundRouterCollection = (ServiceCompositeMessageSource) service.getMessageSource();
         ImmutableEndpoint endpoint = inboundRouterCollection.getEndpoints().get(0);
         assertEndpointAttributes(endpoint);
     }
@@ -254,7 +254,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
 
         // InboundPassThroughRouter is now set in runtime rather than in service creation as in 1.4.x
         // assertEquals(1, service.getInboundRouter().getRouters().size());
-        assertEquals(0, service.getMessageSource().getMessageProcessors().size());
+        assertEquals(0, ((ServiceCompositeMessageSource) service.getMessageSource()).getMessageProcessors().size());
     }
 
 }

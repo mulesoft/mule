@@ -31,6 +31,7 @@ import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.wire.WireFormat;
@@ -288,7 +289,13 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             props.put("synchronousEventTimeout", new Integer(eventTimeout));
             service.setComponent(new SimpleCallableJavaComponent(new PrototypeObjectFactory(RemoteDispatcherComponent.class, props)));
 
-            service.getMessageSource().addSource(endpoint);
+
+            if (!(service.getMessageSource() instanceof CompositeMessageSource))
+            {
+                throw new IllegalStateException("Only 'CompositeMessageSource' is supported with RemoteDispatcherService");
+            }
+
+            ((CompositeMessageSource) service.getMessageSource()).addSource(endpoint);
 
             return service;
         }

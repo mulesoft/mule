@@ -19,6 +19,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
@@ -100,7 +101,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         // TODO Simplify this API for adding an outbound endpoint.
         OutboundPassThroughRouter passThroughRouter = new OutboundPassThroughRouter();
         passThroughRouter.addRoute(endpoint);
-        service.getOutboundRouter().addRoute(passThroughRouter);
+        ((OutboundRouterCollection) service.getOutboundMessageProcessor()).addRoute(passThroughRouter);
         //muleContext.getRegistry().registerComponent(service);
 
         MuleMessage message = new DefaultMuleMessage(MESSAGE, muleContext);

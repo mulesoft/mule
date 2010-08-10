@@ -13,6 +13,7 @@ package org.mule.routing.filters;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.module.client.MuleClient;
 import org.mule.module.ognl.filters.OGNLFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
@@ -67,10 +68,9 @@ public class OGNLFilterTestCase extends FunctionalTestCase
 
     public void testNamespaceHandler()
     {
-        String expression =
-                ((OGNLFilter) ((FilteringOutboundRouter) muleContext.getRegistry().
-                        lookupService(SERVICE_NAME).getOutboundRouter().getRoutes().get(0)).
-                        getFilter()).getExpression();
+        String expression = ((OGNLFilter) ((FilteringOutboundRouter) ((OutboundRouterCollection) muleContext.getRegistry()
+            .lookupService(SERVICE_NAME)
+            .getOutboundMessageProcessor()).getRoutes().get(0)).getFilter()).getExpression();
 
         assertEquals(expression, OGNL_EXSPRESSION);
     }

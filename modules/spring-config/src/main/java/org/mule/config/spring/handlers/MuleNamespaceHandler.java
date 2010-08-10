@@ -343,7 +343,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         //Routers
         registerBeanDefinitionParser("inbound", new ChildDefinitionParser("messageSource", ServiceCompositeMessageSource.class, true));
-        registerBeanDefinitionParser("outbound", new ChildDefinitionParser("outboundRouter", DefaultOutboundRouterCollection.class, true));
+        registerBeanDefinitionParser("outbound", new ChildDefinitionParser("outboundMessageProcessor", DefaultOutboundRouterCollection.class, true));
         registerBeanDefinitionParser("async-reply", new ChildDefinitionParser("asyncReplyMessageSource", ServiceAsyncReplyCompositeMessageSource.class, true));
 
         //Inbound Routers

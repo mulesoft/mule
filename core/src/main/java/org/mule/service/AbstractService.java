@@ -29,9 +29,9 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
-import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.RouterStatisticsRecorder;
 import org.mule.api.service.Service;
+import org.mule.api.source.MessageSource;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.lifecycle.EmptyLifecycleCallback;
@@ -87,9 +87,9 @@ public abstract class AbstractService implements Service
      */
     protected String name;
 
-    protected OutboundRouterCollection outboundRouter = new DefaultOutboundRouterCollection();
+    protected MessageProcessor outboundRouter = new DefaultOutboundRouterCollection();
 
-    protected ServiceCompositeMessageSource messageSource = new ServiceCompositeMessageSource();
+    protected MessageSource messageSource = new ServiceCompositeMessageSource();
     protected ServiceAsyncReplyCompositeMessageSource asyncReplyMessageSource = new ServiceAsyncReplyCompositeMessageSource();
 
     protected MessageProcessor messageProcessorChain;
@@ -147,7 +147,10 @@ public abstract class AbstractService implements Service
             {
                 public void onTransition(String phaseName, FlowConstruct object) throws MuleException
                 {
-                    ((MuleContextAware) outboundRouter).setMuleContext(muleContext);
+                    if (outboundRouter instanceof MuleContextAware)
+                    {
+                        ((MuleContextAware) outboundRouter).setMuleContext(muleContext);
+                    }
 
                     if (exceptionListener == null)
                     {
@@ -156,7 +159,10 @@ public abstract class AbstractService implements Service
                         exceptionListener = getModel().getExceptionListener();
                     }
 
-                    messageSource.setFlowConstruct(object);
+                    if (messageSource instanceof FlowConstructAware)
+                    {
+                        ((FlowConstructAware) messageSource).setFlowConstruct(object);
+                    }
                     asyncReplyMessageSource.setFlowConstruct(object);
                     // Ensure Component has service instance and is initialised. If the component
                     // was configured with spring and is therefore in the registry it will get
@@ -336,7 +342,10 @@ public abstract class AbstractService implements Service
 
     protected void doStop() throws MuleException
     {
-        messageSource.stop();
+        if (messageSource instanceof Stoppable)
+        {
+            ((Stoppable) messageSource).stop();
+        }
         asyncReplyMessageSource.stop();
 
         // Component is not in chain
@@ -362,7 +371,10 @@ public abstract class AbstractService implements Service
             ((Startable) messageProcessorChain).start();
         }
 
-        messageSource.start();
+        if (messageSource instanceof Startable)
+        {
+            ((Startable) messageSource).start();
+        }
         if (asyncReplyMessageSource.getEndpoints().size() > 0)
         {
             asyncReplyMessageSource.start();
@@ -389,13 +401,18 @@ public abstract class AbstractService implements Service
         stats = createStatistics();
         stats.setEnabled(muleContext.getStatistics().isEnabled());
         muleContext.getStatistics().add(stats);
+        RouterStatistics routerStatistics = new RouterStatistics(RouterStatistics.TYPE_OUTBOUND);
+        stats.setOutboundRouterStat(routerStatistics);
         if (outboundRouter != null && outboundRouter instanceof RouterStatisticsRecorder)
         {
-            RouterStatistics routerStatistics = new RouterStatistics(RouterStatistics.TYPE_OUTBOUND);
             ((RouterStatisticsRecorder)outboundRouter).setRouterStatistics(routerStatistics);
-            stats.setOutboundRouterStat(routerStatistics);
         }
-        stats.setInboundRouterStat(messageSource.getRouterStatistics());
+        RouterStatistics inboundRouterStatistics = new RouterStatistics(RouterStatistics.TYPE_INBOUND);
+        stats.setInboundRouterStat(inboundRouterStatistics);
+        if (messageSource instanceof RouterStatisticsRecorder)
+        {
+            ((RouterStatisticsRecorder) messageSource).setRouterStatistics(inboundRouterStatistics);
+        }
         stats.setComponentStat(component.getStatistics());
 
         try
@@ -418,7 +435,10 @@ public abstract class AbstractService implements Service
         {
             ((Initialisable) messageProcessorChain).initialise();
         }
-        messageSource.initialise();
+        if (messageSource instanceof Initialisable)
+        {
+            ((Initialisable) messageSource).initialise();
+        }
         if (asyncReplyMessageSource.getEndpoints().size() > 0)
         {
             asyncReplyMessageSource.initialise();
@@ -532,24 +552,31 @@ public abstract class AbstractService implements Service
         this.exceptionListener = exceptionListener;
     }
 
-    public ServiceCompositeMessageSource getMessageSource()
+    public MessageSource getMessageSource()
     {
         return messageSource;
     }
 
-    public void setMessageSource(ServiceCompositeMessageSource inboundMessageSource)
+    public void setMessageSource(MessageSource inboundMessageSource)
     {
         this.messageSource = inboundMessageSource;
     }
 
-    public OutboundRouterCollection getOutboundRouter()
+    public MessageProcessor getOutboundMessageProcessor()
     {
         return outboundRouter;
     }
 
-    public void setOutboundRouter(OutboundRouterCollection outboundRouter)
+    // TODO Use spring factory bean
+    @Deprecated
+    public void setMessageProcessor(MessageProcessor processor)
     {
-        this.outboundRouter = outboundRouter;
+        setOutboundMessageProcessor(processor);
+    }
+    
+    public void setOutboundMessageProcessor(MessageProcessor processor)
+    {
+        this.outboundRouter = processor;
     }
 
     public ServiceAsyncReplyCompositeMessageSource getAsyncReplyMessageSource()

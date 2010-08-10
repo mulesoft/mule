@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.config.ExceptionHelper;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.providers.soap.AbstractSoapUrlEndpointFunctionalTestCase;
@@ -57,7 +58,7 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
             // TODO MULE-2228 Simplify this API
             Service c = MuleTestUtils.getTestService("testComponentWithoutInterfaces", ComponentWithoutInterfaces.class, null, muleContext, false);
             InboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(getComponentWithoutInterfacesEndpoint());
-            c.getMessageSource().addSource(ep);
+            ((CompositeMessageSource) c.getMessageSource()).addSource(ep);
             muleContext.getRegistry().registerService(c);
             fail("Expected exception");
         }

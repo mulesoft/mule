@@ -95,7 +95,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());
 
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
-        ImmutableEndpoint ep = service.getMessageSource().getEndpoint("Orange");
+        ImmutableEndpoint ep = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoint("Orange");
         assertNotNull(ep);
         final List responseTransformers = ep.getResponseTransformers();
         assertNotNull(responseTransformers);
@@ -189,8 +189,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     {
         // test outbound message router
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
-        assertNotNull(service.getOutboundRouter());
-        OutboundRouterCollection router = service.getOutboundRouter();
+        assertNotNull(service.getOutboundMessageProcessor());
+        OutboundRouterCollection router = (OutboundRouterCollection) service.getOutboundMessageProcessor();
         assertNull(router.getCatchAllStrategy());
         assertEquals(1, router.getRoutes().size());
         // check first Router
@@ -224,8 +224,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     public void testDescriptorEndpoints()
     {
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
-        assertEquals(1, service.getOutboundRouter().getRoutes().size());
-        OutboundRouter router = (OutboundRouter)service.getOutboundRouter().getRoutes().get(0);
+        assertEquals(1, ((OutboundRouterCollection) service.getOutboundMessageProcessor()).getRoutes().size());
+        OutboundRouter router = (OutboundRouter) ((OutboundRouterCollection)service.getOutboundMessageProcessor()).getRoutes().get(0);
         assertEquals(1, router.getRoutes().size());
         MessageProcessor mp = router.getRoutes().get(0);
         assertNotNull(mp);
@@ -236,13 +236,13 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(endpoint.getTransformers());
         assertTrue(TransformerUtils.firstOrNull(endpoint.getTransformers()) instanceof TestCompressionTransformer);
 
-        assertEquals(2, service.getMessageSource().getEndpoints().size());
-        assertNotNull(service.getMessageSource().getCatchAllStrategy());
-        assertTrue(service.getMessageSource().getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
-        ForwardingCatchAllStrategy fcas = (ForwardingCatchAllStrategy)service.getMessageSource().getCatchAllStrategy();
+        assertEquals(2, ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().size());
+        assertNotNull(((ServiceCompositeMessageSource) service.getMessageSource()).getCatchAllStrategy());
+        assertTrue(((ServiceCompositeMessageSource) service.getMessageSource()).getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);
+        ForwardingCatchAllStrategy fcas = (ForwardingCatchAllStrategy)((ServiceCompositeMessageSource) service.getMessageSource()).getCatchAllStrategy();
         assertNotNull(fcas.getEndpoint());
         assertEquals("test://catch.all", fcas.getEndpoint().getEndpointURI().toString());
-        endpoint = service.getMessageSource().getEndpoint("orangeEndpoint");
+        endpoint = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoint("orangeEndpoint");
         assertNotNull(endpoint);
         assertEquals("orangeEndpoint", endpoint.getName());
         assertEquals("orangeQ", endpoint.getEndpointURI().getAddress());
@@ -254,7 +254,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     {
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
         assertNotNull(service.getMessageSource());
-        ServiceCompositeMessageSource messageRouter = service.getMessageSource();
+        ServiceCompositeMessageSource messageRouter = (ServiceCompositeMessageSource) service.getMessageSource();
         assertNotNull(messageRouter.getCatchAllStrategy());
         assertEquals(0, messageRouter.getMessageProcessors().size());
         assertTrue(messageRouter.getCatchAllStrategy() instanceof ForwardingCatchAllStrategy);

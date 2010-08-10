@@ -14,6 +14,7 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
@@ -52,7 +53,8 @@ public class ServiceOutboundMessageProcessor extends AbstractInterceptingMessage
 
         else if (event != null && !syncNullPayload)
         {
-            if (service.getOutboundRouter().hasEndpoints())
+            if (!(service.getOutboundMessageProcessor() instanceof OutboundRouterCollection)
+                || (service.getOutboundMessageProcessor() instanceof OutboundRouterCollection && ((OutboundRouterCollection) service.getOutboundMessageProcessor()).hasEndpoints()))
             {
                 MuleEvent outboundEvent;
                 if (event.getEndpoint().getExchangePattern().hasResponse())

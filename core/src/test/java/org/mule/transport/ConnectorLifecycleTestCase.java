@@ -17,6 +17,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.service.Service;
+import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageRequester;
 import org.mule.tck.AbstractMuleTestCase;
@@ -321,7 +322,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
     {
         Service service = getTestService();
         InboundEndpoint endpoint = getTestInboundEndpoint("in", "test://in");
-        service.getMessageSource().addSource(endpoint);
+        ((CompositeMessageSource) service.getMessageSource()).addSource(endpoint);
         connector = (TestConnector) endpoint.getConnector();
 
         assertEquals(0, connector.receivers.size());
