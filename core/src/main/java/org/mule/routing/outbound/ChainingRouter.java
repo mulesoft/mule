@@ -61,7 +61,7 @@ public class ChainingRouter extends FilteringOutboundRouter implements MessageRo
         try
         {
             MuleMessage intermediaryResult = message;
-System.out.println("Intermediary : " + intermediaryResult);
+
             for (int i = 0; i < endpointsCount; i++)
             {
                 endpoint = getRoute(i, intermediaryResult);
