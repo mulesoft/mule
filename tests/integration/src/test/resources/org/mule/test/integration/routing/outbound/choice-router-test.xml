@@ -11,8 +11,8 @@
     <vm:inbound-endpoint path="without-default-route.in" exchange-pattern="request-response" />
     <choice>
       <when>
-        <outbound-endpoint ref="fruit-channel" />
         <regex-filter pattern="apple" />
+        <outbound-endpoint ref="fruit-channel" />
       </when>
     </choice>
   </flow>
@@ -21,12 +21,12 @@
     <vm:inbound-endpoint path="with-default-route.in" exchange-pattern="request-response" />
     <choice>
       <when>
-        <outbound-endpoint ref="fruit-channel" />
         <regex-filter pattern="apple" />
+        <outbound-endpoint ref="fruit-channel" />
       </when>
       <when>
-        <outbound-endpoint ref="veggie-channel" />
         <regex-filter pattern="turnip" />
+        <outbound-endpoint ref="veggie-channel" />
       </when>
       <when expression="#[regex:.*berry]">
         <outbound-endpoint ref="fruit-channel" />

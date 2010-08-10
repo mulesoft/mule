@@ -4032,11 +4032,7 @@
     -->
     
     <!-- Conditional Message Processor Elements -->
-    <xsd:complexType name="abstractMessageProcessorFilterPairType" abstract="true">
-        <xsd:sequence>
-            <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="1" />
-       </xsd:sequence>
-    </xsd:complexType>
+    <xsd:complexType name="abstractMessageProcessorFilterPairType" abstract="true" />
     
     <xsd:complexType name="whenMessageProcessorFilterPairType">
       <xsd:complexContent>
@@ -4049,6 +4045,7 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
+            <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="1" />
           </xsd:sequence>
           <xsd:attribute name="expression" type="xsd:string">
               <xsd:annotation>
@@ -4064,6 +4061,7 @@
     <xsd:complexType name="otherwiseMessageProcessorFilterPairType">
       <xsd:complexContent>
         <xsd:extension base="abstractMessageProcessorFilterPairType">
+          <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="1" />
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
