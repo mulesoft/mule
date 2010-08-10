@@ -86,15 +86,8 @@
     </script:script>
   </script:transformer>
   
-  <model name="ws-proxy-test-targets">
-    <service name="weather-forecaster">
-      <inbound>
-        <inbound-endpoint address="http://localhost:6090/weather-forecast"
-          exchange-pattern="request-response">
-            <cxf:jaxws-service />  
-        </inbound-endpoint>
-      </inbound>
-      <component class="org.mule.test.integration.tck.WeatherForecaster" />
-    </service>
-  </model>
+  <simple-service name="weather-forecaster-ws"
+                  address="http://localhost:6090/weather-forecast"
+                  component-class="org.mule.test.integration.tck.WeatherForecaster"
+                  type="jax-ws" />
 </mule>
