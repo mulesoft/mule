@@ -376,7 +376,6 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    -->
 
     <xsd:element name="transactional" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
@@ -395,6 +394,7 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
+    -->
     
     <!-- Message Sources -->
     <xsd:element name="abstract-message-source" abstract="true" type="abstractMessageSourceType">
@@ -4116,7 +4116,7 @@
         </xsd:annotation>
     </xsd:element>
     
-    <xsd:element name="multicaster" type="baseMultipleRoutesRoutingMessageProcessorType" substitutionGroup="abstract-routing-message-processor">
+    <xsd:element name="all" type="baseMultipleRoutesRoutingMessageProcessorType" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Sends the same message to multiple message processors or outbound endpoints.

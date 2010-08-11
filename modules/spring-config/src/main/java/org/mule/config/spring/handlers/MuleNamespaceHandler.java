@@ -400,7 +400,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
             "expression"}, new String[]{"{http://www.mulesoft.org/schema/mule/core}abstractFilterType"})));
         registerBeanDefinitionParser("otherwise", new ChildDefinitionParser("defaultRoute", MessageProcessorFilterPairFactoryBean.class));
 
-        registerBeanDefinitionParser("multicaster", new ChildDefinitionParser("messageProcessor", MulticastingRouter.class));
+        registerBeanDefinitionParser("all", new ChildDefinitionParser("messageProcessor", MulticastingRouter.class));
         registerBeanDefinitionParser("recipient-list", new ChildDefinitionParser("messageProcessor", ExpressionRecipientList.class));
 
         
