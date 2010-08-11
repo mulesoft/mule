@@ -40,7 +40,7 @@ public class SingleJmsMessageReceiver extends JmsMessageReceiver implements Mess
         }
         catch (Exception e)
         {
-            getFlowConstruct().getExceptionListener().exceptionThrown(e);
+            getConnector().getMuleContext().getExceptionListener().handleException(e);
         }
     }
 }

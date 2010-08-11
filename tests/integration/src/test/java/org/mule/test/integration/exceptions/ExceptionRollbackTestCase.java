@@ -12,8 +12,8 @@ package org.mule.test.integration.exceptions;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.transaction.Transaction;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.service.DefaultServiceExceptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.transaction.TransactionCoordination;
@@ -22,14 +22,13 @@ import java.io.FileNotFoundException;
 
 public class ExceptionRollbackTestCase extends AbstractMuleTestCase
 {
-
-    private DefaultServiceExceptionStrategy strategy;
+    private DefaultSystemExceptionStrategy strategy;
     private Transaction tx;
 
     @Override
     protected void doSetUp() throws Exception
     {
-        strategy = new DefaultServiceExceptionStrategy();
+        strategy = new DefaultSystemExceptionStrategy();
         strategy.setCommitTxFilter(new WildcardFilter("java.io.*"));
         strategy.setRollbackTxFilter(new WildcardFilter("org.mule.*, javax.*"));
 
@@ -46,7 +45,7 @@ public class ExceptionRollbackTestCase extends AbstractMuleTestCase
 
     public void testCommit() throws Exception
     {
-        strategy.exceptionThrown(new FileNotFoundException());
+        strategy.handleException(new FileNotFoundException());
         assertFalse(tx.isRollbackOnly());
         //There is nothing to actually commit the transaction since we are not running in a real tx
         //assertTrue(tx.isCommitted());
@@ -54,7 +53,7 @@ public class ExceptionRollbackTestCase extends AbstractMuleTestCase
 
     public void testRollback() throws Exception
     {
-        strategy.exceptionThrown(new DefaultMuleException(CoreMessages.agentsRunning()));
+        strategy.handleException(new DefaultMuleException(CoreMessages.agentsRunning()));
         assertTrue(tx.isRollbackOnly());
         //There is nothing to actually commit the transaction since we are not running in a real tx
         assertFalse(tx.isCommitted());
@@ -62,7 +61,7 @@ public class ExceptionRollbackTestCase extends AbstractMuleTestCase
 
     public void testRollbackByDefault() throws Exception
     {
-        strategy.exceptionThrown(new IllegalAccessException());
+        strategy.handleException(new IllegalAccessException());
         assertTrue(tx.isRollbackOnly());
         //There is nothing to actually commit the transaction since we are not running in a real tx
         assertFalse(tx.isCommitted());

@@ -198,7 +198,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         }
         catch (Exception e)
         {
-            getFlowConstruct().getExceptionListener().exceptionThrown(e);
+            getConnector().getMuleContext().getExceptionListener().handleException(e);
         }
     }
 
@@ -282,7 +282,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
             }
             catch (Exception e)
             {
-                getFlowConstruct().getExceptionListener().exceptionThrown(e);
+                getConnector().getMuleContext().getExceptionListener().handleException(e);
             }
         }
 

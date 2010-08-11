@@ -28,10 +28,8 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouter;
-import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
@@ -40,16 +38,13 @@ import org.mule.api.util.StreamCloserService;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ExceptionNotification;
-import org.mule.message.DefaultExceptionPayload;
 import org.mule.message.ExceptionMessage;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.transport.NullPayload;
 import org.mule.util.CollectionUtils;
 
-import java.beans.ExceptionListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,8 +61,7 @@ import org.apache.commons.logging.LogFactory;
  * this exception listener and provides an implementation for dispatching exception
  * events from this Listener.
  */
-public abstract class AbstractExceptionListener
-    implements ExceptionListener, Initialisable, Disposable, MuleContextAware
+public abstract class AbstractExceptionListener implements Initialisable, Disposable, MuleContextAware
 {
     /**
      * logger used by this class
@@ -120,52 +114,6 @@ public abstract class AbstractExceptionListener
     public boolean removeMessageProcessor(MessageProcessor processor)
     {
         return messageProcessors.remove(processor);
-    }
-
-    public void exceptionThrown(Exception e)
-    {
-        if (enableNotifications)
-        {
-            fireNotification(new ExceptionNotification(e));
-        }
-
-        logException(e);
-        handleTransaction(e);
-
-        Throwable t = getExceptionType(e, RoutingException.class);
-        if (t != null)
-        {
-            RoutingException re = (RoutingException) t;
-            handleRoutingException(re.getMuleMessage(), re.getRoute(), e);
-            return;
-        }
-
-        t = getExceptionType(e, MessagingException.class);
-        if (t != null)
-        {
-            MessagingException me = (MessagingException) t;
-            handleMessagingException(me.getMuleMessage(), e);
-            return;
-        }
-
-        t = getExceptionType(e, LifecycleException.class);
-        if (t != null)
-        {
-            LifecycleException le = (LifecycleException) t;
-            handleLifecycleException(le.getComponent(), e);
-            if (RequestContext.getEventContext() != null)
-            {
-                handleMessagingException(RequestContext.getEventContext().getMessage(), e);
-            }
-            else
-            {
-                logger.info("There is no current event available, routing Null message with the exception");
-                handleMessagingException(new DefaultMuleMessage(NullPayload.getInstance(), muleContext), e);
-            }
-            return;
-        }
-
-        handleStandardException(e);
     }
 
     protected Throwable getExceptionType(Throwable t, Class exceptionType)
@@ -531,63 +479,5 @@ public abstract class AbstractExceptionListener
     public void setRollbackTxFilter(WildcardFilter rollbackTxFilter)
     {
         this.rollbackTxFilter = rollbackTxFilter;
-    }
-
-    /**
-     * A messaging exception is thrown when an excpetion occurs during normal message
-     * processing. A <code>MessagingException</code> holds a reference to the current
-     * message that is passed into this method
-     * 
-     * @param message the current message being processed
-     * @param e the top level exception thrown. This may be a Messaging exception or
-     *            some wrapper exception
-     * @see MessagingException
-     */
-    public abstract void handleMessagingException(MuleMessage message, Throwable e);
-
-    /**
-     * A routing exception is thrown when an excpetion occurs during normal message
-     * processing A <code>RoutingException</code> holds a reference to the current
-     * message and te endpoint being routing to or from when the error occurred. Both
-     * are passed into this method
-     * 
-     * @param message the current message being processed
-     * @param target the endpoint being dispatched to or received from when the
-     *            error occurred
-     * @param e the top level exception thrown. This may be a Messaging exception or
-     *            some wrapper exception
-     * @see RoutingException
-     */
-    public abstract void handleRoutingException(MuleMessage message, MessageProcessor target, Throwable e);
-
-    /**
-     * DefaultLifecyclePhase exceptions are thrown when an error occurs during an
-     * object's lifecycle call such as start, stop or initialise. The exception
-     * contains a reference to the object that failed which can be used for more
-     * informative logging.
-     * 
-     * @param component the object that failed during a lifecycle call
-     * @param e the top level exception thrown. This may or may not be the
-     *            <code>LifecycleException</code> but a lifecycle exception will be
-     *            present in the exception stack.
-     * @see LifecycleException
-     */
-    public abstract void handleLifecycleException(Object component, Throwable e);
-
-    /**
-     * A handler for all other exceptions
-     * 
-     * @param e the top level exception thrown
-     */
-    public abstract void handleStandardException(Throwable e);
-
-    /**
-     * Get a message to be returned to the caller as a result of this exception handling.
-     */
-    public MuleMessage getReturnMessage(Exception e)
-    {
-        MuleMessage message = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
-        message.setExceptionPayload(new DefaultExceptionPayload(e));
-        return message;
     }
 }

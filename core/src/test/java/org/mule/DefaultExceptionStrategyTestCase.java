@@ -13,7 +13,7 @@ package org.mule;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.ExceptionNotification;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
+import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
@@ -27,7 +27,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
     {
         InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy();
         strategy.setMuleContext(muleContext);
-        strategy.exceptionThrown(new IllegalArgumentException("boom"));
+        strategy.handleException(new IllegalArgumentException("boom"));
         assertEquals(1, strategy.getCount());
     }
 
@@ -54,7 +54,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
         // throwing exception
         InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy();
         strategy.setMuleContext(muleContext);
-        strategy.exceptionThrown(new IllegalArgumentException("boom"));
+        strategy.handleException(new IllegalArgumentException("boom"));
 
         // Wait for the notifcation event to be fired as they are queue
         latch.await(2000, TimeUnit.MILLISECONDS);
@@ -62,26 +62,15 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
 
     }
 
-    private static class InstrumentedExceptionStrategy extends DefaultMessagingExceptionStrategy
+    private static class InstrumentedExceptionStrategy extends DefaultSystemExceptionStrategy
     {
         private volatile int count = 0;
 
-        public InstrumentedExceptionStrategy()
-        {
-            super();
-        }
-        
         @Override
-        protected void defaultHandler(Throwable t)
+        public void handleException(Exception exception)
         {
             count++;
-            super.defaultHandler(t);
-        }
-
-        @Override
-        protected void logException(Throwable t)
-        {
-            // do not log anything here, we're running as part of a unit test
+            super.handleException(exception);
         }
 
         public int getCount()

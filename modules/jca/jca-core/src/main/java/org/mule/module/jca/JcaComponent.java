@@ -124,17 +124,17 @@ public class JcaComponent extends AbstractJavaComponent implements WorkListener
                 {
                     Message message = JcaMessages.cannotAllocateManagedInstance();
                     logger.error(message);
-                    flowConstruct.getExceptionListener().exceptionThrown(new DefaultMuleException(message, e));
+                    flowConstruct.getExceptionListener().handleException(new DefaultMuleException(message, e), event);
                 }
                 else if (e instanceof MessagingException)
                 {
                     logger.error("Failed to execute  JCAEndPoint " + e.getMessage(), e);
-                    flowConstruct.getExceptionListener().exceptionThrown(e);
+                    flowConstruct.getExceptionListener().handleException(e, event);
                 }
                 else
                 {
-                    flowConstruct.getExceptionListener().exceptionThrown(
-                        new DefaultMuleException(CoreMessages.eventProcessingFailedFor(flowConstruct.getName()), e));
+                    flowConstruct.getExceptionListener().handleException(
+                        new DefaultMuleException(CoreMessages.eventProcessingFailedFor(flowConstruct.getName()), e), event);
                 }
             }
         }

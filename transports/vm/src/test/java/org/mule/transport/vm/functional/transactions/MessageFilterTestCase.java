@@ -40,20 +40,20 @@ public class MessageFilterTestCase extends FunctionalTestCase
     public void testConfiguration() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
+        
         MuleMessage response = client.send("vm://order.validation", "OK", null);
         assertTrue(response.getPayload() instanceof NullPayload);
         assertEquals("OK(rejected!-1)", rejectMesage);
+        
         response = client.send("vm://order.validation", "OK-ABC", null);
-
-        // The current behavior is to echo the response when the filter doesn't accept it.  The Exception
-        // Handling work should replace tht with more intuitive behavior and thus break this assertion..
-        assertEquals("OK-ABC", response.getPayload());
-
+        assertTrue(response.getPayload() instanceof NullPayload);
         assertEquals("OK-ABC(rejected!-2)", rejectMesage);
+        
         response = client.send("vm://order.validation", "OK-DEF", null);
         assertTrue(response.getPayload() instanceof NullPayload);
         assertEquals("OK-DEF(rejected!-1)", rejectMesage);
         rejectMesage = null;
+        
         response = client.send("vm://order.validation", "OK-ABC-DEF", null);
         assertEquals("OK-ABC-DEF(success)", response.getPayloadAsString());
         assertNull(rejectMesage);

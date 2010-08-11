@@ -13,9 +13,9 @@ package org.mule.test.integration.exceptions;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.service.Service;
+import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.message.ExceptionMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.service.DefaultServiceExceptionStrategy;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 

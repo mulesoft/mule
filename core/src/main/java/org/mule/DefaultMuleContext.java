@@ -20,6 +20,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -51,7 +52,6 @@ import org.mule.util.ServerStartupSplashScreen;
 import org.mule.util.SplashScreen;
 import org.mule.util.queue.QueueManager;
 
-import java.beans.ExceptionListener;
 import java.util.Collection;
 
 import javax.resource.spi.work.WorkListener;
@@ -108,7 +108,7 @@ public class DefaultMuleContext implements MuleContext
     protected LocalMuleClient localMuleClient;
     
     /** Global exception handler which handles "system" exceptions (i.e., when no message is involved). */
-    protected ExceptionListener exceptionListener;
+    protected SystemExceptionHandler exceptionListener;
 
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
@@ -635,12 +635,12 @@ public class DefaultMuleContext implements MuleContext
         return localMuleClient;
     }
 
-    public ExceptionListener getExceptionListener()
+    public SystemExceptionHandler getExceptionListener()
     {
         return exceptionListener;
     }
 
-    public void setExceptionListener(ExceptionListener exceptionListener)
+    public void setExceptionListener(SystemExceptionHandler exceptionListener)
     {
         this.exceptionListener = exceptionListener;
     }

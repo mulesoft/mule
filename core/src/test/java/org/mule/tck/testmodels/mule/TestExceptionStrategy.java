@@ -10,14 +10,15 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.exception.DefaultMessagingExceptionStrategy;
+import org.mule.api.MuleEvent;
+import org.mule.exception.AbstractMessagingExceptionStrategy;
 
 /**
  * <code>TestExceptionStrategy</code> is used by the Mule test cases as a direct replacement of the 
- * {@link org.mule.exception.DefaultMessagingExceptionStrategy}. This is used to test that overriding the default 
+ * {@link org.mule.exception.AbstractMessagingExceptionStrategy}. This is used to test that overriding the default 
  * Exception strategy works.
  */
-public class TestExceptionStrategy extends DefaultMessagingExceptionStrategy
+public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
     private ExceptionCallback callback;
     
@@ -44,12 +45,13 @@ public class TestExceptionStrategy extends DefaultMessagingExceptionStrategy
 */
     
     @Override
-    public void exceptionThrown(Exception e)
+    public MuleEvent handleException(Exception exception, MuleEvent event)
     {
         if (callback != null)
         {
-            callback.onException(e);
+            callback.onException(exception);
         }
+        return event;
     }
 
     public interface ExceptionCallback

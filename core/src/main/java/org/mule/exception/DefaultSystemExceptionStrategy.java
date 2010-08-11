@@ -11,42 +11,29 @@
 package org.mule.exception;
 
 import org.mule.RequestContext;
-import org.mule.api.MuleMessage;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.api.exception.SystemExceptionHandler;
+import org.mule.context.notification.ExceptionNotification;
 import org.mule.message.DefaultExceptionPayload;
 
 /**
  * Log exception, fire a notification, and clean up transaction if any.
  */
-public class DefaultSystemExceptionStrategy extends AbstractExceptionListener
+public class DefaultSystemExceptionStrategy extends AbstractExceptionListener implements SystemExceptionHandler
 {
-    @Override
-    public void handleMessagingException(MuleMessage message, Throwable e)
+    public void handleException(Exception e)
     {
+        if (enableNotifications)
+        {
+            fireNotification(new ExceptionNotification(e));
+        }
+
+        logException(e);
+        
+        handleTransaction(e);
+
         if (RequestContext.getEvent() != null)
         {
             RequestContext.setExceptionPayload(new DefaultExceptionPayload(e));
         }
-    }
-
-    @Override
-    public void handleRoutingException(MuleMessage message, MessageProcessor target, Throwable e)
-    {
-        if (RequestContext.getEvent() != null)
-        {
-            RequestContext.setExceptionPayload(new DefaultExceptionPayload(e));
-        }
-    }
-
-    @Override
-    public void handleLifecycleException(Object component, Throwable e)
-    {
-        // do nothing
-    }
-
-    @Override
-    public void handleStandardException(Throwable e)
-    {
-        // do nothing
     }
 }

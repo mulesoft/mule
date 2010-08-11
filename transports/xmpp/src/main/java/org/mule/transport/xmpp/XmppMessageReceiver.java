@@ -154,7 +154,7 @@ public class XmppMessageReceiver extends AbstractMessageReceiver implements Pack
             }
             catch (Exception e)
             {
-                getFlowConstruct().getExceptionListener().exceptionThrown(e);
+                getConnector().getMuleContext().getExceptionListener().handleException(e);
             }
         }
 

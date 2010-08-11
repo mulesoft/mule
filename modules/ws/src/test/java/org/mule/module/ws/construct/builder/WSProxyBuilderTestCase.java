@@ -16,8 +16,8 @@ import java.net.URISyntaxException;
 
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
+import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.module.ws.construct.WSProxy;
-import org.mule.service.DefaultServiceExceptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.compression.GZipCompressTransformer;
 import org.mule.transformer.simple.ObjectToByteArray;

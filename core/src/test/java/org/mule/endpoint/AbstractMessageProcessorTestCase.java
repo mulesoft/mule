@@ -23,6 +23,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
@@ -33,11 +34,12 @@ import org.mule.api.transformer.Transformer;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
+import org.mule.message.DefaultExceptionPayload;
 import org.mule.routing.MessageFilter;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.Latch;
 
-import java.beans.ExceptionListener;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -185,7 +187,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
         return createTestOutboundEvent(endpoint, null);
     }
     
-    protected MuleEvent createTestOutboundEvent(OutboundEndpoint endpoint, ExceptionListener exceptionListener) throws Exception
+    protected MuleEvent createTestOutboundEvent(OutboundEndpoint endpoint, MessagingExceptionHandler exceptionListener) throws Exception
     {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("prop1", "value1");
@@ -262,13 +264,16 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
         }
     }
 
-    public static class TestExceptionListener implements ExceptionListener
+    public static class TestExceptionListener implements MessagingExceptionHandler
     {
         public Exception sensedException;
 
-        public void exceptionThrown(Exception e)
+        public MuleEvent handleException(Exception exception, MuleEvent event)
         {
-            sensedException = e;
+            sensedException = exception;
+            event.getMessage().setPayload(NullPayload.getInstance());
+            event.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
+            return event;
         }
     }
 

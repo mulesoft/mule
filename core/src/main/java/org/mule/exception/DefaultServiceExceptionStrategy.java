@@ -8,14 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.service;
+package org.mule.exception;
 
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.util.CollectionUtils;
 
@@ -26,7 +25,7 @@ import java.util.List;
  * for components. The handler logs errors and will forward the message and exception
  * to an exception endpointUri if one is set on this Exception strategy
  */
-public class DefaultServiceExceptionStrategy extends DefaultMessagingExceptionStrategy
+public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
     public DefaultServiceExceptionStrategy()
     {

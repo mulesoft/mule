@@ -37,6 +37,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReceiveException;
+import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
@@ -725,8 +726,8 @@ public class MuleClient implements Disposable
     protected MuleEvent getEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
     {
         try
-        {
-            DefaultMuleSession session = new DefaultMuleSession(muleContext);
+        {            
+            DefaultMuleSession session = new DefaultMuleSession(new DefaultLocalMuleClient.MuleClientFlowConstruct(), muleContext);
 
             if (user != null)
             {
@@ -1042,5 +1043,5 @@ public class MuleClient implements Disposable
     public MuleConfiguration getConfiguration()
     {
         return muleContext.getConfiguration();
-    }
+    }    
 }

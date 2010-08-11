@@ -13,10 +13,9 @@ package org.mule.api.model;
 import org.mule.api.NamedObject;
 import org.mule.api.component.LifecycleAdapterFactory;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
-
-import java.beans.ExceptionListener;
 
 /**
  * The <code>Model</code> encapsulates and manages the runtime behaviour of a
@@ -79,9 +78,9 @@ public interface Model extends Lifecycle, MuleContextAware, NamedObject, Lifecyc
      * strategy, but if it doesn't this implmentation will be used.
      *
      * @return the default exception strategy for this model.
-     * @see ExceptionListener
+     * @see MessagingExceptionHandler
      */
-    ExceptionListener getExceptionListener();
+    MessagingExceptionHandler getExceptionListener();
 
     /**
      * The exception strategy to use by components managed by the model. The
@@ -90,8 +89,8 @@ public interface Model extends Lifecycle, MuleContextAware, NamedObject, Lifecyc
      * strategy, but if it doesn't this implmentation will be used.
      *
      * @param listener the default exception strategy for this model.
-     * @see ExceptionListener
+     * @see MessagingExceptionHandler
      */
-    void setExceptionListener(ExceptionListener listener);
+    void setExceptionListener(MessagingExceptionHandler listener);
 
 }

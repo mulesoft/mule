@@ -12,7 +12,7 @@ package org.mule;
 
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.exception.AbstractExceptionListener;
-import org.mule.service.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.ArrayList;

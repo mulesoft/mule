@@ -13,7 +13,7 @@
     <model name="main">
         <service name="StopFlowService">
             <inbound>
-                <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
+                <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.test.components.ComponentReturningNullFlowTestCase$ComponentReturningNull"/>
             <outbound>

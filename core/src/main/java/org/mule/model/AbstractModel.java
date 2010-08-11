@@ -14,19 +14,19 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.component.LifecycleAdapterFactory;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
 import org.mule.component.DefaultComponentLifecycleAdapterFactory;
+import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
-import org.mule.service.DefaultServiceExceptionStrategy;
 import org.mule.util.ClassUtils;
 
-import java.beans.ExceptionListener;
 import java.util.Collection;
 
 import org.apache.commons.logging.Log;
@@ -45,7 +45,7 @@ public abstract class AbstractModel implements Model
     private String name = DEFAULT_MODEL_NAME;
     private EntryPointResolverSet entryPointResolverSet = null; // values are supplied below as required
     private LifecycleAdapterFactory lifecycleAdapterFactory = new DefaultComponentLifecycleAdapterFactory();
-    private ExceptionListener exceptionListener = new DefaultServiceExceptionStrategy();
+    private MessagingExceptionHandler exceptionListener = new DefaultServiceExceptionStrategy();
 
     protected transient Log logger = LogFactory.getLog(getClass());
     protected MuleContext muleContext;
@@ -170,12 +170,12 @@ public abstract class AbstractModel implements Model
         }
     }
 
-    public ExceptionListener getExceptionListener()
+    public MessagingExceptionHandler getExceptionListener()
     {
         return exceptionListener;
     }
 
-    public void setExceptionListener(ExceptionListener exceptionListener)
+    public void setExceptionListener(MessagingExceptionHandler exceptionListener)
     {
         this.exceptionListener = exceptionListener;
     }

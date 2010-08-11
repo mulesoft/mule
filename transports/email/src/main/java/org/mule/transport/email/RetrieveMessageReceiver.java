@@ -150,7 +150,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                 }
                 catch (MuleException e)
                 {
-                    getFlowConstruct().getExceptionListener().exceptionThrown(e);
+                    getConnector().getMuleContext().getExceptionListener().handleException(e);
                 }
                 catch (Exception e)
                 {
@@ -165,7 +165,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                         forwarded = new ReceiveException(endpoint, -1, e);
                     }
 
-                    getFlowConstruct().getExceptionListener().exceptionThrown(forwarded);
+                    getConnector().getMuleContext().getExceptionListener().handleException(forwarded);
                 }
             }
             // Lets move all messages in one go
@@ -177,7 +177,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                 }
                 catch (MessagingException e)
                 {
-                    getFlowConstruct().getExceptionListener().exceptionThrown(e);
+                    getConnector().getMuleContext().getExceptionListener().handleException(e);
                 }
             }
         }
@@ -310,7 +310,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
         }
         catch (MessagingException e)
         {
-            getFlowConstruct().getExceptionListener().exceptionThrown(e);
+            getConnector().getMuleContext().getExceptionListener().handleException(e);
         }
         finally
         {

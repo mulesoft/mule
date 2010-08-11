@@ -10,18 +10,18 @@
 
 package org.mule.config.spring.factories;
 
-import java.beans.ExceptionListener;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -91,7 +91,7 @@ public abstract class AbstractFlowConstructFactoryBean
         }
     }
 
-    public void setExceptionListener(ExceptionListener exceptionListener)
+    public void setExceptionListener(MessagingExceptionHandler exceptionListener)
     {
         getFlowConstructBuilder().exceptionStrategy(exceptionListener);
     }

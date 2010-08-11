@@ -85,6 +85,7 @@ import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDe
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.context.notification.ListenerSubscriptionPair;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.BeanBuilderTransformer;
 import org.mule.expression.transformers.ExpressionArgument;
@@ -142,7 +143,6 @@ import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.security.SecretKeyEncryptionStrategy;
 import org.mule.security.filters.MuleEncryptionEndpointSecurityFilter;
-import org.mule.service.DefaultServiceExceptionStrategy;
 import org.mule.service.ForwardingConsumer;
 import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 import org.mule.service.ServiceCompositeMessageSource;

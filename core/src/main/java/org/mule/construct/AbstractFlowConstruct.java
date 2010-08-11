@@ -10,16 +10,13 @@
 
 package org.mule.construct;
 
-import java.beans.ExceptionListener;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -32,10 +29,16 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.source.MessageSource;
+import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.ClassUtils;
+
+import java.beans.ExceptionListener;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract implementation of {@link FlowConstruct} that: <li>Is constructed with
@@ -61,7 +64,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
     protected String name;
     protected MessageSource messageSource;
     protected MessageProcessor messageProcessorChain;
-    protected ExceptionListener exceptionListener;
+    protected MessagingExceptionHandler exceptionListener = new DefaultServiceExceptionStrategy();;
     protected final FlowConstructLifecycleManager lifecycleManager;
     protected final MuleContext muleContext;
     protected final FlowConstructStatistics statistics;
@@ -97,11 +100,6 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
 
                     doInitialise();
 
-                    if (exceptionListener == null)
-                    {
-                        exceptionListener = getMuleContext().getExceptionListener();
-                    }
-
                     validateConstruct();
                 }
             });
@@ -115,7 +113,6 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         {
             throw new InitialisationException(e, this);
         }
-
     }
 
     public final void start() throws MuleException
@@ -222,12 +219,12 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         return name;
     }
 
-    public ExceptionListener getExceptionListener()
+    public MessagingExceptionHandler getExceptionListener()
     {
         return exceptionListener;
     }
 
-    public void setExceptionListener(ExceptionListener exceptionListener)
+    public void setExceptionListener(MessagingExceptionHandler exceptionListener)
     {
         this.exceptionListener = exceptionListener;
     }

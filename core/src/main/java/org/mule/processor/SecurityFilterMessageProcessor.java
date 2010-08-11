@@ -56,7 +56,7 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
                 ((AbstractConnector) event.getEndpoint().getConnector()).fireNotification(
                     new SecurityNotification(e, SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
-                event.getFlowConstruct().getExceptionListener().exceptionThrown(e);
+                event.getFlowConstruct().getExceptionListener().handleException(e, event);
                 event.getMessage().setPayload(e.getLocalizedMessage());
                 event.getMessage().setExceptionPayload(new DefaultExceptionPayload(e));
                 return event;

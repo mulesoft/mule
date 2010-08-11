@@ -10,21 +10,21 @@
 
 package org.mule.module.xml.functional;
 
-import java.beans.ExceptionListener;
+import org.mule.api.MuleEvent;
+import org.mule.api.exception.MessagingExceptionHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class HideExceptions implements ExceptionListener
+public class HideExceptions implements MessagingExceptionHandler
 {
-
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public void exceptionThrown(Exception e)
+    public MuleEvent handleException(Exception exception, MuleEvent event)
     {
-        logger.debug("Hiding exception: " + e);
+        logger.debug("Hiding exception: " + exception);
         logger.debug("(see config for test - some exceptions expected)");
+        return null;
     }
-
 }
 

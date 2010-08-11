@@ -17,6 +17,7 @@ import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
@@ -28,7 +29,7 @@ import org.mule.component.AbstractComponent;
 import org.mule.component.PooledJavaComponent;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
+import org.mule.exception.AbstractMessagingExceptionStrategy;
 import org.mule.interceptor.InterceptorStack;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.interceptor.TimerInterceptor;
@@ -47,8 +48,6 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
-
-import java.beans.ExceptionListener;
 
 public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
@@ -77,7 +76,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         super.testConnectorConfig();
 
-        ExceptionListener es = muleContext.getRegistry().lookupModel("main").getExceptionListener();
+        MessagingExceptionHandler es = muleContext.getRegistry().lookupModel("main").getExceptionListener();
         assertNotNull(es);
         assertTrue(es.getClass().getName(), es instanceof TestExceptionStrategy);
     }
@@ -114,7 +113,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         Service service = muleContext.getRegistry().lookupService("appleComponent");
         assertNotNull(service.getExceptionListener());
-        assertTrue(DefaultMessagingExceptionStrategy.class.isAssignableFrom(service.getExceptionListener().getClass()));
+        assertTrue(AbstractMessagingExceptionStrategy.class.isAssignableFrom(service.getExceptionListener().getClass()));
     }
 
     @Override

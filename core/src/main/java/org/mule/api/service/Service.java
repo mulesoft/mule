@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.NamedObject;
 import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleManager;
 import org.mule.api.model.Model;
@@ -25,7 +26,6 @@ import org.mule.api.source.MessageSource;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 
-import java.beans.ExceptionListener;
 import java.io.Serializable;
 
 /**
@@ -159,7 +159,7 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
 
     ServiceAsyncReplyCompositeMessageSource getAsyncReplyMessageSource();
 
-    ExceptionListener getExceptionListener();
+    MessagingExceptionHandler getExceptionListener();
 
-    void setExceptionListener(ExceptionListener exceptionListener);
+    void setExceptionListener(MessagingExceptionHandler exceptionListener);
 }

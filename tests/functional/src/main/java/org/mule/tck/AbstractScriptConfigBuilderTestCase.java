@@ -16,6 +16,7 @@ import org.mule.api.component.JavaComponent;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.model.Model;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouter;
@@ -36,7 +37,6 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.transformer.TransformerUtils;
 
-import java.beans.ExceptionListener;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +65,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testConnectorConfig() throws Exception
     {
-        ExceptionListener es = muleContext.getRegistry().lookupModel("main").getExceptionListener();
+        MessagingExceptionHandler es = muleContext.getRegistry().lookupModel("main").getExceptionListener();
         assertNotNull(es);
         assertTrue(es.getClass().getName(), es instanceof TestExceptionStrategy);
     }

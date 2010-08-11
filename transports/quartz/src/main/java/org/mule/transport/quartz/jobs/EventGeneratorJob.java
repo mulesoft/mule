@@ -116,7 +116,7 @@ public class EventGeneratorJob implements Job
         }
         catch (Exception e)
         {
-            receiver.getFlowConstruct().getExceptionListener().exceptionThrown(e);
+            muleContext.getExceptionListener().handleException(e);
         }
     }
 }

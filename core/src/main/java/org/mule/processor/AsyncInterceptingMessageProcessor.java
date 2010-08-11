@@ -180,12 +180,12 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
             {
                 if (event.getFlowConstruct() != null)
                 {
-                    event.getFlowConstruct().getExceptionListener().exceptionThrown(e);
+                    event.getFlowConstruct().getExceptionListener().handleException(e, event);
                 }
                 else
                 {
                     logger.warn("MuleEvent does not have a FlowConstruct, this is probably a bug");
-                    event.getMuleContext().getExceptionListener().exceptionThrown(e);
+                    event.getMuleContext().getExceptionListener().handleException(e);
                 }
             }
         }

@@ -18,10 +18,16 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.lifecycle.LifecycleState;
+import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.transport.ReceiveException;
+import org.mule.exception.DefaultServiceExceptionStrategy;
+import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.session.DefaultMuleSession;
 
 import java.util.Map;
@@ -133,7 +139,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
     protected MuleEvent createMuleEvent(MuleMessage message, OutboundEndpoint endpoint)
     {
-        DefaultMuleSession session = new DefaultMuleSession(muleContext);
+        DefaultMuleSession session = new DefaultMuleSession(new MuleClientFlowConstruct(), muleContext);
         return new DefaultMuleEvent(message, endpoint, session);
     }
 
@@ -196,4 +202,39 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         return endpoint;
     }
 
+    /**
+     * Placeholder class which makes the default exception handler available.
+     */
+    static public class MuleClientFlowConstruct implements FlowConstruct
+    {
+        public String getName()
+        {
+            return "MuleClient";
+        }
+
+        public MessagingExceptionHandler getExceptionListener()
+        {
+            return new DefaultServiceExceptionStrategy();
+        }
+
+        public LifecycleState getLifecycleState()
+        {
+            return null;
+        }
+
+        public FlowConstructStatistics getStatistics()
+        {
+            return null;
+        }
+
+        public MuleContext getMuleContext()
+        {
+            return null;
+        }
+
+        public MessageInfoMapping getMessageInfoMapping()
+        {
+            return null;
+        }        
+    };
 }

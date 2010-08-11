@@ -10,14 +10,9 @@
 
 package org.mule.processor;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.exception.AbstractExceptionListener;
-import org.mule.message.DefaultExceptionPayload;
-import org.mule.transport.NullPayload;
-
-import java.beans.ExceptionListener;
+import org.mule.api.exception.MessagingExceptionHandler;
 
 public class ExceptionHandlingMessageProcessor extends AbstractInterceptingMessageProcessor
 {
@@ -29,29 +24,18 @@ public class ExceptionHandlingMessageProcessor extends AbstractInterceptingMessa
         }
         catch (Exception e)
         {
-            ExceptionListener exceptionListener;
+            MessagingExceptionHandler exceptionListener;
             if (event.getFlowConstruct() != null)
             {
                 exceptionListener = event.getFlowConstruct().getExceptionListener();
+                return exceptionListener.handleException(e, event);
             }
             else
             {
                 logger.warn("FlowContruct is not set on MuleEvent, this is probably a bug");
-                exceptionListener = event.getMuleContext().getExceptionListener();
+                event.getMuleContext().getExceptionListener().handleException(e);
+                return null;
             }            
-            exceptionListener.exceptionThrown(e);
-
-            // TODO We should really have MuleExceptionHandler interface which returns a MuleEvent instead of "void exceptionThrown()"
-            if (exceptionListener instanceof AbstractExceptionListener)
-            {
-                return new DefaultMuleEvent(((AbstractExceptionListener) exceptionListener).getReturnMessage(e), event);
-            }
-            else
-            {
-                event.getMessage().setPayload(NullPayload.getInstance());
-                event.getMessage().setExceptionPayload(new DefaultExceptionPayload(e));
-                return event;
-            }
         }
     }
 }

@@ -12,7 +12,7 @@ package org.mule.tck.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.exception.AbstractExceptionListener;
+import org.mule.exception.AbstractMessagingExceptionStrategy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Restrict exceptions to debug log messages
  */
-public class QuietExceptionStrategy extends AbstractExceptionListener
+public class QuietExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 

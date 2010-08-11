@@ -16,7 +16,7 @@ import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.component.simple.EchoComponent;
 import org.mule.construct.SimpleService;
 import org.mule.construct.SimpleService.Type;
-import org.mule.service.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.services.SimpleMathsComponent;
 import org.mule.transformer.compression.GZipCompressTransformer;

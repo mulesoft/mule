@@ -10,7 +10,7 @@
 package org.mule.test.integration.exceptions;
 
 import org.mule.api.service.Service;
-import org.mule.service.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.tck.FunctionalTestCase;
 
 public class ExceptionStrategyConfigTestCase extends FunctionalTestCase

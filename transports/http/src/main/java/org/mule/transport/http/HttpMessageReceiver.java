@@ -171,7 +171,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
             catch (Exception e)
             {
-                getFlowConstruct().getExceptionListener().exceptionThrown(e);
+                getConnector().getMuleContext().getExceptionListener().handleException(e);
             }
             finally
             {

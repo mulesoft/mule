@@ -826,7 +826,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 }
 
                 // Log or otherwise handle exception
-                muleContext.getExceptionListener().exceptionThrown(exception);
+                muleContext.getExceptionListener().handleException(exception);
 
                 // Store some info. about the receiver/dispatcher which threw the
                 // ConnectException so
@@ -852,12 +852,12 @@ public abstract class AbstractConnector implements Connector, WorkListener
             }
             catch (Exception e)
             {
-                muleContext.getExceptionListener().exceptionThrown(exception);
+                muleContext.getExceptionListener().handleException(exception);
             }
         }
         else
         {
-            muleContext.getExceptionListener().exceptionThrown(exception);
+            muleContext.getExceptionListener().handleException(exception);
         }
     }
 

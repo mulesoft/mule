@@ -11,7 +11,7 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleMessage;
-import org.mule.service.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultServiceExceptionStrategy;
 
 import java.util.ArrayList;
 import java.util.List;

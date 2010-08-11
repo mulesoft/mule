@@ -12,12 +12,12 @@ package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.servlet.MuleReceiverServlet;
 
-import java.beans.ExceptionListener;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,7 +76,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
         MuleMessage result = client.send("http://ross:ross@localhost:" + HTTP_PORT
                                         + "/services/mycomponent?method=echo", "test", props);
         
-        ExceptionListener exceptionListener = 
+        MessagingExceptionHandler exceptionListener = 
             muleContext.getRegistry().lookupService("mycomponent").getExceptionListener();
         assertTrue(exceptionListener instanceof UnitTestExceptionStrategy);
         

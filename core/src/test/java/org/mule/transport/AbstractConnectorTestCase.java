@@ -12,6 +12,7 @@ package org.mule.transport;
 
 import org.mule.api.DefaultMuleException;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageDispatcherFactory;
@@ -23,8 +24,6 @@ import org.mule.tck.testmodels.fruit.Apple;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
-
-import java.beans.ExceptionListener;
 
 /**
  * <code>AbstractConnectorTestCase</code> tests common behaviour of all endpoints and
@@ -76,17 +75,17 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         Connector connector = getConnectorAndAssert();
 
         // Text exception handler
-        Mock ehandlerMock = new Mock(ExceptionListener.class, "exceptionHandler");
+        Mock ehandlerMock = new Mock(SystemExceptionHandler.class, "exceptionHandler");
 
-        ehandlerMock.expect("exceptionThrown", C.isA(Exception.class));
+        ehandlerMock.expect("handleException", C.isA(Exception.class));
 
         assertNotNull(muleContext.getExceptionListener());
-        muleContext.setExceptionListener((ExceptionListener) ehandlerMock.proxy());
+        muleContext.setExceptionListener((SystemExceptionHandler) ehandlerMock.proxy());
         connector.handleException(new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
 
         if (connector instanceof AbstractConnector)
         {
-            ehandlerMock.expect("exceptionThrown", C.isA(Exception.class));
+            ehandlerMock.expect("handleException", C.isA(Exception.class));
             ((AbstractConnector) connector).exceptionThrown(
                     new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
         }

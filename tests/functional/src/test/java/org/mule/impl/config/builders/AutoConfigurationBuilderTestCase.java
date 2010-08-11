@@ -14,14 +14,13 @@ import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.context.MuleContextFactory;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-
-import java.beans.ExceptionListener;
 
 public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase
 {
@@ -39,7 +38,7 @@ public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase
         configurationBuilder.configure(muleContext);
 
         // Just a few of the asserts from AbstractConfigBuilderTestCase
-        ExceptionListener es = muleContext.getRegistry().lookupModel("main").getExceptionListener();
+        MessagingExceptionHandler es = muleContext.getRegistry().lookupModel("main").getExceptionListener();
         assertNotNull(es);
         assertTrue(es instanceof TestExceptionStrategy);
     }

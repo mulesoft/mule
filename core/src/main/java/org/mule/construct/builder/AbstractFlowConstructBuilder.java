@@ -10,21 +10,21 @@
 
 package org.mule.construct.builder;
 
-import java.beans.ExceptionListener;
-import java.util.List;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.AbstractFlowConstruct;
+
+import java.util.List;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstructBuilder, F extends AbstractFlowConstruct>
 {
-    private ExceptionListener exceptionListener;
+    private MessagingExceptionHandler exceptionListener;
     private InboundEndpoint inboundEndpoint;
     private EndpointBuilder inboundEndpointBuilder;
     private String inboundAddress;
@@ -41,7 +41,7 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
         return (T) this;
     }
 
-    public T exceptionStrategy(ExceptionListener exceptionListener)
+    public T exceptionStrategy(MessagingExceptionHandler exceptionListener)
     {
         this.exceptionListener = exceptionListener;
         return (T) this;

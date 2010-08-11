@@ -10,7 +10,7 @@
 
 package org.mule.transport.cxf;
 
-import org.mule.service.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultServiceExceptionStrategy;
 
 import org.apache.cxf.interceptor.Fault;
 

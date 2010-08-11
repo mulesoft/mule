@@ -313,9 +313,9 @@ public class EventCorrelator
             final MuleMessageCollection messageCollection = group.toMessageCollection();
             context.fireNotification(new RoutingNotification(messageCollection, null,
                                                              RoutingNotification.CORRELATION_TIMEOUT));
-            service.getExceptionListener().exceptionThrown(
+            service.getExceptionListener().handleException(
                     new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
-                                                    group.getMessageCollectionEvent()));
+                                                    group.getMessageCollectionEvent()), group.getMessageCollectionEvent());
         }
         else
         {
@@ -362,7 +362,7 @@ public class EventCorrelator
             }
             catch (Exception e)
             {
-                service.getExceptionListener().exceptionThrown(e);
+                service.getExceptionListener().handleException(e, group.getMessageCollectionEvent());
             }
         }
     }

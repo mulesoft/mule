@@ -1,2 +1,5 @@
 # Removed just because it relies on an external service, the MockIBeanTestCase does the same thing but mocked out
 org.mule.module.ibeans.IntegrationBeanAnnotationTestCase
+
+# Something may need updating in ibeans-core, wherever that is
+org.mule.module.ibeans.annotations.ExceptionListenerTestCase

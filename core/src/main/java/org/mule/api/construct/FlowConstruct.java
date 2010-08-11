@@ -11,11 +11,10 @@
 package org.mule.api.construct;
 
 import org.mule.api.MuleContext;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.management.stats.FlowConstructStatistics;
-
-import java.beans.ExceptionListener;
 
 /**
  * <p>
@@ -38,7 +37,7 @@ public interface FlowConstruct extends LifecycleStateEnabled
      *         be thrown at different points during the message flow defined by this
      *         construct.
      */
-    ExceptionListener getExceptionListener();
+    MessagingExceptionHandler getExceptionListener();
 
     /**
      * @return The statistics holder used by this flow construct to keep track of its

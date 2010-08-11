@@ -11,6 +11,7 @@ import org.mule.component.DefaultJavaComponent
 import org.mule.config.ChainedThreadingProfile
 import org.mule.endpoint.DefaultEndpointFactory
 import org.mule.endpoint.EndpointURIEndpointBuilder
+import org.mule.exception.DefaultServiceExceptionStrategy
 import org.mule.interceptor.InterceptorStack
 import org.mule.model.seda.SedaModel
 import org.mule.model.seda.SedaService
@@ -22,7 +23,6 @@ import org.mule.routing.filters.MessagePropertyFilter
 import org.mule.routing.filters.PayloadTypeFilter
 import org.mule.routing.outbound.OutboundPassThroughRouter
 import org.mule.security.MuleSecurityManager
-import org.mule.service.DefaultServiceExceptionStrategy
 import org.mule.tck.testmodels.fruit.FruitCleaner
 import org.mule.tck.testmodels.fruit.Orange
 import org.mule.tck.testmodels.mule.TestCompressionTransformer

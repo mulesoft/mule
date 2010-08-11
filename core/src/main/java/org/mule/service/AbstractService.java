@@ -18,6 +18,7 @@ import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -43,8 +44,6 @@ import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.service.processor.ServiceAsyncRequestReplyRequestor;
 import org.mule.util.ClassUtils;
-
-import java.beans.ExceptionListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -80,7 +79,7 @@ public abstract class AbstractService implements Service
     /**
      * The exception strategy used by the service.
      */
-    protected ExceptionListener exceptionListener;
+    protected MessagingExceptionHandler exceptionListener;
 
     /**
      * The service's name
@@ -542,12 +541,12 @@ public abstract class AbstractService implements Service
         this.model = model;
     }
 
-    public ExceptionListener getExceptionListener()
+    public MessagingExceptionHandler getExceptionListener()
     {
         return exceptionListener;
     }
 
-    public void setExceptionListener(ExceptionListener exceptionListener)
+    public void setExceptionListener(MessagingExceptionHandler exceptionListener)
     {
         this.exceptionListener = exceptionListener;
     }

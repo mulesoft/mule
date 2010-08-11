@@ -152,7 +152,7 @@ public abstract class AbstractReceiverWorker implements Work
         }
         catch (Exception e)
         {
-            receiver.getFlowConstruct().getExceptionListener().exceptionThrown(e);
+            muleContext.getExceptionListener().handleException(e);
         }
         finally
         {

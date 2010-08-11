@@ -10,13 +10,12 @@
 package org.mule.test.integration.config;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
-
-import java.beans.ExceptionListener;
 
 public class CustomConfigTestCase extends FunctionalTestCase
 {
@@ -44,7 +43,7 @@ public class CustomConfigTestCase extends FunctionalTestCase
         assertEquals(cnn.getSomeProperty(), "foo");
 
         //Test exception strategy
-        ExceptionListener es = muleContext.getRegistry().lookupModel("main").getExceptionListener();
+        MessagingExceptionHandler es = muleContext.getRegistry().lookupModel("main").getExceptionListener();
         assertNotNull(es);
         assertTrue(es instanceof TestExceptionStrategy);
         assertEquals("bar", ((TestExceptionStrategy) es).getTestProperty());

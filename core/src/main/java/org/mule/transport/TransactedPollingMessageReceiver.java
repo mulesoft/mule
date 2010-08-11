@@ -182,7 +182,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             }
             catch (Exception e)
             {
-                getFlowConstruct().getExceptionListener().exceptionThrown(e);
+                connector.getMuleContext().getExceptionListener().handleException(e);
             }
             finally
             {

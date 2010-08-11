@@ -13,8 +13,8 @@ package org.mule.test.integration.exceptions;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.TransactionException;
+import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.module.client.MuleClient;
-import org.mule.service.DefaultServiceExceptionStrategy;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
 

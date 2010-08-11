@@ -18,6 +18,8 @@ import org.mule.api.MuleException;
 import org.mule.api.NamedObject;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleException;
@@ -35,7 +37,6 @@ import org.mule.util.queue.QueueSession;
 import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
-import java.beans.ExceptionListener;
 import java.text.MessageFormat;
 
 import javax.resource.spi.work.Work;
@@ -179,15 +180,15 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
             catch (Exception e)
             {
                 event.getSession().setValid(false);
-                ExceptionListener exceptionListener = event.getFlowConstruct().getExceptionListener();
+                MessagingExceptionHandler exceptionListener = event.getFlowConstruct().getExceptionListener();
                 if (e instanceof MessagingException)
                 {
-                    exceptionListener.exceptionThrown(e);
+                    exceptionListener.handleException(e, event);
                 }
                 else
                 {
-                    exceptionListener.exceptionThrown(new MessagingException(
-                        CoreMessages.eventProcessingFailedFor(getStageDescription()), event, e));
+                    exceptionListener.handleException(new MessagingException(
+                        CoreMessages.eventProcessingFailedFor(getStageDescription()), event, e), event);
                 }
             }
         }
@@ -199,7 +200,7 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
      */
     public void run()
     {
-        DefaultMuleEvent event = null;
+        DefaultMuleEvent event = null; 
         QueueSession queueSession = muleContext.getQueueManager().getQueueSession();
 
         while (!lifecycleState.isStopped())
@@ -239,7 +240,30 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                 }
 
                 event = (DefaultMuleEvent) dequeue();
-                if (event != null)
+            }
+            catch (InterruptedException ie)
+            {
+                queueDraining.set(false);
+                break;
+            }
+            catch (Exception e)
+            {
+                SystemExceptionHandler exceptionListener = muleContext.getExceptionListener();
+                if (e instanceof MuleException)
+                {
+                    exceptionListener.handleException(e);
+                }
+                else
+                {
+                    exceptionListener.handleException(new MessagingException(
+                        CoreMessages.eventProcessingFailedFor(getStageDescription()),
+                        event, e));
+                }
+            }
+
+            if (event != null)
+            {
+                try
                 {
                     if (isStatsEnabled())
                     {
@@ -262,24 +286,9 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                         work.run();
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                ExceptionListener exceptionListener = muleContext.getExceptionListener();
-                if (e instanceof InterruptedException)
+                catch (Exception e)
                 {
-                    queueDraining.set(false);
-                    break;
-                }
-                if (e instanceof MuleException)
-                {
-                    exceptionListener.exceptionThrown(e);
-                }
-                else
-                {
-                    exceptionListener.exceptionThrown(new MessagingException(
-                        CoreMessages.eventProcessingFailedFor(getStageDescription()),
-                        event, e));
+                    event.getFlowConstruct().getExceptionListener().handleException(e, event);
                 }
             }
         }

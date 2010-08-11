@@ -12,12 +12,12 @@ package org.mule.test.integration.transaction;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
-import org.mule.exception.DefaultMessagingExceptionStrategy;
+import org.mule.exception.AbstractMessagingExceptionStrategy;
 
 /**
  * Will rollback the transaction in case a {@link RoutingException} is encountered.
  */
-public class RollbackRoutingExceptionStrategy extends DefaultMessagingExceptionStrategy
+public class RollbackRoutingExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
 
     public void handleRoutingException(MuleMessage message, MessageProcessor endpoint, Throwable t)

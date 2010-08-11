@@ -152,7 +152,7 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
             }
             catch (Exception e)
             {
-                getFlowConstruct().getExceptionListener().exceptionThrown(e);
+                getConnector().getMuleContext().getExceptionListener().handleException(e);
             }
         }
 

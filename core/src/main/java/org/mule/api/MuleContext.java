@@ -15,6 +15,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
@@ -27,8 +28,6 @@ import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.util.queue.QueueManager;
-
-import java.beans.ExceptionListener;
 
 import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
@@ -224,7 +223,7 @@ public interface MuleContext extends Lifecycle
     
     LocalMuleClient getClient();
     
-    ExceptionListener getExceptionListener();
+    SystemExceptionHandler getExceptionListener();
 
-    void setExceptionListener(ExceptionListener exceptionListener);
+    void setExceptionListener(SystemExceptionHandler exceptionListener);
 }
