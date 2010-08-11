@@ -19,7 +19,6 @@ import org.mule.api.annotations.meta.Channel;
 import org.mule.api.annotations.meta.ChannelType;
 import org.mule.api.annotations.meta.Router;
 import org.mule.api.annotations.meta.RouterType;
-import org.mule.api.annotations.routing.Reply;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -260,11 +259,6 @@ public class DecoratingAnnotatedServiceProcessor implements PreInitProcessor, Mu
     protected void processOutbound(Class componentFactoryClass, org.mule.api.service.Service service) throws MuleException
     {
         OutboundRouter router = processOutboundRouter(componentFactoryClass);
-        Reply replyEp = (Reply) componentFactoryClass.getAnnotation(Reply.class);
-        if (replyEp != null)
-        {
-            router.setReplyTo(replyEp.uri());
-        }
 
         OutboundEndpoint outboundEndpoint;
         List<AnnotationMetaData> annotations = AnnotationUtils.getClassAndMethodAnnotations(componentFactoryClass);
