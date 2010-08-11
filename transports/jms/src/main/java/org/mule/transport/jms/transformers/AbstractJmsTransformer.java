@@ -142,7 +142,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
         return JmsMessageUtils.toObject(source, jmsSpec, encoding);
     }
 
-    protected void setJmsProperties(MuleMessage message, Message msg) throws JMSException
+    public void setJmsProperties(MuleMessage message, Message msg) throws JMSException
     {
         for (String key : message.getOutboundPropertyNames())
         {

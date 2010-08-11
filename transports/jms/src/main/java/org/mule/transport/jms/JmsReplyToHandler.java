@@ -22,6 +22,7 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
+import org.mule.transport.jms.transformers.ObjectToJMSMessage;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 
@@ -48,11 +49,13 @@ import javax.jms.Topic;
 public class JmsReplyToHandler extends DefaultReplyToHandler
 {
     private final JmsConnector connector;
+    private ObjectToJMSMessage toJmsMessage;
 
     public JmsReplyToHandler(JmsConnector connector, List<Transformer> transformers)
     {
         super(transformers, connector.getMuleContext());
         this.connector = connector;
+        toJmsMessage = new ObjectToJMSMessage();
     }
 
     @Override
@@ -102,7 +105,11 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
 
             final boolean topic = connector.getTopicResolver().isTopic(replyToDestination);
             session = connector.getSession(false, topic);
+
+            //This mimics the OBjectToJmsMessage Transformer behaviour without needing an endpoint
+            //TODO clean this up, maybe make the transformer available via a utility class, passing in the Session
             Message replyToMessage = JmsMessageUtils.toMessage(payload, session);
+            toJmsMessage.setJmsProperties(returnMessage, replyToMessage);
 
             processMessage(replyToMessage, event);
             if (logger.isDebugEnabled())
