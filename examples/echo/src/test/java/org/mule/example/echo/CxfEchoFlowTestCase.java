@@ -10,66 +10,15 @@
 
 package org.mule.example.echo;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.NullPayload;
-import org.mule.util.IOUtils;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.custommonkey.xmlunit.XMLAssert;
-
 /**
  * Tests the echo example using CXF.
  */
-public class CxfEchoFlowTestCase extends FunctionalTestCase
+public class CxfEchoFlowTestCase extends CxfEchoTestCase
 {
-    private String expectedGetResponse;
-
     @Override
     protected String getConfigResources()
     {
         return "echo-cxf-flow-config.xml";
     }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        try
-        {
-            expectedGetResponse = IOUtils.getResourceAsString("echo-cxf-response.xml", getClass());
-        }
-        catch (IOException ioex)
-        {
-            fail(ioex.getMessage());
-        }
-    }
-
-    public void testGetEcho() throws Exception
-    {
-        // CXF has built in support for understanding GET requests. They are of the form:
-        // http://host/service/OPERATION/PARAM_NAME/PARAM_VALUE
-        
-        MuleClient client = new MuleClient(muleContext);
-        Map<String, String> props = new HashMap<String, String>();
-        props.put("http.method", "GET");
-        MuleMessage result = client.send("http://localhost:65082/services/EchoUMO/echo/text/hello", "", props);
-        assertNotNull(result);
-        assertFalse(result.getPayload() instanceof NullPayload);
-        XMLAssert.assertXMLEqual(expectedGetResponse, result.getPayloadAsString());
-    }
-
-    public void testSoapPostEcho() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("cxf:http://localhost:65082/services/EchoUMO?method=echo", 
-            "hello", null);
-        assertNotNull(result);
-        assertNull(result.getExceptionPayload());
-        assertFalse(result.getPayload() instanceof NullPayload);
-        assertEquals("hello", result.getPayload());
-    }
 }
