@@ -11,6 +11,7 @@
 package org.mule.transport.vm;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -25,10 +26,12 @@ import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+
+import javax.activation.DataHandler;
 
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
 
@@ -109,46 +112,62 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 
     public MuleMessage onCall(MuleMessage message, boolean synchronous) throws MuleException
     {
-        // Rewrite the message to treat it as a new message
-        MuleMessage newMessage = createMessageCopy(message);
-        MuleEvent event =  routeMessage(newMessage);
-        return event == null ? null : event.getMessage();
+        try
+        {
+            // Rewrite the message to treat it as a new message
+            MuleMessage newMessage = createMessageCopy(message);
+            MuleEvent event =  routeMessage(newMessage);
+            return event == null ? null : event.getMessage();
+        }
+        catch (Exception e)
+        {
+            throw new DefaultMuleException(e);
+        }
     }
     
-    protected MuleMessage createMessageCopy(MuleMessage message)
+    protected MuleMessage createMessageCopy(MuleMessage message) throws Exception
     {
-        MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());
-        movePropertiesToInbound(newMessage);
-        
+        //Copy message, but put all outbound properties and attachments on inbound
+        //We ignore inbound and invocation scopes since the VM receiver needs to behave the
+        //same way as any other receiver in Mule and would only receive inbound headers and attachments
+        Map<String, DataHandler> attachments = new HashMap<String, DataHandler>(3);
+        for (String name : message.getOutboundAttachmentNames())
+        {
+            attachments.put(name, message.getOutboundAttachment(name));
+        }
+
+        Map<String, Object> properties = new HashMap<String, Object>(3);
+        for (String name : message.getOutboundPropertyNames())
+        {
+            properties.put(name, message.getOutboundProperty(name));
+        }
+
+        DefaultMuleMessage newMessage =  new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());
+        newMessage.clearProperties(PropertyScope.INBOUND);
+        newMessage.clearProperties(PropertyScope.INVOCATION);
+        newMessage.clearProperties(PropertyScope.OUTBOUND);
+
+        for (String s : properties.keySet())
+        {
+            newMessage.setInboundProperty(s, properties.get(s));
+        }
+
+        for (String s : newMessage.getOutboundAttachmentNames())
+        {
+            newMessage.removeAttachment(s);
+        }
+
+        for (String s : attachments.keySet())
+        {
+            newMessage.addInboundAttachment(s, attachments.get(s));
+        }
+
         newMessage.setCorrelationId(message.getCorrelationId());
         newMessage.setCorrelationGroupSize(message.getCorrelationGroupSize());
         newMessage.setCorrelationSequence(message.getCorrelationSequence());
-        
+        newMessage.setReplyTo(message.getReplyTo());
+        newMessage.setEncoding(message.getEncoding());
         return newMessage;
-    }
-
-    protected void movePropertiesToInbound(MuleMessage newMessage)
-    {
-        // TODO hackish way, needs to be reworked into an api - move outbound props (from dispatcher) to inbound (for receiver)
-        Set<String> props = new HashSet<String>(newMessage.getInboundPropertyNames());
-        for (String name : props)
-        {
-            newMessage.removeProperty(name, PropertyScope.INBOUND);
-        }
-        
-        props = new HashSet<String>(newMessage.getInvocationPropertyNames());
-        for (String name : props)
-        {
-            newMessage.removeProperty(name, PropertyScope.INVOCATION);
-        }
-        
-        // clone to avoid CMEs
-        props = new HashSet<String>(newMessage.getOutboundPropertyNames());
-        for (String name : props)
-        {
-            final Object value = newMessage.removeProperty(name, PropertyScope.OUTBOUND);
-            newMessage.setInboundProperty(name, value);
-        }
     }
 
     /**
