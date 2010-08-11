@@ -85,7 +85,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     {
         Object body = null;
 
-        if (httpRequest.getContentType().contains("multipart/"))
+        if (httpRequest.getContentType().contains("multipart/form-data"))
         {
             MultiPartInputStream in = new MultiPartInputStream(httpRequest.getBody(), httpRequest.getContentType(), null);
 
