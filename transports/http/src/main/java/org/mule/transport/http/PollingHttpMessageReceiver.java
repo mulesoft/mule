@@ -23,16 +23,15 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.MapUtils;
+import org.mule.util.StringUtils;
 
 import java.util.Collections;
-import java.util.Map;
 
 /**
  * Will poll an http URL and use the response as the input for a service request.
@@ -97,16 +96,6 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
     {
         MuleContext muleContext = connector.getMuleContext();
 
-        MuleMessage request = new DefaultMuleMessage("", muleContext);
-        if (etag != null && checkEtag)
-        {
-            Map<String, String> customHeaders = Collections.singletonMap(HttpConstants.HEADER_IF_NONE_MATCH, etag);
-            request.setOutboundProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, customHeaders);
-        }
-        request.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
-
-        MuleSession session = new DefaultMuleSession((Service) flowConstruct, connector.getMuleContext());
-
         if (outboundEndpoint == null)
         {
             // We need to create an outbound endpoint to do the polled request using
@@ -122,6 +111,17 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             outboundEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
                     endpointBuilder);
         }
+
+        MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, outboundEndpoint.getProperties(), muleContext);
+        if (etag != null && checkEtag)
+        {
+            request.setOutboundProperty(HttpConstants.HEADER_IF_NONE_MATCH, etag);
+        }
+        request.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
+
+        MuleSession session = new DefaultMuleSession(flowConstruct, connector.getMuleContext());
+
+
         MuleEvent event = new DefaultMuleEvent(request, outboundEndpoint, session);
 
         MuleEvent result = outboundEndpoint.process(event);

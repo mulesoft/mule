@@ -10,17 +10,28 @@
 
 package org.mule.transport.http.functional;
 
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
 
 public class HttpPollingFunctionalTestCase extends FunctionalTestCase
 {
 
     public void testPollingHttpConnector() throws Exception
     {
+        FunctionalTestComponent ftc = getFunctionalTestComponent("polled");
+        assertNotNull(ftc);
+        ftc.setEventCallback(new EventCallback(){
+            public void eventReceived(MuleEventContext context, Object component) throws Exception
+            {
+                assertEquals("The Accept header should be set on the incoming message", "application/xml", context.getMessage().<String>getInboundProperty("Accept"));
+            }
+        });
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.request("vm://toclient", 5000);
+        MuleMessage result = client.request("vm://toclient", RECEIVE_TIMEOUT);
         assertNotNull(result.getPayload());
         assertEquals("foo", result.getPayloadAsString());
     }
