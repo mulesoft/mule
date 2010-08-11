@@ -520,10 +520,10 @@
         <xsd:sequence>
             <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:choice minOccurs="0" maxOccurs="unbounded">
-                <xsd:element ref="abstract-inbound-router"/> <!-- Deprecated -->
+                <xsd:element ref="abstract-inbound-router"/>
                 <xsd:element ref="abstract-transformer" />
-                <xsd:element ref="abstract-filter" />
-                <xsd:element ref="abstract-intercepting-message-processor"/>
+                <xsd:element ref="splitter"/>
+                <xsd:element ref="collection-splitter"/>
                 <xsd:element ref="processor"/>
                 <xsd:element ref="custom-processor"/>
             </xsd:choice>
@@ -1162,16 +1162,13 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:choice minOccurs="0">
-                        <xsd:element name="inbound" type="inboundCollectionType">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    The elements within 'inbound' describe how a service receives messages.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:element ref="abstract-inbound-endpoint"/>
-                    </xsd:choice>
+                    <xsd:element name="inbound" type="inboundCollectionType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The elements within 'inbound' describe how a service receives messages.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <!-- minOccurs="0" to allow for <forwarding-router/> and/or default component -->
                     <xsd:element ref="abstract-component" minOccurs="0">
                         <xsd:annotation>
@@ -1180,18 +1177,13 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:choice minOccurs="0">
-                        <xsd:element name="outbound" type="outboundCollectionType">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    The elements within 'outbound' describe how a service sends or dispatches messages.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:element ref="abstract-outbound-endpoint"/>
-                        <xsd:element ref="abstract-outbound-router"/>
-                        <xsd:element ref="abstract-routing-message-processor"/>
-                    </xsd:choice>
+                    <xsd:element name="outbound" type="outboundCollectionType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The elements within 'outbound' describe how a service sends or dispatches messages.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                     <xsd:element name="async-reply" type="asyncReplyCollectionType" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
@@ -1297,9 +1289,7 @@
             <xsd:element ref="abstract-inbound-endpoint" minOccurs="1" maxOccurs="unbounded"/>
             <xsd:choice minOccurs="0" maxOccurs="unbounded">
 	            <xsd:element ref="abstract-async-reply-router"/> <!-- Deprecated -->
-                <xsd:element ref="abstract-transformer" />
-                <xsd:element ref="abstract-filter" />
-                <xsd:element ref="abstract-intercepting-message-processor"/>
+                <xsd:element ref="abstract-inbound-router"/>
                 <xsd:element ref="processor"/>
                 <xsd:element ref="custom-processor"/>
             </xsd:choice>
