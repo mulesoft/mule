@@ -36,7 +36,7 @@ public class LegacyEntryPointResolverSet extends DefaultEntryPointResolverSet
         addEntryPointResolver(reflectionResolver);
     }
 
-    private void addAnnotatedEntryPointResolver()
+    protected void addAnnotatedEntryPointResolver()
     {
         //Annotations support is not part of Mule core, but we want default handling for annotations we have
         //work-arounds like this to avoid importing annotation classes
