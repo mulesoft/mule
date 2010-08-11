@@ -12,7 +12,6 @@ package org.mule.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.exception.MessagingExceptionHandler;
 
 public class ExceptionHandlingMessageProcessor extends AbstractInterceptingMessageProcessor
 {
@@ -24,18 +23,7 @@ public class ExceptionHandlingMessageProcessor extends AbstractInterceptingMessa
         }
         catch (Exception e)
         {
-            MessagingExceptionHandler exceptionListener;
-            if (event.getFlowConstruct() != null)
-            {
-                exceptionListener = event.getFlowConstruct().getExceptionListener();
-                return exceptionListener.handleException(e, event);
-            }
-            else
-            {
-                logger.warn("FlowContruct is not set on MuleEvent, this is probably a bug");
-                event.getMuleContext().getExceptionListener().handleException(e);
-                return null;
-            }            
+            return event.getFlowConstruct().getExceptionListener().handleException(e, event);
         }
     }
 }
