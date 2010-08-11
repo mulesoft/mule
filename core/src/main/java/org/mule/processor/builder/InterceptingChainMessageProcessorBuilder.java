@@ -252,7 +252,8 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
         {
             for (MessageProcessor processor : allProcessors)
             {
-                if (processor instanceof Initialisable)
+                //MULE-5002 TODO review MP Lifecycle
+                if (processor instanceof Initialisable /*&& !(processor instanceof Transformer)*/)
                 {
                     ((Initialisable) processor).initialise();
                 }

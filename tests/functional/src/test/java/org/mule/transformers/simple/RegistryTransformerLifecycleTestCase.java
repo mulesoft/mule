@@ -22,7 +22,7 @@ import java.util.List;
  * Highlights the issue: MULE-4599 where dispose cannot be called on a transformer since it is a 
  * prototype in Spring, so spring does not manage the object.
  */
-public class TransformerLifecycleTestCase extends FunctionalTestCase
+public class RegistryTransformerLifecycleTestCase extends FunctionalTestCase
 {
     @Override
     protected String getConfigResources()
