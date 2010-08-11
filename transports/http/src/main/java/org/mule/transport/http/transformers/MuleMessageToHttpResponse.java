@@ -21,13 +21,13 @@ import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
+import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
@@ -242,20 +242,10 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             }
         }
 
-        //TODO: This is the legacy way of setting custom headers and can be removed in 3.0
-        // Custom responseHeaderNames
         Map customHeaders = msg.getOutboundProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
         if (customHeaders != null)
         {
-            Map.Entry entry;
-            for (Iterator iterator = customHeaders.entrySet().iterator(); iterator.hasNext();)
-            {
-                entry = (Map.Entry) iterator.next();
-                if (entry.getValue() != null)
-                {
-                    response.setHeader(new Header(entry.getKey().toString(), entry.getValue().toString()));
-                }
-            }
+            throw new TransformerException(HttpMessages.customHeaderMapDeprecated(), this);
         }
 
         //attach the outbound properties to the message
@@ -291,7 +281,14 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
                     msg.getReplyTo().toString()));
         }
 
-        response.setBody(msg);
+        try
+        {
+            response.setBody(msg);
+        }
+        catch (Exception e)
+        {
+            throw new TransformerException(this, e);
+        }
 
         return response;
     }

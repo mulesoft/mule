@@ -40,8 +40,8 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
 
         try
         {
-            String httpMethod = message.getOutboundProperty("http.method");
-            String contentType = message.getOutboundProperty("Content-Type");
+            String httpMethod = message.getInboundProperty("http.method");
+            String contentType = message.getInboundProperty("Content-Type");
             
             boolean isGet = HttpConstants.METHOD_GET.equalsIgnoreCase(httpMethod);
             boolean isPost = HttpConstants.METHOD_POST.equalsIgnoreCase(httpMethod);

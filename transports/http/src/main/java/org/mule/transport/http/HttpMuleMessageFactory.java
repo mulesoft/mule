@@ -16,14 +16,22 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.transport.AbstractMuleMessageFactory;
+import org.mule.transport.http.multipart.MultiPartInputStream;
+import org.mule.transport.http.multipart.Part;
+import org.mule.transport.http.multipart.PartDataSource;
+import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.IOUtils;
+import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.activation.DataHandler;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
@@ -38,10 +46,11 @@ import org.apache.commons.logging.LogFactory;
 public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
 {
     private static Log log = LogFactory.getLog(HttpMuleMessageFactory.class);
-    
+
     private boolean enableCookies = false;
     private String cookieSpec;
     private MessageExchangePattern exchangePattern;
+    private Collection<Part> parts;
 
     public HttpMuleMessageFactory(MuleContext context)
     {
@@ -74,27 +83,76 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
 
     protected Object extractPayloadFromHttpRequest(HttpRequest httpRequest) throws IOException
     {
-        Object body = httpRequest.getBody();
+        Object body = null;
 
-        // If http method is GET we use the request uri as the payload.
-        if (body == null)
+        if (httpRequest.getContentType().contains("multipart/"))
         {
-            body = httpRequest.getRequestLine().getUri();
+            MultiPartInputStream in = new MultiPartInputStream(httpRequest.getBody(), httpRequest.getContentType(), null);
+
+            //We need to store this so that the headers for the part can be read
+            parts = in.getParts();
+            for (Part part : parts)
+            {
+                if (part.getName().equals("payload"))
+                {
+                    body = part.getInputStream();
+                    break;
+                }
+            }
+            if (body == null)
+            {
+                throw new IllegalArgumentException("todo");
+            }
         }
         else
         {
-            // If we are running async we need to read stream into a byte[].
-            // Passing along the InputStream doesn't work because the
-            // HttpConnection gets closed and closes the InputStream, often
-            // before it can be read.
-            if (!exchangePattern.hasResponse())
+
+            body = httpRequest.getBody();
+
+            // If http method is GET we use the request uri as the payload.
+            if (body == null)
             {
-                log.debug("Reading HTTP POST InputStream into byte[] for asynchronous messaging.");
-                body = IOUtils.toByteArray((InputStream) body);
+                body = httpRequest.getRequestLine().getUri();
+            }
+            else
+            {
+                // If we are running async we need to read stream into a byte[].
+                // Passing along the InputStream doesn't work because the
+                // HttpConnection gets closed and closes the InputStream, often
+                // before it can be read.
+                if (!exchangePattern.hasResponse())
+                {
+                    log.debug("Reading HTTP POST InputStream into byte[] for asynchronous messaging.");
+                    body = IOUtils.toByteArray((InputStream) body);
+                }
             }
         }
 
         return body;
+    }
+
+    @Override
+    protected void addAttachments(DefaultMuleMessage message, Object transportMessage) throws Exception
+    {
+        if (parts != null)
+        {
+            try
+            {
+                for (Part part : parts)
+                {
+                    if (!part.getName().equals("payload"))
+                    {
+                        message.addInboundAttachment(part.getName(), new DataHandler(new PartDataSource(part)));
+                    }
+                }
+            }
+            finally
+            {
+                //Attachments are the last thing to get processed
+                parts.clear();
+                parts = null;
+            }
+        }
     }
 
     protected Object extractPayloadFromHttpMethod(HttpMethod httpMethod) throws IOException
@@ -128,6 +186,8 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             httpVersion = httpRequest.getRequestLine().getHttpVersion();
             uri = httpRequest.getRequestLine().getUri();
             headers = convertHeadersToMap(httpRequest.getHeaders());
+            convertMultiPartHeaders(headers);
+
             cookieHeader = httpRequest.getFirstHeader(HttpConnector.HTTP_COOKIES_PROPERTY);
         }
         else if (transportMessage instanceof HttpMethod)
@@ -150,6 +210,9 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
 
         headers = processIncomingHeaders(headers, uri, cookieHeader);
 
+        //Make any URI params available ans inbound message headers
+        addUriParamsAsHeaders(headers, uri);
+
         headers.put(HttpConnector.HTTP_METHOD_PROPERTY, method);
         headers.put(HttpConnector.HTTP_REQUEST_PROPERTY, uri);
         headers.put(HttpConnector.HTTP_VERSION_PROPERTY, httpVersion.toString());
@@ -170,11 +233,11 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         initEncoding(message, headers);
     }
 
-    protected Map<String, Object> processIncomingHeaders(Map<String, Object> headers, String uri, 
-        Header cookieHeader) throws Exception
+    protected Map<String, Object> processIncomingHeaders(Map<String, Object> headers, String uri,
+                                                         Header cookieHeader) throws Exception
     {
         Map<String, Object> outHeaders = new HashMap<String, Object>();
-        
+
         for (String headerName : headers.keySet())
         {
             Object headerValue = headers.get(headerName);
@@ -193,7 +256,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
                     URI u = new URI(uri);
 
                     Cookie[] cookies = cs.parse(u.getHost(), u.getPort(), u.getPath(),
-                        u.getScheme().equalsIgnoreCase("https"), cookieHeader);
+                            u.getScheme().equalsIgnoreCase("https"), cookieHeader);
                     if (cookies.length > 0)
                     {
                         // yum!
@@ -215,13 +278,13 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             // accept header & value
             outHeaders.put(headerName, headerValue);
         }
-        
+
         return outHeaders;
     }
 
     private Map<String, Object> convertHeadersToMap(Header[] headers)
     {
-        Map<String, Object> headersMap = new HashMap<String, Object>();
+        Map<String, Object> headersMap = new CaseInsensitiveHashMap();
         for (int i = 0; i < headers.length; i++)
         {
             headersMap.put(headers[i].getName(), headers[i].getValue());
@@ -236,8 +299,8 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         {
             // use HttpClient classes to parse the charset part from the Content-Type
             // header (e.g. "text/html; charset=UTF-16BE")
-            Header contentTypeHeader = new Header(HttpConstants.HEADER_CONTENT_TYPE, 
-                contentType.toString());
+            Header contentTypeHeader = new Header(HttpConstants.HEADER_CONTENT_TYPE,
+                    contentType.toString());
             HeaderElement values[] = contentTypeHeader.getElements();
             if (values.length == 1)
             {
@@ -253,7 +316,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     private void rewriteConnectionAndKeepAliveHeaders(Map<String, Object> headers)
     {
         // rewrite Connection and Keep-Alive headers based on HTTP version
-        String headerValue = null;
+        String headerValue;
         if (!isHttp11(headers))
         {
             String connection = (String) headers.get(HttpConstants.HEADER_CONNECTION);
@@ -269,8 +332,8 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         else
         {
             headerValue = (headers.get(HttpConstants.HEADER_CONNECTION) != null
-                            ? Boolean.TRUE.toString()
-                            : Boolean.FALSE.toString());
+                    ? Boolean.TRUE.toString()
+                    : Boolean.FALSE.toString());
         }
 
         headers.put(HttpConstants.HEADER_CONNECTION, headerValue);
@@ -280,14 +343,36 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
     private boolean isHttp11(Map<String, Object> headers)
     {
         String httpVersion = (String) headers.get(HttpConnector.HTTP_VERSION_PROPERTY);
-        if (HttpConstants.HTTP10.equalsIgnoreCase(httpVersion))
+        return !HttpConstants.HTTP10.equalsIgnoreCase(httpVersion);
+    }
+
+    protected void addUriParamsAsHeaders(Map headers, String uri)
+    {
+        int i = uri.indexOf("?");
+        if (i > -1)
         {
-            return false;
+            headers.putAll(PropertiesUtils.getPropertiesFromQueryString(uri.substring(i + 1)));
         }
-        else
+    }
+
+    protected void convertMultiPartHeaders(Map headers)
+    {
+        if (parts != null)
         {
-            return true;
+            for (Part part : parts)
+            {
+                if (part.getName().equals("payload"))
+                {
+                    for (String name : part.getHeaderNames())
+                    {
+                        headers.put(name, part.getHeader(name));
+                    }
+                    break;
+                }
+            }
+
         }
+
     }
 
     public void setEnableCookies(boolean enableCookies)

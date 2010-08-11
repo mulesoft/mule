@@ -67,7 +67,13 @@ public class HttpConnector extends TcpConnector
      */
     public static final String HTTP_STATUS_PROPERTY = HTTP_PREFIX + "status";
     public static final String HTTP_VERSION_PROPERTY = HTTP_PREFIX + "version";
+    
+    /**
+     * @deprecated Instead users can now add properties to the outgoing request using the OUTBOUND property scope on the message.
+     */
+    @Deprecated
     public static final String HTTP_CUSTOM_HEADERS_MAP_PROPERTY = HTTP_PREFIX + "custom.headers";
+
     public static final String HTTP_METHOD_PROPERTY = HTTP_PREFIX + "method";
     
     /**

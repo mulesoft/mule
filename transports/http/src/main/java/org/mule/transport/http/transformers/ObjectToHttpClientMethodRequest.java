@@ -11,12 +11,14 @@
 package org.mule.transport.http.transformers;
 
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
+import org.mule.message.ds.StringDataSource;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
@@ -24,6 +26,7 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.StreamPayloadRequestEntity;
 import org.mule.transport.http.i18n.HttpMessages;
+import org.mule.util.IOUtils;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 
@@ -33,9 +36,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
+import javax.activation.URLDataSource;
 
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
@@ -50,6 +55,11 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.methods.TraceMethod;
+import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
+import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.lang.SerializationUtils;
 
@@ -60,7 +70,8 @@ import org.apache.commons.lang.SerializationUtils;
 
 public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
 {
-    
+   private MuleContext muleContext;
+
     public ObjectToHttpClientMethodRequest()
     {
         setReturnDataType(DataTypeFactory.create(HttpMethod.class));
@@ -72,97 +83,50 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         registerSourceType(NullPayload.class);
     }
 
-    protected int addParameters(String queryString, PostMethod postMethod, MuleMessage msg)
+    public void setMuleContext(MuleContext context)
     {
-        // Parse the HTTP argument list and convert to a NameValuePair
-        // collection
-
-        if (StringUtils.isBlank(queryString))
-        {
-            return 0;
-        }
-
-        String currentParam;
-        int equals;
-        equals = queryString.indexOf("&");
-        if (equals > -1)
-        {
-            currentParam = queryString.substring(0, equals);
-            queryString = queryString.substring(equals + 1);
-        }
-        else
-        {
-            currentParam = queryString;
-            queryString = StringUtils.EMPTY;
-        }
-        int parameterIndex = -1;
-        while (StringUtils.isNotBlank(currentParam))
-        {
-            String paramName, paramValue;
-            equals = currentParam.indexOf("=");
-            if (equals > -1)
-            {
-                paramName = currentParam.substring(0, equals);
-                paramValue = currentParam.substring(equals + 1);
-                parameterIndex++;
-                postMethod.addParameter(paramName, paramValue);
-            }
-            equals = queryString.indexOf("&");
-            if (equals > -1)
-            {
-                currentParam = queryString.substring(0, equals);
-                queryString = queryString.substring(equals + 1);
-            }
-            else
-            {
-                currentParam = queryString;
-                queryString = StringUtils.EMPTY;
-            }
-        }
-        return parameterIndex + 1;
+        this.muleContext = context;
     }
+
+
 
     @Override
     public Object transformMessage(MuleMessage msg, String outputEncoding) throws TransformerException
     {
         Object src = msg.getPayload();
 
-        String endpointString = msg.getOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
-        if (endpointString == null)
-        {
-            endpointString = msg.getInvocationProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
-        }
-        if (endpointString == null)
+        String endpoint = msg.getOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
+        if (endpoint == null)
         {
             throw new TransformerException(
                     HttpMessages.eventPropertyNotSetCannotProcessRequest(
                             MuleProperties.MULE_ENDPOINT_PROPERTY), this);
         }
 
-        String method = msg.getInvocationProperty(HttpConnector.HTTP_METHOD_PROPERTY);
+        String method = (String) msg.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, PropertyScope.OUTBOUND);
         if (method == null)
         {
-            method = msg.getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
+            method = msg.getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, null);
+            if(method == null)
+            {
+                method = msg.getInvocationProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
+            }
         }
+
         try
         {
             //Allow Expressions to be embedded
-            endpointString = endpointString.replaceAll("%23", "#");
-            endpointString = muleContext.getExpressionManager().parse(endpointString, msg, true);
-            URI uri = new URI(endpointString);
+            endpoint = endpoint.replaceAll("%23", "#");
+            endpoint = muleContext.getExpressionManager().parse(endpoint, msg, true);
+            URI uri = new URI(endpoint);
             HttpMethod httpMethod;
 
             if (HttpConstants.METHOD_GET.equals(method))
             {
                 httpMethod = new GetMethod(uri.toString());
-                String getBodyParam = msg.getInvocationProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
-                                                                HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
-                if (getBodyParam == null)
-                {
-                    msg.getOutboundProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
-                                            HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY);
-                }
-                String paramName = URLEncoder.encode(getBodyParam, outputEncoding);
+                String paramName = URLEncoder.encode(msg.getOutboundProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
+                        HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY), outputEncoding);
+
 
                 String paramValue;
                 Boolean encode = msg.getInvocationProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE);
@@ -170,7 +134,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
                 {
                     encode = msg.getOutboundProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, true);
                 }
-                
+
                 if (encode)
                 {
                     paramValue = URLEncoder.encode(src.toString(), outputEncoding);
@@ -179,6 +143,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
                 {
                     paramValue = src.toString();
                 }
+
 
                 String query = uri.getRawQuery();
                 if (!(src instanceof NullPayload) && !StringUtils.EMPTY.equals(src))
@@ -198,7 +163,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             else if (HttpConstants.METHOD_POST.equalsIgnoreCase(method))
             {
                 PostMethod postMethod = new PostMethod(uri.toString());
-                String paramName = msg.getOutboundProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
+                String paramName = msg.getOutboundProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY, null);
                 if (paramName == null)
                 {
                     paramName = msg.getInvocationProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
@@ -206,22 +171,21 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
 
                 if (src instanceof Map)
                 {
-                    for (Iterator iterator = ((Map)src).entrySet().iterator(); iterator.hasNext();)
+                    for (Iterator iterator = ((Map) src).entrySet().iterator(); iterator.hasNext();)
                     {
-                        Map.Entry entry = (Map.Entry)iterator.next();
+                        Map.Entry entry = (Map.Entry) iterator.next();
                         postMethod.addParameter(entry.getKey().toString(), entry.getValue().toString());
                     }
                 }
-                else if(paramName!=null)
+                else if (paramName != null)
                 {
                     postMethod.addParameter(paramName, src.toString());
 
                 }
                 else
                 {
-                    // Call method to manage the parameter array
-                    addParameters(uri.getQuery(), postMethod, msg);
-                    setupEntityMethod(src, outputEncoding, msg, uri, postMethod);
+                    //addParameters(uri.getQuery(), postMethod, msg);
+                    setupEntityMethod(src, outputEncoding, msg, postMethod);
                 }
 
                 httpMethod = postMethod;
@@ -230,7 +194,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             {
                 PutMethod putMethod = new PutMethod(uri.toString());
 
-                setupEntityMethod(src, outputEncoding, msg, uri, putMethod);
+                setupEntityMethod(src, outputEncoding, msg, putMethod);
 
                 httpMethod = putMethod;
             }
@@ -256,7 +220,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             }
 
             // Allow the user to set HttpMethodParams as an object on the message
-            HttpMethodParams params = (HttpMethodParams) msg.removeProperty(HttpConnector.HTTP_PARAMS_PROPERTY);
+            HttpMethodParams params = (HttpMethodParams) msg.removeProperty(HttpConnector.HTTP_PARAMS_PROPERTY, PropertyScope.OUTBOUND);
             if (params != null)
             {
                 httpMethod.setParams(params);
@@ -264,7 +228,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             else
             {
                 // TODO we should probably set other properties here
-                String httpVersion = msg.getOutboundProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
+                String httpVersion = msg.getOutboundProperty(HttpConnector.HTTP_VERSION_PROPERTY,
+                        HttpConstants.HTTP11);
                 if (HttpConstants.HTTP10.equals(httpVersion))
                 {
                     httpMethod.getParams().setVersion(HttpVersion.HTTP_1_0);
@@ -288,7 +253,6 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
     protected void setupEntityMethod(Object src,
                                      String encoding,
                                      MuleMessage msg,
-                                     URI uri,
                                      EntityEnclosingMethod postMethod)
             throws UnsupportedEncodingException, TransformerException
     {
@@ -297,8 +261,19 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         // can control if a POST body is posted explicitly
         if (!(msg.getPayload() instanceof NullPayload))
         {
-            // See if we have a MIME type set
-            String mimeType = msg.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE);
+            String mimeType = (String) msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.OUTBOUND);
+            if (mimeType == null)
+            {
+                mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+                logger.info("Content-Type not set on outgoing request, defaulting to: " + mimeType);
+            }
+
+            if (encoding != null
+                    && !"UTF-8".equals(encoding.toUpperCase())
+                    && mimeType.indexOf("charset") == -1)
+            {
+                mimeType += "; charset=" + encoding;
+            }
 
             // Ensure that we have a cached representation of the message if we're using HTTP 1.0
             String httpVersion = msg.getOutboundProperty(HttpConnector.HTTP_VERSION_PROPERTY, HttpConstants.HTTP11);
@@ -313,59 +288,32 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
                     throw new TransformerException(this, e);
                 }
             }
-            
+
+            if (msg.getOutboundAttachmentNames() != null && msg.getOutboundAttachmentNames().size() > 0)
+            {
+                try
+                {
+                    postMethod.setRequestEntity(createMultiPart(msg, postMethod));
+                    return;
+                }
+                catch (Exception e)
+                {
+                    throw new TransformerException(this, e);
+                }
+            }
             if (src instanceof String)
             {
-                // Ensure that we strip the encoding information from the
-                // encoding type
-                if (mimeType != null)
-                {
-                    int parameterIndex = mimeType.indexOf(";");
-                    if (parameterIndex > 0)
-                    {
-                        mimeType = mimeType.substring(0, parameterIndex);
-                    }
-                }
-                if (mimeType == null)
-                {
-                    mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-                }
 
-                postMethod.setRequestEntity(new StringRequestEntity(src.toString(), mimeType,
-                        encoding));
+                postMethod.setRequestEntity(new StringRequestEntity(src.toString(), mimeType, encoding));
                 return;
-            }
-
-
-            if (mimeType == null)
-            {
-                mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-            }
-
-            if (encoding != null
-                    && !"UTF-8".equals(encoding.toUpperCase())
-                    && mimeType.indexOf("charset") == -1)
-            {
-                mimeType += "; charset=" + encoding;
             }
 
             if (src instanceof InputStream)
             {
-                // TODO Danger here! We don't know if the content is
-                // really text or not
-                if (mimeType == null)
-                {
-                    mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-                }
-                postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream) src,
-                        mimeType));
+                postMethod.setRequestEntity(new InputStreamRequestEntity((InputStream) src, mimeType));
             }
             else if (src instanceof byte[])
             {
-                if (mimeType == null)
-                {
-                    mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-                }
                 postMethod.setRequestEntity(new ByteArrayRequestEntity((byte[]) src, mimeType));
             }
             else if (src instanceof OutputHandler)
@@ -375,103 +323,103 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             }
             else
             {
-                if (mimeType == null)
-                {
-                    mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
-                }
-
                 byte[] buffer = SerializationUtils.serialize((Serializable) src);
                 postMethod.setRequestEntity(new ByteArrayRequestEntity(buffer, mimeType));
             }
         }
-
-    }
-
-    protected void setHeaders(HttpMethod httpMethod, MuleMessage msg)
-    {
-        // only invocation and outbound scope to be put on the wire
-        setHeadersScoped(httpMethod, msg, PropertyScope.INVOCATION);
-        setHeadersScoped(httpMethod, msg, PropertyScope.OUTBOUND);
-
-        Set attNams = msg.getAttachmentNames();
-        if (msg.getPayload() instanceof InputStream
-                && attNams != null && attNams.size() > 0)
+        else if (msg.getOutboundAttachmentNames() != null && msg.getOutboundAttachmentNames().size() > 0)
         {
-            // must set this for receiver to properly parse attachments
-            httpMethod.addRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, "multipart/related");
-        }
-
-    }
-
-    protected void setHeadersScoped(HttpMethod httpMethod, MuleMessage msg, PropertyScope scope)
-    {
-        String headerName;
-        String headerValue;
-        for (Iterator iterator = msg.getPropertyNames(scope).iterator(); iterator.hasNext();)
-        {
-            headerName = (String) iterator.next();
-
-            if (headerName.equalsIgnoreCase(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY))
+            try
             {
-                if (logger.isInfoEnabled())
-                {
-                    logger.warn("Deprecation warning:  There is no need to set custom headers using: " + HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY
-                        + " you can now add the properties directly to the outbound endpoint or use the OUTBOUND property scope on the message.");
-                }
-
-                Map customHeaders = msg.getProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, scope);
-                if (customHeaders != null)
-                {
-                    for (Iterator headerItr = customHeaders.entrySet().iterator(); headerItr.hasNext();)
-                    {
-                        Map.Entry entry = (Map.Entry) headerItr.next();
-                        if (entry.getValue() != null)
-                        {
-                            httpMethod.addRequestHeader(entry.getKey().toString(), entry.getValue().toString());
-                        }
-                    }
-                }
+                postMethod.setRequestEntity(createMultiPart(msg, postMethod));
             }
-            else if (HttpConstants.REQUEST_HEADER_NAMES.get(headerName) == null
-                        && !HttpConnector.HTTP_INBOUND_PROPERTIES.contains(headerName))
+            catch (Exception e)
             {
-                headerValue = ObjectUtils.getString(msg.getProperty(headerName, scope), null);
-                if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
-                {
-                    headerName = new StringBuffer(30).append("X-").append(headerName).toString();
-                }
-
-                httpMethod.addRequestHeader(headerName, headerValue);
+                throw new TransformerException(this, e);
             }
-        }
-    }
-
-    protected String paramToString(Object param)
-    {
-        StringBuffer buf = new StringBuffer();
-        if (param instanceof List)
-        {
-            List list = (List) param;
-            for (Iterator iterator = list.iterator(); iterator.hasNext();)
-            {
-                Object object = iterator.next();
-                buf.append(object).append(",");
-            }
-            return buf.toString();
-        }
-        else if (param instanceof Map)
-        {
-            Map map = (Map) param;
-            for (Iterator iterator = map.entrySet().iterator(); iterator.hasNext();)
-            {
-                Map.Entry entry = (Map.Entry) iterator.next();
-                buf.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
-            }
-            return buf.toString().substring(0, buf.length() - 1);
         }
         else
         {
-            return param.toString();
+            //throw new TransformerException()
         }
+
+    }
+
+    protected void setHeaders(HttpMethod httpMethod, MuleMessage msg) throws TransformerException
+    {
+        String headerValue;
+        for (String headerName : msg.getOutboundPropertyNames())
+        {
+            headerValue = ObjectUtils.getString(msg.getOutboundProperty(headerName), null);
+
+            if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
+            {
+                //Define Mule headers a custom headers
+                headerName = new StringBuffer(30).append("X-").append(headerName).toString();
+                httpMethod.addRequestHeader(headerName, headerValue);
+
+            }
+            else if (!HttpConstants.RESPONSE_HEADER_NAMES.containsKey(headerName)
+                        && !HttpConnector.HTTP_INBOUND_PROPERTIES.contains(headerName))
+            {
+
+                httpMethod.addRequestHeader(headerName, headerValue);
+                System.out.println("Added header: " + headerName);
+
+            }
+            else
+            {
+                System.err.println("Ignorring header: " + headerName);
+            }
+
+        }
+    }
+
+    protected MultipartRequestEntity createMultiPart(MuleMessage msg, EntityEnclosingMethod method) throws Exception
+    {
+        Part[] parts;
+        int i = 0;
+        if (msg.getPayload() instanceof NullPayload)
+        {
+            parts = new Part[msg.getOutboundAttachmentNames().size()];
+        }
+        else
+        {
+            parts = new Part[msg.getOutboundAttachmentNames().size() + 1];
+            parts[i++] = new FilePart("payload", new ByteArrayPartSource("payload", msg.getPayloadAsBytes()));
+        }
+
+        for (Iterator<String> iterator = msg.getOutboundAttachmentNames().iterator(); iterator.hasNext(); i++)
+        {
+            String name = iterator.next();
+            String fileName = name;
+            DataHandler dh = msg.getOutboundAttachment(name);
+            if (dh.getDataSource() instanceof StringDataSource)
+            {
+                StringDataSource ds = (StringDataSource) dh.getDataSource();
+                parts[i] = new StringPart(ds.getName(), IOUtils.toString(ds.getInputStream()));
+            }
+            else
+            {
+                if (dh.getDataSource() instanceof FileDataSource)
+                {
+                    fileName = ((FileDataSource) dh.getDataSource()).getFile().getName();
+                }
+                else if (dh.getDataSource() instanceof URLDataSource)
+                {
+                    fileName = ((URLDataSource) dh.getDataSource()).getURL().getFile();
+                    //Don't use the whole file path, just the file name
+                    int x = fileName.lastIndexOf("/");
+                    if (x > -1)
+                    {
+                        fileName = fileName.substring(x + 1);
+                    }
+                }
+                parts[i] = new FilePart(dh.getName(), new ByteArrayPartSource(fileName, IOUtils.toByteArray(dh.getInputStream())),
+                        dh.getContentType(), null);
+            }
+        }
+
+        return new MultipartRequestEntity(parts, method.getParams());
     }
 }

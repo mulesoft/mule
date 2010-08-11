@@ -90,6 +90,11 @@ public class HttpMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 20);
     }
+
+    public static Message customHeaderMapDeprecated()
+    {
+        return factory.createMessage(BUNDLE_PATH, 21);
+    }
 }
 
 

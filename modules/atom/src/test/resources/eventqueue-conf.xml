@@ -57,15 +57,10 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint address="http://localhost:9002/events" connector-ref="HttpConnector"
-                                       exchange-pattern="request-response">
-                        <properties>
-                            <s:entry key="Content-Type" value="text/plain"/>
-                            <s:entry key="http.custom.headers">
-                                <s:map>
-                                    <s:entry key="Slug" value="Blob Event"/>
-                                </s:map>
-                            </s:entry>
-                        </properties>
+                                       exchange-pattern="request-response" mimeType="text/plain">
+                        <message-properties-transformer scope="outbound">
+                            <add-message-property key="Slug" value="Blob Event"/>
+                        </message-properties-transformer>
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>

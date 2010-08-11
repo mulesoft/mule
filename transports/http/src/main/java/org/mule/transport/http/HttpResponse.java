@@ -13,7 +13,6 @@ package org.mule.transport.http;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
@@ -262,14 +261,22 @@ public class HttpResponse
         return outputHandler != null;
     }
 
-    public OutputHandler getBody() throws TransformerException 
+    public OutputHandler getBody() throws IOException
     {
         return outputHandler; 
     }
     
-    public void setBody(MuleMessage msg) throws TransformerException 
+    public void setBody(MuleMessage msg) throws Exception
     {
         if (msg == null) return;
+
+        //TODO MULE-5005 response attachments
+//        if(msg.getOutboundAttachmentNames().size() > 0)
+//        {
+//            setBody(createMultipart());
+//            setHeader(new Header(HttpConstants.HEADER_CONTENT_TYPE, MimeTypes.MULTIPART_MIXED));
+//            return;
+//        }
         
         Object payload = msg.getPayload();
         if (payload instanceof String)
@@ -286,7 +293,7 @@ public class HttpResponse
         }
         else 
         {
-            setBody((OutputHandler)msg.getPayload(DataTypeFactory.create(OutputHandler.class)));
+            setBody(msg.getPayload(DataTypeFactory.create(OutputHandler.class)));
         }
     }
     
@@ -382,5 +389,46 @@ public class HttpResponse
     {
         this.fallbackCharset = overrideCharset;
     }
+
+      //TODO MULE-5005 response attachments
+//    protected OutputHandler createMultipart() throws Exception
+//    {
+//
+//        return new OutputHandler() {
+//            public void write(MuleEvent event, OutputStream out) throws IOException
+//            {
+//                MultiPartOutputStream partStream = new MultiPartOutputStream(out, event.getEncoding());
+//                try
+//                {
+//                    MuleMessage msg = event.getMessage();
+//                    if (!(msg.getPayload() instanceof NullPayload))
+//                    {
+//                        String contentType = msg.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, MimeTypes.BINARY);
+//                        partStream.startPart(contentType);
+//                        try
+//                        {
+//                            partStream.getOut().write(msg.getPayloadAsBytes());
+//                        }
+//                        catch (Exception e)
+//                        {
+//                            throw new IOException(e);
+//                        }
+//                    }
+//                    //Write attachments
+//                    for (String name : event.getMessage().getOutboundAttachmentNames())
+//                    {
+//                        DataHandler dh = event.getMessage().getOutboundAttachment(name);
+//                        partStream.startPart(dh.getContentType());
+//                        partStream.getOut().write(IOUtils.toByteArray(dh.getInputStream()));
+//                    }
+//                }
+//                finally
+//                {
+//                    partStream.close();
+//                }
+//            }
+//        };
+//
+//    }
 
 }
