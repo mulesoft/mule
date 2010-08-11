@@ -1288,7 +1288,7 @@
         <xsd:sequence>
             <xsd:element ref="abstract-inbound-endpoint" minOccurs="1" maxOccurs="unbounded"/>
             <xsd:choice minOccurs="0" maxOccurs="unbounded">
-	            <xsd:element ref="abstract-async-reply-router"/> <!-- Deprecated -->
+                <xsd:element ref="abstract-async-reply-router"/> <!-- Deprecated -->
                 <xsd:element ref="abstract-inbound-router"/>
                 <xsd:element ref="processor"/>
                 <xsd:element ref="custom-processor"/>
