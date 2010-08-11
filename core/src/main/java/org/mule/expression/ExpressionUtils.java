@@ -27,7 +27,7 @@ import static org.mule.expression.ExpressionConstants.DELIM;
 import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
 
 /**
- *
+ * Used by the different header expression evaluators to read message properties, honuouring scope and return type
  */
 public final class ExpressionUtils
 {
@@ -43,6 +43,13 @@ public final class ExpressionUtils
 
     /**
      * Handler scope-aware expressions like "#[header:INBOUND:foo]
+     * @param expression the header name to evaluate.  this can be prefixed with a message scope such as INBOUND, OUTBOUND
+     * or INVOCATION scope. If no scope is defined the default scope is OUTBOUND
+     * 
+     * @param msg the message to evaluate on
+     * @param type the expected return type for this evaluation
+     * @return  an object of type 'type' corresponding to the message header requested or null if the header was not on
+     * the message in the specified scope
      */
     @SuppressWarnings("unchecked")
     public static <T> T getPropertyWithScope(String expression, MuleMessage msg, Class<T> type)
@@ -193,7 +200,7 @@ public final class ExpressionUtils
 
     private static List<Object> returnList(List<Object> values, PropertyScope scope)
     {
-        List<Object> l = (values.size() == 0 ? Collections.<Object>emptyList() : values);
+        List<Object> l = (values.size() == 0 ? Collections.emptyList() : values);
         if (scope.equals(PropertyScope.INBOUND))
         {
             l = Collections.unmodifiableList(l);
@@ -205,7 +212,7 @@ public final class ExpressionUtils
     {
         // see if scope has been specified explicitly
         final String[] tokens = expression.split(":", 2); // note we split only once, not on every separator
-        PropertyScope scope = null;
+        PropertyScope scope;
         if (tokens.length == 2)
         {
             final String candidate = tokens[0];
