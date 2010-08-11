@@ -39,6 +39,7 @@ import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.lifecycle.processor.ProcessIfStartedWaitIfPausedMessageProcessor;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.management.stats.ServiceStatistics;
+import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
@@ -423,7 +424,14 @@ public abstract class AbstractService implements Service
             throw new InitialisationException(e, this);
         }
         
-        messageSource.setListener(messageProcessorChain);
+        // Wrap chain to decouple lifecycle
+        messageSource.setListener(new AbstractInterceptingMessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                return messageProcessorChain.process(event);
+            }
+        });
 
         // Component is not in chain
         if (component instanceof Initialisable)

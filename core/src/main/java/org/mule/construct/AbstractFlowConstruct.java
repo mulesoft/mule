@@ -11,6 +11,7 @@
 package org.mule.construct;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
@@ -31,6 +32,7 @@ import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.source.MessageSource;
 import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.management.stats.FlowConstructStatistics;
+import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.ClassUtils;
@@ -90,7 +92,14 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
 
                     if (messageSource != null)
                     {
-                        messageSource.setListener(messageProcessorChain);
+                        // Wrap chain to decouple lifecycle
+                        messageSource.setListener(new AbstractInterceptingMessageProcessor()
+                        {
+                            public MuleEvent process(MuleEvent event) throws MuleException
+                            {
+                                return messageProcessorChain.process(event);
+                            }
+                        });
                     }
 
                     injectFlowConstructMuleContext(messageSource);
