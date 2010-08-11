@@ -122,7 +122,7 @@ public abstract class AbstractAnnotationConfigurationBuilder extends Annotations
         {
             return DEFAULT_BASE_PACKAGE;
         }
-        return (String[]) paths.toArray();
+        return paths.toArray(new String[]{});
     }
 
 
