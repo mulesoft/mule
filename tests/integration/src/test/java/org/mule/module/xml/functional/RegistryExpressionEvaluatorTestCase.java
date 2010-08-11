@@ -67,7 +67,7 @@ public class RegistryExpressionEvaluatorTestCase extends FunctionalTestCase
         }
         catch (Exception e)
         {
-            //Exprected
+            //Expected
         }
 
     }
@@ -93,6 +93,29 @@ public class RegistryExpressionEvaluatorTestCase extends FunctionalTestCase
 //        assertNotNull(o);
 //        assertEquals("foo-value", o);
 
+    }
+
+    public void testLookUpbyType() throws Exception
+    {
+        Apple apple = new Apple();
+        muleContext.getRegistry().registerObject("apple", apple);
+        MuleMessage message = new DefaultMuleMessage("foo", muleContext);
+        RegistryExpressionEvaluator eval = new RegistryExpressionEvaluator();
+        eval.setMuleContext(muleContext);
+        Object o = eval.evaluate("type:org.mule.tck.testmodels.fruit.Apple", message);
+        assertNotNull(o);
+        assertEquals(apple, o);
+
+
+        try
+        {
+            o = eval.evaluate("banana", message);
+            fail("No banana in the registry");
+        }
+        catch (Exception e)
+        {
+            //Expected
+        }
     }
 
 }

@@ -16,8 +16,10 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionRuntimeException;
+import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.AbstractEndpointBuilder;
+import org.mule.util.ClassUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,6 +49,29 @@ public class RegistryExpressionEvaluator implements ExpressionEvaluator, MuleCon
 
     public Object evaluate(String expression, MuleMessage message)
     {
+        if(expression.startsWith("type:"))
+        {
+            String c = expression.substring(5);
+            Class clazz;
+            try
+            {
+                clazz = ClassUtils.loadClass(c, getClass());
+            }
+            catch (ClassNotFoundException e)
+            {
+                throw new IllegalArgumentException("Class not on the classpath: " + c);
+            }
+
+            try
+            {
+                return muleContext.getRegistry().lookupObject(clazz);
+            }
+            catch (RegistrationException e)
+            {
+                return null;
+            }
+        }
+
         int i = expression.indexOf(".");
         String name;
         String property = null;
@@ -90,7 +115,7 @@ public class RegistryExpressionEvaluator implements ExpressionEvaluator, MuleCon
             {
                 property = "endpointBuilder.endpoint." + property;
             }
-            
+
             Object p = muleContext.getExpressionManager().evaluate("#[bean:" + property + "]", new DefaultMuleMessage(o, muleContext));
             if (p == null && propertyRequired)
             {

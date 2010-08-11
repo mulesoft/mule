@@ -9,6 +9,8 @@
  */
 package org.mule.config.i18n;
 
+import org.mule.util.StringUtils;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
@@ -49,6 +51,16 @@ public class AnnotationsMessages extends MessageFactory
     public static Message transformerMethodNotValid(Method method)
     {
         return factory.createMessage(BUNDLE_PATH, 6, method);
+    }
+
+    public static Message lookupNotFoundInRegistry(Class type, String name, Class object)
+    {
+        return factory.createMessage(BUNDLE_PATH, 7, type, (StringUtils.isBlank(name) ? "[no name]" : name), object);
+    }
+
+    public static Message lookupFailedSeePreviousException(Object object)
+    {
+        return factory.createMessage(BUNDLE_PATH, 8, object);
     }
 }
 
