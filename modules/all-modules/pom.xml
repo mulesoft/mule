@@ -141,4 +141,20 @@
             <version>${version}</version>
         </dependency>
     </dependencies>
+    
+    <profiles>
+        <profile>
+            <id>jdk6</id>
+            <activation>
+                <jdk>1.6</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.mule.modules</groupId>
+                    <artifactId>mule-module-jersey</artifactId>
+                    <version>${version}</version>
+                </dependency>
+            </dependencies>
+         </profile>
+    </profiles>
 </project>

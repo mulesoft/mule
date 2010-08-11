@@ -42,4 +42,17 @@
         <module>ws</module>
         <module>xml</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>jdk6</id>
+            <activation>
+                <jdk>1.6</jdk>
+            </activation>
+            <modules>
+                <module>jersey</module>
+            </modules>
+         </profile>
+    </profiles>
+
 </project>
