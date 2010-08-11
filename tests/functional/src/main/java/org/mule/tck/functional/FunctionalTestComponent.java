@@ -217,7 +217,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
         Object replyMessage;
         if (returnData != null)
         {
-            if (returnData instanceof String && muleContext.getExpressionManager().isValidExpression(returnData.toString()))
+            if (returnData instanceof String && muleContext.getExpressionManager().isExpression(returnData.toString()))
             {
                 replyMessage = muleContext.getExpressionManager().parse(returnData.toString(), message);
             }
