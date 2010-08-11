@@ -151,7 +151,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         Map<?, ?> result = (Map<?, ?>) response.getResult();
         //Will match all Mule headers
         assertEquals(1, result.size());
-        assertEquals(result.get(MuleProperties.MULE_ENCODING_PROPERTY), "UTF-8");
+        assertEquals("UTF-8", result.get(MuleProperties.MULE_ENCODING_PROPERTY));
     }
 
     public void testMapHeadersMultiWildcard() throws Exception

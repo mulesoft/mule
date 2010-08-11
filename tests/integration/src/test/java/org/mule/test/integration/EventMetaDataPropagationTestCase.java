@@ -17,7 +17,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.service.Service;
 import org.mule.service.ServiceCompositeMessageSource;
@@ -48,7 +47,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
         Service service = muleContext.getRegistry().lookupService("component1");
         MuleSession session = new DefaultMuleSession(service, muleContext);
         MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
-            (ImmutableEndpoint) ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0), session);
+            ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0), session);
         service.sendEvent(event);
     }
 
@@ -101,7 +100,7 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
                 assertEquals(12345, msg.<Integer>getInboundProperty("integerParam", 0).intValue());
                 assertEquals(123456789, msg.<Long>getInboundProperty("longParam", 0L).longValue());
                 assertEquals(Boolean.TRUE, msg.getInboundProperty("booleanParam", Boolean.FALSE));
-                assertNotNull(msg.getAttachment("test1"));
+                assertNotNull(msg.getInboundAttachment("test1"));
             }
             return null;
         }

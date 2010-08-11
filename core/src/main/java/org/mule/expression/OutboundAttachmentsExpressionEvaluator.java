@@ -35,7 +35,7 @@ public class OutboundAttachmentsExpressionEvaluator implements ExpressionEvaluat
         {
             return null;
         }
-        return new AttachmentsMap(message);
+        return new OutboundAttachmentsMap(message);
     }
 
     /**

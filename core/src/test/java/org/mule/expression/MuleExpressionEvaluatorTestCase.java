@@ -53,20 +53,19 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     protected MuleMessage createMessageWithAttachments()
     {
-        MuleMessage attahcmentsMessage = new DefaultMuleMessage("test", muleContext);
-
         try
         {
-            attahcmentsMessage.addAttachment("foo", new DataHandler(new StringDataSource("moo")));
-            attahcmentsMessage.addAttachment("bar", new DataHandler(new StringDataSource("mar")));
-            attahcmentsMessage.addAttachment("baz", new DataHandler(new StringDataSource("maz")));
+            Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
+            attachments.put("foo", new DataHandler(new StringDataSource("moo")));
+            attachments.put("bar", new DataHandler(new StringDataSource("mar")));
+            attachments.put("baz", new DataHandler(new StringDataSource("maz")));
+            return new DefaultMuleMessage("test", null, attachments, muleContext);
         }
         catch (Exception e)
         {
-            e.printStackTrace();
             fail(e.getMessage());
+            return null;
         }
-        return attahcmentsMessage;
     }
 
     public void testSingleAttachment() throws Exception
@@ -93,8 +92,8 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            result = eval.evaluate("message.attachments(fool)", createMessageWithAttachments());
-            fail("Atachment 'fool' is not on the nessage and not defined as optional");
+            eval.evaluate("message.attachments(fool)", createMessageWithAttachments());
+            fail("Attachment 'fool' is not on the nessage and not defined as optional");
         }
         catch (Exception e)
         {
@@ -102,7 +101,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
-    public void testMapAttachmentss() throws Exception
+    public void testMapAttachments() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
         eval.setMuleContext(muleContext);
@@ -152,12 +151,12 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            result = eval.evaluate("message.attachments(fool)", createMessageWithAttachments());
+            eval.evaluate("message.attachments(fool)", createMessageWithAttachments());
             fail("Attachment 'fool' is not on the nessage and not defined as optional");
         }
         catch (Exception e)
         {
-            //Exprected
+            //Expected
         }
     }
 
@@ -210,8 +209,8 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            result = eval.evaluate("message.attachments-list(fool)", createMessageWithAttachments());
-            fail("Atachment 'fool' is not on the nessage and not defined as optional");
+            eval.evaluate("message.attachments-list(fool)", createMessageWithAttachments());
+            fail("Attachment 'fool' is not on the message and not defined as optional");
         }
         catch (Exception e)
         {
@@ -239,8 +238,8 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNull(result);
         try
         {
-            result = muleContext.getExpressionManager().evaluate("#[mule:message.attachment(fool)]", createMessageWithAttachments());
-            fail("Attachment 'fool' is not on the nessage and not defined as optional");
+            muleContext.getExpressionManager().evaluate("#[mule:message.attachment(fool)]", createMessageWithAttachments());
+            fail("Attachment 'fool' is not on the message and not defined as optional");
         }
         catch (Exception e)
         {
@@ -293,8 +292,8 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            result = muleContext.getExpressionManager().evaluate("#[mule:message.attachments(foo, fool)]", createMessageWithAttachments());
-            fail("Atachment 'fool' is not on the nessage and not defined as optional");
+             muleContext.getExpressionManager().evaluate("#[mule:message.attachments(foo, fool)]", createMessageWithAttachments());
+            fail("Attachment 'fool' is not on the message and not defined as optional");
         }
         catch (Exception e)
         {
@@ -352,8 +351,8 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            result = muleContext.getExpressionManager().evaluate("#[mule:message.attachments-list(foo, fool)]", createMessageWithAttachments());
-            fail("Attachment 'fool' is not on the nessage and not defined as optional");
+            muleContext.getExpressionManager().evaluate("#[mule:message.attachments-list(foo, fool)]", createMessageWithAttachments());
+            fail("Attachment 'fool' is not on the message and not defined as optional");
         }
         catch (Exception e)
         {
@@ -411,12 +410,12 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            result = muleContext.getExpressionManager().evaluate("#[mule:message.header(fool)]", createMessageWithAttachments());
-            fail("Header 'fool' is not on the nessage and not defined as optional");
+            muleContext.getExpressionManager().evaluate("#[mule:message.header(fool)]", createMessageWithAttachments());
+            fail("Header 'fool' is not on the message and not defined as optional");
         }
         catch (Exception e)
         {
-            //Exprected
+            //Expected
         }
     }
 
@@ -455,12 +454,12 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            result = eval.evaluate("message.headers(foo, fool)", createMessageWithAttachments());
-            fail("Header 'fool' is not on the nessage and not defined as optional");
+            eval.evaluate("message.headers(foo, fool)", createMessageWithAttachments());
+            fail("Header 'fool' is not on the message and not defined as optional");
         }
         catch (Exception e)
         {
-            //Exprected
+            //Expected
         }
     }
 
@@ -502,12 +501,12 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            result = eval.evaluate("message.headers-list(foo, fool)", createMessageWithAttachments());
-            fail("Header 'fool' is not on the nessage and not defined as optional");
+            eval.evaluate("message.headers-list(foo, fool)", createMessageWithAttachments());
+            fail("Header 'fool' is not on the message and not defined as optional");
         }
         catch (Exception e)
         {
-            //Exprected
+            //Expected
         }
     }
 
@@ -561,8 +560,8 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            result = muleContext.getExpressionManager().evaluate("#[mule:message.header(fool)]", createMessageWithAttachments());
-            fail("Header 'fool' is not on the nessage and not defined as optional");
+            muleContext.getExpressionManager().evaluate("#[mule:message.header(fool)]", createMessageWithAttachments());
+            fail("Header 'fool' is not on the message and not defined as optional");
         }
         catch (Exception e)
         {
@@ -606,8 +605,8 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            result = muleContext.getExpressionManager().evaluate("#[mule:message.headers(foo, fool)]", createMessageWithAttachments());
-            fail("Header 'fool' is not on the nessage and not defined as optional");
+            muleContext.getExpressionManager().evaluate("#[mule:message.headers(foo, fool)]", createMessageWithAttachments());
+            fail("Header 'fool' is not on the message and not defined as optional");
         }
         catch (Exception e)
         {
@@ -650,8 +649,8 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            result = muleContext.getExpressionManager().evaluate("#[mule:message.headers-list(foo, fool)]", createMessageWithAttachments());
-            fail("Header 'fool' is not on the nessage and not defined as optional");
+            muleContext.getExpressionManager().evaluate("#[mule:message.headers-list(foo, fool)]", createMessageWithAttachments());
+            fail("Header 'fool' is not on the message and not defined as optional");
         }
         catch (Exception e)
         {
@@ -688,7 +687,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            o = extractor.evaluate("context.bork", message);
+            extractor.evaluate("context.bork", message);
             fail("bork is not a valid mule context value");
         }
         catch (Exception e)
@@ -723,7 +722,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            o = muleContext.getExpressionManager().evaluate("mule:context.bork", message);
+            muleContext.getExpressionManager().evaluate("mule:context.bork", message);
             fail("bork is not a valid mule context value");
         }
         catch (Exception e)
@@ -745,7 +744,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            o = extractor.evaluate("context.serviceName", message);
+            extractor.evaluate("context.serviceName", message);
             fail("There is no current event context");
         }
         catch (MuleRuntimeException e)
@@ -793,7 +792,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
         catch (Exception e1)
         {
-            //Exprected
+            //Expected
         }
     }
 
@@ -830,7 +829,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
         catch (Exception e1)
         {
-            //Exprected
+            //Expected
         }
     }
 
@@ -960,7 +959,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            result = muleContext.getExpressionManager().evaluate("#[mule:message.map-payload(fool)]", message);
+            muleContext.getExpressionManager().evaluate("#[mule:message.map-payload(fool)]", message);
             fail("Map payload does not contain property 'fool' but it is required");
         }
         catch (ExpressionRuntimeException e)
@@ -986,7 +985,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            result = muleContext.getExpressionManager().evaluate("#[mule:message.map-payload(fool, boo)]", message);
+            muleContext.getExpressionManager().evaluate("#[mule:message.map-payload(fool, boo)]", message);
             fail("Map payload does not contain property 'fool' but it is required");
         }
         catch (ExpressionRuntimeException e)
@@ -1013,7 +1012,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            o = eval.evaluate("XXbowlToBasket", message);
+            eval.evaluate("XXbowlToBasket", message);
             fail("Object is not optional");
         }
         catch (Exception e)
@@ -1040,7 +1039,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         try
         {
-            o = muleContext.getExpressionManager().evaluate("#[mule:registry.XXbowlToBasket]", message);
+            muleContext.getExpressionManager().evaluate("#[mule:registry.XXbowlToBasket]", message);
             fail("Object is not optional");
         }
         catch (Exception e)

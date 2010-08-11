@@ -33,7 +33,7 @@ public class VMAttachmentsTestCase extends FunctionalTestCase
         DefaultMuleMessage msg = new DefaultMuleMessage("Mmm... attachments!", muleContext);
         FileDataSource ds = new FileDataSource(new File("transports/vm/src/test/resources/"
                                                         + getConfigResources()).getAbsoluteFile());
-        msg.addAttachment("test-attachment", new DataHandler(ds));
+        msg.addOutboundAttachment("test-attachment", new DataHandler(ds));
 
         MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm-in", msg);
@@ -44,8 +44,9 @@ public class VMAttachmentsTestCase extends FunctionalTestCase
             fail(reply.getExceptionPayload().getException().getCause().toString());
         }
 
-        assertEquals(1, reply.getAttachmentNames().size());
-        assertNotNull(reply.getAttachment("mule"));
-        assertTrue(reply.getAttachment("mule").getContentType().startsWith("image/gif"));
+        //TODO MULE-5000 attachments should be on the inbound
+        assertEquals(1, reply.getOutboundAttachmentNames().size());
+        assertNotNull(reply.getOutboundAttachment("mule"));
+        assertTrue(reply.getOutboundAttachment("mule").getContentType().startsWith("image/gif"));
     }
 }

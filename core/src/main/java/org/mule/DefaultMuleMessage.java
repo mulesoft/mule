@@ -36,11 +36,14 @@ import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,12 +52,12 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -91,10 +94,16 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private MessagePropertiesContext properties = new MessagePropertiesContext();
 
     /** 
-     * Collection of attachments associatated with this message 
+     * Collection of attachments that were attached to the incoming message
      */
     @SuppressWarnings("unchecked")
-    private Map<String, DataHandler> attachments = new ConcurrentHashMap();
+    private Map<String, DataHandler> inboundAttachments = new ConcurrentHashMap();
+
+    /**
+     * Collection of attachments that will be sent out with this message
+     */
+    @SuppressWarnings("unchecked")
+    private Map<String, DataHandler> outboundAttachments = new ConcurrentHashMap();
 
     private transient List<Integer> appliedTransformerHashCodes;
     private transient byte[] cache;
@@ -133,6 +142,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     public DefaultMuleMessage(Object message, Map<String, Object> properties, MuleContext muleContext)
     {
+        this(message, properties, null, muleContext);
+    }
+
+    public DefaultMuleMessage(Object message, Map<String, Object> properties, Map<String, DataHandler> attachments, MuleContext muleContext)
+    {
         setMuleContext(muleContext);
         initAppliedTransformerHashCodes();
 
@@ -148,6 +162,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             originalPayload = message;
         }
         addProperties(properties);
+
+        //Add inbound attachments
+        if(attachments!=null)
+        {
+            inboundAttachments = attachments;
+        }
+
         resetAccessControl();
     }
     
@@ -180,7 +201,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         
         resetAccessControl();
     }
-
+    
     private void copyMessageProperties(MuleMessage muleMessage)
     {
         // explicitly copy INBOUND message properties over. This cannot be done in the loop below
@@ -210,13 +231,28 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     private void copyAttachments(MuleMessage previous)
     {
-        if (previous.getAttachmentNames().size() > 0)
+        if (previous.getInboundAttachmentNames().size() > 0)
         {
-            for (String name : previous.getAttachmentNames())
+            for (String name : previous.getInboundAttachmentNames())
             {
                 try
                 {
-                    addAttachment(name, previous.getAttachment(name));
+                    inboundAttachments.put(name, previous.getInboundAttachment(name));
+                }
+                catch (Exception e)
+                {
+                    throw new MuleRuntimeException(CoreMessages.failedToReadAttachment(name), e);
+                }
+            }
+        }
+
+        if (previous.getOutboundAttachmentNames().size() > 0)
+        {
+            for (String name : previous.getOutboundAttachmentNames())
+            {
+                try
+                {
+                    addOutboundAttachment(name, previous.getOutboundAttachment(name));
                 }
                 catch (Exception e)
                 {
@@ -890,8 +926,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      */
     public void addAttachment(String name, DataHandler dataHandler) throws Exception
     {
-        assertAccess(WRITE);
-        attachments.put(name, dataHandler);
+        addOutboundAttachment(name, dataHandler);
     }
 
     /**
@@ -899,8 +934,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      */
     public void removeAttachment(String name) throws Exception
     {
-        assertAccess(WRITE);
-        attachments.remove(name);
+        removeOutboundAttachment(name);
     }
 
     /**
@@ -908,8 +942,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      */
     public DataHandler getAttachment(String name)
     {
-        assertAccess(READ);
-        return attachments.get(name);
+        return getOutboundAttachment(name);
     }
 
     /**
@@ -917,8 +950,84 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      */
     public Set<String> getAttachmentNames()
     {
+        return getOutboundAttachmentNames();
+    }
+
+    public void addOutboundAttachment(String name, DataHandler dataHandler) throws Exception
+    {
+        assertAccess(WRITE);
+        outboundAttachments.put(name, dataHandler);
+    }
+
+    ///TODO this should not be here, but needed so that a message factory can add attachments
+    public void addInboundAttachment(String name, DataHandler dataHandler) throws Exception
+    {
+        assertAccess(WRITE);
+        inboundAttachments.put(name, dataHandler);
+    }
+
+    public void addOutboundAttachment(String name, Object object, String contentType) throws Exception
+    {
+        assertAccess(WRITE);
+        DataHandler dh;
+        if(object instanceof File)
+        {
+            if(contentType!=null)
+            {
+                dh = new DataHandler(new FileInputStream((File)object), contentType);
+
+            }
+            else
+            {
+                dh = new DataHandler(new FileDataSource((File)object));
+            }
+        }
+        else if(object instanceof URL)
+        {
+            if(contentType!=null)
+            {
+                dh = new DataHandler(((URL)object).openStream(), contentType);
+            }
+            else
+            {
+                dh = new DataHandler((URL)object);
+            }
+        }
+        else
+        {
+            dh = new DataHandler(object, contentType);
+        }
+        outboundAttachments.put(name, dh);
+    }
+
+    public void removeOutboundAttachment(String name) throws Exception
+    {
+        assertAccess(WRITE);
+        outboundAttachments.remove(name);
+    }
+
+    public DataHandler getInboundAttachment(String name)
+    {
         assertAccess(READ);
-        return Collections.unmodifiableSet(attachments.keySet());
+        return inboundAttachments.get(name);
+    }
+
+    public DataHandler getOutboundAttachment(String name)
+    {
+        assertAccess(READ);
+        return outboundAttachments.get(name);
+    }
+
+    public Set<String> getInboundAttachmentNames()
+    {
+        assertAccess(READ);
+        return Collections.unmodifiableSet(inboundAttachments.keySet());
+    }
+
+    public Set<String> getOutboundAttachmentNames()
+    {
+        assertAccess(READ);
+        return Collections.unmodifiableSet(outboundAttachments.keySet());
     }
 
     /**

@@ -16,6 +16,13 @@ import java.util.Map;
 public class OutboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypointResolverTestCase
 {
     @Override
+    public void doSetUp() throws Exception
+    {
+        inboundScope = false;
+        super.doSetUp();
+    }
+    
+    @Override
     protected Object getComponent()
     {
         return new OutboundHeadersAnnotationComponent();

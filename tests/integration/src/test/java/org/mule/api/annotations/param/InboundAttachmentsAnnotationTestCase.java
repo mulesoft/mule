@@ -17,6 +17,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.StringDataSource;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,21 +42,33 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
     public void doSetUp() throws Exception
     {
         super.doSetUp();
-        
-        muleMessage = new DefaultMuleMessage("test", muleContext);
+        muleMessage  = createMessage(null, null);
+    }
 
-        try
+    protected MuleMessage createMessage(Map<String, Object> headers, Map<String, DataHandler> attachments) throws Exception
+    {
+        if(headers==null)
         {
-            muleMessage.addAttachment("foo", new DataHandler(new StringDataSource("fooValue")));
-            muleMessage.addAttachment("bar", new DataHandler(new StringDataSource("barValue")));
-            muleMessage.addAttachment("baz", new DataHandler(new StringDataSource("bazValue")));
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            fail(e.getMessage());
+            headers = new HashMap<String, Object>();
+            headers.put("foo", "fooValue");
+            headers.put("bar", "barValue");
+            headers.put("baz", "bazValue");
         }
 
+        if(attachments==null)
+        {
+            attachments = new HashMap<String, DataHandler>();
+            attachments.put("foo", new DataHandler(new StringDataSource("fooValue")));
+            attachments.put("bar", new DataHandler(new StringDataSource("barValue")));
+            attachments.put("baz", new DataHandler(new StringDataSource("bazValue")));
+        }
+        MuleMessage message;
+        message = new DefaultMuleMessage("test",null, attachments, muleContext);
+        for (String s : headers.keySet())
+        {
+            message.setOutboundProperty(s, headers.get(s));
+        }
+        return message;
     }
 
     public void testSingleAttachment() throws Exception
@@ -113,7 +126,9 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
     
     public void testMapAttachmentsMissing() throws Exception
     {
-        muleMessage.removeAttachment("foo");
+        //clear attachments
+        muleMessage = createMessage(null, new HashMap<String, DataHandler>());
+
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachments", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
@@ -136,7 +151,11 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 
     public void testMapAttachmentsOptional() throws Exception
     {
-        muleMessage.removeAttachment("baz");
+        //clear baz attachment
+        Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
+        attachments.put("foo", new DataHandler(new StringDataSource("fooValue")));
+        attachments.put("bar", new DataHandler(new StringDataSource("barValue")));
+        muleMessage = createMessage(null, attachments);
 
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachmentsOptional", muleMessage);
@@ -151,9 +170,8 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 
     public void testMapAttachmentsAllOptional() throws Exception
     {
-        muleMessage.removeAttachment("foo");
-        muleMessage.removeAttachment("bar");
-        muleMessage.removeAttachment("baz");
+        //clear attachments
+        muleMessage = createMessage(null, new HashMap<String, DataHandler>());
 
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachmentsAllOptional", muleMessage);
@@ -230,7 +248,12 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 
     public void testListAttachmentsWithOptional() throws Exception
     {
-        muleMessage.removeAttachment("baz");
+        //clear baz attachment
+        Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
+        attachments.put("foo", new DataHandler(new StringDataSource("fooValue")));
+        attachments.put("bar", new DataHandler(new StringDataSource("barValue")));
+        muleMessage = createMessage(null, attachments);
+
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachmentsListOptional", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
@@ -243,9 +266,8 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 
     public void testListAttachmentsWithAllOptional() throws Exception
     {
-        muleMessage.removeAttachment("foo");
-        muleMessage.removeAttachment("bar");
-        muleMessage.removeAttachment("baz");
+        //clear attachments
+        muleMessage = createMessage(null, new HashMap<String, DataHandler>());
 
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachmentsListAllOptional", muleMessage);
@@ -257,7 +279,11 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 
     public void testListAttachmentsWithMissing() throws Exception
     {
-        muleMessage.removeAttachment("bar");
+        //clear bar attachment
+        Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
+        attachments.put("foo", new DataHandler(new StringDataSource("fooValue")));
+        attachments.put("baz", new DataHandler(new StringDataSource("bazValue")));
+        muleMessage = createMessage(null, attachments);
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://attachmentsListOptional", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);

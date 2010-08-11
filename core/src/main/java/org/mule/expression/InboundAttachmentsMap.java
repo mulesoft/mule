@@ -21,31 +21,29 @@ import javax.activation.DataHandler;
 /**
  * Creates a wrapper around Mule Message with a MAp facade used for allowing developers to add attachments to
  * an outgoing message in a transformer of component without needing to access the Mule API directly
- *
  */
-//TODO add a helper method for creating the DataHandler from an object
-public class AttachmentsMap implements Map<String, DataHandler>
+public class InboundAttachmentsMap implements Map<String, DataHandler>
 {
     private MuleMessage message;
 
-    public AttachmentsMap(MuleMessage message)
+    public InboundAttachmentsMap(MuleMessage message)
     {
         this.message = message;
     }
 
     public int size()
     {
-        return message.getAttachmentNames().size();
+        return message.getInboundAttachmentNames().size();
     }
 
     public boolean isEmpty()
     {
-        return message.getAttachmentNames().size() == 0;
+        return message.getInboundAttachmentNames().size() == 0;
     }
 
     public boolean containsKey(Object key)
     {
-        return message.getAttachmentNames().contains(key.toString());
+        return message.getInboundAttachmentNames().contains(key.toString());
     }
 
     public boolean containsValue(Object value)
@@ -55,36 +53,18 @@ public class AttachmentsMap implements Map<String, DataHandler>
 
     public DataHandler get(Object key)
     {
-        return message.getAttachment(key.toString());
+        return message.getInboundAttachment(key.toString());
     }
 
     public DataHandler put(String key, DataHandler value)
     {
-        try
-        {
-            message.addAttachment(key, value);
-            return value;
-        }
-        catch (Exception e)
-        {
-            //Not sure we can do anything else here
-            throw new RuntimeException(e);
-        }
+        throw new UnsupportedOperationException("put(): Inbound attachments are read-only");
     }
 
 
     public DataHandler remove(Object key)
     {
-        DataHandler attachment = message.getAttachment(key.toString());
-        try
-        {
-            message.removeAttachment(key.toString());
-        }
-        catch (Exception e)
-        {
-            //ignore (some message types may throw an exception if the attachment does not exist)
-        }
-        return attachment;
+        throw new UnsupportedOperationException("remove(): Inbound attachments are read-only");
     }
 
 
@@ -103,7 +83,7 @@ public class AttachmentsMap implements Map<String, DataHandler>
 
     public Set<String> keySet()
     {
-        return message.getAttachmentNames();
+        return message.getInboundAttachmentNames();
     }
 
     public Collection<DataHandler> values()
@@ -120,9 +100,9 @@ public class AttachmentsMap implements Map<String, DataHandler>
     private Map<String, DataHandler> getAttachments()
     {
         Map<String, DataHandler> props = new HashMap<String, DataHandler>();
-        for (String s : message.getAttachmentNames())
+        for (String s : message.getInboundAttachmentNames())
         {
-            props.put(s, message.getAttachment(s));
+            props.put(s, message.getInboundAttachment(s));
         }
         return props;
     }

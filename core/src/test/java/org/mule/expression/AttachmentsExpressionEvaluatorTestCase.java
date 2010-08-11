@@ -16,6 +16,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.StringDataSource;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,13 +29,15 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        message = new DefaultMuleMessage("test", muleContext);
 
         try
         {
-            message.addAttachment("foo", new DataHandler(new StringDataSource("foovalue")));
-            message.addAttachment("bar", new DataHandler(new StringDataSource("barvalue")));
-            message.addAttachment("baz", new DataHandler(new StringDataSource("bazvalue")));
+            Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
+            attachments.put("foo", new DataHandler(new StringDataSource("foovalue")));
+            attachments.put("bar", new DataHandler(new StringDataSource("barvalue")));
+            attachments.put("baz", new DataHandler(new StringDataSource("bazvalue")));
+            message = new DefaultMuleMessage("test", null, attachments, muleContext);
+
         }
         catch (Exception e)
         {

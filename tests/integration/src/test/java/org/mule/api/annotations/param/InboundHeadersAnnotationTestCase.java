@@ -183,9 +183,8 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) message.getPayload();
         //Will match all Mule headers
-        assertEquals(3, result.size());
-        assertEquals(result.get(MuleProperties.MULE_ENCODING_PROPERTY), "UTF-8");
-        assertEquals(result.get(MuleProperties.MULE_ENDPOINT_PROPERTY), "vm://headersWildcard");
+        assertEquals(2, result.size());
+        assertEquals("vm://headersWildcard", result.get(MuleProperties.MULE_ENDPOINT_PROPERTY));
         assertTrue(result.keySet().contains(MuleProperties.MULE_SESSION_PROPERTY));
     }
 
@@ -197,11 +196,10 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) message.getPayload();
         //Will match all Mule headers
-        assertEquals(5, result.size());
+        assertEquals(4, result.size());
 
         //Match on MULE_*
-        assertEquals(result.get(MuleProperties.MULE_ENCODING_PROPERTY), "UTF-8");
-        assertEquals(result.get(MuleProperties.MULE_ENDPOINT_PROPERTY), "vm://headersMultiWildcard");
+        assertEquals("vm://headersMultiWildcard", result.get(MuleProperties.MULE_ENDPOINT_PROPERTY));
         assertTrue(result.keySet().contains(MuleProperties.MULE_SESSION_PROPERTY));
 
         //Match on ba*
@@ -320,9 +318,8 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
         List<?> result = (List<?>) message.getPayload();
         //Will match all Mule headers
-        assertEquals(3, result.size());
-        //MULE_ENCODING
-        assertTrue(result.contains("UTF-8"));
+        assertEquals(2, result.size());
+
         //MULE_ENDPOINT
         assertTrue(result.contains("vm://headersListWildcard"));
         //The last value is the encoded session
@@ -336,11 +333,10 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
         List<?> result = (List<?>) message.getPayload();
         //Will match on MULE_* and ba*
-        assertEquals(5, result.size());
+        assertEquals(4, result.size());
 
         //Match on MULE_*
-        //MULE_ENCODING
-        assertTrue(result.contains("UTF-8"));
+
         //MULE_ENDPOINT
         assertTrue(result.contains("vm://headersListMultiWildcard"));
         //The last value is the encoded session

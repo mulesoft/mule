@@ -46,7 +46,7 @@ public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator
         {
             required = true;
         }
-        DataHandler dh = message.getAttachment(expression);
+        DataHandler dh = message.getInboundAttachment(expression);
 
         if (dh == null && required)
         {

@@ -11,8 +11,10 @@ package org.mule.api.annotations.param;
 
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.model.InvocationResult;
+import org.mule.util.StringDataSource;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +74,8 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
 
     public void testMapAttachmentsMissing() throws Exception
     {
-        eventContext.getMessage().removeAttachment("foo");
+        //clear attachments
+        eventContext = createEventContext(null, new HashMap<String, DataHandler>());
         try
         {
             invokeResolver("processAttachments", eventContext);
@@ -97,6 +100,12 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
 
     public void testMapAttachmentsOptional() throws Exception
     {
+        //restrict attachments
+        Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
+        attachments.put("foo", new DataHandler(new StringDataSource("fooValue")));
+        attachments.put("bar", new DataHandler(new StringDataSource("barValue")));
+        eventContext = createEventContext(null, attachments);
+
         eventContext.getMessage().removeAttachment("baz");
 
         InvocationResult response = invokeResolver("processAttachmentsOptional", eventContext);
@@ -110,9 +119,8 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
 
     public void testMapAttachmentsAllOptional() throws Exception
     {
-        eventContext.getMessage().removeAttachment("foo");
-        eventContext.getMessage().removeAttachment("bar");
-        eventContext.getMessage().removeAttachment("baz");
+        //clear attachments
+        eventContext = createEventContext(null, new HashMap<String, DataHandler>());
 
         InvocationResult response = invokeResolver("processAttachmentsAllOptional", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
@@ -181,7 +189,11 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
 
     public void testListAttachmentsWithOptional() throws Exception
     {
-        eventContext.getMessage().removeAttachment("baz");
+        Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
+        attachments.put("foo", new DataHandler(new StringDataSource("fooValue")));
+        attachments.put("bar", new DataHandler(new StringDataSource("barValue")));
+        eventContext = createEventContext(null, attachments);
+
         InvocationResult response = invokeResolver("processAttachmentsListOptional", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<DataHandler> result = (List<DataHandler>) response.getResult();
@@ -190,9 +202,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
 
     public void testListAttachmentsWithAllOptional() throws Exception
     {
-        eventContext.getMessage().removeAttachment("foo");
-        eventContext.getMessage().removeAttachment("bar");
-        eventContext.getMessage().removeAttachment("baz");
+        eventContext = createEventContext(null, new HashMap<String, DataHandler>());
 
         InvocationResult response = invokeResolver("processAttachmentsListAllOptional", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
@@ -202,7 +212,10 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
 
     public void testListAttachmentsWithMissing() throws Exception
     {
-        eventContext.getMessage().removeAttachment("bar");
+        Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
+        attachments.put("foo", new DataHandler(new StringDataSource("fooValue")));
+        attachments.put("bar", new DataHandler(new StringDataSource("barValue")));
+        eventContext = createEventContext(null, attachments);
         try
         {
             invokeResolver("processAttachmentsList", eventContext);

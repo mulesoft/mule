@@ -29,12 +29,12 @@ public class AttachmentsComponent implements Callable
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
         MuleMessage msg = eventContext.getMessage();
-        if (msg.getAttachmentNames().size() == 2)
+        if (msg.getInboundAttachmentNames().size() == 2)
         {
             throw new IllegalArgumentException("There shuold be 2 attachments");
         }
 
-        DataHandler dh = msg.getAttachment("test-attachment");
+        DataHandler dh = msg.getInboundAttachment("test-attachment");
         if (dh == null)
         {
             throw new IllegalArgumentException("test-attachment is not on the message");
@@ -52,7 +52,7 @@ public class AttachmentsComponent implements Callable
         MuleMessage result = new DefaultMuleMessage("here is one for you!", eventContext.getMuleContext());
         FileDataSource ds = new FileDataSource(
             new File("transports/vm/src/test/resources/test.gif").getAbsoluteFile());
-        result.addAttachment("mule", new DataHandler(ds));
+        result.addOutboundAttachment("mule", new DataHandler(ds));
         return result;
     }
 }

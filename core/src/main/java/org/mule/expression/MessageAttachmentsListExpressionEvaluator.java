@@ -45,12 +45,12 @@ public class MessageAttachmentsListExpressionEvaluator implements ExpressionEval
         if (expression.contains(ALL_ARGUMENT))
         {
             WildcardFilter filter = new WildcardFilter(expression);
-            result = new ArrayList<DataHandler>(message.getAttachmentNames().size());
-            for (String name : message.getAttachmentNames())
+            result = new ArrayList<DataHandler>(message.getInboundAttachmentNames().size());
+            for (String name : message.getInboundAttachmentNames())
             {
                 if (filter.accept(name))
                 {
-                    result.add(message.getAttachment(name));
+                    result.add(message.getInboundAttachment(name));
                 }
             }
         }
@@ -71,7 +71,7 @@ public class MessageAttachmentsListExpressionEvaluator implements ExpressionEval
                 {
                     required = true;
                 }
-                DataHandler val = message.getAttachment(s);
+                DataHandler val = message.getInboundAttachment(s);
                 if (val != null)
                 {
                     result.add(val);

@@ -9,45 +9,82 @@
  */
 package org.mule.api.annotations.param;
 
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleEventContext;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.InvocationResult;
 import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
+import org.mule.session.DefaultMuleSession;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 import org.mule.util.StringDataSource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.activation.DataHandler;
 
 public abstract class AbstractAnnotatedEntrypointResolverTestCase extends AbstractMuleTestCase
 {
     protected MuleEventContext eventContext;
+    protected boolean inboundScope = true;
 
     @Override
     public void doSetUp() throws Exception
     {
         super.doSetUp();
 
-        eventContext = getTestEventContext("test");
-        eventContext.getMessage().setInboundProperty("foo", "fooValue");
-        eventContext.getMessage().setInboundProperty("bar", "barValue");
-        eventContext.getMessage().setInboundProperty("baz", "bazValue");
-
         try
         {
-            eventContext.getMessage().addAttachment("foo", new DataHandler(new StringDataSource("fooValue")));
-            eventContext.getMessage().addAttachment("bar", new DataHandler(new StringDataSource("barValue")));
-            eventContext.getMessage().addAttachment("baz", new DataHandler(new StringDataSource("bazValue")));
+            eventContext = createEventContext(null, null);
         }
         catch (Exception e)
         {
-            e.printStackTrace();
             fail(e.getMessage());
         }
+    }
+
+    protected MuleEventContext createEventContext(Map<String, Object> headers, Map<String, DataHandler> attachments) throws Exception
+    {
+        if(headers==null)
+        {
+            headers = new HashMap<String, Object>();
+            headers.put("foo", "fooValue");
+            headers.put("bar", "barValue");
+            headers.put("baz", "bazValue");
+        }
+
+        if(attachments==null)
+        {
+            attachments = new HashMap<String, DataHandler>();
+            attachments.put("foo", new DataHandler(new StringDataSource("fooValue")));
+            attachments.put("bar", new DataHandler(new StringDataSource("barValue")));
+            attachments.put("baz", new DataHandler(new StringDataSource("bazValue")));
+        }
+        MuleMessage message;
+        if(inboundScope)
+        {
+            message = new DefaultMuleMessage("test", null, attachments, muleContext);
+            for (String s : headers.keySet())
+            {
+                message.setInboundProperty(s, headers.get(s));
+            }
+        }
+        else
+        {
+            message = new DefaultMuleMessage("test", headers, muleContext);
+            for (String s : attachments.keySet())
+            {
+                message.addOutboundAttachment(s, attachments.get(s));
+            }
+        }
+        return new DefaultMuleEventContext(new DefaultMuleEvent(message, getTestInboundEndpoint("null"), new DefaultMuleSession(muleContext)));
     }
 
     protected InvocationResult invokeResolver(String methodName, MuleEventContext eventContext) throws Exception

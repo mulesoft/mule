@@ -15,7 +15,9 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.transformer.types.MimeTypes;
 import org.mule.transport.NullPayload;
+import org.mule.util.IOUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -197,7 +199,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     //
     // attachments
     //
-    public void testAddingAttachment() throws Exception
+    public void testLegacyAddingAttachment() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         
@@ -206,6 +208,52 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         
         assertTrue(message.getAttachmentNames().contains("attachment"));
         assertEquals(handler, message.getAttachment("attachment"));
+    }
+
+    public void testAddingOutboundAttachment() throws Exception
+    {
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
+
+        DataHandler handler = new DataHandler("this is the attachment", "text/plain");
+        message.addOutboundAttachment("attachment", handler);
+
+        assertTrue(message.getOutboundAttachmentNames().contains("attachment"));
+        assertEquals(handler, message.getOutboundAttachment("attachment"));
+        assertEquals(0, message.getInboundAttachmentNames().size());
+
+        message.removeOutboundAttachment("attachment");
+        assertEquals(0, message.getOutboundAttachmentNames().size());
+
+        //Try with content type set
+        message.addOutboundAttachment("spi-props", IOUtils.getResourceAsUrl("test-spi.properties", getClass()), MimeTypes.TEXT);
+
+        assertTrue(message.getOutboundAttachmentNames().contains("spi-props"));
+        handler = message.getOutboundAttachment("spi-props");
+        assertEquals(MimeTypes.TEXT, handler.getContentType());
+        assertEquals(1, message.getOutboundAttachmentNames().size());
+
+        //Try without content type set
+        message.addOutboundAttachment("dummy", IOUtils.getResourceAsUrl("dummy.xml", getClass()), null);
+        handler = message.getOutboundAttachment("dummy");
+        assertEquals(MimeTypes.APPLICATION_XML, handler.getContentType());
+        assertEquals(2, message.getOutboundAttachmentNames().size());
+
+
+    }
+    
+    public void testAddingInboundAttachment() throws Exception
+    {
+        Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
+
+        DataHandler dh = new DataHandler("this is the attachment", "text/plain");
+        attachments.put("attachment", dh);
+        MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, null, attachments, muleContext);
+
+        assertTrue(message.getInboundAttachmentNames().contains("attachment"));
+        assertEquals(dh, message.getInboundAttachment("attachment"));
+
+        assertEquals(0, message.getOutboundAttachmentNames().size());
+
     }
     
     public void testNewMuleMessageFromMuleMessageWithAttachment() throws Exception

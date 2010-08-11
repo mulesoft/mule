@@ -33,14 +33,16 @@ public interface MuleMessage extends Serializable
      * Adds a map of properties to be associated with this message
      * 
      * @param properties the properties add to this message
+     * @deprecated use {@link #addProperties(java.util.Map, org.mule.api.transport.PropertyScope)} instead
      */
+    @Deprecated
     void addProperties(Map<String, Object> properties);
 
     /**
      * Adds a map of properties to be associated with this message
      *
      * @param properties the properties add to this message
-     * @param scope the scope in which the proeprties should be added
+     * @param scope the scope in which the properties should be added
      */
     void addProperties(Map<String, Object> properties, PropertyScope scope);
 
@@ -139,7 +141,8 @@ public interface MuleMessage extends Serializable
     Object removeProperty(String key, PropertyScope scope);
 
     /**
-     * @return all property keys on this message
+     * @return all property keys on this message.
+     * @since 3.0 only the outbound scope properties are returned
      * @deprecated use {@link #getPropertyNames(org.mule.api.transport.PropertyScope)}
      */
     @Deprecated
@@ -349,38 +352,107 @@ public interface MuleMessage extends Serializable
     void setExceptionPayload(ExceptionPayload payload);
 
     /**
-     * Allows for arbitary data attachments to be associated with the Message. These attachements work in the
+     * Allows for arbitrary data attachments to be associated with the Message. These attachments work in the
      * same way that email attachments work. Attachments can be binary or text
      * @param name the name to associate with the attachment
-     * @param dataHandler The attachment datahandler to use. This will be used to interract with the attachment data
-     * @throws Exception
+     * @param dataHandler The attachment datahandler to use. This will be used to interact with the attachment data
+     * @throws Exception if the attachment cannot be added for any reason
      * @see javax.activation.DataHandler
+     * @deprecated use {@link #addOutboundAttachment(javax.activation.DataHandler)} instead
      */
+    @Deprecated
     void addAttachment(String name, DataHandler dataHandler) throws Exception;
+
+    /**
+     * Allows for arbitrary data attachments to be associated with the Message. These attachments work in the
+     * same way that email attachments work. Attachments can be binary or text
+     * @param name the name to associate with the attachment
+     * @param dataHandler The attachment {@link javax.activation.DataHandler} to use. This will be used to interact with the attachment data
+     * @throws Exception if the attachment cannot be added for any reason
+     * @see javax.activation.DataHandler
+     * @since 3.0
+     */
+    void addOutboundAttachment(String name, DataHandler dataHandler) throws Exception;
+
+    /**
+     *  Adds an outgoing attachment to the message
+     * @param object the input stream to the contents of the attachment. This object can either be a {@link java.net.URL}, which will construct a URL data source, or
+     * a {@link java.io.File}, which will construct a file data source.  Any other object will be used as the raw contents of the attachment
+     * @param contentType the content type of the attachment.  Note that the charset attribute can be specifed too i.e. text/plain;charset=UTF-8
+     * @param name the name to associate with the attachments
+     * @throws Exception if the attachment cannot be read or created
+     * @since 3.0
+     */
+    void addOutboundAttachment(String name, Object object, String contentType) throws Exception;
 
     /**
      * Remove an attachment form this message with the specified name
      * @param name the name of the attachment to remove. If the attachment does not exist, the request may be ignored
      * @throws Exception different messaging systems handle attachments differently, as such some will throw an exception
      * if an attachment does dot exist.
+     * @deprecated use {@link #removeOutboundAttachment(java.lang.String)} instead
      */
+    @Deprecated
     void removeAttachment(String name) throws Exception;
+
+    /**
+     * Remove an attachment form this message with the specified name
+     * @param name the name of the attachment to remove. If the attachment does not exist, the request may be ignored
+     * @throws Exception different messaging systems handle attachments differently, as such some will throw an exception
+     * if an attachment does dot exist.
+     * @since 3.0
+     */
+    void removeOutboundAttachment(String name) throws Exception;
 
     /**
      * Retrieve an attachment with the given name. If the attachment does not exist, null will be returned
      * @param name the name of the attachment to retrieve
      * @return the attachment with the given name or null if the attachment does not exist
      * @see javax.activation.DataHandler
+     * @deprecated use {@link #getInboundAttachment(String)} instead
      */
+    @Deprecated
     DataHandler getAttachment(String name);
 
     /**
-     * Returns a set of the names of the attachments on this message. If there are no attachments an empty set will be
-     * returned.
+     * Retrieve an attachment with the given name. If the attachment does not exist, null will be returned
+     * @param name the name of the attachment to retrieve
+     * @return the attachment with the given name or null if the attachment does not exist
+     * @see javax.activation.DataHandler
+     * @since 3.0
+     */
+    DataHandler getInboundAttachment(String name);
+
+    /**
+     * Retrieve an attachment with the given name. If the attachment does not exist, null will be returned
+     * @param name the name of the attachment to retrieve
+     * @return the attachment with the given name or null if the attachment does not exist
+     * @see javax.activation.DataHandler
+     * @since 3.0
+     */
+    DataHandler getOutboundAttachment(String name);
+
+    /**
      * @return a set of the names of the attachments on this message. If there are no attachments an empty set will be
      * returned.
+     * @deprecated use {@link #getInboundAttachmentNames()}
      */
+    @Deprecated
     Set<String> getAttachmentNames();
+
+    /**
+     * @return a set of the names of the attachments on this message. If there are no attachments an empty set will be
+     * returned.
+     * @since 3.0
+     */
+    Set<String> getInboundAttachmentNames();
+
+    /**
+     * @return a set of the names of the attachments on this message. If there are no attachments an empty set will be
+     * returned.
+     * @since 3.0
+     */
+    Set<String> getOutboundAttachmentNames();
 
     /**
      * Gets the encoding for the current message. For potocols that send encoding
