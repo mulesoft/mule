@@ -11,8 +11,7 @@
     <model>
         <service name="rssTester">
             <inbound>
-                <rss:inbound-endpoint address="http://blogs.mulesoft.org/feed/" pollingFrequency="1000"
-                    exchange-pattern="request-response">
+                <rss:inbound-endpoint address="http://blogs.mulesoft.org/feed/" pollingFrequency="1000">
                     <property key="followRedirects" value="true"/>
                 </rss:inbound-endpoint>
             </inbound>
@@ -24,7 +23,7 @@
         <service name="rssTester2">
             <inbound>
                 <rss:inbound-endpoint address="http://blogs.mulesoft.org/feed/" pollingFrequency="1000"
-                                      lastUpdate="2009-11-01" exchange-pattern="request-response">
+                                      lastUpdate="2009-11-01">
                     <property key="followRedirects" value="true"/>
                 </rss:inbound-endpoint>
             </inbound>

@@ -10,7 +10,7 @@
         <service name="test">
             <inbound>
                 <rss:inbound-endpoint address="http://foo.com" acceptedMimeTypes="foo/bar" 
-                    lastUpdate="2009-10-01" exchange-pattern="request-response"/>
+                    lastUpdate="2009-10-01"/>
             </inbound>
             <echo-component/>
         </service>
