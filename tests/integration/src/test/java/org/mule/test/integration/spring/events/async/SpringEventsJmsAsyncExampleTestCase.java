@@ -27,14 +27,16 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
  */
 public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
 {
-    private final AtomicInteger eventCount = new AtomicInteger(0);
+    final AtomicInteger eventCount = new AtomicInteger(0);
 
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         eventCount.set(0);
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/spring/events/async/mule-events-example-async-app-context.xml";
@@ -66,28 +68,5 @@ public class SpringEventsJmsAsyncExampleTestCase extends FunctionalTestCase
         assertEquals(1, eventCount.intValue());
         assertNotNull(result);
         assertEquals("Order 'Sausage and Mash' Processed", result.getPayloadAsString());
-    }
-
-    public void testReceiveAsWebService() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-        OrderManagerBean orderManager = (OrderManagerBean) muleContext.getRegistry().lookupObject("orderManagerBean");
-        assertNotNull(orderManager);
-        EventCallback callback = new EventCallback()
-        {
-            public void eventReceived(MuleEventContext context, Object o) throws Exception
-            {
-                eventCount.incrementAndGet();
-            }
-        };
-        orderManager.setEventCallback(callback);
-
-        Order order = new Order("Sausage and Mash");
-        // Make an async call
-        client.dispatch("axis:http://localhost:44444/mule/orderManager?method=processOrderAsync", order, null);
-
-        MuleMessage result = client.request("jms://processed.queue", 10000);
-        assertNotNull(result);
-        assertEquals("Order 'Sausage and Mash' Processed Async", result.getPayload());
     }
 }

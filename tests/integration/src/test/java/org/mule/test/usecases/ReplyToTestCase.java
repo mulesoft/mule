@@ -55,27 +55,6 @@ public class ReplyToTestCase extends FunctionalTestCase
         assertNull("Extra message received at replyTo destination: " + result, result);        
     }
 
-    public void testAxis() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-        
-        MuleMessage msg = new DefaultMuleMessage("testing", muleContext);
-        msg.setReplyTo("ReplyTo");
-        
-        // Send asynchronous request
-        client.dispatch("EchoAxisSend", msg, null);
-
-        // Wait for asynchronous response
-        MuleMessage result = client.request("ReplyTo", RECEIVE_DELAY);
-        assertNotNull("Result is null", result);
-        assertFalse("Result is null", result.getPayload() instanceof NullPayload);
-        assertEquals("testing", result.getPayload());
-
-        // Make sure there are no more responses
-        result = client.request("ReplyTo", RECEIVE_DELAY);
-        assertNull("Extra message received at replyTo destination: " + result, result);        
-    }
-
     public void testCxf() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

@@ -2,9 +2,6 @@
 # Mule 1.x failures
 ##########################################################################
 
-# MULE-3697
-org.mule.test.usecases.axis.AxisClientWithComplexTypesTestCase
-
 # MULE-2258: fails on the build server
 org.mule.test.usecases.sync.TcpToFileTestCase
 
@@ -33,9 +30,6 @@ org.mule.test.integration.client.MuleClientTransactionTestCase
 # MULE-2733
 # @ in URI is not getting replaced (1 of 3 tests fails)
 org.mule.test.integration.util.ObjectNameHelperTestCase
-
-# MULE-3695
-org.mule.transport.soap.cxf.ServiceUsingAxisEndpointTestCase
 
 ##########################################################################
 # Low priority

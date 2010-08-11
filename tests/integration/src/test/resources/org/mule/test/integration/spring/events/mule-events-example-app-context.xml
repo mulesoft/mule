@@ -23,7 +23,6 @@
         <spring:property name="subscriptions">
             <spring:list>
                 <spring:value>jms://orders.queue</spring:value>
-                <spring:value>axis:http://localhost:44444/mule/orderManager</spring:value>
             </spring:list>
         </spring:property>
     </spring:bean>

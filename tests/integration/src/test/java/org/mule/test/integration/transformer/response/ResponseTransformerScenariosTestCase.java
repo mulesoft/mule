@@ -59,18 +59,6 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     // assertEquals("request" + "customResponse", message.getPayloadAsString());
     // }
 
-    // TODO Not sure how to implement with axis
-
-    // public void testAxisSyncResponseTransformer() throws Exception
-    // {
-    // MuleClient client = new MuleClient();
-    // MuleMessage message = client.send("axis:http://localhost:4445/services/AxisSync?method=echo",
-    // "request",
-    // null);
-    // assertNotNull(message);
-    // assertEquals("request" + "customResponse", message.getPayloadAsString());
-    // }
-
     public void testVmSync() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

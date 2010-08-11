@@ -37,14 +37,6 @@
             <echo-component />
         </service>
 
-        <service name="AxisSync">
-            <inbound>
-                <inbound-endpoint address="axis:http://localhost:4445/services/AxisSync" 
-                    exchange-pattern="request-response" responseTransformer-refs="customResponse" />
-            </inbound>
-            <echo-component />
-        </service>
-
         <service name="VmSync">
             <inbound>
                 <inbound-endpoint address="vm://sync" exchange-pattern="request-response" />

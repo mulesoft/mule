@@ -13,7 +13,6 @@
 
     <modules>
         <module>all-transports</module>
-        <module>axis</module>
         <module>bpm</module>
         <module>ajax</module>
         <module>cxf</module>

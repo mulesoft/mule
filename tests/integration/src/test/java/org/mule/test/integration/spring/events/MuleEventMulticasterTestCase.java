@@ -61,26 +61,4 @@ public class MuleEventMulticasterTestCase extends FunctionalTestCase
         assertNotNull(result);
         assertEquals("Order 'Sausage and Mash' Processed", result.getPayload());
     }
-
-    public void testReceiveAsWebService() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-        OrderManagerBean orderManager = (OrderManagerBean) muleContext.getRegistry().lookupObject("orderManagerBean");
-        assertNotNull(orderManager);
-        EventCallback callback = new EventCallback()
-        {
-            public void eventReceived(MuleEventContext context, Object o) throws Exception
-            {
-                eventCount.incrementAndGet();
-            }
-        };
-        orderManager.setEventCallback(callback);
-
-        Order order = new Order("Sausage and Mash");
-        MuleMessage result = client.send("axis:http://localhost:44444/mule/orderManager?method=processOrder", order,
-            null);
-
-        assertNotNull(result);
-        assertEquals("Order 'Sausage and Mash' Processed", (result.getPayload()));
-    }
 }
