@@ -134,7 +134,10 @@ public class MuleInvoker implements Invoker
         else
         {
             exchange.getInMessage().getInterceptorChain().abort();
-            exchange.getOutMessage().getInterceptorChain().abort();
+            if (exchange.getOutMessage() != null)
+            {
+                exchange.getOutMessage().getInterceptorChain().abort();
+            }
             exchange.put(CxfConstants.MULE_EVENT, null);
             return null;
         }
