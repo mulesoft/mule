@@ -1460,7 +1460,7 @@
         </xsd:complexContent>
     </xsd:complexType>
     
-    <xsd:element name="flow" type="flowType" substitutionGroup="abstract-flow-construct">
+    <xsd:element name="flow" type="flowType">
         <xsd:annotation>
             <xsd:documentation>
                 A flexible flow.
