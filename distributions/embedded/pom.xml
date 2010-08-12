@@ -170,6 +170,11 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-jersey</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-jbossts</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
