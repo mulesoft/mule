@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.module.launcher;
 
 import java.io.IOException;
@@ -38,13 +48,13 @@ public class GoodCitizenClassLoader extends URLClassLoader
         // jars
         try
         {
-            Class clazz = URLClassLoader.class;
+            Class<URLClassLoader> clazz = URLClassLoader.class;
             Field ucp = clazz.getDeclaredField("ucp");
             ucp.setAccessible(true);
             Object urlClassPath = ucp.get(this);
             Field loaders = urlClassPath.getClass().getDeclaredField("loaders");
             loaders.setAccessible(true);
-            Collection jarLoaders = (Collection) loaders.get(urlClassPath);
+            Collection<?> jarLoaders = (Collection<?>) loaders.get(urlClassPath);
             for (Object jarLoader : jarLoaders)
             {
                 try
@@ -68,10 +78,10 @@ public class GoodCitizenClassLoader extends URLClassLoader
         try
         {
             // now native libs
-            Class clazz = ClassLoader.class;
+            Class<ClassLoader> clazz = ClassLoader.class;
             Field nativeLibraries = clazz.getDeclaredField("nativeLibraries");
             nativeLibraries.setAccessible(true);
-            Vector nativelib = (Vector) nativeLibraries.get(this);
+            Vector<?> nativelib = (Vector<?>) nativeLibraries.get(this);
             for (Object lib : nativelib)
             {
                 Method finalize = lib.getClass().getDeclaredMethod("finalize");
@@ -83,7 +93,6 @@ public class GoodCitizenClassLoader extends URLClassLoader
         {
             // ignore
         }
-
     }
 
     protected static class NonCachingURLStreamHandlerFactory implements URLStreamHandlerFactory
@@ -100,6 +109,10 @@ public class GoodCitizenClassLoader extends URLClassLoader
      */
     private static class NonCachingJarResourceURLStreamHandler extends Handler
     {
+        public NonCachingJarResourceURLStreamHandler()
+        {
+            super();
+        }
 
         @Override
         protected java.net.URLConnection openConnection(URL u) throws IOException
