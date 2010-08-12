@@ -29,3 +29,6 @@ org.mule.transport.cxf.payload.TreatNullPayloadAsVoidTestCase
 org.mule.transport.cxf.DatabindingTestCase
 org.mule.transport.cxf.wsa.WSATest
 org.mule.transport.cxf.ClientSimpleFrontendTestCase
+
+# Exclude to discuss with Dan D
+org.mule.transport.cxf.CxfOutboundMessageProcessorTestCase
