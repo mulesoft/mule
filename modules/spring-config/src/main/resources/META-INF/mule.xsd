@@ -103,6 +103,7 @@
             <xsd:element ref="abstract-transformer"/>
             <xsd:element ref="abstract-filter"/>
             <xsd:element ref="abstract-flow-construct" />
+            <xsd:element ref="flow" />
             <xsd:element ref="abstract-model"/>
             <xsd:element ref="abstract-interceptor-stack"/>
             <xsd:element ref="abstract-message-processor"/>
@@ -355,6 +356,25 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="request-reply" type="requestReplyType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Processes the nest list of message processors asychronously using a thread pool 
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="requestReplyType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
+                    <xsd:element ref="abstract-inbound-endpoint"/>                    
+                </xsd:sequence>
+                <xsd:attribute name="timeout" type="substitutableInt" use="optional"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -1453,44 +1473,54 @@
                 A flexible flow..
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:complexContent>
-            <xsd:extension base="baseFlowConstructType">
-                <xsd:sequence>
-                    <xsd:choice>
-                        <xsd:element ref="composite-source" minOccurs="1"
-                            maxOccurs="1">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    The source of new messages for this flow
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                        <xsd:element ref="abstract-inbound-endpoint" minOccurs="1"
-                            maxOccurs="1">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    The inbound endpoint for this flow
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                    </xsd:choice> 
-                    <xsd:choice minOccurs="1" maxOccurs="unbounded">
-                        <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
-                        <xsd:element name="response">
-                            <xsd:annotation>
-                                <xsd:documentation>
-                                    An outbound endpoint
-                                </xsd:documentation>
-                            </xsd:annotation>
-                            <xsd:complexType>
-                                <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
-                            </xsd:complexType>
-                        </xsd:element>
-                    </xsd:choice>
-                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
+        <xsd:sequence>
+            <xsd:element name="description" type="descriptionType" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        This can hold any kind of documentation related to the flow construct. It is intended to be "human readable" only and is not used by the system.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:choice>
+                <xsd:element ref="composite-source" minOccurs="1"
+                    maxOccurs="1">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The source of new messages for this flow
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+                <xsd:element ref="abstract-inbound-endpoint" minOccurs="1"
+                    maxOccurs="1">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The inbound endpoint for this flow
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+            </xsd:choice> 
+            <xsd:choice minOccurs="1" maxOccurs="unbounded">
+                <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
+                <xsd:element name="response">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An outbound endpoint
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:choice>
+            <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="nonBlankString" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The name used to identify this flow construct.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>    
     
     <xsd:element name="simple-service" type="simpleServiceType" substitutionGroup="abstract-flow-construct">
@@ -4132,7 +4162,11 @@
         </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
-                <xsd:extension base="baseMultipleRoutesRoutingMessageProcessorType">
+                <xsd:extension base="abstractRoutingMessageProcessorType">
+                    <xsd:sequence>
+                       <xsd:element ref="abstract-message-info-mapping" minOccurs="0"/>
+                    </xsd:sequence>
+                    <xsd:attributeGroup ref="defaultCorrelationAttributes"/>
                     <xsd:attributeGroup ref="expressionAttributes"/>
                     <xsd:attributeGroup ref="allExchangePatterns" />
                 </xsd:extension>
