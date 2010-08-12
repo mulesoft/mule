@@ -383,7 +383,6 @@
         <include>org.mule.transports:mule-transport-ajax</include>
         <include>org.mule.transports:mule-transport-axis</include>
         <include>org.mule.transports:mule-transport-bpm</include>
-        <include>org.mule.transports:mule-transport-cxf</include>
         <include>org.mule.transports:mule-transport-ejb</include>
         <include>org.mule.transports:mule-transport-email</include>
         <include>org.mule.transports:mule-transport-file</include>
@@ -411,6 +410,7 @@
         <include>org.mule.modules:mule-module-atom</include>
         <include>org.mule.modules:mule-module-builders</include>
         <include>org.mule.modules:mule-module-client</include>
+        <include>org.mule.modules:mule-module-cxf</include>
         <include>org.mule.modules:mule-module-guice</include>
         <include>org.mule.modules:mule-module-ibeans</include>
         <include>org.mule.modules:mule-module-jaas</include>
@@ -446,7 +446,6 @@
         <exclude>org.mule.transports:mule-transport-ajax</exclude>
         <exclude>org.mule.transports:mule-transport-axis</exclude>
         <exclude>org.mule.transports:mule-transport-bpm</exclude>
-        <exclude>org.mule.transports:mule-transport-cxf</exclude>
         <exclude>org.mule.transports:mule-transport-ejb</exclude>
         <exclude>org.mule.transports:mule-transport-email</exclude>
         <exclude>org.mule.transports:mule-transport-file</exclude>
@@ -475,6 +474,7 @@
         <exclude>org.mule.modules:mule-module-boot</exclude>
         <exclude>org.mule.modules:mule-module-builders</exclude>
         <exclude>org.mule.modules:mule-module-client</exclude>
+        <exclude>org.mule.modules:mule-module-cxf</exclude>
         <exclude>org.mule.modules:mule-module-guice</exclude>
         <exclude>org.mule.modules:mule-module-ibeans</exclude>
         <exclude>org.mule.modules:mule-module-jaas</exclude>
