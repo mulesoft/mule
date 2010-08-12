@@ -216,5 +216,11 @@
             </otherwise>
         </choice>
     </flow>
+    
+    <flow name="flow-ref">
+        <vm:inbound-endpoint path="flow-ref-in" exchange-pattern="request-response"/>
+        <flow-ref name="flow"/>
+        <flow-ref name="flow"/>
+    </flow>
 
 </mule>

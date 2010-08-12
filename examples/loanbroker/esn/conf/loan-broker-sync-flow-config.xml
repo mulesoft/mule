@@ -31,8 +31,8 @@
                 <outbound-endpoint ref="CreditAgency" exchange-pattern="request-response" />
             </binding>
         </component>
-        <request-reply timeout="60000">
-            <outbound-endpoint ref="LenderService" />
+        <request-reply timeout="10000">
+            <flow-ref name="TheLenderService" />
             <inbound-endpoint ref="LoanBrokerQuotes">
                 <custom-aggregator class="org.mule.example.loanbroker.routers.BankQuotesResponseAggregator" />
             </inbound-endpoint>
@@ -44,13 +44,11 @@
      The Lender service is used to determine which banks to contact for a quote
      -->
     <flow name="TheLenderService">
-        <inbound-endpoint ref="LenderService" />
         <component class="org.mule.example.loanbroker.lender.DefaultLender" />
-        <outbound-endpoint ref="BankGateway" />
+        <flow-ref name="TheBankGateway" />
     </flow>
 
     <flow name="TheBankGateway">
-        <inbound-endpoint ref="BankGateway" exchange-pattern="one-way" />
         <expression-filter expression="payload.lenders.endpoint!=null" evaluator="groovy" />
         <recipient-list evaluator="groovy" expression="payload.lenders.endpoint"/>
     </flow>

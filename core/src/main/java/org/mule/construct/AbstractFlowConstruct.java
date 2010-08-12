@@ -10,6 +10,8 @@
 
 package org.mule.construct;
 
+import org.mule.DefaultMuleEvent;
+import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -59,7 +61,7 @@ import org.apache.commons.logging.LogFactory;
  * {@link #doStop()} and {@link #doDispose()} if they need to perform any action on
  * lifecycle transitions.
  */
-public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
+public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle, MessageProcessor
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -352,6 +354,13 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         {
             ((Disposable) candidate).dispose();
         }
+    }
+    
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event.getEndpoint(), this, event);
+        RequestContext.setEvent(newEvent);
+        return messageProcessorChain.process(newEvent);
     }
 
 }

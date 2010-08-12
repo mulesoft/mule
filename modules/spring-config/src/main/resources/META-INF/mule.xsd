@@ -1482,7 +1482,7 @@
                 </xsd:annotation>
             </xsd:element>
             <xsd:choice>
-                <xsd:element ref="composite-source" minOccurs="1"
+                <xsd:element ref="composite-source" minOccurs="0"
                     maxOccurs="1">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -1521,7 +1521,17 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-    </xsd:complexType>    
+    </xsd:complexType>   
+    
+    <xsd:element name="flow-ref" substitutionGroup="abstract-message-processor">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="abstractMessageProcessorType">
+                    <xsd:attribute name="name" type="xsd:string" use="required"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>    
     
     <xsd:element name="simple-service" type="simpleServiceType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>

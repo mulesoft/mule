@@ -10,6 +10,8 @@
 
 package org.mule.service;
 
+import org.mule.DefaultMuleEvent;
+import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -52,7 +54,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * A base implementation for all Services in Mule
  */
-public abstract class AbstractService implements Service
+public abstract class AbstractService implements Service, MessageProcessor
 {
 
     /**
@@ -661,6 +663,13 @@ public abstract class AbstractService implements Service
         asyncReplyMessageProcessor.setFailOnTimeout(asyncReplyMessageSource.isFailOnTimeout());
         asyncReplyMessageProcessor.setReplySource(asyncReplyMessageSource);
         return asyncReplyMessageProcessor;
+    }
+    
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event.getEndpoint(), this, event);
+        RequestContext.setEvent(newEvent);
+        return messageProcessorChain.process(newEvent);
     }
 
 }

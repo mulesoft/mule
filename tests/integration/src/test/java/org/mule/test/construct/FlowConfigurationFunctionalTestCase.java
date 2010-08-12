@@ -304,4 +304,11 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
             new DefaultMuleMessage("egh", muleContext)).getPayloadAsString());
     }
 
+    public void testFlowRef() throws MuleException, Exception
+    {
+        assertEquals("012xyzabc3", muleContext.getClient().send("vm://flow-ref-in",
+            new DefaultMuleMessage("0", muleContext)).getPayloadAsString());
+
+    }
+    
 }

@@ -53,6 +53,7 @@ import org.mule.config.spring.parsers.specific.ExceptionTXFilterDefinitionParser
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.FlowDefinitionParser;
+import org.mule.config.spring.parsers.specific.FlowRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.GlobalPropertyDefinitionParser;
 import org.mule.config.spring.parsers.specific.IgnoreObjectMethodsDefinitionParser;
 import org.mule.config.spring.parsers.specific.InboundRouterDefinitionParser;
@@ -314,6 +315,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("simple-service", new SimpleServiceDefinitionParser());
         registerBeanDefinitionParser("bridge", new BridgeDefinitionParser());
 
+        registerBeanDefinitionParser("flow-ref", new FlowRefDefinitionParser());
+        
         // Components
         registerBeanDefinitionParser("component", new ComponentDelegatingDefinitionParser(DefaultJavaComponent.class));
         registerBeanDefinitionParser("pooled-component", new ComponentDelegatingDefinitionParser(PooledJavaComponent.class));
