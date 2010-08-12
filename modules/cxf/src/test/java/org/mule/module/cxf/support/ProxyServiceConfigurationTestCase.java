@@ -11,7 +11,6 @@
 package org.mule.module.cxf.support;
 
 import org.mule.MuleServer;
-import org.mule.module.cxf.support.ComponentNotFoundRuntimeException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.ExceptionUtils;
 
@@ -21,13 +20,13 @@ public class ProxyServiceConfigurationTestCase extends AbstractMuleTestCase
 {
     public void testGetEndpointName_CorrectNameSpace()
     {
-        String configFilePath = "/org/mule/transport/cxf/support/test-proxy-mule-config-correct-namespace.xml";
+        String configFilePath = "/org/mule/module/cxf/support/test-proxy-mule-config-correct-namespace.xml";
         startServer(configFilePath);
     }
 
     public void testGetEndpointName_NoNameSpace()
     {
-        String configFilePath = "/org/mule/transport/cxf/support/test-proxy-mule-config-no-namespace.xml";
+        String configFilePath = "/org/mule/module/cxf/support/test-proxy-mule-config-no-namespace.xml";
         try
         {
             startServer(configFilePath);

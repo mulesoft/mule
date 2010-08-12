@@ -48,18 +48,19 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
         // Http Status Code 200 means OK, the request has succeeded. (500 would indicate an error)
         assertEquals(200, client.executeMethod(httpMethod));
         // By default the class package - in its other way round - is used for the namespace:
-        // Here, EchoServiceImpl classpath is: com\mulesource\test\connectors\transport\cxf
+        // Here, EchoServiceImpl classpath is: com\mulesource\test\connectors\module\cxf
         // Therefore namespace should be: http://cxf.transport.connectors.test.mulesource.com
         assertEquals(
                 "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
                     "<soap:Body>" +
-                        "<ns2:echoResponse xmlns:ns2=\"http://testmodels.cxf.transport.mule.org/\">" +                        
+                        "<ns2:echoResponse xmlns:ns2=\"http://testmodels.cxf.module.mule.org/\">" +                        
                             "<text>hello</text>" +
                         "</ns2:echoResponse>" +
                     "</soap:Body>" +
                 "</soap:Envelope>", httpMethod.getResponseBodyAsString());
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "jaxws-conf.xml";

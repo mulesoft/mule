@@ -21,7 +21,7 @@ public class UsernameTokenTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "org/mule/transport/cxf/wssec/cxf-secure-service.xml, org/mule/transport/cxf/wssec/username-token-conf.xml";
+        return "org/mule/module/cxf/wssec/cxf-secure-service.xml, org/mule/module/cxf/wssec/username-token-conf.xml";
     }
     
     @Override

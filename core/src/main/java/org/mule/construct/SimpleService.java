@@ -10,8 +10,6 @@
 
 package org.mule.construct;
 
-import java.lang.reflect.Method;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -29,6 +27,8 @@ import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.util.ClassUtils;
+
+import java.lang.reflect.Method;
 
 /**
  * In-out SOA-style simple service, with no outbound router. Always fully
@@ -155,7 +155,7 @@ public class SimpleService extends AbstractFlowConstruct
     {
         try
         {
-            MessageProcessorBuilder wsmpb = (MessageProcessorBuilder) ClassUtils.instanciateClass("org.mule.transport.cxf.builder.WebServiceMessageProcessorBuilder");
+            MessageProcessorBuilder wsmpb = (MessageProcessorBuilder) ClassUtils.instanciateClass("org.mule.module.cxf.builder.WebServiceMessageProcessorBuilder");
 
             Method setServiceClassMethod = ClassUtils.getMethod(wsmpb.getClass(), "setServiceClass",
                 new Class<?>[]{Class.class});

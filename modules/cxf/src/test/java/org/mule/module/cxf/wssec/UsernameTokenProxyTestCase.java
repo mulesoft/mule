@@ -23,7 +23,7 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources() 
     {
-        return "org/mule/transport/cxf/wssec/cxf-secure-proxy.xml, org/mule/transport/cxf/wssec/username-token-conf.xml";
+        return "org/mule/module/cxf/wssec/cxf-secure-proxy.xml, org/mule/module/cxf/wssec/username-token-conf.xml";
     }
 
     @Override
@@ -64,6 +64,6 @@ public class UsernameTokenProxyTestCase extends FunctionalTestCase
 
     protected String getMessageResource()
     {
-        return "/org/mule/transport/cxf/wssec/in-message.xml";
+        return "/org/mule/module/cxf/wssec/in-message.xml";
     }
 }

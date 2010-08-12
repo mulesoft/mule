@@ -20,7 +20,7 @@
                     <cxf:proxy-service port="TestPOJOComponentPort"
                                        service="TestPOJOComponent" 
                                        namespace="http://someOtherPackage.support.cxf.transport.mule/"
-                                       wsdlLocation="./org/mule/transport/cxf/support/TestProxyImpl.wsdl"
+                                       wsdlLocation="./org/mule/module/cxf/support/TestProxyImpl.wsdl"
                     />
                 </inbound-endpoint>
             </inbound>

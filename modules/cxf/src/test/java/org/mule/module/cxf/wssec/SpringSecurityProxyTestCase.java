@@ -10,12 +10,11 @@
 
 package org.mule.module.cxf.wssec;
 
-
 public class SpringSecurityProxyTestCase extends UsernameTokenProxyTestCase 
 {
     @Override
     protected String getConfigResources() 
     {
-        return "org/mule/transport/cxf/wssec/cxf-secure-proxy.xml, org/mule/transport/cxf/wssec/spring-security-conf.xml";
+        return "org/mule/module/cxf/wssec/cxf-secure-proxy.xml, org/mule/module/cxf/wssec/spring-security-conf.xml";
     }
 }

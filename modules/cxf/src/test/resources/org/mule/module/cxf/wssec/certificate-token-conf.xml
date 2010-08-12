@@ -15,7 +15,7 @@
           <spring:map>
               <spring:entry key="action" value="Signature" />
               <spring:entry key="user" value="joe" />
-              <spring:entry key="signaturePropFile" value="org/mule/transport/cxf/wssec/wssecurity.properties" />
+              <spring:entry key="signaturePropFile" value="org/mule/module/cxf/wssec/wssecurity.properties" />
               <spring:entry key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ClientPasswordCallback" />
           </spring:map>
         </spring:property>
@@ -26,7 +26,7 @@
         <spring:property name="sourceMap">
             <spring:map>
                 <spring:entry key="action" value="Signature" />
-                <spring:entry key="signaturePropFile" value="org/mule/transport/cxf/wssec/wssecurity.properties" />
+                <spring:entry key="signaturePropFile" value="org/mule/module/cxf/wssec/wssecurity.properties" />
                 <spring:entry key="passwordCallbackClass" value="org.mule.module.cxf.wssec.ServerPasswordCallback" />
             </spring:map>
         </spring:property>
