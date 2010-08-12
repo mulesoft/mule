@@ -10,14 +10,17 @@
 
 package org.mule.config.spring.factories;
 
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.routing.MessageProcessorFilterPair;
 import org.mule.routing.filters.AcceptAllFilter;
 import org.mule.routing.filters.ExpressionFilter;
+
 import org.springframework.beans.factory.FactoryBean;
 
-public class MessageProcessorFilterPairFactoryBean implements FactoryBean
+public class MessageProcessorFilterPairFactoryBean implements FactoryBean, MuleContextAware
 {
     private MessageProcessor messageProcessor;
     private Filter filter;
@@ -52,6 +55,18 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean
     public boolean isSingleton()
     {
         return true;
+    }
+    
+    public void setMuleContext(MuleContext context)
+    {
+        if (messageProcessor != null && messageProcessor instanceof MuleContextAware)
+        {
+            ((MuleContextAware) messageProcessor).setMuleContext(context);
+        }
+        if (filter != null && filter instanceof MuleContextAware)
+        {
+            ((MuleContextAware) filter).setMuleContext(context);
+        }
     }
 
 }
