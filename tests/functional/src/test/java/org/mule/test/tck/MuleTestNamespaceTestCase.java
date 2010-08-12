@@ -12,7 +12,6 @@ package org.mule.test.tck;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.tck.functional.ResponseWriterCallback;
 
 import java.io.IOException;
 
@@ -56,7 +55,7 @@ public class MuleTestNamespaceTestCase extends FunctionalTestCase
         assertTrue(ftc.isEnableNotifications());
         assertNull(ftc.getAppendString());
         assertNotNull(ftc.getEventCallback());
-        assertTrue(ftc.getEventCallback() instanceof ResponseWriterCallback);
+        assertTrue(ftc.getEventCallback() instanceof CounterCallback);
 
     }
 

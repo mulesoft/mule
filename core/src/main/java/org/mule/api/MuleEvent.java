@@ -16,8 +16,6 @@ import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 
-import java.io.OutputStream;
-
 /**
  * <code>MuleEvent</code> represents any data event occuring in the Mule
  * environment. All data sent or received within the mule environment will be passed
@@ -216,15 +214,6 @@ public interface MuleEvent
      * @param timeout the event timeout in milliseconds
      */
     void setTimeout(int timeout);
-
-    /**
-     * An outputstream the can optionally be used write response data to an incoming
-     * message.
-     * 
-     * @return an output strem if one has been made available by the message receiver
-     *         that received the message
-     */
-    OutputStream getOutputStream();
 
     /**
      * Gets the encoding for this message.

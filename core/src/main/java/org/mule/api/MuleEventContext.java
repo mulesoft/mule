@@ -20,8 +20,6 @@ import org.mule.api.transaction.TransactionException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 
-import java.io.OutputStream;
-
 /**
  * <code>MuleEventContext</code> is the context object for the current request.
  * Using the context, developers can send/dispatch/receive events programmatically as
@@ -414,15 +412,6 @@ public interface MuleEventContext
      * @param stopFurtherProcessing the value to set.
      */
     void setStopFurtherProcessing(boolean stopFurtherProcessing);
-
-    /**
-     * An outputstream the can optionally be used write response data to an incoming
-     * message.
-     * 
-     * @return an output strem if one has been made available by the message receiver
-     *         that received the message
-     */
-    OutputStream getOutputStream();
 
     MessageExchangePattern getExchangePattern();
     

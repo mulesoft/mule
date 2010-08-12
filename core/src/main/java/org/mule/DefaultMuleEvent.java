@@ -41,7 +41,6 @@ import org.mule.util.store.DeserializationPostInitialisable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -94,8 +93,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     private int timeout = TIMEOUT_NOT_SET_VALUE;
 
-    private transient ResponseOutputStream outputStream = null;
-
     private transient Object transformedMessage = null;
 
     private Credentials credentials = null;
@@ -121,7 +118,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         ((DefaultMuleSession) session).setFlowConstruct(service);
         this.endpoint = endpoint;
         this.timeout = previousEvent.getTimeout();
-        this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
         fillProperties(previousEvent);
     }
 
@@ -142,7 +138,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.endpoint = endpoint;
         this.session = session;
         this.id = generateEventId();
-        this.outputStream = outputStream;
         fillProperties(null);
     }
 
@@ -162,7 +157,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         session.setFlowConstruct(rewriteEvent.getFlowConstruct());
         this.endpoint = rewriteEvent.getEndpoint();
         this.timeout = rewriteEvent.getTimeout();
-        this.outputStream = (ResponseOutputStream) rewriteEvent.getOutputStream();
         if (rewriteEvent instanceof DefaultMuleEvent)
         {
             this.transformedMessage = ((DefaultMuleEvent) rewriteEvent).getCachedMessage();
@@ -500,18 +494,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     public void setTimeout(int timeout)
     {
         this.timeout = timeout;
-    }
-
-    /**
-     * An outputstream can optionally be used to write response data to an incoming
-     * message.
-     *
-     * @return an output strem if one has been made available by the message receiver
-     *         that received the message
-     */
-    public OutputStream getOutputStream()
-    {
-        return outputStream;
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException
