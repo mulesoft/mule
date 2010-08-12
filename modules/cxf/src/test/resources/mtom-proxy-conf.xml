@@ -39,7 +39,7 @@
                </inbound-endpoint>
             </inbound>
             <component>
-                <singleton-object class="org.mule.transport.cxf.testmodels.TestMtomImpl"/>
+                <singleton-object class="org.mule.module.cxf.testmodels.TestMtomImpl"/>
             </component>
         </service>
     </model>

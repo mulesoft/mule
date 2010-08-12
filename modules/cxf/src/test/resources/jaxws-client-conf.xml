@@ -51,7 +51,7 @@
         <inbound-endpoint address="vm://quartz.in" exchange-pattern="one-way"/>
       </inbound>
       <component>
-          <singleton-object class="org.mule.transport.cxf.jaxws.ClientMessageGenerator"/>
+          <singleton-object class="org.mule.module.cxf.jaxws.ClientMessageGenerator"/>
       </component>
       <outbound>
         <pass-through-router>

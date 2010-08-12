@@ -38,7 +38,7 @@
                     <cxf:simple-service />
                 </inbound-endpoint>                
             </inbound>
-            <component class="org.mule.transport.cxf.support.someOtherPackage.TestPOJOComponent"/>
+            <component class="org.mule.module.cxf.support.someOtherPackage.TestPOJOComponent"/>
         </service>
         
     </model>

@@ -10,7 +10,7 @@
 
 package org.mule.transport.cxf.transport;
 
-import org.mule.transport.cxf.CxfConfiguration;
+import org.mule.module.cxf.CxfConfiguration;
 
 import java.io.IOException;
 import java.util.ArrayList;

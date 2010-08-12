@@ -21,7 +21,7 @@
             </cxf:jaxws-service>
           </inbound-endpoint>
       </inbound>
-      <component class="org.mule.transport.cxf.testmodels.Echo"/>
+      <component class="org.mule.module.cxf.testmodels.Echo"/>
     </service>
     <service name="asyncService">
       <inbound>
@@ -30,7 +30,7 @@
               <cxf:jaxws-service />
           </inbound-endpoint>
       </inbound>
-      <component class="org.mule.transport.cxf.testmodels.AsyncService"/>
+      <component class="org.mule.module.cxf.testmodels.AsyncService"/>
     </service>
   </model>
 </mule>

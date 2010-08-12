@@ -4,28 +4,28 @@
 
 # This class matches surefire's include pattern by accident.
 # Don't execute it as it's not a unit test.
-org.mule.transport.cxf.testmodels.TestCxfComponent
+org.mule.module.cxf.testmodels.TestCxfComponent
 
 # tests with external dependencies
 # MULE-3693
-org.mule.transport.cxf.CxfWsdlTestCase
+org.mule.module.cxf.CxfWsdlTestCase
 
 # MULE-3257
-org.mule.transport.cxf.client.GeneratedClientTestCase
+org.mule.module.cxf.client.GeneratedClientTestCase
 
 # Doesn't work on build server for some reason?
 # MULE-3054
-org.mule.transport.cxf.jaxws.ClientTestCase
+org.mule.module.cxf.jaxws.ClientTestCase
 
 ###########################
 # Broken by BL-137
 ###########################
 # Problem with arguments in doSendWithProxy() 
-org.mule.transport.cxf.payload.TreatNullPayloadAsParameterByDefaultTestCase
-org.mule.transport.cxf.payload.TreatNullPayloadAsParameterTestCase
-org.mule.transport.cxf.payload.TreatNullPayloadAsVoidTestCase
+org.mule.module.cxf.payload.TreatNullPayloadAsParameterByDefaultTestCase
+org.mule.module.cxf.payload.TreatNullPayloadAsParameterTestCase
+org.mule.module.cxf.payload.TreatNullPayloadAsVoidTestCase
 
 # Need to make work post refactoring
-org.mule.transport.cxf.DatabindingTestCase
-org.mule.transport.cxf.wsa.WSATest
-org.mule.transport.cxf.ClientSimpleFrontendTestCase
+org.mule.module.cxf.DatabindingTestCase
+org.mule.module.cxf.wsa.WSATest
+org.mule.module.cxf.ClientSimpleFrontendTestCase

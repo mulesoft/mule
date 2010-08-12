@@ -14,8 +14,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.endpoint.AbstractEndpointBuilder;
 import org.mule.module.client.MuleClient;
+import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.cxf.CxfOutboundMessageProcessor;
 import org.mule.transport.cxf.config.FlowConfiguringMessageProcessor;
 
 import java.util.List;

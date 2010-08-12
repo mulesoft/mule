@@ -1,7 +1,7 @@
 package org.mule.transport.cxf.builder;
 
 import org.mule.api.lifecycle.CreateException;
-import org.mule.transport.cxf.CxfOutboundMessageProcessor;
+import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.transport.cxf.i18n.CxfMessages;
 
 import java.io.IOException;

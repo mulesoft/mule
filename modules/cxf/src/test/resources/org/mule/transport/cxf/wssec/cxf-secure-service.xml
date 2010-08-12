@@ -19,7 +19,7 @@
                 </quartz:inbound-endpoint>
             </inbound>
             <component>
-                <singleton-object class="org.mule.transport.cxf.jaxws.ClientMessageGenerator" />
+                <singleton-object class="org.mule.module.cxf.jaxws.ClientMessageGenerator" />
             </component>
             <outbound>
                 <pass-through-router>
@@ -54,7 +54,7 @@
                 </inbound-endpoint>
             </inbound>
             <component>
-                <singleton-object class="org.mule.transport.cxf.wssec.GreeterWithLatch" />
+                <singleton-object class="org.mule.module.cxf.wssec.GreeterWithLatch" />
             </component>
         </service>
 

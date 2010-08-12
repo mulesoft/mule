@@ -1,8 +1,8 @@
 package org.mule.transport.cxf.builder;
 
 import org.mule.api.lifecycle.CreateException;
-import org.mule.transport.cxf.CxfConstants;
-import org.mule.transport.cxf.CxfOutboundMessageProcessor;
+import org.mule.module.cxf.CxfConstants;
+import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.transport.cxf.support.CopyAttachmentInInterceptor;
 import org.mule.transport.cxf.support.CopyAttachmentOutInterceptor;
 import org.mule.transport.cxf.support.CxfUtils;

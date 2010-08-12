@@ -18,8 +18,8 @@
         </inbound-endpoint>
       </inbound>
       <component
-        class="org.mule.transport.cxf.testmodels.TestCxfComponent" />
-      <custom-exception-strategy class="org.mule.transport.cxf.CxfComponentExceptionStrategy"/>
+        class="org.mule.module.cxf.testmodels.TestCxfComponent" />
+      <custom-exception-strategy class="org.mule.module.cxf.CxfComponentExceptionStrategy"/>
     </service>
 
     <service name="CxfDefault">
@@ -31,7 +31,7 @@
         </inbound-endpoint>
       </inbound>
       <component
-        class="org.mule.transport.cxf.testmodels.TestCxfComponent" />
+        class="org.mule.module.cxf.testmodels.TestCxfComponent" />
     </service>
   </model>
 

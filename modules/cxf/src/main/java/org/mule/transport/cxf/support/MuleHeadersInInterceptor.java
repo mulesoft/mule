@@ -13,7 +13,7 @@ package org.mule.transport.cxf.support;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.transport.cxf.CxfConstants;
+import org.mule.module.cxf.CxfConstants;
 
 import java.util.Set;
 

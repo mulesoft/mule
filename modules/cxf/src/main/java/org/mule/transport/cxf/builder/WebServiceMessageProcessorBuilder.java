@@ -11,8 +11,8 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.AbstractFlowConstruct;
+import org.mule.module.cxf.CxfConstants;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.transport.cxf.CxfConstants;
 import org.mule.transport.cxf.i18n.CxfMessages;
 
 import java.util.List;

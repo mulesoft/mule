@@ -22,7 +22,7 @@
               </cxf:jaxws-service>
           </inbound-endpoint>
       </inbound>
-      <component class="org.mule.transport.cxf.employee.EmployeeDirectoryImpl"/>
+      <component class="org.mule.module.cxf.employee.EmployeeDirectoryImpl"/>
     </service>
   </model>
 </mule>

@@ -14,7 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
-import org.mule.transport.cxf.CxfOutboundMessageProcessor;
+import org.mule.module.cxf.CxfOutboundMessageProcessor;
 
 import junit.framework.TestCase;
 

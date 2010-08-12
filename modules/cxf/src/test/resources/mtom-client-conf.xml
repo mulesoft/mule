@@ -33,7 +33,7 @@
           <inbound>
             <inbound-endpoint ref="quartz.in"/>
           </inbound>
-          <component class="org.mule.transport.cxf.employee.EmployeeMessageGenerator">
+          <component class="org.mule.module.cxf.employee.EmployeeMessageGenerator">
           </component>
           <outbound>
               <pass-through-router>
@@ -47,7 +47,7 @@
 	                      wsdlLocation="classpath:employeeDirectory.wsdl"
 	                      mtomEnabled="true">
 	                      <cxf:outInterceptors>
-	                        <spring:bean class="org.mule.transport.cxf.employee.AttachmentVerifyInterceptor"/>
+	                        <spring:bean class="org.mule.module.cxf.employee.AttachmentVerifyInterceptor"/>
 	                      </cxf:outInterceptors>
                       </cxf:jaxws-client>
                   </outbound-endpoint>
@@ -64,7 +64,7 @@
             </inbound-endpoint>
           </inbound>
           <component>
-            <singleton-object class="org.mule.transport.cxf.employee.EmployeeDirectoryImpl"/>
+            <singleton-object class="org.mule.module.cxf.employee.EmployeeDirectoryImpl"/>
           </component>
         </service>
     </model>

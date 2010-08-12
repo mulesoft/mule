@@ -1,6 +1,6 @@
 package org.mule.transport.cxf.config;
 
-import org.mule.transport.cxf.CxfOutboundMessageProcessor;
+import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.transport.cxf.builder.SimpleClientMessageProcessorBuilder;
 
 import org.springframework.beans.factory.FactoryBean;

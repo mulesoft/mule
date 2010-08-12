@@ -13,7 +13,6 @@
 
 
     <model name="CxfSimpleProxy">
-
         <service name="Gateway">
             <inbound>
                 <inbound-endpoint address="http://localhost:8088/TestProxy" 
@@ -40,9 +39,7 @@
                     <cxf:proxy-service />
                 </inbound-endpoint>             
             </inbound>
-            <component class="org.mule.transport.cxf.support.someOtherPackage.TestPOJOComponent"/>
+            <component class="org.mule.module.cxf.support.someOtherPackage.TestPOJOComponent"/>
         </service>
-        
     </model>
-
 </mule>
