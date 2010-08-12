@@ -31,8 +31,8 @@
             <version>${muleVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-cxf</artifactId>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-cxf</artifactId>
             <version>${muleVersion}</version>
         </dependency>
         <dependency>

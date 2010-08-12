@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule.transports</groupId>
-        <artifactId>mule-transports</artifactId>
+        <groupId>org.mule.modules</groupId>
+        <artifactId>mule-modules</artifactId>
         <version>3.0.0-RC1-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-transport-cxf</artifactId>
+    <artifactId>mule-module-cxf</artifactId>
     <packaging>jar</packaging>
-    <name>SOAP Transport: CXF</name>
-    <description>A Mule transport for web service connectivity using CXF.</description>
+    <name>CXF</name>
+    <description>A Mule module for web service connectivity using CXF.</description>
 
     <build>
         <plugins>

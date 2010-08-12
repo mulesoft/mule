@@ -112,6 +112,7 @@ mule-module-atom
 mule-module-boot
 mule-module-builders
 mule-module-client
+mule-module-cxf
 mule-module-guice
 mule-module-ibeans
 mule-module-jaas
@@ -136,7 +137,6 @@ mule-tests-functional
 mule-transport-bpm
 mule-transport-ajax
 mule-transport-axis
-mule-transport-cxf
 mule-transport-ejb
 mule-transport-email
 mule-transport-file

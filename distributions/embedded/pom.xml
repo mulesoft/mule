@@ -39,11 +39,6 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.transports</groupId>
-                                    <artifactId>mule-transport-cxf</artifactId>
-                                    <version>${version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.mule.transports</groupId>
                                     <artifactId>mule-transport-ejb</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
@@ -161,6 +156,11 @@
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-client</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-cxf</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
