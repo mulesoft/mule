@@ -193,8 +193,6 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         processor.setBus(sfb.getBus());
         processor.setServer(server);
         processor.setProxy(isProxy());
-        processor.initialise();
-        processor.start();
         return processor;
     }
 

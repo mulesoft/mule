@@ -1,5 +1,6 @@
 package org.mule.transport.cxf;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.component.simple.EchoService;
@@ -55,7 +56,7 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleTestCase
         };
         processor.setListener(messageProcessor);
         
-        MuleEvent event = getTestEvent("hello", getTestInboundEndpoint("test"));
+        MuleEvent event = getTestEvent("hello", getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
         MuleEvent response = processor.process(event);
         
         Object payload = response.getMessage().getPayload();
