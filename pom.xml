@@ -1090,11 +1090,6 @@
                 <artifactId>bsh</artifactId>
                 <version>${bshVersion}-osgi</version>
             </dependency>
-            <dependency>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-jaxrs</artifactId>
-                <version>${jacksonVersion}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 

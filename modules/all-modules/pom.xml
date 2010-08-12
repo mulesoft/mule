@@ -141,7 +141,7 @@
             <version>${version}</version>
         </dependency>
     </dependencies>
-    
+
     <profiles>
         <profile>
             <id>jdk6</id>

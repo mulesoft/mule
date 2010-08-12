@@ -11,11 +11,15 @@
     <name>Jersey Module</name>
     <description>A module for Jersey, the JAX-RS RI.</description>
 
-    <!-- Common Dependencies -->
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-config</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
@@ -25,20 +29,55 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-jetty</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-servlet</artifactId>
             <version>${version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <version>1.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
+                    <artifactId>jackson-lgpl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.jettison</groupId>
+                    <artifactId>jettison</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.xml.stream</groupId>
+                    <artifactId>stax-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>stax-api</artifactId>
+                    <groupId>stax</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>${jacksonVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-jaxrs</artifactId>
+            <version>${jacksonVersion}</version>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jetty</artifactId>
             <version>${version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
@@ -52,62 +91,9 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-        
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>1.3</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-json</artifactId>
-            <version>1.3</version>
-            <exclusions>
-              <exclusion>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-lgpl</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>org.codehaus.jettison</groupId>
-                <artifactId>jettison</artifactId>
-              </exclusion>
-              <exclusion>
-              	<artifactId>stax-api</artifactId>
-              	<groupId>javax.xml.stream</groupId>
-              </exclusion>
-              <exclusion>
-              	<artifactId>stax-api</artifactId>
-              	<groupId>stax</groupId>
-              </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-            <version>${jacksonVersion}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-jaxrs</artifactId>
-            <version>${jacksonVersion}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
+
     <repositories>
-        <repository>
-            <id>codehaus</id>
-            <name>codehaus Repository</name>
-            <url>http://repository.codehaus.org/</url>
-        </repository>
         <repository>
             <id>java.net</id>
             <name>java.net Repository</name>
