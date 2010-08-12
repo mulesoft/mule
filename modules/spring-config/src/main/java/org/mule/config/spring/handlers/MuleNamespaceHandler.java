@@ -140,6 +140,7 @@ import org.mule.routing.outbound.MessageChunkingRouter;
 import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.routing.outbound.StaticRecipientList;
+import org.mule.routing.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.security.SecretKeyEncryptionStrategy;
 import org.mule.security.filters.MuleEncryptionEndpointSecurityFilter;
@@ -402,6 +403,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("all", new ChildDefinitionParser("messageProcessor", MulticastingRouter.class));
         registerBeanDefinitionParser("recipient-list", new ChildDefinitionParser("messageProcessor", ExpressionRecipientList.class));
+
+        registerBeanDefinitionParser("request-reply", new ChildDefinitionParser("messageProcessor", SimpleAsyncRequestReplyRequester.class));
 
         
         //Message Info Mappings

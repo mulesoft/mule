@@ -15,8 +15,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.CoreMessages;
@@ -58,10 +58,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         {
             locks.put(getAsyncReplyCorrelationId(event), new Latch());
 
-            // Send one-way requert
-            processNext(event);
+            sendAsyncRequest(event);
 
-            // Receive one-way async-reply response
             return receiveAsyncReply(event);
         }
     }
@@ -99,6 +97,11 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         }
     }
 
+    protected void sendAsyncRequest(MuleEvent event) throws MuleException
+    {
+        processNext(event);
+    }
+    
     protected MuleEvent receiveAsyncReply(MuleEvent event) throws ResponseTimeoutException
     {
         String asyncReplyCorrelationId = getAsyncReplyCorrelationId(event);

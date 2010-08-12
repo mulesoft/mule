@@ -28,7 +28,7 @@
 
     <vm:endpoint name="CustomerRequests" path="customer.requests"
         connector-ref="syncVm"/>
-    <vm:endpoint name="LoanBrokerQuotes" path="loan.quotes" exchange-pattern="request-response"
+    <vm:endpoint name="LoanBrokerQuotes" path="loan.quotes" exchange-pattern="one-way"
         connector-ref="syncVm"/>
     
     <endpoint name="CreditAgency" 
@@ -48,47 +48,47 @@
         exchange-pattern="one-way" connector-ref="syncVm"/>
 
     <endpoint name="Bank1" address="http://localhost:10080/mule/TheBank1?method=getLoanQuote" 
-        exchange-pattern="request-response">
+        exchange-pattern="one-way">
         <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" />
     </endpoint>
     <endpoint name="Bank1In" address="http://localhost:10080/mule/TheBank1" 
-        exchange-pattern="request-response">
-        <cxf:jaxws-service />    
+        exchange-pattern="one-way">
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.BankService"/>    
     </endpoint>
 
     <endpoint name="Bank2" address="http://localhost:20080/mule/TheBank2?method=getLoanQuote" 
-        exchange-pattern="request-response">
+        exchange-pattern="one-way">
         <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" />
     </endpoint>
     <endpoint name="Bank2In" address="http://localhost:20080/mule/TheBank2" 
-        exchange-pattern="request-response">
-        <cxf:jaxws-service />    
+        exchange-pattern="one-way">
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.BankService"/>    
     </endpoint>
 
     <endpoint name="Bank3" address="http://localhost:30080/mule/TheBank3?method=getLoanQuote" 
-        exchange-pattern="request-response">
+        exchange-pattern="one-way">
         <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" />
     </endpoint>
     <endpoint name="Bank3In" address="http://localhost:30080/mule/TheBank3" 
-        exchange-pattern="request-response">
-        <cxf:jaxws-service />    
+        exchange-pattern="one-way">
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.BankService"/>    
     </endpoint>
 
     <endpoint name="Bank4" address="http://localhost:40080/mule/TheBank4?method=getLoanQuote" 
-        exchange-pattern="request-response">
+        exchange-pattern="one-way">
         <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" />
     </endpoint>
     <endpoint name="Bank4In" address="http://localhost:40080/mule/TheBank4" 
-        exchange-pattern="request-response">
-        <cxf:jaxws-service />    
+        exchange-pattern="one-way">
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.BankService"/>    
     </endpoint>
 
     <endpoint name="Bank5" address="http://localhost:50080/mule/TheBank5?method=getLoanQuote" 
-        exchange-pattern="request-response">
-        <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService" />
+        exchange-pattern="one-way">
+        <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.bank.BankService"/>
     </endpoint>
     <endpoint name="Bank5In" address="http://localhost:50080/mule/TheBank5" 
-        exchange-pattern="request-response">
-        <cxf:jaxws-service />    
+        exchange-pattern="one-way">
+        <cxf:jaxws-service serviceClass="org.mule.example.loanbroker.bank.BankService"/>    
     </endpoint>
 </mule>
