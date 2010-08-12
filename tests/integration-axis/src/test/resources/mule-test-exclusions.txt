@@ -1,0 +1,5 @@
+# MULE-3697
+org.mule.test.usecases.axis.AxisClientWithComplexTypesTestCase
+
+# MULE-3695
+org.mule.transport.soap.cxf.ServiceUsingAxisEndpointTestCase

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.mulesource.muleesb.tests</groupId>
+        <artifactId>mule-tests</artifactId>
+        <version>3.0.0-RC1-SNAPSHOT</version>
+    </parent>
+    <groupId>com.mulesource.muleesb.tests</groupId>
+    <artifactId>mule-tests-integration-axis</artifactId>
+    <packaging>jar</packaging>
+    <name>Integration Tests for the Axis transport</name>
+    <description>Integration Tests for the Axis transport</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-axis</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jms</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-cxf</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-extras</artifactId>
+            <version>${version}</version>
+        </dependency>
+    </dependencies>
+</project>
