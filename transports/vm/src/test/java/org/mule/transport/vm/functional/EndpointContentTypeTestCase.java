@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.transport.vm.functional;
 
 import org.mule.api.MessagingException;
@@ -11,18 +21,8 @@ import org.mule.tck.FunctionalTestCase;
 import java.util.HashMap;
 import java.util.Map;
 
-/*
-* $Id
-* --------------------------------------------------------------------------------------
-* Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
-*
-* The software in this package is published under the terms of the CPAL v1.0
-* license, a copy of which has been included with this distribution in the
-* LICENSE.txt file.
-*/
 public class EndpointContentTypeTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -32,7 +32,7 @@ public class EndpointContentTypeTestCase extends FunctionalTestCase
     public void testContentTypes() throws Exception
     {
         MuleMessage response;
-        Map messageProperties = new HashMap();
+        Map<String, Object> messageProperties = new HashMap<String, Object>();
         messageProperties.put("content-type", "text/xml");
         MuleClient client = new MuleClient(muleContext);
         response = client.send("vm://in1?connector=vm-in1", "<OK/>", messageProperties);

@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.module.cxf.builder;
 
 import org.mule.api.DefaultMuleException;
@@ -45,6 +55,7 @@ public class WebServiceMessageProcessorBuilder
     private Service muleService;
     private Class serviceClass;
 
+    @Override
     protected ServerFactoryBean createServerFactory() throws Exception
     {
         ServerFactoryBean sfb;
@@ -115,6 +126,7 @@ public class WebServiceMessageProcessorBuilder
         }
     }
     
+    @Override
     protected String getAddress()
     {
         if (flowConstruct != null)
@@ -156,6 +168,7 @@ public class WebServiceMessageProcessorBuilder
         return false;
     }
 
+    @Override
     public Class getServiceClass()
     {
         return serviceClass;

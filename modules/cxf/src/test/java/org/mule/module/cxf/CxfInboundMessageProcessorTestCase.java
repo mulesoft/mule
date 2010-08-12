@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.module.cxf;
 
 import org.mule.MessageExchangePattern;
@@ -6,8 +16,6 @@ import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.OutputHandler;
-import org.mule.module.cxf.CxfConfiguration;
-import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.builder.WebServiceMessageProcessorBuilder;
 import org.mule.module.cxf.testmodels.Echo;
 import org.mule.tck.AbstractMuleTestCase;
@@ -91,7 +99,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleTestCase
         builder.setServiceClass(Echo.class);
         builder.setMuleContext(muleContext);
         
-        CxfInboundMessageProcessor processor = (CxfInboundMessageProcessor) builder.build();
+        CxfInboundMessageProcessor processor = builder.build();
         processor.start();
         return processor;
     }

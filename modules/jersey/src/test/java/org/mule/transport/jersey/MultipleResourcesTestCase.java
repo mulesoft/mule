@@ -1,7 +1,14 @@
-package org.mule.transport.jersey;
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 
-import java.util.HashMap;
-import java.util.Map;
+package org.mule.transport.jersey;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -9,11 +16,16 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * Tests that the jersey:resources component can handle multiple components correctly.
+ * Tests that the jersey:resources component can handle multiple components
+ * correctly.
  */
-public class MultipleResourcesTestCase extends FunctionalTestCase {
-    
+public class MultipleResourcesTestCase extends FunctionalTestCase
+{
+
     public void testParams() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -23,14 +35,14 @@ public class MultipleResourcesTestCase extends FunctionalTestCase {
         MuleMessage result = client.send("http://localhost:63081/helloworld/sayHelloWithUri/Dan", "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Hello Dan", result.getPayloadAsString());
-        
+
         result = client.send("http://localhost:63081/anotherworld/sayHelloWithUri/Dan", "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Bonjour Dan", result.getPayloadAsString());
     }
-    
+
     @Override
-    protected String getConfigResources() 
+    protected String getConfigResources()
     {
         return "multiple-resources-conf.xml";
     }

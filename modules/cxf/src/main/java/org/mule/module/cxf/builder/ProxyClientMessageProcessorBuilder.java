@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.module.cxf.builder;
 
 import org.mule.api.lifecycle.CreateException;
@@ -38,6 +48,7 @@ public class ProxyClientMessageProcessorBuilder extends AbstractOutboundMessageP
 {
     private String payload;
     
+    @Override
     protected void configureClient(Client client)
     {
         MuleUniversalConduit conduit = (MuleUniversalConduit)client.getConduit();
@@ -57,6 +68,7 @@ public class ProxyClientMessageProcessorBuilder extends AbstractOutboundMessageP
         return CxfConstants.PAYLOAD_ENVELOPE.equals(payload);
     }
     
+    @Override
     protected void configureMessageProcessor(CxfOutboundMessageProcessor processor)
     {
         processor.setProxy(true);

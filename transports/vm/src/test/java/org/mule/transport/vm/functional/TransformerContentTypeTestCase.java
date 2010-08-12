@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.transport.vm.functional;
 
 import org.mule.api.MuleEventContext;
@@ -7,19 +17,11 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-import javax.activation.MimeType;
 import java.util.HashMap;
 import java.util.Map;
 
-/*
-* $Id
-* --------------------------------------------------------------------------------------
-* Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
-*
-* The software in this package is published under the terms of the CPAL v1.0
-* license, a copy of which has been included with this distribution in the
-* LICENSE.txt file.
-*/
+import javax.activation.MimeType;
+
 public class TransformerContentTypeTestCase extends FunctionalTestCase
 {
 
@@ -32,7 +34,7 @@ public class TransformerContentTypeTestCase extends FunctionalTestCase
     public void testContentTypes() throws Exception
     {
         MuleMessage response;
-        Map messageProperties = new HashMap();
+        Map<String, Object> messageProperties = new HashMap<String, Object>();
 
         MuleClient client = new MuleClient(muleContext);
 

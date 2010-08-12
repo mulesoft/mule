@@ -1,3 +1,13 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.transport.jersey;
 
 import javax.ws.rs.DELETE;
@@ -11,46 +21,53 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("/helloworld")
-public class HelloWorldResource {
-
+public class HelloWorldResource
+{
     @POST
     @Produces("text/plain")
-    public String sayHelloWorld() {
+    public String sayHelloWorld()
+    {
         return "Hello World";
     }
 
     @GET
     @Produces("application/json")
     @Path("/sayHelloWithJson/{name}")
-    public HelloBean sayHelloWithJson(@PathParam("name") String name) {
+    public HelloBean sayHelloWithJson(@PathParam("name") String name)
+    {
         HelloBean hello = new HelloBean();
         hello.setMessage("Hello " + name);
         return hello;
     }
-    
+
     @DELETE
     @Produces("text/plain")
-    public String deleteHelloWorld() {
+    public String deleteHelloWorld()
+    {
         return "Hello World Delete";
     }
-    
+
     @GET
     @Produces("text/plain")
     @Path("/sayHelloWithUri/{name}")
-    public String sayHelloWithUri(@PathParam("name") String name) {
+    public String sayHelloWithUri(@PathParam("name") String name)
+    {
         return "Hello " + name;
     }
 
     @GET
     @Produces("text/plain")
     @Path("/sayHelloWithHeader")
-    public Response sayHelloWithHeader(@HeaderParam("X-Name") String name) {
+    public Response sayHelloWithHeader(@HeaderParam("X-Name") String name)
+    {
         return Response.status(201).header("X-ResponseName", name).entity("Hello " + name).build();
     }
+
     @GET
     @Produces("text/plain")
     @Path("/sayHelloWithQuery")
-    public String sayHelloWithQuery(@QueryParam("name") String name) {
+    public String sayHelloWithQuery(@QueryParam("name") String name)
+    {
         return "Hello " + name;
     }
 }
