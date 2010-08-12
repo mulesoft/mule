@@ -199,11 +199,22 @@
                 </spring:entry>
             </add-message-properties>
         </message-properties-transformer>
-        <recipient-list enableCorrelation="ALWAYS" evaluator="header" expression="myRecipients">
-            <vm:outbound-endpoint path="multicaster-out1" exchange-pattern="one-way" />
-            <vm:outbound-endpoint path="multicaster-out2" exchange-pattern="one-way" />
-            <vm:outbound-endpoint path="multicaster-out3" exchange-pattern="one-way" />
-        </recipient-list>    
+        <recipient-list enableCorrelation="ALWAYS" evaluator="header" expression="myRecipients"/>
+    </flow>
+
+    <flow name="loan-broker">
+        <vm:inbound-endpoint path="choice2-in" exchange-pattern="request-response"/>
+        <choice>
+            <when expression="groovy:payload=='foo'">
+                <append-string-transformer message=" Hello foo" />
+            </when>
+            <when expression="groovy:payload=='bar'">
+                <append-string-transformer message=" Hello bar" />
+            </when>
+            <otherwise>
+                <append-string-transformer message=" Hello ?" />
+            </otherwise>
+        </choice>
     </flow>
 
 </mule>

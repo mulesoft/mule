@@ -293,5 +293,15 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertEquals(TEST_MESSAGE, result3.getPayload());
 
     }
+    
+    public void testChoiceWithoutOutboundEndpoints() throws MuleException, Exception
+    {
+        assertEquals("foo Hello foo",muleContext.getClient().send("vm://choice2-in",
+            new DefaultMuleMessage("foo", muleContext)).getPayloadAsString());
+        assertEquals("bar Hello bar",muleContext.getClient().send("vm://choice2-in",
+            new DefaultMuleMessage("bar", muleContext)).getPayloadAsString());
+        assertEquals("egh Hello ?",muleContext.getClient().send("vm://choice2-in",
+            new DefaultMuleMessage("egh", muleContext)).getPayloadAsString());
+    }
 
 }
