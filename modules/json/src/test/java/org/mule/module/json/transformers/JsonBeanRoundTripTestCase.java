@@ -69,4 +69,26 @@ public class JsonBeanRoundTripTestCase extends AbstractTransformerTestCase
         //Note that Banana has been excluded
         return JSON_STRING;
     }
+
+    @Override
+    public boolean compareResults(Object expected, Object result)
+    {
+        //MULE-4879 field ordering is not guaranteed by the JVM so we cannot compare result strings
+        if(expected instanceof String)
+        {
+            try
+            {
+                Transformer toObject = getRoundTripTransformer();
+                expected = toObject.transform(expected);
+                result = toObject.transform(result);
+            }
+            catch (Exception e)
+            {
+                fail(e.getMessage());
+                return false;
+            }
+        }
+
+        return super.compareResults(expected, result);
+    }
 }
