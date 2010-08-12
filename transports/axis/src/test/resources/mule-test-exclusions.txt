@@ -1,0 +1,22 @@
+#
+# Test cases listed in this file are not run.
+#
+
+# Skip these until the tests-external profile works
+# MULE-3674
+org.mule.transport.soap.axis.VmToAxisProxyTestCase
+
+# MULE-2164
+org.mule.transport.soap.axis.AxisEndpointMule2164TestCase
+
+# This works, but it requires tools.jar on the classpath which not everyone has
+org.mule.transport.soap.axis.AxisServiceUsingCxfEndpointTestCase
+
+# MULE-4573
+org.mule.transport.soap.axis.AxisConnectorLifecycleTestCase
+
+# MULE-4969
+org.mule.transport.soap.axis.functional.AxisSoapHeadersTestCase
+
+# Fix test case after BL-165
+org.mule.transport.soap.axis.AxisServletWithSecurityTestCase
