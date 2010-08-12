@@ -8,9 +8,9 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.OutputHandler;
 import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
+import org.mule.module.cxf.builder.WebServiceMessageProcessorBuilder;
+import org.mule.module.cxf.testmodels.Echo;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.cxf.builder.WebServiceMessageProcessorBuilder;
-import org.mule.transport.cxf.testmodels.Echo;
 
 public class CxfInboundMessageProcessorTestCase extends AbstractMuleTestCase
 {

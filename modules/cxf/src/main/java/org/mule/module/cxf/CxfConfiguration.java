@@ -17,7 +17,7 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.spring.SpringRegistry;
-import org.mule.transport.cxf.transport.MuleUniversalTransport;
+import org.mule.module.cxf.transport.MuleUniversalTransport;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;

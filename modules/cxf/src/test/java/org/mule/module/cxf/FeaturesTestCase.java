@@ -12,9 +12,9 @@ package org.mule.module.cxf;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.module.cxf.builder.WebServiceMessageProcessorBuilder;
+import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.cxf.builder.WebServiceMessageProcessorBuilder;
-import org.mule.transport.cxf.config.FlowConfiguringMessageProcessor;
 
 import java.util.List;
 

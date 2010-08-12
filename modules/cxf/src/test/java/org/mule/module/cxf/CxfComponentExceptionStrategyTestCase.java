@@ -13,9 +13,9 @@ package org.mule.module.cxf;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.module.cxf.testmodels.CustomFault;
+import org.mule.module.cxf.testmodels.CxfEnabledFaultMessage;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.cxf.testmodels.CustomFault;
-import org.mule.transport.cxf.testmodels.CxfEnabledFaultMessage;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.interceptor.Fault;

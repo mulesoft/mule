@@ -13,10 +13,10 @@ package org.mule.module.cxf;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.module.cxf.testmodels.AsyncService;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
-import org.mule.transport.cxf.testmodels.AsyncService;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.concurrent.Latch;
 

@@ -7,8 +7,8 @@ import org.mule.api.component.simple.EchoService;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
+import org.mule.module.cxf.builder.SimpleClientMessageProcessorBuilder;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.cxf.builder.SimpleClientMessageProcessorBuilder;
 
 public class CxfOutboundMessageProcessorTestCase extends AbstractMuleTestCase
 {

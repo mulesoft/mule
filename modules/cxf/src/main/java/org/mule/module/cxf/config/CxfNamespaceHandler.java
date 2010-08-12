@@ -1,0 +1,83 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.module.cxf.config;
+
+import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
+import org.mule.config.spring.parsers.generic.GrandchildDefinitionParser;
+import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
+import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
+import org.mule.config.spring.parsers.processors.AddAttribute;
+import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.module.cxf.CxfConfiguration;
+import org.mule.module.cxf.CxfConstants;
+import org.mule.module.cxf.component.WebServiceWrapperComponent;
+import org.mule.module.cxf.support.MuleSecurityManagerCallbackHandler;
+import org.mule.module.cxf.support.StaxFeature;
+
+import org.apache.cxf.configuration.spring.SimpleBeanDefinitionParser;
+import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.xml.ParserContext;
+import org.w3c.dom.Element;
+
+public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
+{
+
+    public void init()
+    {
+        MuleOrphanDefinitionParser configParser = new MuleOrphanDefinitionParser(CxfConfiguration.class, true) {
+
+            @Override
+            protected String resolveId(Element element,
+                                       AbstractBeanDefinition definition,
+                                       ParserContext parserContext) throws BeanDefinitionStoreException
+            {
+                return CxfConstants.DEFAULT_CXF_CONFIGURATION;
+            }
+
+        };
+        configParser.addIgnored("name");
+        registerMuleBeanDefinitionParser("configuration", configParser);
+        
+        MessageProcessorDefinitionParser jsParser = new MessageProcessorDefinitionParser(WebServiceFactoryBean.class);
+        jsParser.registerPreProcessor(new AddAttribute("frontend", CxfConstants.JAX_WS_FRONTEND));
+        registerBeanDefinitionParser("jaxws-service", jsParser);
+        
+        MessageProcessorDefinitionParser ssParser = new MessageProcessorDefinitionParser(WebServiceFactoryBean.class);
+        ssParser.registerPreProcessor(new AddAttribute("frontend", CxfConstants.SIMPLE_FRONTEND));
+        registerBeanDefinitionParser("simple-service", ssParser);
+
+        registerBeanDefinitionParser("proxy-service", new MessageProcessorDefinitionParser(ProxyServiceFactoryBean.class));
+        
+        registerBeanDefinitionParser("simple-client", new MessageProcessorDefinitionParser(SimpleClientFactoryBean.class));
+        registerBeanDefinitionParser("jaxws-client", new MessageProcessorDefinitionParser(JaxWsClientFactoryBean.class));
+        registerBeanDefinitionParser("proxy-client", new MessageProcessorDefinitionParser(ProxyClientFactoryBean.class));
+
+        registerBeanDefinitionParser(CxfConstants.FEATURES, new ChildListDefinitionParser(CxfConstants.FEATURES));
+//        registerBeanDefinitionParser(CxfConstants.DATA_BINDING, new GrandchildDefinitionParser(CxfConstants.DATA_BINDING));
+        
+        registerBeanDefinitionParser(CxfConstants.IN_INTERCEPTORS, new ChildListDefinitionParser(CxfConstants.IN_INTERCEPTORS));
+        registerBeanDefinitionParser(CxfConstants.IN_FAULT_INTERCEPTORS, new ChildListDefinitionParser(CxfConstants.IN_FAULT_INTERCEPTORS));
+        registerBeanDefinitionParser(CxfConstants.OUT_INTERCEPTORS, new ChildListDefinitionParser(CxfConstants.OUT_INTERCEPTORS));
+        registerBeanDefinitionParser(CxfConstants.OUT_FAULT_INTERCEPTORS, new ChildListDefinitionParser(CxfConstants.OUT_FAULT_INTERCEPTORS));
+        
+        registerBeanDefinitionParser("stax", new SimpleBeanDefinitionParser(StaxFeature.class));
+        
+        registerBeanDefinitionParser("wrapper-component", new ComponentDefinitionParser(WebServiceWrapperComponent.class));
+        
+        OrphanDefinitionParser parser = new OrphanDefinitionParser(MuleSecurityManagerCallbackHandler.class, true);
+        parser.registerPreProcessor(new AddAttribute("securityManager-ref", "_muleSecurityManager"));
+        registerBeanDefinitionParser("security-manager-callback", parser);
+        
+    }
+}
