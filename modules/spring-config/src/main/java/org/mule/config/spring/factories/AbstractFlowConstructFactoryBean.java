@@ -12,6 +12,7 @@ package org.mule.config.spring.factories;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
@@ -21,7 +22,6 @@ import org.mule.api.source.MessageSource;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -29,7 +29,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 public abstract class AbstractFlowConstructFactoryBean
-    implements FactoryBean, InitializingBean, ApplicationContextAware, MuleContextAware, Initialisable
+    implements FactoryBean<FlowConstruct>, InitializingBean, ApplicationContextAware, MuleContextAware, Initialisable
 {
     private static final NullFlowConstruct NULL_FLOW_CONSTRUCT = new NullFlowConstruct("noop", null);
 
@@ -106,7 +106,7 @@ public abstract class AbstractFlowConstructFactoryBean
         flowConstruct.initialise();
     }
 
-    public Object getObject() throws Exception
+    public FlowConstruct getObject() throws Exception
     {
         return flowConstruct;
     }
