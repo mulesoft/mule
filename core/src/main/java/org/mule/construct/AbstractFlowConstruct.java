@@ -68,7 +68,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     protected String name;
     protected MessageSource messageSource;
     protected MessageProcessor messageProcessorChain;
-    protected MessagingExceptionHandler exceptionListener = new DefaultServiceExceptionStrategy();;
+    protected MessagingExceptionHandler exceptionListener;
     protected final FlowConstructLifecycleManager lifecycleManager;
     protected final MuleContext muleContext;
     protected final FlowConstructStatistics statistics;
@@ -80,6 +80,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
         this.name = name;
         this.lifecycleManager = new FlowConstructLifecycleManager(this);
         this.statistics = new FlowConstructStatistics(name);
+        this.exceptionListener = new DefaultServiceExceptionStrategy(muleContext);
     }
 
     public final void initialise() throws InitialisationException

@@ -29,7 +29,7 @@ public class BridgeBuilderTestCase extends AbstractMuleTestCase
             .outboundAddress("test://foo.out")
             .exchangePattern(MessageExchangePattern.REQUEST_RESPONSE)
             .transacted(false)
-            .exceptionStrategy(new DefaultServiceExceptionStrategy())
+            .exceptionStrategy(new DefaultServiceExceptionStrategy(muleContext))
             .build(muleContext);
 
         assertEquals("test-bridge-full", bridge.getName());

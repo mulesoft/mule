@@ -50,7 +50,7 @@ public class WSProxyBuilderTestCase extends AbstractMuleTestCase
             .outboundAddress("test://bar")
             .outboundTransformers(new StringAppendTransformer("bar"))
             .outboundResponseTransformers(new ObjectToByteArray(), new GZipCompressTransformer())
-            .exceptionStrategy(new DefaultServiceExceptionStrategy())
+            .exceptionStrategy(new DefaultServiceExceptionStrategy(muleContext))
             .build(muleContext);
 
         assertEquals("test-ws-proxy-full-file-wsdl", wsProxy.getName());

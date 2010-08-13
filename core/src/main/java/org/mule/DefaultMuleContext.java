@@ -125,13 +125,10 @@ public class DefaultMuleContext implements MuleContext
         this.notificationManager.setMuleContext(this);
         //there is no point having this object configurable
         this.expressionManager = new DefaultExpressionManager();
-
         registryBroker = createRegistryBroker();
         muleRegistryHelper = createRegistryHelper(registryBroker);
         localMuleClient = new DefaultLocalMuleClient(this);
-
-        exceptionListener = new DefaultSystemExceptionStrategy();
-        ((MuleContextAware) exceptionListener).setMuleContext(this);
+        exceptionListener = new DefaultSystemExceptionStrategy(this);
     }
 
     protected DefaultRegistryBroker createRegistryBroker()

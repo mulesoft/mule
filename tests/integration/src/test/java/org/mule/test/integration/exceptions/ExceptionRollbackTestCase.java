@@ -28,7 +28,7 @@ public class ExceptionRollbackTestCase extends AbstractMuleTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        strategy = new DefaultSystemExceptionStrategy();
+        strategy = new DefaultSystemExceptionStrategy(muleContext);
         strategy.setCommitTxFilter(new WildcardFilter("java.io.*"));
         strategy.setRollbackTxFilter(new WildcardFilter("org.mule.*, javax.*"));
 

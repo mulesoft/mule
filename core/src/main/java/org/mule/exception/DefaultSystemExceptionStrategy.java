@@ -11,6 +11,7 @@
 package org.mule.exception;
 
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.message.DefaultExceptionPayload;
@@ -20,6 +21,21 @@ import org.mule.message.DefaultExceptionPayload;
  */
 public class DefaultSystemExceptionStrategy extends AbstractExceptionListener implements SystemExceptionHandler
 {
+    /** 
+     * For IoC only 
+     * @deprecated Use DefaultSystemExceptionStrategy(MuleContext muleContext) instead 
+     */
+    public DefaultSystemExceptionStrategy()
+    {
+        super();
+    }
+    
+    public DefaultSystemExceptionStrategy(MuleContext muleContext)
+    {
+        super();
+        setMuleContext(muleContext);
+    }
+
     public void handleException(Exception e)
     {
         if (enableNotifications)

@@ -11,6 +11,7 @@
 package org.mule.exception;
 
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
@@ -27,9 +28,19 @@ import java.util.List;
  */
 public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
+    /** 
+     * For IoC only 
+     * @deprecated Use DefaultServiceExceptionStrategy(MuleContext muleContext) instead
+     */
     public DefaultServiceExceptionStrategy()
     {
         super();
+    }
+
+    public DefaultServiceExceptionStrategy(MuleContext muleContext)
+    {
+        super();
+        setMuleContext(muleContext);
     }
 
     @Override
