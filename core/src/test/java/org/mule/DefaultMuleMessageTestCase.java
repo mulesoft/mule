@@ -12,6 +12,7 @@ package org.mule;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
+import org.mule.session.DefaultMuleSession;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
@@ -267,20 +268,29 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         assertEquals(handler, message.getOutboundAttachment("attachment"));
     }
 
-    public void testFindPropertiesInAnyScope()
+    public void testFindPropertiesInAnyScope() throws Exception
     {
         MuleMessage message = createMuleMessage();
         //Not sure why this test adds this property
         message.removeProperty("MuleMessage", PropertyScope.OUTBOUND);
 
+        //We need a session and current event for this test
+        RequestContext.setEvent(new DefaultMuleEvent(
+                message,
+                getTestInboundEndpoint("foo"),
+                new DefaultMuleSession(muleContext)));
+
         message.setOutboundProperty("foo", "fooOutbound");
         message.setInvocationProperty("bar", "barInvocation");
         message.setInvocationProperty("foo", "fooInvocation");
         message.setInboundProperty("foo", "fooInbound");
+        message.setSessionProperty("foo", "fooSession");
+
 
         assertEquals(2, message.getInvocationPropertyNames().size());
         assertEquals(1, message.getOutboundPropertyNames().size());
         assertEquals(1, message.getInboundPropertyNames().size());
+        assertEquals(1, message.getSessionPropertyNames().size());
 
         String value = message.findPropertyInAnyScope("foo", null);
         assertEquals("fooOutbound", value);
@@ -291,6 +301,10 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         assertEquals("fooInvocation", value);
 
         message.removeProperty("foo", PropertyScope.INVOCATION);
+
+        value = message.findPropertyInAnyScope("foo", null);
+        assertEquals("fooSession", value);
+        message.removeProperty("foo", PropertyScope.SESSION);
 
         value = message.findPropertyInAnyScope("foo", null);
         assertEquals("fooInbound", value);

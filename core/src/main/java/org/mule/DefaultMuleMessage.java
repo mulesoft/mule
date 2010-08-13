@@ -1058,7 +1058,11 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             value = getProperty(name, PropertyScope.INVOCATION);
             if (value == null)
             {
-                value = getProperty(name, PropertyScope.INBOUND);
+                value = getProperty(name, PropertyScope.SESSION);
+                if (value == null)
+                {
+                    value = getProperty(name, PropertyScope.INBOUND);
+                }
             }
         }
         if(value == null)

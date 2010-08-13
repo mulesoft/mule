@@ -250,10 +250,9 @@ public interface MuleMessage extends Serializable
      * <ul>
      * <li>Outbound</li>
      * <li>Invocation</li>
+     * <li>Session</li>
      * <li>Inbound</li>
      * </ul>
-     *
-     * Session scope is not checked.
      *
      * @param name the name of the property to look for
      * @param defaultValue the default value that will be returned if the property is not found
