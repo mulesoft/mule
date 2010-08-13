@@ -317,9 +317,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      *          case the stream will be read and the payload will become the fully read stream.
      * @throws TransformerException if a transformer cannot be found or there is an error during 
      *          transformation of the payload.
-     * @since 3.0.0
+     * @since 3.0
      *
-     * TODO make this public, roll encoding into the datatype object
      */
     @SuppressWarnings("unchecked")
     protected <T> T getPayload(DataType<T> resultType, String encoding) throws TransformerException
@@ -465,6 +464,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      */
     public Object removeProperty(String key)
     {
+        //TODO
+        //logger.warn("MuleMessage.removeProperty() method is deprecated, use MuleMessage.removeProperty(String, PropertyScope) instead.  This method will be removed in the next point release");
+        //return removeProperty(key, PropertyScope.OUTBOUND);
         assertAccess(WRITE);
         return properties.removeProperty(key);
     }
@@ -568,6 +570,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Deprecated
     public Set<String> getPropertyNames()
     {
+        //TODO logger.warn("MuleMessage.getPropertyNames() method is deprecated, use MuleMessage.getOutboundPropertyNames() instead.  This method will be removed in the next point release");
+        //return getOutboundPropertyNames();
         assertAccess(READ);
         return properties.getPropertyNames();
     }
@@ -637,6 +641,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      */
     public Object getProperty(String name, Object defaultValue)
     {
+        //TODO logger.warn("MuleMessage.getProperty() method is deprecated, use MuleMessage.getOutboundProperty() instead.  This method will be removed in the next point release");
+        //return getOutboundProperty(name, defaultValue);
         assertAccess(READ);
         return properties.getProperty(name, defaultValue);
     }
@@ -863,7 +869,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return groupSize;
     }
 
-    //** {@inheritDoc} */
+    /** {@inheritDoc} */
     public void setCorrelationGroupSize(int size)
     {
         assertAccess(WRITE);
@@ -924,32 +930,40 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public void addAttachment(String name, DataHandler dataHandler) throws Exception
     {
+        logger.warn("MuleMessage.addAttachment() method is deprecated, use MuleMessage.addOutboundAttachment() instead.  This method will be removed in the next point release");
         addOutboundAttachment(name, dataHandler);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public void removeAttachment(String name) throws Exception
     {
+        logger.warn("MuleMessage.removeAttachment() method is deprecated, use MuleMessage.removeOutboundAttachment() instead.  This method will be removed in the next point release");
         removeOutboundAttachment(name);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public DataHandler getAttachment(String name)
     {
+        logger.warn("MuleMessage.getAttachment() method is deprecated, use MuleMessage.getOutboundAttachment() instead.  This method will be removed in the next point release");
         return getOutboundAttachment(name);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public Set<String> getAttachmentNames()
     {
+        logger.warn("MuleMessage.getAttachmentNames() method is deprecated, use MuleMessage.getOutboundAttachmentNames() instead.  This method will be removed in the next point release");
         return getOutboundAttachmentNames();
     }
 
@@ -1068,6 +1082,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
+    /**
+     *
+     * @param mimeType
+     *
+     * @since 3.0
+     */
     public void setMimeType(String mimeType)
     {
         assertAccess(WRITE);
@@ -1476,5 +1496,93 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     public DataType<?> getDataType()
     {
         return dataType;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public int getIntProperty(String name, int defaultValue)
+    {
+        assertAccess(READ);
+        logger.warn("MuleMessage.getIntProperty() method is deprecated, use MuleMessage.getInboundProperty() instead.  This method will be removed in the next point release");
+        return getInboundProperty(name, defaultValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public long getLongProperty(String name, long defaultValue)
+    {
+        assertAccess(READ);
+        logger.warn("MuleMessage.getLongProperty() method is deprecated, use MuleMessage.getInboundProperty() instead.  This method will be removed in the next point release");
+        return getInboundProperty(name, defaultValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public double getDoubleProperty(String name, double defaultValue)
+    {
+        assertAccess(READ);
+        logger.warn("MuleMessage.getDoubleProperty() method is deprecated, use MuleMessage.getInboundProperty() instead.  This method will be removed in the next point release");
+        return getInboundProperty(name, defaultValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public boolean getBooleanProperty(String name, boolean defaultValue)
+    {
+        assertAccess(READ);
+        logger.warn("MuleMessage.getBooleanProperty() method is deprecated, use MuleMessage.getInboundProperty() instead.  This method will be removed in the next point release");
+        return getInboundProperty(name, defaultValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public void setBooleanProperty(String name, boolean value)
+    {
+        assertAccess(WRITE);
+        logger.warn("MuleMessage.setBooleanProperty() method is deprecated, use MuleMessage.setOutboundProperty() instead.  This method will be removed in the next point release");
+        setOutboundProperty(name, value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public void setIntProperty(String name, int value)
+    {
+        assertAccess(WRITE);
+        logger.warn("MuleMessage.setIntProperty() method is deprecated, use MuleMessage.setOutboundProperty() instead.  This method will be removed in the next point release");
+        setOutboundProperty(name, value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public void setLongProperty(String name, long value)
+    {
+        assertAccess(WRITE);
+        logger.warn("MuleMessage.setLongProperty() method is deprecated, use MuleMessage.setOutboundProperty() instead.  This method will be removed in the next point release");
+        setOutboundProperty(name, value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public void setDoubleProperty(String name, double value)
+    {
+        assertAccess(WRITE);
+        logger.warn("MuleMessage.setDoubleProperty() method is deprecated, use MuleMessage.setOutboundProperty() instead.  This method will be removed in the next point release");
+        setOutboundProperty(name, value);
     }
 }

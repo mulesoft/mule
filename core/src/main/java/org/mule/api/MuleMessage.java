@@ -255,6 +255,90 @@ public interface MuleMessage extends Serializable
      */
     <T> T getProperty(String name, PropertyScope scope, T defaultValue);
 
+    /**
+     * Gets an integer property from the message
+     *
+     * @param name the name or key of the property
+     * @param defaultValue a default value if the property doesn't exist in the event
+     * @return the property value or the defaultValue if the property does not exist
+     * @deprecated use {@link #getInboundProperty(String, Object)} instead
+     */
+    @Deprecated
+    int getIntProperty(String name, int defaultValue);
+
+    /**
+     * Gets a long property from the message
+     *
+     * @param name the name or key of the property
+     * @param defaultValue a default value if the property doesn't exist in the event
+     * @return the property value or the defaultValue if the property does not exist
+     * @deprecated use {@link #getInboundProperty(String, Object)} instead
+     */
+    @Deprecated
+    long getLongProperty(String name, long defaultValue);
+
+    /**
+     * Gets a double property from the message
+     *
+     * @param name the name or key of the property
+     * @param defaultValue a default value if the property doesn't exist in the event
+     * @return the property value or the defaultValue if the property does not exist
+     * @deprecated use {@link #getInboundProperty(String, Object)} instead
+     */
+    @Deprecated
+    double getDoubleProperty(String name, double defaultValue);
+
+    /**
+     * Gets a boolean property from the message
+     *
+     * @param name the name or key of the property
+     * @param defaultValue a default value if the property doesn't exist in the event
+     * @return the property value or the defaultValue if the property does not exist
+     * @deprecated use {@link #getInboundProperty(String, Object)} instead
+     */
+    @Deprecated
+    boolean getBooleanProperty(String name, boolean defaultValue);
+
+    /**
+     * Sets a boolean property on the message
+     *
+     * @param name the property name or key
+     * @param value the property value
+     * @deprecated use {@link #setOutboundProperty(String, Object)} instead
+     */
+    @Deprecated
+    void setBooleanProperty(String name, boolean value);
+
+    /**
+     * Sets a integer property on the message
+     *
+     * @param name the property name or key
+     * @param value the property value
+     * @deprecated use {@link #setOutboundProperty(String, Object)} instead
+     */
+    @Deprecated
+    void setIntProperty(String name, int value);
+
+    /**
+     * Sets a long property on the message
+     *
+     * @param name the property name or key
+     * @param value the property value
+     * @deprecated use {@link #setOutboundProperty(String, Object)} instead
+     */
+    @Deprecated
+    void setLongProperty(String name, long value);
+
+    /**
+     * Sets a double property on the message
+     *
+     * @param name the property name or key
+     * @param value the property value
+     * @deprecated use {@link #setOutboundProperty(String, Object)} instead
+     */
+    @Deprecated
+    void setDoubleProperty(String name, double value);
+
 
     /**
      * Sets a correlationId for this message. The correlation Id can be used by
