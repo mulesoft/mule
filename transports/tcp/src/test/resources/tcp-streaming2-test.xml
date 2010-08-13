@@ -19,18 +19,18 @@
 
         <service name="echo">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="65432" exchange-pattern="one-way"/>
+                <tcp:inbound-endpoint host="localhost" port="65432" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <tcp:outbound-endpoint host="localhost" port="65433" exchange-pattern="one-way"/>
+                    <tcp:outbound-endpoint host="localhost" port="65433" exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="testComponent">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="65433" exchange-pattern="one-way"/>
+                <tcp:inbound-endpoint host="localhost" port="65433" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <!-- This component knows how to look for EOF -->
