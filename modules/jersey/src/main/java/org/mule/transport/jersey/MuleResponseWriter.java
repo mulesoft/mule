@@ -54,11 +54,11 @@ public class MuleResponseWriter implements ContainerResponseWriter
         Map<String, String> customHeaders = new HashMap<String, String>();
         for (Map.Entry<String, List<Object>> e : response.getHttpHeaders().entrySet())
         {
-            customHeaders.put(e.getKey(), getHeaderValue(e.getValue()));
+              // TODO: is this correct?
+              message.setOutboundProperty(e.getKey(), getHeaderValue(e.getValue()));
         }
 
         message.setInvocationProperty(JerseyResourcesComponent.JERSEY_RESPONSE, response);
-        message.setOutboundProperty(HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY, customHeaders);
         message.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, response.getStatus());
 
         return out;
