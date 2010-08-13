@@ -10,6 +10,13 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
+    <custom-processor name="ProcessorB" class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+        <spring:property name="label" value="B" />
+    </custom-processor>
+    <custom-processor name="ProcessorG" class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+        <spring:property name="label" value="G" />
+    </custom-processor>
+
     <model>
         <service name="synchronousOutbound">
             <inbound>
@@ -17,13 +24,17 @@
                     <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                         <spring:property name="label" value="A" />
                     </custom-processor>
-                    <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
-                        <spring:property name="label" value="B" />
-                    </custom-processor>
+                    <message-filter>
+                    	<wildcard-filter pattern="*:A" />
+                    </message-filter>
+                	<processor ref="ProcessorB" />
                     <response>
                         <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="C" />
                         </custom-processor>
+	                    <message-filter>
+	                    	<wildcard-filter pattern="*:G:H*" />
+	                    </message-filter>
                         <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="D" />
                         </custom-processor>
@@ -41,9 +52,7 @@
                             <spring:property name="label" value="F" />
                         </custom-processor>
                         <response>
-                            <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
-                                <spring:property name="label" value="G" />
-                            </custom-processor>
+		                	<processor ref="ProcessorG" />
                             <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                                 <spring:property name="label" value="H" />
                             </custom-processor>
@@ -59,9 +68,7 @@
                     <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                         <spring:property name="label" value="A" />
                     </custom-processor>
-                    <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
-                        <spring:property name="label" value="B" />
-                    </custom-processor>
+                    <processor ref="ProcessorB" />
                     <response>
                         <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="C" />
@@ -84,9 +91,7 @@
                         </custom-processor>
                         <!-- These processors should get ignored because the endpoint is asynchronous -->
                         <response>
-                            <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
-                                <spring:property name="label" value="G" />
-                            </custom-processor>
+		                	<processor ref="ProcessorG" />
                             <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                                 <spring:property name="label" value="H" />
                             </custom-processor>
@@ -101,7 +106,6 @@
                 <vm:inbound-endpoint path="service2" exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=":service2" />
-        </service>
-        
+        </service>        
     </model>
 </mule>

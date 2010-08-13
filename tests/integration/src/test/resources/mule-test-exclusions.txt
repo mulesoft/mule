@@ -97,3 +97,6 @@ org.mule.context.notification.EndpointMessageNotificationTestCase
 
 # MULE-4976 (broken with migration to Spring 3)
 org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCase
+
+# MULE-5010
+org.mule.test.integration.endpoints.EndpointMessageProcessorsTestCase
