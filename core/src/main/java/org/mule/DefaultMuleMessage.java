@@ -73,27 +73,27 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private static final Log logger = LogFactory.getLog(DefaultMuleMessage.class);
     private static final List<Class<?>> consumableClasses = new ArrayList<Class<?>>();
 
-    /** 
-     * The default UUID for the message. If the underlying transport has the notion of a 
-     * message id, this uuid will be ignored 
+    /**
+     * The default UUID for the message. If the underlying transport has the notion of a
+     * message id, this uuid will be ignored
      */
     private String id = UUID.getUUID();
 
     private transient Object payload;
     private transient Object originalPayload;
 
-    /** 
+    /**
      * If an exception occurs while processing this message an exception payload
-     * will be attached here 
+     * will be attached here
      */
     private ExceptionPayload exceptionPayload;
 
-    /** 
-     * Scoped properties for this message 
+    /**
+     * Scoped properties for this message
      */
     private MessagePropertiesContext properties = new MessagePropertiesContext();
 
-    /** 
+    /**
      * Collection of attachments that were attached to the incoming message
      */
     @SuppressWarnings("unchecked")
@@ -122,7 +122,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         addToConsumableClasses("javax.xml.transform.stream.StreamSource");
         consumableClasses.add(OutputHandler.class);
     }
-    
+
     private static void addToConsumableClasses(String className)
     {
         try
@@ -164,21 +164,21 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         addProperties(properties);
 
         //Add inbound attachments
-        if(attachments!=null)
+        if (attachments != null)
         {
             inboundAttachments = attachments;
         }
 
         resetAccessControl();
     }
-    
+
     public DefaultMuleMessage(Object message, MuleMessage previous, MuleContext muleContext)
     {
         id = previous.getUniqueId();
         setMuleContext(muleContext);
         initAppliedTransformerHashCodes();
         setEncoding(previous.getEncoding());
-        
+
         if (message instanceof MuleMessage)
         {
             MuleMessage payloadMessage = (MuleMessage) message;
@@ -191,24 +191,24 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             copyMessageProperties(previous);
         }
         originalPayload = previous.getPayload();
-        
+
         if (previous.getExceptionPayload() != null)
         {
             setExceptionPayload(previous.getExceptionPayload());
         }
-        
+
         copyAttachments(previous);
-        
+
         resetAccessControl();
     }
-    
+
     private void copyMessageProperties(MuleMessage muleMessage)
     {
         // explicitly copy INBOUND message properties over. This cannot be done in the loop below
         Map<String, Object> inboundProperties =
-            ((DefaultMuleMessage)muleMessage).properties.getScopedProperties(PropertyScope.INBOUND);
+                ((DefaultMuleMessage) muleMessage).properties.getScopedProperties(PropertyScope.INBOUND);
         addInboundProperties(inboundProperties);
-        
+
         for (PropertyScope scope : PropertyScope.ALL_SCOPES)
         {
             try
@@ -275,7 +275,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
         muleContext = context;
     }
-    
+
     @SuppressWarnings("unchecked")
     private void initAppliedTransformerHashCodes()
     {
@@ -306,19 +306,18 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     /**
      * Will attempt to obtain the payload of this message with the desired Class type. This will
-     * try and resolve a transformer that can do this transformation. If a transformer cannot be 
-     * found an exception is thrown. Any transformers added to the registry will be checked for 
+     * try and resolve a transformer that can do this transformation. If a transformer cannot be
+     * found an exception is thrown. Any transformers added to the registry will be checked for
      * compatability.
      *
      * @param resultType the desired return type
-     * @param encoding the encoding to use if required
-     * @return The converted payload of this message. Note that this method will not alter the 
-     *          payload of this message <b>unless</b> the payload is an {@link InputStream} in which
-     *          case the stream will be read and the payload will become the fully read stream.
-     * @throws TransformerException if a transformer cannot be found or there is an error during 
-     *          transformation of the payload.
+     * @param encoding   the encoding to use if required
+     * @return The converted payload of this message. Note that this method will not alter the
+     *         payload of this message <b>unless</b> the payload is an {@link InputStream} in which
+     *         case the stream will be read and the payload will become the fully read stream.
+     * @throws TransformerException if a transformer cannot be found or there is an error during
+     *                              transformation of the payload.
      * @since 3.0
-     *
      */
     @SuppressWarnings("unchecked")
     protected <T> T getPayload(DataType<T> resultType, String encoding) throws TransformerException
@@ -343,7 +342,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, resultType));
         }
-        
+
         // Pass in the message itself
         Object result = transformer.transform(this, encoding);
 
@@ -352,10 +351,10 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             throw new TransformerException(CoreMessages.transformOnObjectNotOfSpecifiedType(resultType, result));
         }
-        
+
         // If the payload is a stream and we've consumed it, then we should set the payload on the 
         // message. This is the only time this method will alter the payload on the message
-        if (isPayloadConsumed(source.getType()))                                                           
+        if (isPayloadConsumed(source.getType()))
         {
             setPayload(result);
         }
@@ -459,6 +458,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return properties.getProperty(key, PropertyScope.OUTBOUND);
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -482,15 +482,15 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     /**
      * Set a property on the message. This method will now set a value on the outbound scope only.
-     * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)} or
-     * preferrably any of the scope-specific set methods.
      *
-     * @param key the key on which to associate the value
+     * @param key   the key on which to associate the value
      * @param value the property value
      * @see #setInboundProperty(String, Object)
      * @see #setInvocationProperty(String, Object)
      * @see #setOutboundProperty(String, Object)
      * @see #setSessionProperty(String, Object)
+     * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)} or
+     *             preferrably any of the scope-specific set methods.
      */
     @Deprecated
     public void setProperty(String key, Object value)
@@ -565,6 +565,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     /**
      * {@inheritDoc}
+     *
      * @deprecated use {@link #getPropertyNames(org.mule.api.transport.PropertyScope)}
      */
     @Deprecated
@@ -629,7 +630,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         assertAccess(READ);
         return id;
     }
-    
+
     public void setUniqueId(String uid)
     {
         assertAccess(WRITE);
@@ -834,7 +835,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(READ);
         // need to wrap with another getInt() as some transports operate on it as a String
-        Integer seq = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.OUTBOUND, null),-1);
+        Integer seq = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.OUTBOUND, null), -1);
         if (seq == null)
         {
             seq = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.INBOUND, null), -1);
@@ -869,7 +870,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return groupSize;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void setCorrelationGroupSize(int size)
     {
         assertAccess(WRITE);
@@ -974,6 +977,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     }
 
     ///TODO this should not be here, but needed so that a message factory can add attachments
+    //This is not part of the API
+
     public void addInboundAttachment(String name, DataHandler dataHandler) throws Exception
     {
         assertAccess(WRITE);
@@ -984,27 +989,27 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(WRITE);
         DataHandler dh;
-        if(object instanceof File)
+        if (object instanceof File)
         {
-            if(contentType!=null)
+            if (contentType != null)
             {
-                dh = new DataHandler(new FileInputStream((File)object), contentType);
+                dh = new DataHandler(new FileInputStream((File) object), contentType);
 
             }
             else
             {
-                dh = new DataHandler(new FileDataSource((File)object));
+                dh = new DataHandler(new FileDataSource((File) object));
             }
         }
-        else if(object instanceof URL)
+        else if (object instanceof URL)
         {
-            if(contentType!=null)
+            if (contentType != null)
             {
-                dh = new DataHandler(((URL)object).openStream(), contentType);
+                dh = new DataHandler(((URL) object).openStream(), contentType);
             }
             else
             {
-                dh = new DataHandler((URL)object);
+                dh = new DataHandler((URL) object);
             }
         }
         else
@@ -1042,6 +1047,25 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(READ);
         return Collections.unmodifiableSet(outboundAttachments.keySet());
+    }
+
+    @SuppressWarnings("unused")
+    public <T> T findPropertyInAnyScope(String name, T defaultValue)
+    {
+        Object value = getProperty(name, PropertyScope.OUTBOUND);
+        if (value == null)
+        {
+            value = getProperty(name, PropertyScope.INVOCATION);
+            if (value == null)
+            {
+                value = getProperty(name, PropertyScope.INBOUND);
+            }
+        }
+        if(value == null)
+        {
+            return defaultValue;
+        }
+        return (T)value;
     }
 
     /**
@@ -1083,9 +1107,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     }
 
     /**
-     *
      * @param mimeType
-     *
      * @since 3.0
      */
     public void setMimeType(String mimeType)
@@ -1101,6 +1123,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             setOutboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY, mimeType);
         }
     }
+
     /**
      * {@inheritDoc}
      */
@@ -1126,7 +1149,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             }
         }
     }
-    
+
     public void addInboundProperties(Map<String, Object> props)
     {
         properties.addInboundProperties(props);
@@ -1246,7 +1269,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
                     Object result;
                     if (transformer instanceof MessageTransformer)
                     {
-                        result = ((MessageTransformer)transformer).transform(this, event);
+                        result = ((MessageTransformer) transformer).transform(this, event);
                     }
                     else
                     {
@@ -1442,7 +1465,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     private void writeObject(ObjectOutputStream out) throws Exception
     {
         out.defaultWriteObject();
-        
+
         if (payload instanceof Serializable)
         {
             out.writeBoolean(true);
@@ -1455,14 +1478,14 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             out.writeInt(serializablePayload.length);
             out.write(serializablePayload);
         }
-        
+
         // TODO: we don't serialize the originalPayload for now
     }
-    
+
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
     {
         in.defaultReadObject();
-        
+
         boolean payloadWasSerialized = in.readBoolean();
         if (payloadWasSerialized)
         {
@@ -1476,7 +1499,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             payload = serializedPayload;
         }
     }
-    
+
     /**
      * Invoked after deserialization. This is called when the marker interface
      * {@link org.mule.util.store.DeserializationPostInitialisable} is used. This will get invoked
@@ -1583,6 +1606,28 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(WRITE);
         logger.warn("MuleMessage.setDoubleProperty() method is deprecated, use MuleMessage.setOutboundProperty() instead.  This method will be removed in the next point release");
+        setOutboundProperty(name, value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public String getStringProperty(String name, String defaultValue)
+    {
+        assertAccess(READ);
+        logger.warn("MuleMessage.getStringProperty() method is deprecated, use MuleMessage.getInboundProperty() instead.  This method will be removed in the next point release");
+        return getInboundProperty(name, defaultValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public void setStringProperty(String name, String value)
+    {
+        assertAccess(WRITE);
+        logger.warn("MuleMessage.setStringProperty() method is deprecated, use MuleMessage.setOutboundProperty() instead.  This method will be removed in the next point release");
         setOutboundProperty(name, value);
     }
 }

@@ -242,6 +242,29 @@ public interface MuleMessage extends Serializable
     <T> T getOutboundProperty(String name);
 
     /**
+     * This method was added with the introduction of Property scopes.  However, this method should
+     * rarely be used.  Instead, the scoped accessors should be used.  Mule does not use this method internally
+     * and may be deprecated in future versions
+     *
+     * The Scopes will be checked in the following order, with the first match being returned -
+     * <ul>
+     * <li>Outbound</li>
+     * <li>Invocation</li>
+     * <li>Inbound</li>
+     * </ul>
+     *
+     * Session scope is not checked.
+     *
+     * @param name the name of the property to look for
+     * @param defaultValue the default value that will be returned if the property is not found
+     * @param <T> The Type of the property value that will be returned
+     * @return TThe property value from the first scope that had the property set, or the 'defaultValue' if the property was
+     * not found in any scope
+     * @since 3.0
+     */
+    <T> T findPropertyInAnyScope(String name, T defaultValue);
+
+    /**
      * Gets a property from the message with a given scope and provides a default value if the property is not
      * present on the message in the scope specified.  The method will also type check against the default value
      * to ensure that the value is of the correct type.  If null is used for the default value no type checking is
@@ -287,6 +310,17 @@ public interface MuleMessage extends Serializable
      */
     @Deprecated
     double getDoubleProperty(String name, double defaultValue);
+
+    /**
+     * Gets a String property from the message
+     *
+     * @param name the name or key of the property
+     * @param defaultValue a default value if the property doesn't exist in the event
+     * @return the property value or the defaultValue if the property does not exist
+     * @deprecated use {@link #getInboundProperty(String, Object)} instead
+     */
+    @Deprecated
+    String getStringProperty(String name, String defaultValue);
 
     /**
      * Gets a boolean property from the message
@@ -338,6 +372,18 @@ public interface MuleMessage extends Serializable
      */
     @Deprecated
     void setDoubleProperty(String name, double value);
+
+    /**
+     * Sets a String property on the message
+     *
+     * @param name the property name or key
+     * @param value the property value
+     * @deprecated use {@link #setOutboundProperty(String, Object)} instead
+     */
+    @Deprecated
+    void setStringProperty(String name, String value);
+
+
 
 
     /**
