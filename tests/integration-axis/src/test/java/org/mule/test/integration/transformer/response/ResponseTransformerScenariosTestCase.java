@@ -39,4 +39,11 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
     // assertNotNull(message);
     // assertEquals("request" + "customResponse", message.getPayloadAsString());
     // }
+
+    /**
+     * make maven happy
+     */
+    public void testDummy()
+    {
+    }
 }
