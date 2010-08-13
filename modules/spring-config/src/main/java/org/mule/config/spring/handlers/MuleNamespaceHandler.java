@@ -10,6 +10,7 @@
 
 package org.mule.config.spring.handlers;
 
+import org.mule.RouteableExceptionStrategy;
 import org.mule.api.config.MuleProperties;
 import org.mule.component.DefaultInterfaceBinding;
 import org.mule.component.DefaultJavaComponent;
@@ -203,6 +204,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("rollback-transaction", new ExceptionTXFilterDefinitionParser("rollbackTxFilter"));
         registerBeanDefinitionParser("custom-agent", new DefaultNameMuleOrphanDefinitionParser());        
 
+        registerBeanDefinitionParser("routeable-exception-strategy", new ChildDefinitionParser("exceptionListener", RouteableExceptionStrategy.class));
         registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
         registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
         registerMuleBeanDefinitionParser("notifications", new NamedDefinitionParser(MuleProperties.OBJECT_NOTIFICATION_MANAGER)).addAlias("dynamic", "notificationDynamic");

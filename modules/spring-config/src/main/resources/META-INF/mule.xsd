@@ -3642,6 +3642,24 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="routeable-exception-strategy" type="routeableExceptionStrategyType"
+                 substitutionGroup="abstract-exception-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                An exception strategy the routes exceptions through routers
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="routeableExceptionStrategyType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractExceptionStrategyType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-outbound-router" minOccurs="1" maxOccurs="1"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <!-- Custom connector element -->
 
     <xsd:element name="custom-connector" type="customConnectorType" substitutionGroup="abstract-connector">
