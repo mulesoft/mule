@@ -44,15 +44,30 @@ public interface MuleEvent
     Credentials getCredentials();
 
     /**
-     * Reterns the conents of the message as a byte array.
+     * Returns the contents of the message as a byte array.
      * 
-     * @return the conents of the message as a byte array
+     * @return the contents of the message as a byte array
      * @throws MuleException if the message cannot be converted into an array of bytes
      */
     byte[] getMessageAsBytes() throws MuleException;
 
     /**
-     * Transforms the message into the requested format. The transformer used is 
+     * Transforms the message into it's recognised or expected format. The
+     * transformer used is the one configured on the endpoint through which this
+     * event was received.
+     *
+     * @return the message transformed into it's recognised or expected format.
+     * @throws TransformerException if a failure occurs in the transformer
+     * @see org.mule.api.transformer.Transformer
+     * @deprecated Since Mule 3.0 this method does nothing.  The message is already transformed before the event reaches a component
+     * IF you need to have access to the original message, the must be no transformations before the component, this
+     * means that any 'connector-level' transfromers will have to be explicitly overriden via the service overrides on the connector.
+     */
+    @Deprecated
+    Object transformMessage() throws TransformerException;
+
+    /**
+     * Transforms the message into the requested format. The transformer used is
      * the one configured on the endpoint through which this event was received.
      * 
      * @param outputType The requested output type.

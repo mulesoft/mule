@@ -172,24 +172,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     protected void fillProperties(MuleEvent previousEvent)
     {
-//        if (previousEvent != null)
-//        {
-//            MuleMessage msg = previousEvent.getMessage();
-//            synchronized (msg)
-//            {
-//                for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
-//                {
-//                    String prop = (String) iterator.next();
-//                    Object value = msg.getProperty(prop);
-//                    // don't overwrite property on the message
-//                    if (!ignoreProperty(prop))
-//                    {
-//                        message.setProperty(prop, value);
-//                    }
-//                }
-//            }
-//        }
-
         if (endpoint != null && endpoint.getProperties() != null)
         {
 //            PropertyScope scope = endpoint instanceof OutboundEndpoint ? PropertyScope.OUTBOUND : PropertyScope.INVOCATION;
@@ -708,4 +690,10 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
     }
 
+    @Deprecated
+    public Object transformMessage() throws TransformerException
+    {
+        logger.warn("Deprecation warning: MUleEvent.transformMessage does nothing in Mule 3.0.  The message is already transformed before the event reaches a component");
+        return message.getPayload();
+    }
 }
