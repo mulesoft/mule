@@ -44,7 +44,7 @@
                 <xsd:attribute name="servletUrl">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The real URL on which the servlet container is bound. If this is not set, the WSDL may not be generated correctly.
+                            The real URL on which the servlet container is bound. If this is not set, the WSDL may not be generated correctly when using CXF bound to a servlet endpoint.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
