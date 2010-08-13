@@ -24,7 +24,7 @@ import org.mule.processor.AbstractFilteringMessageProcessor;
  * the filter accepts the message then message flow continues to the next message processor. If the filter
  * does not accept the message processor and a message processor is configured for handling unaccepted message
  * then this will be invoked, otherwise <code>null</code> will be returned.
- * <p>
+ * <p/>
  * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/Filter.html}
  */
 public class MessageFilter extends AbstractFilteringMessageProcessor
@@ -81,15 +81,15 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
         }
         if (throwOnUnaccepted)
         {
-            throw new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event, filter);   
+            throw new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event, filter);
         }
         return null;
     }
-    
+
     /**
      * The <code>MessageProcessor</code> that should be used to handle messaged that are not accepted by the
      * filter.
-     * 
+     *
      * @param unacceptedMessageProcessor
      */
     public void setUnacceptedMessageProcessor(MessageProcessor unacceptedMessageProcessor)
@@ -116,10 +116,10 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
     {
         this.throwOnUnaccepted = throwOnUnaccepted;
     }
-    
+
     @Override
     public String toString()
     {
-        return filter.getClass().getName() + " (wrapped by " + this.getClass().getSimpleName() + ")";
+        return (filter == null ? "null filter" : filter.getClass().getName()) + " (wrapped by " + this.getClass().getSimpleName() + ")";
     }
 }
