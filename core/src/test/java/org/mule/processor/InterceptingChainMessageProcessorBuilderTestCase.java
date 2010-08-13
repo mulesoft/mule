@@ -21,6 +21,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.ObjectUtils;
 
 import org.junit.Test;
 
@@ -209,6 +210,12 @@ public class InterceptingChainMessageProcessorBuilderTestCase extends AbstractMu
         {
             disposed = true;
         }
+
+        @Override
+        public String toString()
+        {
+            return ObjectUtils.toString(this);
+        }
     }
 
     private static class AppendingInterceptingMP extends AppendingMP implements InterceptingMessageProcessor
@@ -250,6 +257,10 @@ public class InterceptingChainMessageProcessorBuilderTestCase extends AbstractMu
             next = mp;
         }
 
+        @Override
+        public String toString()
+        {
+            return ObjectUtils.toString(this);
+        }
     }
-
 }

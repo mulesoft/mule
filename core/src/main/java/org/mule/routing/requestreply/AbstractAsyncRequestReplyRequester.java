@@ -22,6 +22,7 @@ import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.util.ObjectUtils;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
@@ -257,4 +258,9 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         }
     }
 
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
+    }
 }

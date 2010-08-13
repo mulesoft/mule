@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.NamedObject;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.util.ObjectUtils;
 
 public class TestMessageProcessor implements MessageProcessor, NamedObject
 {
@@ -60,6 +61,12 @@ public class TestMessageProcessor implements MessageProcessor, NamedObject
     public String getName()
     {
         return name;
+    }
+
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
     }
 }
 

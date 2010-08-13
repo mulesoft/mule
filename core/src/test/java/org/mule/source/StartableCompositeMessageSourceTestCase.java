@@ -18,6 +18,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.util.ObjectUtils;
 
 public class StartableCompositeMessageSourceTestCase extends AbstractMuleTestCase
 {
@@ -175,6 +176,10 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleTestCas
             started = false;
         }
 
+        @Override
+        public String toString()
+        {
+            return ObjectUtils.toString(this);
+        }
     }
-
 }

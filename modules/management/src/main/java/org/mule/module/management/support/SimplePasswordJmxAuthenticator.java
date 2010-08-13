@@ -11,7 +11,6 @@
 package org.mule.module.management.support;
 
 import org.mule.module.management.agent.JmxAgent;
-import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 
 import java.security.Principal;
@@ -65,7 +64,8 @@ public class SimplePasswordJmxAuthenticator implements JMXAuthenticator
             throw new SecurityException("Unauthenticated user: " + username);
         }
 
-        if (!password.equals(ObjectUtils.toString(credentials.get(username))))
+        Object pass = credentials.get(username);
+        if (!password.equals(pass == null ? "" : pass.toString()))
         {
             throw new SecurityException("Invalid password");
         }

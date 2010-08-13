@@ -23,6 +23,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -183,6 +184,12 @@ public class StartableCompositeMessageSource
                 return null;
             }
 
+        }
+
+        @Override
+        public String toString()
+        {
+            return ObjectUtils.toString(this);
         }
     }
 }

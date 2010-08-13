@@ -25,6 +25,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.NullMessageProcessor;
+import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -249,23 +250,24 @@ public class IteratingListMessageProcessorBuilder implements MessageProcessorBui
             {
                 string.append(" '" + name + "' ");
             }
-            else
+            
+            Iterator<MessageProcessor> mpIterator = list.iterator();
+            if (mpIterator.hasNext())
             {
-                string.append("[ processors= ");
-                Iterator<MessageProcessor> mpIterator = list.iterator();
+                string.append("\n[ ");
                 while (mpIterator.hasNext())
                 {
                     MessageProcessor mp = mpIterator.next();
-                    string.append(mp.getClass().getName());
+                    string.append("\n  " + StringUtils.replace(mp.toString(), "\n", "\n  "));
                     if (mpIterator.hasNext())
                     {
                         string.append(", ");
                     }
                 }
-                string.append(" ]");
+                string.append("\n]");
             }
+
             return string.toString();
         }
     }
-
 }

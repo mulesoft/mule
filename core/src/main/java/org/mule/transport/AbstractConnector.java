@@ -2450,42 +2450,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 return getDispatcherWorkManager();
             }
         }, getDispatcherThreadingProfile().isDoThreading()));
-        builder.chain(new MessageProcessor()
-        {
-            private MessageProcessor notificationMessageProcessor;
-
-            public MuleEvent process(MuleEvent event) throws MuleException
-            {
-                OutboundEndpoint endpoint = (OutboundEndpoint) event.getEndpoint();
-                MessageDispatcher dispatcher = null;
-                try
-                {
-                    dispatcher = getDispatcher(endpoint);
-                    MuleEvent result = dispatcher.process(event);
-                    // We need to invoke notification message processor with request
-                    // message only after successful send/dispatch
-                    if (notificationMessageProcessor == null)
-                    {
-                        notificationMessageProcessor = new OutboundNotificationMessageProcessor(endpoint);
-                    }
-                    notificationMessageProcessor.process(event);
-                    return result;
-
-                }
-                catch (DispatchException dex)
-                {
-                    throw dex;
-                }
-                catch (MuleException ex)
-                {
-                    throw new DispatchException(event, endpoint, ex);
-                }
-                finally
-                {
-                    returnDispatcher(endpoint, dispatcher);
-                }
-            }
-        });
+        builder.chain(new DispatcherMessageProcessor());
         return builder.build();
     }
     
@@ -2524,4 +2489,47 @@ public abstract class AbstractConnector implements Connector, WorkListener
             throw new MuleRuntimeException(tse);
         }
     }
+    
+    class DispatcherMessageProcessor implements MessageProcessor
+    {
+        private MessageProcessor notificationMessageProcessor;
+
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            OutboundEndpoint endpoint = (OutboundEndpoint) event.getEndpoint();
+            MessageDispatcher dispatcher = null;
+            try
+            {
+                dispatcher = getDispatcher(endpoint);
+                MuleEvent result = dispatcher.process(event);
+                // We need to invoke notification message processor with request
+                // message only after successful send/dispatch
+                if (notificationMessageProcessor == null)
+                {
+                    notificationMessageProcessor = new OutboundNotificationMessageProcessor(endpoint);
+                }
+                notificationMessageProcessor.process(event);
+                return result;
+
+            }
+            catch (DispatchException dex)
+            {
+                throw dex;
+            }
+            catch (MuleException ex)
+            {
+                throw new DispatchException(event, endpoint, ex);
+            }
+            finally
+            {
+                returnDispatcher(endpoint, dispatcher);
+            }
+        }
+        
+        @Override
+        public String toString()
+        {
+            return ObjectUtils.toString(this);
+        }
+    };
 }

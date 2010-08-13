@@ -13,6 +13,7 @@ package org.mule.processor;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.util.ObjectUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,4 +36,10 @@ public abstract class AbstractMessageObserver implements MessageProcessor
     }
 
     public abstract void observe(MuleEvent event);
+    
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
+    }
 }

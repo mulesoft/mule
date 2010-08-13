@@ -31,6 +31,7 @@ import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.construct.SimpleFlowConstruct;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
+import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -324,24 +325,24 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
             {
                 string.append(" '" + name + "' ");
             }
-            else
+            
+            Iterator<MessageProcessor> mpIterator = allProcessors.iterator();
+            if (mpIterator.hasNext())
             {
-                string.append("[ processors= ");
-                Iterator<MessageProcessor> mpIterator = allProcessors.iterator();
+                string.append("\n[ ");
                 while (mpIterator.hasNext())
                 {
                     MessageProcessor mp = mpIterator.next();
-                    string.append(mp.getClass().getName());
+                    string.append("\n  " + StringUtils.replace(mp.toString(), "\n", "\n  "));
                     if (mpIterator.hasNext())
                     {
                         string.append(", ");
                     }
                 }
-                string.append(" ]");
+                string.append("\n]");
             }
+
             return string.toString();
         }
-
     }
-
 }

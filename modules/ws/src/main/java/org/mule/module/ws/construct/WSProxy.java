@@ -30,6 +30,7 @@ import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transformer.TransformerTemplate.TransformerCallback;
+import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 
 import java.net.InetAddress;
@@ -355,5 +356,11 @@ public class WSProxy extends AbstractFlowConstruct
 
             return wsdlString;
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
     }
 }

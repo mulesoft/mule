@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.ObjectUtils;
 
 public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
 {
@@ -32,6 +33,11 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
             return listener.process(event);
         }
 
+        @Override
+        public String toString()
+        {
+            return ObjectUtils.toString(this);
+        }
     }
 
     protected DirectInboundMessageSource directInboundMessageSource;

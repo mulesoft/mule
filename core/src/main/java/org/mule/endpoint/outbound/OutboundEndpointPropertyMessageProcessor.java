@@ -15,6 +15,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.util.ObjectUtils;
+
 
 /**
  * Sets the outbound endpoint uri on as a property of the message using the following
@@ -28,5 +30,11 @@ public class OutboundEndpointPropertyMessageProcessor implements MessageProcesso
                                                event.getEndpoint().getEndpointURI().toString());
         event = OptimizedRequestContext.unsafeSetEvent(event);
         return event;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
     }
 }

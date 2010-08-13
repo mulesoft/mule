@@ -15,7 +15,9 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
+
 
 /**
  * Sets the inbound endpoint uri on as a property of the message using the following
@@ -42,5 +44,11 @@ public class InboundEndpointPropertyMessageProcessor implements MessageProcessor
         }
         event.getMessage().setOutboundProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint);
         return event;
+    }
+
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
     }
 }

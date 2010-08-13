@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.util.ObjectUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,5 +56,11 @@ public abstract class AbstractInterceptingMessageProcessor implements Intercepti
             }
             return next.process(event);
         }
+    }
+    
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
     }
 }

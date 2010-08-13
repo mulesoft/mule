@@ -14,6 +14,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.SessionHandler;
+import org.mule.util.ObjectUtils;
+
 
 /**
  * Stores session information on the outbound message.
@@ -35,4 +37,9 @@ public class OutboundSessionHandlerMessageProcessor implements MessageProcessor
         return event;
     }
 
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
+    }
 }

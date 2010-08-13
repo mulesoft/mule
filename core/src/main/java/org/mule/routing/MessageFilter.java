@@ -116,4 +116,10 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
     {
         this.throwOnUnaccepted = throwOnUnaccepted;
     }
+    
+    @Override
+    public String toString()
+    {
+        return filter.getClass().getName() + " (wrapped by " + this.getClass().getSimpleName() + ")";
+    }
 }

@@ -18,9 +18,11 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.util.ObjectUtils;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
+
 
 /**
  * Verify that the outbound mime type is acceptable by this endpoint.
@@ -65,5 +67,11 @@ public class OutboundEndpointMimeTypeCheckingMessageProcessor implements Message
         }
 
         return event;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
     }
 }

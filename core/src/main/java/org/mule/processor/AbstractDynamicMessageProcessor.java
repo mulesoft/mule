@@ -13,6 +13,8 @@ package org.mule.processor;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.util.ObjectUtils;
+
 
 /**
  * Implementation of {@link MessageProcessor} that dynamically chooses and uses
@@ -35,4 +37,9 @@ public abstract class AbstractDynamicMessageProcessor implements MessageProcesso
      */
     protected abstract MessageProcessor resolveMessageProcessor(MuleEvent event) throws MuleException;
 
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
+    }
 }

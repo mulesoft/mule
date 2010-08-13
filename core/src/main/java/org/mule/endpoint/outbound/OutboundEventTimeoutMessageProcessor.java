@@ -14,6 +14,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.util.ObjectUtils;
+
 
 public class OutboundEventTimeoutMessageProcessor implements MessageProcessor
 {
@@ -28,4 +30,9 @@ public class OutboundEventTimeoutMessageProcessor implements MessageProcessor
         return event;
     }
 
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
+    }
 }

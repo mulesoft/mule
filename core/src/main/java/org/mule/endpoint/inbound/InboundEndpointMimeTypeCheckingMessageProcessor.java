@@ -19,6 +19,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.util.ObjectUtils;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
@@ -70,5 +71,11 @@ public class InboundEndpointMimeTypeCheckingMessageProcessor implements MessageP
         }
 
         return event;
+    }
+
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
     }
 }

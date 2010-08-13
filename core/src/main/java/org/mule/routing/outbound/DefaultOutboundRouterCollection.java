@@ -29,6 +29,7 @@ import org.mule.api.routing.TransformingMatchable;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.AbstractCatchAllStrategy;
+import org.mule.util.ObjectUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -250,4 +251,9 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
         return false;
     }
 
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
+    }
 }

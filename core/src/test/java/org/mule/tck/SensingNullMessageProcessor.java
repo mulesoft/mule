@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
+import org.mule.util.ObjectUtils;
 
 public class SensingNullMessageProcessor implements MessageProcessor
 {
@@ -75,6 +76,12 @@ public class SensingNullMessageProcessor implements MessageProcessor
         {
             this.listener = listener;
 
+        }
+
+        @Override
+        public String toString()
+        {
+            return ObjectUtils.toString(this);
         }
     }
 }
