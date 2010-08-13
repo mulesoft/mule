@@ -27,6 +27,7 @@ import org.mule.util.SystemUtils;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -102,16 +103,16 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
 
     private Object getMessageFromContext(MuleEventContext context) throws MuleException
     {
-        if(isDoInboundTransform())
+        if (isDoInboundTransform())
         {
             Object o = context.getMessage().getPayload();
-            if(getAppendString()!=null && !(o instanceof String))
+            if (getAppendString() != null && !(o instanceof String))
             {
                 o = context.transformMessageToString();
             }
             return o;
         }
-        else if(getAppendString()!=null)
+        else if (getAppendString()!=null)
         {
             return context.getMessageAsString();
         }
