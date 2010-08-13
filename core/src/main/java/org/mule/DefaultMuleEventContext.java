@@ -38,6 +38,8 @@ import org.mule.endpoint.URIBuilder;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.types.DataTypeFactory;
 
+import java.io.OutputStream;
+
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 
 import org.apache.commons.logging.Log;
@@ -662,6 +664,18 @@ public class DefaultMuleEventContext implements MuleEventContext
     public void setStopFurtherProcessing(boolean stopFurtherProcessing)
     {
         event.setStopFurtherProcessing(stopFurtherProcessing);
+    }
+
+    /**
+     * An outputstream the can optionally be used write response data to an incoming
+     * message.
+     * 
+     * @return an output stream if one has been made available by the message
+     *         receiver that received the message
+     */
+    public OutputStream getOutputStream()
+    {
+        return event.getOutputStream();
     }
 
     public EndpointURI getEndpointURI()
