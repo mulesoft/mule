@@ -68,7 +68,8 @@ import org.apache.commons.lang.SerializationUtils;
  * HttpClient HttpMethod that represents an HttpRequest.
  */
 
-public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
+public class
+        ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
 {
    private MuleContext muleContext;
 
@@ -364,14 +365,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             {
 
                 httpMethod.addRequestHeader(headerName, headerValue);
-                System.out.println("Added header: " + headerName);
-
             }
-            else
-            {
-                System.err.println("Ignorring header: " + headerName);
-            }
-
         }
     }
 
