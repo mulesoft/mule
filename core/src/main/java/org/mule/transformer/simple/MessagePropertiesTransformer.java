@@ -111,7 +111,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer imp
                     Object realValue = value;
 
                     //Enable expression support for property values
-                    if (muleContext.getExpressionManager().isValidExpression(value.toString()))
+                    if (muleContext.getExpressionManager().isExpression(value.toString()))
                     {
                         realValue = muleContext.getExpressionManager().evaluate(value.toString(), message);
                     }
