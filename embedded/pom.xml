@@ -99,11 +99,6 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.transports</groupId>
-                                    <artifactId>mule-transport-soap</artifactId>
-                                    <version>${version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.mule.transports</groupId>
                                     <artifactId>mule-transport-servlet</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
