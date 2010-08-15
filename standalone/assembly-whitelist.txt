@@ -150,7 +150,6 @@ mule-transport-multicast
 mule-transport-quartz
 mule-transport-rmi
 mule-transport-servlet
-mule-transport-soap
 mule-transport-ssl
 mule-transport-stdio
 mule-transport-tcp
