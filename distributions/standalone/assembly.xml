@@ -396,7 +396,6 @@
         <include>org.mule.transports:mule-transport-quartz</include>
         <include>org.mule.transports:mule-transport-rmi</include>
         <include>org.mule.transports:mule-transport-servlet</include>
-        <include>org.mule.transports:mule-transport-soap</include>
         <include>org.mule.transports:mule-transport-ssl</include>
         <include>org.mule.transports:mule-transport-stdio</include>
         <include>org.mule.transports:mule-transport-tcp</include>
@@ -459,7 +458,6 @@
         <exclude>org.mule.transports:mule-transport-quartz</exclude>
         <exclude>org.mule.transports:mule-transport-rmi</exclude>
         <exclude>org.mule.transports:mule-transport-servlet</exclude>
-        <exclude>org.mule.transports:mule-transport-soap</exclude>
         <exclude>org.mule.transports:mule-transport-ssl</exclude>
         <exclude>org.mule.transports:mule-transport-stdio</exclude>
         <exclude>org.mule.transports:mule-transport-tcp</exclude>
