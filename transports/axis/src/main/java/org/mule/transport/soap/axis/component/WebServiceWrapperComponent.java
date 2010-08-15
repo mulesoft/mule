@@ -18,8 +18,8 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.module.cxf.component.AbstractWebServiceWrapperComponent;
 import org.mule.transport.soap.axis.AxisConnector;
-import org.mule.transport.soap.component.AbstractWebServiceWrapperComponent;
 
 import java.util.Map;
 

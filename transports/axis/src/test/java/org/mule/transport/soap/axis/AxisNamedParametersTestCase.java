@@ -14,8 +14,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.soap.NamedParameter;
-import org.mule.transport.soap.SoapMethod;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +24,7 @@ import javax.xml.rpc.ParameterMode;
 public class AxisNamedParametersTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "axis-named-param-mule-config.xml";

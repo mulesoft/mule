@@ -23,8 +23,8 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.service.Service;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.ExceptionHelper;
+import org.mule.module.cxf.SoapConstants;
 import org.mule.transport.AbstractMessageReceiver;
-import org.mule.transport.soap.SoapConstants;
 import org.mule.transport.soap.axis.extras.AxisCleanAndAddProperties;
 import org.mule.util.ClassUtils;
 
@@ -71,7 +71,7 @@ public class AxisServiceProxy
 
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
         {
-            MuleMessage messageToRoute = receiver.createMuleMessage(args, 
+            MuleMessage messageToRoute = receiver.createMuleMessage(args,
                 receiver.getEndpoint().getEncoding());
             messageToRoute.setProperty(MuleProperties.MULE_METHOD_PROPERTY, method, PropertyScope.INVOCATION);
             
@@ -80,7 +80,7 @@ public class AxisServiceProxy
             // for MULE_USER header. Filter out other headers like "soapMethods" and
             // MuleProperties.MULE_METHOD_PROPERTY and "soapAction"
             // and also filter out any http related header
-            messageToRoute.addProperties(AxisCleanAndAddProperties.cleanAndAdd(RequestContext.getEventContext()));                        
+            messageToRoute.addProperties(AxisCleanAndAddProperties.cleanAndAdd(RequestContext.getEventContext()));
 
             MuleEvent event = receiver.routeMessage(messageToRoute);
             MuleMessage message = event == null ? null : event.getMessage();

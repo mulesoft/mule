@@ -8,12 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.soap;
+package org.mule.transport.soap.axis;
 
 import org.mule.api.registry.ServiceDescriptor;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceFinder;
-import org.mule.transport.soap.i18n.SoapMessages;
+import org.mule.transport.soap.axis.i18n.AxisMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.PropertiesUtils;
 
@@ -31,6 +31,7 @@ public class SoapServiceFinder implements ServiceFinder
     /**
      * @deprecated We can use a more intelligent strategy for locating the service using the OSGi registry.
      */
+    @Deprecated
     public String findService(String service, ServiceDescriptor descriptor, Properties props) throws ServiceException
     {
         Map finders = new TreeMap();
@@ -51,7 +52,7 @@ public class SoapServiceFinder implements ServiceFinder
                     ")").append(", ");
             }
         }
-        throw new ServiceException(SoapMessages.couldNotFindSoapProvider(buf.toString()));
+        throw new ServiceException(AxisMessages.couldNotFindSoapProvider(buf.toString()));
     }
 
     protected String getProtocolFromKey(String key)

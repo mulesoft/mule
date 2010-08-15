@@ -8,7 +8,8 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.soap;
+package org.mule.transport.soap.axis;
+
 
 /**
  * <code>WsdlServiceFinder</code> finds a the connector service to use by checking

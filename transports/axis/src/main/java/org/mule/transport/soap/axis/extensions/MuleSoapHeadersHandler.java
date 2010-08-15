@@ -12,7 +12,7 @@ package org.mule.transport.soap.axis.extensions;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.config.MuleProperties;
-import org.mule.transport.soap.MuleSoapHeaders;
+import org.mule.module.cxf.MuleSoapHeaders;
 
 import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPMessage;

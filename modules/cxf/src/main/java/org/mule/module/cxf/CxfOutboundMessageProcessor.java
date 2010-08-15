@@ -25,7 +25,6 @@ import org.mule.module.cxf.security.WebServiceSecurityException;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
-import org.mule.transport.soap.SoapConstants;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 

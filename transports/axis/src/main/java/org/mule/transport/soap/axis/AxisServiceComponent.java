@@ -25,9 +25,9 @@ import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.MuleEndpointURI;
+import org.mule.module.cxf.SoapConstants;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
-import org.mule.transport.soap.SoapConstants;
 import org.mule.transport.soap.axis.extensions.AxisMuleSession;
 import org.mule.transport.soap.axis.extensions.MuleConfigProvider;
 import org.mule.util.StringUtils;
@@ -711,10 +711,10 @@ public class AxisServiceComponent implements Initialisable, Callable
 
         // if using jms or vm we can skip this
         String scheme = endpointUri.getScheme();
-        if (!("vm".equalsIgnoreCase(scheme) 
+        if (!("vm".equalsIgnoreCase(scheme)
                         || "jms".equalsIgnoreCase(scheme)
                         || "servlet".equalsIgnoreCase(scheme)))
-        {            
+        {
             // Component Name is set by Mule so if its null we can skip this check
             if (service.getOption(AxisConnector.SERVICE_PROPERTY_COMPONENT_NAME) != null)
             {

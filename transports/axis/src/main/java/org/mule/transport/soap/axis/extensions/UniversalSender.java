@@ -30,9 +30,9 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
+import org.mule.module.cxf.SoapConstants;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transport.http.HttpConstants;
-import org.mule.transport.soap.SoapConstants;
 import org.mule.transport.soap.axis.AxisConnector;
 import org.mule.transport.soap.axis.extras.AxisCleanAndAddProperties;
 
@@ -172,7 +172,7 @@ public class UniversalSender extends BasicHandler
             }
             
             // with jms and vm the default SOAPAction will result in the name of the endpoint, which we may not necessarily want. This should be set manually on the endpoint
-            String scheme = requestEndpoint.getEndpointURI().getScheme(); 
+            String scheme = requestEndpoint.getEndpointURI().getScheme();
             if (!("vm".equalsIgnoreCase(scheme) || "jms".equalsIgnoreCase(scheme)))
             {
                 if (call.useSOAPAction())

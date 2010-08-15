@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.soap;
+package org.mule.transport.soap.axis;
 
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.endpoint.AbstractEndpointURIBuilder;
@@ -22,7 +22,7 @@ import java.util.Properties;
  */
 public class WsdlUrlEndpointURIBuilder extends AbstractEndpointURIBuilder
 {
-
+    @Override
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
         address = "";

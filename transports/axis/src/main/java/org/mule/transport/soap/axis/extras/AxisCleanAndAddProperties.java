@@ -14,9 +14,9 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.PropertyScope;
+import org.mule.module.cxf.SoapConstants;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
-import org.mule.transport.soap.SoapConstants;
 import org.mule.transport.soap.axis.AxisConnector;
 import org.mule.util.StringUtils;
 

@@ -31,7 +31,6 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
-import org.mule.transport.soap.SoapConstants;
 import org.mule.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -256,7 +255,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
             // TODO: Not sure if this is 100% correct - DBD
             String soapAction = getSoapAction(event.getMessage());
-            m.put(org.mule.transport.soap.SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
+            m.put(org.mule.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
 
             org.apache.cxf.transport.Destination d = server.getDestination();
 

@@ -13,8 +13,8 @@ package org.mule.test.integration.client;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.module.cxf.SoapConstants;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.soap.SoapConstants;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
 

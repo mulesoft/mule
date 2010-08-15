@@ -10,21 +10,23 @@
 
 package org.mule.transport.soap.axis;
 
-import org.mule.tck.providers.soap.AbstractSoapResourceEndpointFunctionalTestCase;
 import org.mule.transport.vm.VMConnector;
 
 public class AxisConnectorVMFunctionalTestCase extends AbstractSoapResourceEndpointFunctionalTestCase
 {
+    @Override
     protected String getTransportProtocol()
     {
         return VMConnector.VM;
     }
 
+    @Override
     protected String getSoapProvider()
     {
         return "axis";
     }
 
+    @Override
     public String getConfigResources()
     {
         return "axis-" + getTransportProtocol() + "-mule-config.xml";

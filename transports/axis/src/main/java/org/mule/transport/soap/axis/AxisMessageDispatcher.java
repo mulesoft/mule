@@ -21,12 +21,10 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.module.cxf.SoapConstants;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.NullPayload;
-import org.mule.transport.soap.NamedParameter;
-import org.mule.transport.soap.SoapConstants;
-import org.mule.transport.soap.SoapMethod;
-import org.mule.transport.soap.i18n.SoapMessages;
+import org.mule.transport.soap.axis.i18n.AxisMessages;
 import org.mule.util.BeanUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
@@ -385,7 +383,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         }
         if (method == null)
         {
-            throw new DispatchException(SoapMessages.cannotInvokeCallWithoutOperation(), 
+            throw new DispatchException(AxisMessages.cannotInvokeCallWithoutOperation(),
                 event, this);
         }
         else if (method instanceof SoapMethod)

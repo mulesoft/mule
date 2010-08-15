@@ -19,7 +19,6 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.cxf.endpoint.CxfEndpointBuilder;
-import org.mule.transport.soap.component.AbstractWebServiceWrapperComponent;
 
 public class WebServiceWrapperComponent extends AbstractWebServiceWrapperComponent
 {

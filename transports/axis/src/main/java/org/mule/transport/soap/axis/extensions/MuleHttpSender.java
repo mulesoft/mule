@@ -10,7 +10,7 @@
 
 package org.mule.transport.soap.axis.extensions;
 
-import org.mule.transport.soap.SoapConstants;
+import org.mule.module.cxf.SoapConstants;
 import org.mule.util.StringUtils;
 import org.mule.util.SystemUtils;
 
@@ -62,6 +62,7 @@ import org.apache.commons.logging.Log;
  *
  * @deprecated Use the UniversalSender instead
  */
+@Deprecated
 public class MuleHttpSender extends BasicHandler
 {
     /**

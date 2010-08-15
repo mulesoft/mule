@@ -17,7 +17,6 @@ import org.mule.api.service.Service;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.config.ExceptionHelper;
 import org.mule.tck.MuleTestUtils;
-import org.mule.tck.providers.soap.AbstractSoapUrlEndpointFunctionalTestCase;
 
 public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpointFunctionalTestCase
 {
@@ -29,16 +28,19 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
         }
     }
 
+    @Override
     public String getConfigResources()
     {
         return "axis-" + getTransportProtocol() + "-mule-config.xml";
     }
 
+    @Override
     protected String getTransportProtocol()
     {
         return "http";
     }
 
+    @Override
     protected String getSoapProvider()
     {
         return "axis";

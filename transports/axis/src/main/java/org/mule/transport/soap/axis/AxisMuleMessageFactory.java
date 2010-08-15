@@ -12,8 +12,8 @@ package org.mule.transport.soap.axis;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
+import org.mule.module.cxf.MuleSoapHeaders;
 import org.mule.transport.AbstractMuleMessageFactory;
-import org.mule.transport.soap.MuleSoapHeaders;
 import org.mule.util.StringUtils;
 
 import java.util.Iterator;

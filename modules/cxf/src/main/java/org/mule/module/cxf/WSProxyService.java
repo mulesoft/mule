@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.soap;
+package org.mule.module.cxf;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;

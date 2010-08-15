@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.soap;
+package org.mule.transport.soap.axis;
 
 import org.mule.config.spring.editors.QNamePropertyEditor;
 import org.mule.util.ClassUtils;

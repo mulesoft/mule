@@ -12,9 +12,10 @@
     <description>A Mule transport for Soap Connectivity using Axis.</description>
 
     <dependencies>
+        <!-- we use some common classes from the CXF module -->
         <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-soap</artifactId>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-cxf</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
@@ -100,13 +101,6 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jetty</artifactId>
             <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-soap</artifactId>
-            <version>${version}</version>
-            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>

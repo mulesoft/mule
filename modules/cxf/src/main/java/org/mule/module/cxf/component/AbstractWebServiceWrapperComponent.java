@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.soap.component;
+package org.mule.module.cxf.component;
 
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.component.AbstractComponent;

@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.soap;
+package org.mule.module.cxf;
 
 /**
  * Common SOAP constants

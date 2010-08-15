@@ -33,6 +33,16 @@ public class AxisMessages extends MessageFactory
     {
         return factory.getString(BUNDLE_PATH, 3);
     }
+    
+    public static Message cannotInvokeCallWithoutOperation()
+    {
+        return factory.createMessage(BUNDLE_PATH, 4);
+    }
+    
+    public static Message couldNotFindSoapProvider(String name)
+    {
+        return factory.createMessage(BUNDLE_PATH, 5, name);
+    }
 }
 
 

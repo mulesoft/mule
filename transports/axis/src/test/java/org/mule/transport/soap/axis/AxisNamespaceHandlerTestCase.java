@@ -11,21 +11,20 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.module.cxf.SoapConstants;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.soap.SoapConstants;
-import org.mule.transport.soap.axis.AxisConnector;
-import org.mule.transport.soap.axis.AxisMessageReceiver;
 import org.mule.transport.soap.axis.mock.MockAxisServer;
 import org.mule.transport.soap.axis.mock.MockProvider;
 
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.axis.constants.Use;
 import org.apache.axis.constants.Style;
+import org.apache.axis.constants.Use;
 
 public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
-{   
+{
+    @Override
     protected String getConfigResources()
     {
         return "axis-namespace-config.xml";
@@ -33,7 +32,7 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testConfig()
     {
-        AxisConnector connector = 
+        AxisConnector connector =
             (AxisConnector)muleContext.getRegistry().lookupConnector("axisConnector");
         
         assertNotNull(connector);
@@ -50,7 +49,7 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testInjectedObjects()
     {
-        AxisConnector connector = 
+        AxisConnector connector =
             (AxisConnector)muleContext.getRegistry().lookupConnector("axisConnector2");
 
         assertNotNull(connector);
@@ -105,7 +104,7 @@ public class AxisNamespaceHandlerTestCase extends FunctionalTestCase
         Object value = props.get(name);
         assertNotNull(name + " value null", value);
         assertTrue(value.getClass() + " not subclass of " + clazz, clazz.isAssignableFrom(value.getClass()));
-        return value; 
+        return value;
     }
 
 }

@@ -10,7 +10,6 @@
 
 package org.mule.transport.soap.axis;
 
-import org.mule.tck.providers.soap.AbstractSoapFunctionalTestCase;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
@@ -40,56 +39,67 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
         }
     }
 
+    @Override
     public String getConfigResources()
     {
         return "axis-test-servlet-mule-config.xml";
     }
 
+    @Override
     protected String getRequestResponseEndpoint()
     {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=echo";
     }
 
+    @Override
     protected String getReceiveEndpoint()
     {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getDate";
     }
 
+    @Override
     protected String getReceiveComplexEndpoint()
     {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Fred";
     }
 
+    @Override
     protected String getSendReceiveComplexEndpoint1()
     {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=addPerson";
     }
 
+    @Override
     protected String getSendReceiveComplexEndpoint2()
     {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Dino";
     }
 
+    @Override
     protected String getReceiveComplexCollectionEndpoint()
     {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPeople";
     }
 
+    @Override
     protected String getDispatchAsyncComplexEndpoint1()
     {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=addPerson";
     }
 
+    @Override
     protected String getDispatchAsyncComplexEndpoint2()
     {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getPerson&param=Betty";
     }
 
+    @Override
     protected String getTestExceptionEndpoint()
     {
         return "axis:http://localhost:" + HTTP_PORT + "/services/mycomponent?method=getDate";
     }
 
+    @Override
     protected String getWsdlEndpoint()
     {
         return "http://localhost:" + HTTP_PORT + "/services/mycomponent?wsdl";

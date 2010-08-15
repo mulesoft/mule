@@ -12,7 +12,7 @@ package org.mule.transport.soap.axis.wsdl;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.transport.soap.SoapConstants;
+import org.mule.module.cxf.SoapConstants;
 import org.mule.transport.soap.axis.AxisMessageDispatcher;
 
 import java.util.ArrayList;

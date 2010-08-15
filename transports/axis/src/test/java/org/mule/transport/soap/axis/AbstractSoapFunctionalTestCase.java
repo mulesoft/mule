@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.tck.providers.soap;
+package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
@@ -50,9 +50,9 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     public void testRequestResponse() throws Throwable
     {
         MuleClient client = new MuleClient(muleContext);
-        List results = new ArrayList();
+        List<Object> results = new ArrayList<Object>();
         int number = 1;
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         for (int i = 0; i < number; i++)
         {
             props.put("X-Message-Number", String.valueOf(i));
@@ -146,7 +146,7 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
 
     public void testLocationUrlInWSDL() throws Exception
     {
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send(getWsdlEndpoint(), null, props);

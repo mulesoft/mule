@@ -23,7 +23,7 @@ import org.mule.config.spring.parsers.specific.properties.ListPropertyDefinition
 import org.mule.config.spring.parsers.specific.properties.NestedListDefinitionParser;
 import org.mule.config.spring.parsers.specific.properties.NestedMapWithAttributesDefinitionParser;
 import org.mule.config.spring.parsers.specific.properties.SimplePropertyDefinitionParser;
-import org.mule.transport.soap.SoapConstants;
+import org.mule.module.cxf.SoapConstants;
 import org.mule.transport.soap.axis.AxisConnector;
 import org.mule.transport.soap.axis.AxisMessageReceiver;
 import org.mule.transport.soap.axis.component.WebServiceWrapperComponent;
@@ -42,13 +42,14 @@ public class AxisNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
     public static final String PROPERTIES = "properties";
-    public static final Map USE_MAP = new HashMap();
-    public static final Map STYLE_MAP = new HashMap();
+    public static final Map<String, String> USE_MAP = new HashMap<String, String>();
+    public static final Map<String, String> STYLE_MAP = new HashMap<String, String>();
 
     static
     {
         USE_MAP.put("LITERAL", Use.LITERAL_STR);
         USE_MAP.put("ENCODED", Use.ENCODED_STR);
+        
         STYLE_MAP.put("DOCUMENT", Style.DOCUMENT_STR);
         STYLE_MAP.put("MESSAGE", Style.MESSAGE_STR);
         STYLE_MAP.put("RPC", Style.RPC_STR);

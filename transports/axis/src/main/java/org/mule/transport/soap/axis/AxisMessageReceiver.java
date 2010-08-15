@@ -23,8 +23,6 @@ import org.mule.api.transport.Connector;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageReceiver;
-import org.mule.transport.soap.NamedParameter;
-import org.mule.transport.soap.SoapMethod;
 import org.mule.transport.soap.axis.extensions.MuleMsgProvider;
 import org.mule.transport.soap.axis.extensions.MuleRPCProvider;
 import org.mule.transport.soap.axis.i18n.AxisMessages;
@@ -390,7 +388,7 @@ public class AxisMessageReceiver extends AbstractMessageReceiver
     @Override
     protected void doDispose()
     {
-        // nothing to do               
+        // nothing to do
     }
 
     protected void setOptionIfNotset(SOAPService service, String option, Object value)

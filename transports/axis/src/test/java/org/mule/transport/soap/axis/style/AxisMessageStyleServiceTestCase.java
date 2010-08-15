@@ -14,8 +14,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.soap.NamedParameter;
-import org.mule.transport.soap.SoapMethod;
+import org.mule.transport.soap.axis.NamedParameter;
+import org.mule.transport.soap.axis.SoapMethod;
 import org.mule.util.StringUtils;
 
 import java.util.HashMap;
@@ -31,6 +31,7 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
 {
     private static String expectedResult = "TEST RESPONSE";
 
+    @Override
     public String getConfigResources()
     {
         return "style/axis-mule-message-config.xml";
