@@ -72,6 +72,7 @@ import javax.management.remote.JMXServiceURL;
 import javax.management.remote.rmi.RMIConnectorServer;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -83,6 +84,7 @@ public class JmxAgent extends AbstractAgent
     public static final String NAME = "jmx-agent";
 
     public static final String DEFAULT_REMOTING_URI = "service:jmx:rmi:///jndi/rmi://localhost:1099/server";
+    
     // populated with values below in a static initializer
     public static final Map<String, String> DEFAULT_CONNECTOR_SERVER_PROPERTIES;
 
@@ -186,7 +188,6 @@ public class JmxAgent extends AbstractAgent
                 }
                 return;
             }
-            //initRMI();
         }
         catch (Exception e)
         {
@@ -266,7 +267,6 @@ public class JmxAgent extends AbstractAgent
                 }
             }
         }
-
     }
 
     public void start() throws MuleException
@@ -353,7 +353,7 @@ public class JmxAgent extends AbstractAgent
     }
 
     protected void registerStatisticsService() throws NotCompliantMBeanException, MBeanRegistrationException,
-            InstanceAlreadyExistsException, MalformedObjectNameException
+        InstanceAlreadyExistsException, MalformedObjectNameException
     {
         ObjectName on = jmxSupport.getObjectName(String.format("%s:%s", jmxSupport.getDomainName(muleContext, !containerMode), StatisticsServiceMBean.DEFAULT_JMX_NAME));
         StatisticsService service = new StatisticsService();
@@ -381,7 +381,7 @@ public class JmxAgent extends AbstractAgent
     }
 
     protected void registerMuleService() throws NotCompliantMBeanException, MBeanRegistrationException,
-            InstanceAlreadyExistsException, MalformedObjectNameException
+        InstanceAlreadyExistsException, MalformedObjectNameException
     {
         ObjectName on = jmxSupport.getObjectName(String.format("%s:%s", jmxSupport.getDomainName(muleContext, !containerMode), MuleServiceMBean.DEFAULT_JMX_NAME));
         if (muleContext.getConfiguration().isContainerMode() && mBeanServer.isRegistered(on))
@@ -406,7 +406,7 @@ public class JmxAgent extends AbstractAgent
     }
 
     protected void registerServiceServices() throws NotCompliantMBeanException, MBeanRegistrationException,
-            InstanceAlreadyExistsException, MalformedObjectNameException
+        InstanceAlreadyExistsException, MalformedObjectNameException
     {
         for (Service service : muleContext.getRegistry().lookupObjects(Service.class))
         {
@@ -422,7 +422,7 @@ public class JmxAgent extends AbstractAgent
     }
 
     protected void registerEndpointServices() throws NotCompliantMBeanException, MBeanRegistrationException,
-            InstanceAlreadyExistsException, MalformedObjectNameException
+        InstanceAlreadyExistsException, MalformedObjectNameException
     {
         for (Connector connector : muleContext.getRegistry().lookupObjects(Connector.class))
         {
@@ -470,11 +470,8 @@ public class JmxAgent extends AbstractAgent
         return fullName.toString();
     }
 
-    protected void registerConnectorServices() throws
-            MalformedObjectNameException,
-            NotCompliantMBeanException,
-            MBeanRegistrationException,
-            InstanceAlreadyExistsException
+    protected void registerConnectorServices() throws MalformedObjectNameException,
+        NotCompliantMBeanException, MBeanRegistrationException, InstanceAlreadyExistsException
     {
         for (Connector connector : muleContext.getRegistry().lookupObjects(Connector.class))
         {
@@ -686,7 +683,7 @@ public class JmxAgent extends AbstractAgent
         }
     }
 
-        protected class MuleContextStoppedListener implements MuleContextNotificationListener<MuleContextNotification>
+    protected class MuleContextStoppedListener implements MuleContextNotificationListener<MuleContextNotification>
     {
 
         public void onNotification(MuleContextNotification notification)

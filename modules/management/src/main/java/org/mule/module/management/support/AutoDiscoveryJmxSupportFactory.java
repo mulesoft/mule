@@ -90,7 +90,7 @@ public class AutoDiscoveryJmxSupportFactory implements JmxSupportFactory
      */
     protected boolean isModernSpecAvailable ()
     {
-        Class clazz = ObjectName.class;
+        Class<ObjectName> clazz = ObjectName.class;
         // method escape() is available since JMX 1.2
         Method method = ClassUtils.getMethod(clazz, "quote", new Class[]{String.class});
 
