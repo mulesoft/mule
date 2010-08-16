@@ -12,7 +12,6 @@ package org.mule.module.management.agent;
 import org.mule.AbstractAgent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.agent.Agent;
 import org.mule.api.context.notification.MuleContextNotificationListener;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
@@ -51,10 +50,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.ExportException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -150,18 +147,6 @@ public class JmxAgent extends AbstractAgent
         {
             return "JMX Agent";
         }
-    }
-
-    /**
-     * The JmxAgent needs a RmiRegistryAgent to be started before it can properly work.
-     */
-    @Override
-    public List<Class<? extends Agent>> getDependentAgents()
-    {
-        // use an extra var to explicitly specify the correct generics type
-        List<Class<? extends Agent>> list = new ArrayList<Class<? extends Agent>>(1);
-        list.add(RmiRegistryAgent.class);
-        return list;
     }
 
     /**

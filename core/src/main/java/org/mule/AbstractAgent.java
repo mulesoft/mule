@@ -13,9 +13,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.api.context.MuleContextAware;
 
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Implements common methods for all Agents. Importantly, the Management context is made available to Agents that
  * extend this.
@@ -45,11 +42,6 @@ public abstract class AbstractAgent implements Agent, MuleContextAware
     public String getDescription()
     {
         return name;
-    }
-
-    public List<Class<? extends Agent>> getDependentAgents()
-    {
-        return Collections.emptyList();
     }
 
     public void setMuleContext(MuleContext context)

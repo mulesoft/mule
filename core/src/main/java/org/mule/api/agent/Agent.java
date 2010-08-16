@@ -13,8 +13,6 @@ package org.mule.api.agent;
 import org.mule.api.NamedObject;
 import org.mule.api.lifecycle.Lifecycle;
 
-import java.util.List;
-
 /**
  * <code>Agent</code> is a server plugin that can be initialised, started and
  * destroyed along with the MuleContext itself. Agents can initialise or bind to
@@ -28,12 +26,4 @@ public interface Agent extends Lifecycle, NamedObject
      * @return a 1 line description of the agent.
      */
     String getDescription();
-
-    
-    /**
-     * @return List of Class objects (agent classes) that this Agent requires to be
-     *          started before it can start itself. The implementation of this class may never
-     *          return <code>null</code>.
-     */
-    List<Class<? extends Agent>> getDependentAgents();
 }
