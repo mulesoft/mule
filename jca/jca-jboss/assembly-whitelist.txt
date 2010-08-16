@@ -55,8 +55,6 @@ dom4j-1.6.1-osgi
 FastInfoset-1.2.3
 geronimo-stax-api_1.0_spec-1.0.1
 groovy-all-1.6.7
-guice-all-2.0
-guiceyfruit-core-2.0
 hibernate-core-3.3.2.GA
 ibeans-core-1.0-dev-20100804
 ibeans-annotations-api-0.9
@@ -97,7 +95,6 @@ mule-module-atom
 mule-module-builders
 mule-module-client
 mule-module-cxf
-mule-module-guice
 mule-module-ibeans
 mule-module-jaas
 mule-module-jca-core
