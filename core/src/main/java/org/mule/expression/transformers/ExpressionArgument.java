@@ -19,8 +19,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.expression.ExpressionConfig;
 import org.mule.transformer.types.DataTypeFactory;
 
-import java.util.Collection;
-
 /**
  * TODO
  */
@@ -29,13 +27,13 @@ public class ExpressionArgument implements MuleContextAware
     private ExpressionConfig expressionConfig = new ExpressionConfig();
     private String name;
     private boolean optional;
-    private Class returnClass;
+    private Class<?> returnClass;
     protected ClassLoader expressionEvaluationClassLoader = ExpressionArgument.class.getClassLoader();
-
     private MuleContext muleContext;
 
     public ExpressionArgument()
     {
+        super();
     }
 
     public ExpressionArgument(String name, ExpressionConfig expressionConfig, boolean optional)
@@ -43,7 +41,8 @@ public class ExpressionArgument implements MuleContextAware
         this(name, expressionConfig, optional, null);
     }
 
-    public ExpressionArgument(String name, ExpressionConfig expressionConfig, boolean optional, Class returnClass)
+    public ExpressionArgument(String name, ExpressionConfig expressionConfig, boolean optional, 
+        Class<?> returnClass)
     {
         this.expressionConfig = expressionConfig;
         this.name = name;
@@ -133,7 +132,8 @@ public class ExpressionArgument implements MuleContextAware
                 //If the return type does not match, lets attempt to transform it before throwing an error
                 try
                 {
-                    Transformer t = muleContext.getRegistry().lookupTransformer(DataTypeFactory.createFromObject(result), DataTypeFactory.create(getReturnClass()));
+                    Transformer t = muleContext.getRegistry().lookupTransformer(
+                        DataTypeFactory.createFromObject(result), DataTypeFactory.create(getReturnClass()));
                     result = t.transform(result);
                 }
                 catch (TransformerException e)
@@ -181,12 +181,12 @@ public class ExpressionArgument implements MuleContextAware
         return expressionConfig.getCustomEvaluator();
     }
 
-    public Class getReturnClass()
+    public Class<?> getReturnClass()
     {
         return returnClass;
     }
 
-    public void setReturnDataType(Class returnClass)
+    public void setReturnDataType(Class<?> returnClass)
     {
         this.returnClass = returnClass;
     }

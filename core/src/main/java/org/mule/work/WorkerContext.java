@@ -243,7 +243,6 @@ public class WorkerContext implements Work
      */
     public synchronized boolean isTimedOut()
     {
-
         // A value of 0 means that the work never times out.
         // ??? really?
         if (0 == startTimeOut || startTimeOut == MuleWorkManager.INDEFINITE)

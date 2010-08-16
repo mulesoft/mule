@@ -70,9 +70,7 @@ public class ScriptComponent extends AbstractComponent
         }
         catch (Exception e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            
+            // leave this catch block in place to help debug classloading issues
             throw e;
         }
     }
