@@ -63,8 +63,6 @@ geronimo-jta_1.0.1B_spec-1.1-osgi
 geronimo-stax-api_1.0_spec-1.0.1
 geronimo-ws-metadata_2.0_spec-1.1.2
 groovy-all-1.6.7
-guice-all-2.0
-guiceyfruit-core-2.0
 hibernate-core-3.3.2.GA
 ibeans-core-1.0-dev-20100804
 ibeans-annotations-api-0.9
@@ -113,7 +111,6 @@ mule-module-boot
 mule-module-builders
 mule-module-client
 mule-module-cxf
-mule-module-guice
 mule-module-ibeans
 mule-module-jaas
 mule-module-jbossts
