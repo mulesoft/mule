@@ -34,4 +34,10 @@ public class LocaleMessage extends MessageFactory
             low, volume, previousClose };
         return factory.getString(BUNDLE_PATH, 1, params);
     }
+
+    @Override
+    protected ClassLoader getClassLoader()
+    {
+        return getClass().getClassLoader();
+    }
 }
