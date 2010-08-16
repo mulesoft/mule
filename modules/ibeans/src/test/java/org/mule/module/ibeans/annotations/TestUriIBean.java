@@ -1,5 +1,5 @@
 /*
- * $Id: TestUriIBean.java 107 2009-10-21 22:02:05Z ross $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

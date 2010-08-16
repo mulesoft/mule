@@ -1,5 +1,5 @@
 /*
- * $Id: DynamicRequestInterfaceBinding.java 174 2009-11-07 20:36:32Z ross $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: DynamicRequestEndpoint.java 28 2009-09-21 20:07:36Z ross $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

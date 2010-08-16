@@ -1,5 +1,5 @@
 /*
- * $Id: CallOutboundEndpoint.java 194 2009-11-17 13:51:41Z ross $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

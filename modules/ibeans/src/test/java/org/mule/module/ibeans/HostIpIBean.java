@@ -1,5 +1,5 @@
 /*
- * $Id: HostIpClient.java 37 2009-10-23 23:30:36Z ross $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

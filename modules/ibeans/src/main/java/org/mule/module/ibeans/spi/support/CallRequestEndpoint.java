@@ -1,5 +1,5 @@
 /*
- * $Id: CallRequestEndpoint.java 25 2009-09-21 17:19:38Z ross $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

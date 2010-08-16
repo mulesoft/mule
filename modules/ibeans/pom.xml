@@ -20,8 +20,6 @@
     <url>http://www.muleforge.org/projects/IBEANS</url>
 
     <dependencies>
-
-
         <dependency>
             <groupId>org.ibeans</groupId>
             <artifactId>ibeans-core</artifactId>
@@ -34,47 +32,39 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-annotations</artifactId>
             <version>${version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${version}</version>
         </dependency>
-
         <!-- Mule Transports -->
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
-
         <!-- Mule Modules -->
-
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-json</artifactId>
@@ -100,5 +90,4 @@
             <artifactId>mockito-all</artifactId>
         </dependency>
     </dependencies>
-
 </project>

@@ -1,5 +1,5 @@
 /*
- * $Id: TestImplicitPropertiesinFactoryIBean.java 113 2009-10-21 23:27:34Z ross $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

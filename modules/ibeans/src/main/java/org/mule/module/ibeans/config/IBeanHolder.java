@@ -1,5 +1,5 @@
 /*
- * $Id: IBeanHolder.java 358 2010-06-13 17:57:22Z ross $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

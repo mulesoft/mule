@@ -1,5 +1,5 @@
 /*
- * $Id: DefaultRequestInterfaceBinding.java 8 2009-09-20 23:49:27Z ross $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
