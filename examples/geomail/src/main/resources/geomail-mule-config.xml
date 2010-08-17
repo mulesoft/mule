@@ -10,15 +10,15 @@
       xmlns:json="http://www.mulesoft.org/schema/mule/json"
       xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
       xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.0/mule-quartz.xsd
-       http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.0/mule-json.xsd
-       http://www.mulesoft.org/schema/mule/imaps http://www.mulesoft.org/schema/mule/imaps/3.0/mule-imaps.xsd
-       http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
-       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.0/mule-xml.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.0/mule-quartz.xsd
+        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.0/mule-json.xsd
+        http://www.mulesoft.org/schema/mule/imaps http://www.mulesoft.org/schema/mule/imaps/3.0/mule-imaps.xsd
+        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.0/mule-xml.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
     <spring:beans>
         <spring:import resource="classpath:components.xml"/>
@@ -50,9 +50,9 @@
     <!-- # Endpoint Definitions -->
 
     <!-- Todo add your email server here, note that Gmail, Yahoo, etc cannot be used since they do not set the sender ip addrsss -->
-    <!--<imaps:endpoint name="Input" host="imap.mycompany.com" user="x" password="y" exchange-pattern="one-way"/>-->
+    <!--<imaps:endpoint name="Input" host="imap.mycompany.com" user="x" password="y"/>-->
 
-    <quartz:endpoint name="quartzTrigger" repeatInterval="2000" jobName="dataGenerator" exchange-pattern="one-way">
+    <quartz:endpoint name="quartzTrigger" repeatInterval="2000" jobName="dataGenerator">
         <quartz:event-generator-job/>
     </quartz:endpoint>
 
@@ -63,7 +63,7 @@
     <vm:endpoint name="Storage" path="channels/storage" exchange-pattern="one-way"/>
     <vm:endpoint name="Aggregator" path="channels/positions/aggregator" exchange-pattern="one-way"/>
     
-    <ajax:servlet-endpoint name="Output" path="/GEOMAIL" exchange-pattern="one-way">
+    <ajax:servlet-endpoint name="Output" channel="/GEOMAIL">
     	<transformer ref="SenderToJson"/>
     </ajax:servlet-endpoint>
 

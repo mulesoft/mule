@@ -54,6 +54,13 @@
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ajax</artifactId>
             <version>${muleVersion}</version>
+            <exclusions>
+                <!-- this example runs on tomcat and thus may not package any servlet api -->
+                <exclusion>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
