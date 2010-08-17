@@ -59,7 +59,7 @@ public class ChildEndpointDefinitionParser extends ChildDefinitionParser
     public String getPropertyName(Element e)
     {
         String parent = e.getParentNode().getLocalName().toLowerCase();
-        if ("inbound-endpoint".equals(e.getLocalName()))
+        if (e.getLocalName() != null && e.getLocalName().toLowerCase().endsWith("inbound-endpoint"))
         {
             return "messageSource";
         }
