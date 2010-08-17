@@ -34,7 +34,6 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
@@ -91,6 +90,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected EndpointMessageProcessorChainFactory messageProcessorsFactory;
     protected List<MessageProcessor> messageProcessors = new LinkedList<MessageProcessor>();
     protected List<MessageProcessor> responseMessageProcessors = new LinkedList<MessageProcessor>();
+    protected List<Transformer> transformers = new LinkedList<Transformer>();
+    protected List<Transformer> responseTransformers = new LinkedList<Transformer>();
     protected Boolean disableTransportTransformer;
     protected String mimeType;
 
@@ -178,6 +179,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         addTransformersFromUri(endpointURI);
         addResponseTransformersFromUri(endpointURI);
+        addTransformers();
+        addResponseTransformers();
 
         Connector connector = getConnector();
         if (connector != null && !connector.supportsProtocol(endpointURI.getFullScheme()))
@@ -238,6 +241,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         addTransformersFromUri(endpointURI);
         addResponseTransformersFromUri(endpointURI);
+        addTransformers();
+        addResponseTransformers();
 
         Connector connector = getConnector();
         if (connector != null && !connector.supportsProtocol(getScheme()))
@@ -521,6 +526,16 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
             }
         }
     }
+    
+    protected void addTransformers() 
+    {
+        messageProcessors.addAll(transformers);
+    }
+
+    protected void addResponseTransformers() 
+    {
+        responseMessageProcessors.addAll(responseTransformers);
+    }
 
     protected String getMimeType()
     {
@@ -635,16 +650,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     /** @deprecated Use addMessageProcessor() */
     public void addTransformer(Transformer transformer)
     {
-    	this.messageProcessors.add(transformer);
+        this.transformers.add(transformer);
     }
 
     /** @deprecated Use setMessageProcessors() */
     public void setTransformers(List<Transformer> transformers)
     {
-        if (transformers != null && !transformers.isEmpty())
-        {
-            this.messageProcessors.addAll(transformers);
-        }
+        this.transformers = transformers;
     }
 
     protected EndpointMessageProcessorChainFactory getMessageProcessorsFactory()
@@ -662,16 +674,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     /** @deprecated Use addResponseMessageProcessor() */
     public void addResponseTransformer(Transformer transformer)
     {
-    	this.responseMessageProcessors.add(transformer);
+        this.responseTransformers.add(transformer);
     }
 
     /** @deprecated Use setResponseMessageProcessors() */
     public void setResponseTransformers(List<Transformer> transformers)
     {
-        if (transformers != null && !transformers.isEmpty())
-        {
-            this.responseMessageProcessors.addAll(transformers);
-        }
+        this.responseTransformers = transformers;
     }
 
     public void addMessageProcessor(MessageProcessor messageProcessor)
@@ -868,6 +877,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         builder.setRegistryId(registryId);
         builder.setMuleContext(muleContext);
         builder.setRetryPolicyTemplate(retryPolicyTemplate);
+        builder.setTransformers(transformers);
+        builder.setResponseTransformers(responseTransformers);
 
         if (deleteUnacceptedMessages != null)
         {

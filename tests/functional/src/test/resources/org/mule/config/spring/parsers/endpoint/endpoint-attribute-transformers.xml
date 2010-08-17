@@ -40,5 +40,26 @@
                 </pass-through-router>
             </outbound>
         </service>
+        
+        <service name="transformerRefsWithChildProcessors">
+            <inbound>
+                <inbound-endpoint address="test://ep4" transformer-refs="t1" responseTransformer-refs="rt1">
+                    <append-string-transformer message="12"/>
+                    <response>
+                        <append-string-transformer message="12"/>
+                    </response>
+                </inbound-endpoint>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint address="test://ep5" transformer-refs="t1" responseTransformer-refs="rt1">
+                        <message-properties-transformer/>
+                        <response>
+                            <message-properties-transformer/>
+                        </response>
+                    </outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
     </model>
 </mule>

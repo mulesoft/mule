@@ -54,6 +54,9 @@ public class EndpointURIEndpointBuilder extends AbstractEndpointBuilder
         responseMessageProcessors = global.responseMessageProcessors;
         mimeType = global.mimeType;
         disableTransportTransformer = global.disableTransportTransformer;
+        transformers = global.transformers;
+        responseTransformers = global.responseTransformers;
+
     }
 
     public EndpointURIEndpointBuilder(URIBuilder builder)
