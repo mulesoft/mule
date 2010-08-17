@@ -35,9 +35,9 @@ public class HttpRequestToBook extends AbstractMessageTransformer
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
-        String author = message.getOutboundProperty("author");
-        String title = message.getOutboundProperty("title");
-        String price = message.getOutboundProperty("price");
+        String author = message.getInboundProperty("author");
+        String title = message.getInboundProperty("title");
+        String price = message.getInboundProperty("price");
 
         if (StringUtils.isBlank(author))
         {
