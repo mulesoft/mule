@@ -33,7 +33,7 @@
     </xsl:template>
 
     <xsl:template match="ipLocation">
-        <xsl:variable name="pos" select="gml:PointProperty/gml:Point/gml:coordinates"/>
+        <xsl:variable name="pos" select="gml:pointProperty/gml:Point/gml:coordinates"/>
         <xsl:variable name="lon" select="substring-before($pos, ',')"/>
         <xsl:variable name="lat" select="substring-after($pos, ',')"/>
         <latitude>
