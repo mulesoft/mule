@@ -34,7 +34,7 @@
 
     <servlet>
         <servlet-name>muleResources</servlet-name>
-        <servlet-class>org.mule.transport.ajax.MuleJarResourcesServlet</servlet-class>
+        <servlet-class>org.mule.transport.servlet.JarResourceServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
