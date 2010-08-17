@@ -68,7 +68,6 @@
     </ajax:servlet-endpoint>
 
     <model>
-
         <service name="DataGeneratorMailService">
             <description>
                 A service used to create test data.  It uses a quartz endpoint to trigger the test method and generates
@@ -129,7 +128,6 @@
                     <filter ref="inCacheFilter"/>
                 </filtering-router>
             </outbound>
-
         </service>
 
         <service name="HostipInfoService">
@@ -157,7 +155,6 @@
             <default-service-exception-strategy>
                 <outbound-endpoint ref="Fraudlabs"/>
             </default-service-exception-strategy>
-
         </service>
 
         <service name="FraudlabsService">
@@ -182,7 +179,6 @@
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
-
         </service>
 
         <service name="StorageService">
@@ -224,7 +220,5 @@
                 </pass-through-router>
             </outbound>
         </service>
-
     </model>
-
 </mule>

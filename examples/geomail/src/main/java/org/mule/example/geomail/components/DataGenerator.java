@@ -28,7 +28,7 @@ public class DataGenerator implements Callable
     {
         eventContext.getMessage().setOutboundProperty("from.email.address", "testdatagenerator@geomail.com");
 
-        // Create 3 for each run since many addresses will not be valid
+        // Create multiple IPs for each run since many addresses will not be valid
         List<String> ipAddresses = new ArrayList<String>(batchSize);
         for (int i = 0; i < batchSize; i++)
         {

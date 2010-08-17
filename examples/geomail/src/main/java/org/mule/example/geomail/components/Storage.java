@@ -30,23 +30,22 @@ public class Storage implements Callable
 
     public Object onCall(MuleEventContext context) throws Exception
     {
-
         MuleMessage message = context.getMessage();
 
-        System.err.println("GroupSize: " + message.getCorrelationGroupSize());
-        System.err.println("Correlation ID: " + message.getCorrelationId());
-        System.err.println("Sequence Number: " + message.getCorrelationSequence());
-
-        String ip = message.getOutboundProperty("ip");
-        if (ip == null)
-        {
-            throw new IllegalStateException("'ip' property should have been set on MuleMessage.");
-        }
+        log.info("GroupSize: " + message.getCorrelationGroupSize());
+        log.info("Correlation ID: " + message.getCorrelationId());
+        log.info("Sequence Number: " + message.getCorrelationSequence());
+        
+//        String ip = message.getOutboundProperty("ip");
+//        if (ip == null)
+//        {
+//            throw new IllegalStateException("'ip' property should have been set on MuleMessage.");
+//        }
 
         String from = message.getOutboundProperty("from.email.address");
 
         Sender sender = (Sender) message.getPayload();
-        sender.setIp(ip);
+//        sender.setIp(ip);
         sender.setEmail(from);
 
         if (getSenderDao().getSender(sender.getIp()) != null)

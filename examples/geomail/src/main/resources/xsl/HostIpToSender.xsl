@@ -11,31 +11,31 @@
         </sender>
     </xsl:template>
 
-    <xsl:template match="hostip:HostipLookupResultSet">
+    <xsl:template match="/HostipLookupResultSet">
         <xsl:apply-templates select="gml:featureMember"/>
     </xsl:template>
 
     <xsl:template match="gml:featureMember">
-        <xsl:apply-templates select="hostip:Hostip"/>
+        <xsl:apply-templates select="Hostip"/>
     </xsl:template>
 
-    <xsl:template match="hostip:Hostip">
+    <xsl:template match="Hostip">
         <locationName>
             <xsl:value-of select="gml:name"/>
         </locationName>
         <countryName>
-            <xsl:value-of select="hostip:countryName"/>
+            <xsl:value-of select="countryName"/>
         </countryName>
-        <xsl:apply-templates select="hostip:ipLocation"/>
+        <ip>
+            <xsl:value-of select="ip"/>
+        </ip>
+        <xsl:apply-templates select="ipLocation"/>
     </xsl:template>
 
-    <xsl:template match="hostip:ipLocation">
+    <xsl:template match="ipLocation">
         <xsl:variable name="pos" select="gml:PointProperty/gml:Point/gml:coordinates"/>
         <xsl:variable name="lon" select="substring-before($pos, ',')"/>
         <xsl:variable name="lat" select="substring-after($pos, ',')"/>
-        <ip>
-            <xsl:value-of select="@ip"/>
-        </ip>
         <latitude>
             <xsl:value-of select="$lat"/>
         </latitude>
@@ -43,6 +43,4 @@
             <xsl:value-of select="$lon"/>
         </longitude>
     </xsl:template>
-
-
 </xsl:stylesheet>

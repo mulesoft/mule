@@ -69,8 +69,8 @@ public class Mail implements Callable
         return result;
     }
 
-    private String getFromIP(ReceivedHeader receivedHeader) {
-
+    private String getFromIP(ReceivedHeader receivedHeader) 
+    {
         String result = null;
 
         Matcher matcher = Pattern.compile(".*\\(.*\\[(.*?)\\]\\)", Pattern.DOTALL).matcher(receivedHeader.getFrom());

@@ -25,12 +25,12 @@ public class IPToSender extends AbstractTransformer
 
     public IPToSender()
     {
-        registerSourceType(String.class);
+        registerSourceType(DataTypeFactory.create(String.class));
         setReturnDataType(DataTypeFactory.create(Sender.class));
     }
 
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         return getSenderDao().getSender((String)src);
     }
