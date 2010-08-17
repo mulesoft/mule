@@ -18,8 +18,8 @@
     <json:json-to-object-transformer name="JsonToObject"/>
 
     <management:publish-notifications ignoreConnectionNotifications="true">
-        <ajax:servlet-outbound-endpoint path="/mule/notifications" transformer-refs="ObjectToJson" 
-            cacheMessages="true" exchange-pattern="one-way">
+        <ajax:servlet-outbound-endpoint channel="/mule/notifications" transformer-refs="ObjectToJson" 
+            cacheMessages="true">
             <or-filter>
                 <payload-type-filter expectedType="org.mule.example.notifications.HeartbeatNotification"/>
                 <payload-type-filter expectedType="org.mule.context.notification.SecurityNotification"/>
@@ -33,7 +33,7 @@
     <model>
         <service name="TestEchoService">
             <inbound>
-                <ajax:servlet-inbound-endpoint path="/services/echo" exchange-pattern="request-response">
+                <ajax:servlet-inbound-endpoint channel="/services/echo">
                     <custom-security-filter class="org.mule.example.notifications.DummySecurityFilter"/>
                 </ajax:servlet-inbound-endpoint>
             </inbound>
