@@ -320,7 +320,7 @@ public final class TemplateParser
     }
 
 
-    static class PatternInfo
+    public static class PatternInfo
     {
         String name;
         String regEx;
