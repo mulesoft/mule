@@ -15,6 +15,7 @@ import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.util.ClassUtils;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -209,7 +210,7 @@ public class URIBuilder
         OrderedQueryParameters uriQueries = appendAddress(buffer);
         uriQueries.override(queryMap);
         buffer.append(uriQueries.toString());
-        return buffer.toString();
+        return URLDecoder.decode(buffer.toString());
     }
 
     private void appendMeta(StringBuffer buffer)
