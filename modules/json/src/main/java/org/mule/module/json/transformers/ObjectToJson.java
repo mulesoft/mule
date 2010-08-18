@@ -88,7 +88,7 @@ public class ObjectToJson extends AbstractJsonTransformer
     {
         Object src = message.getPayload();
 
-        if(src instanceof String)
+        if (src instanceof String)
         {
             if(isJsonFilter.accept(src))
             {
@@ -101,7 +101,7 @@ public class ObjectToJson extends AbstractJsonTransformer
             }
         }
 
-// Checks if there's an exception
+        // Checks if there's an exception
         if (message.getExceptionPayload() != null && this.isHandleException())
         {
             if (logger.isDebugEnabled())
