@@ -39,7 +39,7 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
 
     private static final long serialVersionUID = -2814979100270307813L;
 
-    private InboundEndpoint endpoint;
+    protected InboundEndpoint endpoint;
     private EndpointURI dynamicEndpointURI;
     private MessageProcessor listener;
     private FlowConstruct flowConstruct;
