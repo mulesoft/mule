@@ -16,9 +16,6 @@ ECHO   2. WSDL
 ECHO   3. SOAP
 SET /P Choice=Select the one you wish to execute and press Enter...
 
-IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -config
-"%MULE_BASE%\bin\mule.bat" -app stockquote-rest
-IF '%Choice%'=='2' call "%MULE_BASE%\bin\mule.bat" -config 
-"%MULE_BASE%\bin\mule.bat" -app stockquote-wsdl
-IF '%Choice%'=='3' call "%MULE_BASE%\bin\mule.bat" -config 
-"%MULE_BASE%\bin\mule.bat" -app stockquote-soap
+IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -app stockquote-rest
+IF '%Choice%'=='2' call "%MULE_BASE%\bin\mule.bat" -app stockquote-wsdl
+IF '%Choice%'=='3' call "%MULE_BASE%\bin\mule.bat" -app stockquote-soap
