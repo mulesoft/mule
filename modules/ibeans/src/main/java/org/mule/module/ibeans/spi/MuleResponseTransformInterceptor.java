@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.module.ibeans.spi.support.DataTypeConverter;
+import org.mule.routing.filters.ExpressionFilter;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.lang.reflect.Method;
@@ -84,8 +85,16 @@ public class MuleResponseTransformInterceptor extends AbstractCallInterceptor
             }
             else
             {
-                Transformer transformer = muleContext.getRegistry().lookupTransformer( DataTypeFactory.createFromObject(result.getMessage()), requiredType);
-                finalResult = transformer.transform(result.getPayload());
+                DataType sourceType = DataTypeFactory.createFromObject(result.getMessage());
+                if(requiredType.isCompatibleWith(sourceType))
+                {
+                    finalResult = result.getPayload();
+                }
+                else
+                {
+                    Transformer transformer = muleContext.getRegistry().lookupTransformer(sourceType, requiredType);
+                    finalResult = transformer.transform(result.getPayload());
+                }
             }
 
 
@@ -102,6 +111,10 @@ public class MuleResponseTransformInterceptor extends AbstractCallInterceptor
             expr = parser.parseUriTokens(ctx.getIBeanConfig().getPropertyParams(), expr);
         }
 
+        if(ctx.getMethod().getReturnType().equals(Boolean.class))
+        {
+            return new ExpressionFilter(expr).accept(((MuleResponseMessage)message).getMessage());
+        }
         return parser.evaluate(expr, message);
     }
 }
