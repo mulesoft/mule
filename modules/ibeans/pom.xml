@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.ibeans</groupId>
             <artifactId>ibeans-core</artifactId>
-            <version>1.0-dev-20100804</version>
+            <version>1.0-dev-20100813</version>
             <exclusions>
                 <!-- we like slf4j -->
                 <exclusion>
