@@ -53,11 +53,6 @@ public class CallOutboundEndpoint extends org.mule.endpoint.DynamicOutboundEndpo
 
     private static final long serialVersionUID = 1861985949279708638L;
 
-    //Need read/write transformers
-//    private List<Transformer> transformers = new ArrayList<Transformer>();
-//    private List<Transformer> responseTransformers = new ArrayList<Transformer>();
-
-
     //The parser used to parse the @Call uri template
     protected TemplateParser parser = TemplateParser.createCurlyBracesStyleParser();
 
@@ -108,7 +103,6 @@ public class CallOutboundEndpoint extends org.mule.endpoint.DynamicOutboundEndpo
                     BeanUtils.populateWithoutFail(cnn, props, false);
                 }
                 EndpointBuilder builder = context.getRegistry().lookupEndpointFactory().getEndpointBuilder(address);
-                builder.setExchangePattern(epData.getMep());
                 builder.setConnector(cnn);
                 builder.setName(epData.getName());
                 builder.setProperties(props);
@@ -156,63 +150,6 @@ public class CallOutboundEndpoint extends org.mule.endpoint.DynamicOutboundEndpo
         }
         return props;
     }
-
-//    @Override
-//    public List getTransformers()
-//    {
-//        if(endpoint instanceof NullOutboundEndpoint)
-//        {
-//            return Collections.emptyList();
-//        }
-//        if (transformers.size() == 0)
-//        {
-//            synchronized (transformers)
-//            {
-//                if (transformers.size() == 0)
-//                {
-//                    List temp = ((AbstractConnector) getConnector()).getDefaultOutboundTransformers(this);
-//                    if (temp != null)
-//                    {
-//                        transformers.addAll(((AbstractConnector) getConnector()).getDefaultOutboundTransformers(this));
-//                        for (Transformer transformer : transformers)
-//                        {
-//                            transformer.setEndpoint(this);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return transformers;
-//    }
-//
-//    @Override
-//    public List getResponseTransformers()
-//    {
-//        if(endpoint instanceof NullOutboundEndpoint)
-//        {
-//            return Collections.emptyList();
-//        }
-//        if (responseTransformers.size() == 0)
-//        {
-//            synchronized (responseTransformers)
-//            {
-//                if (responseTransformers.size() == 0)
-//                {
-//                    List temp = ((AbstractConnector) getConnector()).getDefaultResponseTransformers(this);
-//                    if (temp != null)
-//                    {
-//                        responseTransformers.addAll(temp);
-//                        for (Transformer transformer : responseTransformers)
-//                        {
-//                            transformer.setEndpoint(this);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return responseTransformers;
-//    }
-
 
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
