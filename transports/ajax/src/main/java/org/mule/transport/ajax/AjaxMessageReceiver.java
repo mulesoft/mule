@@ -61,10 +61,8 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver implements Baye
             subscribe(channel, "route");
         }
 
-
         public Object route(Client client, Object data) throws Exception
         {
-            AbstractConnector connector = (AbstractConnector) getConnector();
             MuleMessage messageToRoute = createMuleMessage(data, endpoint.getEncoding());
             messageToRoute.setInvocationProperty(AjaxConnector.COMETD_CLIENT, client);
 
@@ -75,7 +73,8 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver implements Baye
             //Mule does not invoke the replyTo handler if an error occurs, but in this case we want it to.
             if ((message != null && message.getExceptionPayload() == null) && replyTo != null)
             {
-                connector.getReplyToHandler(endpoint).processReplyTo(RequestContext.getEvent(), message, replyTo);
+                AbstractConnector conn = (AbstractConnector) getConnector();
+                conn.getReplyToHandler(endpoint).processReplyTo(RequestContext.getEvent(), message, replyTo);
             }
             return null;
         }

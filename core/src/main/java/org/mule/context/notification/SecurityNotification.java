@@ -11,14 +11,10 @@
 package org.mule.context.notification;
 
 import org.mule.api.context.notification.ServerNotification;
+import org.mule.api.security.SecurityException;
 
 /**
- * <code>SecurityNotification</code> is fired when a request for authorisation
- * occurs. The event may denote successful access or denied access depending on the
- * type of event. Subscribing to these notifications developers can maintain an
- * access log, block clients, etc.
- * 
- * @see org.mule.api.MuleContext
+ * <code>SecurityNotification</code> is fired when a request for authorisation failed.
  */
 public class SecurityNotification extends ServerNotification
 {
@@ -29,16 +25,18 @@ public class SecurityNotification extends ServerNotification
 
     public static final int SECURITY_AUTHENTICATION_FAILED = SECURITY_EVENT_ACTION_START_RANGE + 1;
 
-    static {
+    static
+    {
         registerAction("authentication failed", SECURITY_AUTHENTICATION_FAILED);
     }
 
-    public SecurityNotification(org.mule.api.security.SecurityException message, int action)
+    public SecurityNotification(SecurityException message, int action)
     {
         super(message.getDetailedMessage(), action);
         resourceIdentifier = message.getClass().getName();
     }
 
+    @Override
     public String getType()
     {
         return TYPE_WARNING;

@@ -84,7 +84,7 @@ public class ObjectToJson extends AbstractJsonTransformer
 
         if (src instanceof String)
         {
-            if(isJsonFilter.accept(src))
+            if (isJsonFilter.accept(src))
             {
                 //Nothing to transform
                 return src;
