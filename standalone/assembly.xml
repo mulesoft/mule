@@ -214,15 +214,6 @@
         <directory>../../examples/loanbroker/esb/dist</directory>
         <outputDirectory>examples/loanbroker/esb</outputDirectory>
     </fileSet>
-    <!-- OpenEJB needs a direct path to the openejb.conf file (i.e., it can't find it from within a jar) -->
-    <fileSet>
-        <directory>../../examples/loanbroker/esb/src/main/resources</directory>
-        <outputDirectory>lib/user</outputDirectory>
-        <includes>
-            <include>openejb.conf</include>
-            <include>castor.properties</include>
-        </includes>
-    </fileSet>
     <!-- LoanBroker ESN -->
     <fileSet>
         <directory>../../examples/loanbroker/esn/dist</directory>
