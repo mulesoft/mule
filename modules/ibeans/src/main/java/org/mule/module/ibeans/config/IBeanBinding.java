@@ -21,7 +21,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.construct.SimpleFlowConstruct;
 import org.mule.module.ibeans.spi.MuleCallAnnotationHandler;
 import org.mule.module.ibeans.spi.MuleIBeansPlugin;
 import org.mule.module.ibeans.spi.support.DynamicRequestInterfaceBinding;
@@ -43,9 +42,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.ibeans.annotation.Call;
 import org.ibeans.annotation.Template;
+import org.ibeans.annotation.param.Body;
+import org.ibeans.annotation.param.BodyParam;
 import org.ibeans.annotation.param.HeaderParam;
-import org.ibeans.annotation.param.Payload;
-import org.ibeans.annotation.param.PayloadParam;
 import org.ibeans.api.IBeanInvoker;
 import org.ibeans.api.IBeansException;
 import org.ibeans.api.channel.HTTP;
@@ -65,13 +64,13 @@ public class IBeanBinding implements InterfaceBinding
     // The endpoint used to actually dispatch the message
     protected OutboundEndpoint endpoint;
 
-    protected SimpleFlowConstruct flow;
+    protected IBeanFlowConstruct flow;
 
     protected MuleIBeansPlugin plugin;
     
     protected MuleContext muleContext;
 
-    public IBeanBinding(SimpleFlowConstruct flow, MuleIBeansPlugin plugin)
+    public IBeanBinding(IBeanFlowConstruct flow, MuleIBeansPlugin plugin)
     {
         this.flow = flow;
         this.muleContext = this.flow.getMuleContext();
@@ -100,7 +99,7 @@ public class IBeanBinding implements InterfaceBinding
         }
         catch (MuleException e)
         {
-            throw new MessagingException(e.getI18nMessage(), event.getMessage(), e);
+            throw new MessagingException(e.getI18nMessage(), event, e);
         }
     }
 
@@ -120,6 +119,8 @@ public class IBeanBinding implements InterfaceBinding
         try
         {
             IBeanInvoker<MuleCallAnnotationHandler, TemplateAnnotationHandler> invoker = plugin.getIBeanInvoker();
+            invoker.getCallHandler().setFlow(flow);
+
             List<AnnotationMetaData> annos = AnnotationUtils.getAllMethodAnnotations(getInterface());
             for (AnnotationMetaData metaData : annos)
             {
@@ -159,11 +160,11 @@ public class IBeanBinding implements InterfaceBinding
                             //The other way to handle this is to introduce a new annotation to explicitly handle this (See the Get annotation).
                             //The issue is it may be difficult for the user to understand the difference between @Call and @Get. Instead we figure it out
                             //here.
-                            for (int x = 0; i < method.getParameterAnnotations().length; x++)
+                            for (int x = 0; x < method.getParameterAnnotations().length; x++)
                             {
                                 ann = method.getParameterAnnotations()[x][0];
-                                if (ann.annotationType().equals(Payload.class) ||
-                                        ann.annotationType().equals(PayloadParam.class) ||
+                                if (ann.annotationType().equals(Body.class) ||
+                                        ann.annotationType().equals(BodyParam.class) ||
                                         ann.annotationType().equals(HeaderParam.class))
                                 {
 
@@ -196,8 +197,8 @@ public class IBeanBinding implements InterfaceBinding
                                 boolean post = false;
                                 for (AnnotationMetaData data : temp)
                                 {
-                                    if (data.getAnnotation().annotationType().equals(Payload.class) ||
-                                            data.getAnnotation().annotationType().equals(PayloadParam.class))
+                                    if (data.getAnnotation().annotationType().equals(Body.class) ||
+                                            data.getAnnotation().annotationType().equals(BodyParam.class))
                                     {
                                         post = true;
                                         break;
