@@ -372,9 +372,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             {
                 Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(
                     defaultInboundTransformer, ClassUtils.NO_ARGS, classLoader);
-                newTransformer.setName(newTransformer.getName() + "#" + hashCode());
+                newTransformer.setName(newTransformer.getName() + "#" + newTransformer.hashCode());
                 newTransformer.setEndpoint(endpoint);
-                muleContext.getRegistry().registerObject(newTransformer.getName(), newTransformer);
                 return CollectionUtils.singletonList(newTransformer);
             }
             catch (Exception e)
@@ -396,9 +395,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             {
                 Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(
                     defaultOutboundTransformer, ClassUtils.NO_ARGS, classLoader);
-                newTransformer.setName(newTransformer.getName() + "#" + hashCode());
+                newTransformer.setName(newTransformer.getName() + "#" + newTransformer.hashCode());
                 newTransformer.setEndpoint(endpoint);
-                muleContext.getRegistry().registerObject(newTransformer.getName(), newTransformer);
                 return CollectionUtils.singletonList(newTransformer);
             }
             catch (Exception e)
@@ -420,9 +418,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             {
                 Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(
                     defaultResponseTransformer, ClassUtils.NO_ARGS, classLoader);
-                newTransformer.setName(newTransformer.getName() + "#" + hashCode());
+                newTransformer.setName(newTransformer.getName() + "#" + newTransformer.hashCode());
                 newTransformer.setEndpoint(endpoint);
-                muleContext.getRegistry().registerObject(newTransformer.getName(), newTransformer);
                 return CollectionUtils.singletonList(newTransformer);
             }
             catch (Exception e)
