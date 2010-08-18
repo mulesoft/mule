@@ -43,7 +43,6 @@ import javax.activation.MimeTypeParseException;
 import javax.xml.transform.stream.StreamSource;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -86,9 +85,14 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
 
     /**
      * Determines whether the transformer will throw an exception if the message
-     * passed is is not supported or the return tye is incorrect
+     * passed is is not supported
      */
     private boolean ignoreBadInput = false;
+
+    /**
+     * Allows a transformer to return a null result
+     */
+    private boolean allowNullReturn = false;
 
     /*
      *  Mime type and encoding for transformer output
@@ -122,6 +126,12 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
     
     protected Object checkReturnClass(Object object) throws TransformerException
     {
+        //Null is a valid return type
+        if(object==null || object instanceof NullPayload && isAllowNullReturn())
+        {
+            return object;
+        }
+
         if (returnType != null)
         {
             DataType<?> dt = DataTypeFactory.create(object.getClass());
@@ -278,6 +288,16 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
         {
             returnType.setEncoding(encoding);
         }
+    }
+
+    public boolean isAllowNullReturn()
+    {
+        return allowNullReturn;
+    }
+
+    public void setAllowNullReturn(boolean allowNullReturn)
+    {
+        this.allowNullReturn = allowNullReturn;
     }
 
     @Deprecated

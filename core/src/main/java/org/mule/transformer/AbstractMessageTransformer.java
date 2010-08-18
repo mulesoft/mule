@@ -189,6 +189,13 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
      */
     protected Object checkReturnClass(Object object, MuleEvent event) throws TransformerMessagingException
     {
+
+        //Null is a valid return type
+        if(object==null || object instanceof NullPayload && isAllowNullReturn())
+        {
+            return object;
+        }
+
         if (returnType != null)
         {
             DataType<?> dt = DataTypeFactory.create(object.getClass());
