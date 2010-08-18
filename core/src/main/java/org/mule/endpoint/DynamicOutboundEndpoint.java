@@ -53,7 +53,7 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
     private static final long serialVersionUID = 8861985949279708638L;
 
     /**
-     * THe URI template used to construct the actual URI to send the message to.
+     * The URI template used to construct the actual URI to send the message to.
      */
     protected String uriTemplate;
 
@@ -75,7 +75,7 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
         }
     }
 
-    protected EndpointURI getEndpointURIForMessage(MuleMessage message) throws DispatchException
+    protected EndpointURI getEndpointURIForMessage(MuleEvent event) throws DispatchException
     {
         if (logger.isDebugEnabled())
         {
@@ -85,11 +85,11 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
         String newUriString = uriTemplate;
         try
         {
-            newUriString = parseURIString(newUriString, message);
+            newUriString = parseURIString(newUriString, event.getMessage());
         }
         catch (ExpressionRuntimeException e)
         {
-            throw new DispatchException(message, this, e);
+            throw new DispatchException(event, this, e);
         }
 
         if (logger.isDebugEnabled())
@@ -110,7 +110,7 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
         {
             throw new DispatchException(
                     CoreMessages.templateCausedMalformedEndpoint(uriTemplate, newUriString),
-                    message, this, e);
+                    event, this, e);
         }
 
     }
@@ -123,7 +123,7 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        EndpointURI uri = getEndpointURIForMessage(event.getMessage());
+        EndpointURI uri = getEndpointURIForMessage(event);
         if (endpoint instanceof NullOutboundEndpoint)
         {
             builder.setURIBuilder(new URIBuilder(uri));
@@ -161,19 +161,6 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
         return new Double(Math.random()).intValue();
     }
 
-    static Connector createDynamicConnector(MuleContext muleContext)
-    {
-        try
-        {
-            return new TransportFactory(muleContext).createConnector(DYNAMIC_URI_PLACEHOLDER);
-        }
-        catch (TransportFactoryException e)
-        {
-            //This should never happen
-            throw new MuleRuntimeException(e);
-        }
-    }
-
     protected static class NullOutboundEndpoint extends AbstractEndpoint implements OutboundEndpoint
     {
         NullOutboundEndpoint(MuleContext muleContext)
@@ -195,6 +182,19 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             throw new UnsupportedOperationException("process");
+        }
+
+        static Connector createDynamicConnector(MuleContext muleContext)
+        {
+            try
+            {
+                return new TransportFactory(muleContext).createConnector(DYNAMIC_URI_PLACEHOLDER);
+            }
+            catch (TransportFactoryException e)
+            {
+                //This should never happen
+                throw new MuleRuntimeException(e);
+            }
         }
     }
 
