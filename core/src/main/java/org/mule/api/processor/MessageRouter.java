@@ -31,6 +31,6 @@ public interface MessageRouter extends MessageProcessor
      * @param processor destination message processor to remove
      * @return true if the route was removed
      */
-    boolean removeRoute(MessageProcessor processor);
+    void removeRoute(MessageProcessor processor);
 
 }
