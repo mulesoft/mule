@@ -30,6 +30,7 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
 
     public SecurityFilterMessageProcessor()
     {
+        super();
     }
 
     public SecurityFilterMessageProcessor(EndpointSecurityFilter filter)
@@ -52,11 +53,14 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
             }
             catch (SecurityException e)
             {
-                // TODO MULE-863: Do we need this warning?
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
-                ((AbstractConnector) event.getEndpoint().getConnector()).fireNotification(
-                    new SecurityNotification(e, SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
+                
+                AbstractConnector connector = (AbstractConnector) event.getEndpoint().getConnector();
+                connector.fireNotification(new SecurityNotification(e,
+                    SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
+                
                 event.getFlowConstruct().getExceptionListener().handleException(e, event);
+                
                 event.getMessage().setPayload(e.getLocalizedMessage());
                 event.getMessage().setExceptionPayload(new DefaultExceptionPayload(e));
                 return event;
