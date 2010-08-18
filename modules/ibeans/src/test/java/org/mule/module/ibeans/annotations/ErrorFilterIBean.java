@@ -14,8 +14,8 @@ import org.ibeans.annotation.Template;
 import org.ibeans.annotation.filter.ExpressionErrorFilter;
 import org.ibeans.annotation.filter.JsonErrorFilter;
 import org.ibeans.annotation.filter.XmlErrorFilter;
+import org.ibeans.annotation.param.Body;
 import org.ibeans.annotation.param.HeaderParam;
-import org.ibeans.annotation.param.Payload;
 import org.ibeans.api.CallException;
 
 /**
@@ -27,11 +27,11 @@ import org.ibeans.api.CallException;
 public interface ErrorFilterIBean
 {
     @Template("")
-    public String jsonErrorFilter(@Payload String testData, @HeaderParam("Content-Type") String contentType) throws CallException;
+    public String jsonErrorFilter(@Body String testData, @HeaderParam("Content-Type") String contentType) throws CallException;
 
     @Template("")
-    public String xmlErrorFilter(@Payload String testData, @HeaderParam("Content-Type") String contentType) throws CallException;
+    public String xmlErrorFilter(@Body String testData, @HeaderParam("Content-Type") String contentType) throws CallException;
 
     @Template("")
-    public String regExErrorFilter(@Payload String testData, @HeaderParam("Content-Type") String contentType) throws CallException;
+    public String regExErrorFilter(@Body String testData, @HeaderParam("Content-Type") String contentType) throws CallException;
 }

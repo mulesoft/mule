@@ -20,6 +20,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.message.DefaultExceptionPayload;
+import org.mule.module.ibeans.config.IBeanFlowConstruct;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringMessageUtils;
@@ -46,11 +47,18 @@ public class MuleCallAnnotationHandler implements ClientAnnotationHandler
 
     private MuleContext muleContext;
 
+    private IBeanFlowConstruct flow;
+
     protected Map<String, InterfaceBinding> routers = new HashMap<String, InterfaceBinding>();
 
     public MuleCallAnnotationHandler(MuleContext muleContext)
     {
         this.muleContext = muleContext;
+    }
+
+    public void setFlow(IBeanFlowConstruct flow)
+    {
+        this.flow = flow;
     }
 
     public void addRouterForInterface(InterfaceBinding router)
@@ -123,7 +131,7 @@ public class MuleCallAnnotationHandler implements ClientAnnotationHandler
 
         MuleEvent replyEvent = null;
         MuleMessage reply;
-        MuleSession session = new DefaultMuleSession(muleContext);
+        MuleSession session = new DefaultMuleSession(flow, muleContext);
 
         try
         {
@@ -134,7 +142,7 @@ public class MuleCallAnnotationHandler implements ClientAnnotationHandler
             //Make all exceptions go through the CallException handler
             reply = new DefaultMuleMessage(NullPayload.getInstance(), muleContext);
             reply.setExceptionPayload(new DefaultExceptionPayload(e));
-            e.printStackTrace();
+            return new MuleResponseMessage(reply);
         }
         return new MuleResponseMessage(replyEvent.getMessage());
     }
