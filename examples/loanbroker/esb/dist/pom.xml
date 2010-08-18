@@ -111,10 +111,9 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy tofile="${MULE_HOME}/apps/loanbroker-esb/mule-config.xml" file="${basedir}/target/classes/loan-broker-esb-mule-config.xml"/>
+                                <copy tofile="${MULE_HOME}/apps/loanbroker-esb/mule-config.xml" file="${basedir}/target/classes/loan-broker-esb-mule-config-with-ejb-container.xml"/>
+                                <copy todir="${MULE_HOME}/apps/loanbroker-esb" file="${basedir}/target/classes/openejb.conf"/>
                                 <copy todir="${MULE_HOME}/apps/loanbroker-esb" file="${basedir}/target/classes/mule-deploy.properties"/>
-                                <copy tofile="${MULE_HOME}/apps/loanbroker-ejb/mule-config.xml" file="${basedir}/target/classes/loan-broker-esb-mule-config-with-ejb-container.xml"/>
-                                <copy todir="${MULE_HOME}/apps/loanbroker-ejb" file="${basedir}/target/classes/mule-deploy.properties"/>
                             </tasks>
                         </configuration>
                     </execution>
@@ -134,26 +133,6 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${MULE_HOME}/apps/loanbroker-esb/lib</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${groupId}</groupId>
-                                    <artifactId>${artifactId}</artifactId>
-                                    <version>${version}</version>
-                                    <destFileName>${artifactId}.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-artifact2</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/loanbroker-ejb/lib</outputDirectory>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <artifactItems>

@@ -27,11 +27,10 @@ MULE_LIB=./conf
 export MULE_LIB
 
 echo "The Loan Broker example is available in five flavors:"
-echo "  1. Loan Broker ESB - Ejb via an Endpoint"
-echo "  2. Loan Broker ESB - Managed Ejb Component"
-echo "  3. Loan Broker ESN - sync"
-echo "  4. Loan Broker ESN - async"
-echo "  5. Loan Broker BPM"
+echo "  1. Loan Broker ESB"
+echo "  2. Loan Broker ESN - synchronous"
+echo "  3. Loan Broker ESN - asynchronous"
+echo "  4. Loan Broker BPM"
 echo "Select the one you wish to execute and press Enter..."
 read i
 
@@ -55,29 +54,11 @@ then
     fi
 elif [ 2 = $i ]
 then
-    if [ ! -f "$MULE_BASE/lib/user/${ACTIVEMQ}" ]; then
-       if [ ! -f "$MULE_HOME/lib/user/${ACTIVEMQ}" ]; then
-          MISSING_LIB=1
-       fi
-    fi
-    if [ ! -f "$MULE_BASE/lib/user/${OPENEJB}" ]; then
-       if [ ! -f "$MULE_HOME/lib/user/${OPENEJB}" ]; then
-          MISSING_LIB=1
-       fi
-    fi
-    if [ -z "$MISSING_LIB" ]
-    then
-        # MULE_HOME_UNIX must be set. This is a workaround for windows but since the config relies
-        # on it we need to implement it here, too
-        exec "$MULE_BASE/bin/mule" -app loanbroker-ejb -M-Dmule.home.unix="$MULE_HOME"
-    fi
+    exec "$MULE_BASE/bin/mule" -app loanbroker-esn-sync
 elif [ 3 = $i ]
 then
-    exec "$MULE_BASE/bin/mule" -app loanbroker-esn-sync
-elif [ 4 = $i ]
-then
     exec "$MULE_BASE/bin/mule" -app loanbroker-esn-async
-elif [ 5 = $i ]
+elif [ 4 = $i ]
 then
     if [ ! -f "$MULE_BASE/lib/user/${BSH}" ]; then
        if [ ! -f "$MULE_HOME/lib/user/${BSH}" ]; then

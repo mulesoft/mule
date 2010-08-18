@@ -29,18 +29,16 @@
         <client:remote-endpoint address="tcp://localhost:5555" exchange-pattern="request-response"/>
     </client:remote-dispatcher-agent>
 
-    <context:property-placeholder location="openejb.properties"/>
-
     <spring:beans>
         <jee:remote-slsb id="creditAgencyEJB" jndi-name="local/CreditAgency"
                          business-interface="org.mule.example.loanbroker.credit.CreditAgency">
             <jee:environment>
                 java.naming.factory.initial=org.openejb.client.LocalInitialContextFactory
                 java.naming.provider.url=rmi://localhost:1099
-                openejb.base=${openejb.base}
-                openejb.configuration=${openejb.configuration}
-                logging.conf=${logging.conf}
-                openejb.nobanner=${openejb.nobanner}
+                openejb.base=${mule.base}
+                openejb.configuration=apps/loanbroker-esb/openejb.conf
+		        logging.conf=conf/log4j.properties
+                openejb.nobanner=true
             </jee:environment>
         </jee:remote-slsb>
     </spring:beans>
