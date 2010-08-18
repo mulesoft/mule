@@ -9,7 +9,6 @@
  */
 package org.mule.module.json.transformers;
 
-import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
 
 
@@ -29,17 +28,10 @@ public class JsonStringTestCase extends AbstractMuleTestCase
     }
 
 
-    public void testTryConvertJsonStringToInvalidString() throws Exception
+    public void testTryConvertJsonStringToJustString() throws Exception
     {
         ObjectToJson transformer = createObject(ObjectToJson.class);
-        try
-        {
-            transformer.transform("Hello");
-            fail("String is not valid Json");
-        }
-        catch (TransformerException e)
-        {
-            //expected
-        }
+        //This is still valid json
+        assertEquals("\"Hello\"", transformer.transform("Hello"));
     }
 }

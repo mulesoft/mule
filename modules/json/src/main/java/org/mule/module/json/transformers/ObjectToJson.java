@@ -13,7 +13,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.json.filters.IsJsonFilter;
-import org.mule.module.json.i18n.JsonMessages;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayOutputStream;
@@ -81,18 +80,10 @@ public class ObjectToJson extends AbstractJsonTransformer
     public Object transformMessage(MuleMessage message, String encoding) throws TransformerException
     {
         Object src = message.getPayload();
-
-        if (src instanceof String)
+        if (src instanceof String && isJsonFilter.accept(src))
         {
-            if (isJsonFilter.accept(src))
-            {
-                //Nothing to transform
-                return src;
-            }
-            else
-            {
-                throw new TransformerException(JsonMessages.messageStringIsNotJson(), this);
-            }
+            //Nothing to transform
+            return src;
         }
 
         // Checks if there's an exception
