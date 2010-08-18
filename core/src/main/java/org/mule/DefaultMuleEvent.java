@@ -53,7 +53,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>DefaultMuleEvent</code> represents any data event occuring in the Mule
+ * <code>DefaultMuleEvent</code> represents any data event occurring in the Mule
  * environment. All data sent or received within the Mule environment will be passed
  * between components as an MuleEvent. <p/> The MuleEvent holds some data and provides
  * helper methods for obtaining the data in a format that the receiving Mule component
@@ -108,6 +108,11 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      * Properties cache that only reads properties once from the inbound message and
      * merges them with any properties on the endpoint. The message properties take
      * precedence over the endpoint properties
+     *
+     * @param message
+     * @param endpoint
+     * @param service
+     * @param previousEvent
      */
     public DefaultMuleEvent(MuleMessage message,
                             ImmutableEndpoint endpoint,
@@ -150,8 +155,8 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     /**
      * A helper constructor used to rewrite an event payload
      *
-     * @param message
-     * @param rewriteEvent
+     * @param message The message to use as the current payload of the event
+     * @param rewriteEvent the previous event that will be used as a template for this event
      */
     public DefaultMuleEvent(MuleMessage message, MuleEvent rewriteEvent)
     {
@@ -174,8 +179,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     {
         if (endpoint != null && endpoint.getProperties() != null)
         {
-//            PropertyScope scope = endpoint instanceof OutboundEndpoint ? PropertyScope.OUTBOUND : PropertyScope.INVOCATION;
-
             for (Iterator iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
             {
                 String prop = (String) iterator.next();
@@ -188,29 +191,21 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                 }
             }
         }
-        //TODO MULE-3999. Should session properties be copied to the message?
-//        if (session != null)
-//        {
-//            for (Iterator iterator = session.getPropertyNames(); iterator.hasNext();)
-//            {
-//                String prop = (String) iterator.next();
-//                message.setProperty(prop, session.getProperty(prop), PropertyScope.SESSION);
-//            }
-//        }
 
         setCredentials();
     }
 
     /**
      * This method is used to determine if a property on the previous event should be
-     * ignorred for the next event. This method is here because we don't have proper
-     * scoped handlng of meta data yet The rules are
+     * ignored for the next event. This method is here because we don't have proper
+     * scoped handling of meta data yet The rules are
      * <ol>
-     * <li>If a property is already set on the currect event don't overwrite with the previous event value
-     * <li>If the propery name appears in the ignorredPropertyOverrides list, then we always set it on the new event
+     * <li>If a property is already set on the current event don't overwrite with the previous event value
+     * <li>If the property name appears in the ignoredPropertyOverrides list, then we always set it on the new event
      * </ol>
      *
-     * @param key
+     * @param key The name of the property to ignore
+     * @return true if the property should be ignored, false otherwise
      */
     protected boolean ignoreProperty(String key)
     {
@@ -319,7 +314,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      */
     public String transformMessageToString() throws TransformerException
     {
-        return (String) transformMessage(DataTypeFactory.createWithEncoding(String.class, getEncoding())); 
+        return transformMessage(DataTypeFactory.createWithEncoding(String.class, getEncoding()));
     }
 
     public String getMessageAsString() throws MuleException
@@ -431,7 +426,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      * in the standard way. This allow for client code to override default behaviour.
      * The common reasons for doing this are - 1. The service has more than one send
      * endpoint configured; the service must dispatch to other prviders
-     * programatically by using the service on the current event 2. The service doesn't
+     * programmatically by using the service on the current event 2. The service doesn't
      * send the current event out through a endpoint. i.e. the processing of the
      * event stops in the uMO.
      *
@@ -485,7 +480,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     }
 
     /**
-     * An outputstream can optionally be used to write response data to an incoming
+     * An output stream can optionally be used to write response data to an incoming
      * message.
      *
      * @return an output strem if one has been made available by the message receiver
