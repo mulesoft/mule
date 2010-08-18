@@ -28,7 +28,7 @@ public class LoanBrokerApp extends AbstractLoanBrokerApp
         //LoanBrokerApp loanBrokerApp = new LoanBrokerApp(configFile);
         LoanBrokerApp loanBrokerApp = new LoanBrokerApp();
         // FIXME DZ: need to know if we are running sync/async servers
-        loanBrokerApp.run(false);
+        loanBrokerApp.run(true);
     }
 
     @Override
