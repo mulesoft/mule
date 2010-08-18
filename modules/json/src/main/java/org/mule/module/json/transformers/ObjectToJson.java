@@ -30,12 +30,6 @@ import org.apache.commons.logging.LogFactory;
  * Converts a java object to a JSON encoded object that can be consumed by other languages such as
  * Javascript or Ruby.
  * <p/>
- * The JSON engine can be configured using the jsonConfig attribute. This is an object reference to an
- * instance of: {@link net.sf.json.JsonConfig}. This can be created as a spring bean.
- * <p/>
- * Users can configure a comma-separated list of property names to exclude or include i.e.
- * excludeProperties="address,postcode".
- * <p/>
  * The returnClass for this transformer is always java.lang.String, there is no need to set this.
  */
 public class ObjectToJson extends AbstractJsonTransformer

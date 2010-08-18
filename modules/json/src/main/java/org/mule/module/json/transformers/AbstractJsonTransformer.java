@@ -32,7 +32,7 @@ public abstract class AbstractJsonTransformer extends AbstractMessageTransformer
     @Override
     public void initialise() throws InitialisationException
     {
-        if(mapper==null)
+        if (mapper == null)
         {
             mapper = new ObjectMapper();
         }
