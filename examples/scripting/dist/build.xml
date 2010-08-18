@@ -110,12 +110,15 @@
                   tofile="${dir.mule.home}/apps/scripting-python/classes/greedy.py"/>
             <copy file="conf/python-gbp.properties"
                   tofile="${dir.mule.home}/apps/scripting-python/classes/default-config.properties"/>
-           <copy todir="${dir.mule.home}/apps/scripting-python/lib"
+            <copy todir="${dir.mule.home}/apps/scripting-python/lib"
                   overwrite="true" verbose="true">
                 <fileset dir="${dir.build}/lib">
                     <include name="**/*.jar"/>
                 </fileset>
             </copy>
+            <!-- workaround for MULE-4921 -->
+            <copy file="${dir.build}/lib/jython-engine-1.1-jdk14.jar" todir="${dir.mule.home}/lib/user"/>
+            <copy file="${dir.build}/lib/jython-2.2.1.jar" todir="${dir.mule.home}/lib/user"/>
    </target>
 
    <target name="setup">

@@ -242,6 +242,32 @@
                             </artifactItems>
                         </configuration>
                     </execution>
+                    <!-- workaround for MULE-4921 -->
+                    <execution>
+                        <id>copy-python-artifacts-to-mule-libs</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>javax.script</groupId>
+                                    <artifactId>jython-engine</artifactId>
+                                    <version>1.1</version>
+                                    <classifier>jdk14</classifier>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.python</groupId>
+                                    <artifactId>jython</artifactId>
+                                    <version>2.2.1</version>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
