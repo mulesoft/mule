@@ -14,7 +14,11 @@
         <notification event="COMPONENT-MESSAGE"/>
     </notifications>
 
-    <json:object-to-json-transformer name="ObjectToJson"/>
+    <json:object-to-json-transformer name="ObjectToJson">
+        <json:serialization-mixin targetClass="org.mule.context.notification.ComponentMessageNotification" 
+            mixinClass="org.mule.example.notifications.ComponentMessageNotificationMixin"/>
+    </json:object-to-json-transformer>
+    
     <json:json-to-object-transformer name="JsonToObject"/>
 
     <management:publish-notifications ignoreConnectionNotifications="true">
