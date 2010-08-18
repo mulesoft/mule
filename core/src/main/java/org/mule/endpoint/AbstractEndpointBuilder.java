@@ -417,7 +417,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     protected Connector getDefaultConnector() throws EndpointException
     {
-        return getConnector(uriBuilder.getEndpoint(), muleContext);
+        return getConnector(uriBuilder.getEndpoint());
     }
 
     protected String getName(EndpointURI endpointURI)
@@ -453,7 +453,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                                                : getDefaultDeleteUnacceptedMessages(connector);
     }
 
-    @SuppressWarnings("unused")
     protected boolean getDefaultDeleteUnacceptedMessages(Connector connector)
     {
         return false;
@@ -464,7 +463,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return encoding != null ? encoding : getDefaultEndpointEncoding(connector);
     }
 
-    @SuppressWarnings("unused")
     protected String getDefaultEndpointEncoding(Connector connector)
     {
         return muleContext.getConfiguration().getDefaultEncoding();
@@ -475,7 +473,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return initialState != null ? initialState : getDefaultInitialState(connector);
     }
 
-    @SuppressWarnings("unused")
     protected String getDefaultInitialState(Connector connector)
     {
         return ImmutableEndpoint.INITIAL_STATE_STARTED;
@@ -487,7 +484,6 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
     }
 
-    @SuppressWarnings("unused")
     protected int getDefaultResponseTimeout(Connector connector)
     {
         return muleContext.getConfiguration().getDefaultResponseTimeout();
@@ -563,11 +559,11 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
     }
 
-    private List<Transformer> getTransformersFromString(String transformers) throws TransportFactoryException
+    private List<Transformer> getTransformersFromString(String transformerString) throws TransportFactoryException
     {
         try
         {
-            return TransformerUtils.getTransformers(transformers, muleContext);
+            return TransformerUtils.getTransformers(transformerString, muleContext);
         }
         catch (DefaultMuleException e)
         {
@@ -575,7 +571,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         }
     }
 
-    private Connector getConnector(EndpointURI endpointURI, MuleContext muleContext) throws EndpointException
+    private Connector getConnector(EndpointURI endpointURI) throws EndpointException
     {
         String scheme = getScheme();
         TransportFactory factory = new TransportFactory(muleContext);
@@ -648,15 +644,21 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     }
 
     /** @deprecated Use addMessageProcessor() */
+    @Deprecated
     public void addTransformer(Transformer transformer)
     {
         this.transformers.add(transformer);
     }
 
     /** @deprecated Use setMessageProcessors() */
-    public void setTransformers(List<Transformer> transformers)
+    @Deprecated
+    public void setTransformers(List<Transformer> newTransformers)
     {
-        this.transformers = transformers;
+        if (newTransformers == null)
+        {
+            newTransformers = new LinkedList<Transformer>();
+        }
+        this.transformers = newTransformers;
     }
 
     protected EndpointMessageProcessorChainFactory getMessageProcessorsFactory()
@@ -672,15 +674,21 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     }
 
     /** @deprecated Use addResponseMessageProcessor() */
+    @Deprecated
     public void addResponseTransformer(Transformer transformer)
     {
         this.responseTransformers.add(transformer);
     }
 
     /** @deprecated Use setResponseMessageProcessors() */
-    public void setResponseTransformers(List<Transformer> transformers)
+    @Deprecated
+    public void setResponseTransformers(List<Transformer> newResponseTransformers)
     {
-        this.responseTransformers = transformers;
+        if (newResponseTransformers == null)
+        {
+            newResponseTransformers = new LinkedList<Transformer>();
+        }
+        this.responseTransformers = newResponseTransformers;
     }
 
     public void addMessageProcessor(MessageProcessor messageProcessor)
@@ -688,9 +696,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         messageProcessors.add(messageProcessor);
     }
 
-    public void setMessageProcessors(List<MessageProcessor> messageProcessors)
+    public void setMessageProcessors(List<MessageProcessor> newMessageProcessors)
     {
-        this.messageProcessors = messageProcessors;
+        if (newMessageProcessors == null)
+        {
+            newMessageProcessors = new LinkedList<MessageProcessor>();
+        }
+        this.messageProcessors = newMessageProcessors;
     }
 
     public List<MessageProcessor> getMessageProcessors()
@@ -703,9 +715,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         responseMessageProcessors.add(messageProcessor);
     }
 
-    public void setResponseMessageProcessors(List<MessageProcessor> messageProcessors)
+    public void setResponseMessageProcessors(List<MessageProcessor> newResponseMessageProcessors)
     {
-        this.responseMessageProcessors = messageProcessors;
+        if (newResponseMessageProcessors == null)
+        {
+            newResponseMessageProcessors = new LinkedList<MessageProcessor>();
+        }
+        this.responseMessageProcessors = newResponseMessageProcessors;
     }
 
     public List<MessageProcessor> getResponseMessageProcessors()
