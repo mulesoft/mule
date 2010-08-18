@@ -19,7 +19,7 @@
                 <inbound-endpoint transformer-refs="HttpRequestToParameter" 
                                   address="servlet://restPUTTest"
                                   responseTransformer-refs="PlainTextResponseTransformer"
-                                  exchange-pattern="one-way"/>
+                                  exchange-pattern="request-response"/>
             </inbound>
             <pooled-component>
                 <prototype-object class="org.mule.example.rest.RestTester">

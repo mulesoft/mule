@@ -38,7 +38,7 @@ public class HttpRequestToParameter extends AbstractMessageTransformer
         String payloadParam = message.getOutboundProperty(AbstractReceiverServlet.PAYLOAD_PARAMETER_NAME,
                                                           AbstractReceiverServlet.DEFAULT_PAYLOAD_PARAMETER_NAME);
 
-        String payload = message.getOutboundProperty(payloadParam);
+        String payload = message.getInboundProperty(payloadParam);
         if (payload == null)
         {
             // Plain text
