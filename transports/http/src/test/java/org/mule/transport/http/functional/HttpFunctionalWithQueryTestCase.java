@@ -10,8 +10,8 @@
 
 package org.mule.transport.http.functional;
 
-import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
@@ -20,6 +20,7 @@ import java.util.Map;
 
 public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "http-functional-test-with-query.xml";
@@ -35,7 +36,7 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
     public void testSendWithParams() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "noo");
         props.put("far", "nar");
         MuleMessage result = client.send("clientEndpoint2", null, props);
@@ -45,13 +46,18 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
     public void testSendWithBadParams() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("hoo", "noo");
         props.put("har", "nar");
 
-        MuleMessage result = client.send("clientEndpoint2", null, props);
-        assertNotNull(result);
-        assertNotNull("Parameters on the request do not match up", result.getExceptionPayload());
-        assertTrue(result.getExceptionPayload().getException() instanceof MuleException);
+        try
+        {
+            client.send("clientEndpoint2", null, props);
+            fail("parsing the dynamic endpoint must fail");
+        }
+        catch (DispatchException de)
+        {
+            // this one was expected
+        }
     }
 }
