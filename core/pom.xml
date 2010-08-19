@@ -72,6 +72,7 @@
         <dependency>
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
+            <version>1.5.3</version>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>

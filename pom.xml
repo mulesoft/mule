@@ -337,12 +337,6 @@
             </dependency>
             <dependency>
                 <!-- OSGi-ready -->
-                <groupId>commons-pool</groupId>
-                <artifactId>commons-pool</artifactId>
-                <version>1.5.3</version>
-            </dependency>
-            <dependency>
-                <!-- OSGi-ready -->
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty</artifactId>
                 <version>${jettyVersion}</version>
