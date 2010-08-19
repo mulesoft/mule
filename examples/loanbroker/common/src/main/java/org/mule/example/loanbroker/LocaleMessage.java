@@ -173,4 +173,10 @@ public class LocaleMessage extends MessageFactory
     {
         return factory.getString(BUNDLE_PATH, 46);
     }
+
+    @Override
+    protected ClassLoader getClassLoader()
+    {
+        return getClass().getClassLoader();
+    }
 }
