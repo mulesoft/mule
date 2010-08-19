@@ -297,9 +297,9 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
         routes.add(route);
     }
 
-    public boolean removeRoute(MessageProcessor route)
+    public void removeRoute(MessageProcessor route)
     {
-        return routes.remove(route);
+        routes.remove(route);
     }
 
     public String getReplyTo()

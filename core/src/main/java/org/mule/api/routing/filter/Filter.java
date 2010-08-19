@@ -10,14 +10,13 @@
 
 package org.mule.api.routing.filter;
 
-import org.mule.api.Criteria;
 import org.mule.api.MuleMessage;
 
 /**
  * The <code>Filter</code> interface allows MuleMessage filtering.
  */
 
-public interface Filter extends Criteria
+public interface Filter
 {
     /**
      * Check a given message against this filter.
