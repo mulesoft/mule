@@ -20,6 +20,7 @@ import java.util.Map;
 
 public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "jetty-http-functional-test-with-query.xml";
@@ -28,7 +29,7 @@ public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         MuleMessage result = client.send("clientEndpoint1", null, props);
         assertEquals("boobar", result.getPayloadAsString());
     }
@@ -36,7 +37,7 @@ public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
     public void testSendWithParams() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "noo");
         props.put("far", "nar");
         MuleMessage result = client.send("clientEndpoint2", null, props);
@@ -46,13 +47,18 @@ public class JettyHttpFunctionalWithQueryTestCase extends FunctionalTestCase
     public void testSendWithBadParams() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("hoo", "noo");
         props.put("har", "nar");
 
-        MuleMessage result = client.send("clientEndpoint2", null, props);
-        assertNotNull(result);
-        assertNotNull("Parameters on the request do not match up", result.getExceptionPayload());
-        assertTrue(result.getExceptionPayload().getException() instanceof DispatchException);
+        try
+        {
+            client.send("clientEndpoint2", null, props);
+            fail();
+        }
+        catch (DispatchException ex)
+        {
+            // this one was expected
+        }
     }
 }
