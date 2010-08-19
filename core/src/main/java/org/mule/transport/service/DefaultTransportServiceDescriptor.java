@@ -370,10 +370,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             logger.info("Loading default inbound transformer: " + defaultInboundTransformer);
             try
             {
-                Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(
-                    defaultInboundTransformer, ClassUtils.NO_ARGS, classLoader);
-                newTransformer.setName(newTransformer.getName() + "#" + newTransformer.hashCode());
-                newTransformer.setEndpoint(endpoint);
+                Transformer newTransformer = createTransformer(defaultInboundTransformer, endpoint);
                 return CollectionUtils.singletonList(newTransformer);
             }
             catch (Exception e)
@@ -384,7 +381,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         return Collections.emptyList();
     }
-
+    
     @SuppressWarnings("unchecked")
     public List<Transformer> createOutboundTransformers(ImmutableEndpoint endpoint) throws TransportFactoryException
     {
@@ -393,10 +390,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             logger.info("Loading default outbound transformer: " + defaultOutboundTransformer);
             try
             {
-                Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(
-                    defaultOutboundTransformer, ClassUtils.NO_ARGS, classLoader);
-                newTransformer.setName(newTransformer.getName() + "#" + newTransformer.hashCode());
-                newTransformer.setEndpoint(endpoint);
+                Transformer newTransformer = createTransformer(defaultOutboundTransformer, endpoint);
                 return CollectionUtils.singletonList(newTransformer);
             }
             catch (Exception e)
@@ -416,10 +410,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             logger.info("Loading default response transformer: " + defaultResponseTransformer);
             try
             {
-                Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(
-                    defaultResponseTransformer, ClassUtils.NO_ARGS, classLoader);
-                newTransformer.setName(newTransformer.getName() + "#" + newTransformer.hashCode());
-                newTransformer.setEndpoint(endpoint);
+                Transformer newTransformer = createTransformer(defaultResponseTransformer, endpoint);
                 return CollectionUtils.singletonList(newTransformer);
             }
             catch (Exception e)
@@ -429,6 +420,16 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             }
         }
         return Collections.emptyList();
+    }
+
+    protected Transformer createTransformer(String className, ImmutableEndpoint endpoint) throws Exception
+    {
+        Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(className, 
+            ClassUtils.NO_ARGS, classLoader);
+        newTransformer.setMuleContext(muleContext);
+        newTransformer.setName(newTransformer.getName() + "#" + newTransformer.hashCode());
+        newTransformer.setEndpoint(endpoint);
+        return newTransformer;
     }
 
     public EndpointURIBuilder createEndpointURIBuilder() throws TransportFactoryException
