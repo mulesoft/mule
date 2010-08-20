@@ -31,7 +31,7 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
 
     protected Service service;
     protected MessageProcessor receiveAsyncReplyMessageProcessor;
-    private AtomicReference<ReplyToHandler> cachedReplyToHandler;
+    private AtomicReference<ReplyToHandler> cachedReplyToHandler = new AtomicReference<ReplyToHandler>();
 
 
     public ServiceInternalMessageProcessor(Service service)
