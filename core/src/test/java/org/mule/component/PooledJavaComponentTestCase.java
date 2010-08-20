@@ -232,7 +232,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
         component.stop();
         component.dispose();
 
-        assertNull(lifecycleAdapter.componentObject.get());
+        assertNull(lifecycleAdapter.componentObject);
     }
     
     private PrototypeObjectFactory getDefaultObjectFactory() throws InitialisationException
@@ -282,7 +282,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
     {
         DefaultComponentLifecycleAdapter lifecycleAdapter = 
             (DefaultComponentLifecycleAdapter) component.borrowComponentLifecycleAdaptor();
-        Object obj = lifecycleAdapter.componentObject.get();
+        Object obj = lifecycleAdapter.componentObject;
         
         // there is a slight chance that GC kicks in before we can get a hard reference to the 
         // object. If this occurs, talk do Dirk and Andrew P about how to fix this

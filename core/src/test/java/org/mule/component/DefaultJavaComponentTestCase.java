@@ -57,8 +57,8 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
         component.start();
 
         assertNotSame(
-            ((DefaultComponentLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject.get(),
-            ((DefaultComponentLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject.get());
+            ((DefaultComponentLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject,
+            ((DefaultComponentLifecycleAdapter) component.borrowComponentLifecycleAdaptor()).componentObject);
 
     }
 
@@ -77,7 +77,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
         component.returnComponentLifecycleAdaptor(lifecycleAdapter);
         component.dispose();
 
-        assertNull(lifecycleAdapter.componentObject.get());
+        assertNull(lifecycleAdapter.componentObject);
     }
     
     public void testServicePropogatedLifecycle() throws InitialisationException
