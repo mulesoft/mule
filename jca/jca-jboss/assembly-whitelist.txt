@@ -25,7 +25,7 @@ cryptix-jce-provider-20050328-osgi
 cryptix-message-api-20050405-osgi
 cryptix-openpgp-provider-20050405-osgi
 cryptix-pki-api-20050405-osgi
-cxf-api-2.1.9
+cxf-api-2.1.10
 cxf-common-schemas-2.1.9
 cxf-common-utilities-2.1.9
 cxf-rt-bindings-soap-2.1.9
