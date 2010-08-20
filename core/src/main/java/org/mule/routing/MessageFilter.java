@@ -30,11 +30,14 @@ import org.mule.processor.AbstractFilteringMessageProcessor;
 public class MessageFilter extends AbstractFilteringMessageProcessor
 {
     protected Filter filter;
-    protected MessageProcessor unacceptedMessageProcessor;
-    protected boolean throwOnUnaccepted;
 
+    /** 
+     * For IoC only
+     * @deprecated Use MessageFilter(Filter filter) 
+     */
     public MessageFilter()
     {
+        // empty
     }
 
     public MessageFilter(Filter filter)
@@ -44,11 +47,14 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
 
     /**
      * @param filter
+     * @param throwExceptionOnUnaccepted throw a FilterUnacceptedException when a message is rejected by the filter?
      * @param messageProcessor used to handler unaccepted messages
      */
-    public MessageFilter(Filter filter, MessageProcessor messageProcessor)
+    public MessageFilter(Filter filter, boolean throwExceptionOnUnaccepted, MessageProcessor messageProcessor)
     {
         this.filter = filter;
+        this.throwOnUnaccepted = throwExceptionOnUnaccepted;
+        this.unacceptedMessageProcessor = messageProcessor;
     }
 
     @Override
@@ -69,39 +75,12 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
         }
     }
 
-    protected MuleEvent handleUnaccepted(MuleEvent event) throws MuleException
+    @Override
+    protected MuleException filterUnacceptedException(MuleEvent event)
     {
-        if (unacceptedMessageProcessor == null)
-        {
-            super.handleUnaccepted(event);
-        }
-        else
-        {
-            unacceptedMessageProcessor.process(event);
-        }
-        if (throwOnUnaccepted)
-        {
-            throw new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event, filter);
-        }
-        return null;
+        return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event, filter);        
     }
-
-    /**
-     * The <code>MessageProcessor</code> that should be used to handle messaged that are not accepted by the
-     * filter.
-     *
-     * @param unacceptedMessageProcessor
-     */
-    public void setUnacceptedMessageProcessor(MessageProcessor unacceptedMessageProcessor)
-    {
-        this.unacceptedMessageProcessor = unacceptedMessageProcessor;
-    }
-
-    public MessageProcessor getUnacceptedMessageProcessor()
-    {
-        return unacceptedMessageProcessor;
-    }
-
+    
     public Filter getFilter()
     {
         return filter;
@@ -110,11 +89,6 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
     public void setFilter(Filter filter)
     {
         this.filter = filter;
-    }
-
-    public void setThrowOnUnaccepted(boolean throwOnUnaccepted)
-    {
-        this.throwOnUnaccepted = throwOnUnaccepted;
     }
 
     @Override

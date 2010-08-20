@@ -31,10 +31,8 @@ import org.mule.endpoint.outbound.OutboundRewriteResponseEventMessageProcessor;
 import org.mule.endpoint.outbound.OutboundSessionHandlerMessageProcessor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.ExceptionHandlingMessageProcessor;
-import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
-import org.mule.routing.ExceptionThrowingMessageFilter;
 import org.mule.transport.AbstractConnector;
 
 import java.util.ArrayList;
@@ -53,9 +51,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
             new InboundEndpointPropertyMessageProcessor(endpoint),
             new InboundNotificationMessageProcessor(endpoint), 
             new InboundLoggingMessageProcessor(endpoint),
-            new ExceptionThrowingMessageFilter(endpoint.getFilter()),
-        });
-        
+        });        
     }
     
     /** Override this method to change the default MessageProcessors. */

@@ -339,12 +339,22 @@ public final class MuleTestUtils
     /** Supply no service, no endpoint */
     public static MuleEvent getTestEvent(Object data, MuleContext context) throws Exception
     {
-        return getTestEvent(data, getTestService(context), context);
+        return getTestEvent(data, getTestService(context), MessageExchangePattern.REQUEST_RESPONSE, context);
+    }
+
+    public static MuleEvent getTestEvent(Object data, MessageExchangePattern mep, MuleContext context) throws Exception
+    {
+        return getTestEvent(data, getTestService(context), mep, context);
     }
 
     public static MuleEvent getTestInboundEvent(Object data, MuleContext context) throws Exception
     {
-        return getTestInboundEvent(data, getTestService(context), context);
+        return getTestInboundEvent(data, getTestService(context), MessageExchangePattern.REQUEST_RESPONSE, context);
+    }
+
+    public static MuleEvent getTestInboundEvent(Object data, MessageExchangePattern mep, MuleContext context) throws Exception
+    {
+        return getTestInboundEvent(data, getTestService(context), mep, context);
     }
 
     /** Supply service but no endpoint */
@@ -353,9 +363,19 @@ public final class MuleTestUtils
         return getTestEvent(data, service, getTestOutboundEndpoint("test1", MessageExchangePattern.REQUEST_RESPONSE, context), context);
     }
 
+    public static MuleEvent getTestEvent(Object data, Service service, MessageExchangePattern mep, MuleContext context) throws Exception
+    {
+        return getTestEvent(data, service, getTestOutboundEndpoint("test1", mep, context), context);
+    }
+
     public static MuleEvent getTestInboundEvent(Object data, Service service, MuleContext context) throws Exception
     {
         return getTestEvent(data, service, getTestInboundEndpoint("test1", MessageExchangePattern.REQUEST_RESPONSE, context, null), context);
+    }
+
+    public static MuleEvent getTestInboundEvent(Object data, Service service, MessageExchangePattern mep, MuleContext context) throws Exception
+    {
+        return getTestEvent(data, service, getTestInboundEndpoint("test1", mep, context, null), context);
     }
 
     /** Supply endpoint but no service */
@@ -383,11 +403,11 @@ public final class MuleTestUtils
         return new DefaultMuleEvent(message, endpoint, session);
     }
 
-    public static MuleEventContext getTestEventContext(Object data, MuleContext context) throws Exception
+    public static MuleEventContext getTestEventContext(Object data, MessageExchangePattern mep, MuleContext context) throws Exception
     {
         try
         {
-            MuleEvent event = getTestEvent(data, context);
+            MuleEvent event = getTestEvent(data, mep, context);
             RequestContext.setEvent(event);
             return RequestContext.getEventContext();
         }

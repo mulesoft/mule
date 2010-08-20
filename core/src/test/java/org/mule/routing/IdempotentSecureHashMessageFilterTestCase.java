@@ -39,6 +39,7 @@ public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleTestC
 
         IdempotentSecureHashMessageFilter ir = new IdempotentSecureHashMessageFilter();
         ir.setFlowConstruct(service);
+        ir.setThrowOnUnaccepted(false);
 
         MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
         MuleEvent event = new DefaultMuleEvent(okMessage, endpoint1, (MuleSession) session.proxy());

@@ -94,7 +94,7 @@ public class MessageFilterTestCase extends FunctionalTestCase
                 MuleMessage msg = event.getMessage();
                 String payload = msg.getPayloadAsString();
                 rejectMesage = payload + "(rejected!-2)";
-                return event;
+                return null;
             }
             catch (Exception e)
             {

@@ -28,7 +28,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleTestCase
 
     public void testIdempotentReceiver() throws Exception
     {
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?synchronous=false");
+        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?exchangePattern=one-way");
         Mock session = MuleTestUtils.getMockSession();
         Service service = getTestService();
         session.matchAndReturn("getFlowConstruct", service);
@@ -37,6 +37,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleTestCase
         IdempotentMessageFilter ir = new IdempotentMessageFilter();
         ir.setIdExpression("#[header:id]");
         ir.setFlowConstruct(service);
+        ir.setThrowOnUnaccepted(false);
 
         MuleMessage okMessage = new DefaultMuleMessage("OK", muleContext);
         okMessage.setOutboundProperty("id", "1");

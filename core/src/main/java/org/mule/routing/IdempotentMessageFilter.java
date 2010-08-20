@@ -21,6 +21,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.store.ObjectStore;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.util.store.InMemoryObjectStore;
 
 import java.text.MessageFormat;
@@ -32,7 +33,7 @@ import java.text.MessageFormat;
  * <p>
  * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/IdempotentReceiver.html}
  */
-public class IdempotentMessageFilter extends MessageFilter implements FlowConstructAware, Initialisable
+public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor implements FlowConstructAware, Initialisable
 {
     protected volatile ObjectStore<String> store;
     protected volatile String assignedComponentName;
@@ -148,19 +149,6 @@ public class IdempotentMessageFilter extends MessageFilter implements FlowConstr
                          + event.getFlowConstruct().getName() + " from the endpoint "
                          + event.getEndpoint().getEndpointURI().getUri(), e);
             return false;
-        }
-    }
-
-    @Override
-    protected MuleEvent handleUnaccepted(MuleEvent event) throws MuleException
-    {
-        if (unacceptedMessageProcessor == null)
-        {
-            return super.handleUnaccepted(event);
-        }
-        else
-        {
-            return unacceptedMessageProcessor.process(event);
         }
     }
 

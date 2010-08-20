@@ -60,9 +60,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -691,12 +693,22 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     public static MuleEvent getTestEvent(Object data, Service service) throws Exception
     {
-        return MuleTestUtils.getTestEvent(data, service, muleContext);
+        return MuleTestUtils.getTestEvent(data, service, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
+    }
+
+    public static MuleEvent getTestEvent(Object data, Service service, MessageExchangePattern mep) throws Exception
+    {
+        return MuleTestUtils.getTestEvent(data, service, mep, muleContext);
     }
 
     public static MuleEvent getTestEvent(Object data) throws Exception
     {
-        return MuleTestUtils.getTestEvent(data, muleContext);
+        return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
+    }
+
+    public static MuleEvent getTestEvent(Object data, MessageExchangePattern mep) throws Exception
+    {
+        return MuleTestUtils.getTestEvent(data, mep, muleContext);
     }
 
     public static MuleEvent getTestInboundEvent(Object data, MuleSession session) throws Exception
@@ -706,12 +718,22 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     public static MuleEvent getTestInboundEvent(Object data) throws Exception
     {
-        return MuleTestUtils.getTestInboundEvent(data, muleContext);
+        return MuleTestUtils.getTestInboundEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
+    }
+
+    public static MuleEvent getTestInboundEvent(Object data, MessageExchangePattern mep) throws Exception
+    {
+        return MuleTestUtils.getTestInboundEvent(data, mep, muleContext);
     }
 
     public static MuleEventContext getTestEventContext(Object data) throws Exception
     {
-        return MuleTestUtils.getTestEventContext(data, muleContext);
+        return MuleTestUtils.getTestEventContext(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
+    }
+
+    public static MuleEventContext getTestEventContext(Object data, MessageExchangePattern mep) throws Exception
+    {
+        return MuleTestUtils.getTestEventContext(data, mep, muleContext);
     }
 
     public static Transformer getTestTransformer() throws Exception

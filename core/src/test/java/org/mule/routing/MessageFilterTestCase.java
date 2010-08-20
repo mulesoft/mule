@@ -10,9 +10,8 @@
 
 package org.mule.routing;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
-import org.mule.api.processor.InterceptingMessageProcessor;
-import org.mule.api.routing.filter.Filter;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
@@ -25,7 +24,7 @@ public class MessageFilterTestCase extends AbstractMuleTestCase
     @Test
     public void testFilterPass() throws Exception
     {
-        InterceptingMessageProcessor mp = getMessageFilter(new EqualsFilter(TEST_MESSAGE));
+        MessageFilter mp = new MessageFilter(new EqualsFilter(TEST_MESSAGE), false, null);
         SensingNullMessageProcessor listener = getSensingNullMessageProcessor();
         mp.setListener(listener);
 
@@ -41,7 +40,7 @@ public class MessageFilterTestCase extends AbstractMuleTestCase
     @Test
     public void testFilterFail() throws Exception
     {
-        InterceptingMessageProcessor mp = getMessageFilter(new EqualsFilter(null));
+        MessageFilter mp = new MessageFilter(new EqualsFilter(null), false, null);
         SensingNullMessageProcessor out = getSensingNullMessageProcessor();
         mp.setListener(out);
 
@@ -56,7 +55,7 @@ public class MessageFilterTestCase extends AbstractMuleTestCase
     @Test
     public void testFilterPassUnacceptedMP() throws Exception
     {
-        MessageFilter mp = getMessageFilter(new EqualsFilter(TEST_MESSAGE));
+        MessageFilter mp = new MessageFilter(new EqualsFilter(TEST_MESSAGE), false, null);
         SensingNullMessageProcessor out = getSensingNullMessageProcessor();
         SensingNullMessageProcessor unaccepted = getSensingNullMessageProcessor();
         mp.setListener(out);
@@ -75,13 +74,12 @@ public class MessageFilterTestCase extends AbstractMuleTestCase
     @Test
     public void testFilterFailUnacceptedMP() throws Exception
     {
-        MessageFilter mp = getMessageFilter(new EqualsFilter(null));
-        SensingNullMessageProcessor out = getSensingNullMessageProcessor();
         SensingNullMessageProcessor unaccepted = getSensingNullMessageProcessor();
+        MessageFilter mp = new MessageFilter(new EqualsFilter(null), false, unaccepted);
+        SensingNullMessageProcessor out = getSensingNullMessageProcessor();
         mp.setListener(out);
-        mp.setUnacceptedMessageProcessor(unaccepted);
 
-        MuleEvent inEvent = getTestEvent(TEST_MESSAGE);
+        MuleEvent inEvent = getTestEvent(TEST_MESSAGE, MessageExchangePattern.ONE_WAY);
 
         MuleEvent resultEvent = mp.process(inEvent);
 
@@ -90,10 +88,4 @@ public class MessageFilterTestCase extends AbstractMuleTestCase
         assertNotNull(unaccepted.event);
         assertSame(inEvent, unaccepted.event);
     }
-
-    protected MessageFilter getMessageFilter(Filter filter)
-    {
-        return new MessageFilter(filter);
-    }
-
 }
