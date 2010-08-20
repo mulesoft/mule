@@ -14,9 +14,9 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.mule.api.context.notification.ServerNotification;
 
 /**
- * This class is from Mule 2.2.5. It is modified so the ExceptionNotification has a resourceId
- * of the exception type.  This is only here so we can avoid doing a hot fix of Mule
- * to run MMC. This will be removed in future releases of MMC.
+ * This class is from Mule 2.2.5. It is modified so the ExceptionNotification has a
+ * resourceId of the exception type. This is only here so we can avoid doing a hot
+ * fix of Mule to run MMC. This will be removed in future releases of MMC.
  */
 public class ExceptionNotification extends ServerNotification
 {
@@ -40,16 +40,19 @@ public class ExceptionNotification extends ServerNotification
     }
 
     /**
-     * Find the root cause of the exception as typically Mule wraps the exception
-     * in something like a ServiceException and when we register a listener under a particular
-     * resource ID we want to listen for this root cause, not the ServiceException.
+     * Find the root cause of the exception as typically Mule wraps the exception in
+     * something like a ServiceException and when we register a listener under a
+     * particular resource ID we want to listen for this root cause, not the
+     * ServiceException.
+     * 
      * @param exception
      * @return
      */
-    private static String getExceptionCause(Throwable exception) {
+    private static String getExceptionCause(Throwable exception)
+    {
         Throwable cause = ExceptionUtils.getRootCause(exception);
-        if(cause != null)
-        {        
+        if (cause != null)
+        {
             return cause.getClass().getName();
         }
         else
