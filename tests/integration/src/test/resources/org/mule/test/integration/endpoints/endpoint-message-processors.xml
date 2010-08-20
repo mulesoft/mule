@@ -16,6 +16,7 @@
     <custom-processor name="ProcessorG" class="org.mule.tck.testmodels.mule.TestMessageProcessor">
         <spring:property name="label" value="G" />
     </custom-processor>
+    <append-string-transformer name="TransformerD" message=":D" />
 
     <model>
         <service name="synchronousOutbound">
@@ -29,9 +30,7 @@
                     </message-filter>
                 	<processor ref="ProcessorB" />
                     <response>
-                        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
-                            <spring:property name="label" value="C" />
-                        </custom-processor>
+                    	<append-string-transformer message=":C" />
 	                    <message-filter>
 	                    	<wildcard-filter pattern="*:G:H*" />
 	                    </message-filter>
@@ -73,9 +72,7 @@
                         <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="C" />
                         </custom-processor>
-                        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
-                            <spring:property name="label" value="D" />
-                        </custom-processor>
+                        <transformer ref="TransformerD" />
                     </response>
                 </vm:inbound-endpoint>
             </inbound>
@@ -83,9 +80,10 @@
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="out" exchange-pattern="one-way">
-                        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
-                            <spring:property name="label" value="E" />
-                        </custom-processor>
+	                    <message-filter>
+	                    	<wildcard-filter pattern="*:service1" />
+	                    </message-filter>
+                    	<append-string-transformer message=":E" />
                         <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="F" />
                         </custom-processor>
