@@ -19,9 +19,10 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.api.transport.ReplyToHandler;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transport.AbstractConnector;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang.BooleanUtils;
 
@@ -30,6 +31,8 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
 
     protected Service service;
     protected MessageProcessor receiveAsyncReplyMessageProcessor;
+    private AtomicReference<ReplyToHandler> cachedReplyToHandler;
+
 
     public ServiceInternalMessageProcessor(Service service)
     {
@@ -82,17 +85,21 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
     protected ReplyToHandler getReplyToHandler(MuleMessage message, ImmutableEndpoint endpoint)
     {
         Object replyTo = message.getReplyTo();
-        ReplyToHandler replyToHandler = null;
         if (replyTo != null)
         {
-            replyToHandler = ((AbstractConnector) endpoint.getConnector()).getReplyToHandler(endpoint);
-            // Use the response transformer for the event if one is set
-            if (endpoint.getResponseTransformers() != null)
+            if (cachedReplyToHandler.get() == null)
             {
-                replyToHandler.setTransformers(endpoint.getResponseTransformers());
+                ReplyToHandler replyToHandler = ((AbstractConnector) endpoint.getConnector()).getReplyToHandler(endpoint);
+                // Use the response transformer for the event if one is set
+                if (endpoint.getResponseTransformers() != null)
+                {
+                    replyToHandler.setTransformers(endpoint.getResponseTransformers());
+                }
+                cachedReplyToHandler.compareAndSet(null, replyToHandler);
             }
+            return cachedReplyToHandler.get();
         }
-        return replyToHandler;
+        return null;
     }
 
     protected void processReplyTo(MuleEvent event,
