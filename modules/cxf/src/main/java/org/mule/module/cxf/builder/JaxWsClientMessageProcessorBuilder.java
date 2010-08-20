@@ -84,10 +84,6 @@ public class JaxWsClientMessageProcessorBuilder extends AbstractClientMessagePro
         cpf.setServiceClass(serviceClass);
         if (databinding == null) 
         {
-            cpf.setDataBinding(new AegisDatabinding());
-        }
-        else 
-        {
             cpf.setDataBinding(databinding);
         }
         cpf.setAddress(getAddress());
