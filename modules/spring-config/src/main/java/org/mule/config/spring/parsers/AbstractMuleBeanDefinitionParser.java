@@ -25,6 +25,7 @@ import org.mule.config.spring.parsers.assembly.configuration.ReusablePropertyCon
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.config.spring.parsers.generic.AutoIdUtils;
 import org.mule.util.ClassUtils;
+import org.mule.util.StringUtils;
 import org.mule.util.XMLUtils;
 
 import java.util.HashSet;
@@ -251,6 +252,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      *                               {@link #getBeanClass(org.w3c.dom.Element)} is <code>null</code>
      * @see #doParse
      */
+    @Override
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
     {
         preProcess(element);
@@ -359,17 +361,16 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      *         (must <b>not</b> be <code>null</code>)
      * @see #parseInternal(org.w3c.dom.Element,ParserContext)
      */
-    protected Class getBeanClassFromAttribute(Element element)
+    protected Class<?> getBeanClassFromAttribute(Element element)
     {
-        String att= beanPropertyConfiguration.getAttributeAlias(ATTRIBUTE_CLASS);
+        String att = beanPropertyConfiguration.getAttributeAlias(ATTRIBUTE_CLASS);
         String className = element.getAttribute(att);
-        Class clazz = null;
-        if (org.mule.util.StringUtils.isNotBlank(className))
+        Class<?> clazz = null;
+        if (StringUtils.isNotBlank(className))
         {
             try
             {
                 element.removeAttribute(att);
-                //RM* Todo probably need to use OSGi Loader here
                 clazz = ClassUtils.loadClass(className, getClass());
             }
             catch (ClassNotFoundException e)
@@ -388,7 +389,7 @@ public abstract class AbstractMuleBeanDefinitionParser extends AbstractBeanDefin
      *         (must <b>not</b> be <code>null</code>)
      * @see #parseInternal(org.w3c.dom.Element,ParserContext)
      */
-    protected abstract Class getBeanClass(Element element);
+    protected abstract Class<?> getBeanClass(Element element);
 
     /**
      * Parse the supplied {@link Element} and populate the supplied

@@ -161,11 +161,8 @@ public class DefaultMuleApplication implements Application
                 configBuilderClassName = builderFromDesc;
             }
 
-
-            ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(configBuilderClassName,
-                                                                                                 new Object[] {absoluteResourcePaths}, getDeploymentClassLoader());
-
-
+            ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(
+                configBuilderClassName, new Object[] {absoluteResourcePaths}, getDeploymentClassLoader());
 
             if (!cfgBuilder.isConfigured())
             {
