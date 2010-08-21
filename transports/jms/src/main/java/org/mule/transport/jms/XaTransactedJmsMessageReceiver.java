@@ -36,6 +36,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageReceiver
 {
@@ -47,7 +48,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     protected boolean reuseSession;
     protected final ThreadContextLocal context = new ThreadContextLocal();
     protected final long timeout;
-    protected final RedeliveryHandler redeliveryHandler;
+    private final AtomicReference/*<RedeliveryHandler>*/ redeliveryHandler = new AtomicReference();
 
     /**
      * Holder receiving the session and consumer for this thread.
@@ -122,16 +123,6 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         // If we're using topics we don't want to use multiple receivers as we'll get
         // the same message multiple times
         this.setUseMultipleTransactedReceivers(!topic);
-
-        try
-        {
-            redeliveryHandler = this.connector.getRedeliveryHandlerFactory().create();
-            redeliveryHandler.setConnector(this.connector);
-        }
-        catch (Exception e)
-        {
-            throw new CreateException(e, this);
-        }
     }
 
     @Override
@@ -143,7 +134,10 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     @Override
     protected void doConnect() throws Exception
     {
-        // template method
+        if (redeliveryHandler.compareAndSet(null, connector.getRedeliveryHandlerFactory().create()))
+        {
+            ((RedeliveryHandler) redeliveryHandler.get()).setConnector(this.connector);
+        }
     }
 
     @Override
@@ -211,7 +205,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     }
 
     @Override
-    protected List getMessages() throws Exception
+    protected List<MuleMessage> getMessages() throws Exception
     {
         Session session = this.connector.getSessionFromTransaction();
         Transaction tx = TransactionCoordination.getInstance().getTransaction();
@@ -271,7 +265,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
                 logger.debug("Message with correlationId: " + message.getJMSCorrelationID()
                              + " is redelivered. handing off to Exception Handler");
             }
-            redeliveryHandler.handleRedelivery(message);
+            ((RedeliveryHandler) redeliveryHandler.get()).handleRedelivery(message);
         }
 
         MuleMessage messageToRoute = createMuleMessage(message, endpoint.getEncoding());
