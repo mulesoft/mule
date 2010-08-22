@@ -43,19 +43,12 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleConte
      * logger used by this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
-
+    protected transient MuleContext muleContext;
     private NamespaceManager namespaceManager;
 
     public void setMuleContext(MuleContext context)
     {
-        try
-        {
-            namespaceManager = context.getRegistry().lookupObject(NamespaceManager.class);
-        }
-        catch (RegistrationException e)
-        {
-            throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
-        }
+        muleContext = context;
     }
 
     public Object evaluate(String expression, MuleMessage message)
@@ -111,9 +104,10 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleConte
 
     private Object getExpressionValue(JXPathContext context, String expression)
     {
-        if (namespaceManager != null)
+        NamespaceManager theNamespaceManager = getNamespaceManager();
+        if (theNamespaceManager != null)
         {
-            addNamespacesToContext(namespaceManager, context);
+            addNamespacesToContext(theNamespaceManager, context);
         }
 
         Object result = null;
@@ -163,5 +157,30 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleConte
     public void setName(String name)
     {
         throw new UnsupportedOperationException("setName");
+    }
+
+    /**
+     *
+     * @return the nsmespace manager from the registry
+     */
+    protected synchronized NamespaceManager getNamespaceManager()
+    {
+        if (namespaceManager == null)
+        {
+
+            try
+            {
+                // We defer looking this up until registry is completely built
+                if (muleContext != null)
+                {
+                    namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
+                }
+            }
+            catch (RegistrationException e)
+            {
+                throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
+            }
+        }
+        return namespaceManager;
     }
 }
