@@ -10,8 +10,10 @@
 
 package org.mule.module.xml.util;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleMessage;
 import org.mule.api.transport.OutputHandler;
 import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.StaxSource;
@@ -22,13 +24,17 @@ import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -52,6 +58,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.DocumentException;
 import org.dom4j.io.DOMReader;
+import org.dom4j.io.DOMWriter;
 import org.dom4j.io.DocumentSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -191,6 +198,81 @@ public class XMLUtils extends org.mule.util.XMLUtils
             return null;
         }
     }
+
+    /**
+     * Converts a payload to a {@link org.w3c.dom.Document} representation.
+     * <p> Reproduces the behavior from {@link org.mule.module.xml.util.XMLUtils#toDocument(Object, MuleContext)}
+     * which works converting to {@link org.dom4j.Document}.
+     *
+     * @param payload the payload to convert.
+     * @return a document from the payload or null if the payload is not a valid XML document.
+     */
+    public static org.w3c.dom.Document toW3cDocument(Object payload) throws Exception
+    {
+        if (payload instanceof org.dom4j.Document)
+        {
+            DOMWriter writer = new DOMWriter();
+            org.w3c.dom.Document w3cDocument = writer.write((org.dom4j.Document) payload);
+
+            return w3cDocument;
+        }
+        else if (payload instanceof org.w3c.dom.Document)
+        {
+            return (org.w3c.dom.Document) payload;
+        }
+        else if (payload instanceof org.xml.sax.InputSource)
+        {
+            return parseXML((InputSource) payload);
+        }
+        else if (payload instanceof javax.xml.transform.Source || payload instanceof javax.xml.stream.XMLStreamReader)
+        {
+            DOMResult result = new DOMResult();
+            Transformer idTransformer = getTransformer();
+            Source source = (payload instanceof Source) ? (Source)payload : toXmlSource(null, true, payload);
+            idTransformer.transform(source, result);
+            return (Document) result.getNode();
+        }
+        else if (payload instanceof java.io.InputStream)
+        {
+            InputStreamReader input = new InputStreamReader((InputStream) payload);
+            return parseXML(input);
+        }
+        else if (payload instanceof String)
+        {
+            Reader input = new StringReader((String) payload);
+
+            return parseXML(input);
+        }
+        else if (payload instanceof byte[])
+        {
+            // TODO Handle encoding/charset somehow
+            Reader input = new StringReader(new String((byte[]) payload));
+            return parseXML(input);
+        }
+        else if (payload instanceof File)
+        {
+            Reader input = new FileReader((File) payload);
+            return parseXML(input);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private static org.w3c.dom.Document parseXML(Reader source) throws Exception
+    {
+        return parseXML(new InputSource(source));
+    }
+
+    private static org.w3c.dom.Document parseXML(InputSource source) throws Exception
+    {
+        DocumentBuilderFactory factory =
+                DocumentBuilderFactory.newInstance();
+
+        return factory.newDocumentBuilder().parse(source);
+    }
+
     /**
      * Returns an XMLStreamReader for an object of unknown type if possible.
      * @return null if no XMLStreamReader can be created for the object type

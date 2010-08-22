@@ -10,8 +10,10 @@
 
 package org.mule.module.xml.expression;
 
+import org.apache.commons.jxpath.Container;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.registry.RegistrationException;
@@ -26,7 +28,7 @@ import java.util.Map;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dom4j.Document;
+import org.w3c.dom.Document;
 
 /**
  * Will extract properties based on Xpath expressions. Will work on Xml/Dom and beans
@@ -34,7 +36,7 @@ import org.dom4j.Document;
  * @deprecated Developers should use xpath, bean or groovy instead of this expression evaluator since there are some
  * quirks with JXPath and the performance is not good.
  */
-public class JXPathExpressionEvaluator implements ExpressionEvaluator
+public class JXPathExpressionEvaluator implements ExpressionEvaluator, MuleContextAware
 {
     public static final String NAME = "jxpath";
     /**
@@ -42,15 +44,13 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    private MuleContext muleContext;
     private NamespaceManager namespaceManager;
 
     public void setMuleContext(MuleContext context)
     {
-        this.muleContext = context;
         try
         {
-            namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
+            namespaceManager = context.getRegistry().lookupObject(NamespaceManager.class);
         }
         catch (RegistrationException e)
         {
@@ -58,55 +58,82 @@ public class JXPathExpressionEvaluator implements ExpressionEvaluator
         }
     }
 
-    public Object evaluate(String name, MuleMessage message)
+    public Object evaluate(String expression, MuleMessage message)
     {
-        Object result = null;
-        Object payload = message.getPayload();
-        JXPathContext context = JXPathContext.newContext(message.getPayload());
-        if (namespaceManager != null)
+        Document document;
+        try
         {
-            addNamespaces(namespaceManager, context);
+            document = XMLUtils.toW3cDocument(message.getPayload());
+        }
+        catch (Exception e)
+        {
+            logger.error(e);
+            return null;
         }
 
-        Document doc;
-            try
-            {
-                //no support for namespaces
-                doc = XMLUtils.toDocument(payload, muleContext);
+        JXPathContext context;
 
-            }
-            catch (Exception e)
-            {
-                logger.error(e);
-                return null;
-            }
-        //payload is XML
-        if(doc!=null)
+        if (document != null)
         {
-            result = doc.valueOf(name);
+            context = createContextForXml(document);
         }
-        //payload is a bean
         else
         {
-            try
+            context = createContextForBean(message.getPayload());
+        }
+
+        return getExpressionValue(context, expression);
+    }
+
+    private JXPathContext createContextForXml(final Document document)
+    {
+        Container container = new Container()
+        {
+
+            public Object getValue()
             {
-                result = context.getValue(name);
+                return document;
             }
-            catch (Exception e)
+
+            public void setValue(Object value)
             {
-                // ignore
-                if(logger.isDebugEnabled())
-                {
-                    logger.debug("failed to process JXPath expression: " + name, e);
-                }
+                throw new UnsupportedOperationException();
+            }
+        };
+
+        return JXPathContext.newContext(container);
+    }
+
+    private JXPathContext createContextForBean(Object payload)
+    {
+        return JXPathContext.newContext(payload);
+    }
+
+    private Object getExpressionValue(JXPathContext context, String expression)
+    {
+        if (namespaceManager != null)
+        {
+            addNamespacesToContext(namespaceManager, context);
+        }
+
+        Object result = null;
+
+        try
+        {
+            result = context.getValue(expression);
+        }
+        catch (Exception e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("failed to process JXPath expression: " + expression, e);
             }
         }
+
         return result;
     }
 
-    // Payload is a Java object
-
-    protected void addNamespaces(NamespaceManager manager, JXPathContext context)
+    protected void addNamespacesToContext(NamespaceManager manager, JXPathContext context)
     {
         for (Iterator iterator = manager.getNamespaces().entrySet().iterator(); iterator.hasNext();)
         {
