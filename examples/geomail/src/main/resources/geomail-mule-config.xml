@@ -64,7 +64,7 @@
     <vm:endpoint name="Aggregator" path="channels/positions/aggregator" exchange-pattern="one-way"/>
     
     <ajax:servlet-endpoint name="Output" channel="/GEOMAIL">
-    	<transformer ref="SenderToJson"/>
+        <transformer ref="SenderToJson"/>
     </ajax:servlet-endpoint>
 
     <model>
@@ -123,7 +123,7 @@
 
                 <filtering-router>
                     <outbound-endpoint ref="Positions">
-                    	<transformer ref="IP2Sender"/>
+                        <transformer ref="IP2Sender"/>
                     </outbound-endpoint>
                     <filter ref="inCacheFilter"/>
                 </filtering-router>
@@ -146,8 +146,8 @@
              <outbound>
                 <pass-through-router>
                     <outbound-endpoint ref="Storage">
-                    	<transformer ref="HostIpXSLT" />
-                    	<transformer ref="XmlToSender" />
+                        <transformer ref="HostIpXSLT" />
+                        <transformer ref="XmlToSender" />
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -174,8 +174,8 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint ref="Storage">
-                    	<transformer ref="FraudlabsXSLT" />
-                    	<transformer ref="XmlToSender"/>
+                        <transformer ref="FraudlabsXSLT" />
+                        <transformer ref="XmlToSender"/>
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>

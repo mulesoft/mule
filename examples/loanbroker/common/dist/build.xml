@@ -13,7 +13,7 @@
     <property name="dir.java" value="src"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
-	<property name="domain" value="loanbroker"/>
+    <property name="domain" value="loanbroker"/>
 
     <target name="clean"
             description="Clean the output directory (start from scratch)."

@@ -115,127 +115,127 @@
         </pluginRepository>
     </pluginRepositories>
 
-	    <build>
-	        <defaultGoal>install</defaultGoal>
-	        <finalName>${artifactId}</finalName>
+        <build>
+            <defaultGoal>install</defaultGoal>
+            <finalName>${artifactId}</finalName>
 
-	        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
-	        <resources>
-	            <resource>
-	                <directory>conf</directory>
-	            </resource>
-	            <resource>
-	                <directory>src/main/resources</directory>
-	            </resource>
-	        </resources>
+            <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
+            <resources>
+                <resource>
+                    <directory>conf</directory>
+                </resource>
+                <resource>
+                    <directory>src/main/resources</directory>
+                </resource>
+            </resources>
 
-	        <plugins>
-	            <plugin>
-	                <groupId>org.apache.maven.plugins</groupId>
-	                <artifactId>maven-compiler-plugin</artifactId>
-	                <configuration>
-	                    <source>5</source>
-	                    <target>5</target>
-	                </configuration>
-	            </plugin>
-	            <!-- "mvn install" will copy the application to the $MULE_HOME/apps directory,
-	                overwriting the previous one. -->
-	            <plugin>
-	                <groupId>org.apache.maven.plugins</groupId>
-	                <artifactId>maven-antrun-plugin</artifactId>
-	                <executions>
-	                    <execution>
-	                        <id>copy-resources</id>
-	                        <phase>install</phase>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>5</source>
+                        <target>5</target>
+                    </configuration>
+                </plugin>
+                <!-- "mvn install" will copy the application to the $MULE_HOME/apps directory,
+                    overwriting the previous one. -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>copy-resources</id>
+                            <phase>install</phase>
 
-	                        <goals>
-	                            <goal>run</goal>
-	                        </goals>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
 
-	                        <configuration>
-	                            <tasks>
-	                                <copy tofile="${MULE_HOME}/apps/stockquote-rest/stockquote-rest-config.xml" file="${basedir}/target/classes/stockquote-rest-config.xml"/>
-	                                <copy tofile="${MULE_HOME}/apps/stockquote-rest/stdio-config.xml" file="${basedir}/target/classes/stdio-config.xml"/>
-	                                <copy tofile="${MULE_HOME}/apps/stockquote-rest/mule-deploy.properties" file="${basedir}/target/classes/stockquote-rest-deploy.properties"/>
-	
-	                                <copy tofile="${MULE_HOME}/apps/stockquote-wsdl/stockquote-wsdl-config.xml" file="${basedir}/target/classes/stockquote-wsdl-config.xml"/>
-	                                <copy tofile="${MULE_HOME}/apps/stockquote-wsdl/stdio-config.xml" file="${basedir}/target/classes/stdio-config.xml"/>
-	                                <copy tofile="${MULE_HOME}/apps/stockquote-wsdl/mule-deploy.properties" file="${basedir}/target/classes/stockquote-wsdl-deploy.properties"/>
-	
-	                                <copy tofile="${MULE_HOME}/apps/stockquote-soap/stockquote-soap-config.xml" file="${basedir}/target/classes/stockquote-soap-config.xml"/>
-	                                <copy tofile="${MULE_HOME}/apps/stockquote-soap/stdio-config.xml" file="${basedir}/target/classes/stdio-config.xml"/>
-	                                <copy tofile="${MULE_HOME}/apps/stockquote-soap/mule-deploy.properties" file="${basedir}/target/classes/stockquote-soap-deploy.properties"/>
-	                            </tasks>
-	                        </configuration>
-	                    </execution>
-	                </executions>
-	            </plugin>
-	            <plugin>
-	                <groupId>org.apache.maven.plugins</groupId>
-	                <artifactId>maven-dependency-plugin</artifactId>
-	                <executions>
-	                    <execution>
-	                        <id>copy-artifact</id>
-	                        <phase>install</phase>
-	                        <goals>
-	                            <goal>copy</goal>
-	                        </goals>
-	                        <configuration>
-	                            <outputDirectory>${MULE_HOME}/apps/stockquote-rest/lib</outputDirectory>
-	                            <overWriteReleases>true</overWriteReleases>
-	                            <overWriteSnapshots>true</overWriteSnapshots>
-	                            <artifactItems>
-	                                <artifactItem>
-	                                    <groupId>${groupId}</groupId>
-	                                    <artifactId>${artifactId}</artifactId>
-	                                    <version>${version}</version>
-	                                    <destFileName>${artifactId}.jar</destFileName>
-	                                </artifactItem>
-	                            </artifactItems>
-	                        </configuration>
-	                    </execution>
-	                    <execution>
-	                        <id>copy-artifact2</id>
-	                        <phase>install</phase>
-	                        <goals>
-	                            <goal>copy</goal>
-	                        </goals>
-	                        <configuration>
-	                            <outputDirectory>${MULE_HOME}/apps/stockquote-wsdl/lib</outputDirectory>
-	                            <overWriteReleases>true</overWriteReleases>
-	                            <overWriteSnapshots>true</overWriteSnapshots>
-	                            <artifactItems>
-	                                <artifactItem>
-	                                    <groupId>${groupId}</groupId>
-	                                    <artifactId>${artifactId}</artifactId>
-	                                    <version>${version}</version>
-	                                    <destFileName>${artifactId}.jar</destFileName>
-	                                </artifactItem>
-	                            </artifactItems>
-	                        </configuration>
-	                    </execution>
-	                    <execution>
-	                        <id>copy-artifact3</id>
-	                        <phase>install</phase>
-	                        <goals>
-	                            <goal>copy</goal>
-	                        </goals>
-	                        <configuration>
-	                            <outputDirectory>${MULE_HOME}/apps/stockquote-soap/lib</outputDirectory>
-	                            <overWriteReleases>true</overWriteReleases>
-	                            <overWriteSnapshots>true</overWriteSnapshots>
-	                            <artifactItems>
-	                                <artifactItem>
-	                                    <groupId>${groupId}</groupId>
-	                                    <artifactId>${artifactId}</artifactId>
-	                                    <version>${version}</version>
-	                                    <destFileName>${artifactId}.jar</destFileName>
-	                                </artifactItem>
-	                            </artifactItems>
-	                        </configuration>
-	                    </execution>
-	                </executions>
-	            </plugin>
-	        </plugins>
-	    </build>
-	</project>
+                            <configuration>
+                                <tasks>
+                                    <copy tofile="${MULE_HOME}/apps/stockquote-rest/stockquote-rest-config.xml" file="${basedir}/target/classes/stockquote-rest-config.xml"/>
+                                    <copy tofile="${MULE_HOME}/apps/stockquote-rest/stdio-config.xml" file="${basedir}/target/classes/stdio-config.xml"/>
+                                    <copy tofile="${MULE_HOME}/apps/stockquote-rest/mule-deploy.properties" file="${basedir}/target/classes/stockquote-rest-deploy.properties"/>
+
+                                    <copy tofile="${MULE_HOME}/apps/stockquote-wsdl/stockquote-wsdl-config.xml" file="${basedir}/target/classes/stockquote-wsdl-config.xml"/>
+                                    <copy tofile="${MULE_HOME}/apps/stockquote-wsdl/stdio-config.xml" file="${basedir}/target/classes/stdio-config.xml"/>
+                                    <copy tofile="${MULE_HOME}/apps/stockquote-wsdl/mule-deploy.properties" file="${basedir}/target/classes/stockquote-wsdl-deploy.properties"/>
+
+                                    <copy tofile="${MULE_HOME}/apps/stockquote-soap/stockquote-soap-config.xml" file="${basedir}/target/classes/stockquote-soap-config.xml"/>
+                                    <copy tofile="${MULE_HOME}/apps/stockquote-soap/stdio-config.xml" file="${basedir}/target/classes/stdio-config.xml"/>
+                                    <copy tofile="${MULE_HOME}/apps/stockquote-soap/mule-deploy.properties" file="${basedir}/target/classes/stockquote-soap-deploy.properties"/>
+                                </tasks>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>copy-artifact</id>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>copy</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${MULE_HOME}/apps/stockquote-rest/lib</outputDirectory>
+                                <overWriteReleases>true</overWriteReleases>
+                                <overWriteSnapshots>true</overWriteSnapshots>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>${groupId}</groupId>
+                                        <artifactId>${artifactId}</artifactId>
+                                        <version>${version}</version>
+                                        <destFileName>${artifactId}.jar</destFileName>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>copy-artifact2</id>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>copy</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${MULE_HOME}/apps/stockquote-wsdl/lib</outputDirectory>
+                                <overWriteReleases>true</overWriteReleases>
+                                <overWriteSnapshots>true</overWriteSnapshots>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>${groupId}</groupId>
+                                        <artifactId>${artifactId}</artifactId>
+                                        <version>${version}</version>
+                                        <destFileName>${artifactId}.jar</destFileName>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>copy-artifact3</id>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>copy</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${MULE_HOME}/apps/stockquote-soap/lib</outputDirectory>
+                                <overWriteReleases>true</overWriteReleases>
+                                <overWriteSnapshots>true</overWriteSnapshots>
+                                <artifactItems>
+                                    <artifactItem>
+                                        <groupId>${groupId}</groupId>
+                                        <artifactId>${artifactId}</artifactId>
+                                        <version>${version}</version>
+                                        <destFileName>${artifactId}.jar</destFileName>
+                                    </artifactItem>
+                                </artifactItems>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    </project>

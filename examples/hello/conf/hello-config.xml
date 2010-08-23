@@ -65,7 +65,7 @@
 
             <inbound>
                 <stdio:inbound-endpoint system="IN" exchange-pattern="one-way">
-                	<transformer ref ="StdinToNameString"/>
+                    <transformer ref ="StdinToNameString"/>
                 </stdio:inbound-endpoint>
             </inbound>
 
@@ -93,7 +93,7 @@
 
             <inbound>
                 <vm:inbound-endpoint path="chitchatter" exchange-pattern="one-way">
-                	<transformer ref="NameStringToChatString"/>
+                    <transformer ref="NameStringToChatString"/>
                 </vm:inbound-endpoint>
             </inbound>
 
@@ -102,7 +102,7 @@
             <outbound>
                 <pass-through-router>
                     <stdio:outbound-endpoint system="OUT" exchange-pattern="one-way">
-                    	<transformer ref="ChatStringToString" />
+                        <transformer ref="ChatStringToString" />
                     </stdio:outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -114,7 +114,7 @@
         <service name="UserErrorHandler">
             <inbound>
                 <vm:inbound-endpoint path="userErrorHandler" exchange-pattern="one-way">
-                	<transformer ref="ExceptionToString"/>
+                    <transformer ref="ExceptionToString"/>
                 </vm:inbound-endpoint>
             </inbound>
 

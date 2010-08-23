@@ -122,7 +122,7 @@
     </target>
 
     <target name="test" depends="compile">
-		<!--
+        <!--
         <junit haltonerror="true" haltonfailure="true">
             <classpath>
                 <pathelement location="${dir.build}/classes"/>
@@ -135,6 +135,6 @@
               </fileset>
             </batchtest>
         </junit>
-		-->
+        -->
     </target>
 </project>

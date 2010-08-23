@@ -23,7 +23,7 @@
             description="Clean the output directory (start from scratch)."
             depends="setup,ifMuleBase,ifMuleHome">
         <delete dir="${dir.build}"/>
-    	<delete dir="${dir.app}"/>
+        <delete dir="${dir.app}"/>
     </target>
 
     <!-- Download any additional libraries needed to run the application -->
@@ -37,7 +37,7 @@
              verbose="true"
              usetimestamp="true"/>
         <get src="${url.maven.repo}/org/apache/activemq/activemq-core/4.1.2/activemq-core-4.1.2.jar"
-    	     dest="${dir.user.lib}/activemq-core-4.1.2.jar"/>
+             dest="${dir.user.lib}/activemq-core-4.1.2.jar"/>
     </target>
 
     <target name="init" depends="setup,ifMuleBase,ifMuleHome,get.libraries">
@@ -98,7 +98,7 @@
                 <include name="**/*"/>
             </fileset>
             <fileset dir="${dir.conf}">
-            	<!-- only include the jpd file -->
+                <!-- only include the jpd file -->
                 <include name="**/*process*"/>
             </fileset>
         </jar>
@@ -110,8 +110,8 @@
     <mkdir dir="${dir.mule.home}/apps/${instance.name}" />
     <mkdir dir="${dir.mule.home}/apps/${instance.name}/lib" />
     <copy file="${dir.build}/${app.name}.jar" todir="${dir.app}/lib" overwrite="true" verbose="true"/>
-   	<copy file="${dir.conf}/loan-broker-bpm-mule-config.xml" tofile="${dir.app}/mule-config.xml" overwrite="true" verbose="true"/>
-   	<copy file="${dir.java}/main/resources/mule-deploy.properties" todir="${dir.app}" overwrite="true" verbose="true"/>
+       <copy file="${dir.conf}/loan-broker-bpm-mule-config.xml" tofile="${dir.app}/mule-config.xml" overwrite="true" verbose="true"/>
+       <copy file="${dir.java}/main/resources/mule-deploy.properties" todir="${dir.app}" overwrite="true" verbose="true"/>
    </target>
 
    <target name="setup">
@@ -137,9 +137,9 @@
    <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
       <property name="dir.mule.home" value="${env.MULE_HOME}"/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-   	  <property name="dir.app" value="${dir.mule.home}/apps/loanbroker-bpm"/>
+         <property name="dir.app" value="${dir.mule.home}/apps/loanbroker-bpm"/>
    </target>
-	
+
     <target name="test" depends="compile">
         <junit haltonerror="true" haltonfailure="true">
             <classpath>
@@ -154,5 +154,5 @@
                 </fileset>
             </batchtest>
         </junit>
-    </target>	
+    </target>
 </project>

@@ -95,10 +95,10 @@
        <mkdir dir="${dir.async.app}" />
        <mkdir dir="${dir.sync.app}" />
        <mkdir dir="${dir.async.app}/lib" />
-   	   <mkdir dir="${dir.sync.app}/lib" />
+          <mkdir dir="${dir.sync.app}/lib" />
        
        <copy file="${dir.build}/${app.name}.jar" todir="${dir.async.app}/lib" overwrite="true" verbose="true"/>
-   	   <copy file="${dir.build}/${app.name}.jar" todir="${dir.sync.app}/lib" overwrite="true" verbose="true"/>
+          <copy file="${dir.build}/${app.name}.jar" todir="${dir.sync.app}/lib" overwrite="true" verbose="true"/>
        
        <copy tofile="${dir.async.app}/mule-config.xml" file="${basedir}/target/classes/loan-broker-async-config.xml" overwrite="true" verbose="true"/>
        <copy todir="${dir.async.app}" file="${basedir}/target/classes/loan-broker-cxf-endpoints-config.xml" overwrite="true" verbose="true"/>

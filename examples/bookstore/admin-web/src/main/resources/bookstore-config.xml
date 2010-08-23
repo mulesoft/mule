@@ -105,7 +105,7 @@
                <outbound>
                     <pass-through-router>
                         <outbound-endpoint ref="stats">
-                        	<transformer ref="setHtmlContentType"/>
+                            <transformer ref="setHtmlContentType"/>
                         </outbound-endpoint>
                     </pass-through-router>
                </outbound>

@@ -117,8 +117,8 @@
                 <filtering-router>
                     <file:outbound-endpoint path="test-data/exceptions" 
                                             outputPattern="Exception-[function:uuid].xml">
-                    	<transformer ref="ErrorMessageToExceptionBean" />
-                    	<transformer ref="ExceptionBeanToXML" />
+                        <transformer ref="ErrorMessageToExceptionBean" />
+                        <transformer ref="ExceptionBeanToXML" />
                     </file:outbound-endpoint>
                     <!-- Check ErrorMessage.getThrowable() exception type -->
                     <expression-filter evaluator="groovy" expression="payload.throwable instanceof org.mule.api.DefaultMuleException"/>
@@ -129,18 +129,18 @@
                                             host="${smtp.host}" port="${smtp.port}"
                                             to="${email.toAddress}" from="${email.fromAddress}"
                                             subject="${email.subject}">
-	                    <!-- Check ErrorMessage.getThrowable() exception type -->
-	                    <expression-filter evaluator="groovy" expression="payload.throwable instanceof org.mule.api.lifecycle.FatalException"/>
-	                    <transformer ref="ErrorMessageToExceptionBean" />
-	                     <transformer ref="ExceptionBeanToXML" />
-	                     <transformer ref="StringToEmailMessage"/>
+                        <!-- Check ErrorMessage.getThrowable() exception type -->
+                        <expression-filter evaluator="groovy" expression="payload.throwable instanceof org.mule.api.lifecycle.FatalException"/>
+                        <transformer ref="ErrorMessageToExceptionBean" />
+                         <transformer ref="ExceptionBeanToXML" />
+                         <transformer ref="StringToEmailMessage"/>
                      </smtp:outbound-endpoint>
                 </filtering-router>
                 
                 <filtering-router>
                     <outbound-endpoint address="jms://exception.queue" exchange-pattern="one-way">
-                    	<transformer ref="ErrorMessageToExceptionBean" />
-                    	<transformer ref="ExceptionBeanToXML" />
+                        <transformer ref="ErrorMessageToExceptionBean" />
+                        <transformer ref="ExceptionBeanToXML" />
                     </outbound-endpoint>
                     <!-- Check ErrorMessage.getThrowable() exception type -->
                     <expression-filter evaluator="groovy" expression="payload.throwable instanceof org.mule.example.errorhandler.exceptions.BusinessException"/>

@@ -122,7 +122,7 @@
        <mkdir dir="${dir.common.deploy}" />       
 
        <copy file="${dir.build}/${app.name}.jar" todir="${dir.esb.app}/lib" overwrite="true" verbose="true"/>
-   	   <copy file="${dir.build}/${app.name}.jar" todir="${dir.ejb.app}/lib" overwrite="true" verbose="true"/>
+          <copy file="${dir.build}/${app.name}.jar" todir="${dir.ejb.app}/lib" overwrite="true" verbose="true"/>
        
        <copy tofile="${dir.esb.app}/mule-config.xml" file="${basedir}/target/classes/loan-broker-esb-mule-config.xml" overwrite="true" verbose="true"/>
        <copy todir="${dir.esb.app}" file="${dir.java}/main/resources/mule-deploy.properties" overwrite="true" verbose="true"/>

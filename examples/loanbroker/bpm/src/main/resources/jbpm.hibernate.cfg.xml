@@ -17,7 +17,7 @@
      <property name="hibernate.transaction.flush_before_completion">true</property>
      <!-- 
      <property name="hibernate.cache.use_second_level_cache">false</property>
-	-->
+    -->
 
      <!-- Standard jBPM mappings -->     
      <mapping resource="jbpm.repository.hbm.xml" />

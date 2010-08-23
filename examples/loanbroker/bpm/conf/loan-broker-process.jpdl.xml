@@ -12,11 +12,11 @@
     </mule-receive>
 
     <!-- Send customer info. to credit agency -->
-	<mule-send name="sendToCreditAgency" 
-		  expr="#{customerRequest.customer}" endpoint="CreditAgency" synchronous="false">
-		<transition to="waitForCreditAgency" />
-	</mule-send>	
-	
+    <mule-send name="sendToCreditAgency"
+          expr="#{customerRequest.customer}" endpoint="CreditAgency" synchronous="false">
+        <transition to="waitForCreditAgency" />
+    </mule-send>
+
     <!-- Wait for the customer's credit profile to arrive. -->
     <mule-receive name="waitForCreditAgency" endpoint="CreditProfiles" var="creditProfile">
         <timer duedate="4 hours" />
@@ -25,10 +25,10 @@
 
     <!-- Prepare a quote request to send to the banks which includes the customer's credit info. -->
     <java name="prepareLoanQuoteRequest" 
-    	  class="org.mule.example.loanbroker.bpm.activity.PrepareLoanQuoteRequest" 
-    	  method="prepareRequest" var="loanRequest">
-    	<arg><object expr="#{customerRequest}"/></arg>
-    	<arg><object expr="#{creditProfile}"/></arg>
+          class="org.mule.example.loanbroker.bpm.activity.PrepareLoanQuoteRequest"
+          method="prepareRequest" var="loanRequest">
+        <arg><object expr="#{customerRequest}"/></arg>
+        <arg><object expr="#{creditProfile}"/></arg>
         <transition to="sendToBanks" />
     </java>
 
@@ -53,28 +53,28 @@
         <transition to="loanDenied" />
     </decision>
 
-	<mule-send name="sendToBigBank" 
-		  expr="#{loanRequest}" endpoint="BigBank" 
-		  var="loanQuote" type="org.mule.example.loanbroker.messages.LoanQuote">
-		<transition to="sendCustomerResponse" />
-	</mule-send>	
+    <mule-send name="sendToBigBank"
+          expr="#{loanRequest}" endpoint="BigBank"
+          var="loanQuote" type="org.mule.example.loanbroker.messages.LoanQuote">
+        <transition to="sendCustomerResponse" />
+    </mule-send>
 
-	<mule-send name="sendToMediumBank" 
-		  expr="#{loanRequest}" endpoint="MediumBank" 
-		  var="loanQuote" type="org.mule.example.loanbroker.messages.LoanQuote">
-		<transition to="sendCustomerResponse" />
-	</mule-send>	
+    <mule-send name="sendToMediumBank"
+          expr="#{loanRequest}" endpoint="MediumBank"
+          var="loanQuote" type="org.mule.example.loanbroker.messages.LoanQuote">
+        <transition to="sendCustomerResponse" />
+    </mule-send>
 
-	<mule-send name="sendToSmallBank" 
-		  expr="#{loanRequest}" endpoint="SmallBank" 
-		  var="loanQuote" type="org.mule.example.loanbroker.messages.LoanQuote">
-		<transition to="sendCustomerResponse" />
-	</mule-send>	
+    <mule-send name="sendToSmallBank"
+          expr="#{loanRequest}" endpoint="SmallBank"
+          var="loanQuote" type="org.mule.example.loanbroker.messages.LoanQuote">
+        <transition to="sendCustomerResponse" />
+    </mule-send>
 
-	<mule-send name="sendCustomerResponse" 
-		  expr="#{loanQuote}" endpoint="CustomerResponses">
-		<transition to="loanApproved" />
-	</mule-send>	
+    <mule-send name="sendCustomerResponse"
+          expr="#{loanQuote}" endpoint="CustomerResponses">
+        <transition to="loanApproved" />
+    </mule-send>
 
     <end name="loanApproved" />
 
