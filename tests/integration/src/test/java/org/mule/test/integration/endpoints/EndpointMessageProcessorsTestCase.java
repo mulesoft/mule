@@ -43,6 +43,16 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         assertNotNull(response);
         assertEquals("input:A:B:service1:E:F", response.getPayload());
     }
+
+    public void testLegacyAttributes() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        
+        MuleMessage response = client.send("vm://in3", "input", null);
+        assertNotNull(response);
+        assertEquals("input:A:B:service1:E:F:service2:G:H:C:D", response.getPayload());
+    }
+
 }
 
 

@@ -16,7 +16,10 @@
     <custom-processor name="ProcessorG" class="org.mule.tck.testmodels.mule.TestMessageProcessor">
         <spring:property name="label" value="G" />
     </custom-processor>
+    <append-string-transformer name="TransformerB" message=":B" />
     <append-string-transformer name="TransformerD" message=":D" />
+    <append-string-transformer name="TransformerF" message=":F" />
+    <append-string-transformer name="TransformerH" message=":H" />
 
     <model>
         <service name="synchronousOutbound">
@@ -104,6 +107,39 @@
                 <vm:inbound-endpoint path="service2" exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=":service2" />
-        </service>        
+        </service> 
+               
+        <service name="legacyAttributes">
+            <inbound>
+                <vm:inbound-endpoint path="in3" exchange-pattern="request-response" transformer-refs="TransformerB" responseTransformer-refs="TransformerD">
+                    <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                        <spring:property name="label" value="A" />
+                    </custom-processor>
+                    <message-filter>
+                    	<wildcard-filter pattern="*:A" />
+                    </message-filter>
+                    <response>
+                    	<append-string-transformer message=":C" />
+	                    <message-filter>
+	                    	<wildcard-filter pattern="*:G:H*" />
+	                    </message-filter>
+                    </response>
+                </vm:inbound-endpoint>
+            </inbound>
+            <test:component appendString=":service1" />
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="service2" exchange-pattern="request-response" transformer-refs="TransformerF" responseTransformer-refs="TransformerH">
+                        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                            <spring:property name="label" value="E" />
+                        </custom-processor>
+                        <response>
+		                	<processor ref="ProcessorG" />
+                        </response>
+                    </vm:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
     </model>
 </mule>
