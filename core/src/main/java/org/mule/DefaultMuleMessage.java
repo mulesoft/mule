@@ -835,8 +835,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(READ);
         // need to wrap with another getInt() as some transports operate on it as a String
-        Object correlationSequence =
-            findPropertyInSpecifiedScopes(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.OUTBOUND, PropertyScope.INBOUND);
+        Object correlationSequence = findPropertyInSpecifiedScopes(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY,
+                                                                   PropertyScope.OUTBOUND,
+                                                                   PropertyScope.INBOUND);
         return ObjectUtils.getInt(correlationSequence, -1);
     }
 
@@ -856,8 +857,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(READ);
         // need to wrap with another getInt() as some transports operate on it as a String
-        Object correlationGroupSize =
-            findPropertyInSpecifiedScopes(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.OUTBOUND, PropertyScope.INBOUND);
+        Object correlationGroupSize = findPropertyInSpecifiedScopes(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY,
+                                                                    PropertyScope.OUTBOUND,
+                                                                    PropertyScope.INBOUND);
         return ObjectUtils.getInt(correlationGroupSize, -1);
     }
 
@@ -1043,8 +1045,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @SuppressWarnings("unused")
     public <T> T findPropertyInAnyScope(String name, T defaultValue)
     {
-        Object value = findPropertyInSpecifiedScopes(name, PropertyScope.OUTBOUND, PropertyScope.INVOCATION, PropertyScope.SESSION, PropertyScope.INBOUND);
-        if(value == null)
+        Object value = findPropertyInSpecifiedScopes(name,
+                                                     PropertyScope.OUTBOUND,
+                                                     PropertyScope.INVOCATION,
+                                                     PropertyScope.SESSION,
+                                                     PropertyScope.INBOUND);
+        if (value == null)
         {
             return defaultValue;
         }
@@ -1617,13 +1623,15 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * Find property in one of the specified scopes, in order
      */
-    private Object findPropertyInSpecifiedScopes(String name, PropertyScope... scopesToSearch)
+    protected Object findPropertyInSpecifiedScopes(String name, PropertyScope... scopesToSearch)
     {
         for (PropertyScope scope : scopesToSearch)
         {
             Object result = getProperty(name, scope);
             if (result != null)
+            {
                 return result;
+            }
         }
         return null;
     }

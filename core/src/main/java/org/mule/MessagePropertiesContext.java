@@ -17,11 +17,9 @@ import org.mule.util.MapUtils;
 import org.mule.util.ObjectUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -49,35 +47,7 @@ public class MessagePropertiesContext implements Serializable
 {
     private static final long serialVersionUID = -5230693402768953742L;
 
-    /**
-     * The order that properties should be read in.
-     */
-    private final static List<PropertyScope> SCOPE_ORDER = new ArrayList<PropertyScope>();
-
     private Log logger = LogFactory.getLog(getClass());
-
-    static
-    {
-        /**
-         * Outbound is the default scope since properties added to a message are assumed to be included on the
-         * outgoing message
-         */
-        SCOPE_ORDER.add(PropertyScope.OUTBOUND);
-        /**
-         * Invocation scope properties only exist for the invocation of a service, after which they are destroyed
-         */
-        SCOPE_ORDER.add(PropertyScope.INVOCATION);
-        /**
-         * If a message was created via and inbound event, any properties associated with that event are available
-         * in the inbound scope
-         */
-        SCOPE_ORDER.add(PropertyScope.INBOUND);
-        /**
-         * Any properties available on the session associated with the current message (if any) will be made available
-         * the session scope
-         */
-        SCOPE_ORDER.add(PropertyScope.SESSION);
-    }
 
     /**
      * Map of maps containing the scoped properties, each scope has its own Map.
