@@ -835,14 +835,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(READ);
         // need to wrap with another getInt() as some transports operate on it as a String
-        Integer seq = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.OUTBOUND, null), -1);
-        if (seq == null)
-        {
-            seq = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.INBOUND, null), -1);
-        }
-
-        return seq;
-
+        Object correlationSequence =
+            findPropertyInSpecifiedScopes(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY, PropertyScope.OUTBOUND, PropertyScope.INBOUND);
+        return ObjectUtils.getInt(correlationSequence, -1);
     }
 
     /**
@@ -861,13 +856,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         assertAccess(READ);
         // need to wrap with another getInt() as some transports operate on it as a String
-        Integer groupSize = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.OUTBOUND, null), -1);
-        if (groupSize == null)
-        {
-            groupSize = ObjectUtils.getInt(getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.INBOUND, null), -1);
-        }
-
-        return groupSize;
+        Object correlationGroupSize =
+            findPropertyInSpecifiedScopes(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY, PropertyScope.OUTBOUND, PropertyScope.INBOUND);
+        return ObjectUtils.getInt(correlationGroupSize, -1);
     }
 
     /**
@@ -1052,19 +1043,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @SuppressWarnings("unused")
     public <T> T findPropertyInAnyScope(String name, T defaultValue)
     {
-        Object value = getProperty(name, PropertyScope.OUTBOUND);
-        if (value == null)
-        {
-            value = getProperty(name, PropertyScope.INVOCATION);
-            if (value == null)
-            {
-                value = getProperty(name, PropertyScope.SESSION);
-                if (value == null)
-                {
-                    value = getProperty(name, PropertyScope.INBOUND);
-                }
-            }
-        }
+        Object value = findPropertyInSpecifiedScopes(name, PropertyScope.OUTBOUND, PropertyScope.INVOCATION, PropertyScope.SESSION, PropertyScope.INBOUND);
         if(value == null)
         {
             return defaultValue;
@@ -1633,5 +1612,19 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         assertAccess(WRITE);
         logger.warn("MuleMessage.setStringProperty() method is deprecated, use MuleMessage.setOutboundProperty() instead.  This method will be removed in the next point release");
         setOutboundProperty(name, value);
+    }
+
+    /**
+     * Find property in one of the specified scopes, in order
+     */
+    private Object findPropertyInSpecifiedScopes(String name, PropertyScope... scopesToSearch)
+    {
+        for (PropertyScope scope : scopesToSearch)
+        {
+            Object result = getProperty(name, scope);
+            if (result != null)
+                return result;
+        }
+        return null;
     }
 }

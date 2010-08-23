@@ -181,6 +181,15 @@ public void testHeadersWithScopes() throws Exception
         assertTrue(((Map)result).values().contains("foovalue"));
         assertTrue(((Map)result).values().contains("bazvalue"));
 
+        message.setInboundProperty("infoo", "infoovalue");
+        result = eval.evaluate("infoo?", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(0, ((Map)result).size());
+        result = eval.evaluate("INBOUND:infoo?", message);
+        assertNotNull(result);
+        assertTrue(result instanceof Map);
+        assertEquals(1, ((Map)result).size());
     }
 
 

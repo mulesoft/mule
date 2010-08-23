@@ -41,7 +41,7 @@ public class XmppPacketToObject extends AbstractMessageTransformer
         String subject = xmppMessage.getSubject();
         if (StringUtils.isNotEmpty(subject))
         {
-            muleMessage.setOutboundProperty(XmppConnector.XMPP_SUBJECT, subject);
+            muleMessage.setInboundProperty(XmppConnector.XMPP_SUBJECT, subject);
         }
     }
 

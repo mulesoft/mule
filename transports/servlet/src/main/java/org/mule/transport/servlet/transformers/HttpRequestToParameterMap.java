@@ -32,6 +32,6 @@ public class HttpRequestToParameterMap extends AbstractMessageTransformer
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding)
     {
-        return message.getOutboundProperty(ServletConnector.PARAMETER_MAP_PROPERTY_KEY);
+        return message.getInboundProperty(ServletConnector.PARAMETER_MAP_PROPERTY_KEY);
     }
 }
