@@ -1042,7 +1042,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return Collections.unmodifiableSet(outboundAttachments.keySet());
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings("unchecked")
     public <T> T findPropertyInAnyScope(String name, T defaultValue)
     {
         Object value = findPropertyInSpecifiedScopes(name,
@@ -1054,7 +1054,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             return defaultValue;
         }
-        return (T)value;
+        return (T) value;
     }
 
     /**
@@ -1623,14 +1623,15 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * Find property in one of the specified scopes, in order
      */
-    protected Object findPropertyInSpecifiedScopes(String name, PropertyScope... scopesToSearch)
+    @SuppressWarnings("unchecked")
+    public <T> T findPropertyInSpecifiedScopes(String name, PropertyScope... scopesToSearch)
     {
         for (PropertyScope scope : scopesToSearch)
         {
             Object result = getProperty(name, scope);
             if (result != null)
             {
-                return result;
+                return (T) result;
             }
         }
         return null;
