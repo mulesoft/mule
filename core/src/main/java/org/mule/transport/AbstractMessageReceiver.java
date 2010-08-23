@@ -76,8 +76,8 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
      */
     private EndpointURI endpointUri;
     
-    private List<Transformer> defaultInboundTransformers;
-    private List<Transformer> defaultResponseTransformers;
+    protected List<Transformer> defaultInboundTransformers;
+    protected List<Transformer> defaultResponseTransformers;
 
     /**
      * Creates the Message Receiver

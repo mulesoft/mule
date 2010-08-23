@@ -25,7 +25,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.Message;
@@ -47,6 +46,7 @@ import java.util.Map;
 import javax.resource.spi.work.Work;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.logging.Log;
@@ -466,7 +466,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         }
         //TODO RM*: Maybe we can have a generic Transformer wrapper rather that using DefaultMuleMessage (or another static utility
         //class
-        message.applyTransformers(null, connector.getDefaultResponseTransformers(endpoint), HttpResponse.class);
+        message.applyTransformers(null, defaultResponseTransformers, HttpResponse.class);
         return (HttpResponse) message.getPayload();
     }
 
