@@ -95,7 +95,7 @@ public class CxfOutboundMessageProcessor
         Object[] args = payloadToArguments.payloadToArrayOfArguments(payload);
 
         MuleMessage message = event.getMessage();
-        Set<?> attachmentNames = message.getAttachmentNames();
+        Set<?> attachmentNames = message.getOutboundAttachmentNames();
         if (attachmentNames != null && !attachmentNames.isEmpty())
         {
             List<DataHandler> attachments = new ArrayList<DataHandler>();
