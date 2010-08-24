@@ -9,10 +9,13 @@
  */
 package org.mule.transport.ftp;
 
+import org.mule.api.endpoint.EndpointException;
+import org.mule.endpoint.MuleEndpointURI;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.file.DummyFilenameParser;
 import org.mule.transport.file.FilenameParser;
-import org.mule.transport.ftp.FtpConnector;
+
+import org.apache.commons.pool.impl.GenericObjectPool;
 
 /**
  * Load a mule config and verify that the parameters are set as expected
@@ -41,5 +44,15 @@ public class FtpNamespaceHandlerTestCase extends FunctionalTestCase
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
+    }
+    
+    public void testReceiverFtpConnector() throws EndpointException 
+    {
+        FtpConnector c = (FtpConnector)muleContext.getRegistry().lookupConnector("receiverFtpConnector");
+        assertNotNull(c);
+        
+        MuleEndpointURI uri = new MuleEndpointURI("http://localhost", null);
+        GenericObjectPool objectPool = (GenericObjectPool) c.getFtpPool(uri);
+        assertEquals(GenericObjectPool.WHEN_EXHAUSTED_FAIL, objectPool.getWhenExhaustedAction());
     }
 }

@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.config.ThreadingProfile;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -222,9 +223,9 @@ public class FtpConnector extends AbstractConnector
                 FtpConnectionFactory connectionFactory =
                         (FtpConnectionFactory) ClassUtils.instanciateClass(getConnectionFactoryClass(),
                                                                             new Object[] {uri}, getClass());
-                pool = new GenericObjectPool(connectionFactory);
-                ((GenericObjectPool) pool).setTestOnBorrow(isValidateConnections());
-                pools.put(key, pool);
+                GenericObjectPool genericPool = createPool(connectionFactory);
+                pools.put(key, genericPool);
+                pool = genericPool;
             }
             catch (Exception ex)
             {
@@ -235,6 +236,33 @@ public class FtpConnector extends AbstractConnector
         return pool;
     }
 
+    protected GenericObjectPool createPool(FtpConnectionFactory connectionFactory)
+    {
+        GenericObjectPool genericPool = new GenericObjectPool(connectionFactory);
+        byte poolExhaustedAction = ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION;
+        
+        ThreadingProfile receiverThreadingProfile = this.getReceiverThreadingProfile();
+        if (receiverThreadingProfile != null) 
+        {
+            int threadingProfilePoolExhaustedAction = receiverThreadingProfile.getPoolExhaustedAction();
+            if (threadingProfilePoolExhaustedAction == ThreadingProfile.WHEN_EXHAUSTED_WAIT) 
+            {
+                poolExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_BLOCK;
+            } 
+            else if (threadingProfilePoolExhaustedAction == ThreadingProfile.WHEN_EXHAUSTED_ABORT) 
+            {
+                poolExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_FAIL;
+            } 
+            else if (threadingProfilePoolExhaustedAction == ThreadingProfile.WHEN_EXHAUSTED_RUN) 
+            {
+                poolExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_GROW;
+            }
+        }
+        
+        genericPool.setWhenExhaustedAction(poolExhaustedAction);
+        genericPool.setTestOnBorrow(isValidateConnections());
+        return genericPool;
+    }
 
     @Override
     protected void doInitialise() throws InitialisationException
