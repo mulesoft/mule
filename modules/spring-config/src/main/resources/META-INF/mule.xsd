@@ -3181,7 +3181,7 @@
                     <xsd:sequence minOccurs="1" maxOccurs="unbounded">
                         <xsd:element name="bean-property">
                             <xsd:complexType>
-                                <xsd:attribute name="name" type="xsd:string" use="required">
+                                <xsd:attribute name="property-name" type="xsd:string" use="required">
                                     <xsd:annotation>
                                         <xsd:documentation>
                                             The name of the bean property

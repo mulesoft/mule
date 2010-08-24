@@ -230,7 +230,10 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("return-argument", new ChildDefinitionParser("argument", ExpressionArgument.class));
 
         registerBeanDefinitionParser("bean-builder-transformer", new MessageProcessorDefinitionParser(BeanBuilderTransformer.class));
-        registerBeanDefinitionParser("bean-property", new ChildDefinitionParser("argument", ExpressionArgument.class));
+        
+        ChildDefinitionParser beanPropertyParser = new ChildDefinitionParser("argument", ExpressionArgument.class);
+        beanPropertyParser.addAlias("property-name", "name");
+        registerBeanDefinitionParser("bean-property", beanPropertyParser);
 
         registerBeanDefinitionParser("base64-encoder-transformer", new MessageProcessorDefinitionParser(Base64Encoder.class));
         registerBeanDefinitionParser("base64-decoder-transformer", new MessageProcessorDefinitionParser(Base64Decoder.class));
