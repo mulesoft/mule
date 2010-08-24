@@ -656,6 +656,30 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
     }
 
+
+    /**
+     * Closes a session if there is no active transaction in the current thread, otherwise the
+     * session will continue active until there is a direct call to close it.
+     *
+     * @param session the session that ill be closed if there is an active transaction.
+     */
+    public void closeSessionIfNoTransactionActive(Session session)
+    {
+        final Transaction transaction = TransactionCoordination.getInstance().getTransaction();
+        if (transaction == null)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.error("Closing non-TX session: " + session);
+            }
+            closeQuietly(session);
+        }
+        else if (logger.isDebugEnabled())
+        {
+            logger.error("Not closing TX session: " + session);
+        }
+    }
+
     @Override
     protected void doStop() throws MuleException
     {

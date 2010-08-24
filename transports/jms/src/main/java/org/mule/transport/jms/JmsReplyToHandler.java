@@ -176,21 +176,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         finally
         {
             connector.closeQuietly(replyToProducer);
-
-            final Transaction transaction = TransactionCoordination.getInstance().getTransaction();
-            if (transaction == null)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Closing non-TX replyTo session: " + session);
-                }
-                connector.closeQuietly(session);
-            }
-            else if (logger.isDebugEnabled())
-            {
-                logger.debug("Not closing TX replyTo session: " + session);
-            }
-
+            connector.closeSessionIfNoTransactionActive(session);
         }
     }
 

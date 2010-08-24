@@ -10,7 +10,12 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.transaction.Transaction;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transaction.TransactionCoordination;
+
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,6 +24,7 @@ import org.mule.tck.AbstractMuleTestCase;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.Session;
 
 import org.mockito.Matchers;
 
@@ -91,5 +97,26 @@ public class JmsConnectorTestCase extends AbstractMuleTestCase
 
         assertEquals(connection, createdConnection);
         verify(connection, times(0)).setClientID(Matchers.anyString());
+    }
+
+    public void testClosesSessionIfThereIsNoActiveTransaction() throws Exception
+    {
+        JmsConnector connector = new JmsConnector(muleContext);
+
+        Session session = mock(Session.class);
+        connector.closeSessionIfNoTransactionActive(session);
+        verify(session, times(1)).close();
+    }
+
+    public void testDoNotClosesSessionIfThereIsAnActiveTransaction() throws Exception
+    {
+        Transaction transaction = mock(Transaction.class);
+        TransactionCoordination.getInstance().bindTransaction(transaction);
+
+        JmsConnector connector = new JmsConnector(muleContext);
+
+        Session session = mock(Session.class);
+        connector.closeSessionIfNoTransactionActive(session);
+        verify(session, never()).close();
     }
 }
