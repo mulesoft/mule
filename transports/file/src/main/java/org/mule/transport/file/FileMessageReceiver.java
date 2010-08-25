@@ -454,6 +454,12 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             files = currentDirectory.listFiles(filenameFilter);
         }
+        
+        // the listFiles calls above may actually return null (check the JDK code).
+        if (files == null)
+        {
+            return;
+        }
 
         for (File file : files)
         {
