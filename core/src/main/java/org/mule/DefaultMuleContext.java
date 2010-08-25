@@ -263,6 +263,10 @@ public class DefaultMuleContext implements MuleContext
             SplashScreen shutdownScreen = buildShutdownSplash();
             logger.info(shutdownScreen.toString());
         }
+
+        //registryBroker.dispose();
+
+        setExecutionClassLoader(null);
     }
 
     /**

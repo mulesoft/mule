@@ -14,6 +14,7 @@ import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.FilenameUtils;
 
+import java.beans.Introspector;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -50,6 +51,7 @@ public class DefaultMuleDeployer implements MuleDeployer
             app.dispose();
             final File appDir = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), app.getAppName());
             FileUtils.deleteDirectory(appDir);
+            Introspector.flushCaches();
         }
         catch (Throwable t)
         {

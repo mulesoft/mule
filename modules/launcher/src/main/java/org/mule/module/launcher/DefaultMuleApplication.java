@@ -233,6 +233,7 @@ public class DefaultMuleApplication implements Application
         }
 
         muleContext.dispose();
+        muleContext = null;
         // kill any refs to the old classloader to avoid leaks
         Thread.currentThread().setContextClassLoader(null);
     }
@@ -252,6 +253,9 @@ public class DefaultMuleApplication implements Application
 
         init();
         start();
+
+        // release the ref
+        Thread.currentThread().setContextClassLoader(null);
     }
 
     public void stop()

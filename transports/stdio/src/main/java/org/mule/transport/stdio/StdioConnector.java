@@ -13,6 +13,7 @@ package org.mule.transport.stdio;
 import org.mule.api.MuleContext;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -46,7 +47,7 @@ public abstract class StdioConnector extends AbstractConnector
     public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
         return serviceDescriptor.createMessageReceiver(this, flowConstruct, endpoint,
-            new Object[]{ Long.valueOf(AbstractPollingMessageReceiver.DEFAULT_POLL_FREQUENCY) });
+                                                       AbstractPollingMessageReceiver.DEFAULT_POLL_FREQUENCY);
     }
 
     @Override
@@ -93,4 +94,13 @@ public abstract class StdioConnector extends AbstractConnector
         this.outputStream = outputStream;
     }
 
+    public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, FlowConstruct flowConstruct) throws Exception
+    {
+        if (receivers.size() > 0)
+        {
+            throw new UnsupportedOperationException(
+                "You can only register one listener per system stream connector");
+        }
+        super.registerListener(endpoint, listener, flowConstruct);
+    }
 }

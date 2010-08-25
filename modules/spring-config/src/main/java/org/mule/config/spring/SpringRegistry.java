@@ -21,8 +21,8 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.lifecycle.phases.ContainerManagedLifecyclePhase;
 import org.mule.lifecycle.RegistryLifecycleManager;
+import org.mule.lifecycle.phases.ContainerManagedLifecyclePhase;
 import org.mule.lifecycle.phases.MuleContextStartPhase;
 import org.mule.lifecycle.phases.MuleContextStopPhase;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
@@ -118,6 +118,9 @@ public class SpringRegistry extends AbstractRegistry
         {
             ((ConfigurableApplicationContext) applicationContext).close();
         }
+
+        // release the circular implicit ref to MuleContext
+        applicationContext = null;
 
         this.springContextInitialised.set(false);
     }

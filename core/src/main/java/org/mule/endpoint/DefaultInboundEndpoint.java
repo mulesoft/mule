@@ -145,4 +145,12 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
     {
         this.exceptionListener = exceptionListener;
     }
+
+    @Override
+    public void dispose()
+    {
+        super.dispose();
+        this.flowConstruct = null;
+        this.listener = null;
+    }
 }

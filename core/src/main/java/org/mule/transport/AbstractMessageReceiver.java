@@ -28,7 +28,6 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
@@ -326,5 +325,13 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
     public void setListener(MessageProcessor processor)
     {
         this.listener = processor;
+    }
+
+    @Override
+    protected void doDispose()
+    {
+        this.listener = null;
+        this.flowConstruct = null;
+        super.doDispose();
     }
 }
