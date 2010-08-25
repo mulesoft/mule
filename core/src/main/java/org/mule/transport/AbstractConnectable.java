@@ -17,6 +17,7 @@ import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
@@ -174,7 +175,10 @@ public abstract class AbstractConnectable<O> implements Connectable, LifecycleSt
             {
                 logger.warn(e.getMessage(), e);
             }
-            if(isStarted()) stop();
+            if (isStarted())
+            {
+                stop();
+            }
             
             //Nothing to do when disposing, just transition
             lifecycleManager.fireDisposePhase(new LifecycleCallback<O>() {
@@ -485,7 +489,10 @@ public abstract class AbstractConnectable<O> implements Connectable, LifecycleSt
 
     protected void doDispose()
     {
-        // nothing to do by default
+        if (this.endpoint instanceof Disposable)
+        {
+            ((Disposable) this.endpoint).dispose();
+        }
     }
 
     protected void doConnect() throws Exception
