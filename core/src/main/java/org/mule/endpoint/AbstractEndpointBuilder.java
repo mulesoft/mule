@@ -34,6 +34,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
@@ -396,9 +397,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     {
         for (MessageProcessor mp : messageProcessors)
         {
-            if (mp instanceof SecurityFilterMessageProcessorBuilder)
+            if (mp instanceof SecurityFilterMessageProcessor)
             {
-                return ((SecurityFilterMessageProcessorBuilder)mp).getSecurityFilter();
+                return ((SecurityFilterMessageProcessor) mp).getFilter();
             }
         }
 

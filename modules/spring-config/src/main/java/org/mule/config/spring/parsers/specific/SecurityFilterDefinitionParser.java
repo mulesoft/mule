@@ -16,7 +16,7 @@ import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.WrappingChildDefinitionParser;
-import org.mule.endpoint.SecurityFilterMessageProcessorBuilder;
+import org.mule.processor.SecurityFilterMessageProcessor;
 
 import org.w3c.dom.Element;
 
@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
 public class SecurityFilterDefinitionParser extends ParentContextDefinitionParser  implements WrappingChildDefinitionParser.WrappingController
 {
 
-    public static final String SECURITY_FILTER = "securityFilter";
+    public static final String SECURITY_FILTER = "filter";
     public static final String ATTRIBUTE_NAME = AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME;
 
     public SecurityFilterDefinitionParser(Class filter)
@@ -35,7 +35,7 @@ public class SecurityFilterDefinitionParser extends ParentContextDefinitionParse
         super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new OrphanDefinitionParser(filter, false));
         otherwise(
             new WrappingChildDefinitionParser(
-                "messageProcessor", filter, EndpointSecurityFilter.class, false, SecurityFilterMessageProcessorBuilder.class,
+                "messageProcessor", filter, EndpointSecurityFilter.class, false, SecurityFilterMessageProcessor.class,
                 SECURITY_FILTER, SECURITY_FILTER, this));
         addIgnored(ATTRIBUTE_NAME);
     }
@@ -45,7 +45,7 @@ public class SecurityFilterDefinitionParser extends ParentContextDefinitionParse
         super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new OrphanDefinitionParser(false));
         otherwise(
             new WrappingChildDefinitionParser(
-                "messageProcessor", null, EndpointSecurityFilter.class, true, SecurityFilterMessageProcessorBuilder.class,
+                "messageProcessor", null, EndpointSecurityFilter.class, true, SecurityFilterMessageProcessor.class,
                 SECURITY_FILTER, SECURITY_FILTER, this));
         addIgnored(ATTRIBUTE_NAME);
     }
