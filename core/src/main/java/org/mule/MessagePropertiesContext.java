@@ -61,6 +61,7 @@ public class MessagePropertiesContext implements Serializable
 
     protected PropertyScope defaultScope = PropertyScope.OUTBOUND;
 
+    @SuppressWarnings("unchecked")
     public MessagePropertiesContext()
     {
         keySet = new TreeSet<String>();
@@ -69,21 +70,6 @@ public class MessagePropertiesContext implements Serializable
         scopedMap.put(PropertyScope.INVOCATION, new CaseInsensitiveHashMap/*<String, Object>*/(6));
         scopedMap.put(PropertyScope.INBOUND, new CaseInsensitiveHashMap/*<String, Object>*/(6));
         scopedMap.put(PropertyScope.OUTBOUND, new CaseInsensitiveHashMap/*<String, Object>*/(6));
-    }
-
-    /**
-     * Ctor used for copying only
-     *
-     * @param defaultScope The default scope to add properties to if a scope is not defined
-     * @param keySet       the set ofkeys for the Message properties context being copied
-     * @param scopedMap    the map of actual properties to be copied
-     */
-    private MessagePropertiesContext(PropertyScope defaultScope, Set<String> keySet,
-                                     Map<PropertyScope, Map<String, Object>> scopedMap)
-    {
-        this.keySet = keySet;
-        this.scopedMap = scopedMap;
-        this.defaultScope = defaultScope;
     }
 
     protected Map<String, Object> getScopedProperties(PropertyScope scope)
@@ -257,6 +243,7 @@ public class MessagePropertiesContext implements Serializable
      * @param value the property value
      * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)}
      */
+    @Deprecated
     public void setProperty(String key, Object value)
     {
         getScopedProperties(defaultScope).put(key, value);
