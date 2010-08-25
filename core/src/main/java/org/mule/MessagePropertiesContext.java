@@ -46,6 +46,7 @@ import org.apache.commons.logging.LogFactory;
 public class MessagePropertiesContext implements Serializable
 {
     private static final long serialVersionUID = -5230693402768953742L;
+    private static final PropertyScope DEFAULT_SCOPE = PropertyScope.OUTBOUND;
 
     private Log logger = LogFactory.getLog(getClass());
 
@@ -59,7 +60,6 @@ public class MessagePropertiesContext implements Serializable
      */
     protected Set<String> keySet;
 
-    protected PropertyScope defaultScope = PropertyScope.OUTBOUND;
 
     @SuppressWarnings("unchecked")
     public MessagePropertiesContext()
@@ -84,7 +84,7 @@ public class MessagePropertiesContext implements Serializable
 
     public PropertyScope getDefaultScope()
     {
-        return defaultScope;
+        return DEFAULT_SCOPE;
     }
 
     protected void addInboundProperties(Map<String, Object> properties)
@@ -246,7 +246,7 @@ public class MessagePropertiesContext implements Serializable
     @Deprecated
     public void setProperty(String key, Object value)
     {
-        getScopedProperties(defaultScope).put(key, value);
+        getScopedProperties(DEFAULT_SCOPE).put(key, value);
         keySet.add(key);
     }
 
