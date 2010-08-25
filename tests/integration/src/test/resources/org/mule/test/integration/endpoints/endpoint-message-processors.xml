@@ -82,7 +82,7 @@
             <test:component appendString=":service1" />
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="out" exchange-pattern="one-way">
+                    <vm:outbound-endpoint path="out2" exchange-pattern="one-way">
 	                    <message-filter>
 	                    	<wildcard-filter pattern="*:service1" />
 	                    </message-filter>
@@ -136,6 +136,42 @@
                         <response>
 		                	<processor ref="ProcessorG" />
                         </response>
+                    </vm:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="routers">
+            <inbound>
+                <vm:inbound-endpoint path="in4" exchange-pattern="one-way">
+                    <wire-tap>
+                    	<vm:outbound-endpoint path="wiretap1" exchange-pattern="one-way">
+	                    	<append-string-transformer message=" (tapped)" />
+		                </vm:outbound-endpoint>
+                    </wire-tap>
+                    <custom-splitter class="org.mule.test.integration.endpoints.CommaSplitter" />
+                    <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                        <spring:property name="label" value="A" />
+                    </custom-processor>
+                    <processor ref="ProcessorB" />
+                </vm:inbound-endpoint>
+            </inbound>
+            <test:component appendString=":service1" />
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out4" exchange-pattern="one-way">
+	                    <wire-tap>
+	                    	<vm:outbound-endpoint path="wiretap2" exchange-pattern="one-way">
+		                    	<append-string-transformer message=" (tapped)" />
+	                    	</vm:outbound-endpoint>
+	                    </wire-tap>
+	                    <message-filter>
+	                    	<wildcard-filter pattern="*:service1" />
+	                    </message-filter>
+                    	<append-string-transformer message=":E" />
+                        <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
+                            <spring:property name="label" value="F" />
+                        </custom-processor>
                     </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>

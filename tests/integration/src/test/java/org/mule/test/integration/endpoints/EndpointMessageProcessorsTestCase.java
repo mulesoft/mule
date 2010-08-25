@@ -39,7 +39,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         assertNotNull(response);
         assertEquals("input:A:B:service1:C:D", response.getPayload());
 
-        response = client.request("vm://out", 1000);
+        response = client.request("vm://out2", 1000);
         assertNotNull(response);
         assertEquals("input:A:B:service1:E:F", response.getPayload());
     }
@@ -53,6 +53,44 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         assertEquals("input:A:B:service1:E:F:service2:G:H:C:D", response.getPayload());
     }
 
+    public void testRouters() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        
+        client.dispatch("vm://in4", "input1,input2,input3", null);
+
+        MuleMessage response = client.request("vm://wiretap1", 1000);
+        assertNotNull(response);
+        assertEquals("input1,input2,input3 (tapped)", response.getPayload());
+
+        response = client.request("vm://wiretap2", 1000);
+        assertNotNull(response);
+        assertTrue(response.getPayloadAsString().startsWith("input"));
+        assertTrue(response.getPayloadAsString().endsWith(":A:B:service1 (tapped)"));
+        response = client.request("vm://wiretap2", 1000);
+        assertNotNull(response);
+        assertTrue(response.getPayloadAsString().startsWith("input"));
+        assertTrue(response.getPayloadAsString().endsWith(":A:B:service1 (tapped)"));
+        response = client.request("vm://wiretap2", 1000);
+        assertNotNull(response);
+        assertTrue(response.getPayloadAsString().startsWith("input"));
+        assertTrue(response.getPayloadAsString().endsWith(":A:B:service1 (tapped)"));
+        response = client.request("vm://wiretap2", 1000);
+        assertNull(response);
+
+        response = client.request("vm://out4", 1000);
+        assertNotNull(response);
+        assertTrue(response.getPayloadAsString().startsWith("input"));
+        assertTrue(response.getPayloadAsString().endsWith(":A:B:service1:E:F"));
+        response = client.request("vm://out4", 1000);
+        assertNotNull(response);
+        assertTrue(response.getPayloadAsString().startsWith("input"));
+        assertTrue(response.getPayloadAsString().endsWith(":A:B:service1:E:F"));
+        response = client.request("vm://out4", 1000);
+        assertNotNull(response);
+        assertTrue(response.getPayloadAsString().startsWith("input"));
+        assertTrue(response.getPayloadAsString().endsWith(":A:B:service1:E:F"));
+        response = client.request("vm://out4", 1000);
+        assertNull(response);
+    }
 }
-
-
