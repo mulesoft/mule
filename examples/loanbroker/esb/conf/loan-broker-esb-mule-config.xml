@@ -22,7 +22,7 @@
 
     <description>
         The Loan Broker ESB example implements the Loan Broker Example using an ESB topology. See
-        http://mule.mulesource.org/wiki/display/MULE/LoanBroker+ESB for details.
+        http://mule.mulesoft.org/wiki/display/MULE/LoanBroker+ESB for details.
     </description>
 
     <client:remote-dispatcher-agent>

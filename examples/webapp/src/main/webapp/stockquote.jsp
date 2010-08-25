@@ -36,7 +36,7 @@ Enter a stock symbol:
 </form>
 <p/>
 <table border="1" bordercolor="#990000"  align="left">
-<tr><td>For more information about the Stock Quote example go <a target="_blank" href="http://mule.mulesource.org/display/MULE2INTRO/Stock+Quote+Example">here</a>.</td></tr>
+<tr><td>For more information about the Stock Quote example go <a target="_blank" href="http://www.mulesoft.org/documentation/display/MULE3INTRO/Stock+Quote+Example">here</a>.</td></tr>
 </table>
 </body>
 </html>

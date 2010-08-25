@@ -38,7 +38,7 @@
     <xsl:template match="transport">
         <xsl:choose>
             <xsl:when test="@dist = 'ee'">
-                <xsl:apply-templates select="document(concat('http://www.mulesource.org/schema/mule/ee/',. ,'$version', '/mule-', ., '-ee.xsd'))"/>
+                <xsl:apply-templates select="document(concat('http://www.mulesoft.org/schema/mule/ee/',. ,'$version', '/mule-', ., '-ee.xsd'))"/>
             </xsl:when>
             <xsl:when test="@dist = 'mf'">
                 <xsl:variable name="schemaLocation"><xsl:value-of select="@schema"/></xsl:variable>
@@ -144,7 +144,7 @@
             <xsl:value-of select="schemadoc:MEPs/@default"/>
         </xsl:variable>
         <xsl:variable name="page">
-            <xsl:value-of select="concat('http://mule.mulesoft.org/display/MULE2USER/', translate(/xsd:schema/xsd:annotation/xsd:appinfo/schemadoc:page-title, ' ', '+'))"/>
+            <xsl:value-of select="concat('http://www.mulesoft.org/documentation/display/MULE3USER/', translate(/xsd:schema/xsd:annotation/xsd:appinfo/schemadoc:page-title, ' ', '+'))"/>
         </xsl:variable>
         <tr>
             <td class="confluenceTd"><a href="{$page}"><xsl:value-of

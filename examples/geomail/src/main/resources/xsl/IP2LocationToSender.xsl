@@ -10,7 +10,7 @@
     </xsl:template>
 
     <xsl:template match="fraudlabs:IP2LOCATION">
-        <sender xmlns="http://www.mulesource.org/example/geomail">
+        <sender xmlns="http://www.mulesoft.org/example/geomail">
             <locationName><xsl:value-of select="fraudlabs:CITY"/>,
                 <xsl:value-of select="fraudlabs:REGION"/>
             </locationName>

@@ -6,7 +6,7 @@ the objects managed by Mule and how to publish events to multiple outbound
 endpoints.  The example consists of two components: ExceptionManager and 
 BusinessErrorManager.
 
-For more information, refer to http://mule.mulesource.org/display/MULE2INTRO/Examples
+For more information, refer to http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples
 
 +----------------------+
 | Building the example |

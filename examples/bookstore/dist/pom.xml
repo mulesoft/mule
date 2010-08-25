@@ -48,7 +48,7 @@
     </build>
 
     <distributionManagement>
-        <downloadUrl>http://mule.mulesource.org/display/MULE/Download</downloadUrl>
+        <downloadUrl>http://mule.mulesoft.org/display/MULE/Download</downloadUrl>
         <repository>
             <id>mule-releases</id>
             <name>Mule Release Repository</name>

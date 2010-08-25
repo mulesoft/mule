@@ -1,7 +1,7 @@
 /*
  * $Id: CorrelationSequenceComparator.java 18181 2010-07-13 13:46:53Z dirk.olmes $
  * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the

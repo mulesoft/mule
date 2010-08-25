@@ -7,7 +7,7 @@ Enterprise Integration Patterns book.
 There are several variations of the same application which illustrate different 
 architectural styles and Mule constructs.
 
-For more information, refer to http://mule.mulesource.org/display/MULE2INTRO/Examples
+For more information, refer to http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples
 
 +----------------------+
 | Building the example |

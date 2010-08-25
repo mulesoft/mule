@@ -120,7 +120,7 @@ This  project also contains test classes that can be run as part of a test suite
 ./src/test/java/${package}/${ModuleNameLower}/${ModuleName}TestCase.java
 
 This is an example functional test case.  The test will work as is, but you need to configure it to actually test your
-code.  For more information about testing see: http://www.mulesource.org/display/MULE2USER/Functional+Testing.
+code.  For more information about testing see: http://www.mulesoft.org/documentation/display/MULE3USER/Functional+Testing.
 
 -----------------------------------------------------------------
 ./src/test/resources/${ModuleNameLower}-functional-test-config.xml
@@ -143,24 +143,24 @@ The configuration file for the ${ModuleName}NamespaceHandlerTestCase.java testca
 ADDITIONAL RESOURCES
 ====================
 Everything you need to know about getting started with Mule can be found here:
-http://www.mulesource.org/display/MULE2INTRO/Home
+http://www.mulesoft.org/documentation/display/MULE3INTRO/Home
 
 There further useful information about extending Mule here:
-http://mule.mulesource.org/display/MULE2USER/Introduction+to+Extending+Mule
+http://www.mulesoft.org/documentation/display/MULE3USER/Introduction+to+Extending+Mule
 
   #if($hasCustomSchema == "y")
 There is detailed information about creating Mule configuration schemas here:
-http://mule.mulesource.org/display/MULE2USER/Creating+a+Custom+XML+Namespace
+http://www.mulesoft.org/documentation/display/MULE3USER/Creating+a+Custom+XML+Namespace
   #end
   
 For information about working with Mule inside and IDE with maven can be found here:
-http://www.mulesource.org/display/MULE2INTRO/Setting+Up+Eclipse
+http://www.mulesoft.org/documentation/display/MULE3INTRO/Setting+Up+Eclipse
 
 Remember if you get stuck you can try getting help on the Mule user list:
-http://www.mulesource.org/display/MULE/Mailing+Lists
+http://www.mulesoft.org/email-lists
 
-Also, MuleSource, the company behind Mule, offers 24x7 support options:
-http://www.mulesource.com/services/subscriptions.php
+Also, MuleSoft, the company behind Mule, offers 24x7 support options:
+http://www.mulesoft.com/enterprise-subscriptions-and-support
 
 Enjoy your Mule ride!
 

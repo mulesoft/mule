@@ -6,7 +6,7 @@
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
     <xsl:template match="/">
-        <sender xmlns="http://www.mulesource.org/example/geomail">
+        <sender xmlns="http://www.mulesoft.org/example/geomail">
             <xsl:apply-templates/>
         </sender>
     </xsl:template>

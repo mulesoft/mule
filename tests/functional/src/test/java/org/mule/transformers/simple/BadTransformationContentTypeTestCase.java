@@ -1,7 +1,7 @@
 /*
  * $Id: ExpressionTransformerTestCase.java 18265 2010-07-19 09:42:45Z rossmason $
  * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the

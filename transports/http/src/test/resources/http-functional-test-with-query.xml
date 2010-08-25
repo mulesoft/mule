@@ -13,7 +13,7 @@
     <http:endpoint name="clientEndpoint1" host="localhost" port="60231" 
         path="test1/?foo=boo&amp;far=bar" exchange-pattern="request-response"/>
     
-    <!-- TODO http://mule.mulesource.org/jira/browse/MULE-3828
+    <!-- TODO http://mule.mulesoft.org/jira/browse/MULE-3828
     <http:endpoint name="clientEndpoint2" host="localhost" port="60231" 
         path="test1/?foo=#[header:foo]&amp;far=#[header:far]" exchange-pattern="request-response"/>
     -->

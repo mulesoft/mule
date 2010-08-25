@@ -8,7 +8,7 @@
         <artifactId>mule-tests</artifactId>
         <version>3.0.0-RC3-SNAPSHOT</version>
     </parent>
-    <groupId>com.mulesource.muleesb.tests</groupId>
+    <groupId>com.mulesoft.muleesb.tests</groupId>
     <artifactId>mule-tests-integration-axis</artifactId>
     <packaging>jar</packaging>
     <name>Integration Tests for the Axis transport</name>

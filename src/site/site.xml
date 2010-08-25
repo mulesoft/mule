@@ -2,8 +2,8 @@
 <project name="Mule">
     <bannerLeft>
         <name>Mule</name>
-        <src>images/mulesource_logo.gif</src>
-        <href>http://mule.mulesource.org/</href>
+        <src>images/mulesoft_logo.gif</src>
+        <href>http://mule.mulesoft.org/</href>
     </bannerLeft>
     <!--
     <bannerRight>

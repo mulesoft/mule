@@ -2,7 +2,7 @@
 <!--
  $Id$
  
- Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  
  The software in this package is published under the terms of the CPAL v1.0
  license, a copy of which has been included with this distribution in the
@@ -38,7 +38,7 @@
     <str id="common.logo.gif">logo.png</str>
     <str id="common.logo.width">100</str>
     <str id="common.logo.height">50</str>
-    <str id="common.site">http://mule.mulesource.org</str>
+    <str id="common.site">http://mule.mulesoft.org</str>
 
     <str id="serverbydomain.title">{0}: JMX Management Console - Agent View</str>
     <str id="serverbydomain.error.query">Exception during query: {0}</str>
@@ -211,7 +211,7 @@
     <str id="about.title">{0}: JMX Management Console - About</str>
     <str id="about.main.title">About JMX Management Console:</str>
     <str id="about.main.mule.title">JMX Management Console</str>
-    <str id="about.main.mule.url">http://mule.mulesource.org</str>
+    <str id="about.main.mule.url">http://mule.mulesoft.org</str>
     <str id="about.main.mule.version">{0} version {1}</str>
     <str id="about.main.mx4j.title">Built using {0} HttpAdaptor</str>
     <str id="about.main.mx4j.url">http://mx4j.sourceforge.net</str>

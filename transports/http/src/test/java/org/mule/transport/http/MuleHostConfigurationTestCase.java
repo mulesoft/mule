@@ -1,7 +1,7 @@
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
@@ -36,11 +36,11 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
     {
         HostConfiguration hostConfig = createHostConfiguration();
         
-        URI uri = new URI("http://www.mulesource.org:8080", false);
+        URI uri = new URI("http://www.mulesoft.org:8080", false);
         hostConfig.setHost(uri);
         
         assertMockSocketFactory(hostConfig);
-        assertEquals("www.mulesource.org", hostConfig.getHost());
+        assertEquals("www.mulesoft.org", hostConfig.getHost());
         assertEquals(8080, hostConfig.getPort());
     }
 
@@ -52,11 +52,11 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
             {
                 HostConfiguration hostConfig = createHostConfiguration();
                 
-                URI uri = new URI("httpx://www.mulesource.org:8080", false);
+                URI uri = new URI("httpx://www.mulesoft.org:8080", false);
                 hostConfig.setHost(uri);
                 
                 assertTrue(hostConfig.getProtocol().getSocketFactory() instanceof DefaultProtocolSocketFactory);
-                assertEquals("www.mulesource.org", hostConfig.getHost());
+                assertEquals("www.mulesoft.org", hostConfig.getHost());
                 assertEquals(8080, hostConfig.getPort());
             }
         }.test();
@@ -66,11 +66,11 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
     {
         HostConfiguration hostConfig = createHostConfiguration();
         
-        HttpHost host = new HttpHost("www.mulesource.org", 8080);
+        HttpHost host = new HttpHost("www.mulesoft.org", 8080);
         hostConfig.setHost(host);
         
         assertMockSocketFactory(hostConfig);
-        assertEquals("www.mulesource.org", hostConfig.getHost());
+        assertEquals("www.mulesoft.org", hostConfig.getHost());
         assertEquals(8080, hostConfig.getPort());
     }
 
@@ -78,10 +78,10 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
     {
         HostConfiguration hostConfig = createHostConfiguration();
         
-        hostConfig.setHost("www.mulesource.org", 8080, "http");
+        hostConfig.setHost("www.mulesoft.org", 8080, "http");
         
         assertMockSocketFactory(hostConfig);
-        assertEquals("www.mulesource.org", hostConfig.getHost());
+        assertEquals("www.mulesoft.org", hostConfig.getHost());
         assertEquals(8080, hostConfig.getPort());
     }
 
@@ -93,10 +93,10 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
             {
                 HostConfiguration hostConfig = createHostConfiguration();
                 
-                hostConfig.setHost("www.mulesource.org", 8080, "httpx");
+                hostConfig.setHost("www.mulesoft.org", 8080, "httpx");
                 
                 assertDefaultSocketFactory(hostConfig);
-                assertEquals("www.mulesource.org", hostConfig.getHost());
+                assertEquals("www.mulesoft.org", hostConfig.getHost());
                 assertEquals(8080, hostConfig.getPort());
             }
         }.test();
@@ -108,12 +108,12 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
         HostConfiguration hostConfig = createHostConfiguration();
 
         Protocol protocol = Protocol.getProtocol("http");
-        hostConfig.setHost("www.mulesource.org", "www.mulesource.com", 8080, protocol);
+        hostConfig.setHost("www.mulesoft.org", "www.mulesoft.com", 8080, protocol);
         
         assertMockSocketFactory(hostConfig);
-        assertEquals("www.mulesource.org", hostConfig.getHost());
+        assertEquals("www.mulesoft.org", hostConfig.getHost());
         assertEquals(8080, hostConfig.getPort());
-        assertEquals("www.mulesource.com", hostConfig.getVirtualHost());
+        assertEquals("www.mulesoft.com", hostConfig.getVirtualHost());
     }
 
     @SuppressWarnings("deprecation")
@@ -126,12 +126,12 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
                 HostConfiguration hostConfig = createHostConfiguration();
 
                 Protocol protocol = Protocol.getProtocol("httpx");
-                hostConfig.setHost("www.mulesource.org", "www.mulesource.com", 8080, protocol);
+                hostConfig.setHost("www.mulesoft.org", "www.mulesoft.com", 8080, protocol);
                 
                 assertDefaultSocketFactory(hostConfig);
-                assertEquals("www.mulesource.org", hostConfig.getHost());
+                assertEquals("www.mulesoft.org", hostConfig.getHost());
                 assertEquals(8080, hostConfig.getPort());
-                assertEquals("www.mulesource.com", hostConfig.getVirtualHost());
+                assertEquals("www.mulesoft.com", hostConfig.getVirtualHost());
             }
         }.test();
     }
@@ -140,10 +140,10 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
     {
         HostConfiguration hostConfig = createHostConfiguration();
 
-        hostConfig.setHost("www.mulesource.org", 8080);
+        hostConfig.setHost("www.mulesoft.org", 8080);
 
         assertMockSocketFactory(hostConfig);
-        assertEquals("www.mulesource.org", hostConfig.getHost());
+        assertEquals("www.mulesoft.org", hostConfig.getHost());
         assertEquals(8080, hostConfig.getPort());
     }
 
@@ -151,9 +151,9 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
     {
         HostConfiguration hostConfig = createHostConfiguration();
         
-        hostConfig.setHost("www.mulesource.org");
+        hostConfig.setHost("www.mulesoft.org");
         
-        assertEquals("www.mulesource.org", hostConfig.getHost());
+        assertEquals("www.mulesoft.org", hostConfig.getHost());
         assertMockSocketFactory(hostConfig);
     }
 

@@ -1,7 +1,7 @@
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
@@ -101,7 +101,7 @@ public class MuleSoapHeaders
 
             Object elementObject = elements.next();
 
-            // Fixed MULE-770 (http://mule.mulesource.org/jira/browse/MULE-770)
+            // Fixed MULE-770 (http://mule.mulesoft.org/jira/browse/MULE-770)
             if (elementObject instanceof SOAPElement)
             // if not, means that it is a value not an element, therefore we cannot
             // look for correlation_id ...

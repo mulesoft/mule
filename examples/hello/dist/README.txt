@@ -6,7 +6,7 @@ example, go to your browser to run it:
     http://localhost:8888/?name=Ross
 You can change 'Ross' to any string you want.
 
-For more information, refer to http://mule.mulesource.org/display/MULE2INTRO/Examples
+For more information, refer to http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples
 
 +---------------------+
 | Running the example |

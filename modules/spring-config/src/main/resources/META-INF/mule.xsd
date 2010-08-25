@@ -5780,7 +5780,7 @@
     <xsd:attribute name="host" type="xsd:string">
         <xsd:annotation>
             <xsd:documentation>
-                An IP address (eg www.mulesource.com, localhost, 127.0.0.1).
+                An IP address (eg www.mulesoft.com, localhost, 127.0.0.1).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:attribute>

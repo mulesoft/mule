@@ -1,7 +1,7 @@
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
@@ -100,7 +100,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
                 logger.error(StringMessageUtils.getBoilerPlate("ReplyTo destination implements both Queue and Topic "
                                                                + "while complying with JMS 1.0.2b specification. "
                                                                + "Please report your application server or JMS vendor name and version "
-                                                               + "to dev<_at_>mule.codehaus.org or http://mule.mulesource.org/jira"));
+                                                               + "to dev<_at_>mule.codehaus.org or http://mule.mulesoft.org/jira"));
             }
 
             final boolean topic = connector.getTopicResolver().isTopic(replyToDestination);

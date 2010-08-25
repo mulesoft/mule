@@ -3,7 +3,7 @@ GETTING STARTED WITH MULE
 
 This file describes the basics of how to get started using Mule. 
 For full deta ils,see the Mule Getting Started Guide at:
-http://www.mulesource.org/display/MULE2INTRO/Home
+http://www.mulesoft.org/documentation/display/MULE3INTRO/Home
 
 
 Setting Up Your Environment
@@ -33,7 +33,8 @@ Distribution Contents
 
 The Mule distribution contains the following directories and files:
 
-/bin            Shell and batch scripts for controlling Mule from the command line
+/bin            Shell and batch scripts for controlling Mule from the command 
+                line
 /conf           Configuration files
 /docs           API documentation (Javadoc) for Mule and its sub-projects
 /examples       Example applications you can run and try building yourself
@@ -42,8 +43,9 @@ The Mule distribution contains the following directories and files:
 /lib/mule       Mule libraries
 /lib/opt        Third-party libraries
 /lib/user       Your custom classes and libraries. This directory comes before
-                /lib/mule on the classpath and can be used to patch the distributed 
-                Mule classes. You must restart Mule after adding files to this directory.
+                /lib/mule on the classpath and can be used to patch the 
+                distributed Mule classes. You must restart Mule after adding 
+                files to this directory.
 /licenses       License information for all libraries shipped with Mule
 /logs           Log file output when running in background mode
 /sbin           Internal scripts (not to be run by the user)
@@ -67,7 +69,7 @@ this is an XML file called mule-config.xml. The examples directory
 provides you with several examples of Mule applications including
 their configuration files, which you can use as the starting point
 for creating your configuration file. For more information,
-see http://www.mulesource.org/display/MULE2INTRO/Examples.
+see http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples.
 
 
 Working with Configuration Files
@@ -99,15 +101,15 @@ instead, using start, stop, or restart as the first parameter as needed:
     mule start|stop|restart [-config <your-config.xml>]
 
 For more information on running Mule, see: 
-http://www.mulesource.org/display/MULEINTRO/Starting+the+Server.
+http://www.mulesoft.org/documentation/display/MULE3INTRO/Running+Mule.
 
 
 Additional Setup for Community Edition Users
 --------------------------------------------
 
-If you are running Mule Community Edition, the MuleSource Public
-License is displayed page by page when you start Mule for the first time. 
-To advance a page, press Enter. At the end of the license display, 
+If you are running Mule Community Edition, the Common Public Attribution 
+License (CPAL) is displayed page by page when you start Mule for the first 
+time.  To advance a page, press Enter. At the end of the license display, 
 type y to accept the license file and proceed with startup.
 
 
@@ -119,22 +121,24 @@ with Mule. Following is information about where to go next.
 
 - For information on more ways to run Mule and how to get started using
 the examples, go to the Getting Started Guide at: 
-http://www.mulesource.org/display/MULE2INTRO/Home 
+http://www.mulesoft.org/documentation/display/MULE3INTRO/Home
 
 - For complete information on using Mule, go to the Mule User Guide at:
-http://www.mulesource.org/display/MULE2USER/Home. You will need to register
-to view these pages, but registration is free and only takes a few moments.
+http://www.mulesoft.org/documentation/display/MULE3USER/Home. You will need to 
+register to view these pages, but registration is free and only takes a few 
+moments.
 
 - If you need assistance and are a Mule Enterprise customer,
-see the support page at: http://www.mulesource.org/display/MULE/Support
+see the support page at: 
+http://www.mulesoft.com/enterprise-subscriptions-and-support
 
 - If you are evaluating Mule and want to find out about subscription
-options, you can submit a request for MuleSource to contact you by
-going to http://www.mulesource.com/buynow/, or call us at 877-MULE-OSS.
+options, you can submit a request for MuleSoft to contact you by
+going to http://www.mulesoft.com/buy-mule-esb.
 
 - All Mule users can subscribe to the Mule mailing lists. You can find
-these lists at http://mule.mulesource.org/display/MULE/Mailing+Lists
+these lists at http://www.mulesoft.org/email-lists
 
 - If you experience problems with the Mule software or documentation,
-please log an issue in the MuleSource issue-tracking system, located at:
-http://mule.mulesource.org/jira/browse/MULE
+please log an issue in the MuleSoft issue-tracking system, located at:
+http://www.mulesoft.org/jira/browse/MULE

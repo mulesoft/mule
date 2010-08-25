@@ -7,7 +7,7 @@ h1. Overview
 ${description}
 
 h1. Classpath Settings
-The latest Mule ${ModuleName} ${ModuleType} has been tested with Mule [${mule.version}|http://www.mulesource.org/display/MULE/Download].
+The latest Mule ${ModuleName} ${ModuleType} has been tested with Mule [${mule.version}|http://www.mulesoft.org/display/MULE/Download].
 
 h2. Mule Standalone
 To set up the Mule classpath to use the ${ModuleName} ${ModuleType}, you must first [download|http://dist.muleforge.org/${ModuleNameLower}/] the Mule ${ModuleName} distribution. Then simply take all the JARs inside the distribution {{lib/}} directory and put them in {{MULE_HOME/lib/user}}.

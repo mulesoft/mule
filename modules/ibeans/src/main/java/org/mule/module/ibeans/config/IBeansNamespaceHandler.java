@@ -1,7 +1,7 @@
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
@@ -29,7 +29,7 @@ public class IBeansNamespaceHandler extends AbstractMuleNamespaceHandler
 
         /* This will create the handler for your custom 'connector' element.  You will need to add handlers for any other
            xml elements you define.  For more information see:
-           http://www.mulesoft.org/display/MULE2USER/Creating+a+Custom+XML+Namespace
+           http://www.mulesoft.org/documentation/display/MULE3USER/Creating+a+Custom+XML+Namespace
         */
         registerConnectorDefinitionParser(IBeansConnector.class);
     }

@@ -49,8 +49,8 @@ if (options.t)
 // this regex matches both, the CE (.org) and EE (.com) schema in the source version
 // There is one matching group around the whole schema so the matching schema name can be
 // accessed from the code below
-schemaRegex = /(http:\/\/www.mulesource.[org|com]{3}?\/schema\/mule[\/\w+\/]+$sourceSchemaVersion)/
-xsdRegex = /(http:\/\/www.mulesource.[org|com]{3}?\/schema\/mule[\/\w+\/]+$sourceSchemaVersion\/.*xsd)/
+schemaRegex = /(http:\/\/www.mulesoft.[org|com]{3}?\/schema\/mule[\/\w+\/]+$sourceSchemaVersion)/
+xsdRegex = /(http:\/\/www.mulesoft.[org|com]{3}?\/schema\/mule[\/\w+\/]+$sourceSchemaVersion\/.*xsd)/
 //
 // switch the version in all XSD and XML files
 //

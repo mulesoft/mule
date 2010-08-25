@@ -39,7 +39,7 @@
     </td>
   </tr>
   <tr>
-    <td width="100%"><a href="http://mule.mulesource.org/display/MULE2INTRO/Examples" target="_blank"><font color="#FFFFFF" face="Arial Black">Example Docs</font></a>
+    <td width="100%"><a href="http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples" target="_blank"><font color="#FFFFFF" face="Arial Black">Example Docs</font></a>
     </td>
   </tr>
   <tr>
@@ -54,7 +54,7 @@
 </table>
 </td></tr>
 <tr>
-<td width="100%" height="*" valign="bottom"><font size="1" face="Arial">&#169; MuleSource</font></td>
+<td width="100%" height="*" valign="bottom"><font size="1" face="Arial">&#169; MuleSoft</font></td>
 </tr>
 </table>
 </body>

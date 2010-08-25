@@ -1,7 +1,7 @@
 /*
  * $Id $
  * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
@@ -83,7 +83,7 @@ public final class LicenseHandler
         {
             if (!getLicenseFile().exists() || !MuleBootstrapUtils.getMuleLibDir().exists())
             {
-                System.out.println("\nYour Mule installation seems to be incomplete. Please try downloading it again from http://mule.mulesource.org/display/MULE/Download and start again.");
+                System.out.println("\nYour Mule installation seems to be incomplete. Please try downloading it again from http://mule.mulesoft.org/display/MULE/Download and start again.");
                 hasAccepted = false;
             }
             else

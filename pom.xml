@@ -30,13 +30,13 @@
         </license>
     </licenses>
     <mailingLists>
-        <!-- Refer to http://www.mulesource.org/display/MULE/Mailing+Lists -->
+        <!-- Refer to http://www.mulesoft.org/display/MULE/Mailing+Lists -->
     </mailingLists>
     <developers>
-        <!-- Refer to http://www.mulesource.org/display/MULE/Team -->
+        <!-- Refer to http://www.mulesoft.org/display/MULE/Team -->
     </developers>
     <contributors>
-        <!-- Refer to http://www.mulesource.org/display/MULE/Team -->
+        <!-- Refer to http://www.mulesoft.org/display/MULE/Team -->
     </contributors>
     <issueManagement>
         <system>jira</system>
@@ -1426,7 +1426,7 @@
                 <configuration>
                     <archive>
                         <!--
-                            Disabled for http://mule.mulesource.org/jira/browse/MULE-1153
+                            Disabled for http://mule.mulesoft.org/jira/browse/MULE-1153
                             and http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4408526
                          -->
                         <index>false</index>
@@ -1783,12 +1783,12 @@
                 <repository>
                     <id>mule-ee-releases</id>
                     <name>Mule Release Repository</name>
-                    <url>http://dev.ee.mulesource.com/repository/content/repositories/releases/</url>
+                    <url>http://dev.ee.mulesoft.com/repository/content/repositories/releases/</url>
                 </repository>
                 <snapshotRepository>
                     <id>mule-ee-snapshots</id>
                     <name>Mule Snapshot Repository</name>
-                    <url>http://dev.ee.mulesource.com/repository/content/repositories/snapshots/</url>
+                    <url>http://dev.ee.mulesoft.com/repository/content/repositories/snapshots/</url>
                     <uniqueVersion>false</uniqueVersion>
                 </snapshotRepository>
             </distributionManagement>

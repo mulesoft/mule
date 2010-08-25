@@ -1,7 +1,7 @@
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
@@ -48,8 +48,8 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
         // Http Status Code 200 means OK, the request has succeeded. (500 would indicate an error)
         assertEquals(200, client.executeMethod(httpMethod));
         // By default the class package - in its other way round - is used for the namespace:
-        // Here, EchoServiceImpl classpath is: com\mulesource\test\connectors\module\cxf
-        // Therefore namespace should be: http://cxf.transport.connectors.test.mulesource.com
+        // Here, EchoServiceImpl classpath is: com\mulesoft\test\connectors\module\cxf
+        // Therefore namespace should be: http://cxf.transport.connectors.test.mulesoft.com
         assertEquals(
                 "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
                     "<soap:Body>" +
