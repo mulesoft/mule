@@ -17,6 +17,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
@@ -37,7 +38,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.emory.mathcs.backport.java.util.Collections;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -45,7 +45,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>ImmutableMuleEndpoint</code> describes a Provider in the Mule Server. A
  * endpoint is a grouping of an endpoint, an endpointUri and a transformer.
  */
-public abstract class AbstractEndpoint implements ImmutableEndpoint
+public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable
 {
 
     private static final long serialVersionUID = -1650380871293160973L;
@@ -113,7 +113,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
 
     private final String endpointEncoding;
 
-    private final MuleContext muleContext;
+    private MuleContext muleContext;
 
     protected RetryPolicyTemplate retryPolicyTemplate;
 
@@ -178,19 +178,19 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         this.messageProcessorsFactory = messageProcessorsFactory;
         if (messageProcessors == null)
         {
-            this.messageProcessors = Collections.unmodifiableList(java.util.Collections.EMPTY_LIST);
+            this.messageProcessors = Collections.emptyList();
         }
         else
         {
-            this.messageProcessors = Collections.unmodifiableList(messageProcessors);
+            this.messageProcessors = messageProcessors;
         }
         if (responseMessageProcessors == null)
         {
-            this.responseMessageProcessors = Collections.unmodifiableList(java.util.Collections.EMPTY_LIST);
+            this.responseMessageProcessors = Collections.emptyList();
         }
         else
         {
-            this.responseMessageProcessors = Collections.unmodifiableList(responseMessageProcessors);
+            this.responseMessageProcessors = responseMessageProcessors;
         }
     }
 
@@ -478,7 +478,14 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
     {
         return disableTransportTransformer;
     }
-    
+
+    public void dispose()
+    {
+        this.muleContext = null;
+        this.messageProcessors.clear();
+        this.messageProcessorChain = null;
+    }
+
     public MessageProcessor getMessageProcessorChain(FlowConstruct flowContruct) throws MuleException
     {
         if (messageProcessorChain == null)
