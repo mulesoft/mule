@@ -201,7 +201,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
     public MessageReceiver createMessageReceiver(Connector connector,
                                                  FlowConstruct flowConstruct,
                                                  InboundEndpoint endpoint,
-                                                 Object[] args) throws MuleException
+                                                 Object... args) throws MuleException
     {
         String receiverClass = messageReceiver;
 
