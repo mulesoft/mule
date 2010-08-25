@@ -44,27 +44,27 @@ public class SessionInvocationHandler implements TargetInvocationHandler
     private volatile boolean reuseObject = false;
     private final Session session;
 
-    private SessionInvocationHandler(XASession xaSession, Session session)
+    private SessionInvocationHandler(XASession xaSession, Session session, Boolean sameRMOverrideValue)
     {
         super();
         this.xaSession = xaSession;
         this.session = session;
-        this.xaResource = new XAResourceWrapper(xaSession.getXAResource(), this);
+        this.xaResource = new XAResourceWrapper(xaSession.getXAResource(), this, sameRMOverrideValue);
     }
     
-    public SessionInvocationHandler(XASession xaSession) throws JMSException
+    public SessionInvocationHandler(XASession xaSession, Boolean sameRMOverrideValue) throws JMSException
     {
-        this(xaSession, xaSession.getSession());
+        this(xaSession, xaSession.getSession(), sameRMOverrideValue);
     }
 
-    public SessionInvocationHandler(XAQueueSession xaSession) throws JMSException
+    public SessionInvocationHandler(XAQueueSession xaSession, Boolean sameRMOverrideValue) throws JMSException
     {
-        this(xaSession, xaSession.getQueueSession());
+        this(xaSession, xaSession.getQueueSession(), sameRMOverrideValue);
     }
 
-    public SessionInvocationHandler(XATopicSession xaSession) throws JMSException
+    public SessionInvocationHandler(XATopicSession xaSession, Boolean sameRMOverrideValue) throws JMSException
     {
-        this(xaSession, xaSession.getTopicSession());
+        this(xaSession, xaSession.getTopicSession(), sameRMOverrideValue);
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable

@@ -13,19 +13,19 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-/**
- * Arjuna can't serialize proxy
- */
 public class XAResourceWrapper implements XAResource
 {
 
     private XAResource xaResource;
     private SessionInvocationHandler sessionInvocationHandler;
+    private Boolean sameRMOverrideValue;
 
-    public XAResourceWrapper(XAResource xaResource, SessionInvocationHandler sessionInvocationHandler)
+
+    public XAResourceWrapper(XAResource xaResource, SessionInvocationHandler sessionInvocationHandler, Boolean sameRMOverrideValue)
     {
         this.xaResource = xaResource;
         this.sessionInvocationHandler = sessionInvocationHandler;
+        this.sameRMOverrideValue = sameRMOverrideValue;
     }
 
     public int getTransactionTimeout() throws XAException
@@ -38,13 +38,22 @@ public class XAResourceWrapper implements XAResource
         return xaResource.setTransactionTimeout(i);
     }
 
-    public boolean isSameRM(XAResource xaResource) throws XAException
+    public boolean isSameRM(XAResource other) throws XAException
     {
-        if (xaResource instanceof XAResourceWrapper)
+        if (sameRMOverrideValue != null)
         {
-            xaResource = ((XAResourceWrapper) xaResource).xaResource;
+            return sameRMOverrideValue;
         }
-        return this.xaResource.isSameRM(xaResource);
+
+        if (other instanceof XAResourceWrapper)
+        {
+            other = ((XAResourceWrapper) other).xaResource;
+        }
+        final boolean isSame = this.xaResource.isSameRM(other);
+
+        System.out.println("\n\n\nisSame = " + isSame);
+
+        return isSame;
     }
 
     public Xid[] recover(int i) throws XAException

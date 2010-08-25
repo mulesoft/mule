@@ -29,10 +29,17 @@ import javax.jms.XATopicSession;
 public class ConnectionInvocationHandler implements TargetInvocationHandler
 {
     private Object xaConnection;
+    private Boolean sameRMOverrideValue;
 
     public ConnectionInvocationHandler(Object xac)
     {
+        this(xac, null);
+    }
+
+    public ConnectionInvocationHandler(Object xac, Boolean sameRMOverrideValue)
+    {
         this.xaConnection = xac;
+        this.sameRMOverrideValue = sameRMOverrideValue;
     }
 
     public Object getTargetObject()
@@ -56,7 +63,7 @@ public class ConnectionInvocationHandler implements TargetInvocationHandler
                 XASession xas = ((XAConnection) xaConnection).createXASession();
                 return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), 
                     new Class[]{ Session.class, XaTransaction.MuleXaObject.class },
-                    new SessionInvocationHandler(xas));
+                    new SessionInvocationHandler(xas, sameRMOverrideValue));
             }
             else
             {
@@ -70,7 +77,7 @@ public class ConnectionInvocationHandler implements TargetInvocationHandler
                 XAQueueSession xaqs = ((XAQueueConnection) xaConnection).createXAQueueSession();
                 return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
                     new Class[]{ QueueSession.class, XaTransaction.MuleXaObject.class }, 
-                    new SessionInvocationHandler(xaqs));
+                    new SessionInvocationHandler(xaqs, sameRMOverrideValue));
             }
             else
             {
@@ -84,7 +91,7 @@ public class ConnectionInvocationHandler implements TargetInvocationHandler
                 XATopicSession xats = ((XATopicConnection) xaConnection).createXATopicSession();
                 return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
                     new Class[]{ TopicSession.class, XaTransaction.MuleXaObject.class }, 
-                    new SessionInvocationHandler(xats));
+                    new SessionInvocationHandler(xats, sameRMOverrideValue));
             }
             else
             {
