@@ -37,13 +37,14 @@ import org.apache.commons.logging.LogFactory;
 
 public class DeploymentService
 {
+    public static final String APP_ANCHOR_SUFFIX = "-anchor.txt";
     protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
 
     protected ScheduledExecutorService appDirMonitorTimer;
-    protected transient final Log logger = LogFactory.getLog(getClass());
 
-    private List<Application> applications = new ArrayList<Application>();
+    protected transient final Log logger = LogFactory.getLog(getClass());
     protected MuleDeployer deployer = new DefaultMuleDeployer();
+    private List<Application> applications = new ArrayList<Application>();
 
     public void start()
     {
@@ -52,6 +53,15 @@ public class DeploymentService
         String appString = (String) options.get("app");
 
         final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
+
+        // delete any leftover anchor files from previous unclean shutdowns
+        String[] appAnchors = appsDir.list(new SuffixFileFilter(APP_ANCHOR_SUFFIX));
+        for (String anchor : appAnchors)
+        {
+            // ignore result
+            new File(appsDir, anchor).delete();
+        }
+
         String[] apps;
 
         // mule -app app1:app2:app3 will restrict deployment only to those specified apps
@@ -205,15 +215,13 @@ public class DeploymentService
             final String[] zips = appsDir.list(new SuffixFileFilter(".zip"));
             String[] apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
             // we care only about removed anchors
-            // TODO extract suffix to a constant
-            final String anchorSuffix = "-anchor.txt";
-            String[] currentAnchors = appsDir.list(new SuffixFileFilter(anchorSuffix));
+            String[] currentAnchors = appsDir.list(new SuffixFileFilter(APP_ANCHOR_SUFFIX));
             @SuppressWarnings("unchecked")
             final Collection<String> deletedAnchors = CollectionUtils.subtract(Arrays.asList(appAnchors), Arrays.asList(currentAnchors));
             for (String deletedAnchor : deletedAnchors)
             {
                 // apps.find ( it.appName = (removedAnchor - suffix))
-                String appName = StringUtils.removeEnd(deletedAnchor, anchorSuffix);
+                String appName = StringUtils.removeEnd(deletedAnchor, APP_ANCHOR_SUFFIX);
                 try
                 {
                     onApplicationUndeployRequested(appName);
