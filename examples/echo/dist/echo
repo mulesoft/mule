@@ -18,9 +18,9 @@ if [ ! -d "$MULE_BASE/apps/echo-stdin" ]
 then
     echo "This example requires you to build it before running it.  Please follow the instructions in the README.txt file."
     exit 1
-fi         
+fi
 
-echo "The Echo example is available in three variations:"
+echo "The Echo example is available in two variations:"
 echo "  1. Echo from the Command Line"
 echo "  2. Echo using the CXF Transport"
 echo "     (surf to http://localhost:65082/services/EchoUMO/echo/text/hello)"

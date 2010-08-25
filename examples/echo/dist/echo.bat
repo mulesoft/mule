@@ -8,11 +8,11 @@ echo This example requires you to build it before running it.  Please follow the
 goto :eof
 
 :run
-ECHO The Echo example is available in three variations:
+ECHO The Echo example is available in two variations:
 ECHO   1. Echo from the Command Line
 ECHO   2. Echo using the Cxf Transport
 ECHO      (surf to http://localhost:65082/services/EchoUMO/echo/text/hello)
-SET /P Choice=Select the one you wish to execute and press Enter... 
+SET /P Choice=Select the one you wish to execute and press Enter...
 
 IF '%Choice%'=='1' call "%MULE_BASE%\bin\mule.bat" -app echo-stdin
 IF '%Choice%'=='2' call "%MULE_BASE%\bin\mule.bat" -app echo-cxf
