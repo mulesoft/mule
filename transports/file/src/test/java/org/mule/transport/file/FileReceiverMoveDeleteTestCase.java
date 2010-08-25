@@ -194,10 +194,10 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         }
         
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(url, muleContext);
-        endpointBuilder.addTransformer(transformer);
+        endpointBuilder.addMessageProcessor(transformer);
         if (filePayload)
         {
-            endpointBuilder.addTransformer(new NoActionTransformer());
+            endpointBuilder.addMessageProcessor(new NoActionTransformer());
         }
         InboundEndpoint endpoint = 
             muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
@@ -209,7 +209,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         testComponent.setEventCallback(new EventCallback()
         {
             public void eventReceived(final MuleEventContext context, final Object message) throws Exception
-            {
+            {                
                 assertEquals(1, latch.getCount());
                 latch.countDown();
                 assertEquals(TEST_MESSAGE, context.transformMessageToString());

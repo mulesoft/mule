@@ -25,12 +25,18 @@ public abstract class AbstractFileMoveDeleteTestCase extends AbstractFileFunctio
         Class<? extends AbstractMuleMessageFactory> messageFactoryClass) throws Exception
     {
         FileConnector fc = new FileConnector(muleContext);
+        
+        // some tests assert that a sinlge message arrives from this connector. Use a very large
+        // polling frequency to avoid multiple messages coming in during a single test run.
+        fc.setPollingFrequency(3000000);
+        
         if (messageFactoryClass != null)
         {
             Map<String, String> overrides = new HashMap<String, String>();
             overrides.put("message.factory", messageFactoryClass.getName());
             fc.setServiceOverrides(overrides);
         }
+        
         fc.setName("moveDeleteConnector");
         File moveToDir = new File(inFile.getParent() + "/moveto/");
         moveToDir.mkdir();
@@ -41,6 +47,7 @@ public abstract class AbstractFileMoveDeleteTestCase extends AbstractFileFunctio
         }
         fc.setAutoDelete(delete);
         fc.setStreaming(stream);
+        
         return moveToDir;
     }
 
