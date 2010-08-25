@@ -35,6 +35,7 @@ import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.message.DefaultExceptionPayload;
+import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.routing.MessageFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.NullPayload;
@@ -99,8 +100,14 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
         throws EndpointException, InitialisationException
     {
         EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URI, muleContext);
-        endpointBuilder.addMessageProcessor(new MessageFilter(filter));
-        endpointBuilder.addMessageProcessor(new SecurityFilterMessageProcessorBuilder(securityFilter));
+        if (filter != null)
+        {
+            endpointBuilder.addMessageProcessor(new MessageFilter(filter));
+        }
+        if (securityFilter != null)
+        {
+            endpointBuilder.addMessageProcessor(new SecurityFilterMessageProcessor(securityFilter));
+        }
         if (transformer != null)
         {
             endpointBuilder.setTransformers(Collections.singletonList(transformer));
@@ -161,8 +168,14 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
     {
         EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri,
             muleContext);
-        endpointBuilder.addMessageProcessor(new MessageFilter(filter));
-        endpointBuilder.addMessageProcessor(new SecurityFilterMessageProcessorBuilder(securityFilter));
+        if (filter != null)
+        {
+            endpointBuilder.addMessageProcessor(new MessageFilter(filter));
+        }
+        if (securityFilter != null)
+        {
+            endpointBuilder.addMessageProcessor(new SecurityFilterMessageProcessor(securityFilter));
+        }
         if (transformer != null)
         {
             endpointBuilder.setMessageProcessors(Collections.singletonList(transformer));
