@@ -392,7 +392,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         catch (InterruptedException e)
         {
             logger.info(
-                "someone interrupted the thread, probable the call to watchdog.cancel() in teardown method.",
+                "Test thread has been interrupted, probably bt the call to watchdog.cancel() in teardown method.",
                 e);
         }
     }
