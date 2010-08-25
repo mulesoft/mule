@@ -27,7 +27,7 @@ public abstract class AbstractFilteringMessageProcessor extends AbstractIntercep
     /** 
      * Throw a FilterUnacceptedException when a message is rejected by the filter? 
      */
-    protected boolean throwOnUnaccepted = true;
+    protected boolean throwOnUnaccepted = false;
     
     /** 
      * The <code>MessageProcessor</code> that should be used to handle messages that are not accepted by the filter.

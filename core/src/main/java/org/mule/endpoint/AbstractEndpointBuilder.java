@@ -35,6 +35,7 @@ import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.processor.SecurityFilterMessageProcessor;
+import org.mule.routing.MessageFilter;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transport.AbstractConnector;
@@ -192,6 +193,15 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         checkInboundExchangePattern();
 
+        // Filters on inbound endpoints need to throw exceptions in case the reciever needs to reject the message 
+        for (MessageProcessor mp :messageProcessors)
+        {
+            if (mp instanceof MessageFilter)
+            {
+                ((MessageFilter) mp).setThrowOnUnaccepted(true);
+            }
+        }
+        
         InboundEndpoint endpoint = new DefaultInboundEndpoint(connector, endpointURI,
                 getName(endpointURI), getProperties(), getTransactionConfig(),
                 getDefaultDeleteUnacceptedMessages(connector),
@@ -215,6 +225,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         		((Transformer) mp).setEndpoint(endpoint);
         	}
         }
+        
         return endpoint;
     }
 
