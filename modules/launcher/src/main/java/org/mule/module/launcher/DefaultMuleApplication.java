@@ -45,6 +45,7 @@ public class DefaultMuleApplication implements Application
 {
 
     protected static final int DEFAULT_RELOAD_CHECK_INTERVAL_MS = 3000;
+    protected static final String ANCHOR_FILE_BLURB = "Delete this file while Mule is running to undeploy this app in a clean way.";
 
     protected transient final Log logger = LogFactory.getLog(getClass());
 
@@ -121,7 +122,7 @@ public class DefaultMuleApplication implements Application
             this.muleContext.start();
             // save app's state in the marker file
             File marker = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), String.format("%s-anchor.txt", getAppName()));
-            FileUtils.writeStringToFile(marker, "Delete this file while Mule is running to undeploy this app in a clean way.");
+            FileUtils.writeStringToFile(marker, ANCHOR_FILE_BLURB);
         }
         catch (MuleException e)
         {

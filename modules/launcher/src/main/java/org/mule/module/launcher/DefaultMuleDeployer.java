@@ -51,6 +51,9 @@ public class DefaultMuleDeployer implements MuleDeployer
             app.dispose();
             final File appDir = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), app.getAppName());
             FileUtils.deleteDirectory(appDir);
+            // remove a marker, harmless, but a tidy app dir is always better :)
+            File marker = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), String.format("%s-anchor.txt", app.getAppName()));
+            marker.delete();
             Introspector.flushCaches();
         }
         catch (Throwable t)
