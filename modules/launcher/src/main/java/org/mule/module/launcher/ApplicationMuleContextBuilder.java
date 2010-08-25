@@ -10,10 +10,12 @@
 
 package org.mule.module.launcher;
 
+import org.mule.api.config.ThreadingProfile;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.util.StringUtils;
+import org.mule.work.MuleWorkManager;
 
 /**
  * Takes Mule application descriptor into account when building the context.
@@ -40,4 +42,12 @@ public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder
         return configuration;
     }
 
+    @Override
+    protected MuleWorkManager createWorkManager()
+    {
+        // use app name in the core Mule thread
+        final String threadName = String.format("Mule[%s]", desc.getAppName());
+        return new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, threadName, getMuleConfiguration().getShutdownTimeout());
+
+    }
 }
