@@ -20,7 +20,6 @@ import java.util.Map;
 
 public class ExceptionHelperTestCase extends AbstractMuleTestCase
 {
-
     public void testNestedExceptionRetreval() throws Exception
     {
         Exception testException = getException();
@@ -34,19 +33,27 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
         assertEquals("bar", t.getMessage());
         assertNotNull(t.getCause());
 
-        List l = ExceptionHelper.getExceptionsAsList(testException);
+        List<?> l = ExceptionHelper.getExceptionsAsList(testException);
         assertEquals(3, l.size());
 
-        Map info = ExceptionHelper.getExceptionInfo(testException);
+        Map<?, ?> info = ExceptionHelper.getExceptionInfo(testException);
         assertNotNull(info);
         assertEquals(1, info.size());
         assertNotNull(info.get("JavaDoc"));
-
+    }
+    
+    public void testSummarizeWithDepthBeyondStracTraceLength()
+    {
+        Exception exception = getException();
+        int numberOfStackFrames = exception.getStackTrace().length;
+        int depth = numberOfStackFrames + 1;
+        
+        Throwable summary = ExceptionHelper.summarise(exception, depth);
+        assertNotNull(summary);
     }
 
     private Exception getException()
     {
-
         return new DefaultMuleException(MessageFactory.createStaticMessage("foo"), new DefaultMuleException(
             MessageFactory.createStaticMessage("bar"), new Exception("blah")));
     }

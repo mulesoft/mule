@@ -259,12 +259,12 @@ public final class ExceptionHelper
         return mappings.getProperty(code, code);
     }
 
-    public static String getJavaDocUrl(Class exception)
+    public static String getJavaDocUrl(Class<?> exception)
     {
         return getDocUrl("javadoc.", exception.getName());
     }
 
-    public static String getDocUrl(Class exception)
+    public static String getDocUrl(Class<?> exception)
     {
         return getDocUrl("doc.", exception.getName());
     }
@@ -359,7 +359,6 @@ public final class ExceptionHelper
             }
         }
 
-
         StackTraceElement[] clean = new StackTraceElement[newTrace.size()];
         newTrace.toArray(clean);
         t.setStackTrace(clean);
@@ -375,10 +374,13 @@ public final class ExceptionHelper
     {
         t = sanitize(t);
         StackTraceElement[] trace = t.getStackTrace();
-        StackTraceElement[] newTrace = new StackTraceElement[depth];
 
-        System.arraycopy(trace, 0, newTrace, 0, newTrace.length);
+        int newStackDepth = Math.min(trace.length, depth);
+        StackTraceElement[] newTrace = new StackTraceElement[newStackDepth];
+
+        System.arraycopy(trace, 0, newTrace, 0, newStackDepth);
         t.setStackTrace(newTrace);
+        
         return t;
     }
 
