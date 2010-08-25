@@ -4001,7 +4001,7 @@
     <xsd:element name="splitter" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                The simple splitter splits incoming message into parts using the configured expressio passing on each part in turn to the next message processor
+                The simple splitter splits incoming message into parts using the configured expression passing on each part in turn to the next message processor
             </xsd:documentation>
         </xsd:annotation>
 	    <xsd:complexType>
@@ -4047,7 +4047,6 @@
         </xsd:complexType>
     </xsd:element>
     
-    <!-- TODO
     <xsd:element name="custom-splitter" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -4077,7 +4076,6 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    -->
     
     <!-- Conditional Message Processor Elements -->
     <xsd:complexType name="abstractMessageProcessorFilterPairType" abstract="true" />

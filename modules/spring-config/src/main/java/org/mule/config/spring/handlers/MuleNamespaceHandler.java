@@ -400,6 +400,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("splitter", new SplitterDefinitionParser(ExpressionSplitter.class));
         registerBeanDefinitionParser("collection-splitter", new SplitterDefinitionParser(CollectionSplitter.class));
         registerBeanDefinitionParser("message-chunk-splitter", new SplitterDefinitionParser(MessageChunkSplitter.class));
+        registerBeanDefinitionParser("custom-splitter", new SplitterDefinitionParser());
 
         // Routing: Routing Message Processors
         
