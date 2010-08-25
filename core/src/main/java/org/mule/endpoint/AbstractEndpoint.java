@@ -13,6 +13,7 @@ package org.mule.endpoint;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -28,9 +29,7 @@ import org.mule.routing.MessageFilter;
 import org.mule.util.ClassUtils;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +40,6 @@ import edu.emory.mathcs.backport.java.util.Collections;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.util.CollectionUtils;
 
 /**
  * <code>ImmutableMuleEndpoint</code> describes a Provider in the Mule Server. A
@@ -184,7 +182,6 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         }
         else
         {
-            messageProcessors = injectSelfIntoMessageProcessors(messageProcessors);
             this.messageProcessors = Collections.unmodifiableList(messageProcessors);
         }
         if (responseMessageProcessors == null)
@@ -482,39 +479,14 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint
         return disableTransportTransformer;
     }
     
-    public MessageProcessor getMessageProcessorChain() throws MuleException
+    public MessageProcessor getMessageProcessorChain(FlowConstruct flowContruct) throws MuleException
     {
         if (messageProcessorChain == null)
         {
-            messageProcessorChain = createMessageProcessorChain();
+            messageProcessorChain = createMessageProcessorChain(flowContruct);
         }
         return messageProcessorChain;
     }
 
-    abstract protected MessageProcessor createMessageProcessorChain() throws MuleException;
-
-    private List injectSelfIntoMessageProcessors(List<MessageProcessor> messageProcessors)
-    {
-        if (!CollectionUtils.containsType(messageProcessors, EndpointAwareMessageProcessor.class))
-        {
-            return messageProcessors;
-        }
-        List<MessageProcessor> newMessageProcessors = new ArrayList<MessageProcessor>(messageProcessors.size());
-        for (MessageProcessor mp : messageProcessors)
-        {
-            if (!(mp instanceof EndpointAwareMessageProcessor))
-            {
-                newMessageProcessors.add(mp);
-            }
-            else
-            {
-                MessageProcessor newMp = ((EndpointAwareMessageProcessor)mp).injectEndpoint(this);
-                if (newMp != null)
-                {
-                    newMessageProcessors.add(newMp);
-                }
-            }
-        }
-        return newMessageProcessors;
-    }
+    abstract protected MessageProcessor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException;
 }

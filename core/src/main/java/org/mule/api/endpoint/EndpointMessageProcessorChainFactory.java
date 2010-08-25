@@ -11,13 +11,14 @@
 package org.mule.api.endpoint;
 
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 
 public interface EndpointMessageProcessorChainFactory
 {
-    public MessageProcessor createInboundMessageProcessorChain(InboundEndpoint endpoint, MessageProcessor target) throws MuleException;
+    public MessageProcessor createInboundMessageProcessorChain(InboundEndpoint endpoint, FlowConstruct flowConstruct, MessageProcessor target) throws MuleException;
     
-    public MessageProcessor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, MessageProcessor target) throws MuleException;
+    public MessageProcessor createOutboundMessageProcessorChain(OutboundEndpoint endpoint, FlowConstruct flowConstruct, MessageProcessor target) throws MuleException;
 }
 
 

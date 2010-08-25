@@ -213,6 +213,6 @@ public class TestConnector extends AbstractConnector
     public MessageProcessor getOutboundEndpointMessageProcessor(OutboundEndpoint endpoint)
         throws MuleException
     {
-        return ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+        return ((AbstractEndpoint) endpoint).getMessageProcessorChain(null);
     }    
 }

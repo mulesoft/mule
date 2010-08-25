@@ -18,6 +18,7 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -29,6 +30,7 @@ import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.construct.SimpleFlowConstruct;
+import org.mule.endpoint.EndpointAwareMessageProcessor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
 import org.mule.util.StringUtils;
@@ -59,7 +61,30 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
 
     protected List processors = new ArrayList();
     protected String name;
+    protected ImmutableEndpoint endpoint;
+    protected FlowConstruct flowConstruct;
 
+    public InterceptingChainMessageProcessorBuilder()
+    {
+        // empty
+    }
+    
+    public InterceptingChainMessageProcessorBuilder(ImmutableEndpoint endpoint, FlowConstruct flowConstruct)
+    {
+        this.endpoint = endpoint;
+        this.flowConstruct = flowConstruct;
+    }
+    
+    public InterceptingChainMessageProcessorBuilder(ImmutableEndpoint endpoint)
+    {
+        this.endpoint = endpoint;
+    }
+    
+    public InterceptingChainMessageProcessorBuilder(FlowConstruct flowConstruct)
+    {
+        this.flowConstruct = flowConstruct;
+    }
+    
     public MessageProcessor build() throws MuleException
     {
         if (processors.isEmpty())
@@ -67,36 +92,41 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
             return new NullMessageProcessor();
         }
 
-        InterceptingMessageProcessor first = createInterceptingMessageProcessor(getMessageProcessor(processors.get(0)));
+        InterceptingMessageProcessor first = createInterceptingMessageProcessor(initializeMessageProcessor(processors.get(0)));
         MessageProcessor composite = new InterceptingChainCompositeMessageProcessor(first, processors, name);
         InterceptingMessageProcessor current = first;
 
         for (int i = 1; i < processors.size(); i++)
         {
-            InterceptingMessageProcessor mp = createInterceptingMessageProcessor(getMessageProcessor(processors.get(i)));
+            InterceptingMessageProcessor mp = createInterceptingMessageProcessor(initializeMessageProcessor(processors.get(i)));
             current.setListener(mp);
             current = mp;
         }
         return composite;
     }
 
-    private MessageProcessor getMessageProcessor(Object processor) throws MuleException
+    // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder
+    protected MessageProcessor initializeMessageProcessor(Object processor) throws MuleException
     {
-        if (processor instanceof MessageProcessor)
+        if (processor instanceof EndpointAwareMessageProcessor)
         {
-            return (MessageProcessor) processor;
+            ((EndpointAwareMessageProcessor) processor).injectEndpoint(endpoint);
         }
-        else if (processor instanceof MessageProcessorBuilder)
+        if (processor instanceof FlowConstructAware)
+        {
+            ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
+        }
+        
+        if (processor instanceof MessageProcessorBuilder)
         {
             return ((MessageProcessorBuilder) processor).build();
         }
         else
         {
-            throw new IllegalArgumentException(
-                "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+            return (MessageProcessor) processor;
         }
     }
-
+    
     public void setName(String name)
     {
         this.name = name;

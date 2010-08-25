@@ -235,7 +235,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
                 this);
         }
         
-        InterceptingChainMessageProcessorBuilder chainBuilder = new InterceptingChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder chainBuilder = new InterceptingChainMessageProcessorBuilder(flowConstruct);
         for (Interceptor interceptor : interceptors)
         {
             chainBuilder.chain(interceptor);

@@ -28,7 +28,6 @@ import org.mule.api.security.SecurityManager;
 import org.mule.api.security.SecurityProvider;
 import org.mule.api.security.SecurityProviderNotFoundException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
-import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.util.StringUtils;
@@ -96,18 +95,22 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
         }
     }
 
-    protected final synchronized void lazyInit() throws InitialisationException
+    protected final synchronized void lazyInit(ImmutableEndpoint endpoint) throws InitialisationException
     {
         if (!isInitialised)
         {
-            initialiseEndpoint();
+            initialiseEndpoint(endpoint);
             isInitialised = true;
         }
     }
 
-    protected final void initialiseEndpoint() throws InitialisationException
+    protected final void initialiseEndpoint(ImmutableEndpoint endpoint) throws InitialisationException
     {
-        if (endpoint == null)
+        if (endpoint != null)
+        {
+            this.endpoint = endpoint;
+        }
+        else
         {
             throw new InitialisationException(CoreMessages.objectIsNull("Endpoint"), this);
         }
@@ -174,7 +177,7 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
             SecurityProviderNotFoundException, EncryptionStrategyNotFoundException,
             InitialisationException
     {
-        lazyInit();
+        lazyInit(event.getEndpoint());
         if (inbound)
         {
             authenticateInbound(event);

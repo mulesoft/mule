@@ -15,7 +15,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -25,8 +24,6 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.api.routing.filter.Filter;
-import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
 import org.mule.config.MuleManifest;
@@ -94,11 +91,11 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
     {
         try
         {
-            if (getMessageProcessorChain() instanceof Startable)
+            if (getMessageProcessorChain(flowConstruct) instanceof Startable)
             {
-                ((Startable) getMessageProcessorChain()).start();
+                ((Startable) getMessageProcessorChain(flowConstruct)).start();
             }
-            getConnector().registerListener(this, getMessageProcessorChain(), flowConstruct);
+            getConnector().registerListener(this, getMessageProcessorChain(flowConstruct), flowConstruct);
         }
         catch (Exception e)
         {
@@ -111,9 +108,9 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
         try
         {
             getConnector().unregisterListener(this, flowConstruct);
-            if (getMessageProcessorChain() instanceof Stoppable)
+            if (getMessageProcessorChain(flowConstruct) instanceof Stoppable)
             {
-                ((Stoppable) getMessageProcessorChain()).stop();
+                ((Stoppable) getMessageProcessorChain(flowConstruct)).stop();
             }
         }
         catch (Exception e)
@@ -123,14 +120,10 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
     }
 
     @Override
-    public MessageProcessor createMessageProcessorChain() throws MuleException
+    public MessageProcessor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException
     {
         EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
-        MessageProcessor processorChain = factory.createInboundMessageProcessorChain(this, listener);
-        if (processorChain instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) processorChain).setFlowConstruct(flowConstruct);
-        }
+        MessageProcessor processorChain = factory.createInboundMessageProcessorChain(this, flowConstruct, listener);
         if (processorChain instanceof Initialisable)
         {
             ((Initialisable) processorChain).initialise();

@@ -15,6 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -85,14 +86,14 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        return getMessageProcessorChain().process(event);
+        return getMessageProcessorChain(event.getFlowConstruct()).process(event);
     }
 
     @Override
-    protected MessageProcessor createMessageProcessorChain() throws MuleException
+    protected MessageProcessor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException
     {
         EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
-        MessageProcessor chain = factory.createOutboundMessageProcessorChain(this, 
+        MessageProcessor chain = factory.createOutboundMessageProcessorChain(this, flowContruct,
             ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this));
         
         if (chain instanceof Initialisable)

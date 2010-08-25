@@ -65,7 +65,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         requestEvent = createTestRequestEvent(endpoint);
         responseEvent = createTestResponseEvent(endpoint);
 
-        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
         result = mpChain.process(requestEvent);
 
         assertMessageSentSame(true);
@@ -80,7 +80,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         requestEvent = createTestRequestEvent(endpoint);
         responseEvent = createTestResponseEvent(endpoint);
 
-        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
         result = mpChain.process(requestEvent);
 
         assertMessageSentSame(false);
@@ -95,7 +95,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         requestEvent = createTestRequestEvent(endpoint);
         responseEvent = createTestResponseEvent(endpoint);
 
-        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
         result = mpChain.process(requestEvent);
 
         assertMessageSentSame(true);
@@ -111,7 +111,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         requestEvent = createTestRequestEvent(endpoint);
         responseEvent = createTestResponseEvent(endpoint);
 
-        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
 
         result = mpChain.process(requestEvent);
         assertNotNull(result);
@@ -129,7 +129,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         requestEvent = createTestRequestEvent(endpoint);
         responseEvent = createTestResponseEvent(endpoint);
 
-        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
         result = mpChain.process(requestEvent);
 
         assertMessageSentSame(true);
@@ -148,7 +148,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         requestEvent = createTestRequestEvent(endpoint);
         responseEvent = createTestResponseEvent(endpoint);
 
-        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
         
         // Required for UnauthorisedException creation
         RequestContext.setEvent(requestEvent);
@@ -181,7 +181,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         requestEvent = createTestRequestEvent(endpoint);
         responseEvent = createTestResponseEvent(endpoint);
 
-        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
 
         result = mpChain.process(requestEvent);
         assertNotNull(result);
@@ -201,7 +201,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         responseEvent = createTestResponseEvent(endpoint);
         responseEvent.getMessage().setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
 
-        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
         result = mpChain.process(requestEvent);
 
         assertMessageSentSame(true);
@@ -219,7 +219,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         responseEvent = createTestResponseEvent(endpoint);
         responseEvent.getMessage().setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
 
-        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
         
         // Required for UnauthorisedException creation
         RequestContext.setEvent(requestEvent);
@@ -248,7 +248,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         requestEvent = createTestRequestEvent(endpoint);
         responseEvent = createTestResponseEvent(endpoint);
 
-        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
         result = mpChain.process(requestEvent);
 
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
@@ -268,7 +268,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         requestEvent = createTestRequestEvent(endpoint);
         responseEvent = createTestResponseEvent(endpoint);
 
-        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain();
+        MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
         result = mpChain.process(requestEvent);
 
         assertMessageSent(true);

@@ -94,7 +94,7 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
 
     protected void createMessageProcessorChain() throws MuleException
     {
-        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder(flowConstruct);
         builder.chain(processors);
         builder.chain(new StopFurtherMessageProcessingMessageProcessor());
         // Stats

@@ -209,7 +209,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
      */
     protected void createMessageProcessor() throws MuleException
     {
-        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder(this);
         configureMessageProcessors(builder);
         messageProcessorChain = builder.build();
     }

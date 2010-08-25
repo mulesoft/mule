@@ -30,9 +30,9 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.endpoint.AbstractEndpointBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.endpoint.SecurityFilterMessageProcessorBuilder;
 import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
+import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.routing.MessageFilter;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.transport.AbstractConnector;
@@ -404,7 +404,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         EndpointSecurityFilter securityFilter = receiver.getEndpoint().getSecurityFilter();
         if (securityFilter != null)
         {
-            serviceEndpointbuilder.addMessageProcessor(new SecurityFilterMessageProcessorBuilder(securityFilter));
+            serviceEndpointbuilder.addMessageProcessor(new SecurityFilterMessageProcessor(securityFilter));
         }
 
         // TODO Do we really need to modify the existing receiver endpoint? What happens if we don't security,
@@ -414,7 +414,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
 
         List<MessageProcessor> procs = new ArrayList(receiverEndpointBuilder.getMessageProcessors());
         CollectionUtils.removeType(procs, MessageFilter.class);
-        CollectionUtils.removeType(procs, SecurityFilterMessageProcessorBuilder.class);
+        CollectionUtils.removeType(procs, SecurityFilterMessageProcessor.class);
         receiverEndpointBuilder.setMessageProcessors(procs);
 
         InboundEndpoint serviceEndpoint = muleContext.getRegistry()

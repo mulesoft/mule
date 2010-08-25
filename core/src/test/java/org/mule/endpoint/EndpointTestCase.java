@@ -17,12 +17,12 @@ import static org.mockito.Mockito.mock;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
@@ -119,7 +119,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
             mimeType)
         {
             @Override
-            protected MessageProcessor createMessageProcessorChain() throws MuleException
+            protected MessageProcessor createMessageProcessorChain(FlowConstruct flowConstruct) throws MuleException
             {
                 return null;
             }

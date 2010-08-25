@@ -34,7 +34,7 @@ public class ServiceAsyncReplyCompositeMessageSource extends ServiceCompositeMes
 
     protected void createMessageProcessorChain() throws MuleException
     {
-        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder(flowConstruct);
         builder.chain(processors);
         builder.chain(listener);
         listener = builder.build();

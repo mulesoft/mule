@@ -481,16 +481,11 @@ public abstract class AbstractService implements Service, MessageProcessor
 
     protected void buildServiceMessageProcessorChain() throws MuleException
     {
-        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder(this);
         builder.setName("Service '" + name + "' Processor Chain");
         builder.chain(getServiceStartedAssertingMessageProcessor());
         addMessageProcessors(builder);
         messageProcessorChain = builder.build();
-
-        if (messageProcessorChain instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) messageProcessorChain).setFlowConstruct(this);
-        }
     }
 
     protected MessageProcessor getServiceStartedAssertingMessageProcessor()

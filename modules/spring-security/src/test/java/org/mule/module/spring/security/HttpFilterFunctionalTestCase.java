@@ -38,19 +38,12 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
         {
             int status = client.executeMethod(get);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
-            assertEquals(getNoContextErrorResponse(), get.getResponseBodyAsString());
+            assertTrue(get.getResponseBodyAsString().contains("no security context on the session. Authentication denied on endpoint"));
         }
         finally
         {
             get.releaseConnection();
         }
-    }
-
-    protected String getNoContextErrorResponse()
-    {
-        return "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
-               + "but there was no security context on the session. Authentication denied on endpoint "
-               + "http://localhost:4567. Message payload is of type: String";
     }
 
     public void testAuthenticationFailureBadCredentials() throws Exception
