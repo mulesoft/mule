@@ -45,7 +45,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
     private TimeUnit timeUnit = DEFAULT_POLL_TIMEUNIT;
 
     // @GuardedBy(itself)
-    protected final List schedules = new LinkedList();
+    protected final List<ScheduledFuture> schedules = new LinkedList<ScheduledFuture>();
 
     public AbstractPollingMessageReceiver(Connector connector,
                                           FlowConstruct flowConstruct,
@@ -54,6 +54,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
         super(connector, flowConstruct, endpoint);
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         try
@@ -67,6 +68,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
         }
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         this.unschedule();
@@ -115,9 +117,9 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
         synchronized (schedules)
         {
             // cancel our schedules gently: do not interrupt when polling is in progress
-            for (Iterator i = schedules.iterator(); i.hasNext();)
+            for (Iterator<ScheduledFuture> i = schedules.iterator(); i.hasNext();)
             {
-                ScheduledFuture schedule = (ScheduledFuture)i.next();
+                ScheduledFuture schedule = i.next();
                 schedule.cancel(false);
                 i.remove();
 

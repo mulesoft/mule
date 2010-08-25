@@ -141,7 +141,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             {
                 logger.debug("Files: " + files.toString());
             }
-            Comparator comparator = getComparator();
+            Comparator<File> comparator = getComparator();
             if (comparator != null)
             {
                 Collections.sort(files, comparator);
@@ -495,21 +495,21 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    protected Comparator getComparator() throws Exception
+    protected Comparator<File> getComparator() throws Exception
     {
-
-        Object o = getEndpoint().getProperty(COMPARATOR_CLASS_NAME_PROPERTY);
-        Object reverseProperty = this.getEndpoint().getProperty(COMPARATOR_REVERSE_ORDER_PROPERTY);
-        boolean reverse = false;
-        if (o != null)
+        Object comparatorClassName = getEndpoint().getProperty(COMPARATOR_CLASS_NAME_PROPERTY);
+        if (comparatorClassName != null)
         {
+            Object reverseProperty = this.getEndpoint().getProperty(COMPARATOR_REVERSE_ORDER_PROPERTY);
+            boolean reverse = false;
             if (reverseProperty != null)
             {
                 reverse = Boolean.valueOf((String) reverseProperty);
             }
-            Class clazz = Class.forName(o.toString());
-            o = clazz.newInstance();
-            return reverse ? new ReverseComparator((Comparator) o) : (Comparator) o;
+            
+            Class<?> clazz = Class.forName(comparatorClassName.toString());
+            Comparator<?> comparator = (Comparator<?>)clazz.newInstance();
+            return reverse ? new ReverseComparator(comparator) : comparator;
         }
         return null;
     }
