@@ -153,4 +153,14 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
         this.flowConstruct = null;
         this.listener = null;
     }
+    
+    @Override
+    public int hashCode()
+    {
+        // We need unique hashcode for each inbound endpoint instance because flowConstuct and listener are not
+        // injected until after endpoint has been created and cached and the key used for caching is hashcode.
+        // If we don't do this then endpoints which are configured identically but used with different
+        // services get mixed up after deserialization of events
+        return System.identityHashCode(this);
+    }
 }
