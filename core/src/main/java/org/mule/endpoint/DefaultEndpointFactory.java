@@ -19,7 +19,6 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ServiceType;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.service.TransportServiceDescriptor;
@@ -80,30 +79,12 @@ public class DefaultEndpointFactory implements EndpointFactory
 
     public InboundEndpoint getInboundEndpoint(EndpointBuilder builder) throws MuleException
     {
-        InboundEndpoint endpoint = builder.buildInboundEndpoint();
-        return (InboundEndpoint) registerEndpoint(endpoint);
+        return builder.buildInboundEndpoint();
     }
 
     public OutboundEndpoint getOutboundEndpoint(EndpointBuilder builder) throws MuleException
     {
-        OutboundEndpoint endpoint = builder.buildOutboundEndpoint();
-        return (OutboundEndpoint) registerEndpoint(endpoint);
-    }
-
-    /**
-     * @param endpoint
-     * @throws RegistrationException
-     */
-    protected ImmutableEndpoint registerEndpoint(ImmutableEndpoint endpoint) throws RegistrationException
-    {
-        ImmutableEndpoint registryEndpoint = (ImmutableEndpoint) muleContext.getRegistry().lookupObject(
-                ENDPOINT_REGISTRY_PREFIX + endpoint.hashCode());
-        if (registryEndpoint == null)
-        {
-            muleContext.getRegistry().registerObject(ENDPOINT_REGISTRY_PREFIX + endpoint.hashCode(), endpoint);
-            registryEndpoint = endpoint;
-        }
-        return registryEndpoint;
+        return builder.buildOutboundEndpoint();
     }
 
     public EndpointBuilder getEndpointBuilder(String uri)

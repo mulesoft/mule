@@ -54,6 +54,7 @@ public class StartableCompositeMessageSource
     protected static final Log log = LogFactory.getLog(StartableCompositeMessageSource.class);
 
     protected MessageProcessor listener;
+    protected AtomicBoolean initialised = new AtomicBoolean(false);
     protected AtomicBoolean started = new AtomicBoolean(false);
     protected final List<MessageSource> sources = Collections.synchronizedList(new ArrayList<MessageSource>());
     protected AtomicBoolean starting = new AtomicBoolean(false);
@@ -67,13 +68,16 @@ public class StartableCompositeMessageSource
             sources.add(source);
         }
         source.setListener(internalListener);
-        if (source instanceof FlowConstructAware)
+        if (initialised.get())
         {
-            ((FlowConstructAware) source).setFlowConstruct(flowConstruct);
-        }
-        if (source instanceof Initialisable)
-        {
-            ((Initialisable) source).initialise();
+            if (source instanceof FlowConstructAware)
+            {
+                ((FlowConstructAware) source).setFlowConstruct(flowConstruct);
+            }
+            if (source instanceof Initialisable)
+            {
+                ((Initialisable) source).initialise();
+            }
         }
         if (started.get() && source instanceof Startable)
         {
@@ -129,6 +133,7 @@ public class StartableCompositeMessageSource
                 }
             }
         }
+        initialised.set(true);
     }
 
     public void start() throws MuleException
