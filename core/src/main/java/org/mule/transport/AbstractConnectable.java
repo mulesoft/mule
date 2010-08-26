@@ -489,10 +489,7 @@ public abstract class AbstractConnectable<O> implements Connectable, LifecycleSt
 
     protected void doDispose()
     {
-        if (this.endpoint instanceof Disposable)
-        {
-            ((Disposable) this.endpoint).dispose();
-        }
+        // nothing to do by default
     }
 
     protected void doConnect() throws Exception

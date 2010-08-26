@@ -394,6 +394,10 @@ public abstract class AbstractService implements Service, MessageProcessor
         {
             ((Disposable) messageProcessorChain).dispose();
         }
+        if (messageSource instanceof Disposable)
+        {
+            ((Disposable) messageSource).dispose();
+        }
         muleContext.getStatistics().remove(stats);
     }
 

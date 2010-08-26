@@ -55,6 +55,7 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
     
     public void initialise() throws InitialisationException
     {
+        super.initialise();
         if (catchAllStrategy != null)
         {
             for (MessageProcessor processor : processors)

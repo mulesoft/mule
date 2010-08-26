@@ -16,6 +16,10 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
@@ -45,7 +49,7 @@ import org.apache.commons.logging.LogFactory;
  * <li>Message will only be received from endpoints if the connector is also started.
  */
 public class StartableCompositeMessageSource
-    implements CompositeMessageSource, Startable, Stoppable, FlowConstructAware
+    implements CompositeMessageSource, Lifecycle, FlowConstructAware
 {
     protected static final Log log = LogFactory.getLog(StartableCompositeMessageSource.class);
 
@@ -69,6 +73,10 @@ public class StartableCompositeMessageSource
             {
                 ((FlowConstructAware) source).setFlowConstruct(flowConstruct);
             }
+            if (source instanceof Initialisable)
+            {
+                ((Initialisable) source).initialise();
+            }
             if (source instanceof Startable)
             {
                 ((Startable) source).start();
@@ -78,9 +86,16 @@ public class StartableCompositeMessageSource
 
     public void removeSource(MessageSource source) throws MuleException
     {
-        if (started.get() && (source instanceof Stoppable))
+        if (started.get())
         {
-            ((Stoppable) source).stop();
+            if (source instanceof Stoppable)
+            {
+                ((Stoppable) source).stop();
+            }
+            if (source instanceof Disposable)
+            {
+                ((Disposable) source).dispose();
+            }
         }
         synchronized (sources)
         {
@@ -96,6 +111,28 @@ public class StartableCompositeMessageSource
             addSource(messageSource);
         }
     }
+    
+    public void initialise() throws InitialisationException
+    {
+        if (listener == null)
+        {
+            throw new InitialisationException(CoreMessages.objectIsNull("listener"), this);
+        }
+        synchronized (sources)
+        {
+            for (MessageSource source : sources)
+            {
+                if (source instanceof FlowConstructAware)
+                {
+                    ((FlowConstructAware) source).setFlowConstruct(flowConstruct);
+                }
+                if (source instanceof Initialisable)
+                {
+                    ((Initialisable) source).initialise();
+                }
+            }
+        }
+    }
 
     public void start() throws MuleException
     {
@@ -109,10 +146,6 @@ public class StartableCompositeMessageSource
             starting.set(true);
             for (MessageSource source : sources)
             {
-                if (source instanceof FlowConstructAware)
-                {
-                    ((FlowConstructAware) source).setFlowConstruct(flowConstruct);
-                }
                 if (source instanceof Startable)
                 {
                     ((Startable) source).start();
@@ -137,6 +170,20 @@ public class StartableCompositeMessageSource
             }
 
             started.set(false);
+        }
+    }
+    
+    public void dispose()
+    {
+        synchronized (sources)
+        {
+            for (MessageSource source : sources)
+            {
+                if (source instanceof Disposable)
+                {
+                    ((Disposable) source).dispose();
+                }
+            }
         }
     }
 
