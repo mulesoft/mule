@@ -11,16 +11,11 @@
 package org.mule.endpoint;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.processor.MessageProcessor;
 
 /**
- * A message processor into which an endpoint needs to be injected.
+ * Interface used by objects that allow an endpoint instance to be set.
  */
-public interface EndpointAwareMessageProcessor extends MessageProcessor
+public interface EndpointAware
 {
-    /**
-     * Inject the endpoint.  Note that this might return a different MessageProcessor, or null if no
-     * MessageProcessor is needed for the given endpoint type
-     */
-    MessageProcessor injectEndpoint(ImmutableEndpoint ep);
+    void setEndpoint(ImmutableEndpoint ep);
 }

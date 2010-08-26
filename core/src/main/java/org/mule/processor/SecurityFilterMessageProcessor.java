@@ -13,11 +13,10 @@ package org.mule.processor;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.security.SecurityException;
 import org.mule.context.notification.SecurityNotification;
-import org.mule.endpoint.EndpointAwareMessageProcessor;
+import org.mule.endpoint.EndpointAware;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.AbstractConnector;
 
@@ -27,7 +26,7 @@ import org.mule.transport.AbstractConnector;
  * message is not send or dispatched by the transport. When unauthorised the request
  * message is returned as the response.
  */
-public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor implements EndpointAwareMessageProcessor
+public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor implements EndpointAware
 {
     private EndpointSecurityFilter filter;
 
@@ -81,9 +80,8 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
         this.filter = filter;
     }
 
-    public MessageProcessor injectEndpoint(ImmutableEndpoint ep)
+    public void setEndpoint(ImmutableEndpoint ep)
     {
         filter.setEndpoint(ep);
-        return this;
     }
 }

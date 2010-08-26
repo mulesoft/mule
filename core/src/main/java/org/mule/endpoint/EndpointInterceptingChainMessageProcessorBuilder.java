@@ -31,9 +31,9 @@ public class EndpointInterceptingChainMessageProcessorBuilder extends
     @Override
     protected MessageProcessor initializeMessageProcessor(Object processor) throws MuleException
     {
-        if (processor instanceof EndpointAwareMessageProcessor)
+        if (processor instanceof EndpointAware)
         {
-            ((EndpointAwareMessageProcessor) processor).injectEndpoint(endpoint);
+            ((EndpointAware) processor).setEndpoint(endpoint);
         }
         return super.initializeMessageProcessor(processor);
     }
