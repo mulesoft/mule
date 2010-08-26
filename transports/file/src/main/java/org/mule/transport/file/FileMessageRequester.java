@@ -28,7 +28,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 
 /**
- * <code>FileMessageDispatcher</code> is used to read/write files to the filesystem
+ * <code>FileMessageRequester</code> is used to read/write files to the filesystem
  */
 public class FileMessageRequester extends AbstractMessageRequester
 {
@@ -137,11 +137,11 @@ public class FileMessageRequester extends AbstractMessageRequester
                     {
                         // This isn't nice but is needed as MuleMessage is required to
                         // resolve the destination file name
-                        DefaultMuleMessage parserMesssage = new DefaultMuleMessage(null, 
+                        DefaultMuleMessage parserMesssage = new DefaultMuleMessage(null,
                             connector.getMuleContext());
                         parserMesssage.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
 
-                        destinationFileName = 
+                        destinationFileName =
                             connector.getFilenameParser().getFilename(parserMesssage, moveToPattern);
                     }
                     // don't use new File() directly, see MULE-1112
@@ -154,7 +154,7 @@ public class FileMessageRequester extends AbstractMessageRequester
                 {
                     if (connector.isStreaming())
                     {
-                        ReceiverFileInputStream receiverStream = new ReceiverFileInputStream(result, 
+                        ReceiverFileInputStream receiverStream = new ReceiverFileInputStream(result,
                             connector.isAutoDelete(), destinationFile);
                         returnMessage = createMuleMessage(receiverStream, encoding);
                     }
@@ -206,6 +206,7 @@ public class FileMessageRequester extends AbstractMessageRequester
             // no moveTo directory
             if (destinationFile == null)
             {
+System.out.println("\n\n***** FileMessageRequester moveOrDelete\n\n");
                 // delete source
                 if (!sourceFile.delete())
                 {

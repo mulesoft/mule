@@ -35,7 +35,8 @@ public class FileToByteArray extends ObjectToByteArray
         registerSourceType(byte[].class);
     }
 
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    @Override
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         // Support other payload types so that this transformer can be used
         // transparently both when streaming is on and off
@@ -43,13 +44,13 @@ public class FileToByteArray extends ObjectToByteArray
         {
             return src;
         }
+        
         if (src instanceof InputStream || src instanceof String)
         {
-            return super.doTransform(src, encoding);
+            return super.doTransform(src, outputEncoding);
         }
         else
         {
-
             File file = (File) src;
 
             if (file == null)
@@ -94,7 +95,6 @@ public class FileToByteArray extends ObjectToByteArray
             {
                 IOUtils.closeQuietly(fis);
             }
-
         }
     }
 }

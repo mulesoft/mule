@@ -205,15 +205,15 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
-        DefaultMuleMessage fileParserMsgAdaptor = new DefaultMuleMessage(null, connector.getMuleContext());
-        fileParserMsgAdaptor.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+        DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, connector.getMuleContext());
+        fileParserMessasge.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
         
         File workFile = null;
         if (workDir != null && (moveDir == null || (moveDir != null && fileConnector.isStreaming())))
         {
             String workFileName = sourceFileOriginalName;
             
-            workFileName = fileConnector.getFilenameParser().getFilename(fileParserMsgAdaptor,
+            workFileName = fileConnector.getFilenameParser().getFilename(fileParserMessasge,
                     workFileNamePattern);
             // don't use new File() directly, see MULE-1112
             workFile = FileUtils.newFile(workDir, workFileName);
@@ -230,7 +230,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             String destinationFileName = sourceFileOriginalName;
             if (moveToPattern != null)
             {
-                destinationFileName = ((FileConnector) connector).getFilenameParser().getFilename(fileParserMsgAdaptor,
+                destinationFileName = ((FileConnector) connector).getFilenameParser().getFilename(fileParserMessasge,
                     moveToPattern);
             }
             // don't use new File() directly, see MULE-1112
@@ -243,7 +243,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             if (fileConnector.isStreaming())
             {
-                ReceiverFileInputStream payload = new ReceiverFileInputStream(sourceFile, 
+                ReceiverFileInputStream payload = new ReceiverFileInputStream(sourceFile,
                     fileConnector.isAutoDelete(), destinationFile);
                 message = createMuleMessage(payload, encoding);
             }
@@ -274,10 +274,9 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    private void moveAndDelete(final File sourceFile, File destinationFile, 
+    private void moveAndDelete(final File sourceFile, File destinationFile,
         String sourceFileOriginalName, MuleMessage message)
     {
-
         boolean fileWasMoved = false;
 
         try
