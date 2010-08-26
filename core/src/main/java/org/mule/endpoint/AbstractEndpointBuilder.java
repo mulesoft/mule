@@ -207,30 +207,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
             }
         }
         
-        InboundEndpoint endpoint = new DefaultInboundEndpoint(connector, endpointURI,
+        return new DefaultInboundEndpoint(connector, endpointURI,
                 getName(endpointURI), getProperties(), getTransactionConfig(),
                 getDefaultDeleteUnacceptedMessages(connector),
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
                 getMessageProcessorsFactory(), messageProcessors, responseMessageProcessors,
                 isDisableTransportTransformer(), mimeType);
-
-        for (MessageProcessor mp : messageProcessors)
-        {
-        	if (mp instanceof EndpointAware)
-        	{
-        		((EndpointAware) mp).setEndpoint(endpoint);
-        	}
-        }
-        for (MessageProcessor mp : responseMessageProcessors)
-        {
-        	if (mp instanceof EndpointAware)
-        	{
-        		((EndpointAware) mp).setEndpoint(endpoint);
-        	}
-        }
-        
-        return endpoint;
     }
 
     protected OutboundEndpoint doBuildOutboundEndpoint() throws InitialisationException, EndpointException
@@ -269,30 +252,13 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         checkOutboundExchangePattern();
 
-        OutboundEndpoint endpoint = new DefaultOutboundEndpoint(connector, endpointURI,
+        return new DefaultOutboundEndpoint(connector, endpointURI,
                 getName(endpointURI), getProperties(), getTransactionConfig(),
                 getDefaultDeleteUnacceptedMessages(connector), 
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
                 responsePropertiesList,  getMessageProcessorsFactory(), messageProcessors,
                 responseMessageProcessors, isDisableTransportTransformer(), mimeType);
-
-        for (MessageProcessor mp : messageProcessors)
-        {
-        	// TODO There should ideally be an EndpointAware interface
-        	if (mp instanceof Transformer)
-        	{
-        		((Transformer) mp).setEndpoint(endpoint);
-        	}
-        }
-        for (MessageProcessor mp : responseMessageProcessors)
-        {
-        	if (mp instanceof Transformer)
-        	{
-        		((Transformer) mp).setEndpoint(endpoint);
-        	}
-        }
-        return endpoint;
     }
 
     protected void prepareToBuildEndpoint()
