@@ -12,7 +12,6 @@ package org.mule.transport.jms.transformers;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
@@ -129,7 +128,6 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
         // Try to figure out our endpoint's JMS Specification and fall back to
         // 1.0.2 if none is set.
         String jmsSpec = JmsConstants.JMS_SPECIFICATION_102B;
-        ImmutableEndpoint endpoint = this.getEndpoint();
         if (endpoint != null)
         {
             Connector connector = endpoint.getConnector();

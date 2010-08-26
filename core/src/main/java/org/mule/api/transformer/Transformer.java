@@ -10,7 +10,13 @@
 
 package org.mule.api.transformer;
 
+import org.mule.api.NamedObject;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.endpoint.EndpointAware;
 
 import java.util.List;
 
@@ -18,7 +24,7 @@ import java.util.List;
  * <code>Transformer</code> can be chained together to covert message payloads
  * from one object type to another.
  */
-public interface Transformer extends BaseTransformer, MuleContextAware
+public interface Transformer extends MessageProcessor, Initialisable, Disposable, NamedObject, MuleContextAware, EndpointAware
 {
 
     /**
@@ -155,5 +161,12 @@ public interface Transformer extends BaseTransformer, MuleContextAware
      * Return the encoding returned by the transformer (if any).
      */
     String getEncoding();
+    
+    /**
+     * The endpoint that this transformer is attached to
+     * @return the endpoint associated with the transformer
+     * @deprecated
+     */
+    ImmutableEndpoint getEndpoint();
 
 }
