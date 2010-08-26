@@ -16,14 +16,12 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.construct.SimpleFlowConstruct;
-import org.mule.endpoint.EndpointAwareMessageProcessor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
 
@@ -49,23 +47,11 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
 
     protected List processors = new ArrayList();
     protected String name;
-    protected ImmutableEndpoint endpoint;
     protected FlowConstruct flowConstruct;
 
     public InterceptingChainMessageProcessorBuilder()
     {
         // empty
-    }
-    
-    public InterceptingChainMessageProcessorBuilder(ImmutableEndpoint endpoint, FlowConstruct flowConstruct)
-    {
-        this.endpoint = endpoint;
-        this.flowConstruct = flowConstruct;
-    }
-    
-    public InterceptingChainMessageProcessorBuilder(ImmutableEndpoint endpoint)
-    {
-        this.endpoint = endpoint;
     }
     
     public InterceptingChainMessageProcessorBuilder(FlowConstruct flowConstruct)
@@ -96,10 +82,6 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
     // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder
     protected MessageProcessor initializeMessageProcessor(Object processor) throws MuleException
     {
-        if (processor instanceof EndpointAwareMessageProcessor)
-        {
-            ((EndpointAwareMessageProcessor) processor).injectEndpoint(endpoint);
-        }
         if (processor instanceof FlowConstructAware)
         {
             ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);

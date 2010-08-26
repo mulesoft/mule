@@ -2440,7 +2440,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
     {
-        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder(endpoint);
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
         builder.chain(new ExceptionHandlingMessageProcessor());
         builder.chain(new AsyncInterceptingMessageProcessor(new WorkManagerSource()
         {
