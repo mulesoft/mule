@@ -23,7 +23,6 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.FilterUnacceptedException;
@@ -331,12 +330,8 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
     @Override
     protected void doDispose()
     {
-        if (flowConstruct instanceof Disposable)
-        {
-            ((Disposable) flowConstruct).dispose();
-        }
-        this.flowConstruct = null;
         this.listener = null;
+        this.flowConstruct = null;
         super.doDispose();
     }
 }
