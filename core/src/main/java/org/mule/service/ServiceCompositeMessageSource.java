@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
@@ -93,6 +94,19 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
         }
     }
 
+    @Override
+    public void dispose()
+    {
+        for (MessageProcessor processor : processors)
+        {
+            if (processor instanceof Disposable)
+            {
+                ((Disposable) processor).dispose();
+            }
+        }
+        super.dispose();
+    }
+    
     protected void createMessageProcessorChain() throws MuleException
     {
         InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder(flowConstruct);
