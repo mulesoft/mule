@@ -173,12 +173,12 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
                                                   new Class[]{Statement.class}, new StatementInvocationHandler(this, st));
     }
 
-    public Map getTypeMap() throws SQLException
+    public Map<String, Class<?>> getTypeMap() throws SQLException
     {
         return connection.getTypeMap();
     }
 
-    public void setTypeMap(Map map) throws SQLException
+    public void setTypeMap(Map<String, Class<?>> map) throws SQLException
     {
         connection.setTypeMap(map);
     }
