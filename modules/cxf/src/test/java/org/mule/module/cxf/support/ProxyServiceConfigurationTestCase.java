@@ -30,6 +30,7 @@ public class ProxyServiceConfigurationTestCase extends AbstractMuleTestCase
         try
         {
             startServer(configFilePath);
+            fail("It should have failed because no namespace was specified");
         }
         catch (RuntimeException e)
         {

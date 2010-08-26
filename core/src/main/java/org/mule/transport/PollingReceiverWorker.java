@@ -10,6 +10,7 @@
 
 package org.mule.transport;
 
+import org.mule.RequestContext;
 import org.mule.api.MuleException;
 
 import javax.resource.spi.work.Work;
@@ -39,6 +40,8 @@ public class PollingReceiverWorker implements Work
     // by the scheduler
     public void run()
     {
+        // Make sure we start with a clean slate.
+        RequestContext.clear();
         if (receiver.isStarted())
         {
             running = true;

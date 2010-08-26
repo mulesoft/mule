@@ -121,6 +121,13 @@ public class CxfMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 26);
     }
+
+    public static Message couldNotFindEndpoint(QName endpointNameThatCannotBeFound,
+                                               List<QName> availableEndpoingNames)
+    {
+        return factory.createMessage(BUNDLE_PATH, 27, String.valueOf(endpointNameThatCannotBeFound),
+                                     String.valueOf(availableEndpoingNames));
+    }
 }
 
 

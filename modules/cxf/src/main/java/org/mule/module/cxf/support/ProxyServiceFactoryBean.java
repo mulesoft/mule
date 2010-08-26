@@ -25,6 +25,7 @@ import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.mule.module.cxf.i18n.CxfMessages;
 
 public class ProxyServiceFactoryBean extends ReflectionServiceFactoryBean
 {
@@ -78,7 +79,8 @@ public class ProxyServiceFactoryBean extends ReflectionServiceFactoryBean
                     enames.add(ep.getName());
                 }
             }
-            LOG.log(Level.WARNING, "COULD_NOT_FIND_ENDPOINT", new Object[]{getEndpointName(), enames});
+            LOG.log(Level.WARNING, "COULD_NOT_FIND_ENDPOINT",  new ComponentNotFoundRuntimeException(
+                CxfMessages.couldNotFindEndpoint(getEndpointName(), enames)));
         }
 
         try

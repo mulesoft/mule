@@ -124,7 +124,8 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         data.add(new Float("6"));
         data.add(new Double("7"));
         data.add(new String("8"));
-        data.add(new byte[]{9, 10});
+        data.add(null);
+        data.add(new byte[]{9, 10});        
 
         StreamMessage result = (StreamMessage) JmsMessageUtils.toMessage(data, session);
 
@@ -140,6 +141,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         assertEquals(new Float("6"), result.readObject());
         assertEquals(new Double("7"), result.readObject());
         assertEquals(new String("8"), result.readObject());
+        assertNull(result.readObject());
         assertTrue(Arrays.equals(new byte[]{9, 10}, (byte[]) result.readObject()));
     }
 
@@ -199,6 +201,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         data.put("value3", "value3");
         data.put("value4", new Double(67.9));
         data.put("value5", true);
+        data.put("value6", null);
 
         Message message = JmsMessageUtils.toMessage(data, session);
         assertTrue(message instanceof MapMessage);
@@ -209,6 +212,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         assertEquals("value3", mapMessage.getString("value3"));
         assertEquals(new Double(67.9), mapMessage.getDouble("value4"));
         assertTrue(mapMessage.getBoolean("value5"));
+        assertNull(mapMessage.getObject("value6"));
     }
 
     /**

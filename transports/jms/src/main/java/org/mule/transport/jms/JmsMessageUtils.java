@@ -491,7 +491,8 @@ public class JmsMessageUtils
      */
     protected static boolean validateStreamMessageType(Object candidate)
     {
-        if (candidate instanceof Boolean ||
+        if (candidate == null ||
+                candidate instanceof Boolean ||
                 candidate instanceof Byte ||
                 candidate instanceof Short ||
                 candidate instanceof Character ||
@@ -523,11 +524,10 @@ public class JmsMessageUtils
         for (Iterator<?> iterator = candidate.values().iterator(); iterator.hasNext();)
         {
             Object o = iterator.next();
-            if(!validateStreamMessageType(o) || !(o instanceof Serializable))
+            if (!validateStreamMessageType(o))
             {
-                return false;
+                    return false;
             }
-
         }
         return true;
     }
