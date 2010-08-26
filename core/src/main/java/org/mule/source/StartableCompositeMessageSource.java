@@ -67,20 +67,17 @@ public class StartableCompositeMessageSource
             sources.add(source);
         }
         source.setListener(internalListener);
-        if (started.get())
+        if (source instanceof FlowConstructAware)
         {
-            if (source instanceof FlowConstructAware)
-            {
-                ((FlowConstructAware) source).setFlowConstruct(flowConstruct);
-            }
-            if (source instanceof Initialisable)
-            {
-                ((Initialisable) source).initialise();
-            }
-            if (source instanceof Startable)
-            {
-                ((Startable) source).start();
-            }
+            ((FlowConstructAware) source).setFlowConstruct(flowConstruct);
+        }
+        if (source instanceof Initialisable)
+        {
+            ((Initialisable) source).initialise();
+        }
+        if (started.get() && source instanceof Startable)
+        {
+            ((Startable) source).start();
         }
     }
 
