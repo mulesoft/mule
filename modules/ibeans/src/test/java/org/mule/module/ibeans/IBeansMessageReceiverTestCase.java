@@ -20,20 +20,18 @@ import com.mockobjects.dynamic.Mock;
 
 public class IBeansMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
-    /* For general guidelines on writing transports see
-       http://www.mulesoft.org/documentation/display/MULE3USER/Creating+Transports */
-
     @Override
     public MessageReceiver getMessageReceiver() throws Exception
     {
         Mock mockService = new Mock(Service.class);
-        mockService.expectAndReturn("getResponseTransformer", null);
-        return new IBeansMessageReceiver(endpoint.getConnector(), (Service) mockService.proxy(), endpoint);
+        mockService.expect("dispose");
+        return new IBeansMessageReceiver(endpoint.getConnector(), (Service)mockService.proxy(), endpoint);
     }
 
     @Override
     public InboundEndpoint getEndpoint() throws Exception
     {
-         return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("ibean://hostip.getHostInfo");
+        String url = "ibean://hostip.getHostInfo";
+        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(url);
     }
 }
