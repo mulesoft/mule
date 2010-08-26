@@ -26,6 +26,7 @@ public class EndpointInterceptingChainMessageProcessorBuilder extends
                                                             FlowConstruct flowConstruct)
     {
         super(flowConstruct);
+        this.endpoint = endpoint;
     }
 
     @Override
