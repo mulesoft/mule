@@ -26,6 +26,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
+import org.mule.endpoint.EndpointAware;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
 import org.mule.transport.NullPayload;
@@ -43,6 +44,7 @@ import javax.activation.MimeTypeParseException;
 import javax.xml.transform.stream.StreamSource;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -51,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
  * Transformations transform one object into another.
  */
 
-public abstract class AbstractTransformer implements Transformer, MuleContextNotificationListener<MuleContextNotification>
+public abstract class AbstractTransformer implements Transformer, MuleContextNotificationListener<MuleContextNotification>, EndpointAware
 {
     public static final DataType<MuleMessage> MULE_MESSAGE_DATA_TYPE = new SimpleDataType<MuleMessage>(MuleMessage.class);
 

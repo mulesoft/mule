@@ -13,6 +13,7 @@ package org.mule.config.spring.factories;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 
 import org.apache.commons.logging.Log;
@@ -51,6 +52,12 @@ public abstract class AbstractEndpointFactoryBean extends EndpointURIEndpointBui
     public void initialise() throws InitialisationException
     {
         // subclasses may override this method
+    }
+    
+    protected void verifyValidMessageProcessor(MessageProcessor processor)
+    {
+        // We are building concrete endpoints so there is no need to validate message processors don't
+        // implement lifecycle etc.
     }
 
     protected abstract Object doGetObject() throws Exception;
