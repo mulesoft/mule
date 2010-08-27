@@ -46,14 +46,20 @@ public class WaitPolicy implements RejectedExecutionHandler
         this.timeUnit = timeUnit;
     }
 
+    @SuppressWarnings("boxing")
     public void rejectedExecution(Runnable r, ThreadPoolExecutor e)
     {
         try
         {
-            if (e.isShutdown() || !e.getQueue().offer(r, time, timeUnit))
+            if (e.isShutdown())
             {
-                // TODO better message
-                throw new RejectedExecutionException();
+                throw new RejectedExecutionException("ThreadPoolExecutor is already shut down");
+            }
+            else if (!e.getQueue().offer(r, time, timeUnit))
+            {
+                String message = String.format("ThreadPoolExecutor did not accept within %1d %2s", 
+                    time, timeUnit);
+                throw new RejectedExecutionException(message);
             }
         }
         catch (InterruptedException ie)
