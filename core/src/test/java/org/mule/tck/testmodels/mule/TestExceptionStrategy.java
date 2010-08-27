@@ -11,6 +11,7 @@
 package org.mule.tck.testmodels.mule;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.exception.AbstractMessagingExceptionStrategy;
 
 /**
@@ -18,7 +19,7 @@ import org.mule.exception.AbstractMessagingExceptionStrategy;
  * {@link org.mule.exception.AbstractMessagingExceptionStrategy}. This is used to test that overriding the default 
  * Exception strategy works.
  */
-public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
+public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy implements SystemExceptionHandler
 {
     private ExceptionCallback callback;
     
@@ -33,16 +34,6 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
     {
         this.testProperty = testProperty;
     }
-/*    
-    protected void defaultHandler(Throwable t)
-    {
-        super.defaultHandler(t);
-        if(callback != null)
-        {
-            callback.onException(t);
-        }
-    }
-*/
     
     @Override
     public MuleEvent handleException(Exception exception, MuleEvent event)
@@ -54,6 +45,14 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
         return event;
     }
 
+    public void handleException(Exception exception)
+    {
+        if (callback != null)
+        {
+            callback.onException(exception);
+        }
+    }
+    
     public interface ExceptionCallback
     {
         void onException(Throwable t);
