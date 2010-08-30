@@ -28,6 +28,7 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
                     "  <child/>\n" +
                     "</org.mule.issues.MulticastRouterMule2136TestCase_-Parent>";
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/issues/multicast-router-mule-2136-test.xml";
@@ -76,16 +77,17 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
         }
     }
 
-
-    protected Object request(MuleClient client, String endpoint, Class clazz) throws MuleException
+    protected Object request(MuleClient client, String endpoint, Class<?> clazz) throws MuleException
     {
         MuleMessage message = client.request(endpoint, TIMEOUT);
         assertNotNull(message);
         assertNotNull(message.getPayload());
-        assertTrue(message.getPayload().getClass().getName(), clazz.isAssignableFrom(message.getPayload().getClass()));
+        
+        Class<?> payloadClass = message.getPayload().getClass();
+        String assertionMessage = String.format("expected payload of type %1s but was %2s", clazz.getName(), payloadClass);
+        assertTrue(assertionMessage, clazz.isAssignableFrom(payloadClass));
         return message.getPayload();
     }
-
 
     public static class Parent
     {
