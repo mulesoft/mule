@@ -11,6 +11,8 @@
 package org.mule.transport.file.i18n;
 
 import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.Connector;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 
@@ -60,6 +62,13 @@ public class FileMessages extends MessageFactory
     public static Message invalidFilter(Object filter)
     {
         return factory.createMessage(BUNDLE_PATH, 8, filter.getClass().getName());
+    }
+
+    public static Message connectorAutodeletesWithOneWayEndpoint(Connector connector,
+        ImmutableEndpoint endpoint)
+    {
+        return factory.createMessage(BUNDLE_PATH, 9, connector.getName(), 
+            endpoint.getEndpointURI().toString());
     }
 }
 
