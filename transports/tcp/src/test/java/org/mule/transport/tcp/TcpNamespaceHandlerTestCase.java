@@ -1,7 +1,7 @@
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
@@ -27,24 +27,6 @@ import org.apache.commons.pool.impl.GenericKeyedObjectPool;
  */
 public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
 {
-    
-    public static class StubSocketFactory extends AbstractTcpSocketFactory
-    {
-        @Override
-        protected Socket createSocket(TcpSocketKey key) throws IOException
-        {
-            return new Socket();
-        }
-    }
-    
-    public static class StubSocketPoolFactory implements SocketPoolFactory
-    {
-        public KeyedObjectPool createSocketPool(TcpConnector connector)
-        {
-            return new GenericKeyedObjectPool();
-        }
-    }
-    
     protected String getConfigResources()
     {
         return "tcp-namespace-config.xml";
@@ -66,7 +48,6 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
         assertEquals(c.getNextMessageExceptionPolicy().getClass(), DefaultMessageExceptionPolicy.class);
-        assertEquals(c.getSocketPoolFactory().getClass(), DefaultSocketPoolFactory.class);
         assertEquals(c.getSocketFactory().getClass(), TcpSocketFactory.class);
         assertFalse(((AbstractByteProtocol) c.getTcpProtocol()).isRethrowExceptionOnRead());
     }
@@ -80,8 +61,6 @@ public class TcpNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
         assertEquals(c.getNextMessageExceptionPolicy().getClass(), DefaultMessageExceptionPolicy.class);
-        assertEquals(c.getSocketPoolFactory().getClass(), StubSocketPoolFactory.class);
-        assertEquals(c.getSocketFactory().getClass(), StubSocketFactory.class);
     }
     
     public void testTcpProtocolWithClass()

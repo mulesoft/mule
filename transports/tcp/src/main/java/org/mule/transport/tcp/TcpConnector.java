@@ -33,7 +33,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.URI;
 
-import org.apache.commons.pool.KeyedObjectPool;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 /**
  * <code>TcpConnector</code> can bind or sent to a given TCP port on a given host.
@@ -67,11 +67,10 @@ public class TcpConnector extends AbstractConnector
     private TcpProtocol tcpProtocol;
     private AbstractTcpSocketFactory socketFactory;
     private SimpleServerSocketFactory serverSocketFactory;
-    private KeyedObjectPool socketsPool;
+    private GenericKeyedObjectPool socketsPool = new GenericKeyedObjectPool();
     private int keepAliveTimeout = 0;
     private ExpiryMonitor keepAliveMonitor;
     private NextMessageExceptionPolicy nextMessageExceptionPolicy;
-    private SocketPoolFactory socketPoolFactory;
 
     /** 
      * If set, the socket is not closed after sending a message.  This attribute 
@@ -151,8 +150,12 @@ public class TcpConnector extends AbstractConnector
 
     protected void doInitialise() throws InitialisationException
     {
-        socketsPool = this.getSocketPoolFactory().createSocketPool(this);
         socketsPool.setFactory(getSocketFactory());
+        socketsPool.setTestOnBorrow(true);
+        socketsPool.setTestOnReturn(true);
+        //There should only be one pooled instance per socket (key)
+        socketsPool.setMaxActive(1);
+        socketsPool.setWhenExhaustedAction(GenericKeyedObjectPool.WHEN_EXHAUSTED_BLOCK);
     }
 
     protected void doDispose()
@@ -415,12 +418,12 @@ public class TcpConnector extends AbstractConnector
         this.sendTcpNoDelay = sendTcpNoDelay;
     }
 
-    public void setSocketFactory(AbstractTcpSocketFactory socketFactory)
+    protected void setSocketFactory(AbstractTcpSocketFactory socketFactory)
     {
         this.socketFactory = socketFactory;
     }
 
-    public AbstractTcpSocketFactory getSocketFactory()
+    protected AbstractTcpSocketFactory getSocketFactory()
     {
         return socketFactory;
     }
@@ -518,19 +521,5 @@ public class TcpConnector extends AbstractConnector
         if (this.dispatcherFactory == null) {
             super.setDispatcherFactory(dispatcherFactory);
         }
-    }
-
-    public SocketPoolFactory getSocketPoolFactory()
-    {
-        if (socketPoolFactory == null)
-        {
-            this.socketPoolFactory = new DefaultSocketPoolFactory();
-        }
-        return socketPoolFactory;
-    }
-
-    public void setSocketPoolFactory(SocketPoolFactory socketPoolFactory)
-    {
-        this.socketPoolFactory = socketPoolFactory;
     }
 }
