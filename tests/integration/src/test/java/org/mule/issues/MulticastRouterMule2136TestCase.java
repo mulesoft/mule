@@ -23,7 +23,7 @@ import org.mule.module.xml.functional.AbstractXmlFunctionalTestCase;
 public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCase
 {
 
-    public static final int TEST_COUNT = 10000;
+    public static final int TEST_COUNT = 2000; // cut down from 10k messages, since it seems a little much for the continuous build
     public static final String SERIALIZED = "<org.mule.issues.MulticastRouterMule2136TestCase_-Parent>\n" +
                     "  <child/>\n" +
                     "</org.mule.issues.MulticastRouterMule2136TestCase_-Parent>";
