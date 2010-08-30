@@ -118,6 +118,28 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         assertTrue(StringUtils.isNotBlank(result));
     }
 
+    public void testFunctionalTestComponent() throws Exception
+    {
+        doTestFunctionalTestComponent("vm://ftc1.in", "functional-test-component-1");
+    }
+
+    public void testInheritedFunctionalTestComponents() throws Exception
+    {
+        doTestFunctionalTestComponent("vm://ftc2.in", "functional-test-component-2");
+        doTestFunctionalTestComponent("vm://ftc3.in", "functional-test-component-3");
+
+        assertSame(getFunctionalTestComponent("functional-test-component-2"),
+            getFunctionalTestComponent("functional-test-component-3"));
+    }
+
+    private void doTestFunctionalTestComponent(final String ftcUri, final String ftcName)
+        throws MuleException, Exception
+    {
+        final String s = RandomStringUtils.randomAlphabetic(10);
+        muleClient.send(ftcUri, s, null);
+        assertEquals(s, getFunctionalTestComponent(ftcName).getLastReceivedMessage());
+    }
+
     private void doTestMathsService(String url) throws MuleException
     {
         final int a = RandomUtils.nextInt(100);

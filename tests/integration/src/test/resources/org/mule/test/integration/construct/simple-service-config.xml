@@ -2,10 +2,12 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+  xmlns:test="http://www.mulesoft.org/schema/mule/test"
   xmlns:spring="http://www.springframework.org/schema/beans"
   xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
   <simple-service name="maths-service-1"
@@ -89,4 +91,23 @@
   <simple-service name="weather-xpath-consumer"
                   address="vm://weather-xpath-consumer.in"
                   component-class="org.mule.test.integration.tck.WeatherReportXpathConsumer" />
+                  
+  <!-- Functional testing -->
+  <simple-service name="functional-test-component-1"
+                  address="vm://ftc1.in">
+    <test:component />
+  </simple-service>
+  
+  <simple-service abstract="true"
+                  name="abstract-functional-test-component-service">
+    <test:component />
+  </simple-service>
+  
+  <simple-service name="functional-test-component-2"
+                  parent="abstract-functional-test-component-service"
+                  address="vm://ftc2.in" />
+  
+  <simple-service name="functional-test-component-3"
+                  parent="abstract-functional-test-component-service"
+                  address="vm://ftc3.in" />
 </mule>
