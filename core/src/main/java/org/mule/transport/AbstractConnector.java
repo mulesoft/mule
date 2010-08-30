@@ -166,7 +166,12 @@ public abstract class AbstractConnector implements Connector, WorkListener
     /**
      * A pool of dispatchers for this connector, keyed by endpoint
      */
-    protected final GenericKeyedObjectPool dispatchers = new GenericKeyedObjectPool();
+    protected volatile ConfigurableKeyedObjectPool dispatchers;
+
+    /**
+     * A factory for creating the pool of dispatchers for this connector.
+     */
+    protected volatile ConfigurableKeyedObjectPoolFactory dispatcherPoolFactory;
 
     /**
      * A pool of requesters for this connector, keyed by endpoint
@@ -298,8 +303,6 @@ public abstract class AbstractConnector implements Connector, WorkListener
         // NOTE: testOnBorrow MUST be FALSE. this is a bit of a design bug in
         // commons-pool since validate is used for both activation and passivation,
         // but has no way of knowing which way it is going.
-        dispatchers.setTestOnBorrow(false);
-        dispatchers.setTestOnReturn(true);
         requesters.setTestOnBorrow(false);
         requesters.setTestOnReturn(true);
     }
@@ -350,6 +353,15 @@ public abstract class AbstractConnector implements Connector, WorkListener
                     {
                         retryPolicyTemplate = (RetryPolicyTemplate) muleContext.getRegistry().lookupObject(
                                 MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_TEMPLATE);
+                    }
+
+                    if (dispatcherPoolFactory == null) {
+                        dispatcherPoolFactory = new DefaultConfigurableKeyedObjectPoolFactory();
+                    }
+
+                    dispatchers = dispatcherPoolFactory.createObjectPool();
+                    if (dispatcherFactory != null) {
+                        dispatchers.setFactory(getWrappedDispatcherFactory(dispatcherFactory));
                     }
 
                     // Initialise the structure of this connector
@@ -878,8 +890,20 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     public void setDispatcherFactory(MessageDispatcherFactory dispatcherFactory)
     {
-        KeyedPoolableObjectFactory poolFactory;
+        KeyedPoolableObjectFactory poolFactory = getWrappedDispatcherFactory(dispatcherFactory);
 
+        if (dispatchers !=  null) {
+            this.dispatchers.setFactory(poolFactory);
+        }
+
+        // we keep a reference to the unadapted factory, otherwise people might end
+        // up with ClassCastExceptions on downcast to their implementation (sigh)
+        this.dispatcherFactory = dispatcherFactory;
+    }
+
+    private KeyedPoolableObjectFactory getWrappedDispatcherFactory(MessageDispatcherFactory dispatcherFactory)
+    {
+        KeyedPoolableObjectFactory poolFactory;
         if (dispatcherFactory instanceof KeyedPoolableObjectFactory)
         {
             poolFactory = (KeyedPoolableObjectFactory) dispatcherFactory;
@@ -890,11 +914,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
             poolFactory = new KeyedPoolMessageDispatcherFactoryAdapter(dispatcherFactory);
         }
 
-        this.dispatchers.setFactory(poolFactory);
-
-        // we keep a reference to the unadapted factory, otherwise people might end
-        // up with ClassCastExceptions on downcast to their implementation (sigh)
-        this.dispatcherFactory = dispatcherFactory;
+        return poolFactory;
     }
 
     /**
@@ -990,7 +1010,20 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     public int getMaxDispatchersActive()
     {
+        checkDispatchersInitialised();
         return this.dispatchers.getMaxActive();
+    }
+
+    /**
+     * Checks if the connector was initialised or not. Some connectors fields are created
+     * during connector's initialization so this check should be used before accessing them.
+     */
+    private void checkDispatchersInitialised()
+    {
+        if (dispatchers == null)
+        {
+            throw new IllegalStateException("Dispatchers pool was not initialised");
+        }
     }
 
     /**
@@ -1001,6 +1034,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     public int getMaxTotalDispatchers()
     {
+        checkDispatchersInitialised();
         return this.dispatchers.getMaxTotal();
     }
 
@@ -1012,6 +1046,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     public void setMaxDispatchersActive(int maxActive)
     {
+        checkDispatchersInitialised();
         this.dispatchers.setMaxActive(maxActive);
         // adjust maxIdle in tandem to avoid thrashing
         this.dispatchers.setMaxIdle(maxActive);
@@ -2408,6 +2443,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     public void setDispatcherPoolWhenExhaustedAction(byte whenExhaustedAction)
     {
+        checkDispatchersInitialised();
         dispatchers.setWhenExhaustedAction(whenExhaustedAction);
     }
 
@@ -2417,7 +2453,21 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     public void setDispatcherPoolMaxWait(int maxWait)
     {
+        checkDispatchersInitialised();
         dispatchers.setMaxWait(maxWait);
+    }
+
+    /**
+     * Allows to define a factory to create the dispatchers pool that will be used in the connector
+     */
+    public void setDispatcherPoolFactory(ConfigurableKeyedObjectPoolFactory dispatcherPoolFactory)
+    {
+        this.dispatcherPoolFactory = dispatcherPoolFactory;
+    }
+
+    public ConfigurableKeyedObjectPoolFactory getDispatcherPoolFactory()
+    {
+        return dispatcherPoolFactory;
     }
 
     /**

@@ -9,15 +9,36 @@
  */
 package org.mule.test.tck;
 
+import org.mule.api.transport.Connector;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.functional.ResponseWriterCallback;
+import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.transport.ConfigurableKeyedObjectPool;
+import org.mule.transport.ConfigurableKeyedObjectPoolFactory;
+import org.mule.transport.DefaultConfigurableKeyedObjectPool;
+import org.mule.transport.DefaultConfigurableKeyedObjectPoolFactory;
 
 import java.io.IOException;
 
 public class MuleTestNamespaceTestCase extends FunctionalTestCase
 {
+
+    public static class StubConfigurableKeyedObjectPool extends DefaultConfigurableKeyedObjectPool
+    {
+
+    }
+
+    public static class StubDispatcherPoolFactory implements ConfigurableKeyedObjectPoolFactory
+    {
+
+        public ConfigurableKeyedObjectPool createObjectPool()
+        {
+            return new StubConfigurableKeyedObjectPool();
+        }
+    }
+
     protected String getConfigResources()
     {
         return "test-namespace-config.xml";
@@ -74,4 +95,23 @@ public class MuleTestNamespaceTestCase extends FunctionalTestCase
         assertNull(ftc.getEventCallback());
     }
 
+    public void testConnectorUsingDefaultDispatcherPoolFactory()
+    {
+        Connector connector = muleContext.getRegistry().lookupConnector("testConnectorWithDefaultFactory");
+
+        assertTrue(connector instanceof TestConnector);
+        TestConnector testConnector = (TestConnector) connector;
+        assertEquals(DefaultConfigurableKeyedObjectPoolFactory.class, testConnector.getDispatcherPoolFactory().getClass());
+        assertEquals(DefaultConfigurableKeyedObjectPool.class, testConnector.getDispatchers().getClass());
+    }
+
+    public void testConnectorUsingOverriddenDispatcherPoolFactory()
+    {
+        Connector connector = muleContext.getRegistry().lookupConnector("testConnectorWithOverriddenFactory");
+
+        assertTrue(connector instanceof TestConnector);
+        TestConnector testConnector = (TestConnector) connector;
+        assertEquals(StubDispatcherPoolFactory.class, testConnector.getDispatcherPoolFactory().getClass());
+        assertEquals(StubConfigurableKeyedObjectPool.class, testConnector.getDispatchers().getClass());
+    }
 }

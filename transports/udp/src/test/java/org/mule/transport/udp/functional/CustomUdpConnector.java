@@ -11,9 +11,8 @@
 package org.mule.transport.udp.functional;
 
 import org.mule.api.MuleContext;
+import org.mule.transport.ConfigurableKeyedObjectPool;
 import org.mule.transport.udp.UdpConnector;
-
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 /**
  * Allows access to the dispatchers pool so we can ensure they're disposed
@@ -25,7 +24,7 @@ public class CustomUdpConnector extends UdpConnector
         super(context);
     }
     
-    public GenericKeyedObjectPool getDispatchers() 
+    public ConfigurableKeyedObjectPool getDispatchers() 
     {
         return dispatchers;
     }

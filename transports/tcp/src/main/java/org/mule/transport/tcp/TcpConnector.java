@@ -21,6 +21,7 @@ import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.model.streaming.CallbackOutputStream;
 import org.mule.transport.AbstractConnector;
+import org.mule.transport.ConfigurableKeyedObjectPool;
 import org.mule.transport.tcp.protocols.SafeProtocol;
 import org.mule.util.monitor.ExpiryMonitor;
 
@@ -521,5 +522,10 @@ public class TcpConnector extends AbstractConnector
         if (this.dispatcherFactory == null) {
             super.setDispatcherFactory(dispatcherFactory);
         }
+    }
+
+    public ConfigurableKeyedObjectPool getDispatchers()
+    {
+        return dispatchers;
     }
 }

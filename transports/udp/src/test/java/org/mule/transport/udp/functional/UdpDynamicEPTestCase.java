@@ -11,6 +11,7 @@
 package org.mule.transport.udp.functional;
 
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.ConfigurableKeyedObjectPool;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,8 +23,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
-
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 public class UdpDynamicEPTestCase extends FunctionalTestCase
 {
@@ -82,8 +81,7 @@ public class UdpDynamicEPTestCase extends FunctionalTestCase
         }
         
         CustomUdpConnector udpConnector = (CustomUdpConnector) muleContext.getRegistry().lookupConnector("connector.udp.0");
-        GenericKeyedObjectPool pool = udpConnector.getDispatchers();
+        ConfigurableKeyedObjectPool pool = udpConnector.getDispatchers();
         assertEquals(0, pool.getNumActive());
     }
-
 }
