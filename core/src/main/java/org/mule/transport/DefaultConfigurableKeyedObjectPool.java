@@ -35,133 +35,111 @@ public class DefaultConfigurableKeyedObjectPool implements ConfigurableKeyedObje
         pool.setTestOnReturn(true);
     }
 
-    @Override
     public Object borrowObject(Object key) throws Exception, NoSuchElementException, IllegalStateException
     {
         return pool.borrowObject(key);
     }
 
-    @Override
     public void returnObject(Object key, Object obj) throws Exception
     {
         pool.returnObject(key, obj);
     }
 
-    @Override
     public void invalidateObject(Object key, Object obj) throws Exception
     {
         pool.invalidateObject(key, obj);
     }
 
-    @Override
     public void addObject(Object key) throws Exception, IllegalStateException, UnsupportedOperationException
     {
         pool.addObject(key);
     }
 
-    @Override
     public int getNumIdle(Object key) throws UnsupportedOperationException
     {
         return pool.getNumIdle(key);
     }
 
-    @Override
     public int getNumActive(Object key) throws UnsupportedOperationException
     {
         return pool.getNumActive(key);
     }
 
-    @Override
     public int getNumIdle() throws UnsupportedOperationException
     {
         return pool.getNumIdle();
     }
 
-    @Override
     public int getNumActive() throws UnsupportedOperationException
     {
         return pool.getNumActive();
     }
 
-    @Override
     public void clear()
     {
         pool.clear();
     }
 
-    @Override
     public void clear(Object key) throws Exception, UnsupportedOperationException
     {
         pool.clear(key);
     }
 
-    @Override
     public void close() throws Exception
     {
         pool.close();
     }
 
-    @Override
     public void setFactory(KeyedPoolableObjectFactory factory) throws IllegalStateException, UnsupportedOperationException
     {
         pool.setFactory(factory);
     }
 
-    @Override
     public int getMaxActive()
     {
         return pool.getMaxActive();
     }
 
-    @Override
     public int getMaxTotal()
     {
         return pool.getMaxTotal();
     }
 
-    @Override
     public void setMaxWait(long maxWait)
     {
         pool.setMaxWait(maxWait);
     }
 
-    @Override
     public void setMaxActive(int maxActive)
     {
         pool.setMaxActive(maxActive);
     }
 
-    @Override
     public void setMaxIdle(int maxIdle)
     {
         pool.setMaxIdle(maxIdle);
     }
 
-    @Override
     public void setMaxTotal(int maxTotal)
     {
         pool.setMaxTotal(maxTotal);
     }
 
-    @Override
     public int getMaxIdle()
     {
         return pool.getMaxIdle();
     }
 
-    @Override
     public void setWhenExhaustedAction(byte whenExhaustedAction)
     {
         pool.setWhenExhaustedAction(whenExhaustedAction);
     }
 
-    @Override
     public byte getWhenExhaustedAction()
     {
         return pool.getWhenExhaustedAction();
     }
 
-    @Override
     public long getMaxWait()
     {
         return pool.getMaxWait();

@@ -17,7 +17,6 @@ package org.mule.transport;
 public class DefaultConfigurableKeyedObjectPoolFactory implements ConfigurableKeyedObjectPoolFactory
 {
 
-    @Override
     public ConfigurableKeyedObjectPool createObjectPool()
     {
         return new DefaultConfigurableKeyedObjectPool();
