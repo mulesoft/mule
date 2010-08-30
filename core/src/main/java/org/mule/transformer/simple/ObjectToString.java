@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
-import javax.activation.MimeType;
-
 /**
  * <code>ObjectToString</code> transformer is useful for debugging. It will return
  * human-readable output for various kinds of objects. Right now, it is just coded to
@@ -41,15 +39,16 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
 
     public ObjectToString()
     {
-        registerSourceType(Object.class);
-        registerSourceType(byte[].class);
-        registerSourceType(InputStream.class);
-        registerSourceType(OutputHandler.class);
+        registerSourceType(DataTypeFactory.OBJECT);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
+        registerSourceType(DataTypeFactory.create(OutputHandler.class));
         //deliberately set the mime for this transformer to text plain so that other transformers
         //that serialize string types such as XML or JSON will not match this
         setReturnDataType(DataTypeFactory.TEXT_STRING);
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         String output = "";

@@ -25,7 +25,7 @@ public class IPToSender extends AbstractTransformer
 
     public IPToSender()
     {
-        registerSourceType(DataTypeFactory.create(String.class));
+        registerSourceType(DataTypeFactory.STRING);
         setReturnDataType(DataTypeFactory.create(Sender.class));
     }
 

@@ -15,6 +15,7 @@ import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.jms.transformers.AbstractJmsTransformer;
 
 import javax.jms.Message;
@@ -32,11 +33,13 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
 
     private Session session = null;
 
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-transformers.xml";
     }
 
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -90,7 +93,7 @@ public class JmsMessageAwareTransformersMule2685TestCase extends AbstractJmsFunc
 
         public SetTestRecipientsTransformer()
         {
-            registerSourceType(MuleMessage.class);
+            registerSourceType(DataTypeFactory.MULE_MESSAGE);
         }
 
         @Override

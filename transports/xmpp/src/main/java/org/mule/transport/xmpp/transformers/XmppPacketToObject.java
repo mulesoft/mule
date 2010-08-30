@@ -22,8 +22,8 @@ public class XmppPacketToObject extends AbstractMessageTransformer
 {
     public XmppPacketToObject()
     {
-        registerSourceType(Message.class);
-        setReturnDataType(DataTypeFactory.create(String.class));
+        registerSourceType(DataTypeFactory.create(Message.class));
+        setReturnDataType(DataTypeFactory.STRING);
     }
 
     @Override

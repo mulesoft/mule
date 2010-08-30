@@ -17,7 +17,6 @@ import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.xml.stream.XMLStreamReader;
@@ -35,16 +34,16 @@ public class XmlToOutputHandler extends AbstractXmlTransformer implements Discov
 
     public XmlToOutputHandler()
     {
-        registerSourceType(String.class);
-        registerSourceType(byte[].class);
-        registerSourceType(Source.class);
-        registerSourceType(Document.class);
-        registerSourceType(org.w3c.dom.Document.class);
-        registerSourceType(org.w3c.dom.Element.class);
-        registerSourceType(InputStream.class);
-        registerSourceType(OutputHandler.class);
-        registerSourceType(XMLStreamReader.class);
-        registerSourceType(DelayedResult.class);
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.create(Source.class));
+        registerSourceType(DataTypeFactory.create(Document.class));
+        registerSourceType(DataTypeFactory.create(org.w3c.dom.Document.class));
+        registerSourceType(DataTypeFactory.create(org.w3c.dom.Element.class));
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
+        registerSourceType(DataTypeFactory.create(OutputHandler.class));
+        registerSourceType(DataTypeFactory.create(XMLStreamReader.class));
+        registerSourceType(DataTypeFactory.create(DelayedResult.class));
         setReturnDataType(DataTypeFactory.create(OutputHandler.class));
     }
 
@@ -68,7 +67,7 @@ public class XmlToOutputHandler extends AbstractXmlTransformer implements Discov
         {
             if (src instanceof XMLStreamReader)
             {
-                // Unfortunately, the StAX source doesn't copy/serialize correctly so 
+                // Unfortunately, the StAX source doesn't copy/serialize correctly so
                 // we have to do this little hack.
                 XMLStreamReader reader = (XMLStreamReader)src;
                 XMLStreamWriter writer = getXMLOutputFactory().createXMLStreamWriter(out);

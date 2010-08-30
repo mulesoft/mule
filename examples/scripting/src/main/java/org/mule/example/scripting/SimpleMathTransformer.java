@@ -11,16 +11,17 @@
 package org.mule.example.scripting;
 
 
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.NumberUtils;
 
-/** 
- * A simple transformer which adds/subtracts/multiplies/divides a constant factor to numeric messages. 
+/**
+ * A simple transformer which adds/subtracts/multiplies/divides a constant factor to numeric messages.
  */
-public class SimpleMathTransformer extends AbstractTransformer 
+public class SimpleMathTransformer extends AbstractTransformer
 {
     /** Operation to perform: "add", "subtract", "multiply", "divide" */
     private String operation = "add";
@@ -30,12 +31,14 @@ public class SimpleMathTransformer extends AbstractTransformer
     
     public SimpleMathTransformer()
     {
-        registerSourceType(Number.class);
-        setReturnDataType(DataTypeFactory.create(Number.class));
+        DataType<Number> numberDataType = DataTypeFactory.create(Number.class);
+        registerSourceType(numberDataType);
+        setReturnDataType(numberDataType);
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
-    {         
+    {
         double data = NumberUtils.toDouble(src);
         if (data == NumberUtils.DOUBLE_ERROR)
         {
@@ -59,7 +62,7 @@ public class SimpleMathTransformer extends AbstractTransformer
         {
             result = data / factor;
         }
-        else 
+        else
         {
             throw new TransformerException(MessageFactory.createStaticMessage("Operation " + operation + " not recognized"));
         }

@@ -22,6 +22,7 @@ import java.util.Arrays;
 public class HttpTransformTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/usecases/sync/http-transform.xml";
@@ -33,7 +34,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
         MuleMessage message = client.send("http://localhost:18080/RemoteService", "payload", null);
         assertNotNull(message);
         GZipUncompressTransformer gu = new GZipUncompressTransformer();
-        gu.setReturnDataType(DataTypeFactory.create(String.class));
+        gu.setReturnDataType(DataTypeFactory.STRING);
         assertNotNull(message.getPayload());
         String result = (String)gu.transform(message.getPayloadAsBytes());
         assertEquals("<string>payload</string>", result);

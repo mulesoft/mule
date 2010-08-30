@@ -14,6 +14,7 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.SerializationUtils;
 import org.mule.util.store.DeserializationPostInitialisable;
 
@@ -33,10 +34,11 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
 
     public ByteArrayToSerializable()
     {
-        registerSourceType(byte[].class);
-        registerSourceType(InputStream.class);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try

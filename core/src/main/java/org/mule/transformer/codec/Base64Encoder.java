@@ -28,12 +28,13 @@ public class Base64Encoder extends AbstractTransformer
 
     public Base64Encoder()
     {
-        registerSourceType(String.class);
-        registerSourceType(byte[].class);
-        registerSourceType(InputStream.class);
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
         setReturnDataType(DataTypeFactory.TEXT_STRING);
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try

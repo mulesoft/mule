@@ -51,11 +51,12 @@ public class TransformerCachingTestCase extends AbstractMuleTestCase
     {
         public FilterInputStreamToByteArray()
         {
-            registerSourceType(FilterInputStream.class);
-            setReturnDataType(DataTypeFactory.create(byte[].class));
+            registerSourceType(DataTypeFactory.create(FilterInputStream.class));
+            setReturnDataType(DataTypeFactory.BYTE_ARRAY);
         }
 
-        protected Object doTransform(Object src, String encoding) throws TransformerException
+        @Override
+        protected Object doTransform(Object src, String outputEncoding) throws TransformerException
         {
             throw new UnsupportedOperationException("This is a transformer only to be used for testing");
         }

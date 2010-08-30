@@ -11,6 +11,7 @@
 package org.mule.transport.xmpp.transformers;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.DataType;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.xmpp.XmppConnector;
@@ -25,9 +26,11 @@ public class ObjectToXmppPacket extends AbstractMessageTransformer
 {
     public ObjectToXmppPacket()
     {
-        this.registerSourceType(String.class);
-        this.registerSourceType(Message.class);
-        setReturnDataType(DataTypeFactory.create(Message.class));
+        DataType<Message> messageDataType = DataTypeFactory.create(Message.class);
+
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(messageDataType);
+        setReturnDataType(messageDataType);
     }
 
     @Override
@@ -47,7 +50,7 @@ public class ObjectToXmppPacket extends AbstractMessageTransformer
         if (muleMessage.getExceptionPayload() != null)
         {
             result.setError(
-                new XMPPError(XMPPError.Condition.service_unavailable, 
+                new XMPPError(XMPPError.Condition.service_unavailable,
                     muleMessage.getExceptionPayload().getMessage()));
         }
 

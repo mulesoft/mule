@@ -17,24 +17,27 @@ import org.mule.transport.NullPayload;
 
 public class NullResultTestCase extends AbstractTransformerTestCase
 {
-
     private final NullResultTransformer transformer = new NullResultTransformer();
 
+    @Override
     public Object getTestData()
     {
         return new Object();
     }
 
+    @Override
     public Object getResultData()
     {
         return NullPayload.getInstance();
     }
 
+    @Override
     public Transformer getTransformer() throws Exception
     {
         return transformer;
     }
 
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         return null;
@@ -42,7 +45,7 @@ public class NullResultTestCase extends AbstractTransformerTestCase
 
     public void testNullNotExpected() throws Exception
     {
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setReturnDataType(DataTypeFactory.STRING);
         try
         {
             testTransform();
@@ -59,14 +62,14 @@ public class NullResultTestCase extends AbstractTransformerTestCase
         public NullResultTransformer()
         {
             super();
-            this.registerSourceType(Object.class);
+            this.registerSourceType(DataTypeFactory.OBJECT);
             this.setReturnDataType(DataTypeFactory.create(NullPayload.class));
         }
 
+        @Override
         public Object doTransform(Object src, String encoding) throws TransformerException
         {
             return null;
         }
     }
-
 }

@@ -10,9 +10,6 @@
 
 package org.mule.module.cxf.transport;
 
-import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
-import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
@@ -66,6 +63,9 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
+import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
+import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
+
 /**
  * A Conduit is primarily responsible for sending messages from CXF to somewhere
  * else. This conduit takes messages which are being written and sends them to the
@@ -116,7 +116,7 @@ public class MuleUniversalConduit extends AbstractConduit
             os.close();
         }
         
-        if (closeInput) 
+        if (closeInput)
         {
             InputStream in = msg.getContent(InputStream.class);
             if (in != null)
@@ -200,7 +200,7 @@ public class MuleUniversalConduit extends AbstractConduit
         };
 
         MuleEvent event = (MuleEvent) message.getExchange().get(MULE_EVENT_PROPERTY);
-        if (event == null) 
+        if (event == null)
         {
             MuleContext muleContext = configuration.getMuleContext();
             MuleMessage muleMsg = new DefaultMuleMessage(handler, muleContext);
@@ -315,20 +315,20 @@ public class MuleUniversalConduit extends AbstractConduit
 
     protected InputStream getResponseBody(Message m, MuleMessage result) throws TransformerException, IOException
     {
-        boolean response = result != null 
+        boolean response = result != null
             && !NullPayload.getInstance().equals(result.getPayload())
-            && !isOneway(m.getExchange()); 
+            && !isOneway(m.getExchange());
         
         if (response)
         {
             // Sometimes there may not actually be a body, in which case
             // we want to act appropriately. E.g. one way invocations over a proxy
-            InputStream is = (InputStream) result.getPayload(DataTypeFactory.create(InputStream.class));
+            InputStream is = result.getPayload(DataTypeFactory.create(InputStream.class));
             PushbackInputStream pb = new PushbackInputStream(is);
             result.setPayload(pb);
             
             int b = pb.read();
-            if (b != -1) 
+            if (b != -1)
             {
                 pb.unread(b);
                 return pb;

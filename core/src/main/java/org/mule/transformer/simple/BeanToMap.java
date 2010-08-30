@@ -29,10 +29,11 @@ public class BeanToMap extends AbstractTransformer implements DiscoverableTransf
 
     public BeanToMap()
     {
-        registerSourceType(Object.class);
+        registerSourceType(DataTypeFactory.OBJECT);
         setReturnDataType(DataTypeFactory.create(Map.class));
     }
 
+    @Override
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         Map result = BeanUtils.describeBean(src);

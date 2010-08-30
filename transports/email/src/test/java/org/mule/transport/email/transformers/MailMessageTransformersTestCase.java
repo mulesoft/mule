@@ -76,7 +76,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
     }
 
     
-    protected String getContentType() 
+    protected String getContentType()
     {
         return "text/plain";
     }
@@ -116,7 +116,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
     {
         try
         {
-            assertFalse(getTransformer().isSourceDataTypeSupported(DataTypeFactory.create(String.class)));
+            assertFalse(getTransformer().isSourceDataTypeSupported(DataTypeFactory.STRING));
             getTransformer().transform(getResultData());
             fail("Should throw exception for string source type");
         }

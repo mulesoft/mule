@@ -25,8 +25,8 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 
 /**
- * Factory class used to create {@link org.mule.api.transformer.DataType} objects based on the 
- * parameter types passed into the factory methods.
+ * Factory class used to create {@link DataType} objects based on the parameter types passed into
+ * the factory methods.
  *
  * @since 3.0
  */
@@ -44,6 +44,7 @@ public class DataTypeFactory
     public static final DataType<String> OBJECT = new SimpleDataType<String>(Object.class);
     public static final DataType<String> BYTE_ARRAY = new SimpleDataType<String>(byte[].class);
     public static final DataType<String> INPUT_STREAM = new SimpleDataType<String>(InputStream.class);
+    public static final DataType<String> MULE_MESSAGE = new SimpleDataType<String>(MuleMessage.class);
 
     public static <T> DataType<T> create(Class<T> type)
     {

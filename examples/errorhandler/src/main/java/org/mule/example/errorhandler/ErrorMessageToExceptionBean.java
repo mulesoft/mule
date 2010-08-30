@@ -12,9 +12,10 @@ package org.mule.example.errorhandler;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 /**
- * The <code>ErrorMessageToExceptionBean</code> transformer returns 
+ * The <code>ErrorMessageToExceptionBean</code> transformer returns
  * the exception bean encapsulated by the ErrorMessage message payload.
  */
 public class ErrorMessageToExceptionBean extends AbstractTransformer
@@ -22,7 +23,7 @@ public class ErrorMessageToExceptionBean extends AbstractTransformer
 
     public ErrorMessageToExceptionBean()
     {
-        registerSourceType(ErrorMessage.class);
+        registerSourceType(DataTypeFactory.create(ErrorMessage.class));
     }
 
     @Override

@@ -26,18 +26,17 @@ import org.apache.commons.lang.SerializationUtils;
  */
 public class GZipUncompressTransformer extends AbstractCompressionTransformer
 {
-
     public GZipUncompressTransformer()
     {
         super();
         this.setStrategy(new GZipCompression());
-        this.registerSourceType(byte[].class);
-        this.registerSourceType(InputStream.class);
-        this.setReturnDataType(DataTypeFactory.create(byte[].class));
+        this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        this.registerSourceType(DataTypeFactory.INPUT_STREAM);
+        this.setReturnDataType(DataTypeFactory.BYTE_ARRAY);
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         byte[] buffer;
 
@@ -69,12 +68,11 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer
                     MessageFactory.createStaticMessage("Failed to uncompress message."), this, e);
         }
 
-        if (!getReturnClass().equals(byte[].class))
+        if (!DataTypeFactory.BYTE_ARRAY.equals(getReturnDataType()))
         {
             return SerializationUtils.deserialize(buffer);
         }
 
         return buffer;
     }
-
 }

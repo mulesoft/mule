@@ -27,20 +27,20 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * This transformer uses the returnClass to create the return object and then will populate the bean with arguments
- * defined as expressions
+ * This transformer uses the returnClass to create the return object and then will populate the bean
+ * with arguments defined as expressions
  */
 public class BeanBuilderTransformer extends AbstractExpressionTransformer
 {
     private ObjectFactory beanFactory;
-    private Class beanClass;
+    private Class<?> beanClass;
 
-    public Class getBeanClass()
+    public Class<?> getBeanClass()
     {
         return beanClass;
     }
 
-    public void setBeanClass(Class beanClass)
+    public void setBeanClass(Class<?> beanClass)
     {
         this.beanClass = beanClass;
     }
@@ -55,13 +55,11 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
         this.beanFactory = beanFactory;
     }
 
-
     /**
      * Template method were deriving classes can do any initialisation after the
      * properties have been set on this transformer
      *
      * @throws org.mule.api.lifecycle.InitialisationException
-     *
      */
     @Override
     public void initialise() throws InitialisationException
@@ -77,7 +75,7 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
             setBeanFactory(new PrototypeObjectFactory(getBeanClass()));
         }
         setReturnDataType(DataTypeFactory.create(getBeanFactory().getObjectClass()));
-        //We need to set the MuleContext if we create the factory here 
+        //We need to set the MuleContext if we create the factory here
         if(getBeanFactory() instanceof MuleContextAware)
         {
             ((MuleContextAware)getBeanFactory()).setMuleContext(muleContext);
@@ -96,7 +94,6 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
         {
             throw new TransformerException(this, e);
         }
-
 
         Map<String, Object> args = new HashMap<String, Object>(arguments.size());
 
@@ -124,8 +121,8 @@ public class BeanBuilderTransformer extends AbstractExpressionTransformer
 
             }
             args.put(argument.getName(), value);
-
         }
+
         try
         {
             BeanUtils.populate(bean, args);

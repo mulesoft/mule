@@ -14,6 +14,7 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.File;
 import java.io.InputStream;
@@ -44,15 +45,15 @@ public class JAXBUnmarshallerTransformer extends AbstractTransformer
 
     public JAXBUnmarshallerTransformer()
     {
-        registerSourceType(String.class);
-        registerSourceType(Writer.class);
-        registerSourceType(File.class);
-        registerSourceType(URL.class);
-        registerSourceType(Node.class);
-        registerSourceType(InputStream.class);
-        registerSourceType(Source.class);
-        registerSourceType(XMLStreamReader.class);
-        registerSourceType(XMLEventReader.class);
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.create(Writer.class));
+        registerSourceType(DataTypeFactory.create(File.class));
+        registerSourceType(DataTypeFactory.create(URL.class));
+        registerSourceType(DataTypeFactory.create(Node.class));
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
+        registerSourceType(DataTypeFactory.create(Source.class));
+        registerSourceType(DataTypeFactory.create(XMLStreamReader.class));
+        registerSourceType(DataTypeFactory.create(XMLEventReader.class));
     }
 
     public JAXBUnmarshallerTransformer(JAXBContext jaxbContext, DataType returnType)
@@ -86,6 +87,7 @@ public class JAXBUnmarshallerTransformer extends AbstractTransformer
         }
     }
 
+    @Override
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         try

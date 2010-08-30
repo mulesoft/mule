@@ -230,7 +230,7 @@ public class CoreMessages extends MessageFactory
             ClassUtils.getSimpleName(returnClass));
     }
 
-    public static Message transformUnexpectedType(DataType dt1, DataType dt2)
+    public static Message transformUnexpectedType(DataType<?> dt1, DataType<?> dt2)
     {
         return factory.createMessage(BUNDLE_PATH, 53, dt1, dt2);
     }
@@ -505,7 +505,12 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 110, from, to);
     }
-
+    
+    public static Message transformFailed(String from, DataType<?> to)
+    {
+        return transformFailed(from, to.getClass().getName());
+    }
+    
     public static Message cryptoFailure()
     {
         return factory.createMessage(BUNDLE_PATH, 112);
@@ -714,7 +719,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 175, header, value);
     }
 
-    public static Message transformOnObjectNotOfSpecifiedType(DataType resultType, Object expectedType)
+    public static Message transformOnObjectNotOfSpecifiedType(DataType<?> resultType, Object expectedType)
     {
         return factory.createMessage(BUNDLE_PATH, 177, resultType.getType().getName(),
             expectedType.getClass());
@@ -943,7 +948,7 @@ public class CoreMessages extends MessageFactory
                                                            MuleManifest.getVendorUrl(), notset));
     }
 
-    public static Message noTransformerFoundForMessage(DataType input, DataType output)
+    public static Message noTransformerFoundForMessage(DataType<?> input, DataType<?> output)
     {
         return factory.createMessage(BUNDLE_PATH, 237, input, output);
     }
@@ -1144,7 +1149,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 274, num, name);
     }
 
-    public static Message splitMessageNoEndpointMatch(List endpoints, Object messagePart)
+    public static Message splitMessageNoEndpointMatch(List<?> endpoints, Object messagePart)
     {
         return factory.createMessage(BUNDLE_PATH, 275, StringMessageUtils.toString(endpoints), messagePart);
     }
@@ -1258,7 +1263,7 @@ public class CoreMessages extends MessageFactory
 
     public static Message objectHasMoreThanOnePreDestroyAnnotation(Class<?> clazz)
     {
-        return factory.createMessage(BUNDLE_PATH, 317, clazz.getName());        
+        return factory.createMessage(BUNDLE_PATH, 317, clazz.getName());
     }
 
     public static Message lifecycleMethodNotVoidOrHasParams(Method method)
@@ -1286,7 +1291,7 @@ public class CoreMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 322, message);
     }
 
-    public static Message exchangePatternForEndpointNotSupported(MessageExchangePattern mep, 
+    public static Message exchangePatternForEndpointNotSupported(MessageExchangePattern mep,
         String direction, EndpointURI endpointURI)
     {
         return factory.createMessage(BUNDLE_PATH, 323, mep.name(), direction, endpointURI);

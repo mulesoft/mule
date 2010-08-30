@@ -29,8 +29,8 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
     
     public HttpRequestBodyToParamMap()
     {
-        registerSourceType(Object.class);
-        setReturnDataType(DataTypeFactory.create(Object.class));
+        registerSourceType(DataTypeFactory.OBJECT);
+        setReturnDataType(DataTypeFactory.OBJECT);
     }
 
     @Override

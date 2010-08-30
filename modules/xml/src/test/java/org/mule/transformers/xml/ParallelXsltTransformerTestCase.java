@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.custommonkey.xmlunit.XMLAssert;
 
 public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
@@ -40,7 +41,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
     public Transformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setReturnDataType(DataTypeFactory.STRING);
         transformer.setXslFile("cdcatalog.xsl");
         transformer.setMuleContext(muleContext);
         transformer.initialise();

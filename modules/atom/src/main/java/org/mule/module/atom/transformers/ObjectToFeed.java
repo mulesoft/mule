@@ -31,17 +31,16 @@ import org.apache.abdera.parser.Parser;
  */
 public class ObjectToFeed extends AbstractDiscoverableTransformer
 {
-
     public ObjectToFeed()
     {
-        this.registerSourceType(byte[].class);
-        this.registerSourceType(InputStream.class);
-        this.registerSourceType(String.class);
+        this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        this.registerSourceType(DataTypeFactory.INPUT_STREAM);
+        this.registerSourceType(DataTypeFactory.STRING);
         setReturnDataType(DataTypeFactory.create(Feed.class));
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         try
         {
@@ -49,18 +48,18 @@ public class ObjectToFeed extends AbstractDiscoverableTransformer
             Document<Element> doc;
             if (src instanceof InputStream)
             {
-                doc = parser.parse((InputStream) src, encoding);
+                doc = parser.parse((InputStream) src, outputEncoding);
             }
             else if (src instanceof byte[])
             {
-                doc = parser.parse(new ByteArrayInputStream((byte[]) src), encoding);
+                doc = parser.parse(new ByteArrayInputStream((byte[]) src), outputEncoding);
             }
             else
             {
                 doc = parser.parse(new StringReader((String) src));
             }
+            
             //we only need to check for the registered source types
-
             return doc.getRoot();
         }
         catch (Exception e)
@@ -68,5 +67,4 @@ public class ObjectToFeed extends AbstractDiscoverableTransformer
             throw new TransformerException(this, e);
         }
     }
-
 }

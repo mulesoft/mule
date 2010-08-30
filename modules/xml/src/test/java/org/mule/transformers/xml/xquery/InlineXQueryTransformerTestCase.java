@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transformers.xml.xquery;
 
 import org.mule.api.transformer.Transformer;
@@ -24,6 +25,7 @@ public class InlineXQueryTransformerTestCase extends AbstractTransformerTestCase
     private String srcData;
     private String resultData;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         XMLUnit.setIgnoreWhitespace(true);
@@ -31,6 +33,7 @@ public class InlineXQueryTransformerTestCase extends AbstractTransformerTestCase
         resultData = IOUtils.getResourceAsString("cd-catalog-result.xml", getClass());
     }
 
+    @Override
     public Transformer getTransformer() throws Exception
     {
         XQueryTransformer transformer = new XQueryTransformer();
@@ -40,27 +43,31 @@ public class InlineXQueryTransformerTestCase extends AbstractTransformerTestCase
                 "    for $cd in $document/catalog/cd\n" +
                 "    return <cd-title>{data($cd/title)}</cd-title>\n" +
                 "} </cd-listings>");
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setReturnDataType(DataTypeFactory.STRING);
         transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;
     }
 
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         return null;
     }
 
+    @Override
     public void testRoundtripTransform() throws Exception
     {
         // disable this test
     }
 
+    @Override
     public Object getTestData()
     {
         return srcData;
     }
 
+    @Override
     public Object getResultData()
     {
         return resultData;

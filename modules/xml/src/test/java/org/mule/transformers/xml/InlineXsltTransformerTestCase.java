@@ -25,12 +25,14 @@ public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCas
     private String srcData;
     private String resultData;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         srcData = IOUtils.getResourceAsString("simple.xml", getClass());
         resultData = IOUtils.getResourceAsString("simple-out.xml", getClass());
     }
 
+    @Override
     public Transformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
@@ -39,27 +41,31 @@ public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCas
                             + "<xsl:output method='xml'/>\n" + "<xsl:template match='/'>\n"
                             + "  <some-xml>\n" + "    <xsl:copy-of select='.'/>\n" + "  </some-xml>\n"
                             + "</xsl:template>\n" + "</xsl:stylesheet>");
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setReturnDataType(DataTypeFactory.STRING);
         transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;
     }
 
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         return null;
     }
 
+    @Override
     public void testRoundtripTransform() throws Exception
     {
         // disable this test
     }
 
+    @Override
     public Object getTestData()
     {
         return srcData;
     }
 
+    @Override
     public Object getResultData()
     {
         return resultData;
@@ -77,13 +83,13 @@ public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCas
         while (it.hasNext())
         {
             msg = it.next();
-            // TODO Not working for XMLStreamReader 
+            // TODO Not working for XMLStreamReader
             if (!(msg instanceof javax.xml.stream.XMLStreamReader))
             {
                 result = getTransformer().transform(msg);
                 assertNotNull(result);
                 assertTrue("Test failed for message type: " + msg.getClass(), compareResults(expectedResult, result));
             }
-        }        
+        }
     }
 }

@@ -27,7 +27,7 @@ public abstract class AbstractEventTransformer extends AbstractTransformer
 {
     protected AbstractEventTransformer()
     {
-        setReturnDataType(DataTypeFactory.create(MuleMessage.class));
+        setReturnDataType(DataTypeFactory.MULE_MESSAGE);
     }
 
     public MuleMessage transform(Object src, Method method) throws TransformerException

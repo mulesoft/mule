@@ -20,7 +20,6 @@ import java.io.InputStream;
 
 public class StringAppendTransformer extends AbstractTransformer
 {
-
     private String message = StringUtils.EMPTY;
 
     public StringAppendTransformer()
@@ -31,12 +30,13 @@ public class StringAppendTransformer extends AbstractTransformer
     public StringAppendTransformer(String message)
     {
         this.message = message;
-        setReturnDataType(DataTypeFactory.create(String.class));
-        registerSourceType(String.class);
-        registerSourceType(byte[].class);
-        registerSourceType(InputStream.class);
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
+        setReturnDataType(DataTypeFactory.STRING);
     }
 
+    @Override
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         String string;
@@ -78,5 +78,4 @@ public class StringAppendTransformer extends AbstractTransformer
     {
         this.message = message;
     }
-
 }

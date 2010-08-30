@@ -24,11 +24,12 @@ public class CreditProfileXmlToCreditProfile extends AbstractTransformer
 
     public CreditProfileXmlToCreditProfile()
     {
-        registerSourceType(String.class);
-        registerSourceType(Document.class);
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.create(Document.class));
         setReturnDataType(DataTypeFactory.create(CreditProfile.class));
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         Document doc = null;

@@ -20,6 +20,7 @@ import org.mule.util.IOUtils;
 import java.util.Iterator;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 
@@ -41,7 +42,7 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleTestCase
     public Transformer getTransformer() throws Exception
     {
         XQueryTransformer transformer = new XQueryTransformer();
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setReturnDataType(DataTypeFactory.STRING);
         transformer.setXqueryFile("cd-catalog.xquery");
         transformer.setMuleContext(muleContext);
         transformer.initialise();

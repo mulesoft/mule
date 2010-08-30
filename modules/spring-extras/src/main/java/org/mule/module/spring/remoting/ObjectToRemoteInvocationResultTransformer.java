@@ -25,14 +25,14 @@ import org.springframework.remoting.support.RemoteInvocationResult;
 
 public class ObjectToRemoteInvocationResultTransformer extends AbstractTransformer
 {
-
     public ObjectToRemoteInvocationResultTransformer()
     {
         super();
-        setReturnDataType(DataTypeFactory.create(byte[].class));
+        setReturnDataType(DataTypeFactory.BYTE_ARRAY);
     }
 
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    @Override
+    protected Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         try
         {
@@ -63,5 +63,4 @@ public class ObjectToRemoteInvocationResultTransformer extends AbstractTransform
             throw new TransformerException(this, e);
         }
     }
-
 }

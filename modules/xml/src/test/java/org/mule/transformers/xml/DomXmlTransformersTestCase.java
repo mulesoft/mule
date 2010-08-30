@@ -49,6 +49,7 @@ public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
         resultData = new DOMWriter().write(dom4jDoc);
     }
 
+    @Override
     public Transformer getTransformer() throws Exception
     {
         XmlToDomDocument trans = createObject(XmlToDomDocument.class);
@@ -56,18 +57,21 @@ public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
         return trans;
     }
 
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         DomDocumentToXml trans = createObject(DomDocumentToXml.class);
-        trans.setReturnDataType(DataTypeFactory.create(String.class));
+        trans.setReturnDataType(DataTypeFactory.STRING);
         return trans;
     }
 
+    @Override
     public Object getTestData()
     {
         return srcData;
     }
 
+    @Override
     public Object getResultData()
     {
         return resultData;
@@ -112,7 +116,7 @@ public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
             result = getTransformer().transform(msg);
             assertNotNull(result);
             assertTrue("Test failed for message type: " + msg.getClass(), compareResults(expectedResult, result));
-        }        
+        }
     }
 
 }

@@ -11,6 +11,7 @@ package org.mule.module.atom.transformers;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.config.i18n.CoreMessages;
@@ -37,13 +38,16 @@ import org.apache.abdera.parser.stax.FOMWriterOptions;
 
 public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
 {
+    private static final DataType<Entry> TYPE_ENTRY = DataTypeFactory.create(Entry.class);
+    private static final DataType<OutputHandler> TYPE_OUTPUT_HANDLER = DataTypeFactory.create(OutputHandler.class);
+    
     public AtomEntryBuilderTransformer()
     {
-        setReturnDataType(DataTypeFactory.create(OutputHandler.class));
+        setReturnDataType(TYPE_OUTPUT_HANDLER);
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String encoding) throws TransformerException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         Factory factory = Abdera.getInstance().getFactory();
         Entry entry = factory.newEntry();
@@ -181,12 +185,11 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
 
         }
 
-        if (Entry.class.equals(getReturnClass()))
+        if (TYPE_ENTRY.equals(getReturnDataType()))
         {
             return entry;
         }
-
-        else if (OutputHandler.class.equals(getReturnClass()))
+        else if (TYPE_OUTPUT_HANDLER.equals(getReturnDataType()))
         {
             final Entry e = entry;
             return new OutputHandler()

@@ -28,10 +28,11 @@ public class MapLookup extends AbstractTransformer
 
     public MapLookup()
     {
-        registerSourceType(Map.class);
-        setReturnDataType(DataTypeFactory.create(Object.class));
+        registerSourceType(DataTypeFactory.create(Map.class));
+        setReturnDataType(DataTypeFactory.OBJECT);
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         if (src instanceof Map)

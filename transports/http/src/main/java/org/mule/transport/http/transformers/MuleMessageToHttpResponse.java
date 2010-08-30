@@ -45,7 +45,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
 
     public MuleMessageToHttpResponse()
     {
-        registerSourceType(Object.class);
+        registerSourceType(DataTypeFactory.OBJECT);
         setReturnDataType(DataTypeFactory.create(HttpResponse.class));
     }
 
@@ -175,8 +175,8 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         if (tmp != null)
         {
             status = Integer.valueOf(tmp.toString());
-        } 
-        else if (msg.getExceptionPayload() != null) 
+        }
+        else if (msg.getExceptionPayload() != null)
         {
             status = HttpConstants.SC_INTERNAL_SERVER_ERROR;
         }
@@ -194,7 +194,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
             contentType = msg.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE);
         }
 
-        // MULE-4047 Don't explicitly set the content-type to a default value here, 
+        // MULE-4047 Don't explicitly set the content-type to a default value here,
         // otherwise any settings on the servlet/transport will be happily ignored.
         //if (contentType == null)
         //{
@@ -293,6 +293,7 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         return response;
     }
 
+    @Override
     public boolean isAcceptNull()
     {
         return true;

@@ -24,10 +24,11 @@ public class LoanQuoteRequestToCreditProfileArgs extends AbstractTransformer
 
     public LoanQuoteRequestToCreditProfileArgs()
     {
-        registerSourceType(LoanBrokerQuoteRequest.class);
+        registerSourceType(DataTypeFactory.create(LoanBrokerQuoteRequest.class));
         setReturnDataType(DataTypeFactory.create(Object[].class));
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         LoanBrokerQuoteRequest request = (LoanBrokerQuoteRequest)src;

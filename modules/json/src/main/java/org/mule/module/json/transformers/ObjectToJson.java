@@ -38,9 +38,9 @@ public class ObjectToJson extends AbstractJsonTransformer
      */
     protected transient final Log logger = LogFactory.getLog(ObjectToJson.class);
 
-    private Map<Class, Class> serializationMixins = new HashMap<Class, Class>();
+    private Map<Class<?>, Class<?>> serializationMixins = new HashMap<Class<?>, Class<?>>();
 
-    protected Class sourceClass;
+    protected Class<?> sourceClass;
 
     private boolean handleException = false;
 
@@ -60,24 +60,23 @@ public class ObjectToJson extends AbstractJsonTransformer
         if (getSourceClass() != null)
         {
             sourceTypes.clear();
-            registerSourceType(getSourceClass());
+            registerSourceType(DataTypeFactory.create(getSourceClass()));
         }
 
         //Add shared mixins first
-        for (Map.Entry<Class, Class> entry : getMixins().entrySet())
+        for (Map.Entry<Class<?>, Class<?>> entry : getMixins().entrySet())
         {
             getMapper().getSerializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
         }
 
-        for (Map.Entry<Class, Class> entry : serializationMixins.entrySet())
+        for (Map.Entry<Class<?>, Class<?>> entry : serializationMixins.entrySet())
         {
             getMapper().getSerializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
         }
-
     }
 
     @Override
-    public Object transformMessage(MuleMessage message, String encoding) throws TransformerException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         Object src = message.getPayload();
         if (src instanceof String && isJsonFilter.accept(src))
@@ -122,9 +121,8 @@ public class ObjectToJson extends AbstractJsonTransformer
      */
     private Exception getException(Throwable t)
     {
-
         Exception returnValue = null;
-        List causeStack = new ArrayList();
+        List<Throwable> causeStack = new ArrayList<Throwable>();
 
         for (Throwable tempCause = t; tempCause != null; tempCause = tempCause.getCause())
         {
@@ -133,7 +131,7 @@ public class ObjectToJson extends AbstractJsonTransformer
 
         for (int i = causeStack.size() - 1; i >= 0; i--)
         {
-            Throwable tempCause = (Throwable) causeStack.get(i);
+            Throwable tempCause = causeStack.get(i);
 
             // There is no cause at the very root
             if (i == causeStack.size())
@@ -151,8 +149,6 @@ public class ObjectToJson extends AbstractJsonTransformer
         return returnValue;
     }
 
-    // Getter/Setter
-    // -------------------------------------------------------------------------
     public boolean isHandleException()
     {
         return this.handleException;
@@ -163,22 +159,22 @@ public class ObjectToJson extends AbstractJsonTransformer
         this.handleException = handleException;
     }
 
-    public Class getSourceClass()
+    public Class<?> getSourceClass()
     {
         return sourceClass;
     }
 
-    public void setSourceClass(Class sourceClass)
+    public void setSourceClass(Class<?> sourceClass)
     {
         this.sourceClass = sourceClass;
     }
 
-    public Map<Class, Class> getSerializationMixins()
+    public Map<Class<?>, Class<?>> getSerializationMixins()
     {
         return serializationMixins;
     }
 
-    public void setSerializationMixins(Map<Class, Class> serializationMixins)
+    public void setSerializationMixins(Map<Class<?>, Class<?>> serializationMixins)
     {
         this.serializationMixins = serializationMixins;
     }

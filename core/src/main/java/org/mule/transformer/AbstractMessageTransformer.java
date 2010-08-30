@@ -39,12 +39,10 @@ import org.mule.util.StringMessageUtils;
 
 public abstract class AbstractMessageTransformer extends AbstractTransformer implements MessageTransformer
 {
-
     /**
-     *
-     * @param dataType   the type to check against
-     * @param exactMatch if set to true, this method will look for an exact match to the data type, if false it will look
-     *                   for a compatible data type.
+     * @param dataType the type to check against
+     * @param exactMatch if set to true, this method will look for an exact match to
+     *            the data type, if false it will look for a compatible data type.
      * @return whether the data type is supported
      */
     @Override
@@ -56,7 +54,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
     }
 
     /**
-     * Perform a non-message aware transform.  This should never be called
+     * Perform a non-message aware transform. This should never be called
      */
     @Override
     public final Object doTransform(Object src, String enc) throws TransformerException
@@ -104,7 +102,7 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
 
     /**
      * transform the specified message
-     * @param src      the data to transform
+     * @param src the data to transform
      * @param enc
      * @param event the event currently being processed
      * @return

@@ -18,8 +18,6 @@ import org.mule.module.xml.stax.ReversibleXMLStreamReader;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.transformer.types.DataTypeFactory;
 
-import java.io.InputStream;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
@@ -35,14 +33,13 @@ public class XmlToXMLStreamReader extends AbstractXmlTransformer implements Disc
     public XmlToXMLStreamReader()
     {
         super();
-        registerSourceType(Source.class);
-        registerSourceType(InputStream.class);
-        registerSourceType(Document.class);
-        registerSourceType(byte[].class);
-        registerSourceType(String.class);
+        registerSourceType(DataTypeFactory.create(Source.class));
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
+        registerSourceType(DataTypeFactory.create(Document.class));
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.STRING);
 
         setReturnDataType(DataTypeFactory.create(XMLStreamReader.class));
-        
     }
 
     @Override

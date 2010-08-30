@@ -16,6 +16,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -45,8 +46,8 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
 
     public JAXBMarshallerTransformer()
     {
-        setReturnClass(OutputStream.class);
-        registerSourceType(Object.class);
+        setReturnDataType(DataTypeFactory.create(OutputStream.class));
+        registerSourceType(DataTypeFactory.OBJECT);
     }
 
     public JAXBMarshallerTransformer(JAXBContext jaxbContext, DataType returnType)
@@ -66,6 +67,7 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
         }
     }
 
+    @Override
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         try

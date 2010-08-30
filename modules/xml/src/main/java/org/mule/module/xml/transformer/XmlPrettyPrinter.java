@@ -29,10 +29,10 @@ public class XmlPrettyPrinter extends AbstractTransformer
     public XmlPrettyPrinter()
     {
         super();
-        this.registerSourceType(String.class);
-        this.registerSourceType(org.dom4j.Document.class);
-        this.registerSourceType(org.w3c.dom.Document.class);
-        this.setReturnDataType(DataTypeFactory.create(String.class));
+        this.registerSourceType(DataTypeFactory.STRING);
+        this.registerSourceType(DataTypeFactory.create(org.dom4j.Document.class));
+        this.registerSourceType(DataTypeFactory.create(org.w3c.dom.Document.class));
+        this.setReturnDataType(DataTypeFactory.STRING);
     }
 
     public synchronized OutputFormat getOutputFormat()
@@ -54,7 +54,7 @@ public class XmlPrettyPrinter extends AbstractTransformer
                 writer.close();
                 return resultStream.toString(encoding);
             }
-            else 
+            else
             {
                 throw new DocumentException("Payload is not valid XML");
             }
@@ -68,6 +68,7 @@ public class XmlPrettyPrinter extends AbstractTransformer
     /**
      * @see OutputFormat#getEncoding()
      */
+    @Override
     public synchronized String getEncoding()
     {
         return outputFormat.getEncoding();
@@ -76,6 +77,7 @@ public class XmlPrettyPrinter extends AbstractTransformer
     /**
      * @see OutputFormat#setEncoding(String)
      */
+    @Override
     public synchronized void setEncoding(String encoding)
     {
         outputFormat.setEncoding(encoding);

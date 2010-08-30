@@ -12,13 +12,14 @@ package org.mule.example.errorhandler;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 public class ExceptionBeanToErrorMessage extends AbstractTransformer
 {
 
     public ExceptionBeanToErrorMessage()
     {
-        registerSourceType(ExceptionBean.class);
+        registerSourceType(DataTypeFactory.create(ExceptionBean.class));
     }
 
     @Override

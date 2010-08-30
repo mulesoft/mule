@@ -33,6 +33,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         strat.initialise();
     }
 
+    @Override
     public Object getResultData()
     {
         try
@@ -46,11 +47,13 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         }
     }
 
+    @Override
     public Object getTestData()
     {
         return TEST_DATA;
     }
 
+    @Override
     public Transformer getTransformer()
     {
         EncryptionTransformer transformer = new EncryptionTransformer();
@@ -66,11 +69,12 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
         return transformer;
     }
 
+    @Override
     public Transformer getRoundTripTransformer()
     {
         DecryptionTransformer transformer = new DecryptionTransformer();
         transformer.setStrategy(strat);
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setReturnDataType(DataTypeFactory.STRING);
         try
         {
             transformer.initialise();
@@ -104,5 +108,4 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
             return super.compareResults(src, result);
         }
     }
-
 }

@@ -23,7 +23,7 @@ public class StringToNameString extends AbstractTransformer
     public StringToNameString()
     {
         super();
-        this.registerSourceType(String.class);
+        this.registerSourceType(DataTypeFactory.STRING);
         this.setReturnDataType(DataTypeFactory.create(NameString.class));
     }
 

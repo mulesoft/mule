@@ -26,19 +26,19 @@ public class OrderToEmailTransformer extends AbstractTransformer
     public OrderToEmailTransformer()
     {
         super();
-        registerSourceType(Order.class);
-        setReturnDataType(DataTypeFactory.create(String.class));
+        registerSourceType(DataTypeFactory.create(Order.class));
+        setReturnDataType(DataTypeFactory.STRING);
     }
     
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         Order order = (Order) src;
         Book book = order.getBook();
         
         String body =  "Thank you for placing your order for " +
                        book.getTitle() + " with the Mule-powered On-line Bookstore. " +
-                       "Your order will be shipped  to " + 
+                       "Your order will be shipped  to " +
                        order.getAddress() + " by the next business day.";
         
         String email = order.getEmail();

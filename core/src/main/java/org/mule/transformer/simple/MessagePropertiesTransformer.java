@@ -55,8 +55,8 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer imp
 
     public MessagePropertiesTransformer()
     {
-        registerSourceType(Object.class);
-        setReturnDataType(DataTypeFactory.create(Object.class));
+        registerSourceType(DataTypeFactory.OBJECT);
+        setReturnDataType(DataTypeFactory.OBJECT);
     }
 
     @Override

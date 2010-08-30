@@ -24,9 +24,10 @@ public class OrangetoAppleTransformer extends AbstractTransformer implements Dis
     public OrangetoAppleTransformer()
     {
         setReturnDataType(DataTypeFactory.create(Apple.class));
-        registerSourceType(Orange.class);
+        registerSourceType(DataTypeFactory.create(Orange.class));
     }
 
+    @Override
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         return new Apple();

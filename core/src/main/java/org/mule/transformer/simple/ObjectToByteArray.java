@@ -27,23 +27,22 @@ import java.io.InputStream;
  */
 public class ObjectToByteArray extends SerializableToByteArray
 {
-
     public ObjectToByteArray()
     {
-        this.registerSourceType(InputStream.class);
-        this.registerSourceType(String.class);
-        this.registerSourceType(OutputHandler.class);
-        setReturnDataType(DataTypeFactory.create(byte[].class));
+        this.registerSourceType(DataTypeFactory.INPUT_STREAM);
+        this.registerSourceType(DataTypeFactory.STRING);
+        this.registerSourceType(DataTypeFactory.create(OutputHandler.class));
+        setReturnDataType(DataTypeFactory.BYTE_ARRAY);
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         try
         {
             if (src instanceof String)
             {
-                return src.toString().getBytes(encoding);
+                return src.toString().getBytes(outputEncoding);
             }
             else if (src instanceof InputStream)
             {
@@ -80,7 +79,6 @@ public class ObjectToByteArray extends SerializableToByteArray
             throw new TransformerException(this, e);
         }
 
-        return super.doTransform(src, encoding);
+        return super.doTransform(src, outputEncoding);
     }
-
 }

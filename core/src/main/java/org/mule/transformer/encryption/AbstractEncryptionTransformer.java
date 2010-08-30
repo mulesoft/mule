@@ -34,10 +34,10 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
 
     public AbstractEncryptionTransformer()
     {
-        registerSourceType(byte[].class);
-        registerSourceType(String.class);
-        registerSourceType(InputStream.class);
-        setReturnDataType(DataTypeFactory.create(byte[].class));
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
+        setReturnDataType(DataTypeFactory.BYTE_ARRAY);
     }
 
     @Override
@@ -54,7 +54,8 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
         return clone;
     }
 
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    @Override
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         byte[] buf;
         if (src instanceof String)
@@ -80,13 +81,13 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
         try
         {
             byte[] result = getTransformedBytes(buf);
-            if (getReturnClass().equals(String.class))
+            if (getReturnDataType().equals(DataTypeFactory.STRING))
             {
-                if (encoding != null)
+                if (outputEncoding != null)
                 {
                     try
                     {
-                        return new String(result, encoding);
+                        return new String(result, outputEncoding);
                     }
                     catch (UnsupportedEncodingException ex)
                     {
@@ -117,6 +118,7 @@ public abstract class AbstractEncryptionTransformer extends AbstractTransformer
      * 
      * @throws org.mule.api.lifecycle.InitialisationException
      */
+    @Override
     public void initialise() throws InitialisationException
     {
         if (strategyName != null)

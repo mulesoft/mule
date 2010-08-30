@@ -27,18 +27,18 @@ import org.apache.commons.lang.SerializationUtils;
  */
 public class GZipCompressTransformer extends AbstractCompressionTransformer
 {
-
     public GZipCompressTransformer()
     {
         super();
         this.setStrategy(new GZipCompression());
-        this.registerSourceType(Serializable.class);
-        this.registerSourceType(byte[].class);
-        this.registerSourceType(InputStream.class);
-        this.setReturnDataType(DataTypeFactory.create(byte[].class));
+        this.registerSourceType(DataTypeFactory.create(Serializable.class));
+        this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        this.registerSourceType(DataTypeFactory.INPUT_STREAM);
+        this.setReturnDataType(DataTypeFactory.BYTE_ARRAY);
     }
 
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    @Override
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         try
         {
@@ -70,5 +70,4 @@ public class GZipCompressTransformer extends AbstractCompressionTransformer
             throw new TransformerException(this, ioex);
         }
     }
-
 }

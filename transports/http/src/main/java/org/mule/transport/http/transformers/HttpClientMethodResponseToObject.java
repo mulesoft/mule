@@ -11,7 +11,6 @@
 package org.mule.transport.http.transformers;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
@@ -37,10 +36,11 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
 
     public HttpClientMethodResponseToObject()
     {
-        registerSourceType(HttpMethod.class);
-        setReturnDataType(DataTypeFactory.create(MuleMessage.class));
+        registerSourceType(DataTypeFactory.create(HttpMethod.class));
+        setReturnDataType(DataTypeFactory.MULE_MESSAGE);
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         Object msg;
@@ -56,7 +56,7 @@ public class HttpClientMethodResponseToObject extends AbstractTransformer
             throw new TransformerException(this, e);
         }
         
-        if (is == null) 
+        if (is == null)
         {
             msg = NullPayload.getInstance();
         }

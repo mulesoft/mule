@@ -29,16 +29,18 @@ public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
             "UTF-8");
     }
 
+    @Override
     public Transformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
         transformer.setXslFile("cdcatalog.xsl");
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setReturnDataType(DataTypeFactory.STRING);
         transformer.setMuleContext(muleContext);
         transformer.initialise();
         return transformer;
     }
 
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         return null;
@@ -50,11 +52,13 @@ public class XsltTransformerUTF8TestCase extends AbstractXmlTransformerTestCase
         // disable this test
     }
 
+    @Override
     public Object getTestData()
     {
         return srcData;
     }
 
+    @Override
     public Object getResultData()
     {
         return resultData;

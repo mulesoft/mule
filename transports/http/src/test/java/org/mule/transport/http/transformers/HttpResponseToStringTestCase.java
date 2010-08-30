@@ -58,7 +58,7 @@ public class HttpResponseToStringTestCase extends AbstractMuleTestCase
     public void testTransformChunked() throws Exception
     {
         HttpResponseToString trasf = new HttpResponseToString();
-        trasf.setReturnDataType(DataTypeFactory.create(String.class));
+        trasf.setReturnDataType(DataTypeFactory.STRING);
 
         _resp.setHeader(new Header(HttpConstants.HEADER_TRANSFER_ENCODING,
             HttpConstants.TRANSFER_ENCODING_CHUNKED));
@@ -78,7 +78,7 @@ public class HttpResponseToStringTestCase extends AbstractMuleTestCase
     public void testTransformNotChunked() throws Exception
     {
         HttpResponseToString trasf = new HttpResponseToString();
-        trasf.setReturnDataType(DataTypeFactory.create(String.class));
+        trasf.setReturnDataType(DataTypeFactory.STRING);
 
         _resultNotChunked += _body;
 

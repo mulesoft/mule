@@ -24,7 +24,7 @@ public class NameStringToChatString extends AbstractTransformer
     public NameStringToChatString()
     {
         super();
-        this.registerSourceType(NameString.class);
+        this.registerSourceType(DataTypeFactory.create(NameString.class));
         this.setReturnDataType(DataTypeFactory.create(ChatString.class));
     }
 

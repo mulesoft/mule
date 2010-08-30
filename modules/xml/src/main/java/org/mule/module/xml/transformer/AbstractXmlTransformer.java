@@ -47,18 +47,18 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer
     
     public AbstractXmlTransformer()
     {
-        registerSourceType(String.class);
-        registerSourceType(byte[].class);
-        registerSourceType(javax.xml.transform.Source.class);
-        registerSourceType(org.xml.sax.InputSource.class);
-        registerSourceType(org.dom4j.Document.class);
-        registerSourceType(org.w3c.dom.Document.class);
-        registerSourceType(org.w3c.dom.Element.class);
-        registerSourceType(java.io.InputStream.class);
-        registerSourceType(org.mule.api.transport.OutputHandler.class);
-        registerSourceType(javax.xml.stream.XMLStreamReader.class);
-        registerSourceType(org.mule.module.xml.transformer.DelayedResult.class);
-        setReturnDataType(DataTypeFactory.create(byte[].class));
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.create(javax.xml.transform.Source.class));
+        registerSourceType(DataTypeFactory.create(org.xml.sax.InputSource.class));
+        registerSourceType(DataTypeFactory.create(org.dom4j.Document.class));
+        registerSourceType(DataTypeFactory.create(org.w3c.dom.Document.class));
+        registerSourceType(DataTypeFactory.create(org.w3c.dom.Element.class));
+        registerSourceType(DataTypeFactory.create(java.io.InputStream.class));
+        registerSourceType(DataTypeFactory.create(org.mule.api.transport.OutputHandler.class));
+        registerSourceType(DataTypeFactory.create(javax.xml.stream.XMLStreamReader.class));
+        registerSourceType(DataTypeFactory.create(org.mule.module.xml.transformer.DelayedResult.class));
+        setReturnDataType(DataTypeFactory.BYTE_ARRAY);
         
         xmlInputFactory = XMLInputFactory.newInstance();
         xmlOutputFactory = XMLOutputFactory.newInstance();
@@ -67,7 +67,6 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer
     /** Result callback interface used when processing XML through JAXP */
     protected static interface ResultHolder
     {
-
         /**
          * @return A Result to use in a transformation (e.g. writing a DOM to a
          *         stream)
@@ -83,7 +82,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer
      * @return Callback interface representing the desiredClass - or null if the
      *         return class isn't supported (or is null).
      */
-    protected static ResultHolder getResultHolder(Class desiredClass)
+    protected static ResultHolder getResultHolder(Class<?> desiredClass)
     {
         if (desiredClass == null)
         {
@@ -175,7 +174,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer
                     return result.getDocument();
                 }
             };
-        } 
+        }
         
         return null;
     }
@@ -189,9 +188,10 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer
      *          On error
      * @throws javax.xml.transform.TransformerException
      *          On error
-     * @throws TransformerException 
+     * @throws TransformerException
      * @deprecated Replaced by convertToText(Object obj, String ouputEncoding)
      */
+    @Deprecated
     protected String convertToText(Object obj) throws Exception
     {
         return convertToText(obj, null);
@@ -211,7 +211,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer
      *          On error
      * @throws javax.xml.transform.TransformerException
      *          On error
-     * @throws TransformerException 
+     * @throws TransformerException
      */
     protected String convertToText(Object obj, String outputEncoding) throws Exception
     {
@@ -255,7 +255,7 @@ public abstract class AbstractXmlTransformer extends AbstractMessageTransformer
      *          On error
      * @throws javax.xml.transform.TransformerException
      *          On error
-     * @throws TransformerException 
+     * @throws TransformerException
      */
     protected String convertToBytes(Object obj, String outputEncoding) throws Exception
     {

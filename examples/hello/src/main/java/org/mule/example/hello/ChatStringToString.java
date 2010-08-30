@@ -20,12 +20,11 @@ import org.mule.transformer.types.DataTypeFactory;
  */
 public class ChatStringToString extends AbstractTransformer
 {
-
     public ChatStringToString()
     {
         super();
-        this.registerSourceType(ChatString.class);
-        this.setReturnDataType(DataTypeFactory.create(String.class));
+        this.registerSourceType(DataTypeFactory.create(ChatString.class));
+        this.setReturnDataType(DataTypeFactory.STRING);
     }
 
     @Override

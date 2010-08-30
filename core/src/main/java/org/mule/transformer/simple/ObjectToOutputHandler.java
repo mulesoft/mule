@@ -35,13 +35,14 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
 
     public ObjectToOutputHandler()
     {
-        registerSourceType(byte[].class);
-        registerSourceType(String.class);
-        registerSourceType(InputStream.class);
-        registerSourceType(Serializable.class);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
+        registerSourceType(DataTypeFactory.create(Serializable.class));
         setReturnDataType(DataTypeFactory.create(OutputHandler.class));
     }
 
+    @Override
     public Object doTransform(final Object src, final String encoding) throws TransformerException
     {
         if (src instanceof String)
@@ -71,7 +72,7 @@ public class ObjectToOutputHandler extends AbstractTransformer implements Discov
                 public void write(MuleEvent event, OutputStream out) throws IOException
                 {
                     InputStream is = (InputStream) src;
-                    try 
+                    try
                     {
                         IOUtils.copyLarge(is, out);
                     }

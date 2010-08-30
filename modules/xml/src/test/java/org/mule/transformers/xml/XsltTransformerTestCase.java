@@ -46,7 +46,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
     public Transformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setReturnDataType(DataTypeFactory.STRING);
         transformer.setXslFile("cdcatalog.xsl");
         transformer.setMaxActiveTransformers(42);
         transformer.setMuleContext(muleContext);
@@ -96,7 +96,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
             result = getTransformer().transform(msg);
             assertNotNull(result);
             assertTrue("Test failed for message type: " + msg.getClass(), compareResults(expectedResult, result));
-        }        
+        }
     }
 
     public void testTransformXMLStreamReader() throws Exception
@@ -159,7 +159,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         XsltTransformer transformer = new XsltTransformer();
 
         transformer.setMuleContext(muleContext);
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setReturnDataType(DataTypeFactory.STRING);
         // set stylesheet
         transformer.setXslt(xsl);
 
@@ -217,8 +217,8 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 
         XsltTransformer transformer = new XsltTransformer();
 
-        transformer.setMuleContext(muleContext);        
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setMuleContext(muleContext);
+        transformer.setReturnDataType(DataTypeFactory.STRING);
         transformer.setMuleContext(muleContext);
         // set stylesheet
         transformer.setXslt(xsl);

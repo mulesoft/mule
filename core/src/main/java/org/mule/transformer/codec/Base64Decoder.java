@@ -25,16 +25,16 @@ import java.io.InputStream;
  */
 public class Base64Decoder extends AbstractTransformer
 {
-
     public Base64Decoder()
     {
-        registerSourceType(String.class);
-        registerSourceType(byte[].class);
-        registerSourceType(InputStream.class);
-        setReturnDataType(DataTypeFactory.create(byte[].class));
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
+        setReturnDataType(DataTypeFactory.BYTE_ARRAY);
     }
 
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    @Override
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         try
         {
@@ -42,7 +42,7 @@ public class Base64Decoder extends AbstractTransformer
 
             if (src instanceof byte[])
             {
-                data = new String((byte[]) src, encoding);
+                data = new String((byte[]) src, outputEncoding);
             }
             else if (src instanceof InputStream)
             {
@@ -63,9 +63,9 @@ public class Base64Decoder extends AbstractTransformer
 
             byte[] result = Base64.decode(data);
 
-            if (getReturnClass().equals(String.class))
+            if (DataTypeFactory.STRING.equals(getReturnDataType()))
             {
-                return new String(result, encoding);
+                return new String(result, outputEncoding);
             }
             else
             {
@@ -75,7 +75,7 @@ public class Base64Decoder extends AbstractTransformer
         catch (Exception ex)
         {
             throw new TransformerException(
-                CoreMessages.transformFailed("base64", this.getReturnClass().getName()), this, ex);
+                CoreMessages.transformFailed("base64", getReturnDataType()), this, ex);
         }
     }
 

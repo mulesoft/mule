@@ -18,10 +18,9 @@ import org.mule.api.security.CryptoFailureException;
  */
 public class DecryptionTransformer extends AbstractEncryptionTransformer
 {
-
+    @Override
     protected byte[] getTransformedBytes(byte[] buffer) throws CryptoFailureException
     {
         return getStrategy().decrypt(buffer, null);
     }
-
 }

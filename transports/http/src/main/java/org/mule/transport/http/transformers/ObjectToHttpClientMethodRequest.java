@@ -76,14 +76,15 @@ public class
     public ObjectToHttpClientMethodRequest()
     {
         setReturnDataType(DataTypeFactory.create(HttpMethod.class));
-        registerSourceType(MuleMessage.class);
-        registerSourceType(byte[].class);
-        registerSourceType(String.class);
-        registerSourceType(InputStream.class);
-        registerSourceType(OutputHandler.class);
-        registerSourceType(NullPayload.class);
+        registerSourceType(DataTypeFactory.MULE_MESSAGE);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
+        registerSourceType(DataTypeFactory.create(OutputHandler.class));
+        registerSourceType(DataTypeFactory.create(NullPayload.class));
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;

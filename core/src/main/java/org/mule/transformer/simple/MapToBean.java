@@ -21,9 +21,9 @@ import org.mule.util.ClassUtils;
 import java.util.Map;
 
 /**
- * Creates and object of type {@link #getReturnClass()} and populates values of a 
+ * Creates and object of type {@link #getReturnClass()} and populates values of a
  * {@link java.util.Map} as bean properties on the object.
- * The bean class name can also be passed in as a property on the Map (which gets removed once read).  
+ * The bean class name can also be passed in as a property on the Map (which gets removed once read).
  * The {@link MapToBean#CLASS_PROPERTY} should be set as a fully qualified class name string.
  */
 public class MapToBean extends AbstractTransformer implements DiscoverableTransformer
@@ -37,8 +37,8 @@ public class MapToBean extends AbstractTransformer implements DiscoverableTransf
 
     public MapToBean()
     {
-        registerSourceType(Map.class);
-        setReturnDataType(DataTypeFactory.create(Object.class));
+        registerSourceType(DataTypeFactory.create(Map.class));
+        setReturnDataType(DataTypeFactory.OBJECT);
     }
 
     @Override
@@ -51,6 +51,7 @@ public class MapToBean extends AbstractTransformer implements DiscoverableTransf
         }
     }
 
+    @Override
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         try

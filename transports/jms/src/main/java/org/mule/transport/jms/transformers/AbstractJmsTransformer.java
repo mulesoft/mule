@@ -38,7 +38,6 @@ import javax.jms.Session;
 
 public abstract class AbstractJmsTransformer extends AbstractMessageTransformer implements DiscoverableTransformer
 {
-
     private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
     public AbstractJmsTransformer()
@@ -117,7 +116,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
         }
     }
 
-    protected Object transformFromMessage(Message source, String encoding) throws IOException, JMSException
+    protected Object transformFromMessage(Message source, String outputEncoding) throws IOException, JMSException
     {
         if (logger.isDebugEnabled())
         {
@@ -137,7 +136,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
             }
         }
 
-        return JmsMessageUtils.toObject(source, jmsSpec, encoding);
+        return JmsMessageUtils.toObject(source, jmsSpec, outputEncoding);
     }
 
     public void setJmsProperties(MuleMessage message, Message msg) throws JMSException

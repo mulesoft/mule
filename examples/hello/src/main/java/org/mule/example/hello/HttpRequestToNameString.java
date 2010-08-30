@@ -26,12 +26,13 @@ public class HttpRequestToNameString extends AbstractTransformer
     public HttpRequestToNameString()
     {
         super();
-        this.registerSourceType(String.class);
-        this.registerSourceType(byte[].class);
-        this.registerSourceType(InputStream.class);
+        this.registerSourceType(DataTypeFactory.STRING);
+        this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        this.registerSourceType(DataTypeFactory.INPUT_STREAM);
         this.setReturnDataType(DataTypeFactory.create(NameString.class));
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         return new NameString(extractNameValue(extractRequestQuery(convertRequestToString(src, encoding))));
@@ -74,7 +75,7 @@ public class HttpRequestToNameString extends AbstractTransformer
         else
         {
             srcAsString = src.toString();
-        }        
+        }
         
         return srcAsString;
     }
@@ -100,7 +101,7 @@ public class HttpRequestToNameString extends AbstractTransformer
             int nameParameterPos = requestQuery.indexOf(NAME_REQUEST_PARAMETER);
             if (nameParameterPos != -1)
             {
-                int nextParameterValuePos = requestQuery.indexOf('&'); 
+                int nextParameterValuePos = requestQuery.indexOf('&');
                 if (nextParameterValuePos == -1 || nextParameterValuePos < nameParameterPos)
                 {
                     nextParameterValuePos = requestQuery.length();

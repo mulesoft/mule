@@ -20,14 +20,14 @@ import javax.mail.internet.MimeMessage;
 
 public class MimeMessageToRfc822ByteArray extends AbstractTransformer
 {
-
     public MimeMessageToRfc822ByteArray()
     {
-        registerSourceType(MimeMessage.class);
-        setReturnDataType(DataTypeFactory.create(byte[].class));
+        registerSourceType(DataTypeFactory.create(MimeMessage.class));
+        setReturnDataType(DataTypeFactory.BYTE_ARRAY);
     }
 
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    @Override
+    protected Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         try
         {
@@ -41,5 +41,4 @@ public class MimeMessageToRfc822ByteArray extends AbstractTransformer
             throw new TransformerException(this, e);
         }
     }
-
 }

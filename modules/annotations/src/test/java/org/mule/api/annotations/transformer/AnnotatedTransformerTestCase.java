@@ -48,7 +48,7 @@ public class AnnotatedTransformerTestCase extends AbstractMuleTestCase
         assertEquals(dt, trans.getReturnDataType());
 
         assertEquals(1, trans.getSourceDataTypes().size());
-        assertEquals(DataTypeFactory.create(InputStream.class), trans.getSourceDataTypes().get(0));
+        assertEquals(DataTypeFactory.INPUT_STREAM, trans.getSourceDataTypes().get(0));
         assertEquals(5, trans.getPriorityWeighting());
     }
 

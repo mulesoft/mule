@@ -16,22 +16,23 @@ import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.NumberUtils;
 
-/** 
+/**
  * Converts a string to a number.
  */
-public class StringToNumber extends AbstractTransformer 
+public class StringToNumber extends AbstractTransformer
 {
     /** Convert the string to an integer (by default it will convert it to a double) */
     private boolean integer = false;
     
     public StringToNumber()
     {
-        registerSourceType(String.class);
+        registerSourceType(DataTypeFactory.STRING);
         setReturnDataType(DataTypeFactory.create(Number.class));
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
-    {         
+    {
         if (integer)
         {
             return new Integer(NumberUtils.toInt(src));

@@ -12,6 +12,7 @@ package org.mule.transport.file.transformers;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.simple.ObjectToByteArray;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ArrayUtils;
 
 import java.io.File;
@@ -27,12 +28,11 @@ import org.apache.commons.io.IOUtils;
  */
 public class FileToByteArray extends ObjectToByteArray
 {
-
     public FileToByteArray()
     {
         super();
-        registerSourceType(File.class);
-        registerSourceType(byte[].class);
+        registerSourceType(DataTypeFactory.create(File.class));
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
     }
 
     @Override

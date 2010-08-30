@@ -10,22 +10,25 @@
 
 package org.mule.module.xml.transformer;
 
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
-import org.xml.sax.InputSource;
+import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
-import javax.xml.namespace.QName;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
+import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import javax.xml.xpath.XPath;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.Collections;
-import java.util.Arrays;
+
+import org.xml.sax.InputSource;
 
 /**
  * Simple transformer for using the JAXP XPath library to extract an XPath value from
@@ -55,8 +58,8 @@ public class XPathExtractor extends AbstractTransformer
 
     public XPathExtractor()
     {
-        registerSourceType(org.w3c.dom.Node.class);
-        registerSourceType(InputSource.class);
+        registerSourceType(DataTypeFactory.create(org.w3c.dom.Node.class));
+        registerSourceType(DataTypeFactory.create(InputSource.class));
     }
 
     @Override
@@ -111,6 +114,7 @@ public class XPathExtractor extends AbstractTransformer
         }
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         QName resultType;

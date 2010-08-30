@@ -28,8 +28,8 @@ public class ByteArrayToHexString extends AbstractTransformer
 
     public ByteArrayToHexString()
     {
-        registerSourceType(byte[].class);
-        registerSourceType(InputStream.class);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
         setReturnDataType(DataTypeFactory.TEXT_STRING);
     }
 
@@ -43,6 +43,7 @@ public class ByteArrayToHexString extends AbstractTransformer
         upperCase = value;
     }
 
+    @Override
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         if (src == null)

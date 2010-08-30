@@ -9,7 +9,6 @@
  */
 package org.mule.transformer.simple;
 
-import org.mule.api.MuleMessage;
 import org.mule.transformer.types.DataTypeFactory;
 
 /** TODO */
@@ -18,6 +17,6 @@ public class ByteArrayToMuleMessage extends ByteArrayToSerializable
     public ByteArrayToMuleMessage()
     {
         super();
-        setReturnDataType(DataTypeFactory.create(MuleMessage.class));
+        setReturnDataType(DataTypeFactory.MULE_MESSAGE);
     }
 }

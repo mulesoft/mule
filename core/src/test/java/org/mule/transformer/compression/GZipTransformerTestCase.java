@@ -29,6 +29,7 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
         strat = new GZipCompression();
     }
 
+    @Override
     public Object getResultData()
     {
         try
@@ -42,20 +43,23 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
         }
     }
 
+    @Override
     public Object getTestData()
     {
         return TEST_DATA;
     }
 
+    @Override
     public Transformer getTransformer()
     {
         return new GZipCompressTransformer();
     }
 
+    @Override
     public Transformer getRoundTripTransformer()
     {
         GZipUncompressTransformer transformer = new GZipUncompressTransformer();
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setReturnDataType(DataTypeFactory.STRING);
 
         try
         {
@@ -68,5 +72,4 @@ public class GZipTransformerTestCase extends AbstractTransformerTestCase
 
         return transformer;
     }
-
 }

@@ -27,7 +27,7 @@ public abstract class AbstractJsonTransformer extends AbstractMessageTransformer
 
     private ObjectMapper mapper;
 
-    private Map<Class, Class> sharedMixins = new HashMap<Class, Class>();
+    private Map<Class<?>, Class<?>> sharedMixins = new HashMap<Class<?>, Class<?>>();
 
     @Override
     public void initialise() throws InitialisationException
@@ -58,12 +58,12 @@ public abstract class AbstractJsonTransformer extends AbstractMessageTransformer
         this.weighting = weighting;
     }
 
-    public Map<Class, Class> getMixins()
+    public Map<Class<?>, Class<?>> getMixins()
     {
         return sharedMixins;
     }
 
-    public void setMixins(Map<Class, Class> mixins)
+    public void setMixins(Map<Class<?>, Class<?>> mixins)
     {
         this.sharedMixins = mixins;
     }

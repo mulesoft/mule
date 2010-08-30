@@ -24,8 +24,8 @@ public final class NoActionTransformer extends AbstractTransformer
 
     public NoActionTransformer()
     {
-        registerSourceType(Object.class);
-        setReturnDataType(DataTypeFactory.create(Object.class));
+        registerSourceType(DataTypeFactory.OBJECT);
+        setReturnDataType(DataTypeFactory.OBJECT);
     }
 
     @Override

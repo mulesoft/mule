@@ -16,21 +16,21 @@ import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
 /**
- * A call to addBook() returns a Long representing the number of 
- * books in the catalog.  This transformer wraps the Long into 
- * a nice HTML page.  
+ * A call to addBook() returns a Long representing the number of
+ * books in the catalog.  This transformer wraps the Long into
+ * a nice HTML page.
  */
 public class AddBookResponse extends AbstractTransformer
 {
     public AddBookResponse()
     {
         super();
-        registerSourceType(Long.class);
-        setReturnDataType(DataTypeFactory.create(String.class));
+        registerSourceType(DataTypeFactory.create(Long.class));
+        setReturnDataType(DataTypeFactory.STRING);
     }
 
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         Long numBooks = (Long) src;
         String response = "Catalog now contains: " + numBooks + " book(s)";

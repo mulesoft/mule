@@ -13,6 +13,7 @@ package org.mule.transformer;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
@@ -33,7 +34,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
-        assertEquals(new Integer(1), transformedMessage);       
+        assertEquals(new Integer(1), transformedMessage);
     }
 
     public void testTwoChainedTransformers() throws Exception
@@ -47,7 +48,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
-        assertEquals(new Integer(2), transformedMessage);       
+        assertEquals(new Integer(2), transformedMessage);
     }
 
     public void testThreeChainedTransformers() throws Exception
@@ -61,7 +62,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
 
         Object transformedMessage = message.getPayload();
         assertNotNull(transformedMessage);
-        assertEquals(new Integer(3), transformedMessage);       
+        assertEquals(new Integer(3), transformedMessage);
     }
 
     public void testIgnoreBadInputDoesNotBreakChainWithTransformationOrderInvalidValid() throws Exception
@@ -150,6 +151,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
     {
         AbstractTransformer transformer = new AbstractTransformer()
         {
+            @Override
             protected Object doTransform(final Object src, final String encoding) throws TransformerException
             {
                 throw new RuntimeException("This transformer must not perform any transformations.");
@@ -157,7 +159,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         };
 
         // Use this class as a bogus source type to enforce a simple invalid transformer
-        transformer.registerSourceType(this.getClass());
+        transformer.registerSourceType(DataTypeFactory.create(this.getClass()));
         
         return transformer;
     }
@@ -166,14 +168,16 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
     {
         AbstractTransformer transformer = new AbstractTransformer()
         {
+            @Override
             protected Object doTransform(Object src, String encoding) throws TransformerException
             {
                 return new Integer(((Integer) src).intValue() + 1);
             }
         };
         
-        transformer.registerSourceType(Integer.class);
-        transformer.setReturnDataType(DataTypeFactory.create(Integer.class));
+        DataType<Integer> integerDataType = DataTypeFactory.create(Integer.class);
+        transformer.registerSourceType(integerDataType);
+        transformer.setReturnDataType(integerDataType);
         
         return transformer;
     }

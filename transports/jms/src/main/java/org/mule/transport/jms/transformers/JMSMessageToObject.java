@@ -12,6 +12,7 @@ package org.mule.transport.jms.transformers;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.ClassUtils;
 
 import javax.jms.BytesMessage;
@@ -36,10 +37,8 @@ import javax.jms.TextMessage;
  * Message.</li>
  * </ul>
  */
-
 public class JMSMessageToObject extends AbstractJmsTransformer
 {
-
     public JMSMessageToObject()
     {
         super();
@@ -48,12 +47,12 @@ public class JMSMessageToObject extends AbstractJmsTransformer
     @Override
     protected void declareInputOutputClasses()
     {
-        registerSourceType(Message.class);
-        registerSourceType(TextMessage.class);
-        registerSourceType(ObjectMessage.class);
-        registerSourceType(BytesMessage.class);
-        registerSourceType(MapMessage.class);
-        registerSourceType(StreamMessage.class);
+        registerSourceType(DataTypeFactory.create(Message.class));
+        registerSourceType(DataTypeFactory.create(TextMessage.class));
+        registerSourceType(DataTypeFactory.create(ObjectMessage.class));
+        registerSourceType(DataTypeFactory.create(BytesMessage.class));
+        registerSourceType(DataTypeFactory.create(MapMessage.class));
+        registerSourceType(DataTypeFactory.create(StreamMessage.class));
     }
 
     @Override
@@ -68,8 +67,8 @@ public class JMSMessageToObject extends AbstractJmsTransformer
 
             Object result = transformFromMessage((Message) message.getPayload(), outputEncoding);
 
-            //We need to handle String / byte[] explicitly since this transformer does not nefine a single return type
-
+            // We need to handle String / byte[] explicitly since this transformer does not define
+            // a single return type
             if (returnType.getType().equals(byte[].class) && result instanceof String)
             {
                 result = result.toString().getBytes(outputEncoding);
@@ -92,5 +91,4 @@ public class JMSMessageToObject extends AbstractJmsTransformer
             throw new TransformerException(this, e);
         }
     }
-
 }

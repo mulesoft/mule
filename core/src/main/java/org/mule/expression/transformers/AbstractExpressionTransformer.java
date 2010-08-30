@@ -44,8 +44,8 @@ public abstract class AbstractExpressionTransformer extends AbstractMessageTrans
     public AbstractExpressionTransformer()
     {
         //No type checking by default
-        registerSourceType(Object.class);
-        setReturnDataType(DataTypeFactory.create(Object.class));
+        registerSourceType(DataTypeFactory.OBJECT);
+        setReturnDataType(DataTypeFactory.OBJECT);
         arguments = new ArrayList<ExpressionArgument>(4);
     }
 

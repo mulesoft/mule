@@ -23,10 +23,11 @@ public class FruitBowlToFruitBasket extends AbstractTransformer implements Disco
 
     public FruitBowlToFruitBasket()
     {
-        registerSourceType(FruitBowl.class);
+        registerSourceType(DataTypeFactory.create(FruitBowl.class));
         setReturnDataType(DataTypeFactory.create(FruitBasket.class));
     }
 
+    @Override
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         FruitBowl bowl = (FruitBowl)src;

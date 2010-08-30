@@ -20,10 +20,11 @@ public class ObjectToFruitLover extends AbstractTransformer
     public ObjectToFruitLover()
     {
         this.setReturnDataType(DataTypeFactory.create(FruitLover.class));
-        this.registerSourceType(String.class);
-        this.registerSourceType(FruitLover.class);
+        this.registerSourceType(DataTypeFactory.STRING);
+        this.registerSourceType(DataTypeFactory.create(FruitLover.class));
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         if (src instanceof FruitLover)

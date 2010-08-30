@@ -18,20 +18,21 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
+
 /**
- * Converts an {@link javax.servlet.http.HttpServletRequest} into an {@link InputStream}.
+ * Converts a {@link HttpServletRequest} into an {@link InputStream}.
  */
 public class HttpRequestToInputStream extends AbstractDiscoverableTransformer
 {
-
     public HttpRequestToInputStream()
     {
         super();
-        setReturnDataType(DataTypeFactory.create(InputStream.class));
-        registerSourceType(HttpServletRequest.class);
+        registerSourceType(DataTypeFactory.create(HttpServletRequest.class));
+        setReturnDataType(DataTypeFactory.INPUT_STREAM);
     }
 
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    @Override
+    protected Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         try
         {
@@ -42,7 +43,6 @@ public class HttpRequestToInputStream extends AbstractDiscoverableTransformer
             throw new TransformerException(this, e);
         }
     }
-
 }
 
 

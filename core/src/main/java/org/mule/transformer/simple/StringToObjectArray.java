@@ -32,12 +32,13 @@ public class StringToObjectArray extends AbstractTransformer
 
     public StringToObjectArray()
     {
-        registerSourceType(String.class);
-        registerSourceType(byte[].class);
-        registerSourceType(InputStream.class);
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
         setReturnDataType(DataTypeFactory.create(Object[].class));
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         String in;

@@ -32,10 +32,9 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
 
     public void testExactMatch() throws Exception
     {
-
         DummyTransformer trans = new DummyTransformer();
-        trans.setReturnDataType(DataTypeFactory.create(byte[].class));
-        trans.registerSourceType(IOException.class);
+        trans.setReturnDataType(DataTypeFactory.BYTE_ARRAY);
+        trans.registerSourceType(DataTypeFactory.create(IOException.class));
 
         TransformerWeighting weighting = new TransformerWeighting(IOException.class, byte[].class, trans);
 
@@ -73,8 +72,8 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
         ObjectToByteArray trans1 = new ObjectToByteArray();
 
         DummyTransformer trans2 = new DummyTransformer();
-        trans2.setReturnDataType(DataTypeFactory.create(byte[].class));
-        trans2.registerSourceType(Exception.class);
+        trans2.setReturnDataType(DataTypeFactory.BYTE_ARRAY);
+        trans2.registerSourceType(DataTypeFactory.create(Exception.class));
 
         TransformerWeighting weighting1 =
                 new TransformerWeighting(IOException.class, byte[].class, trans1);
@@ -100,8 +99,8 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
         ObjectToByteArray trans1 = new ObjectToByteArray();
 
         DummyTransformer trans2 = new DummyTransformer();
-        trans2.setReturnDataType(DataTypeFactory.create(byte[].class));
-        trans2.registerSourceType(IOException.class);
+        trans2.setReturnDataType(DataTypeFactory.BYTE_ARRAY);
+        trans2.registerSourceType(DataTypeFactory.create(IOException.class));
 
         TransformerWeighting weighting1 =
                 new TransformerWeighting(IOException.class, byte[].class, trans1);
@@ -127,8 +126,8 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
         ObjectToByteArray trans1 = new ObjectToByteArray();
 
         DummyTransformer trans2 = new DummyTransformer();
-        trans2.setReturnDataType(DataTypeFactory.create(byte[].class));
-        trans2.registerSourceType(FruitBowl.class);
+        trans2.setReturnDataType(DataTypeFactory.BYTE_ARRAY);
+        trans2.registerSourceType(DataTypeFactory.create(FruitBowl.class));
 
         TransformerWeighting weighting1 =
                 new TransformerWeighting(IOException.class, byte[].class, trans1);
@@ -153,13 +152,13 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
     {
         DummyTransformer t1 = new DummyTransformer();
         t1.setName("--t1");
-        t1.registerSourceType(Orange.class);
+        t1.registerSourceType(DataTypeFactory.create(Orange.class));
         t1.setReturnDataType(DataTypeFactory.create(Fruit.class));
         muleContext.getRegistry().registerTransformer(t1);
 
         DummyTransformer t2 = new DummyTransformer();
         t2.setName("--t2");
-        t2.registerSourceType(Object.class);
+        t2.registerSourceType(DataTypeFactory.OBJECT);
         t2.setReturnDataType(DataTypeFactory.create(Fruit.class));
         muleContext.getRegistry().registerTransformer(t2);
 

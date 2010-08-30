@@ -31,13 +31,14 @@ import java.util.List;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Will discover transformers based on type information only. IT looks for transformers that support the source and result
- * types passed into the method.  This resolver only resolves on the first source type ,which is the way transformer
- * resolution working in Mule 2.x.
+ * Will discover transformers based on type information only. It looks for transformers that support
+ * the source and result types passed into the method. This resolver only resolves on the first
+ * source type, which is the way transformer resolution working in Mule 2.x.
  */
 public class TypeBasedTransformerResolver implements TransformerResolver, MuleContextAware, Disposable, Initialisable
 {

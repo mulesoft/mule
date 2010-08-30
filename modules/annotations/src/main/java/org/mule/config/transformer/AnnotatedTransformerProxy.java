@@ -77,13 +77,12 @@ public class AnnotatedTransformerProxy extends AbstractMessageTransformer implem
             }
         }
         //The first Param is the always the object to transform
-        Class source = transformMethod.getParameterTypes()[0];
-        registerSourceType(source);
+        Class<?> source = transformMethod.getParameterTypes()[0];
+        registerSourceType(DataTypeFactory.create(source));
         sourceAnnotated = (transformMethod.getParameterAnnotations()[0].length > 0 &&
                 transformMethod.getParameterAnnotations()[0][0] instanceof Payload);
 
         setName(proxy.getClass().getSimpleName() + "." + transformMethod.getName());
-
     }
 
     protected void validateMethod(Method method, Class[] sourceTypes) throws IllegalArgumentException

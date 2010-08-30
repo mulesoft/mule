@@ -73,7 +73,7 @@ public class FunctionalStreamingTestComponent implements Callable
 
     public Object onCall(MuleEventContext context) throws Exception
     {
-        InputStream in = (InputStream) context.getMessage().getPayload(DataTypeFactory.create(InputStream.class));
+        InputStream in = context.getMessage().getPayload(DataTypeFactory.create(InputStream.class));
         try
         {
             logger.debug("arrived at " + toString());
@@ -182,6 +182,7 @@ public class FunctionalStreamingTestComponent implements Callable
         }
     }
 
+    @Override
     public String toString()
     {
         return ClassUtils.getSimpleName(getClass()) + "/" + number;

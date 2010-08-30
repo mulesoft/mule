@@ -19,6 +19,7 @@ public class Base64TransformersTestCase extends AbstractTransformerTestCase
 {
     private static final String TEST_DATA = "the quick brown fox jumped over the lazy dog";
     
+    @Override
     public Object getResultData()
     {
         try
@@ -32,22 +33,24 @@ public class Base64TransformersTestCase extends AbstractTransformerTestCase
         }
     }
 
+    @Override
     public Object getTestData()
     {
         return TEST_DATA;
     }
 
+    @Override
     public Transformer getTransformer()
     {
         return new Base64Encoder();
     }
 
+    @Override
     public Transformer getRoundTripTransformer()
     {
         Transformer t = new Base64Decoder();
         // our input is a String so we expect a String as output
-        t.setReturnDataType(DataTypeFactory.create(String.class));
+        t.setReturnDataType(DataTypeFactory.STRING);
         return t;
     }
-    
 }

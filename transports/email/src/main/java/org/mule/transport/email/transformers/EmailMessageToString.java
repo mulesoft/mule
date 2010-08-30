@@ -26,19 +26,19 @@ public class EmailMessageToString extends AbstractTransformer
 
     public EmailMessageToString()
     {
-        registerSourceType(Message.class);
-        setReturnDataType(DataTypeFactory.create(String.class));
+        registerSourceType(DataTypeFactory.create(Message.class));
+        setReturnDataType(DataTypeFactory.STRING);
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         Message msg = (Message) src;
         try
         {
             /*
              * Other information about the message such as cc addresses, attachments
-             * are handled by the mail message adapter.
+             * are handled by the mail mule message factory.
              */
 
             // For this impl we just pass back the email content

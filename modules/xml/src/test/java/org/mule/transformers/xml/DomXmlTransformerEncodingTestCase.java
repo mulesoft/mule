@@ -39,10 +39,11 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
             "US-ASCII");
     }
 
+    @Override
     public Transformer getTransformer() throws Exception
     {
         Transformer trans = createObject(DomDocumentToXml.class);
-        trans.setReturnDataType(DataTypeFactory.create(String.class));
+        trans.setReturnDataType(DataTypeFactory.STRING);
 
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
         builder.setEncoding("US-ASCII");
@@ -53,6 +54,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
         return trans;
     }
 
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         XmlToDomDocument trans = createObject(XmlToDomDocument.class); // encoding is not interesting
@@ -60,11 +62,13 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
         return trans;
     }
 
+    @Override
     public Object getTestData()
     {
         return srcData;
     }
 
+    @Override
     public Object getResultData()
     {
         return resultData;

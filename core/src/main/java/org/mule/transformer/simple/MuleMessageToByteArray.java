@@ -20,8 +20,8 @@ public class MuleMessageToByteArray extends AbstractMessageTransformer
 {
     public MuleMessageToByteArray()
     {
-        registerSourceType(MuleMessage.class);
-        setReturnDataType(DataTypeFactory.create(byte[].class));
+        registerSourceType(DataTypeFactory.MULE_MESSAGE);
+        setReturnDataType(DataTypeFactory.BYTE_ARRAY);
     }
 
     @Override

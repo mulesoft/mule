@@ -33,10 +33,11 @@ public class GetBeanProperty extends AbstractTransformer
     public GetBeanProperty()
     {
         super();
-        registerSourceType(Object.class);
-        setReturnDataType(DataTypeFactory.create(Object.class));
+        registerSourceType(DataTypeFactory.OBJECT);
+        setReturnDataType(DataTypeFactory.OBJECT);
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try

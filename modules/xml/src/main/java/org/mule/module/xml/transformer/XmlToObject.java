@@ -38,12 +38,12 @@ public class XmlToObject extends AbstractXStreamTransformer
 
     public XmlToObject()
     {
-        registerSourceType(String.class);
-        registerSourceType(byte[].class);
-        registerSourceType(InputStream.class);
-        registerSourceType(org.w3c.dom.Document.class);
-        registerSourceType(org.dom4j.Document.class);
-        setReturnDataType(DataTypeFactory.create(Object.class));
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
+        registerSourceType(DataTypeFactory.create(org.w3c.dom.Document.class));
+        registerSourceType(DataTypeFactory.create(org.dom4j.Document.class));
+        setReturnDataType(DataTypeFactory.OBJECT);
     }
 
     @Override

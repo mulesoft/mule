@@ -39,26 +39,24 @@ import java.util.Map;
 public class JsonToObject extends AbstractJsonTransformer
 {
     private Map<Class, Class> deserializationMixins = new HashMap<Class, Class>();
-
-
+    
     public JsonToObject()
     {
-        this.registerSourceType(Reader.class);
-        this.registerSourceType(URL.class);
-        this.registerSourceType(File.class);
-        this.registerSourceType(String.class);
-        this.registerSourceType(InputStream.class);
-        this.registerSourceType(byte[].class);
+        this.registerSourceType(DataTypeFactory.create(Reader.class));
+        this.registerSourceType(DataTypeFactory.create(URL.class));
+        this.registerSourceType(DataTypeFactory.create(File.class));
+        this.registerSourceType(DataTypeFactory.STRING);
+        this.registerSourceType(DataTypeFactory.INPUT_STREAM);
+        this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
         setReturnDataType(DataTypeFactory.create(JsonData.class));
     }
-
 
     @Override
     public void initialise() throws InitialisationException
     {
         super.initialise();
         //Add shared mixins first
-        for (Map.Entry<Class, Class> entry : getMixins().entrySet())
+        for (Map.Entry<Class<?>, Class<?>> entry : getMixins().entrySet())
         {
             getMapper().getDeserializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
         }

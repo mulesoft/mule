@@ -36,7 +36,7 @@ import javax.activation.DataSource;
 
 public class EventMetaDataPropagationTestCase extends FunctionalTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/event-metadata-propagation-config.xml";
@@ -53,12 +53,11 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
 
     public static class DummyComponent implements Callable
     {
-
         public Object onCall(MuleEventContext context) throws Exception
         {
             if ("component1".equals(context.getFlowConstruct().getName()))
             {
-                Map props = new HashMap();
+                Map<String, Object> props = new HashMap<String, Object>();
                 props.put("stringParam", "param1");
                 props.put("objectParam", new Apple());
                 props.put("doubleParam", 12345.6);
@@ -110,9 +109,9 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
      * Extend AbstractMessageAwareTransformer, even though it's deprecated, to ensure that it
      * keeps working for compatibility with older user-written transformers.
      */
+    @SuppressWarnings("deprecation")
     public static class DummyTransformer extends AbstractMessageAwareTransformer
     {
-
         @Override
         public Object transform(MuleMessage msg, String outputEncoding)
         {
@@ -126,5 +125,4 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
             return msg;
         }
     }
-
 }

@@ -27,15 +27,14 @@ import org.apache.abdera.parser.stax.FOMWriterOptions;
  */
 public class BaseToOutputHandler extends AbstractDiscoverableTransformer
 {
-
     public BaseToOutputHandler()
     {
-        this.registerSourceType(Base.class);
+        this.registerSourceType(DataTypeFactory.create(Base.class));
         setReturnDataType(DataTypeFactory.create(OutputHandler.class));
     }
 
-    // @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    @Override
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         try
         {
@@ -56,5 +55,4 @@ public class BaseToOutputHandler extends AbstractDiscoverableTransformer
             throw new TransformerException(this, e);
         }
     }
-
 }

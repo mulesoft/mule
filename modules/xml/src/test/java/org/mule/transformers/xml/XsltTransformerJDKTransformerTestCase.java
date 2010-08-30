@@ -42,10 +42,11 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         resultData = IOUtils.getResourceAsString("cdcatalog.html", getClass());
     }
 
+    @Override
     public Transformer getTransformer() throws Exception
     {
         XsltTransformer transformer = new XsltTransformer();
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setReturnDataType(DataTypeFactory.STRING);
         transformer.setXslFile("cdcatalog.xsl");
         transformer.setMaxActiveTransformers(42);
         //Will default to JDK
@@ -54,6 +55,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         return transformer;
     }
 
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         return null;
@@ -65,6 +67,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         // disable this test
     }
 
+    @Override
     public Object getTestData()
     {
         Map props = new HashMap();
@@ -73,6 +76,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         return new DefaultMuleMessage(srcData, props, muleContext);
     }
 
+    @Override
     public Object getResultData()
     {
         return resultData;
@@ -130,7 +134,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         t = new XsltTransformer();
         t.setXslFile("cdcatalog.xsl");
         // try again with JDK default
-        t.setXslTransformerFactory(null);        
+        t.setXslTransformerFactory(null);
         t.initialise();
     }
 
@@ -167,7 +171,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         XsltTransformer transformer = new XsltTransformer();
 
         transformer.setMuleContext(muleContext);
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setReturnDataType(DataTypeFactory.STRING);
         // set stylesheet
         transformer.setXslt(xsl);
 
@@ -222,7 +226,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         XsltTransformer transformer = new XsltTransformer();
 
         transformer.setMuleContext(muleContext);
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setReturnDataType(DataTypeFactory.STRING);
         transformer.setMuleContext(muleContext);
         // set stylesheet
         transformer.setXslt(xsl);

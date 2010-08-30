@@ -23,7 +23,7 @@ public class StdinToNameString extends AbstractTransformer
     public StdinToNameString()
     {
         super();
-        this.registerSourceType(String.class);
+        this.registerSourceType(DataTypeFactory.STRING);
         this.setReturnDataType(DataTypeFactory.create(NameString.class));
     }
 
@@ -32,7 +32,7 @@ public class StdinToNameString extends AbstractTransformer
     {
         NameString nameString = new NameString();
         String name = (String) src;
-        nameString.setName(name.replaceAll("\r", "").replaceAll("\n", "").trim());            
+        nameString.setName(name.replaceAll("\r", "").replaceAll("\n", "").trim());
         return nameString;
     }
 }

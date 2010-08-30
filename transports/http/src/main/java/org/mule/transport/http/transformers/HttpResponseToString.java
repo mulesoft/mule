@@ -37,13 +37,14 @@ public class HttpResponseToString extends AbstractTransformer
 
     public HttpResponseToString()
     {
-        registerSourceType(HttpResponse.class);
-        setReturnDataType(DataTypeFactory.create(String.class));
+        registerSourceType(DataTypeFactory.create(HttpResponse.class));
+        setReturnDataType(DataTypeFactory.STRING);
     }
 
     /**
      * Perform the transformation to always return a String object
      */
+    @Override
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         try

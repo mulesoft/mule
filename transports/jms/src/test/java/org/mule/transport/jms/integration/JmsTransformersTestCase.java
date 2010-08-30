@@ -44,11 +44,13 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
 {
     private Session session = null;
 
+    @Override
     protected String getConfigResources()
     {
         return "integration/jms-transformers.xml";
     }
 
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -179,7 +181,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         assertTrue("Transformed object should be a BytesMessage", result2 instanceof BytesMessage);
 
         AbstractJmsTransformer trans2 = createObject(JMSMessageToObject.class);
-        trans2.setReturnDataType(DataTypeFactory.create(byte[].class));
+        trans2.setReturnDataType(DataTypeFactory.BYTE_ARRAY);
         BytesMessage bMsg = (BytesMessage) result2;
         Object result = trans2.transform(bMsg);
         assertTrue("Transformed object should be a byte[]", result instanceof byte[]);
@@ -267,7 +269,7 @@ public class JmsTransformersTestCase extends AbstractJmsFunctionalTestCase
         // now test the other way around: getting the byte[] from a manually created
         // BytesMessage
         AbstractJmsTransformer trans2 = createObject(JMSMessageToObject.class);
-        trans2.setReturnDataType(DataTypeFactory.create(byte[].class));
+        trans2.setReturnDataType(DataTypeFactory.BYTE_ARRAY);
         BytesMessage bMsg = session.createBytesMessage();
         bMsg.writeBytes(compressedBytes);
         Object result = trans2.transform(bMsg);

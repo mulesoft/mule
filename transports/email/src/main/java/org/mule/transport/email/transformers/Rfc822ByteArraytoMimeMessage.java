@@ -30,11 +30,12 @@ public class Rfc822ByteArraytoMimeMessage extends AbstractTransformer
 
     public Rfc822ByteArraytoMimeMessage()
     {
-        registerSourceType(byte[].class);
-        registerSourceType(InputStream.class);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
         setReturnDataType(DataTypeFactory.create(MimeMessage.class));
     }
 
+    @Override
     protected Object doTransform(Object src, String encoding) throws TransformerException
     {
         try

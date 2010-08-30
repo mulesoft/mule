@@ -52,7 +52,7 @@ public class DataTypesTestCase extends AbstractMuleTestCase
         assertFalse(dt.equals(dt2));
 
         dt = DataTypeFactory.create(Exception.class);
-        dt2 = DataTypeFactory.create(String.class);
+        dt2 = DataTypeFactory.STRING;
 
         assertFalse(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
@@ -74,7 +74,7 @@ public class DataTypesTestCase extends AbstractMuleTestCase
         //Check mime type matching
         dt2 = DataTypeFactory.create(ArrayList.class, "application/list+java");
 
-        //Will match because the default mime type is '*/*'        
+        //Will match because the default mime type is '*/*'
         assertTrue(dt.isCompatibleWith(dt2));
         assertFalse(dt.equals(dt2));
 

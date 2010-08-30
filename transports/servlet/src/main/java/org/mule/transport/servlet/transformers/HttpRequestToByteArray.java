@@ -21,19 +21,19 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
 /**
- * Converts an {@link javax.servlet.http.HttpServletRequest} into an array of bytes by extracting the payload of
- * the request.
+ * Converts an {@link javax.servlet.http.HttpServletRequest} into an array of bytes by extracting
+ * the payload of the request.
  */
 public class HttpRequestToByteArray extends AbstractDiscoverableTransformer
 {
-
     public HttpRequestToByteArray()
     {
-        registerSourceType(HttpServletRequest.class);
-        setReturnDataType(DataTypeFactory.create(byte[].class));
+        registerSourceType(DataTypeFactory.create(HttpServletRequest.class));
+        setReturnDataType(DataTypeFactory.BYTE_ARRAY);
     }
 
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    @Override
+    protected Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(8192);
         try
@@ -46,5 +46,4 @@ public class HttpRequestToByteArray extends AbstractDiscoverableTransformer
         }
         return baos.toByteArray();
     }
-
 }

@@ -10,7 +10,6 @@
 
 package org.mule.transformer.simple;
 
-import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
@@ -29,33 +28,33 @@ import org.apache.commons.lang.SerializationUtils;
  */
 public class SerializableToByteArray extends AbstractTransformer implements DiscoverableTransformer
 {
-
     private int priorityWeighting = DiscoverableTransformer.DEFAULT_PRIORITY_WEIGHTING;
 
     public SerializableToByteArray()
     {
-        this.registerSourceType(Serializable.class);
-        this.setReturnDataType(DataTypeFactory.create(byte[].class));
+        this.registerSourceType(DataTypeFactory.create(Serializable.class));
+        this.setReturnDataType(DataTypeFactory.BYTE_ARRAY);
     }
 
     public boolean isAcceptMuleMessage()
     {
-        return this.isSourceTypeSupported(MuleMessage.class, true);
+        return this.isSourceDataTypeSupported(DataTypeFactory.MULE_MESSAGE, true);
     }
 
     public void setAcceptMuleMessage(boolean value)
     {
         if (value)
         {
-            this.registerSourceType(MuleMessage.class);
+            this.registerSourceType(DataTypeFactory.MULE_MESSAGE);
         }
         else
         {
-            this.unregisterSourceType(MuleMessage.class);
+            this.unregisterSourceType(DataTypeFactory.MULE_MESSAGE);
         }
     }
 
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    @Override
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         /*
          * If the MuleMessage source type has been registered then we can assume that
@@ -83,5 +82,4 @@ public class SerializableToByteArray extends AbstractTransformer implements Disc
     {
         this.priorityWeighting = priorityWeighting;
     }
-
 }

@@ -57,7 +57,7 @@ public class TransformerPairWireFormat implements WireFormat
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("inboundTransformer").getMessage());
         }
-        if (inboundTransformer.isSourceDataTypeSupported(DataTypeFactory.create(InputStream.class)))
+        if (inboundTransformer.isSourceDataTypeSupported(DataTypeFactory.INPUT_STREAM))
         {
             return inboundTransformer.transform(in);
         }

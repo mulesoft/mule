@@ -158,7 +158,9 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
      * transformed by this transformer.
      *
      * @param aClass the source type to allow
+     * @deprecated use registerSourceType(DataType)
      */
+    @Deprecated
     protected void registerSourceType(Class<?> aClass)
     {
         registerSourceType(new SimpleDataType<Object>(aClass));
@@ -168,7 +170,9 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
      * Unregister a supported source type from this transformer
      *
      * @param aClass the type to remove
+     * @deprecated use unregisterSourceType(DataType)
      */
+    @Deprecated
     protected void unregisterSourceType(Class<?> aClass)
     {
         unregisterSourceType(new SimpleDataType<Object>(aClass));
@@ -375,7 +379,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
         if (src instanceof MuleMessage)
         {
             MuleMessage message = (MuleMessage) src;
-            if ((!isSourceDataTypeSupported(MULE_MESSAGE_DATA_TYPE, true) && 
+            if ((!isSourceDataTypeSupported(MULE_MESSAGE_DATA_TYPE, true) &&
                  !(this instanceof AbstractMessageTransformer)))
             {
                 src = ((MuleMessage) src).getPayload();

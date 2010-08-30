@@ -27,12 +27,13 @@ public class XmlEntityDecoder extends AbstractTransformer
 
     public XmlEntityDecoder()
     {
-        registerSourceType(String.class);
-        registerSourceType(byte[].class);
-        registerSourceType(InputStream.class);
-        setReturnDataType(DataTypeFactory.create(String.class));
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
+        setReturnDataType(DataTypeFactory.STRING);
     }
 
+    @Override
     public Object doTransform(Object src, String encoding) throws TransformerException
     {
         try
@@ -57,7 +58,7 @@ public class XmlEntityDecoder extends AbstractTransformer
         catch (Exception ex)
         {
             throw new TransformerException(
-                CoreMessages.transformFailed(src.getClass().getName(), "XML"), 
+                CoreMessages.transformFailed(src.getClass().getName(), "XML"),
                 this, ex);
         }
     }

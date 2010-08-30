@@ -82,13 +82,13 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         transformerPool.setMaxIdle(MAX_IDLE_TRANSFORMERS);
         transformerPool.setMaxActive(MAX_ACTIVE_TRANSFORMERS);
 
-        registerSourceType(String.class);
-        registerSourceType(byte[].class);
-        registerSourceType(DocumentSource.class);
-        registerSourceType(org.dom4j.Document.class);
-        registerSourceType(Document.class);
-        registerSourceType(Element.class);
-        registerSourceType(InputStream.class);
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.create(DocumentSource.class));
+        registerSourceType(DataTypeFactory.create(org.dom4j.Document.class));
+        registerSourceType(DataTypeFactory.create(Document.class));
+        registerSourceType(DataTypeFactory.create(Element.class));
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
         setReturnDataType(DataTypeFactory.create(Element.class));
     }
 
@@ -101,6 +101,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
     /**
      *
      */
+    @Override
     public void initialise() throws InitialisationException
     {
 
@@ -136,6 +137,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
         }
     }
 
+    @Override
     public void dispose()
     {
         try
@@ -403,6 +405,7 @@ public class XQueryTransformer extends AbstractXmlTransformer implements Disposa
 
     protected class PooledXQueryTransformerFactory extends BasePoolableObjectFactory
     {
+        @Override
         public Object makeObject() throws Exception
         {
             return connection.prepareExpression(xquery);

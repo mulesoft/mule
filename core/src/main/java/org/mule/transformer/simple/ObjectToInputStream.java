@@ -17,7 +17,6 @@ import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 
 /**
  * <code>ObjectToInputStream</code> converts Serializable objects to an InputStream
@@ -30,9 +29,9 @@ public class ObjectToInputStream extends SerializableToByteArray
 
     public ObjectToInputStream()
     {
-        this.registerSourceType(String.class);
-        this.registerSourceType(OutputHandler.class);
-        setReturnDataType(DataTypeFactory.create(InputStream.class));
+        this.registerSourceType(DataTypeFactory.STRING);
+        this.registerSourceType(DataTypeFactory.create(OutputHandler.class));
+        setReturnDataType(DataTypeFactory.INPUT_STREAM);
     }
 
     @Override

@@ -28,6 +28,7 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
     private String srcData;
     private String resultData;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         XMLUnit.setIgnoreWhitespace(true);
@@ -36,6 +37,7 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
         resultData = IOUtils.getResourceAsString("cd-catalog-result-with-params.xml", getClass());
     }
 
+    @Override
     public Transformer getTransformer() throws Exception
     {
         XQueryTransformer transformer = new XQueryTransformer();
@@ -48,7 +50,7 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
                 "    for $cd in $document/catalog/cd\n" +
                 "    return <cd-title>{data($cd/title)}</cd-title>\n" +
                 "} \n</cd-listings>");
-        transformer.setReturnDataType(DataTypeFactory.create(String.class));
+        transformer.setReturnDataType(DataTypeFactory.STRING);
         Properties params = new Properties();
         params.setProperty("title", "#[mule:message.header(ListTitle)]");
         params.setProperty("rating", "#[mule:message.header(ListRating)]");
@@ -58,24 +60,28 @@ public class InlineXQueryTransformerWithParamsTestCase extends AbstractTransform
         return transformer;
     }
 
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         return null;
     }
 
+    @Override
     public void testRoundtripTransform() throws Exception
     {
         // disable this test
     }
 
+    @Override
     public Object getTestData()
     {
-        Map props = new HashMap(2);
+        Map<String, Object> props = new HashMap<String, Object>(2);
         props.put("ListTitle", "MyList");
         props.put("ListRating", new Integer(6));
         return new DefaultMuleMessage(srcData, props, muleContext);
     }
 
+    @Override
     public Object getResultData()
     {
         return resultData;

@@ -29,8 +29,8 @@ public class ObjectToXml extends AbstractXStreamTransformer
 
     public ObjectToXml()
     {
-        this.registerSourceType(Object.class);
-        this.setReturnDataType(DataTypeFactory.create(String.class));
+        this.registerSourceType(DataTypeFactory.OBJECT);
+        this.setReturnDataType(DataTypeFactory.STRING);
     }
 
     public boolean isAcceptMuleMessage()
@@ -42,11 +42,11 @@ public class ObjectToXml extends AbstractXStreamTransformer
     {
         if (value)
         {
-            this.registerSourceType(MuleMessage.class);
+            this.registerSourceType(DataTypeFactory.MULE_MESSAGE);
         }
         else
         {
-            this.unregisterSourceType(MuleMessage.class);
+            this.unregisterSourceType(DataTypeFactory.MULE_MESSAGE);
         }
     }
 

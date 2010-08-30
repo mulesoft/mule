@@ -28,8 +28,8 @@ public class HttpRequestToParameter extends AbstractMessageTransformer
 {
     public HttpRequestToParameter()
     {
-        registerSourceType(Object.class);
-        setReturnDataType(DataTypeFactory.create(String.class));
+        registerSourceType(DataTypeFactory.OBJECT);
+        setReturnDataType(DataTypeFactory.STRING);
     }
 
     @Override

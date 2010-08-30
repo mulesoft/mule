@@ -19,8 +19,8 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.StringUtils;
 
 /**
- * Transforms a Map of HttpRequest parameters into a Book object.  
- * The request parameters are always strings (they come from the HTML form), 
+ * Transforms a Map of HttpRequest parameters into a Book object.
+ * The request parameters are always strings (they come from the HTML form),
  * so we need to parse and convert them to their appropriate types.
  */
 public class HttpRequestToBook extends AbstractMessageTransformer
@@ -28,7 +28,7 @@ public class HttpRequestToBook extends AbstractMessageTransformer
     public HttpRequestToBook()
     {
         super();
-        registerSourceType(Object.class);
+        registerSourceType(DataTypeFactory.OBJECT);
         setReturnDataType(DataTypeFactory.create(Book.class));
     }
 

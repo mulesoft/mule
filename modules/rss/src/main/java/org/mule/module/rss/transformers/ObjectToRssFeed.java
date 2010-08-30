@@ -32,16 +32,17 @@ public class ObjectToRssFeed extends AbstractDiscoverableTransformer
 {
     public ObjectToRssFeed()
     {
-        registerSourceType(byte[].class);
-        registerSourceType(String.class);
-        registerSourceType(InputStream.class);
-        registerSourceType(Document.class);
-        registerSourceType(InputSource.class);
-        registerSourceType(File.class);
+        registerSourceType(DataTypeFactory.BYTE_ARRAY);
+        registerSourceType(DataTypeFactory.STRING);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
+        registerSourceType(DataTypeFactory.create(Document.class));
+        registerSourceType(DataTypeFactory.create(InputSource.class));
+        registerSourceType(DataTypeFactory.create(File.class));
         setReturnDataType(DataTypeFactory.create(SyndFeed.class));
     }
 
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    @Override
+    protected Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         SyndFeedInput feedInput = new SyndFeedInput();
         SyndFeed feed = null;

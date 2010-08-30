@@ -18,14 +18,14 @@ import org.mule.transport.servlet.ServletConnector;
 import java.util.Map;
 
 /**
- * Returns a simple Map of the parameters sent with the HTTP Request.  
+ * Returns a simple Map of the parameters sent with the HTTP Request.
  * If the same parameter is given more than once, only the first value for it will be in the Map.
  */
 public class HttpRequestToParameterMap extends AbstractMessageTransformer
 {
     public HttpRequestToParameterMap()
     {
-        registerSourceType(Object.class);
+        registerSourceType(DataTypeFactory.OBJECT);
         setReturnDataType(DataTypeFactory.create(Map.class));
     }
 

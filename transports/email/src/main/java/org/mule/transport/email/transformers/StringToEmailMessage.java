@@ -48,7 +48,7 @@ public class StringToEmailMessage extends AbstractMessageTransformer
 
     public StringToEmailMessage()
     {
-        this.registerSourceType(String.class);
+        this.registerSourceType(DataTypeFactory.STRING);
         this.setReturnDataType(DataTypeFactory.create(Message.class));
     }
 
