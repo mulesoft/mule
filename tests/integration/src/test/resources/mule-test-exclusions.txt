@@ -103,5 +103,5 @@ org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCas
 
 # EE-1539 Ported from 2.2.x, will take some work to get it adjusted to new 3.x APIs 
 org.mule.test.integration.exceptions.RouteableExceptionStrategyIntegrationTestCase
-org.mule.test.integration.exceptions.duplicatehandling.ExceptionOnOutboundTransformerIsHandledOnceSyncTestCase
-org.mule.test.integration.exceptions.duplicatehandling.ExceptionOnOutboundTransformerIsHandledOnceAsyncTestCase
+#org.mule.test.integration.exceptions.duplicatehandling.ExceptionOnOutboundTransformerIsHandledOnceSyncTestCase
+#org.mule.test.integration.exceptions.duplicatehandling.ExceptionOnOutboundTransformerIsHandledOnceAsyncTestCase

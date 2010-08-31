@@ -15,11 +15,6 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.0/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
-    <stdio:connector name="SystemStreamConnector"
-        promptMessage="Please enter something: " messageDelayTime="1000" />
-
-    <vm:connector name="vmConnector" />
-
     <script:transformer name="exceptionTransformer">
         <script:script engine="groovy">
             throw new
@@ -31,25 +26,16 @@
 
         <service name="SomeService">
             <inbound>
-                <stdio:inbound-endpoint system="IN">
-                </stdio:inbound-endpoint>
-                <vm:inbound-endpoint address="vm://in"
-                    connector-ref="vmConnector" />
+                <vm:inbound-endpoint path="in" />
             </inbound>
-
             <outbound>
                 <pass-through-router>
-                    <vm:outbound-endpoint path="SuccessServiceRequest"
-                        exchange-pattern="one-way" connector-ref="vmConnector"
-                        transformer-refs="exceptionTransformer" >
-                    </vm:outbound-endpoint>
+                    <vm:outbound-endpoint path="SuccessServiceRequest" exchange-pattern="one-way" transformer-refs="exceptionTransformer" />
                 </pass-through-router>
             </outbound>
-
             <custom-exception-strategy
                 class="org.mule.tck.testmodels.mule.TestExceptionStrategy">
-                <spring:property name="testProperty"
-                    value="true"></spring:property>
+                <spring:property name="testProperty" value="true" />
             </custom-exception-strategy>
         </service>
 

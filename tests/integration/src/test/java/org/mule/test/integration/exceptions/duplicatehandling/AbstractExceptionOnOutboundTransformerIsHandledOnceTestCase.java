@@ -18,16 +18,18 @@ import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 public abstract class AbstractExceptionOnOutboundTransformerIsHandledOnceTestCase extends FunctionalTestCase
 {
-    private final AtomicInteger connectorExceptionCounter = new AtomicInteger();
+    private final AtomicInteger systemExceptionCounter = new AtomicInteger();
     private final AtomicInteger serviceExceptionCounter = new AtomicInteger();
 
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        connectorExceptionCounter.set(0);
+        systemExceptionCounter.set(0);
         serviceExceptionCounter.set(0);
 
         TestExceptionStrategy es = new TestExceptionStrategy();
@@ -35,26 +37,24 @@ public abstract class AbstractExceptionOnOutboundTransformerIsHandledOnceTestCas
         muleContext.setExceptionListener(es);
     }
 
-    public void testExceptionIsHandledOnceAndOnlyOnConnector() throws Exception
+    public void testExceptionIsHandledOnceAndOnlyOnService() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        client.send("vm://in", "FAIL", null);
 
         final Latch latch = new Latch();
 
-        TestExceptionStrategy connectorExceptionListener = (TestExceptionStrategy) muleContext.getExceptionListener();
-        connectorExceptionListener.setExceptionCallback(new ExceptionCallback()
+        TestExceptionStrategy systemExceptionListener = (TestExceptionStrategy) muleContext.getExceptionListener();
+        systemExceptionListener.setExceptionCallback(new ExceptionCallback()
         {
             public void onException(Throwable t)
             {
-                connectorExceptionCounter.incrementAndGet();
+                systemExceptionCounter.incrementAndGet();
                 latch.countDown();
             }
         });
 
-        TestExceptionStrategy serviceExceptionListener = (TestExceptionStrategy) muleContext.getRegistry()
-            .lookupService("SomeService")
-            .getExceptionListener();
+        TestExceptionStrategy serviceExceptionListener = 
+            (TestExceptionStrategy) muleContext.getRegistry().lookupService("SomeService").getExceptionListener();
         serviceExceptionListener.setExceptionCallback(new ExceptionCallback()
         {
             public void onException(Throwable t)
@@ -64,10 +64,10 @@ public abstract class AbstractExceptionOnOutboundTransformerIsHandledOnceTestCas
             }
         });
 
-        latch.await();
-        Thread.sleep(1000); // sleep one second in case another exception comes
-        assertEquals(0, serviceExceptionCounter.get());
-        assertEquals(1, connectorExceptionCounter.get());
+        client.send("vm://in", "FAIL", null);
+        latch.await(1000, TimeUnit.MILLISECONDS); // sleep one second in case another exception comes
+        assertEquals(1, serviceExceptionCounter.get());
+        assertEquals(0, systemExceptionCounter.get());
     }
 
 }
