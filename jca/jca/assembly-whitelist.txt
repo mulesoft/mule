@@ -19,6 +19,7 @@ commons-httpclient-3.1-osgi
 commons-io-1.3.1-osgi
 commons-jxpath-1.3-osgi
 commons-lang-2.4-osgi
+commons-logging-api-1.0.4
 commons-net-2.0
 commons-pool-1.4
 cryptix-jce-api-20050328-osgi
@@ -128,6 +129,8 @@ stax-utils-20080702-osgi
 sxc-core-0.7.3-osgi
 sxc-runtime-0.7.3-osgi
 sxc-xpath-0.7.3-osgi
+tomcat-apr-5.5.23
+tomcat-util-5.5.23
 wrapper-3.2.3
 wsdl4j-1.6.1-osgi
 wss4j-1.5.8-osgi
