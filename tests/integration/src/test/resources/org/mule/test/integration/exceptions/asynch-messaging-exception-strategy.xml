@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.0/mule-scripting.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
+
+    <script:transformer name="exceptionTransformer">
+        <script:script engine="groovy">
+            log.info("Throwing exception...");
+            throw new org.mule.api.transformer.TransformerException(org.mule.config.i18n.MessageFactory.createStaticMessage("dummyException"));
+        </script:script>
+    </script:transformer>
+    
+    <script:script engine="groovy" name="throwException">
+        log.info("Throwing exception...");
+        throw new org.mule.component.ComponentException(org.mule.config.i18n.MessageFactory.createStaticMessage("dummyException"));
+    </script:script>
+
+    <model name="TestModel">
+        <custom-exception-strategy class="org.mule.tck.testmodels.mule.TestExceptionStrategy" />
+
+        <service name="InboundTransformer">
+            <inbound>
+                <vm:inbound-endpoint path="in1" exchange-pattern="one-way">
+                	<transformer ref="exceptionTransformer" />
+                </vm:inbound-endpoint>
+            </inbound>
+            <log-component />
+        </service>
+
+        <service name="InboundResponseTransformer">
+            <inbound>
+                <vm:inbound-endpoint path="in2" exchange-pattern="one-way">
+                	<response>
+                		<transformer ref="exceptionTransformer" />
+                	</response>
+                </vm:inbound-endpoint>
+            </inbound>
+            <log-component />
+        </service>
+
+        <service name="OutboundTransformer">
+            <inbound>
+                <vm:inbound-endpoint path="in3" exchange-pattern="one-way" />
+            </inbound>
+            <log-component />
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out3" exchange-pattern="one-way">
+                    	<transformer ref="exceptionTransformer" />
+                    </vm:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="OutboundResponseTransformer">
+            <inbound>
+                <vm:inbound-endpoint path="in4" exchange-pattern="one-way" />
+            </inbound>
+            <log-component />
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out4" exchange-pattern="one-way">
+                    	<response>
+                    		<transformer ref="exceptionTransformer" />
+                   		</response>
+                    </vm:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="Component">
+            <inbound>
+                <vm:inbound-endpoint path="in5" exchange-pattern="one-way" />
+            </inbound>
+		    <script:component script-ref="throwException" />
+        </service>
+
+        <service name="InboundRouter">
+            <inbound>
+               	<vm:inbound-endpoint path="in6" exchange-pattern="one-way" />
+                <custom-inbound-router class="org.mule.test.integration.exceptions.ExceptionThrowingInboundRouter" />
+            </inbound>
+            <log-component />
+        </service>
+
+        <service name="OutboundRouter">
+            <inbound>
+                <vm:inbound-endpoint path="in7" exchange-pattern="one-way" />
+            </inbound>
+            <log-component />
+            <outbound>
+                <custom-outbound-router class="org.mule.test.integration.exceptions.ExceptionThrowingOutboundRouter">
+                    <vm:outbound-endpoint path="out7" exchange-pattern="one-way" />
+                </custom-outbound-router>
+            </outbound>
+        </service>
+    </model>
+</mule>

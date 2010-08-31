@@ -72,7 +72,7 @@
             <inbound>
                <vm:inbound-endpoint path="inboundRouterExceptionBridge" exchange-pattern="one-way"
                     connector-ref="vm"/>
-               <custom-inbound-router class="org.mule.test.integration.streaming.ExceptionThrowingInboundRouter"/>
+               <custom-inbound-router class="org.mule.test.integration.exceptions.ExceptionThrowingInboundRouter"/>
             </inbound>
             <outbound>
                 <filtering-router>

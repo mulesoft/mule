@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.streaming;
+package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleEvent;
 import org.mule.routing.MessageFilter;

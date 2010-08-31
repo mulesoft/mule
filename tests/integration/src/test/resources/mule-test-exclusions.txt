@@ -103,3 +103,8 @@ org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCas
 
 # EE-1539 Ported from 2.2.x, will take some work to get it adjusted to new 3.x APIs 
 org.mule.test.integration.exceptions.RouteableExceptionStrategyIntegrationTestCase
+
+# BL-186 
+org.mule.test.integration.exceptions.SynchronousMessagingExceptionStrategyTestCase
+org.mule.test.integration.exceptions.AsynchronousMessagingExceptionStrategyTestCase
+org.mule.test.integration.exceptions.SystemExceptionStrategyTestCase

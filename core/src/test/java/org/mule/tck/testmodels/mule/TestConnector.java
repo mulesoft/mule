@@ -46,6 +46,8 @@ public class TestConnector extends AbstractConnector
     private int disconnectCount = 0;
     private int disposeCount = 0;
     
+    private boolean failAtStartup = false;
+    
     public TestConnector(MuleContext context)
     {
         super(context);
@@ -91,6 +93,10 @@ public class TestConnector extends AbstractConnector
     @Override
     protected void doStart() 
     {
+        if (isFailAtStartup())
+        {
+            throw new RuntimeException("Startup failure");
+        }
         startCount++;
     }
 
@@ -220,5 +226,15 @@ public class TestConnector extends AbstractConnector
         throws MuleException
     {
         return ((AbstractEndpoint) endpoint).getMessageProcessorChain(null);
+    }
+
+    public void setFailAtStartup(boolean failAtStartup)
+    {
+        this.failAtStartup = failAtStartup;
+    }
+
+    public boolean isFailAtStartup()
+    {
+        return failAtStartup;
     }    
 }

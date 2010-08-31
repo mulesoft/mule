@@ -38,6 +38,7 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy im
     @Override
     public MuleEvent handleException(Exception exception, MuleEvent event)
     {
+        logger.info("Handling exception: " + exception.getClass().getName());
         if (callback != null)
         {
             callback.onException(exception);
@@ -47,10 +48,7 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy im
 
     public void handleException(Exception exception)
     {
-        if (callback != null)
-        {
-            callback.onException(exception);
-        }
+        handleException(exception, null);
     }
     
     public interface ExceptionCallback
