@@ -83,12 +83,6 @@
                   component-class="org.mule.test.integration.tck.WeatherForecaster"
                   type="jax-ws" />
   
-  <!-- JAX-RS service -->
-  <simple-service name="weather-report-rsc"
-                  address="http://localhost:6099/rest"
-                  component-class="org.mule.test.integration.tck.WeatherReportResource"
-                  type="jax-rs" />
-
   <!-- JAXB consumer -->
   <simple-service name="weather-jaxb-consumer"
                   address="vm://weather-consumer.in"

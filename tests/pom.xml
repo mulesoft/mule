@@ -34,5 +34,14 @@
                 <module>archetypes</module>
             </modules>
         </profile>
+        <profile>
+            <id>jdk6</id>
+            <activation>
+                <jdk>1.6</jdk>
+            </activation>
+            <modules>
+                <module>integration-jdk6</module>
+            </modules>
+        </profile>
     </profiles>
 </project>
