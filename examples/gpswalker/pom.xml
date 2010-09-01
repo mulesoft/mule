@@ -9,6 +9,7 @@
     </parent>
     <artifactId>mule-example-gpswalker</artifactId>
     <packaging>jar</packaging>
+    <!--<packaging>mule</packaging>-->
     <name>GPS Walker Example</name>
     <description>Simulates plotting GPS coordinates.
         To run directly in Maven use the 'mvn exec:exec' command and go to http://localhost:8081/index.html</description>
@@ -25,6 +26,14 @@
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
             </plugin>
+
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-mule-plugin</artifactId>-->
+                <!--<version>1.0-beta-1</version>-->
+                <!--<extensions>true</extensions>-->
+            <!--</plugin>-->
+            
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -58,26 +67,31 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-annotations</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-quartz</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ajax</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jetty</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>

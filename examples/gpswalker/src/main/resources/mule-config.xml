@@ -8,28 +8,15 @@
        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
-    <ajax:servlet-endpoint name="gpswalker" channel="/gpswalker"/>
+    <ajax:connector name="ajaxServer" serverUrl="http://localhost:8081/services/gps" resourceBase="./docroot"/>
 
-    <model>
-        <service name="StrollerService">
-            <description>
-                A service that generates GPS coordinates in downtown San Francisco. These get mapped on a Google map
-                at the browser. there is no fancy street walking algorithm so the results may vary.
-            </description>
-            <inbound>
-                <quartz:inbound-endpoint repeatInterval="3000" startDelay="3000" jobName="walkGenerator">
-                    <quartz:event-generator-job/>
-                </quartz:inbound-endpoint>
-            </inbound>
-
+        <flow name="StrollerService">
+            <quartz:inbound-endpoint repeatInterval="3000" startDelay="3000" jobName="walkGenerator">
+                <quartz:event-generator-job/>
+            </quartz:inbound-endpoint>
             <component>
                 <singleton-object class="org.mule.example.gpswalker.CityStroller"/>
             </component>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="gpswalker"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+            <ajax:outbound-endpoint channel="/gpswalker"/>
+        </flow>
 </mule>
