@@ -4,6 +4,7 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
        xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
        xmlns:context="http://www.springframework.org/schema/context"
     xsi:schemaLocation="
@@ -12,6 +13,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.0/mule-scripting.xsd
        http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/3.0/mule-stdio.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
     <description>
@@ -25,12 +27,14 @@
     -->
     <context:property-placeholder location="default-config.properties"/>
 
-    <stdio:connector name="SystemStreamConnector"
-                     promptMessage="How much more change do you need? (enter an amount such as 2.37)"
-                     messageDelayTime="1000"/>
-
+    <custom-transformer name="HttpRequestToMap" class="org.mule.transport.http.transformers.HttpRequestBodyToParamMap"/>
+    
+    <expression-transformer name="ExtractAmount">
+        <return-argument evaluator="map-payload" expression="amount"/>
+    </expression-transformer>
+    
     <custom-transformer name="StringToNumber" class="org.mule.example.scripting.StringToNumber"/>
-
+    
     <custom-transformer name="DollarsToCents" class="org.mule.example.scripting.SimpleMathTransformer">
         <spring:property name="operation" value="multiply"/>
         <spring:property name="factor" value="100"/>
@@ -39,8 +43,9 @@
     <model name="main">
         <service name="Accumulator">
             <inbound>
-                <stdio:inbound-endpoint system="IN" transformer-refs="StringToNumber DollarsToCents"
-                    exchange-pattern="request-response"/>
+                <http:inbound-endpoint host="localhost" port="${http.port}" path="change-machine"
+                    exchange-pattern="request-response" 
+                    transformer-refs="HttpRequestToMap ExtractAmount StringToNumber DollarsToCents"/>
                 <!-- For unit testing -->
                 <vm:inbound-endpoint path="input" transformer-refs="DollarsToCents" 
                     exchange-pattern="request-response"/>
@@ -51,7 +56,6 @@
             <outbound>
                 <chaining-router>
                     <vm:outbound-endpoint path="script" exchange-pattern="request-response"/>
-                    <stdio:outbound-endpoint system="OUT" exchange-pattern="request-response"/>
                 </chaining-router>
             </outbound>
         </service>

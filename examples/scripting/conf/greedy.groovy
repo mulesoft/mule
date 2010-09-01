@@ -22,7 +22,7 @@ def change(currency, amount) {
 }
 
 switch (currency) {
-    case "USD": return change(USD, payload)
-    case "GBP": return change(GBP, payload)
+    case "USD": return change(USD, payload).toString()
+    case "GBP": return change(GBP, payload).toString()
     default: throw new AssertionError("Unsupported currency: $currency")
 }

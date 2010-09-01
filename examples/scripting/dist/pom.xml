@@ -37,7 +37,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-stdio</artifactId>
+            <artifactId>mule-transport-http</artifactId>
             <version>${muleVersion}</version>
         </dependency>
 
