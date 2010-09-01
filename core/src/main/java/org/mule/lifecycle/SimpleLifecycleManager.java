@@ -42,6 +42,9 @@ public abstract class SimpleLifecycleManager<O> extends AbstractLifecycleManager
         addDirectTransition(NotInLifecyclePhase.PHASE_NAME, Initialisable.PHASE_NAME);
         addDirectTransition(NotInLifecyclePhase.PHASE_NAME, Disposable.PHASE_NAME);
         addDirectTransition(Initialisable.PHASE_NAME, Startable.PHASE_NAME);
+
+        //If an object fails to start, the object can be left in an initialise state, but the container can be started
+        addDirectTransition(Initialisable.PHASE_NAME, Stoppable.PHASE_NAME);
         addDirectTransition(Initialisable.PHASE_NAME, Disposable.PHASE_NAME);
 
         //start stop
