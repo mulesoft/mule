@@ -71,15 +71,6 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         {
             LifecycleException le = (LifecycleException) t;
             handleLifecycleException(le.getComponent(), e);
-            if (RequestContext.getEventContext() != null)
-            {
-                handleMessagingException(RequestContext.getEventContext().getMessage(), e);
-            }
-            else
-            {
-                logger.info("There is no current event available, routing Null message with the exception");
-                handleMessagingException(new DefaultMuleMessage(NullPayload.getInstance(), muleContext), e);
-            }
             event.getMessage().setPayload(NullPayload.getInstance());
             event.getMessage().setExceptionPayload(new DefaultExceptionPayload(e));
             return event;
