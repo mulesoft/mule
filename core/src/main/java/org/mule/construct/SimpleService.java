@@ -10,9 +10,6 @@
 
 package org.mule.construct;
 
-import java.lang.reflect.Method;
-import java.util.List;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -30,6 +27,9 @@ import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.util.ClassUtils;
+
+import java.lang.reflect.Method;
+import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
@@ -234,7 +234,7 @@ public class SimpleService extends AbstractFlowConstruct
     {
         try
         {
-            Component jrc = (Component) ClassUtils.instanciateClass("org.mule.transport.jersey.JerseyResourcesComponent");
+            Component jrc = (Component) ClassUtils.instanciateClass("org.mule.module.jersey.JerseyResourcesComponent");
 
             Method setComponentsMethod = ClassUtils.getMethod(jrc.getClass(), "setComponents",
                 new Class<?>[]{List.class});

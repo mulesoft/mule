@@ -8,11 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jersey;
+package org.mule.module.jersey;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.OutputHandler;
+import org.mule.module.jersey.JerseyResourcesComponent;
 import org.mule.transport.http.HttpConnector;
 
 import com.sun.jersey.spi.container.ContainerResponse;

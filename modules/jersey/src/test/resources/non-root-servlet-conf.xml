@@ -17,7 +17,7 @@
                 <inbound-endpoint address="servlet://base" exchange-pattern="request-response"/>
             </inbound>
             <jersey:resources>
-                <component class="org.mule.transport.jersey.HelloWorldResource"/>
+                <component class="org.mule.module.jersey.HelloWorldResource"/>
             </jersey:resources>
         </service>
         

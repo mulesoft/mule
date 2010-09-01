@@ -8,11 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jersey.config;
+package org.mule.module.jersey.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
-import org.mule.transport.jersey.JerseyResourcesComponent;
+import org.mule.module.jersey.JerseyResourcesComponent;
 
 public class JerseyNamespaceHandler extends AbstractMuleNamespaceHandler
 {

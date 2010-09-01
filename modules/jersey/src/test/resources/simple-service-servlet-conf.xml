@@ -12,7 +12,7 @@
 
   <simple-service name="helloWorldResource"
                   address="servlet://base"
-                  component-class="org.mule.transport.jersey.HelloWorldResource"
+                  component-class="org.mule.module.jersey.HelloWorldResource"
                   type="jax-rs" />
 
 </mule>

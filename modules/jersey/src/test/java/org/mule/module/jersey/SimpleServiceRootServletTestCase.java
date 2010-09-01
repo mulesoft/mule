@@ -8,11 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jersey;
+package org.mule.module.jersey;
 
-public class RootServletTestCase extends AbstractServletTestCase 
+public class SimpleServiceRootServletTestCase extends AbstractServletTestCase
 {
-    public RootServletTestCase() 
+    public SimpleServiceRootServletTestCase()
     {
         super("/*");
     }
@@ -21,11 +21,10 @@ public class RootServletTestCase extends AbstractServletTestCase
     {
         testBasic("http://localhost:63088/base");
     }
-    
-    @Override
-    protected String getConfigResources() 
-    {
-        return "servlet-conf.xml";
-    }
 
+    @Override
+    protected String getConfigResources()
+    {
+        return "simple-service-servlet-conf.xml";
+    }
 }

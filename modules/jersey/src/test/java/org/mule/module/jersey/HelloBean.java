@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jersey;
+package org.mule.module.jersey;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jersey;
+package org.mule.module.jersey;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;

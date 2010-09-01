@@ -17,8 +17,8 @@
                 <inbound-endpoint address="http://localhost:63081/"/>
             </inbound>
             <jersey:resources>
-                <component class="org.mule.transport.jersey.HelloWorldResource"/>
-                <component class="org.mule.transport.jersey.AnotherWorldResource"/>
+                <component class="org.mule.module.jersey.HelloWorldResource"/>
+                <component class="org.mule.module.jersey.AnotherWorldResource"/>
             </jersey:resources>
         </service>
         
