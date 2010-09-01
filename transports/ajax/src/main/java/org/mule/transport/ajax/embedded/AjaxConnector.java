@@ -56,8 +56,6 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
 {
     public static final String PROTOCOL = "ajax";
 
-    public static final String RESOURCE_BASE_PROPERTY = "resourceBase";
-    
     public static final String CHANNEL_PROPERTY = "channel";
 
     public static final String AJAX_PATH_SPEC = "/ajax/*";
@@ -165,7 +163,7 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
     @Override
     protected void doInitialise() throws InitialisationException
     {
-        if(serverUrl==null)
+        if (serverUrl==null)
         {
             throw new InitialisationException(AjaxMessages.serverUrlNotDefined(), this);
         }
@@ -193,7 +191,7 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
     @Override
     protected void validateSslConfig() throws InitialisationException
     {
-        if(serverUrl.getProtocol().equals("https"))
+        if (serverUrl.getProtocol().equals("https"))
         {
             super.validateSslConfig();
         }
@@ -218,12 +216,13 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
         servlet = (ContinuationCometdServlet)createServlet(connector, builder.buildInboundEndpoint());
     }
 
+    @Override
     public Servlet createServlet(Connector connector, ImmutableEndpoint endpoint)
     {
         ContinuationCometdServlet servlet = new MuleAjaxServlet();
 
         String path = endpoint.getEndpointURI().getPath();
-        if(StringUtils.isBlank(path))
+        if (StringUtils.isBlank(path))
         {
             path = ROOT;
         }
@@ -233,7 +232,7 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
         root.setConnectorNames(new String[]{connector.getName()});
         root.addEventListener(new MuleServletContextListener(muleContext, getName()));
 
-        if(!ROOT.equals(path))
+        if (!ROOT.equals(path))
         {
             Context resourceContext = new Context(handlerCollection, path, Context.NO_SECURITY);
             populateContext(resourceContext);
@@ -248,14 +247,13 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
         holder.setServlet(servlet);
         root.addServlet(holder, AJAX_PATH_SPEC);
 
-
-        if(getInterval() != INT_VALUE_NOT_SET) holder.setInitParameter("interval", Integer.toString(getInterval()));
+        if (getInterval() != INT_VALUE_NOT_SET) holder.setInitParameter("interval", Integer.toString(getInterval()));
         holder.setInitParameter("JSONCommented", Boolean.toString(isJsonCommented()));
-        if(getLogLevel() != INT_VALUE_NOT_SET) holder.setInitParameter("logLevel", Integer.toString(getLogLevel()));
-        if(getMaxInterval() != INT_VALUE_NOT_SET) holder.setInitParameter("maxInterval", Integer.toString(getMaxInterval()));
-        if(getMultiFrameInterval() != INT_VALUE_NOT_SET) holder.setInitParameter("multiFrameInterval", (Integer.toString(getMultiFrameInterval())));
-        if(getTimeout() != INT_VALUE_NOT_SET) holder.setInitParameter("timeout", Integer.toString(getTimeout()));
-        if(getRefsThreshold() != INT_VALUE_NOT_SET) holder.setInitParameter("refsThreshold", Integer.toString(getRefsThreshold()));
+        if (getLogLevel() != INT_VALUE_NOT_SET) holder.setInitParameter("logLevel", Integer.toString(getLogLevel()));
+        if (getMaxInterval() != INT_VALUE_NOT_SET) holder.setInitParameter("maxInterval", Integer.toString(getMaxInterval()));
+        if (getMultiFrameInterval() != INT_VALUE_NOT_SET) holder.setInitParameter("multiFrameInterval", (Integer.toString(getMultiFrameInterval())));
+        if (getTimeout() != INT_VALUE_NOT_SET) holder.setInitParameter("timeout", Integer.toString(getTimeout()));
+        if (getRefsThreshold() != INT_VALUE_NOT_SET) holder.setInitParameter("refsThreshold", Integer.toString(getRefsThreshold()));
         holder.setInitParameter("requestAvailable", Boolean.toString(isRequestAvailable()));
 
 
@@ -268,17 +266,17 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
         context.addServlet(DefaultServlet.class, ROOT);
         context.addServlet(JarResourceServlet.class, JarResourceServlet.DEFAULT_PATH_SPEC);
 
-        if(getResourceBase()!=null)
+        String base = getResourceBase();
+        if (base != null)
         {
-            context.setResourceBase(getResourceBase());
+            context.setResourceBase(base);
         }
     }
-
 
     @Override
     protected AbstractConnector createJettyConnector()
     {
-        if(serverUrl.getProtocol().equals("https"))
+        if (serverUrl.getProtocol().equals("https"))
         {
             return super.createJettyConnector();
         }
@@ -287,7 +285,6 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
             return new SelectChannelConnector();
         }
     }
-
 
     public AbstractBayeux getBayeux( )
     {
@@ -417,35 +414,4 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
     {
         this.refsThreshold = refsThreshold;
     }
-
-//    public class AjaxConnectorHolder extends AbstractConnectorHolder<ContinuationCometdServlet, AjaxMessageReceiver>
-//    {
-//        private int refCount;
-//
-//        public AjaxConnectorHolder(Connector connector, ContinuationCometdServlet servlet, AjaxMessageReceiver receiver)
-//        {
-//            super(connector, servlet, receiver);
-//            addReceiver(receiver);
-//        }
-//
-//        public boolean isReferenced()
-//        {
-//            return refCount == 0;
-//        }
-//
-//
-//        public void addReceiver(AjaxMessageReceiver receiver)
-//        {
-//           refCount++;
-//            if(receiver!=null)
-//            {
-//            receiver.setBayeux(servlet.getBayeux());
-//            }
-//        }
-//
-//        public void removeReceiver(AjaxMessageReceiver receiver)
-//        {
-//            refCount--;
-//        }
-//    }
 }
