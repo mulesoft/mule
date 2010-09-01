@@ -11,13 +11,18 @@
 package org.mule.test.integration.construct;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.tck.WeatherForecaster;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
 import org.springframework.util.FileCopyUtils;
 
@@ -84,7 +89,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         doTestStringMassager("vm://bam2.in");
     }
 
-    public void testJaxRsService() throws Exception
+    public void testJaxWsService() throws Exception
     {
         final String wsdl = new String(FileCopyUtils.copyToByteArray((InputStream) muleClient.request(
             "http://localhost:6099/weather-forecast?wsdl", getTestTimeoutSecs() * 1000L).getPayload()));
@@ -96,6 +101,16 @@ public class SimpleServiceTestCase extends FunctionalTestCase
             getTestTimeoutSecs() * 1000).getPayloadAsString();
 
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
+    }
+
+    public void testJaxRsService() throws Exception
+    {
+        final Map<String, Object> props = new HashMap<String, Object>();
+        props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
+        props.put(HttpConstants.HEADER_CONTENT_TYPE, "application/xml");
+        final MuleMessage result = muleClient.send("http://localhost:6099/rest/weather-report",
+            "<fake_report/>", props);
+        assertEquals((Integer) 201, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
 
     public void testJaxbConsumer() throws Exception

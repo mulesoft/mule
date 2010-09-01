@@ -1559,7 +1559,14 @@
                     <xsd:enumeration value="jax-ws">
                       <xsd:annotation>
                         <xsd:documentation>
-                          Expose a JAX-WS annoted component as a web service. CXF is required to have this working.
+                          Expose a JAX-WS annoted component as a web service. The CXF module is required to have this working.
+                        </xsd:documentation>
+                      </xsd:annotation>
+                    </xsd:enumeration>
+                    <xsd:enumeration value="jax-rs">
+                      <xsd:annotation>
+                        <xsd:documentation>
+                          Expose a JAX-RS annoted component as a web service. The Jersey module is required to have this working.
                         </xsd:documentation>
                       </xsd:annotation>
                     </xsd:enumeration>
