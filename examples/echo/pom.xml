@@ -24,13 +24,30 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--
+                Build a deployable zip file of the app. This is a task for the assembly plugin
+                but the version we use in the build is too outdated to be usable for this task.    
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.1-beta-1</version>
-                <configuration>
-                    <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
-                </configuration>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>package-example</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <zip destfile="${project.build.directory}/mule-example-echo-app.zip">
+                                    <zipfileset file="${project.build.directory}/mule-example-echo-${version}.jar" fullpath="lib/mule-example-echo-${version}.jar"/>
+                                    <zipfileset file="${basedir}/conf/echo-cxf-flow-config.xml" fullpath="mule-config.xml"/>
+                                </zip>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

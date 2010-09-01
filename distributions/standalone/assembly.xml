@@ -116,6 +116,13 @@
             <include>echo.bat</include>
         </includes>
     </fileSet>
+    <fileSet>
+        <directory>../../examples/echo/target</directory>
+        <outputDirectory>examples/echo</outputDirectory>
+        <includes>
+            <include>mule-example-echo-app.zip</include>
+        </includes>
+    </fileSet>
 
     <!--
     ==================================
