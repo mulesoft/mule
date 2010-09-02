@@ -199,16 +199,6 @@
         </dependency>
 
         <!--
-            include the Axis transport in the distro although it's not used
-            in the examples any more
-        -->
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-axis</artifactId>
-            <version>${version}</version>
-        </dependency>
-
-        <!--
             We need to register the endorsed XML jars as dependencies of the
             distribution, so that they can be referenced in the assembly as in/excludes.
         -->
