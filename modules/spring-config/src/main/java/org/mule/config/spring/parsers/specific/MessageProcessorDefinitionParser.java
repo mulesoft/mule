@@ -10,7 +10,6 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;

@@ -278,7 +278,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         
         // Message Processors
         registerBeanDefinitionParser("processor", new MessageProcessorRefDefinitionParser());
-        registerBeanDefinitionParser("custom-processor", new MessageProcessorDefinitionParser());        
+        registerMuleBeanDefinitionParser("custom-processor", new MessageProcessorDefinitionParser()).addIgnored("name");        
         registerBeanDefinitionParser("composite-processor", new CompositeMessageProcessorDefinitionParser());        
         registerBeanDefinitionParser("response", new ResponseDefinitionParser());
         registerMuleBeanDefinitionParser("message-filter", new MessageFilterDefinitionParser());
