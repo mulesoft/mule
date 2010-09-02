@@ -120,77 +120,52 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>5</source>
-                    <target>5</target>
-                </configuration>
-            </plugin>
-            <!-- "mvn install" will copy the application to the $MULE_HOME/apps directory,
-                overwriting the previous one. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.0-beta-1</version>
                 <executions>
                     <execution>
-                        <id>copy-resources</id>
-                        <phase>install</phase>
-
                         <goals>
-                            <goal>run</goal>
+                            <goal>enforce</goal>
                         </goals>
-
                         <configuration>
-                            <tasks>
-                                <copy tofile="${MULE_HOME}/apps/hello-stdin/mule-config.xml" file="${basedir}/target/classes/hello-config.xml"/>
-                                <copy tofile="${MULE_HOME}/apps/hello-http/mule-config.xml" file="${basedir}/target/classes/hello-http-config.xml"/>
-                            </tasks>
+                            <rules>
+                                <requireProperty>
+                                    <property>env.MULE_HOME</property>
+                                    <message>You must set MULE_HOME before building the example.</message>
+                                </requireProperty>
+                            </rules>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <source>5</source>
+                    <target>5</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.4</version>
                 <executions>
                     <execution>
-                        <id>copy-artifact</id>
-                        <phase>install</phase>
+                        <id>package-example</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>copy</goal>
+                            <goal>run</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/hello-stdin/lib</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${groupId}</groupId>
-                                    <artifactId>${artifactId}</artifactId>
-                                    <version>${version}</version>
-                                    <destFileName>${artifactId}.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-artifact2</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/hello-http/lib</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${groupId}</groupId>
-                                    <artifactId>${artifactId}</artifactId>
-                                    <version>${version}</version>
-                                    <destFileName>${artifactId}.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
+                            <tasks>
+                                <zip destfile="${basedir}/mule-example-hello.zip">
+                                    <zipfileset file="${project.build.directory}/mule-example-hello.jar" fullpath="lib/mule-example-hello.jar"/>
+                                    <zipfileset file="${basedir}/conf/hello-http-config.xml" fullpath="mule-config.xml"/>
+                                </zip>
+                                <copy file="${basedir}/mule-example-hello.zip" todir="${env.MULE_HOME}/apps" overwrite="true"/>
+                            </tasks>
                         </configuration>
                     </execution>
                 </executions>

@@ -71,24 +71,11 @@
     </target>
 
     <target name="deploy" depends="package,test" description="Deploy the applications to the Mule server">
-
-        <antcall target="deploy-instance">
-            <param name="instance.name" value="hello-stdin" />
-            <param name="config.file.name" value="hello" />
-        </antcall>
-
-        <antcall target="deploy-instance">
-            <param name="instance.name" value="hello-http" />
-            <param name="config.file.name" value="hello-http" />
-        </antcall>
-    </target>
-
-    <target name="deploy-instance" description="deploys an instance of the hello config, currently stdin or http">
-        <mkdir dir="${dir.mule.home}/apps/${instance.name}" />
-        <mkdir dir="${dir.mule.home}/apps/${instance.name}/lib" />
-        <copy file="${dir.build}/${app.name}.jar" todir="${dir.mule.home}/apps/${instance.name}/lib" overwrite="true" verbose="true" />
-        <copy file="${dir.classes}/${config.file.name}-config.xml" tofile="${dir.mule.home}/apps/${instance.name}/mule-config.xml">
-        </copy>
+        <zip destfile="mule-example-hello.zip">
+            <zipfileset file="${dir.build}/${app.name}.jar" fullpath="lib/mule-example-hello.jar"/>
+            <zipfileset file="${dir.conf}/hello-http-config.xml" fullpath="mule-config.xml"/>
+        </zip>
+        <copy file="mule-example-hello.zip" todir="${dir.mule.home}/apps" overwrite="true"/>
     </target>
 
     <target name="setup">
