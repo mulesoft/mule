@@ -97,15 +97,9 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
         getFlowConstruct().initialise();
         assertFalse(getFlowConstruct().isStarted());
 
-        try
-        {
-            getFlowConstruct().stop();
-            fail("Exception expected: Cannot stop a service that is not started");
-        }
-        catch (final IllegalStateException e)
-        {
-            // expected
-        }
+        // Can stop a service that is not started
+        getFlowConstruct().stop();
+
         assertFalse(getFlowConstruct().isStarted());
         getFlowConstruct().start();
         assertTrue(getFlowConstruct().isStarted());
