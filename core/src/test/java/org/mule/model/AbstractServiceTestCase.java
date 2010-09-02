@@ -11,14 +11,13 @@
 package org.mule.model;
 
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.service.Service;
 import org.mule.tck.AbstractMuleTestCase;
 
 public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
 {
     protected abstract Service getService();
-    
+
     public void testStart() throws MuleException
     {
         try
@@ -64,7 +63,7 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
         }
         catch (IllegalStateException e)
         {
-            //expected
+            // expected
         }
         assertFalse(getService().isPaused());
         getService().start();
@@ -79,7 +78,7 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
         }
         catch (IllegalStateException e)
         {
-            //expected
+            // expected
         }
         assertTrue(getService().isPaused());
         getService().dispose();
@@ -98,11 +97,11 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
         try
         {
             getService().resume();
-            fail("cannot resume a service that is not paused");            
+            fail("cannot resume a service that is not paused");
         }
         catch (IllegalStateException e)
         {
-            //expected
+            // expected
         }
         assertFalse(getService().isPaused());
         getService().start();
@@ -115,14 +114,14 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
         }
         catch (IllegalStateException e)
         {
-            //expected
+            // expected
         }
         assertFalse(getService().isPaused());
         getService().pause();
         assertTrue(getService().isPaused());
         getService().resume();
         assertFalse(getService().isPaused());
-        //Resume is a meta phase, so after pause, we go back to started
+        // Resume is a meta phase, so after pause, we go back to started
         assertTrue(getService().isStarted());
         try
         {
@@ -131,7 +130,7 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
         }
         catch (IllegalStateException e)
         {
-            //expected
+            // expected
         }
         assertFalse(getService().isPaused());
         getService().dispose();
@@ -166,15 +165,9 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
         getService().initialise();
         assertFalse(getService().isStarted());
 
-        try
-        {
-            getService().stop();
-            fail("Exception expected: Cannot stop a service that is not started");
-        }
-        catch (IllegalStateException e)
-        {
-            // expected
-        }
+        // Can stop a service that is not started
+        getService().stop();
+
         assertFalse(getService().isStarted());
         getService().start();
         assertTrue(getService().isStarted());
