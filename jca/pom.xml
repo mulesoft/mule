@@ -74,16 +74,6 @@
             <type>pom</type>
         </dependency>
 
-        <!--
-            include the Axis transport in the distro although it's not used
-            in the examples any more
-        -->
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-axis</artifactId>
-            <version>${version}</version>
-        </dependency>
-
         <!-- re-declaration of dependencies that never ever may end up in the .rar -->
         <dependency>
             <groupId>org.mule.examples</groupId>
