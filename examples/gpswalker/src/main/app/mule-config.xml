@@ -8,7 +8,7 @@
        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
-    <ajax:connector name="ajaxServer" serverUrl="http://localhost:8081/services/gps" resourceBase="./docroot"/>
+    <ajax:connector name="ajaxServer" serverUrl="http://localhost:8081/services/gps" resourceBase="${app.home}/docroot"/>
 
         <flow name="StrollerService">
             <quartz:inbound-endpoint repeatInterval="3000" startDelay="3000" jobName="walkGenerator">

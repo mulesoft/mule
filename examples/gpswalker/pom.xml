@@ -8,8 +8,7 @@
         <version>3.0.0-RC3-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-gpswalker</artifactId>
-    <packaging>jar</packaging>
-    <!--<packaging>mule</packaging>-->
+    <packaging>mule</packaging>
     <name>GPS Walker Example</name>
     <description>Simulates plotting GPS coordinates.
         To run directly in Maven use the 'mvn exec:exec' command and go to http://localhost:8081/index.html</description>
@@ -27,12 +26,15 @@
                 </configuration>
             </plugin>
 
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-mule-plugin</artifactId>-->
-                <!--<version>1.0-beta-1</version>-->
-                <!--<extensions>true</extensions>-->
-            <!--</plugin>-->
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <version>3.0.0-RC3-SNAPSHOT</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <archiveClasses>true</archiveClasses>
+                </configuration>
+            </plugin>
             
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
