@@ -109,6 +109,7 @@ public class MuleProperties
 
     public static final String MULE_WORKING_DIRECTORY_PROPERTY = "mule.working.dir";
     public static final String MULE_HOME_DIRECTORY_PROPERTY = "mule.home";
+    public static final String APP_HOME_DIRECTORY_PROPERTY = "app.home";
 
     // Object Name Keys
     public static final String OBJECT_MULE_CONTEXT = "_muleContext";

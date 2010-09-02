@@ -171,10 +171,13 @@ public class DefaultMuleApplication implements Application
                 List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(2);
 
                 final Map<String,String> appProperties = descriptor.getAppProperties();
-                if (appProperties != null && !appProperties.isEmpty())
-                {
-                    builders.add(new SimpleConfigurationBuilder(appProperties));
-                }
+
+                //Add the app.home variable to the context
+                appProperties.put(MuleProperties.APP_HOME_DIRECTORY_PROPERTY,
+                        new File(MuleContainerBootstrapUtils.getMuleAppsDir(), getAppName()).getAbsolutePath());
+
+                builders.add(new SimpleConfigurationBuilder(appProperties));
+
 
                 // If the annotations module is on the classpath, add the annotations config builder to the list
                 // This will enable annotations config for this instance
