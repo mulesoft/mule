@@ -46,7 +46,7 @@
         <dependency>
             <groupId>org.apache.axis</groupId>
             <artifactId>axis</artifactId>
-            <version>${axisVersion}-osgi</version>
+            <version>1.4-osgi</version>
             <exclusions>
                 <!-- we like slf4j -->
                 <exclusion>
