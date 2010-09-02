@@ -58,6 +58,7 @@
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
+            <version>${geronimoSpecsVersion}-osgi</version>
         </dependency>
          <dependency>
             <groupId>javax.mail</groupId>
@@ -66,7 +67,7 @@
         <dependency>
             <groupId>commons-discovery</groupId>
             <artifactId>commons-discovery</artifactId>
-            <version>${commonsDiscoveryVersion}-osgi</version>
+            <version>0.4-osgi</version>
             <exclusions>
                 <exclusion>
                     <artifactId>commons-logging</artifactId>
@@ -82,6 +83,7 @@
          <dependency>
             <groupId>wsdl4j</groupId>
             <artifactId>wsdl4j</artifactId>
+            <version>1.6.1</version>
         </dependency>
         <!-- needed by the Axis Service component -->
         <dependency>

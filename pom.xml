@@ -88,7 +88,6 @@
         <commonsCodecVersion>1.3</commonsCodecVersion>
         <commonsCollectionsVersion>3.2.1</commonsCollectionsVersion>
         <commonsDbUtilsVersion>1.2</commonsDbUtilsVersion>
-        <commonsDiscoveryVersion>0.4</commonsDiscoveryVersion>
         <commonsHttpClientVersion>3.1</commonsHttpClientVersion>
         <commonsIoVersion>1.4</commonsIoVersion>
         <commonsJxpathVersion>1.3</commonsJxpathVersion>
@@ -113,7 +112,6 @@
         <javaActivationVersion>1.1</javaActivationVersion>
         <javaMailVersion>1.4.3</javaMailVersion>
         <javaScriptVersion>2.0.5</javaScriptVersion>
-        <javaWsdlVersion>1.6.1</javaWsdlVersion>
         <javaXmlBindVersion>2.1.9</javaXmlBindVersion>
         <javaXmlWsVersion>2.1-1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
@@ -544,11 +542,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-jaxrpc_1.1_spec</artifactId>
-                <version>${geronimoSpecsVersion}-osgi</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jms_1.1_spec</artifactId>
                 <version>${geronimoSpecsVersion}-osgi</version>
             </dependency>
@@ -625,11 +618,6 @@
                         <artifactId>jsr173-ri</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>wsdl4j</groupId>
-                <artifactId>wsdl4j</artifactId>
-                <version>${javaWsdlVersion}-osgi</version>
             </dependency>
             <dependency>
                 <groupId>commons-beanutils</groupId>
