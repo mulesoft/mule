@@ -77,6 +77,18 @@
     <default-service-exception-strategy />
   </simple-service>
   
+  <simple-service name="global-exception-strategy"
+                  abstract="true">
+    <custom-exception-strategy
+                  class="org.mule.test.integration.exceptions.TestExceptionStrategy" />
+  </simple-service>
+  
+  <simple-service name="inherited-exception-strategy"
+                  parent="global-exception-strategy"
+                  address="vm://iexst.in">
+    <test:component throwException="true" />
+  </simple-service>
+  
   <!-- JAX-WS service -->
   <simple-service name="weather-forecaster-ws"
                   address="http://localhost:6099/weather-forecast"

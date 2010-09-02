@@ -10,16 +10,15 @@
 
 package org.mule.test.integration.construct;
 
+import java.io.InputStream;
+
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleException;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.tck.WeatherForecaster;
 import org.mule.util.StringUtils;
-
-import java.io.InputStream;
-
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.math.RandomUtils;
 import org.springframework.util.FileCopyUtils;
 
 public class SimpleServiceTestCase extends FunctionalTestCase
@@ -65,6 +64,16 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         doTestMathsService("vm://maths5.in");
     }
 
+    public void testTransformerReferences() throws Exception
+    {
+        doTestStringMassager("vm://bam1.in");
+    }
+
+    public void testConcreteInheritence() throws Exception
+    {
+        doTestStringMassager("vm://bam2.in");
+    }
+
     public void testComponentWithEntryPointResolver() throws Exception
     {
         doTestMathsService("vm://maths6.in");
@@ -75,14 +84,10 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         doTestMathsService("vm://maths7.in");
     }
 
-    public void testTransformerReferences() throws Exception
+    public void testInheritedExceptionStrategy() throws Exception
     {
-        doTestStringMassager("vm://bam1.in");
-    }
-
-    public void testConcreteInheritence() throws Exception
-    {
-        doTestStringMassager("vm://bam2.in");
+        final String result = muleClient.send("vm://iexst.in", "ignored", null).getPayloadAsString();
+        assertEquals("Ka-boom!", result);
     }
 
     public void testJaxWsService() throws Exception
