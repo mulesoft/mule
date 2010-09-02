@@ -108,3 +108,6 @@ org.mule.test.integration.exceptions.RouteableExceptionStrategyIntegrationTestCa
 org.mule.test.integration.exceptions.SynchronousMessagingExceptionStrategyTestCase
 org.mule.test.integration.exceptions.AsynchronousMessagingExceptionStrategyTestCase
 org.mule.test.integration.exceptions.SystemExceptionStrategyTestCase
+
+# MULE-5044
+org.mule.test.integration.endpoints.DynamicEndpointConfigTestCase
