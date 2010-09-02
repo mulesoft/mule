@@ -50,43 +50,41 @@
     </mxml:xslt-transformer>
 <!--// START SNIPPET: xml-transformers2 -->
 
-    <endpoint name="xml-in" address="vm://xml-in" exchange-pattern="one-way"/>
+    <vm:endpoint name="xml-in" path="xml-in" exchange-pattern="one-way"/>
     <vm:endpoint name="object-in" path="object-in" exchange-pattern="one-way"/>
-    <endpoint name="object-in-2" address="vm://object-in-2" exchange-pattern="one-way"/>
-    <vm:endpoint name="dom-in" address="vm://dom-in" exchange-pattern="one-way">
+    <vm:endpoint name="object-in-2" path="object-in-2" exchange-pattern="one-way"/>
+    <vm:endpoint name="dom-in" path="dom-in" exchange-pattern="one-way">
     	<transformer ref="xmlToDom"/>
     </vm:endpoint>
 
-    <endpoint name="xml-out" address="vm://xml-out" 
+    <vm:endpoint name="xml-out" path="xml-out" 
         exchange-pattern="one-way"/>
     <vm:endpoint name="xml-xslt-out" path="xml-xslt-out"
         exchange-pattern="one-way"/>
     <vm:endpoint name="xml-xslt-out-string" path="xml-xslt-out-string"
         exchange-pattern="one-way"/>
-    <endpoint name="xml-jxpath-out" address="vm://xml-jxpath-out"
+    <vm:endpoint name="xml-jxpath-out" path="xml-jxpath-out"
         exchange-pattern="one-way"/>
-    <endpoint name="xml-dom-out" address="vm://xml-dom-out"
+    <vm:endpoint name="xml-dom-out" path="xml-dom-out"
         exchange-pattern="one-way"/>
-    <vm:endpoint name="xml-object-out" address="vm://xml-object-out"
+    <vm:endpoint name="xml-object-out" path="xml-object-out"
         exchange-pattern="one-way"/>
-    <endpoint name="object-out" address="vm://object-out"
+    <vm:endpoint name="object-out" path="object-out"
         exchange-pattern="one-way"/>
     <vm:endpoint name="object-xml-out" path="object-xml-out"
         exchange-pattern="one-way"/>
-    <endpoint name="dom-xml-out" address="vm://dom-xml-out"
+    <vm:endpoint name="dom-xml-out" path="dom-xml-out"
         exchange-pattern="one-way"/>
 
     <model name="xml transformer tests">
-        <custom-exception-strategy class="org.mule.module.xml.functional.HideExceptions"/>
 
         <service name="xml to ...">
             <inbound>
                 <inbound-endpoint ref="xml-in"/>
-                <forwarding-router/>
             </inbound>
             <outbound>
                 <multicasting-router>
-                    <outbound-endpoint ref="xml-out" address="vm://xml-out"/>
+                    <outbound-endpoint ref="xml-out" />
                     <vm:outbound-endpoint ref="xml-xslt-out">
                     	<transformer ref="xslt"/>
                     </vm:outbound-endpoint>
@@ -99,9 +97,11 @@
                     <outbound-endpoint ref="xml-dom-out">
                     	<transformer ref="xmlToDom "/>
                     </outbound-endpoint>
+                    <!-- MULE-5038
                     <vm:outbound-endpoint ref="xml-object-out">
                     	<transformer ref="xmlToObject"/>
                     </vm:outbound-endpoint>
+                    -->
                     <vm:outbound-endpoint ref="dom-in"/>
                 </multicasting-router>
             </outbound>
@@ -128,7 +128,6 @@
         <service name="dom to xml">
             <inbound>
                 <inbound-endpoint ref="dom-in"/>
-                <forwarding-router/>
             </inbound>
             <outbound>
                 <multicasting-router>

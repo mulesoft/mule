@@ -86,10 +86,11 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
         XMLAssert.assertXMLEqual(SERIALIZED, xml);
     }
 
-    public void testXmlObjectOut() throws MuleException
-    {
-        request(sendObject(), "xml-object-out", Parent.class);
-    }
+    // MULE-5038
+    //public void testXmlObjectOut() throws MuleException
+    //{
+    //    request(sendObject(), "xml-object-out", Parent.class);
+    //}
 
     public void testXmlJxpathOut() throws Exception
     {
