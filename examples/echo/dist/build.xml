@@ -66,29 +66,18 @@
 
         <jar jarfile="${dir.build}/${app.name}.jar" 
              basedir="${dir.classes}"/>
+    	
+    	<zip destfile="${app.name}.zip">
+            <zipfileset file="${dir.build}/${app.name}.jar" fullpath="lib/mule-example-echo.jar"/>
+            <zipfileset file="${dir.conf}/echo-cxf-flow-config.xml" fullpath="mule-config.xml"/>
+    	</zip>
     </target>
 
     <target name="deploy" 
            depends="package, test" 
            description="Deploy the application to the Mule server">
 
-        <antcall target="deploy-instance">
-            <param name="instance.name" value="echo-stdin" />
-            <param name="config.file.name" value="echo" />
-        </antcall>
-
-        <antcall target="deploy-instance">
-            <param name="instance.name" value="echo-cxf" />
-            <param name="config.file.name" value="echo-cxf" />
-        </antcall>
-    </target>
-
-    <target name="deploy-instance" description="deploys an instance of the hello config, currently stdin or http">
-        <mkdir dir="${dir.mule.home}/apps/${instance.name}" />
-        <mkdir dir="${dir.mule.home}/apps/${instance.name}/lib" />
-        <copy file="${dir.build}/${app.name}.jar" todir="${dir.mule.home}/apps/${instance.name}/lib" overwrite="true" verbose="true" />
-        <copy file="${dir.classes}/${config.file.name}-config.xml" tofile="${dir.mule.home}/apps/${instance.name}/mule-config.xml">
-        </copy>
+        <copy todir="${dir.mule.home}/apps" file="${app.name}.zip"/>
     </target>
 
     <target name="setup">
@@ -130,5 +119,4 @@
             </batchtest>
         </junit>
     </target>
-
 </project>

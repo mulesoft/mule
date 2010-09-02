@@ -96,6 +96,7 @@
             <layout>legacy</layout>
         </repository>
     </repositories>
+    
     <pluginRepositories>
         <pluginRepository>
             <id>apache-plugin-snapshots</id>
@@ -128,6 +129,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.1</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
@@ -135,50 +137,26 @@
                 </configuration>
             </plugin>
 
-            <!-- "mvn install" will copy the application to the $MULE_HOME/apps directory,
-                overwriting the previous one. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.4</version>
                 <executions>
                     <execution>
-                        <id>copy-resources</id>
-                        <phase>install</phase>
+                        <id>package-example</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy tofile="${MULE_HOME}/apps/echo-cxf/mule-config.xml" file="${basedir}/target/classes/echo-cxf-config.xml"/>
+                                <zip destfile="${basedir}/mule-example-echo.zip">
+                                    <zipfileset file="${project.build.directory}/mule-example-echo.jar" fullpath="lib/mule-example-echo.jar"/>
+                                    <zipfileset file="${basedir}/conf/echo-cxf-flow-config.xml" fullpath="mule-config.xml"/>
+                                </zip>
                             </tasks>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-artifact2</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/echo-cxf/lib</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${groupId}</groupId>
-                                    <artifactId>${artifactId}</artifactId>
-                                    <version>${version}</version>
-                                    <destFileName>${artifactId}.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>                    
                 </executions>
             </plugin>
         </plugins>

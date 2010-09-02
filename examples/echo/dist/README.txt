@@ -13,8 +13,8 @@ Simply copy the pre-built application archive (mule-example-echo-app.zip) to the
 application folder ($MULE_HOME/apps) and start Mule. To access the web service 
 invoke
 
-	http://localhost:65082/services/EchoUMO/echo/text/hello
-	
+    http://localhost:65082/services/EchoUMO/echo/text/hello
+
 from your browser.
 
 +----------------------+
@@ -26,7 +26,7 @@ Java 1.5 because they use annotations.
 First, make sure you have set the MULE_HOME environment variable as recommended
 in Mule's README.txt
 
-Depending on the build tool you are using (Ant or Maven), you can  build the example
-by simply running "ant" or "mvn".  This will compile the example classes, produce a
-jar file, and copy everything to $MULE_HOME/apps/echo-stdin and $MULE_HOME/apps/echo-cxf, 
-which is where your custom classes and configuration files should go.
+Depending on the build tool you are using (Ant or Maven), you can  build the 
+example by simply running "ant" or "mvn".  This will compile the example classes
+and produce a zip file that can be copied into the application folder 
+($MULE_HOME/apps).
