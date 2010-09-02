@@ -684,25 +684,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         {
             newMessageProcessors = new LinkedList<MessageProcessor>();
         }
-        for (MessageProcessor messageProcessor : newMessageProcessors)
-        {
-            verifyValidMessageProcessor(messageProcessor);
-        }
         this.messageProcessors = newMessageProcessors;
     }
 
-    protected void verifyValidMessageProcessor(MessageProcessor processor)
-    {
-        if (processor instanceof EndpointAware || processor instanceof FlowConstructAware
-            || processor instanceof Initialisable || processor instanceof Startable
-            || processor instanceof Stoppable || processor instanceof Disposable)
-        {
-            logger.warn("MessageProcessor "
-                        + processor
-                        + " is not supported on endpoint builders (global endpoints) as it implements EndpointAware, FlowConstructAware or a Lifecycle interface. EndpointBuilders create multiple instances of endpoints (with the same message processors) that can be used with different services/flows. See MULE-5038");
-        }
-    }
-    
     public List<MessageProcessor> getMessageProcessors()
     {
         return messageProcessors;

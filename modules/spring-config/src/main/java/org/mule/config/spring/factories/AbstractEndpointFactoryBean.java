@@ -54,12 +54,6 @@ public abstract class AbstractEndpointFactoryBean extends EndpointURIEndpointBui
         // subclasses may override this method
     }
     
-    protected void verifyValidMessageProcessor(MessageProcessor processor)
-    {
-        // We are building concrete endpoints so there is no need to validate message processors don't
-        // implement lifecycle etc.
-    }
-
     protected abstract Object doGetObject() throws Exception;
 
 }
