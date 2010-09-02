@@ -173,6 +173,7 @@
                                     <zipfileset file="${project.build.directory}/mule-example-echo.jar" fullpath="lib/mule-example-echo.jar"/>
                                     <zipfileset file="${basedir}/conf/echo-cxf-flow-config.xml" fullpath="mule-config.xml"/>
                                 </zip>
+                                <copy file="${basedir}/mule-example-echo.zip" todir="${env.MULE_HOME}/apps"/>
                             </tasks>
                         </configuration>
                     </execution>
