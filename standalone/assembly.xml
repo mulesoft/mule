@@ -181,6 +181,13 @@
             <include>hello.bat</include>
         </includes>
     </fileSet>
+    <fileSet>
+        <directory>../../examples/hello/target</directory>
+        <outputDirectory>examples/hello</outputDirectory>
+        <includes>
+            <include>mule-example-hello-app.zip</include>
+        </includes>
+    </fileSet>
 
     <!--
     ===============================
