@@ -21,7 +21,6 @@ import org.mule.expression.transformers.ExpressionTransformer;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
-import org.mule.transport.NullPayload;
 import org.mule.util.annotation.AnnotationUtils;
 
 import java.lang.reflect.Method;
@@ -53,6 +52,9 @@ public class AnnotatedTransformerProxy extends AbstractMessageTransformer implem
     {
         this.weighting = weighting;
         this.proxy = proxy;
+
+        //By default we allow a transformer to return null
+        setAllowNullReturn(true);
 
         validateMethod(transformMethod, additionalSourceTypes);
 
@@ -238,17 +240,6 @@ public class AnnotatedTransformerProxy extends AbstractMessageTransformer implem
     public void setPriorityWeighting(int weighting)
     {
         throw new UnsupportedOperationException("setPriorityWeighting");
-    }
-
-    @Override
-    protected Object checkReturnClass(Object object) throws TransformerException
-    {
-        if (object instanceof NullPayload)
-        {
-            return null;
-        }
-
-        return super.checkReturnClass(object);
     }
 
     @Override
