@@ -26,11 +26,10 @@
             <schemadoc:short-name>Abdera</schemadoc:short-name>
             <schemadoc:page-title>Abdera Module</schemadoc:page-title>
 
-            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true" responseEvents="true"
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
                                           requestEvents="true"
                                           transactions="false" streaming="true">
-                <schemadoc:inboundMEPs in-only="true" in-out="true" in-optional-out="true"/>
-                <schemadoc:outboundMEPs out-only="true" out-in="true" out-optional-in="true"/>
+                <schemadoc:MEPs supported="one-way" default="one-way"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>
@@ -55,7 +54,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="feed-splitter-router" type="mule:filteringOutboundRouterType"
+    <xsd:element name="feed-splitter" type="mule:filteringOutboundRouterType"
                  substitutionGroup="mule:abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
@@ -160,7 +159,7 @@
                 <xsd:attribute name="acceptedMimeTypes" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A comma-separated list of mime types that can be procesed by this endpoint. Typicially users
+                            A comma-separated list of mime types that can be processed by this endpoint. Typicially users
                             do not need to set this property
                             unless the feed being consumed does not set the mime type correctly. The default for this
                             value is application/rss+xml,application/rss,text/xml

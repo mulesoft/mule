@@ -26,11 +26,10 @@
             <schemadoc:short-name>RSS</schemadoc:short-name>
             <schemadoc:page-title>RSS Module</schemadoc:page-title>
 
-            <schemadoc:transport-features receiveEvents="true" dispatchEvents="false" responseEvents="false"
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="false"
                                           requestEvents="true"
                                           transactions="false" streaming="true">
-                <schemadoc:inboundMEPs in-only="true" in-out="false" in-optional-out="false"/>
-                <schemadoc:outboundMEPs out-only="false" out-in="false" out-optional-in="false"/>
+                <schemadoc:MEPs supported="one-way" default="one-way"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>
@@ -44,8 +43,7 @@
                         <xsd:documentation>
                             Whether the feed entries should be split before routing the data. If split the service
                             component will be invoked for each entry in the feed. Otherwise the feed itself will be used
-                            as the
-                            data for the message.
+                            as the data for the message.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
