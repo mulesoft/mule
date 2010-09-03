@@ -10,21 +10,23 @@
 
 package org.mule.tck;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
+import org.mule.construct.SimpleFlowConstruct;
 import org.mule.construct.SimpleService;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.IOUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * A base tast case for tests that initialize Mule using a configuration file. The
@@ -89,12 +91,22 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
         {
             return getComponentObject(((SimpleService) flowConstruct).getComponent());
         }
-        else
+        else if (flowConstruct instanceof SimpleFlowConstruct)
         {
+            SimpleFlowConstruct flow = (SimpleFlowConstruct)flowConstruct;
+            //Retrieve the first component
+            for (MessageProcessor processor : flow.getMessageProcessors())
+            {
+                if(processor instanceof Component)
+                {
+                    return getComponentObject(((Component) processor));
+                }
+            }
+
+        }
             throw new RegistrationException(
                 MessageFactory.createStaticMessage("Can't get component from flow construct "
                                                    + flowConstruct.getName()));
-        }
     }
 
     /**
