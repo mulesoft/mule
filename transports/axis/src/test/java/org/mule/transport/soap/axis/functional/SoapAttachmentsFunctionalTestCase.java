@@ -14,15 +14,13 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.message.ds.StringDataSource;
 import org.mule.session.DefaultMuleSession;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.soap.axis.AxisMessageDispatcher;
 
-import java.io.File;
-
 import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
 
 public class SoapAttachmentsFunctionalTestCase extends FunctionalTestCase
 {
@@ -50,9 +48,7 @@ public class SoapAttachmentsFunctionalTestCase extends FunctionalTestCase
         for (int i = 0; i < iterations; i++)
         {
             MuleMessage msg = new DefaultMuleMessage("testPayload", muleContext);
-            File tempFile = File.createTempFile("test", ".att");
-            tempFile.deleteOnExit();
-            msg.addAttachment("testAttachment", new DataHandler(new FileDataSource(tempFile)));
+            msg.addOutboundAttachment("testAttachment", new DataHandler(new StringDataSource("foo")));
             DefaultMuleSession session = new DefaultMuleSession(msg, ((AbstractConnector) ep.getConnector()).getSessionHandler(), muleContext);
             DefaultMuleEvent event = new DefaultMuleEvent(msg, ep, session);
             MuleMessage result = client.process(event).getMessage();

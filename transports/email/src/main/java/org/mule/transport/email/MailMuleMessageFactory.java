@@ -146,7 +146,7 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
                 Part part = entry.getValue();
                 String name = entry.getKey();
 
-                muleMessage.addAttachment(name, part.getDataHandler());
+                muleMessage.addInboundAttachment(name, part.getDataHandler());
                 addAttachmentHeaders(name, part, muleMessage);
             }
         }

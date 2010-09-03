@@ -195,10 +195,10 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
     protected void addAttachments(MuleEvent event, Call call)
     {
         // Add any attachments to the call
-        for (Iterator iterator = event.getMessage().getAttachmentNames().iterator(); iterator.hasNext();)
+        for (Iterator iterator = event.getMessage().getOutboundAttachmentNames().iterator(); iterator.hasNext();)
         {
             String name = (String)iterator.next();
-            DataHandler dh = event.getMessage().getAttachment(name);
+            DataHandler dh = event.getMessage().getOutboundAttachment(name);
             AttachmentPart part = new AttachmentPart(dh);
             call.addAttachmentPart(part);
         }
@@ -412,17 +412,17 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         {
             args = new Object[]{payload};
         }
-        if (event.getMessage().getAttachmentNames() != null
-            && event.getMessage().getAttachmentNames().size() > 0)
+        if (event.getMessage().getOutboundAttachmentNames() != null
+            && event.getMessage().getOutboundAttachmentNames().size() > 0)
         {
             ArrayList attachments = new ArrayList();
-            Iterator i = event.getMessage().getAttachmentNames().iterator();
+            Iterator i = event.getMessage().getOutboundAttachmentNames().iterator();
             while (i.hasNext())
             {
-                attachments.add(event.getMessage().getAttachment((String)i.next()));
+                attachments.add(event.getMessage().getOutboundAttachment((String)i.next()));
             }
             ArrayList temp = new ArrayList(Arrays.asList(args));
-            temp.add(attachments.toArray(new DataHandler[0]));
+            temp.add(attachments.toArray(new DataHandler[attachments.size()]));
             args = temp.toArray();
         }
         return args;
@@ -457,7 +457,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         int x = 0;
         for (Iterator iterator = ctx.getMessage().getAttachments(); iterator.hasNext(); x++)
         {
-            message.addAttachment(String.valueOf(x),
+            message.addOutboundAttachment(String.valueOf(x),
                 ((AttachmentPart)iterator.next()).getActivationDataHandler());
         }
     }
@@ -529,8 +529,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
             }
         }
 
-        SoapMethod soapMethod = (SoapMethod)event.getMessage()
-            .removeProperty(MuleProperties.MULE_SOAP_METHOD);
+        SoapMethod soapMethod = (SoapMethod)event.getMessage().removeProperty(MuleProperties.MULE_SOAP_METHOD);
         if (soapMethod == null)
         {
             soapMethod = (SoapMethod)callParameters.get(method.getLocalPart());

@@ -352,7 +352,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             throw new TransformerException(CoreMessages.transformOnObjectNotOfSpecifiedType(resultType, result));
         }
 
-        // If the payload is a stream and we've consumed it, then we should set the payload on the 
+        // If the payload is a stream and we've consumed it, then we should set the payload on the
         // message. This is the only time this method will alter the payload on the message
         if (isPayloadConsumed(source.getType()))
         {
@@ -949,8 +949,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Deprecated
     public DataHandler getAttachment(String name)
     {
-        logger.warn("MuleMessage.getAttachment() method is deprecated, use MuleMessage.getOutboundAttachment() instead.  This method will be removed in the next point release");
-        return getOutboundAttachment(name);
+        logger.warn("MuleMessage.getAttachment() method is deprecated, use MuleMessage.getInboundAttachment() instead.  This method will be removed in the next point release");
+        return getInboundAttachment(name);
     }
 
     /**
@@ -959,8 +959,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Deprecated
     public Set<String> getAttachmentNames()
     {
-        logger.warn("MuleMessage.getAttachmentNames() method is deprecated, use MuleMessage.getOutboundAttachmentNames() instead.  This method will be removed in the next point release");
-        return getOutboundAttachmentNames();
+        logger.warn("MuleMessage.getAttachmentNames() method is deprecated, use MuleMessage.getInboundAttachmentNames() instead.  This method will be removed in the next point release");
+        return getInboundAttachmentNames();
     }
 
     public void addOutboundAttachment(String name, DataHandler dataHandler) throws Exception
