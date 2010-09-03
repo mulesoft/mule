@@ -10,13 +10,13 @@
 
 package org.mule.module.management.mbean;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.module.management.i18n.ManagementMessages;
 
 import com.yourkit.api.Controller;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class YourKitProfilerService implements YourKitProfilerServiceMBean
 {
@@ -26,7 +26,7 @@ public class YourKitProfilerService implements YourKitProfilerServiceMBean
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private final Controller controller;
-    private AtomicBoolean capturing = new AtomicBoolean(false);
+    private final AtomicBoolean capturing = new AtomicBoolean(false);
 
     public YourKitProfilerService() throws Exception
     {
@@ -128,7 +128,7 @@ public class YourKitProfilerService implements YourKitProfilerServiceMBean
     /**
      * {@inheritDoc}
      */
-    public void advanceGeneration(String description)
+    public void advanceGeneration(String description) throws Exception
     {
         controller.advanceGeneration(description);
     }
@@ -138,7 +138,7 @@ public class YourKitProfilerService implements YourKitProfilerServiceMBean
      */
     public String forceGC() throws Exception
     {
-        long[] heapSizes = controller.forceGC();
+        final long[] heapSizes = controller.forceGC();
         return ManagementMessages.forceGC(heapSizes).getMessage();
     }
 
@@ -152,27 +152,24 @@ public class YourKitProfilerService implements YourKitProfilerServiceMBean
             return;
         }
 
-
-        final Thread thread = new Thread(
-                new Runnable()
+        final Thread thread = new Thread(new Runnable()
+        {
+            public void run()
+            {
+                try
                 {
-                    public void run()
+                    while (capturing.get())
                     {
-                        try
-                        {
-                            while (capturing.get())
-                            {
-                                controller.captureMemorySnapshot();
-                                Thread.sleep(seconds * 1000 /* millis in second */);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            logger.error("Failed to capture memory snapshot", e);
-                        }
+                        controller.captureMemorySnapshot();
+                        Thread.sleep(seconds * 1000 /* millis in second */);
                     }
                 }
-        );
+                catch (final Exception e)
+                {
+                    logger.error("Failed to capture memory snapshot", e);
+                }
+            }
+        });
         thread.setDaemon(true); // let the application normally terminate
         thread.start();
     }
@@ -185,13 +182,14 @@ public class YourKitProfilerService implements YourKitProfilerServiceMBean
         this.capturing.set(false);
     }
 
-
     /**
      * {@inheritDoc}
      */
     public long getStatus() throws java.lang.Exception
     {
-        return (this.capturing.get()) ? (controller.getStatus() | SNAPSHOT_CAPTURING) : controller.getStatus();
+        return (this.capturing.get())
+                                     ? (controller.getStatus() | SNAPSHOT_CAPTURING)
+                                     : controller.getStatus();
     }
 
 }
