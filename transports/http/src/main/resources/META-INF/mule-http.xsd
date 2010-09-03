@@ -215,7 +215,7 @@
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                This transformer will creat a valid HTTP request using the current message and any HTTP headers set on the current message.
+                This transformer will create a valid HTTP request using the current message and any HTTP headers set on the current message.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -223,7 +223,15 @@
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                This transformer will creat a valid HTTP response using the current message and any HTTP headers set on the current message.
+                This transformer will create a valid HTTP response using the current message and any HTTP headers set on the current message.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="body-to-parameter-map-transformer" type="mule:abstractTransformerType"
+                 substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                This transformer parses the body of a HTTP request into a Map.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
