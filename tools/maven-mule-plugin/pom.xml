@@ -6,7 +6,7 @@
     <groupId>org.mule.tools</groupId>
     <artifactId>maven-mule-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>1.0</version>
+    <version>1.1</version>
     <name>Maven Mule plugin</name>
     <description>Provides a packaging target for building a Mule application from a maven project</description>
 
