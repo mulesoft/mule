@@ -1,6 +1,3 @@
-#Broken by BL-165
-org.mule.module.ibeans.annotations.ExceptionListenerTestCase
-
 # Removed just because it relies on an external service, the MockIBeanTestCase does the same thing but mocked out
 org.mule.module.ibeans.IntegrationBeanAnnotationTestCase
 

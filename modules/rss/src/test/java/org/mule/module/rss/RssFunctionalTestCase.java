@@ -22,6 +22,11 @@ public class RssFunctionalTestCase extends FunctionalTestCase
 
     public void testRSS() throws Exception
     {
+        if (isOffline(getClass().getName() + ".testRSS"))
+        {
+            return;
+        }
+
         //lets wait to read the feed
         Thread.sleep(10000);
         RssEntryCounterComponent component = (RssEntryCounterComponent) this.getComponent("rssTester");

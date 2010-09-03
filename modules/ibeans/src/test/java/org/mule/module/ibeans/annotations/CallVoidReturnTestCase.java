@@ -21,6 +21,11 @@ public class CallVoidReturnTestCase extends AbstractIBeansTestCase
     @Test
     public void testReturnVoid() throws Exception
     {
+        if (isOffline(getClass().getName() + ".testReturnVoid"))
+        {
+            return;
+        }
+
         //we just need to test that the call doesn't fail
         search.searchAskAndReturnVoid("foo");
     }

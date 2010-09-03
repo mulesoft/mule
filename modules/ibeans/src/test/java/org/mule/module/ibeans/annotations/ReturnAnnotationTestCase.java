@@ -26,6 +26,11 @@ public class ReturnAnnotationTestCase extends AbstractIBeansTestCase
     @Test
     public void testReturnCallURL() throws Exception
     {
+        if (isOffline(getClass().getName() + ".testReturnCallURL"))
+        {
+            return;
+        }
+
         String result = search.searchAskAndReturnURLString("foo");
         assertNotNull(result);
         assertEquals("http://www.ask.com/web?q=foo&search=search", result);
