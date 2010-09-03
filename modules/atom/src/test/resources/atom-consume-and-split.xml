@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:s="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:atom="http://www.mulesoft.org/schema/mule/atom"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+
+      xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+               http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.0/mule-quartz.xsd
+               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+               http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/3.0/mule-atom.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
+
+    <!--<quartz:connector name="quartzConnectorDefaults"/>-->
+
+    <!--<http:connector name="HttpConnector"/>-->
+
+    <!--<http:polling-connector name="PollingHttpConnector" pollingFrequency="1000" discardEmptyContent="false"/>-->
+
+    <!--<quartz:endpoint name="quartz.in" jobName="eventTimer" repeatInterval="1000" repeatCount="0" startDelay="0">-->
+        <!--<quartz:event-generator-job/>-->
+    <!--</quartz:endpoint>-->
+
+    <flow name="feedConsumer">
+        <atom:inbound-endpoint address="http://rossmason.blogspot.com/feeds/posts/default"/>
+        <test:component/>
+    </flow>
+</mule>

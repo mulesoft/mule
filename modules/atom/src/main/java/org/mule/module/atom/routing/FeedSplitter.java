@@ -9,7 +9,6 @@
  */
 package org.mule.module.atom.routing;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -17,8 +16,9 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.TransformerException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.module.atom.transformers.ObjectToFeed;
-import org.mule.processor.AbstractFilteringMessageProcessor;
+import org.mule.routing.AbstractSplitter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
  * certain entries, the most common use of this would be to filter out entries that have already been read
  * by using the {@link org.mule.module.atom.routing.EntryLastUpdatedFilter} filter.
  */
-public class FeedSplitter extends AbstractFilteringMessageProcessor
+public class FeedSplitter extends AbstractSplitter
 {
     /**
      * logger used by this class
@@ -52,14 +52,21 @@ public class FeedSplitter extends AbstractFilteringMessageProcessor
     {
         acceptedContentTypes = new ArrayList<String>();
         acceptedContentTypes.add("application/atom+xml");
+        //By default set the filter so that entries are only read once
+        entryFilter = new EntryLastUpdatedFilter(null);
     }
 
     @Override
-    public MuleEvent process(MuleEvent muleEvent) throws MuleException
+    protected List<MuleMessage> splitMessage(MuleEvent event) throws MuleException
     {
+        if(!accept(event))
+        {
+            throw new MessagingException(CoreMessages.unexpectedMIMEType(event.getMessage().getInboundProperty("Content-Type", ""),
+                    acceptedContentTypes.toString()), event);
+        }
         try
         {
-            Object payload = muleEvent.getMessage().getPayload();
+            Object payload = event.getMessage().getPayload();
             
             Feed feed;
             if (payload instanceof Feed)
@@ -68,37 +75,31 @@ public class FeedSplitter extends AbstractFilteringMessageProcessor
             }
             else
             {
-                feed = (Feed) objectToFeed.transform(muleEvent.getMessage().getPayload());
+                feed = (Feed) objectToFeed.transform(event.getMessage().getPayload());
             }
 
-            List<MuleEvent> events = new ArrayList<MuleEvent>();
+            List<MuleMessage> messages = new ArrayList<MuleMessage>();
             Set<Entry> entries = new TreeSet<Entry>(new EntryComparator());
             entries.addAll(feed.getEntries());
             for (Entry entry : entries)
             {
-                MuleMessage m = new DefaultMuleMessage(entry, muleEvent.getMuleContext());
+                MuleMessage m = new DefaultMuleMessage(entry, event.getMuleContext());
                 if (entryFilter != null && !entryFilter.accept(m))
                 {
                     continue;
                 }
                 m.setInvocationProperty(FEED_PROPERTY, feed);
-                MuleEvent e = new DefaultMuleEvent(m, muleEvent.getEndpoint(), muleEvent.getFlowConstruct(), muleEvent);
-                events.add(e);
+                messages.add(m);
             }
-            for (MuleEvent event : events)
-            {
-                processNext(event);
-            }
+            return messages;
         }
         catch (TransformerException e)
         {
-            throw new MessagingException(e.getI18nMessage(), muleEvent, e);
+            throw new MessagingException(e.getI18nMessage(), event, e);
         }
-        return null;
     }
 
-    @Override
-    public boolean accept(MuleEvent muleEvent)
+    protected boolean accept(MuleEvent muleEvent)
     {
         String contentType = muleEvent.getMessage().getInboundProperty("Content-Type");
         if (contentType != null)

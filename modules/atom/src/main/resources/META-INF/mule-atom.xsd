@@ -54,8 +54,8 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="feed-splitter" type="mule:filteringOutboundRouterType"
-                 substitutionGroup="mule:abstract-outbound-router">
+    <xsd:element name="feed-splitter" type="mule:baseSplitterType"
+                 substitutionGroup="mule:abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Will split the entries of a feed into single entry objects.
