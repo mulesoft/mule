@@ -78,7 +78,7 @@
            depends="package, test" 
            description="Deploy the application to the Mule server">
 
-        <copy todir="${dir.mule.home}/apps" file="${app.name}.zip"/>
+        <copy todir="${dir.mule.home}/apps" file="${app.name}.zip" overwrite="true"/>
     </target>
 
     <target name="setup">

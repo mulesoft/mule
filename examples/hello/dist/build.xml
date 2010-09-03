@@ -68,13 +68,14 @@
 
         <jar jarfile="${dir.build}/${app.name}.jar"
              basedir="${dir.classes}"/>
-    </target>
 
-    <target name="deploy" depends="package,test" description="Deploy the applications to the Mule server">
         <zip destfile="mule-example-hello.zip">
             <zipfileset file="${dir.build}/${app.name}.jar" fullpath="lib/mule-example-hello.jar"/>
             <zipfileset file="src/main/app/mule-config.xml" fullpath="mule-config.xml"/>
         </zip>
+    </target>
+
+    <target name="deploy" depends="package,test" description="Deploy the applications to the Mule server">
         <copy file="mule-example-hello.zip" todir="${dir.mule.home}/apps" overwrite="true"/>
     </target>
 
