@@ -20,6 +20,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractExceptionStrategyTestCase extends FunctionalTestCase
 {
+    public static final int LATCH_AWAIT_TIMEOUT = 3000;
+    
     protected final AtomicInteger systemExceptionCounter = new AtomicInteger();
     protected final AtomicInteger serviceExceptionCounter = new AtomicInteger();
     protected Latch latch;
@@ -29,10 +31,13 @@ public abstract class AbstractExceptionStrategyTestCase extends FunctionalTestCa
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        client = muleContext.getClient();
+        if (client == null)
+        {
+            client = muleContext.getClient();
+        }
+        latch = new Latch();
         systemExceptionCounter.set(0);
         serviceExceptionCounter.set(0);
-        latch = new Latch();
 
         TestExceptionStrategy systemExceptionListener = new TestExceptionStrategy();
         systemExceptionListener.setExceptionCallback(new ExceptionCallback()
@@ -56,6 +61,13 @@ public abstract class AbstractExceptionStrategyTestCase extends FunctionalTestCa
             }
         });
 
+    }
+
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        super.doTearDown();
+        latch = null;
     }
 }
 

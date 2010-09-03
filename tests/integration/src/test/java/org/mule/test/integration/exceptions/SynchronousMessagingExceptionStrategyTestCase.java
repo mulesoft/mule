@@ -25,7 +25,7 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
     public void testInboundTransformer() throws Exception
     {
         client.send("vm://in1", TEST_MESSAGE, null);
-        latch.await(1000, TimeUnit.MILLISECONDS); 
+        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS); 
         assertEquals(1, serviceExceptionCounter.get());
         assertEquals(0, systemExceptionCounter.get());
     }
@@ -33,7 +33,7 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
     public void testInboundResponseTransformer() throws Exception
     {
         client.send("vm://in2", TEST_MESSAGE, null);
-        latch.await(1000, TimeUnit.MILLISECONDS); 
+        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS); 
         assertEquals(1, serviceExceptionCounter.get());
         assertEquals(0, systemExceptionCounter.get());
     }
@@ -41,7 +41,7 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
     public void testOutboundTransformer() throws Exception
     {
         client.send("vm://in3", TEST_MESSAGE, null);
-        latch.await(1000, TimeUnit.MILLISECONDS); 
+        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS); 
         assertEquals(1, serviceExceptionCounter.get());
         assertEquals(0, systemExceptionCounter.get());
         MuleMessage response = client.request("vm://out3", 500);
@@ -51,7 +51,7 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
     public void testOutboundResponseTransformer() throws Exception
     {
         client.send("vm://in4", TEST_MESSAGE, null);
-        latch.await(1000, TimeUnit.MILLISECONDS); 
+        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS); 
         assertEquals(1, serviceExceptionCounter.get());
         assertEquals(0, systemExceptionCounter.get());
         MuleMessage response = client.request("vm://out4", 500);
@@ -61,7 +61,7 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
     public void testComponent() throws Exception
     {
         client.send("vm://in5", TEST_MESSAGE, null);
-        latch.await(1000, TimeUnit.MILLISECONDS); 
+        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS); 
         assertEquals(1, serviceExceptionCounter.get());
         assertEquals(0, systemExceptionCounter.get());
     }
@@ -69,7 +69,7 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
     public void testInboundRouter() throws Exception
     {
         client.send("vm://in6", TEST_MESSAGE, null);
-        latch.await(1000, TimeUnit.MILLISECONDS); 
+        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS); 
         assertEquals(1, serviceExceptionCounter.get());
         assertEquals(0, systemExceptionCounter.get());
     }
@@ -77,7 +77,7 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
     public void testOutboundRouter() throws Exception
     {
         client.send("vm://in7", TEST_MESSAGE, null);
-        latch.await(1000, TimeUnit.MILLISECONDS); 
+        latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS); 
         assertEquals(1, serviceExceptionCounter.get());
         assertEquals(0, systemExceptionCounter.get());
         MuleMessage response = client.request("vm://out7", 500);

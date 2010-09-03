@@ -92,18 +92,21 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
             assertTrue(e instanceof DispatchException);
 
             Message message = RmiMessages.messageParamServiceMethodNotSet();
-            assertTrue("Expected to start with: " + message.toString() + "\n but was: " + e.getMessage(), e.getMessage().startsWith(message.toString()));
+            assertTrue("Expected to start with: " + message.toString() + "\n but was: " + e.getCause().getMessage(), e.getCause().getMessage().startsWith(message.toString()));
         }
     }
 
     public void testBadMethodName() throws Exception
     {
-        MuleMessage result = send("://localhost/TestService?method=foo", "hello");
-        assertNotNull(result);
-        assertNotNull("exception expected", result.getExceptionPayload());
-        Throwable t = result.getExceptionPayload().getException();
-        assertTrue(t instanceof DispatchException);
-        assertTrue(t.getCause() instanceof NoSuchMethodException);
+        try
+        {
+            send("://localhost/TestService?method=foo", "hello");
+            fail("exception expected");
+        }
+        catch (DispatchException e)
+        {
+            assertTrue(e.getCause() instanceof NoSuchMethodException);
+        }
     }
 
     protected String getConfigResources()
@@ -113,12 +116,15 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
 
     public void testBadMethodType() throws Exception
     {
-        MuleMessage result = new MuleClient(muleContext).send("BadType", "hello", null);
-        assertNotNull(result);
-        assertNotNull("exception expected", result.getExceptionPayload());
-        Throwable t = result.getExceptionPayload().getException();
-        assertTrue(t instanceof DispatchException);
-        assertTrue(t.getCause() instanceof NoSuchMethodException);
+        try
+        {
+            new MuleClient(muleContext).send("BadType", "hello", null);
+            fail("exception expected");
+        }
+        catch (DispatchException e)
+        {
+            assertTrue(e.getCause() instanceof NoSuchMethodException);
+        }
     }
 
     public void testCorrectMethodType() throws Exception

@@ -60,6 +60,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     {
         return Arrays.asList(new MessageProcessor[] 
         { 
+            new ExceptionHandlingMessageProcessor(),
             new InboundExceptionDetailsMessageProcessor(endpoint.getConnector()),
         });
     }
@@ -74,8 +75,6 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
 
         List<MessageProcessor> list = new ArrayList<MessageProcessor>();
 
-        list.add(new ExceptionHandlingMessageProcessor());
-        
         // Log but don't proceed if connector is not started
         list.add(new OutboundLoggingMessageProcessor());
         list.add(new ProcessIfStartedMessageProcessor(connector, connector.getLifecycleState()));

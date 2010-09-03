@@ -105,8 +105,6 @@ org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCas
 org.mule.test.integration.exceptions.RouteableExceptionStrategyIntegrationTestCase
 
 # BL-186 
-org.mule.test.integration.exceptions.SynchronousMessagingExceptionStrategyTestCase
-org.mule.test.integration.exceptions.AsynchronousMessagingExceptionStrategyTestCase
 org.mule.test.integration.exceptions.SystemExceptionStrategyTestCase
 
 # MULE-5044

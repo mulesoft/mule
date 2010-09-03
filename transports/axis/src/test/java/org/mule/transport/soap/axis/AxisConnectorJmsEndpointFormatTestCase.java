@@ -15,7 +15,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.NullPayload;
 
 import org.apache.axis.AxisFault;
 
@@ -40,25 +39,29 @@ public class AxisConnectorJmsEndpointFormatTestCase extends FunctionalTestCase
     
     public void testAxisOverJmsWithoutSettingMethodOnEndpoint() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-
-        MuleMessage result = client.send("noMethodDefined", new DefaultMuleMessage("test3", muleContext));
-        assertNotNull(result);
-        assertNotNull("Exception expected", result.getExceptionPayload());
-        assertTrue(result.getExceptionPayload().getException() instanceof DispatchException);
-        assertTrue(result.getExceptionPayload().getException().getMessage().startsWith("Cannot invoke WS call without an Operation."));
+        try
+        {
+            new MuleClient(muleContext).send("noMethodDefined", new DefaultMuleMessage("test3", muleContext));
+            fail("Exception expected");
+        }
+        catch (DispatchException e)
+        {
+            assertTrue(e.getMessage().startsWith("Cannot invoke WS call without an Operation."));
+        }
     }
     
     public void testAxisOverJmsWithoutSettingSoapAction() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-
-        MuleMessage result = client.send("noSoapActionDefined", new DefaultMuleMessage("test4", muleContext));
-        assertNotNull(result);
-        assertNotNull("Exception expected", result.getExceptionPayload());
-        assertTrue(result.getExceptionPayload().getException() instanceof DispatchException);
-        assertTrue(result.getExceptionPayload().getRootException() instanceof AxisFault);
-        assertTrue(result.getExceptionPayload().getRootException().getMessage().startsWith("The AXIS engine could not find a target service to invoke!"));
+        try
+        {
+            new MuleClient(muleContext).send("noSoapActionDefined", new DefaultMuleMessage("test4", muleContext));
+            fail("Exception expected");
+        }
+        catch (DispatchException e)
+        {
+            assertTrue(e.getCause() instanceof AxisFault);
+            assertTrue(e.getCause().getMessage().startsWith("The AXIS engine could not find a target service to invoke!"));
+        }
     }
     
     protected String getConfigResources()

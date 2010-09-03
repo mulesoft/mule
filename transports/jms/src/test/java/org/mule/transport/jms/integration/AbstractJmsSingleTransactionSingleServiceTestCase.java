@@ -142,7 +142,7 @@ public abstract class AbstractJmsSingleTransactionSingleServiceTestCase extends 
         {
             public void onException(Throwable t)
             {
-                assertTrue(t.getCause() instanceof org.mule.transaction.IllegalTransactionStateException);
+                assertTrue(t.getCause().getCause() instanceof org.mule.transaction.IllegalTransactionStateException);
                 assertEquals(1, exceptionLatch.getCount()); // make sure this
                                                             // exception doesn't
                                                             // happen more than once

@@ -59,7 +59,6 @@ import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
-import org.mule.processor.ExceptionHandlingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.routing.filters.WildcardFilter;
@@ -98,6 +97,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -2491,7 +2491,6 @@ public abstract class AbstractConnector implements Connector, WorkListener
     public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
     {
         InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
-        builder.chain(new ExceptionHandlingMessageProcessor());
         builder.chain(new AsyncInterceptingMessageProcessor(new WorkManagerSource()
         {
             public WorkManager getWorkManager() throws MuleException

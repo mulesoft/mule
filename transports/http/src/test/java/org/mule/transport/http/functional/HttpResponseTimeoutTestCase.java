@@ -11,6 +11,7 @@
 package org.mule.transport.http.functional;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
@@ -86,10 +87,15 @@ public class HttpResponseTimeoutTestCase extends FunctionalTestCase
         MuleMessage message;
         Date afterCall;
 
-        MuleMessage result = muleClient.send("http://localhost:60216/DelayService", getPayload(), null, 1000);
-        assertNotNull(result);
-        assertNotNull("SocketTimeoutException expected", result.getExceptionPayload());
-        assertTrue(result.getExceptionPayload().getException().getCause() instanceof SocketTimeoutException);
+        try
+        {
+            muleClient.send("http://localhost:60216/DelayService", getPayload(), null, 1000);
+            fail("SocketTimeoutException expected");
+        }
+        catch (DispatchException e)
+        {
+            assertTrue(e.getCause() instanceof SocketTimeoutException);
+        }
         // Exception should have been thrown after timeout specified which is
         // less than default.
         afterCall = new Date();

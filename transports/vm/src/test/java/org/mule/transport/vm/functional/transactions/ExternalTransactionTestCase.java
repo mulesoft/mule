@@ -310,9 +310,14 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
         assertNull("Response is not null", response);
 
         // This will fail, since there will be no transaction to join
-        response = client.send("vm://entry?connector=vm-normal", "OK", null);
-        assertNotNull(response);
-        assertNotNull("Exception expected", response.getExceptionPayload());
-        assertTrue(response.getExceptionPayload().getException() instanceof MessagingException);
+        try
+        {
+            client.send("vm://entry?connector=vm-normal", "OK", null);
+            fail("Exception expected");
+        }
+        catch (MessagingException e)
+        {
+            // expected
+        }
     }
 }

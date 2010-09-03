@@ -137,11 +137,15 @@ public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient(muleContext);
         
-        MuleMessage result = client.send(getTestExceptionEndpoint(), new Person("Ross", "Mason"), null);
-        assertNotNull(result);
-        assertNotNull("A nested Fault should have been raised", result.getExceptionPayload());
-        assertTrue(result.getExceptionPayload().getException() instanceof DispatchException);
-        assertTrue(result.getExceptionPayload().getRootException() instanceof Exception);
+        try
+        {
+            client.send(getTestExceptionEndpoint(), new Person("Ross", "Mason"), null);
+            fail("A nested Fault should have been raised");
+        }
+        catch (DispatchException e)
+        {
+            assertTrue(e.getCause() instanceof Exception);
+        }
     }
 
     public void testLocationUrlInWSDL() throws Exception

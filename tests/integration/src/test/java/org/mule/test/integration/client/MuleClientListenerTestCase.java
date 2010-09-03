@@ -30,14 +30,17 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient(muleContext);
 
-        if (!canSendWithoutReceiver)
+        try
         {
-            MuleMessage result = client.send(endpoint, "Test Client Send message", null);
-            assertNotNull(result);
-            assertNotNull("There is no receiver for this endpointUri", result.getExceptionPayload());
-            Throwable e = result.getExceptionPayload().getException();
-            assertTrue(e instanceof DispatchException);
-            assertTrue(e.getCause() instanceof NoReceiverForEndpointException);
+            client.send(endpoint, "Test Client Send message", null);
+        }
+        catch (DispatchException e)
+        {
+            if (!canSendWithoutReceiver)
+            {
+                assertTrue(e instanceof DispatchException);
+                assertTrue(e.getCause() instanceof NoReceiverForEndpointException);
+            }
         }
         
         Service c = muleContext.getRegistry().lookupService(component);
@@ -51,14 +54,17 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
         //muleContext.getRegistry().unregisterComponent("vmComponent");
         c.stop();
 
-        if (!canSendWithoutReceiver)
+        try
         {
-            MuleMessage result = client.send(endpoint, "Test Client Send message", null);
-            assertNotNull(result);
-            assertNotNull("There is no receiver for this endpointUri", result.getExceptionPayload());
-            Throwable e = result.getExceptionPayload().getException();
-            assertTrue(e instanceof DispatchException);
-            assertTrue(e.getCause() instanceof NoReceiverForEndpointException);
+            client.send(endpoint, "Test Client Send message", null);
+        }
+        catch (DispatchException e)
+        {
+            if (!canSendWithoutReceiver)
+            {
+                assertTrue(e instanceof DispatchException);
+                assertTrue(e.getCause() instanceof NoReceiverForEndpointException);
+            }
         }
     }
 

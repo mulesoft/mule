@@ -221,10 +221,15 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         endpoint.process(testOutboundEvent);
         endpoint.getConnector().stop();
 
-        MuleEvent resultEvent = endpoint.process(testOutboundEvent);
-        assertNotNull(resultEvent);
-        assertNotNull("exception expected", resultEvent.getMessage().getExceptionPayload());
-        assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof LifecycleException);
+        try
+        {
+            endpoint.process(testOutboundEvent);
+            fail("exception expected");
+        }
+        catch (LifecycleException e)
+        {
+            // expected
+        }
     }
 
     public void testTimeoutSetOnEvent() throws Exception

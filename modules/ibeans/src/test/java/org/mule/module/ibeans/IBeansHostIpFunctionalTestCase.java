@@ -33,6 +33,11 @@ public class IBeansHostIpFunctionalTestCase extends FunctionalTestCase
 
     public void testHostIp() throws Exception
     {
+        if (isOffline(getClass().getName() + ".testHostIp"))
+        {
+            return;
+        }
+
         String ip = "192.215.42.198";
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", ip, null);
@@ -44,6 +49,11 @@ public class IBeansHostIpFunctionalTestCase extends FunctionalTestCase
 
     public void testHostIpFromClient() throws Exception
     {
+        if (isOffline(getClass().getName() + ".testHostIpFromClient"))
+        {
+            return;
+        }
+
         String ip = "192.215.42.198";
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("ibean://hostip.getHostInfo", ip, null);
@@ -75,25 +85,28 @@ public class IBeansHostIpFunctionalTestCase extends FunctionalTestCase
     public void testHostIpWrongNumberOfArgumentsDirectClient() throws Exception
     {
         Object[] params = new Object[]{"192.215.42.198", new Integer(12)};
-        MuleClient client = muleContext.getClient();
 
-        MuleMessage result = client.send("ibean://hostip.getHostInfo", params, null);
-        assertNotNull(result);
-        assertNotNull("Local call should throw exception since there will be no matching method called getHostInfo(String, Integer)", 
-                      result.getExceptionPayload());
-        assertTrue(result.getExceptionPayload().getException() instanceof DispatchException);
-        assertTrue(result.getExceptionPayload().getRootException() instanceof NoSuchMethodException);
+        try
+        {
+            muleContext.getClient().send("ibean://hostip.getHostInfo", params, null);
+            fail("Local call should throw exception since there will be no matching method called getHostInfo(String, Integer)");
+        }
+        catch (DispatchException e)
+        {
+            assertTrue(e.getCause() instanceof NoSuchMethodException);
+        }
     }
 
     public void testHostIpBadArgumentTypeDirectClient() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-
-        MuleMessage result = client.send("ibean://hostip.getHostInfo", new StringBuffer(), null);
-        assertNotNull(result);
-        assertNotNull("Local call should throw exception since there will be no matching method called getHostInfo(StringBuffer)", 
-                      result.getExceptionPayload());
-        assertTrue(result.getExceptionPayload().getException() instanceof DispatchException);
-        assertTrue(result.getExceptionPayload().getRootException() instanceof NoSuchMethodException);
+        try
+        {
+            muleContext.getClient().send("ibean://hostip.getHostInfo", new StringBuffer(), null);
+            fail("Local call should throw exception since there will be no matching method called getHostInfo(StringBuffer)");
+        }
+        catch (DispatchException e)
+        {
+            assertTrue(e.getCause() instanceof NoSuchMethodException);
+        }
     }
 }
