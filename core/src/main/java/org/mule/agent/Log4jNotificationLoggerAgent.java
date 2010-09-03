@@ -10,11 +10,6 @@
 
 package org.mule.agent;
 
-import org.mule.api.context.notification.ServerNotification;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.util.MapUtils;
-import org.mule.util.StringUtils;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,11 +17,14 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.xml.DOMConfigurator;
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.util.MapUtils;
+import org.mule.util.StringUtils;
 
 /**
  * <code>AbstractNotificationLoggerAgent</code> Receives Mule server notifications
  * and logs them and can optionally route them to an endpoint
- *
  */
 public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgent
 {
@@ -39,8 +37,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
     private String logConfigFile = null;
     private String chainsawHost = "localhost";
     private int chainsawPort = -1;
-    private Map<?, ?> levelMappings = new HashMap<Object, Object>();
-
+    private final Map<?, ?> levelMappings = new HashMap<Object, Object>();
 
     public Log4jNotificationLoggerAgent()
     {
@@ -49,25 +46,34 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
 
     /**
      * Should be a 1 line description of the agent
-     *
+     * 
      * @return the description of this Agent
      */
     @Override
     public String getDescription()
     {
         StringBuffer buf = new StringBuffer(DEFAULT_DESCRIPTION_BUFFER_SIZE);
+
+        if (StringUtils.isBlank(logName))
+        {
+            buf.append("Logging notifications to logger: ").append(logName);
+        }
+
         if (StringUtils.isNotBlank(logFile))
         {
             buf.append("Logging notifications to: ").append(logFile);
         }
+
         if (chainsawPort > -1)
         {
             buf.append(" Chainsaw: ").append(chainsawHost).append(":").append(chainsawPort);
         }
+
         if (buf.length() == 0)
         {
             buf.append("No logging or event forwarding is configured");
         }
+
         return getName() + ": " + buf.toString();
     }
 
@@ -95,36 +101,41 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
                 PropertyConfigurator.configure(logConfigFile);
             }
         }
-        /* TODO PAX Logging's Log4J version does not have the method Logger.addAppender()
-            and does not export the package org.apache.log4j.net 
         else
         {
-            try
-            {
-                eventLogger = Logger.getLogger(logName);
-                if (logFile != null)
-                {
-                    File f = FileUtils.newFile(logFile);
-                    if (!f.exists())
-                    {
-                        FileUtils.createFile(logFile);
-                    }
-                    Appender file = new RollingFileAppender(new PatternLayout("%5p %m%n"), logFile, true);
-                    eventLogger.addAppender(file);
-                }
-                if (chainsawPort > -1)
-                {
-                    Appender chainsaw = new SocketAppender(chainsawHost, chainsawPort);
-                    eventLogger.addAppender(chainsaw);
-                } 
-            }
-            catch (IOException e)
-            {
-                throw new InitialisationException(
-                    CoreMessages.failedToLoad("Log4j configuration"), e, this);
-            }
+            eventLogger = Logger.getLogger(logName);
+
+            /*
+             * TODO PAX Logging's Log4J version does not have the method
+             * Logger.addAppender() and does not export the package
+             * org.apache.log4j.net
+             */
+            // try
+            // {
+            // if (logFile != null)
+            // {
+            // File f = FileUtils.newFile(logFile);
+            // if (!f.exists())
+            // {
+            // FileUtils.createFile(logFile);
+            // }
+            // Appender file = new RollingFileAppender(new PatternLayout("%5p %m%n"),
+            // logFile, true);
+            // eventLogger.addAppender(file);
+            // }
+            // if (chainsawPort > -1)
+            // {
+            // Appender chainsaw = new SocketAppender(chainsawHost, chainsawPort);
+            // eventLogger.addAppender(chainsaw);
+            // }
+            // }
+            // catch (IOException e)
+            // {
+            // throw new InitialisationException(
+            // CoreMessages.failedToLoad("Log4j configuration"), e, this);
+            // }
         }
-        */
+
     }
 
     @Override
