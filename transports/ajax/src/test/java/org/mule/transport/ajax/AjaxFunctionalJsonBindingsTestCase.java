@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.cometd.Client;
 import org.cometd.Message;
@@ -41,7 +42,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends FunctionalTestCase
 
     @Override
     protected void doSetUp() throws Exception
-    {
+    {        
         HttpClient http = new HttpClient();
         http.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL);
 
@@ -58,20 +59,19 @@ public class AjaxFunctionalJsonBindingsTestCase extends FunctionalTestCase
         //client.stop();
     }
 
-     public void testClientSubscribeWithJsonObjectResponse() throws Exception
+    public void testClientSubscribeWithJsonObjectResponse() throws Exception
     {
-
         final Latch latch = new Latch();
 
         final AtomicReference<String> data = new AtomicReference<String>();
         client.addListener(new MessageListener()
         {
-            public void deliver(Client client, Client client1, Message message)
+            public void deliver(Client fromClient, Client toClient, Message message)
             {
                 if (message.getData() != null)
                 {
-                    //This simulate what the browser would receive
-                    data.set((message.toString()));
+                    // This simulate what the browser would receive
+                    data.set(message.toString());
                     latch.release();
                 }
             }
@@ -84,11 +84,12 @@ public class AjaxFunctionalJsonBindingsTestCase extends FunctionalTestCase
 
         assertNotNull(data.get());
 
-        // parse the result string into java objects.  different jvms return it in different order, so we can't do a straight string comparison 
+        // parse the result string into java objects. different jvms return it in
+        // different order, so we can't do a straight string comparison
         ObjectMapper mapper = new ObjectMapper();
-        Map result  = mapper.readValue(data.get(), Map.class);
-        assertEquals("/test1", result.get("channel"));       
-        assertEquals("Ross", ((Map)result.get("data")).get("name"));
+        Map<?, ?> result = mapper.readValue(data.get(), Map.class);
+        assertEquals("/test1", result.get("channel"));
+        assertEquals("Ross", ((Map<?, ?>)result.get("data")).get("name"));
     }
 
     public void testClientPublishWithJsonObject() throws Exception
