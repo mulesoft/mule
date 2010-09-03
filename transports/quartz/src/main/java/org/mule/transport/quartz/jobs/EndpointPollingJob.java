@@ -28,6 +28,7 @@ import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.QuartzMessageReceiver;
 import org.mule.transport.quartz.i18n.QuartzMessages;
 
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
@@ -97,24 +98,34 @@ public class EndpointPollingJob implements Job
         try
         {
             logger.debug("Attempting to receive event on: " + jobConfig.getEndpointRef());
-
-            final EndpointBuilder epBuilder = muleContext.getRegistry().lookupEndpointBuilder(jobConfig.getEndpointRef());
-            final boolean pollGlobalEndpoint = epBuilder != null;
-
-            InboundEndpoint endpoint = null;
             TransactionTemplate<Void> tt;
-            if (pollGlobalEndpoint)
+            final AtomicBoolean pollGlobalEndpoint = new AtomicBoolean(false);
+
+            //TODO MULE-5050 work around because the builder is no longer idempotent, we now cache the endpoint instance
+            InboundEndpoint endpoint = muleContext.getRegistry().lookupObject(jobConfig.getEndpointRef() + ".quartz-job");
+            if(endpoint==null)
             {
-                // referencing a global endpoint, fetch configuration from it
-                endpoint = epBuilder.buildInboundEndpoint();
-                tt = new TransactionTemplate<Void>(endpoint.getTransactionConfig(),
-                                                   muleContext);
+                final EndpointBuilder epBuilder = muleContext.getRegistry().lookupEndpointBuilder(jobConfig.getEndpointRef());
+                pollGlobalEndpoint.set(epBuilder != null);
+
+                if (pollGlobalEndpoint.get())
+                {
+                    // referencing a global endpoint, fetch configuration from it
+                    endpoint = epBuilder.buildInboundEndpoint();
+
+                    //TODO MULE-5050 work around because the builder is no longer idempotent, we now cache the endpoint instance
+                    muleContext.getRegistry().registerObject(jobConfig.getEndpointRef() + ".quartz-job", endpoint);
+                    tt = new TransactionTemplate<Void>(endpoint.getTransactionConfig(), muleContext);
+                }
+                else
+                {
+                    // a simple inline endpoint
+                    tt = new TransactionTemplate<Void>(new MuleTransactionConfig(), muleContext);
+                }
             }
             else
             {
-                // a simple inline endpoint
-                tt = new TransactionTemplate<Void>(new MuleTransactionConfig(),
-                                                   muleContext);
+                tt = new TransactionTemplate<Void>(endpoint.getTransactionConfig(), muleContext);
             }
 
 
@@ -130,7 +141,7 @@ public class EndpointPollingJob implements Job
                     }
 
                     MuleMessage result = null;
-                    if (pollGlobalEndpoint)
+                    if (pollGlobalEndpoint.get())
                     {
                         result = finalEndpoint.getConnector().request(finalEndpoint, jobConfig.getTimeout());
                     }
@@ -146,7 +157,7 @@ public class EndpointPollingJob implements Job
                         {
                             logger.debug("Received event on: " + jobConfig.getEndpointRef());
                         }
-                        if (pollGlobalEndpoint)
+                        if (pollGlobalEndpoint.get())
                         {
                             result.applyTransformers(null, finalEndpoint.getTransformers());
                         }
