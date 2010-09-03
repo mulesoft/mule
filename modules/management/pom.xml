@@ -50,7 +50,6 @@
          <dependency>
             <groupId>com.yourkit</groupId>
             <artifactId>yjp-controller-api-redist</artifactId>
-            <version>${yourKitVersion}-osgi</version>
         </dependency>
 
         <!-- Unit tests only -->

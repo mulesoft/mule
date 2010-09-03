@@ -361,6 +361,11 @@
                 <!-- servlet api jar is versioned differently -->
                 <version>${jettyServletApiVersion}</version>
             </dependency>
+            <dependency>
+                <groupId>com.yourkit</groupId>
+                <artifactId>yjp-controller-api-redist</artifactId>
+                <version>${yourKitVersion}</version>
+            </dependency>
             <!-- For unit tests only -->
             <dependency>
                 <groupId>org.apache.derby</groupId>
