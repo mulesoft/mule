@@ -10,7 +10,6 @@
 package org.mule.tools.maven.plugin;
 
 import java.io.File;
-import java.util.Arrays;
 
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
@@ -50,7 +49,6 @@ public class MuleArchiver extends ZipArchiver
         addDirectory(directoryName, CLASSES_LOCATION, includes, addDefaultExcludes(excludes));
     }
 
-    //TODO This seems like a hack, but have no idea why default excludes are not being applied
     private String[] addDefaultExcludes(String[] excludes)
     {
         if(excludes==null || excludes.length==0)
@@ -59,8 +57,11 @@ public class MuleArchiver extends ZipArchiver
         }
         else
         {
-            String[] newExcludes = Arrays.copyOf(excludes, excludes.length + DirectoryScanner.DEFAULTEXCLUDES.length);
-            System.arraycopy(DirectoryScanner.DEFAULTEXCLUDES, 0, newExcludes, excludes.length, DirectoryScanner.DEFAULTEXCLUDES.length);
+            String[] newExcludes = new String[excludes.length + DirectoryScanner.DEFAULTEXCLUDES.length];
+
+            System.arraycopy(DirectoryScanner.DEFAULTEXCLUDES, 0, newExcludes, 0, DirectoryScanner.DEFAULTEXCLUDES.length);
+            System.arraycopy(excludes, 0, newExcludes, DirectoryScanner.DEFAULTEXCLUDES.length, excludes.length);
+
             return newExcludes;
         }
     }
