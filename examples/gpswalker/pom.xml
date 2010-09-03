@@ -13,18 +13,6 @@
     <description>Simulates plotting GPS coordinates.
         To run directly in Maven use the 'mvn exec:exec' command and go to http://localhost:8081/index.html</description>
 
-    <build>
-        <plugins>
-            <!-- we are using 'mule' as the packaging type so need to include the plugin here -->
-            <plugin>
-                <groupId>org.mule.tools</groupId>
-                <artifactId>maven-mule-plugin</artifactId>
-                <version>1.0</version>
-                <extensions>true</extensions>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <!-- note that Mule core dependencies are scoped as provided since they will be available in the contianer in the
         shared class loader -->

@@ -1393,8 +1393,7 @@
                     <downloadSources>true</downloadSources>
                     <!-- configure a JDK named 'jdk5' for this project -->
                     <classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk5Name}
-                        </classpathContainer>
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk5Name}</classpathContainer>
                     </classpathContainers>
                 </configuration>
             </plugin>
@@ -1447,6 +1446,15 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+            </plugin>
+            <!--
+                we are using 'mule' as the packaging type in our examples
+            -->
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <version>1.0</version>
+                <extensions>true</extensions>
             </plugin>
         </plugins>
     </build>
