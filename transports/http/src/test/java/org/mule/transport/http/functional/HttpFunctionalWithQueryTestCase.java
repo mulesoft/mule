@@ -11,6 +11,7 @@
 package org.mule.transport.http.functional;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.expression.RequiredValueException;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
@@ -53,11 +54,12 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
         try
         {
             client.send("clientEndpoint2", null, props);
-            fail("parsing the dynamic endpoint must fail");
+            fail("Required values missing");
         }
-        catch (DispatchException de)
+        catch (DispatchException e)
         {
-            // this one was expected
+            //expected
+            assertTrue(e.getCause() instanceof RequiredValueException);
         }
     }
 }

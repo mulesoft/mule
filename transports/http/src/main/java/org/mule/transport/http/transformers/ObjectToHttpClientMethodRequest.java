@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map;
@@ -68,11 +69,8 @@ import org.apache.commons.lang.SerializationUtils;
  * HttpClient HttpMethod that represents an HttpRequest.
  */
 
-public class
-        ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
+public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
 {
-   private MuleContext muleContext;
-
     public ObjectToHttpClientMethodRequest()
     {
         setReturnDataType(DataTypeFactory.create(HttpMethod.class));
@@ -84,7 +82,6 @@ public class
         registerSourceType(DataTypeFactory.create(NullPayload.class));
     }
 
-    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
@@ -97,19 +94,11 @@ public class
     {
         Object src = msg.getPayload();
 
-        String endpoint = msg.getOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
-        if (endpoint == null)
-        {
-            throw new TransformerException(
-                    HttpMessages.eventPropertyNotSetCannotProcessRequest(
-                            MuleProperties.MULE_ENDPOINT_PROPERTY), this);
-        }
-
         String method = (String) msg.getProperty(HttpConnector.HTTP_METHOD_PROPERTY, PropertyScope.OUTBOUND);
         if (method == null)
         {
             method = msg.getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, null);
-            if(method == null)
+            if (method == null)
             {
                 method = msg.getInvocationProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
             }
@@ -117,80 +106,18 @@ public class
 
         try
         {
-            //Allow Expressions to be embedded
-            endpoint = endpoint.replaceAll("%23", "#");
-            endpoint = muleContext.getExpressionManager().parse(endpoint, msg, true);
-            URI uri = new URI(endpoint);
+            //TODO It makes testing much harder if we use the endpoint on the transformer since we need to create correct message types and endpoints
+            //URI uri = getEndpoint().getEndpointURI().getUri();
+            URI uri = getURI(msg);
             HttpMethod httpMethod;
 
             if (HttpConstants.METHOD_GET.equals(method))
             {
-                httpMethod = new GetMethod(uri.toString());
-                String paramName = URLEncoder.encode(msg.getOutboundProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY,
-                        HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY), outputEncoding);
-
-
-                String paramValue;
-                Boolean encode = msg.getInvocationProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE);
-                if (encode == null)
-                {
-                    encode = msg.getOutboundProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, true);
-                }
-
-                if (encode)
-                {
-                    paramValue = URLEncoder.encode(src.toString(), outputEncoding);
-                }
-                else
-                {
-                    paramValue = src.toString();
-                }
-
-
-                String query = uri.getRawQuery();
-                if (!(src instanceof NullPayload) && !StringUtils.EMPTY.equals(src))
-                {
-                    if (query == null)
-                    {
-                        query = paramName + "=" + paramValue;
-                    }
-                    else
-                    {
-                        query += "&" + paramName + "=" + paramValue;
-                    }
-                }
-                httpMethod.setQueryString(query);
-
+                httpMethod = createGetMethod(msg, outputEncoding);
             }
             else if (HttpConstants.METHOD_POST.equalsIgnoreCase(method))
             {
-                PostMethod postMethod = new PostMethod(uri.toString());
-                String paramName = msg.getOutboundProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY, null);
-                if (paramName == null)
-                {
-                    paramName = msg.getInvocationProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
-                }
-
-                if (src instanceof Map)
-                {
-                    for (Iterator iterator = ((Map) src).entrySet().iterator(); iterator.hasNext();)
-                    {
-                        Map.Entry entry = (Map.Entry) iterator.next();
-                        postMethod.addParameter(entry.getKey().toString(), entry.getValue().toString());
-                    }
-                }
-                else if (paramName != null)
-                {
-                    postMethod.addParameter(paramName, src.toString());
-
-                }
-                else
-                {
-                    //addParameters(uri.getQuery(), postMethod, msg);
-                    setupEntityMethod(src, outputEncoding, msg, postMethod);
-                }
-
-                httpMethod = postMethod;
+                httpMethod = createPostMethod(msg, outputEncoding);
             }
             else if (HttpConstants.METHOD_PUT.equalsIgnoreCase(method))
             {
@@ -252,6 +179,100 @@ public class
         }
     }
 
+    protected HttpMethod createPostMethod(MuleMessage msg, String outputEncoding) throws Exception
+    {
+        Object src = msg.getPayload();
+        //TODO It makes testing much harder if we use the endpoint on the transformer since we need to create correct message types and endpoints
+        //URI uri = getEndpoint().getEndpointURI().getUri();
+        URI uri = getURI(msg);
+        PostMethod postMethod = new PostMethod(uri.toString());
+        String paramName = msg.getOutboundProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY, null);
+        if (paramName == null)
+        {
+            paramName = msg.getInvocationProperty(HttpConnector.HTTP_POST_BODY_PARAM_PROPERTY);
+        }
+
+        if (src instanceof Map)
+        {
+            for (Iterator iterator = ((Map) src).entrySet().iterator(); iterator.hasNext();)
+            {
+                Map.Entry entry = (Map.Entry) iterator.next();
+                postMethod.addParameter(entry.getKey().toString(), entry.getValue().toString());
+            }
+        }
+        else if (paramName != null)
+        {
+            postMethod.addParameter(paramName, src.toString());
+
+        }
+        else
+        {
+            setupEntityMethod(src, outputEncoding, msg, postMethod);
+        }
+
+        return postMethod;
+    }
+
+    protected HttpMethod createGetMethod(MuleMessage msg, String outputEncoding) throws Exception
+    {
+        Object src = msg.getPayload();
+        //TODO It makes testing much harder if we use the endpoint on the transformer since we need to create correct message types and endpoints
+        //URI uri = getEndpoint().getEndpointURI().getUri();
+        URI uri = getURI(msg);
+        HttpMethod httpMethod;
+        String query = uri.getRawQuery();
+
+        httpMethod = new GetMethod(uri.toString());
+        String paramName = msg.getOutboundProperty(HttpConnector.HTTP_GET_BODY_PARAM_PROPERTY, null);
+        if (paramName != null)
+        {
+            paramName = URLEncoder.encode(paramName, outputEncoding);
+
+            String paramValue;
+            Boolean encode = msg.getInvocationProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE);
+            if (encode == null)
+            {
+                encode = msg.getOutboundProperty(HttpConnector.HTTP_ENCODE_PARAMVALUE, true);
+            }
+
+            if (encode)
+            {
+                paramValue = URLEncoder.encode(src.toString(), outputEncoding);
+            }
+            else
+            {
+                paramValue = src.toString();
+            }
+
+            if (!(src instanceof NullPayload) && !StringUtils.EMPTY.equals(src))
+            {
+                if (query == null)
+                {
+                    query = paramName + "=" + paramValue;
+                }
+                else
+                {
+                    query += "&" + paramName + "=" + paramValue;
+                }
+            }
+        }
+
+        httpMethod.setQueryString(query);
+        return httpMethod;
+    }
+
+    protected URI getURI(MuleMessage message) throws URISyntaxException, TransformerException
+    {
+        String endpoint = message.getOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, null);
+        if (endpoint == null)
+        {
+            throw new TransformerException(
+                    HttpMessages.eventPropertyNotSetCannotProcessRequest(
+                            MuleProperties.MULE_ENDPOINT_PROPERTY), this);
+        }
+        return new URI(endpoint);
+    }
+
     protected void setupEntityMethod(Object src,
                                      String encoding,
                                      MuleMessage msg,
@@ -264,6 +285,10 @@ public class
         if (!(msg.getPayload() instanceof NullPayload))
         {
             String mimeType = (String) msg.getProperty(HttpConstants.HEADER_CONTENT_TYPE, PropertyScope.OUTBOUND);
+            if (mimeType == null)
+            {
+                mimeType = (getEndpoint()!=null ? getEndpoint().getMimeType() : null);
+            }
             if (mimeType == null)
             {
                 mimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
@@ -340,11 +365,6 @@ public class
                 throw new TransformerException(this, e);
             }
         }
-        else
-        {
-            //throw new TransformerException()
-        }
-
     }
 
     protected void setHeaders(HttpMethod httpMethod, MuleMessage msg) throws TransformerException
@@ -362,7 +382,7 @@ public class
 
             }
             else if (!HttpConstants.RESPONSE_HEADER_NAMES.containsKey(headerName)
-                        && !HttpConnector.HTTP_INBOUND_PROPERTIES.contains(headerName))
+                    && !HttpConnector.HTTP_INBOUND_PROPERTIES.contains(headerName))
             {
 
                 httpMethod.addRequestHeader(headerName, headerValue);
