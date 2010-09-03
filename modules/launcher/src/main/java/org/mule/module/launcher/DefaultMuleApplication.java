@@ -178,7 +178,6 @@ public class DefaultMuleApplication implements Application
 
                 builders.add(new SimpleConfigurationBuilder(appProperties));
 
-
                 // If the annotations module is on the classpath, add the annotations config builder to the list
                 // This will enable annotations config for this instance
                 //We need to add this builder before spring so that we can use Mule annotations in Spring or any other builder
@@ -353,7 +352,6 @@ public class DefaultMuleApplication implements Application
         }
     }
 
-
     /**
      * Resolve a resource relative to an application root.
      * @param path the relative path to resolve
@@ -366,10 +364,8 @@ public class DefaultMuleApplication implements Application
         return new File(configPath);
     }
 
-
     protected class ConfigFileWatcher extends AbstractFileWatcher
     {
-
         public ConfigFileWatcher(File watchedResource)
         {
             super(watchedResource);
