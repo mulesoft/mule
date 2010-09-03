@@ -20,7 +20,8 @@
         <!-- <property name="cacheFile" value="${checkstyle.cache.file}"/> -->
 
         <property name="tabWidth" value="4"/>
-
+    </module>
+    
         <!-- http://checkstyle.sf.net/config_javadoc.html -->
         <!--<module name="JavadocMethod"/>-->
         <!--<module name="JavadocType"/>-->
