@@ -15,42 +15,19 @@
 
     <build>
         <plugins>
+            <!-- we are using 'mule' as the packaging type so need to include the plugin here -->
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>maven-mule-plugin</artifactId>
                 <version>1.0</version>
                 <extensions>true</extensions>
-                <configuration>
-                    <archiveClasses>true</archiveClasses>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>java</executable>
-                    <arguments>
-                        <argument>-classpath</argument>
-                        <!-- automatically creates the classpath using all project dependencies,
-                  also adding the project build directory -->
-                        <classpath/>
-                        <argument>org.mule.MuleServer</argument>
-                        <!-- No need to set the -config flag as the mule-config.xml will get loaded automatically -->
-                    </arguments>
-                </configuration>
             </plugin>
         </plugins>
     </build>
 
     <dependencies>
+        <!-- note that Mule core dependencies are scoped as provided since they will be available in the contianer in the
+        shared class loader -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
@@ -72,12 +49,6 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ajax</artifactId>
-            <version>${version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-jetty</artifactId>
             <version>${version}</version>
             <scope>provided</scope>
         </dependency>
