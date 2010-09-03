@@ -36,19 +36,19 @@ import org.apache.commons.logging.LogFactory;
  * certain entries, the most common use of this would be to filter out entries that have already been read
  * by using the {@link org.mule.module.atom.routing.EntryLastUpdatedFilter} filter.
  */
-public class InboundFeedSplitter extends AbstractFilteringMessageProcessor
+public class FeedSplitter extends AbstractFilteringMessageProcessor
 {
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(InboundFeedSplitter.class);
+    protected transient final Log logger = LogFactory.getLog(FeedSplitter.class);
 
     public static final String FEED_PROPERTY = "feed.object";
     private Filter entryFilter;
     private List<String> acceptedContentTypes;
     private ObjectToFeed objectToFeed = new ObjectToFeed();
 
-    public InboundFeedSplitter()
+    public FeedSplitter()
     {
         acceptedContentTypes = new ArrayList<String>();
         acceptedContentTypes.add("application/atom+xml");

@@ -20,7 +20,7 @@ import org.mule.endpoint.AbstractMetaEndpointBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 import org.mule.module.atom.routing.EntryLastUpdatedFilter;
-import org.mule.module.atom.routing.InboundFeedSplitter;
+import org.mule.module.atom.routing.FeedSplitter;
 import org.mule.transport.http.HttpPollingConnector;
 import org.mule.util.StringUtils;
 
@@ -97,7 +97,7 @@ public class AtomEndpointBuilder extends AbstractMetaEndpointBuilder
             if (isSplitFeed())
             {
                 Filter filter = new EntryLastUpdatedFilter(date);
-                InboundFeedSplitter splitter = new InboundFeedSplitter();
+                FeedSplitter splitter = new FeedSplitter();
                 splitter.setEntryFilter(filter);
                 splitter.setAcceptedContentTypes(getAcceptedMimeTypes());
                 addMessageProcessor(splitter);
