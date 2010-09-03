@@ -33,6 +33,18 @@
             <implementation>org.mule.tools.maven.plugin.MuleArchiver</implementation>
             <instantiation-strategy>per-lookup</instantiation-strategy>
         </component>
+
+        <!-- let maven plugins know that a mule project is a java project -->
+        <component>
+            <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+            <role-hint>mule</role-hint>
+            <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+            <configuration>
+                <type>mule</type>
+                <language>java</language>
+                <addedToClasspath>true</addedToClasspath>
+            </configuration>
+        </component>
     </components>
 </component-set>
 
