@@ -15,20 +15,24 @@
     <!-- http://checkstyle.sf.net/config_misc.html#Translation -->
     <module name="Translation"/>
 
+    <module name="FileLength"/>
+    <module name="FileTabCharacter"/>
+    <module name="Header">
+        <property name="headerFile" value="${checkstyle.header.file}"/>
+        <property name="ignoreLines" value="2"/>
+    </module>
     <module name="TreeWalker">
 
         <!-- <property name="cacheFile" value="${checkstyle.cache.file}"/> -->
-
         <property name="tabWidth" value="4"/>
-    </module>
     
         <!-- http://checkstyle.sf.net/config_javadoc.html -->
         <!--<module name="JavadocMethod"/>-->
         <!--<module name="JavadocType"/>-->
         <!--<module name="JavadocVariable"/>-->
 
-
         <!-- http://checkstyle.sf.net/config_naming.html -->
+        <module name="MemberName"/>        
         <module name="LocalFinalVariableName"/>
         <module name="LocalVariableName"/>
         <module name="MethodName"/>
@@ -36,7 +40,7 @@
         <module name="ParameterName"/>
         <module name="StaticVariableName"/>
         <module name="TypeName"/>
-        <module name="MemberName"/>
+
 
         <!-- http://checkstyle.sf.net/config_import.html -->
         <module name="AvoidStarImport"/>
@@ -46,7 +50,7 @@
 
 
         <!-- http://checkstyle.sf.net/config_sizes.html -->
-        <module name="FileLength"/>
+
         <module name="ParameterNumber"/>
 
         <!-- http://checkstyle.sf.net/config_whitespace.html -->
@@ -54,7 +58,7 @@
         <module name="NoWhitespaceAfter"/>
         <module name="NoWhitespaceBefore"/>
         <!--<module name="OperatorWrap"/>-->
-        <module name="TabCharacter"/>
+
         <module name="WhitespaceAfter"/>
         <module name="WhitespaceAround"/>
 
@@ -100,10 +104,5 @@
         <module name="UpperEll"/>
 
         <!-- http://checkstyle.sourceforge.net/config_header.html -->
-        <module name="Header">
-            <property name="headerFile" value="${checkstyle.header.file}"/>
-            <property name="ignoreLines" value="2"/>
-        </module>
     </module>
-
 </module>
