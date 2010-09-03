@@ -26,9 +26,7 @@ import org.mule.util.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * An endpoint factory used for creating an ATOM endpoint
@@ -42,8 +40,6 @@ public class AtomEndpointBuilder extends AbstractMetaEndpointBuilder
 
     private String lastUpdate = null;
 
-    private List<String> acceptedMimeTypes;
-
     private long pollingFrequency = 1000;
 
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT);
@@ -52,40 +48,26 @@ public class AtomEndpointBuilder extends AbstractMetaEndpointBuilder
     public AtomEndpointBuilder()
     {
         super();
-        init();
     }
 
     public AtomEndpointBuilder(EndpointURIEndpointBuilder global) throws EndpointException
     {
         super(global);
-        init();
     }
 
-    public AtomEndpointBuilder(URIBuilder uriBuilder, MuleContext muleContext)
+    public AtomEndpointBuilder(URIBuilder uriBuilder)
     {
         super(uriBuilder);
-        init();
     }
 
     public AtomEndpointBuilder(String address, MuleContext muleContext)
     {
         super(address, muleContext);
-        init();
     }
 
-    protected AtomEndpointBuilder(EndpointURI endpointURI, MuleContext muleContext)
+    protected AtomEndpointBuilder(EndpointURI endpointURI)
     {
         super(endpointURI);
-        init();
-    }
-
-    protected void init()
-    {
-
-        acceptedMimeTypes = new ArrayList<String>();
-        acceptedMimeTypes.add("application/atom+xml");
-        acceptedMimeTypes.add("application/atom");
-        acceptedMimeTypes.add("text/xml");
     }
 
     @Override
@@ -99,11 +81,9 @@ public class AtomEndpointBuilder extends AbstractMetaEndpointBuilder
                 Filter filter = new EntryLastUpdatedFilter(date);
                 FeedSplitter splitter = new FeedSplitter();
                 splitter.setEntryFilter(filter);
-                splitter.setAcceptedContentTypes(getAcceptedMimeTypes());
                 addMessageProcessor(splitter);
             }
-            AtomInboundEndpoint in = new AtomInboundEndpoint(isSplitFeed(), date, getAcceptedMimeTypes(),
-                super.buildInboundEndpoint());
+            AtomInboundEndpoint in = new AtomInboundEndpoint(isSplitFeed(), date, super.buildInboundEndpoint());
             in.registerSupportedProtocol("http");
             in.registerSupportedProtocol("https");
             in.registerSupportedProtocol("vm");
@@ -143,16 +123,6 @@ public class AtomEndpointBuilder extends AbstractMetaEndpointBuilder
     public void setSplitFeed(boolean splitFeed)
     {
         this.splitFeed = splitFeed;
-    }
-
-    public List<String> getAcceptedMimeTypes()
-    {
-        return acceptedMimeTypes;
-    }
-
-    public void setAcceptedMimeTypes(List<String> acceptedMimeTypes)
-    {
-        this.acceptedMimeTypes = acceptedMimeTypes;
     }
 
     public long getPollingFrequency()

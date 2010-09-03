@@ -58,7 +58,11 @@
                  substitutionGroup="mule:abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Will split the entries of a feed into single entry objects.
+                Will split the entries of a feed into single entry objects. Each entry will be a separate message in
+                Mule. By default the inbound endpoint will split the feed automatically. The only time this splitter
+                will be useful is when you explicitly request that the feed is not split, but then you want to split it
+                later in the flow or if the endpoint serving the feed is not an Atom endpoint, for example receiving a
+                feed over JMS.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -153,16 +157,6 @@
                             is split. the format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25
                             13:00:00. If only the date
                             is important you can omit the time part
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="acceptedMimeTypes" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A comma-separated list of mime types that can be processed by this endpoint. Typicially users
-                            do not need to set this property
-                            unless the feed being consumed does not set the mime type correctly. The default for this
-                            value is application/rss+xml,application/rss,text/xml
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

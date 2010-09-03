@@ -35,7 +35,5 @@ public class NamespaceTestCase extends FunctionalTestCase
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
         assertEquals(sdf.parse("2009-10-01"), ep.getLastUpdate());
-        assertEquals(1, ep.getAcceptedMimeTypes().size());
-        assertTrue(ep.getAcceptedMimeTypes().contains("foo/bar"));
     }
 }

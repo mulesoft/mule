@@ -9,18 +9,19 @@
  */
 package org.mule.module.atom;
 
+import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
-public class FeedConsumeNoSplitTestCase extends FunctionalTestCase
+public class FeedConsumeAndSplitExplicitNonHttpTestCase extends FunctionalTestCase
 {
     private final CounterCallback counter = new CounterCallback();
 
     @Override
     protected String getConfigResources()
     {
-        return "atom-consume-no-split.xml";
+        return "atom-consume-and-explicit-split-non-http.xml";
     }
 
     @Override
@@ -30,12 +31,13 @@ public class FeedConsumeNoSplitTestCase extends FunctionalTestCase
         comp.setEventCallback(counter);
     }
 
-    public void testConsume() throws Exception {
-
-        Thread.sleep(1500);
+    public void testConsume() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        String feed = loadResourceAsString("sample-feed.atom");
+        client.dispatch("vm://feed.in", feed, null);
+        Thread.sleep(2000);
         int count = counter.getCallbackCount();
-        //We just receive the feed, not split
-        assertTrue(count < 3);
-
+        assertEquals(25, count);
     }
 }

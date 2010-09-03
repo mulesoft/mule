@@ -16,7 +16,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.TransformerException;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.module.atom.transformers.ObjectToFeed;
 import org.mule.routing.AbstractSplitter;
 
@@ -45,13 +44,10 @@ public class FeedSplitter extends AbstractSplitter
 
     public static final String FEED_PROPERTY = "feed.object";
     private Filter entryFilter;
-    private List<String> acceptedContentTypes;
     private ObjectToFeed objectToFeed = new ObjectToFeed();
 
     public FeedSplitter()
     {
-        acceptedContentTypes = new ArrayList<String>();
-        acceptedContentTypes.add("application/atom+xml");
         //By default set the filter so that entries are only read once
         entryFilter = new EntryLastUpdatedFilter(null);
     }
@@ -59,11 +55,16 @@ public class FeedSplitter extends AbstractSplitter
     @Override
     protected List<MuleMessage> splitMessage(MuleEvent event) throws MuleException
     {
-        if(!accept(event))
+        //TODO MULE-5048, should not need to set this manually
+        setMuleContext(event.getMuleContext());
+        
+        List<MuleMessage> messages = new ArrayList<MuleMessage>();        
+        if(event.getMessage().getInboundProperty("Content-Length", -1) == 0)
         {
-            throw new MessagingException(CoreMessages.unexpectedMIMEType(event.getMessage().getInboundProperty("Content-Type", ""),
-                    acceptedContentTypes.toString()), event);
+            logger.info("Feed has no content, ignoring");
+            return messages;
         }
+
         try
         {
             Object payload = event.getMessage().getPayload();
@@ -78,7 +79,6 @@ public class FeedSplitter extends AbstractSplitter
                 feed = (Feed) objectToFeed.transform(event.getMessage().getPayload());
             }
 
-            List<MuleMessage> messages = new ArrayList<MuleMessage>();
             Set<Entry> entries = new TreeSet<Entry>(new EntryComparator());
             entries.addAll(feed.getEntries());
             for (Entry entry : entries)
@@ -99,22 +99,6 @@ public class FeedSplitter extends AbstractSplitter
         }
     }
 
-    protected boolean accept(MuleEvent muleEvent)
-    {
-        String contentType = muleEvent.getMessage().getInboundProperty("Content-Type");
-        if (contentType != null)
-        {
-            int i = contentType.indexOf(";");
-            contentType = (i > -1 ? contentType.substring(0, i) : contentType);
-            return acceptedContentTypes.contains(contentType);
-        }
-        else
-        {
-            logger.warn("Content-Type header not set, not accepting the message");
-            return false;
-        }
-    }
-
     public Filter getEntryFilter()
     {
         return entryFilter;
@@ -123,16 +107,6 @@ public class FeedSplitter extends AbstractSplitter
     public void setEntryFilter(Filter entryFilter)
     {
         this.entryFilter = entryFilter;
-    }
-
-    public List<String> getAcceptedContentTypes()
-    {
-        return acceptedContentTypes;
-    }
-
-    public void setAcceptedContentTypes(List<String> acceptedContentTypes)
-    {
-        this.acceptedContentTypes = acceptedContentTypes;
     }
 
     class EntryComparator implements Comparator<Entry>
