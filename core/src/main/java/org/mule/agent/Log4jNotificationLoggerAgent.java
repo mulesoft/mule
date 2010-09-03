@@ -54,7 +54,7 @@ public class Log4jNotificationLoggerAgent extends AbstractNotificationLoggerAgen
     {
         StringBuffer buf = new StringBuffer(DEFAULT_DESCRIPTION_BUFFER_SIZE);
 
-        if (StringUtils.isBlank(logName))
+        if (StringUtils.isNotBlank(logName))
         {
             buf.append("Logging notifications to logger: ").append(logName);
         }
