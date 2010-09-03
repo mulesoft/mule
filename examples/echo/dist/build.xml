@@ -57,6 +57,7 @@
         <!-- Copy all resources to the output folder as well -->
         <copy todir="${dir.classes}">
             <fileset dir="${dir.conf}"/>
+        	<fileset dir="src/main/app"/>
         </copy>
     </target>
 
@@ -69,7 +70,7 @@
     	
     	<zip destfile="${app.name}.zip">
             <zipfileset file="${dir.build}/${app.name}.jar" fullpath="lib/mule-example-echo.jar"/>
-            <zipfileset file="${dir.conf}/echo-cxf-flow-config.xml" fullpath="mule-config.xml"/>
+            <zipfileset file="src/main/app/mule-config.xml" fullpath="mule-config.xml"/>
     	</zip>
     </target>
 

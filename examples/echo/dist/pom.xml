@@ -6,6 +6,7 @@
     <artifactId>mule-example-echo</artifactId>
     <version>1.0</version>
     <name>Echo Example</name>
+    <packaging>mule</packaging>
     <description>Is a simple component example that demonstrates how to expose a component over multiple transports (soap and stream).</description>
 
     <properties>
@@ -17,32 +18,31 @@
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${muleVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${muleVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${muleVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>
             <version>${muleVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${muleVersion}</version>
-        </dependency>
-        <!-- Needed for CXF -->
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-annotation_1.0_spec</artifactId>
-            <version>1.1.1</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Better testing of XML -->
@@ -115,15 +115,17 @@
         <defaultGoal>install</defaultGoal>
         <finalName>${artifactId}</finalName>
 
-        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
-        <resources>
-            <resource>
+        <testResources>
+            <testResource>
                 <directory>conf</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
+            </testResource>
+            <testResource>
+                <directory>${basedir}/src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <directory>${basedir}/src/main/app</directory>
+            </testResource>
+        </testResources>
 
         <plugins>
             <plugin>
@@ -157,23 +159,26 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <version>1.0</version>
+                <extensions>true</extensions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.4</version>
                 <executions>
                     <execution>
                         <id>package-example</id>
-                        <phase>package</phase>
+                        <phase>install</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
                         <configuration>
                             <tasks>
-                                <zip destfile="${basedir}/mule-example-echo.zip">
-                                    <zipfileset file="${project.build.directory}/mule-example-echo.jar" fullpath="lib/mule-example-echo.jar"/>
-                                    <zipfileset file="${basedir}/conf/echo-cxf-flow-config.xml" fullpath="mule-config.xml"/>
-                                </zip>
-                                <copy file="${basedir}/mule-example-echo.zip" todir="${env.MULE_HOME}/apps" overwrite="true"/>
+                                <copy file="${project.build.directory}/${artifactId}.zip" 
+                                    todir="${env.MULE_HOME}/apps" overwrite="true"/>
                             </tasks>
                         </configuration>
                     </execution>

@@ -116,13 +116,6 @@
             <include>echo.bat</include>
         </includes>
     </fileSet>
-    <fileSet>
-        <directory>../../examples/echo/target</directory>
-        <outputDirectory>examples/echo</outputDirectory>
-        <includes>
-            <include>mule-example-echo-app.zip</include>
-        </includes>
-    </fileSet>
 
     <!--
     ==================================
@@ -560,6 +553,14 @@
           <include>xerces:xml-serializer</include>
           <include>xalan:xalan</include>
       </includes>
+    </dependencySet>
+
+    <!-- Examples -->
+    <dependencySet>
+        <outputDirectory>examples/echo</outputDirectory>
+        <includes>
+            <include>org.mule.examples:mule-example-echo</include>
+        </includes>
     </dependencySet>
   </dependencySets>
 </assembly>

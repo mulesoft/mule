@@ -18,7 +18,7 @@ public class CxfEchoFlowTestCase extends CxfEchoTestCase
     @Override
     protected String getConfigResources()
     {
-        return "echo-cxf-flow-config.xml";
+        return "mule-config.xml";
     }
 
 }

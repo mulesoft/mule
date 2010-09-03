@@ -24,7 +24,7 @@
         <module>notifications</module>
         <module>scripting</module>
         <module>stockquote</module>
-        <module>webapp</module>
+<!--         <module>webapp</module> -->
     </modules>
 
     <build>
