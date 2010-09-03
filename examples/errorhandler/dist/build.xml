@@ -72,6 +72,7 @@
         <copy todir="${dir.classes}">
             <fileset dir="${dir.conf}"/>
             <fileset dir="${dir.resources}"/>
+            <fileset dir="src/main/app"/>
         </copy>
     </target>
 
@@ -81,29 +82,22 @@
 
         <jar jarfile="${dir.build}/${app.name}.jar"
              basedir="${dir.classes}"/>
+
+        <zip destfile="${app.name}.zip">
+            <zipfileset file="${dir.build}/${app.name}.jar" fullpath="lib/mule-example-errorhandler.jar"/>
+            <zipfileset file="src/main/app/mule-config.xml" fullpath="mule-config.xml"/>
+            <zipfileset file="${dir.build}/lib/activemq-core-4.1.2.jar" fullpath="lib/activemq-core-4.1.2.jar"/>
+            <fileset dir="src/main/app">
+                <include name="test-data/**"/>
+            </fileset>
+        </zip>
    </target>
 
     <target name="deploy" 
            depends="package, test" 
            description="Deploy the application to the Mule server">
 
-        <antcall target="deploy-instance">
-            <param name="instance.name" value="errorhandler" />
-            <param name="config.file.name" value="error" />
-        </antcall>
-    </target>
-
-    <target name="deploy-instance" description="deploys an instance of the errorhandler config">
-        <mkdir dir="${dir.mule.home}/apps/${instance.name}" />
-        <mkdir dir="${dir.mule.home}/apps/${instance.name}/lib" />
-        <copy file="${dir.build}/${app.name}.jar" todir="${dir.mule.home}/apps/${instance.name}/lib" overwrite="true" verbose="true"/>
-        <copy file="${dir.classes}/${config.file.name}-config.xml" tofile="${dir.mule.home}/apps/${instance.name}/mule-config.xml"/>
-        <copy todir="${dir.mule.home}/apps/${instance.name}/lib"
-              overwrite="true" verbose="true">
-             <fileset dir="${dir.build}/lib">
-                 <include name="**/*.jar"/>
-             </fileset>
-        </copy>        
+        <copy file="${app.name}.zip" todir="${dir.mule.home}/apps" overwrite="true"/>
     </target>
 
     <target name="setup">

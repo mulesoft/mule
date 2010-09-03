@@ -11,12 +11,24 @@
 package org.mule.example.errorhandler;
 
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.SystemUtils;
+
+import java.util.Properties;
 
 public class ErrorHandlerTestCase extends FunctionalTestCase
 {
+    @Override
+    protected Properties getStartUpProperties()
+    {
+        Properties startupProps = new Properties();
+        startupProps.put("app.home", SystemUtils.JAVA_IO_TMPDIR);
+        return  startupProps;
+    }
+
+    @Override
     protected String getConfigResources()
     {
-        return "error-config.xml";
+        return "mule-config.xml";
     }
 
     public void testConfigSanity()

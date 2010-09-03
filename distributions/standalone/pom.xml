@@ -249,5 +249,15 @@
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
         </dependency>
+
+        <!--
+            Activemq is a transitive dependency from the errorhandler example.
+            Make sure it doesn't end up in the standalone distro.
+        -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

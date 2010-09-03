@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.examples</groupId>
@@ -9,6 +8,7 @@
     </parent>
     <artifactId>mule-example-errorhandler</artifactId>
     <name>Error Handler Example</name>
+    <packaging>mule</packaging>
     <description>Demonstrates using Spring as the external container to provide the objects managed by Mule and how to publish events to multiple outbound endpoints. The example consists of two components; ExecptionManager and BusinessErrorManager.</description>
 
     <dependencies>
@@ -16,40 +16,46 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-extras</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-email</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jms</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-file</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-core</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- test dependencies -->
@@ -60,4 +66,19 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    
+    <build>
+        <!--
+            src/main/app contains the config file. Add this folder to the test resources so that
+            our unit tests can find it.
+         -->
+        <testResources>
+            <testResource>
+                <directory>src/main/app</directory>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+    </build>
 </project>

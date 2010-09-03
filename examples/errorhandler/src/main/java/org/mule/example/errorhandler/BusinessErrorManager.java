@@ -35,7 +35,7 @@ public class BusinessErrorManager implements Callable
     {
         ErrorMessage msg = (ErrorMessage)context.getMessage().getPayload();
         // Do something with the error message
-        List msgs = new ArrayList();
+        List<String> msgs = new ArrayList<String>();
 
         msgs.add(LocaleMessage.businessErrorManagerError());
         msgs.add(LocaleMessage.errorDetail(msg.getException().getDetailMessage()));

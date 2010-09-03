@@ -27,6 +27,7 @@
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-errorhandler</artifactId>
             <version>${version}</version>
+            <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>

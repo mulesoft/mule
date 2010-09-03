@@ -60,7 +60,7 @@
     
     <file:connector name="FileConnector" 
                     pollingFrequency="1000" 
-                    moveToDirectory="./test-data/out"/>
+                    moveToDirectory="${app.home}/test-data/out"/>
 
     <!-- 
         All transformers must be declared here to be referenced by their names in the 
@@ -82,21 +82,16 @@
                              returnClass="org.mule.example.errorhandler.ExceptionBean"/>
 
     <model name="errorhandler-test">
-        <!-- 
-            This uses an URL endpointUri instead of a provider config.  Note that this specifies 
-            a relative path as the endpoint though fully qualified uri will work i.e. 
-            file:///usr/test-data/samples/errorhandler/in
-        -->
         <service name="Error Manager">
             <inbound>
-                <inbound-endpoint address="file://./test-data/in" exchange-pattern="one-way">
+                <file:inbound-endpoint path="${app.home}/test-data/in">
                     <!-- Ignore other files than our XML error input. When running this example from
                          a svn checkout the file connector would try to process subversion's meta
                          dirs which is not what we want.
                     -->
                     <file:filename-wildcard-filter pattern="*.xml"/>
                     <transformer ref="XMLToExceptionBean ExceptionBeanToErrorMessage" />
-                </inbound-endpoint>
+                </file:inbound-endpoint>
             </inbound>
             
             <pooled-component>
@@ -115,7 +110,7 @@
 
             <outbound>
                 <filtering-router>
-                    <file:outbound-endpoint path="test-data/exceptions" 
+                    <file:outbound-endpoint path="${app.home}/test-data/exceptions" 
                                             outputPattern="Exception-[function:uuid].xml">
                         <transformer ref="ErrorMessageToExceptionBean" />
                         <transformer ref="ExceptionBeanToXML" />
@@ -132,8 +127,8 @@
                         <!-- Check ErrorMessage.getThrowable() exception type -->
                         <expression-filter evaluator="groovy" expression="payload.throwable instanceof org.mule.api.lifecycle.FatalException"/>
                         <transformer ref="ErrorMessageToExceptionBean" />
-                         <transformer ref="ExceptionBeanToXML" />
-                         <transformer ref="StringToEmailMessage"/>
+                        <transformer ref="ExceptionBeanToXML" />
+                        <transformer ref="StringToEmailMessage"/>
                      </smtp:outbound-endpoint>
                 </filtering-router>
                 
