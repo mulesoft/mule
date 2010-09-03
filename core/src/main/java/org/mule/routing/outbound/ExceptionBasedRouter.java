@@ -22,6 +22,7 @@ import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.routing.CorrelationMode;
 
 import java.util.ArrayList;
@@ -91,13 +92,14 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
             endpoint = getRecipientEndpoint(request, iterator.next());
             boolean lastEndpoint = !iterator.hasNext();
 
-            if (!lastEndpoint)
+            // TODO MULE-4476
+            if (!lastEndpoint && !endpoint.getExchangePattern().hasResponse())
             {
-                logger.info("Sync mode will be forced for " + endpoint.getEndpointURI()
-                            + ", as there are more targets available.");
+                throw new CouldNotRouteOutboundMessageException(
+                    MessageFactory.createStaticMessage("The ExceptionBasedRouter does not support asynchronous endpoints, make sure all endpoints on the router are configured as synchronous"), event, endpoint);
             }
-
-            if (!lastEndpoint || endpoint.getExchangePattern().hasResponse())
+            
+            if (endpoint.getExchangePattern().hasResponse())
             {
                 try
                 {

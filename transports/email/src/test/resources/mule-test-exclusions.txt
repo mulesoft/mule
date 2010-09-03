@@ -2,5 +2,5 @@
 # Test cases listed in this file are not run.
 #
 
-# MULE-4476
+# MULE-4476 ExceptionBasedRouter does not support asynchronous endpoints, but email endpoints cannot be synchronous
 org.mule.transport.email.issues.ExceptionHandlingMule2167TestCase
