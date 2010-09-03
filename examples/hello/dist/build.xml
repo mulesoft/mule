@@ -73,7 +73,7 @@
     <target name="deploy" depends="package,test" description="Deploy the applications to the Mule server">
         <zip destfile="mule-example-hello.zip">
             <zipfileset file="${dir.build}/${app.name}.jar" fullpath="lib/mule-example-hello.jar"/>
-            <zipfileset file="${dir.conf}/hello-http-config.xml" fullpath="mule-config.xml"/>
+            <zipfileset file="src/main/app/mule-config.xml" fullpath="mule-config.xml"/>
         </zip>
         <copy file="mule-example-hello.zip" todir="${dir.mule.home}/apps" overwrite="true"/>
     </target>

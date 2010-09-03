@@ -7,20 +7,28 @@
     <version>3.0.0-RC3-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-hello</artifactId>
-    <packaging>jar</packaging>
+    <packaging>mule</packaging>
     <name>Hello Example</name>
     <description>Shows how to configure multiple components to interact on a single request and how to manage event transformations.</description>
 
     <dependencies>
         <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- test dependencies -->
@@ -31,34 +39,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
-    <build>
-        <plugins>
-            <!--
-                Build a deployable zip file of the app. This is a task for the assembly plugin
-                but the version we use in the build is too outdated to be usable for this task.    
-            -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>package-example</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <zip destfile="${project.build.directory}/mule-example-hello-app.zip">
-                                    <zipfileset file="${project.build.directory}/mule-example-hello-${version}.jar" fullpath="lib/mule-example-hello-${version}.jar"/>
-                                    <zipfileset file="${basedir}/conf/hello-http-config.xml" fullpath="mule-config.xml"/>
-                                </zip>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>

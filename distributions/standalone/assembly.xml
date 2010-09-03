@@ -562,5 +562,11 @@
             <include>org.mule.examples:mule-example-echo</include>
         </includes>
     </dependencySet>
+    <dependencySet>
+        <outputDirectory>examples/hello</outputDirectory>
+        <includes>
+            <include>org.mule.examples:mule-example-hello</include>
+        </includes>
+    </dependencySet>
   </dependencySets>
 </assembly>
