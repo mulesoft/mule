@@ -49,7 +49,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
 
     private boolean enableCookies = false;
     private String cookieSpec;
-    private MessageExchangePattern exchangePattern;
+    private MessageExchangePattern exchangePattern = MessageExchangePattern.REQUEST_RESPONSE;
     private Collection<Part> parts;
 
     public HttpMuleMessageFactory(MuleContext context)
