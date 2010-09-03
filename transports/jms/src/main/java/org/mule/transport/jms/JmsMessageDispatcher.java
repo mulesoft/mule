@@ -27,7 +27,6 @@ import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.transport.jms.i18n.JmsMessages;
 import org.mule.util.ClassUtils;
 import org.mule.util.NumberUtils;
-import org.mule.util.StringUtils;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.concurrent.WaitableBoolean;
 
@@ -43,8 +42,6 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang.BooleanUtils;
 
 /**
  * <code>JmsMessageDispatcher</code> is responsible for dispatching messages to JMS
@@ -190,19 +187,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             processMessage(msg, event);
 
             // QoS support
-            String ttlString = (String) eventMsg.removeProperty(JmsConstants.TIME_TO_LIVE_PROPERTY);
-            String priorityString = (String) eventMsg.removeProperty(JmsConstants.PRIORITY_PROPERTY);
-            String persistentDeliveryString = (String) eventMsg.removeProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY);
-
-            long ttl = StringUtils.isNotBlank(ttlString)
-                    ? NumberUtils.toLong(ttlString)
-                    : Message.DEFAULT_TIME_TO_LIVE;
-            int priority = StringUtils.isNotBlank(priorityString)
-                    ? NumberUtils.toInt(priorityString)
-                    : Message.DEFAULT_PRIORITY;
-            boolean persistent = StringUtils.isNotBlank(persistentDeliveryString)
-                    ? BooleanUtils.toBoolean(persistentDeliveryString)
-                    : connector.isPersistentDelivery();
+            long ttl = eventMsg.getOutboundProperty(JmsConstants.TIME_TO_LIVE_PROPERTY, Message.DEFAULT_TIME_TO_LIVE);
+            int priority = eventMsg.getOutboundProperty(JmsConstants.PRIORITY_PROPERTY, Message.DEFAULT_PRIORITY);
+            boolean persistent= eventMsg.getOutboundProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY, connector.isPersistentDelivery());
 
             // If we are honouring the current QoS message headers we need to use the ones set on the current message
             if (connector.isHonorQosHeaders())
@@ -451,11 +438,11 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
         if (isHandleReplyTo(message, event))
         {
 
-            Object tempReplyTo = event.getMessage().removeProperty(JmsConstants.JMS_REPLY_TO);
+            Object tempReplyTo = event.getMessage().getOutboundProperty(JmsConstants.JMS_REPLY_TO);
             if (tempReplyTo == null)
             {
                 //It may be a Mule URI or global endpoint Ref
-                tempReplyTo = event.getMessage().removeProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
+                tempReplyTo = event.getMessage().getOutboundProperty(MuleProperties.MULE_REPLY_TO_PROPERTY);
                 if (tempReplyTo != null)
                 {
                     int i = tempReplyTo.toString().indexOf("://");

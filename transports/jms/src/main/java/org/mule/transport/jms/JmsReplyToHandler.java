@@ -15,10 +15,8 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
-import org.mule.api.transaction.Transaction;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
-import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
@@ -121,9 +119,9 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
 
             // QoS support
             MuleMessage eventMsg = event.getMessage();
-            String ttlString = (String)eventMsg.removeProperty(JmsConstants.TIME_TO_LIVE_PROPERTY);
-            String priorityString = (String)eventMsg.removeProperty(JmsConstants.PRIORITY_PROPERTY);
-            String persistentDeliveryString = (String)eventMsg.removeProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY);
+            String ttlString = (String)eventMsg.getOutboundProperty(JmsConstants.TIME_TO_LIVE_PROPERTY);
+            String priorityString = (String)eventMsg.getOutboundProperty(JmsConstants.PRIORITY_PROPERTY);
+            String persistentDeliveryString = (String)eventMsg.getOutboundProperty(JmsConstants.PERSISTENT_DELIVERY_PROPERTY);
 
             String correlationIDString = replyToMessage.getJMSCorrelationID();
             if (StringUtils.isBlank(correlationIDString))
