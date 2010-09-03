@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:rss="http://www.mulesoft.org/schema/mule/rss"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+
+      xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+               http://www.mulesoft.org/schema/mule/rss http://www.mulesoft.org/schema/mule/rss/3.0/mule-rss.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd">
+
+    <flow name="feedConsumer">
+        <rss:inbound-endpoint address="http://feeds.feedburner.com/muleblog?format=xml" splitFeed="false"/>
+        <test:component/>
+    </flow>
+</mule>

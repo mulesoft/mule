@@ -11,7 +11,7 @@ package org.mule.module.rss;
 
 import org.mule.api.service.Service;
 import org.mule.module.rss.endpoint.RssInboundEndpoint;
-import org.mule.module.rss.routing.InboundFeedSplitter;
+import org.mule.module.rss.routing.FeedSplitter;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.FunctionalTestCase;
 
@@ -32,13 +32,11 @@ public class NamespaceTestCase extends FunctionalTestCase
         assertNotNull(service);
         assertTrue(((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0) instanceof RssInboundEndpoint);
         RssInboundEndpoint ep = (RssInboundEndpoint) ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
-        assertEquals(InboundFeedSplitter.class, ep.getMessageProcessors().get(0).getClass());
+        assertEquals(FeedSplitter.class, ep.getMessageProcessors().get(0).getClass());
 
         assertNotNull(ep.getLastUpdate());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
         Assert.assertEquals(sdf.parse("2009-10-01"), ep.getLastUpdate());
-        Assert.assertEquals(1, ep.getAcceptedMimeTypes().size());
-        assertTrue(ep.getAcceptedMimeTypes().contains("foo/bar"));
     }
 }

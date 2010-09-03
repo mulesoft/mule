@@ -9,7 +9,6 @@
  */
 package org.mule.module.rss.routing;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
@@ -18,7 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.rss.transformers.ObjectToRssFeed;
-import org.mule.processor.AbstractFilteringMessageProcessor;
+import org.mule.routing.AbstractSplitter;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -36,31 +35,39 @@ import org.apache.commons.logging.LogFactory;
  * Will split the feed into entries.  This router also filters out any entries that are older than the last one read
  * The filter can be configured with a date from which to accept feed entries
  */
-public class InboundFeedSplitter extends AbstractFilteringMessageProcessor
+public class FeedSplitter extends AbstractSplitter
 {
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(InboundFeedSplitter.class);
+    protected transient final Log logger = LogFactory.getLog(FeedSplitter.class);
 
     public static final String FEED_PROPERTY = "feed.object";
     private Filter entryFilter;
-    private List<String> acceptedContentTypes;
     private ObjectToRssFeed objectToFeed = new ObjectToRssFeed();
 
-    public InboundFeedSplitter()
+    public FeedSplitter()
     {
-        acceptedContentTypes = new ArrayList<String>();
-        acceptedContentTypes.add("application/rss+xml");
-        acceptedContentTypes.add("application/rss");
+        //By default set the filter so that entries are only read once
+        entryFilter = new EntryLastUpdatedFilter(null);
     }
 
     @Override
-    public MuleEvent process(MuleEvent muleEvent) throws MessagingException
+    protected List<MuleMessage> splitMessage(MuleEvent event) throws MuleException
     {
+        //TODO MULE-5048, should not need to set this manually
+        setMuleContext(event.getMuleContext());
+
+        List<MuleMessage> messages = new ArrayList<MuleMessage>();
+        if(event.getMessage().getInboundProperty("Content-Length", -1) == 0)
+        {
+            logger.info("Feed has no content, ignoring");
+            return messages;
+        }
+
         try
         {
-            Object payload = muleEvent.getMessage().getPayload();
+            Object payload = event.getMessage().getPayload();
             
             SyndFeed feed;
             if (payload instanceof SyndFeed)
@@ -69,51 +76,28 @@ public class InboundFeedSplitter extends AbstractFilteringMessageProcessor
             }
             else
             {
-                feed = (SyndFeed) objectToFeed.transform(muleEvent.getMessage().getPayload());
+                feed = (SyndFeed) objectToFeed.transform(event.getMessage().getPayload());
             }
             
             Set<SyndEntry> entries = new TreeSet<SyndEntry>(new EntryComparator());
             entries.addAll(feed.getEntries());
-            List<MuleEvent> events = new ArrayList<MuleEvent>();
 
             for (SyndEntry entry : entries)
             {
-                MuleMessage m = new DefaultMuleMessage(entry, muleEvent.getMuleContext());
+                MuleMessage m = new DefaultMuleMessage(entry, event.getMuleContext());
                 if (entryFilter != null && !entryFilter.accept(m))
                 {
                     continue;
                 }
                 m.setProperty(FEED_PROPERTY, feed, PropertyScope.INVOCATION);
-                MuleEvent e = new DefaultMuleEvent(m, muleEvent.getEndpoint(), muleEvent.getFlowConstruct(), muleEvent);
-                events.add(e);
+                messages.add(m);
+            }
+            return messages;
 
-            }
-            for (MuleEvent event : events)
-            {
-                processNext(event);
-            }
         }
         catch (MuleException e)
         {
-            throw new MessagingException(e.getI18nMessage(), muleEvent, e);
-        }
-        return null;
-    }
-
-    @Override
-    public boolean accept(MuleEvent muleEvent)
-    {
-        String contentType = muleEvent.getMessage().getOutboundProperty("Content-Type");
-        if (contentType != null)
-        {
-            int i = contentType.indexOf(";");
-            contentType = (i > -1 ? contentType.substring(0, i) : contentType);
-            return acceptedContentTypes.contains(contentType);
-        }
-        else
-        {
-            logger.warn("Content-Type header not set, not accepting the message");
-            return false;
+            throw new MessagingException(e.getI18nMessage(), event, e);
         }
     }
 
@@ -126,17 +110,7 @@ public class InboundFeedSplitter extends AbstractFilteringMessageProcessor
     {
         this.entryFilter = entryFilter;
     }
-
-    public List<String> getAcceptedContentTypes()
-    {
-        return acceptedContentTypes;
-    }
-
-    public void setAcceptedContentTypes(List<String> acceptedContentTypes)
-    {
-        this.acceptedContentTypes = acceptedContentTypes;
-    }
-
+    
     class EntryComparator implements Comparator<SyndEntry>
     {
         public int compare(SyndEntry e1, SyndEntry e2)

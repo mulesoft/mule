@@ -20,15 +20,13 @@ import org.mule.endpoint.AbstractMetaEndpointBuilder;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.URIBuilder;
 import org.mule.module.rss.routing.EntryLastUpdatedFilter;
-import org.mule.module.rss.routing.InboundFeedSplitter;
+import org.mule.module.rss.routing.FeedSplitter;
 import org.mule.transport.http.HttpPollingConnector;
 import org.mule.util.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Creates RSS endpoints. Right now only inbound endpoints are supported, i.e. poll an RSS URL
@@ -41,8 +39,6 @@ public class RssEndpointBuilder extends AbstractMetaEndpointBuilder
     private boolean splitFeed = true;
 
     private String lastUpdate = null;
-
-    private List<String> acceptedMimeTypes;
 
     private long pollingFrequency = 1000;
 
@@ -61,7 +57,7 @@ public class RssEndpointBuilder extends AbstractMetaEndpointBuilder
         init();
     }
 
-    public RssEndpointBuilder(URIBuilder URIBuilder, MuleContext muleContext)
+    public RssEndpointBuilder(URIBuilder URIBuilder)
     {
         super(URIBuilder);
         init();
@@ -73,7 +69,7 @@ public class RssEndpointBuilder extends AbstractMetaEndpointBuilder
         init();
     }
 
-    protected RssEndpointBuilder(EndpointURI endpointURI, MuleContext muleContext)
+    protected RssEndpointBuilder(EndpointURI endpointURI)
     {
         super(endpointURI);
         init();
@@ -83,10 +79,6 @@ public class RssEndpointBuilder extends AbstractMetaEndpointBuilder
     {
         shortDateFormatter.setLenient(false);
         dateFormatter.setLenient(false);
-        acceptedMimeTypes = new ArrayList<String>();
-        acceptedMimeTypes.add("application/rss+xml");
-        acceptedMimeTypes.add("application/rss");
-        acceptedMimeTypes.add("text/xml");
     }
 
     @Override
@@ -98,14 +90,12 @@ public class RssEndpointBuilder extends AbstractMetaEndpointBuilder
             if (isSplitFeed())
             {
                 Filter filter = new EntryLastUpdatedFilter(date);
-                InboundFeedSplitter splitter = new InboundFeedSplitter();
+                FeedSplitter splitter = new FeedSplitter();
                 splitter.setEntryFilter(filter);
-                splitter.setAcceptedContentTypes(getAcceptedMimeTypes());
                 addMessageProcessor(splitter);
 
             }
-            RssInboundEndpoint in = new RssInboundEndpoint(isSplitFeed(), date, getAcceptedMimeTypes(),
-                super.buildInboundEndpoint());
+            RssInboundEndpoint in = new RssInboundEndpoint(isSplitFeed(), date, super.buildInboundEndpoint());
             in.registerSupportedProtocol("http");
             in.registerSupportedProtocol("https");
             in.registerSupportedProtocol("vm");
@@ -151,16 +141,6 @@ public class RssEndpointBuilder extends AbstractMetaEndpointBuilder
     public void setSplitFeed(boolean splitFeed)
     {
         this.splitFeed = splitFeed;
-    }
-
-    public List<String> getAcceptedMimeTypes()
-    {
-        return acceptedMimeTypes;
-    }
-
-    public void setAcceptedMimeTypes(List<String> acceptedMimeTypes)
-    {
-        this.acceptedMimeTypes = acceptedMimeTypes;
     }
 
     public long getPollingFrequency()

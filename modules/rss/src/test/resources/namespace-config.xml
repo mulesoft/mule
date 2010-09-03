@@ -9,8 +9,7 @@
     <model>
         <service name="test">
             <inbound>
-                <rss:inbound-endpoint address="http://foo.com" acceptedMimeTypes="foo/bar" 
-                    lastUpdate="2009-10-01"/>
+                <rss:inbound-endpoint address="http://foo.com" lastUpdate="2009-10-01"/>
             </inbound>
             <echo-component/>
         </service>
