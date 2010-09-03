@@ -15,27 +15,15 @@
 
     <build>
         <plugins>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                    <encoding>ISO-8859-1</encoding>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>maven-mule-plugin</artifactId>
-                <version>3.0.0-RC3-SNAPSHOT</version>
+                <version>1.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <archiveClasses>true</archiveClasses>
                 </configuration>
             </plugin>
-            
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -59,12 +47,10 @@
                     </arguments>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
     <dependencies>
-
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
@@ -95,6 +81,5 @@
             <version>${version}</version>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
 </project>

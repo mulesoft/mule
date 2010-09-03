@@ -1213,7 +1213,6 @@
                 <enabled>true</enabled>
             </releases>
         </pluginRepository>
-
         <pluginRepository>
             <id>mule-deps</id>
             <name>Mule Dependencies</name>
