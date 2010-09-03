@@ -10,31 +10,43 @@
 package org.mule.module.ibeans.spi.support;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.MalformedEndpointException;
+import org.mule.api.expression.ExpressionManager;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.endpoint.DefaultInboundEndpoint;
+import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.endpoint.DynamicURIInboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.transport.AbstractConnector;
+import org.mule.endpoint.URIBuilder;
 import org.mule.transport.service.TransportFactory;
-import org.mule.util.BeanUtils;
+import org.mule.transport.service.TransportFactoryException;
 import org.mule.util.TemplateParser;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * A dynamic request endpoint is used in conjunction with the {@link org.ibeans.annotation.Call} annotation when there are no {@link org.ibeans.annotation.param.Payload},
- * {@link org.ibeans.annotation.param.PayloadParam} or {@link org.ibeans.annotation.param.HeaderParam} annotations
+ * A dynamic request endpoint is used in conjunction with the {@link org.ibeans.annotation.Call} annotation when there are no {@link org.ibeans.annotation.param.Body},
+ * {@link org.ibeans.annotation.param.BodyParam} or {@link org.ibeans.annotation.param.HeaderParam} annotations
  * on a method and allows a dynamic {@link org.mule.api.endpoint.InboundEndpoint} to be created.  This endpoint is then used via the Mule {@link org.mule.api.transport.MessageRequester}
  * interface to make a specific request to a transport for a message.
  */
@@ -47,18 +59,29 @@ public class DynamicRequestEndpoint extends DynamicURIInboundEndpoint
     protected transient final Log logger = LogFactory.getLog(DynamicRequestEndpoint.class);
     private static final long serialVersionUID = 8861985949279708638L;
 
-    protected String uri;
-
-    //Need a local read-write intance
-    protected AbstractConnector localConnector;
-
     protected TemplateParser parser = TemplateParser.createCurlyBracesStyleParser();
 
-    public DynamicRequestEndpoint(InboundEndpoint endpoint, String uri)
+    /**
+     * The URI template used to construct the actual URI to send the message to.
+     */
+    protected String uriTemplate;
+
+    private EndpointBuilder builder;
+
+   public DynamicRequestEndpoint(MuleContext muleContext, EndpointBuilder builder, String uriTemplate) throws MalformedEndpointException
     {
-        super(endpoint);
-        this.uri = uri;
-        this.localConnector = (AbstractConnector) endpoint.getConnector();
+        super(new NullInboundEndpoint(muleContext));
+        this.builder = builder;
+        this.uriTemplate = uriTemplate;
+        validateUriTemplate(uriTemplate);
+    }
+
+    protected void validateUriTemplate(String uri) throws MalformedEndpointException
+    {
+        if (uri.indexOf(":") > uri.indexOf(ExpressionManager.DEFAULT_EXPRESSION_PREFIX))
+        {
+            throw new MalformedEndpointException(CoreMessages.dynamicEndpointsMustSpecifyAScheme(), uri);
+        }
     }
 
     protected Map<String, Object> getPropertiesForTemplate(MuleMessage message)
@@ -74,24 +97,24 @@ public class DynamicRequestEndpoint extends DynamicURIInboundEndpoint
         return props;
     }
 
-    protected EndpointURI getEndpointURIForMessage(MuleMessage message) throws MessagingException
+    protected EndpointURI getEndpointURIForMessage(MuleEvent event) throws MessagingException
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Uri before parsing is: " + uri);
+            logger.debug("Uri before parsing is: " + uriTemplate);
         }
 
-        Map<String, Object> props = getPropertiesForTemplate(message);
+        Map<String, Object> props = getPropertiesForTemplate(event.getMessage());
 
-        String newUriString = parser.parse(props, uri);
+        String newUriString = parser.parse(props, uriTemplate);
         Object evalParam = props.get(EVAL_PARAM_PROPERTY);
         if (evalParam != null)
         {
-            newUriString = this.getMuleContext().getExpressionManager().parse(newUriString, new DefaultMuleMessage(evalParam, getMuleContext()), true);
+            newUriString = parseURIString(newUriString, new DefaultMuleMessage(evalParam, getMuleContext()));
         }
         else
         {
-            newUriString = this.getMuleContext().getExpressionManager().parse(newUriString, message, true);
+            newUriString = parseURIString(newUriString, event.getMessage());
         }
         if (logger.isDebugEnabled())
         {
@@ -102,10 +125,10 @@ public class DynamicRequestEndpoint extends DynamicURIInboundEndpoint
         {
             setEndpointURI(new MuleEndpointURI(newUriString, getMuleContext()));
 
-            if (!getLocalConnector().supportsProtocol(getEndpointURI().getScheme()))
+            if (!newUriString.startsWith(getEndpointURI().getScheme()))
             {
                 throw new MessagingException(CoreMessages.schemeCannotChangeForRouter(
-                        this.getEndpointURI().getScheme(), getEndpointURI().getScheme()), message);
+                        this.getEndpointURI().getScheme(), getEndpointURI().getScheme()), event);
             }
             getEndpointURI().initialise();
             return getEndpointURI();
@@ -113,47 +136,33 @@ public class DynamicRequestEndpoint extends DynamicURIInboundEndpoint
         catch (Exception e)
         {
             throw new MessagingException(
-                    CoreMessages.templateCausedMalformedEndpoint(uri, newUriString),
-                    message, e);
+                    CoreMessages.templateCausedMalformedEndpoint(uriTemplate, newUriString),
+                    event, e);
         }
 
     }
 
-    @Override
-    public Connector getConnector()
+    protected String parseURIString(String uri, MuleMessage message)
     {
-        try
-        {
-            return getLocalConnector();
-        }
-        catch (MuleException e)
-        {
-            throw new MuleRuntimeException(e.getI18nMessage(), e);
-        }
+        return this.getMuleContext().getExpressionManager().parse(uri, message, true);
     }
 
-
-    protected AbstractConnector getLocalConnector() throws MuleException
+    public MuleMessage request(long timeout, MuleEvent event) throws Exception
     {
-        if (localConnector == null)
-        {
-            localConnector = (AbstractConnector) new TransportFactory(getMuleContext()).createConnector(getEndpointURI());
-            getMuleContext().getRegistry().registerConnector(localConnector);
-            //This allows connector properties to be set as properties on the endpoint
-            BeanUtils.populateWithoutFail(localConnector, this.getProperties(), false);
-        }
-        return localConnector;
-    }
+        EndpointURI uri = getEndpointURIForMessage(event);
 
-    public MuleMessage request(long timeout, MuleMessage message) throws Exception
-    {
-        EndpointURI uri = getEndpointURIForMessage(message);
-        DynamicURIInboundEndpoint inboundEndpoint = new DynamicURIInboundEndpoint(this, uri);
-        if (message.getInvocationProperty(MuleProperties.MULE_CREDENTIALS_PROPERTY) != null)
+        if (endpoint instanceof NullInboundEndpoint)
         {
-            inboundEndpoint.getProperties().put(MuleProperties.MULE_CREDENTIALS_PROPERTY, message.getInvocationProperty(MuleProperties.MULE_CREDENTIALS_PROPERTY));
+            builder.setURIBuilder(new URIBuilder(uri));
+            endpoint = builder.buildInboundEndpoint();
         }
-        return getLocalConnector().request(inboundEndpoint, timeout);
+        InboundEndpoint inboundEndpoint = new DynamicURIInboundEndpoint(endpoint, uri);
+
+        if (event.getMessage().getInvocationProperty(MuleProperties.MULE_CREDENTIALS_PROPERTY) != null)
+        {
+            inboundEndpoint.getProperties().put(MuleProperties.MULE_CREDENTIALS_PROPERTY, event.getMessage().getInvocationProperty(MuleProperties.MULE_CREDENTIALS_PROPERTY));
+        }
+        return super.request(timeout);
     }
 
     @Override
@@ -174,7 +183,7 @@ public class DynamicRequestEndpoint extends DynamicURIInboundEndpoint
 
         DynamicRequestEndpoint that = (DynamicRequestEndpoint) o;
 
-        return !(uri != null ? !uri.equals(that.uri) : that.uri != null);
+        return !(uriTemplate != null ? !uriTemplate.equals(that.uriTemplate) : that.uriTemplate != null);
 
     }
 
@@ -182,7 +191,47 @@ public class DynamicRequestEndpoint extends DynamicURIInboundEndpoint
     public int hashCode()
     {
         int result = 0;
-        result = 31 * result + (uri != null ? uri.hashCode() : 0);
+        result = 31 * result + (uriTemplate != null ? uriTemplate.hashCode() : 0);
         return result;
     }
+
+    protected static class NullInboundEndpoint extends DefaultInboundEndpoint implements InboundEndpoint
+    {
+        NullInboundEndpoint(MuleContext muleContext)
+        {
+            super(createDynamicConnector(muleContext), null, null, new HashMap(), null, true, MessageExchangePattern.ONE_WAY, 0, "started", null, null, muleContext, null, null, null, null, true, null);
+        }
+
+        @Override
+        public MessageProcessor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException
+        {
+            throw new UnsupportedOperationException("createMessageProcessorChain");
+        }
+
+        public List<String> getResponseProperties()
+        {
+            return Collections.emptyList();
+        }
+
+        @SuppressWarnings("unused")
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            throw new UnsupportedOperationException("process");
+        }
+
+        static Connector createDynamicConnector(MuleContext muleContext)
+        {
+            try
+            {
+                return new TransportFactory(muleContext).createConnector(DynamicOutboundEndpoint.DYNAMIC_URI_PLACEHOLDER);
+            }
+            catch (TransportFactoryException e)
+            {
+                //This should never happen
+                throw new MuleRuntimeException(e);
+            }
+        }
+    }
+
+
 }

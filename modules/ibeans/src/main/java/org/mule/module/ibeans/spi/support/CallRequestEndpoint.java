@@ -13,10 +13,12 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointBuilder;
-import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.PropertyScope;
 import org.mule.config.endpoint.AnnotatedEndpointData;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.AbstractConnector;
+import org.mule.util.UriParamFilter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,13 +50,24 @@ public class CallRequestEndpoint extends DynamicRequestEndpoint
     //determined
     private static List<Transformer> transformers = new ArrayList<Transformer>();
     private static List<Transformer> responseTransformers = new ArrayList<Transformer>();
+    
+    private UriParamFilter filter = new UriParamFilter();
 
-    public CallRequestEndpoint(MuleContext context, AnnotatedEndpointData epData)
+    public CallRequestEndpoint(MuleContext context, AnnotatedEndpointData epData) throws MalformedEndpointException
     {
-        super(createInboundEndpoint(context, epData), epData.getAddress());
+        super( context, createInboundBuilder(context, epData), epData.getAddress());
     }
 
-    private static InboundEndpoint createInboundEndpoint(MuleContext context, AnnotatedEndpointData epData)
+    @Override
+    protected void validateUriTemplate(String uri) throws MalformedEndpointException
+    {
+        if (uri.indexOf(":") > uri.indexOf(parser.getStyle().getPrefix()))
+        {
+            throw new MalformedEndpointException(CoreMessages.dynamicEndpointsMustSpecifyAScheme(), uri);
+        }
+    }
+
+    private static EndpointBuilder createInboundBuilder(MuleContext context, AnnotatedEndpointData epData)
     {
         try
         {
@@ -64,7 +77,7 @@ public class CallRequestEndpoint extends DynamicRequestEndpoint
             builder.setName(epData.getName());
             builder.setProperties(epData.getProperties() == null ? new HashMap() : epData.getProperties());
 
-            return builder.buildInboundEndpoint();
+            return builder;
         }
         catch (MuleException e)
         {
@@ -73,9 +86,22 @@ public class CallRequestEndpoint extends DynamicRequestEndpoint
     }
 
     @Override
+    protected String parseURIString(String uri, MuleMessage message)
+    {
+        //We do additional processing here to parse the URI template
+        Map<String, Object> props = getPropertiesForTemplate(message);
+
+        String newUriString = parser.parse(props, uri);
+        //Remove optional params completely if null
+        newUriString = filter.filterParamsByValue(newUriString, CallOutboundEndpoint.NULL_PARAM);
+
+        return super.parseURIString(newUriString, message);
+    }
+
+    @Override
     protected Map<String, Object> getPropertiesForTemplate(MuleMessage message)
     {
-        Map<String, Object> props = (Map) message.removeProperty(CHANNEL.URI_PARAM_PROPERTIES, PropertyScope.INVOCATION);
+        Map<String, Object> props = (Map) message.findPropertyInAnyScope(CHANNEL.URI_PARAM_PROPERTIES, null);
         if (props == null)
         {
             throw new IllegalStateException(CHANNEL.URI_PARAM_PROPERTIES + " not set on message");
@@ -90,7 +116,7 @@ public class CallRequestEndpoint extends DynamicRequestEndpoint
         {
             try
             {
-                transformers.addAll(getLocalConnector().getDefaultInboundTransformers(this));
+                transformers.addAll(((AbstractConnector)getConnector()).getDefaultInboundTransformers(this));
                 for (Transformer tran : transformers)
                 {
                     tran.setEndpoint(this);
@@ -113,7 +139,7 @@ public class CallRequestEndpoint extends DynamicRequestEndpoint
         {
             try
             {
-                responseTransformers.addAll(getLocalConnector().getDefaultResponseTransformers(this));
+                responseTransformers.addAll(((AbstractConnector)getConnector()).getDefaultResponseTransformers(this));
                 for (Transformer tran : responseTransformers)
                 {
                     tran.setEndpoint(this);

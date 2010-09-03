@@ -10,9 +10,12 @@
 package org.mule.module.ibeans.spi.support;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.NullPayload;
 
 import org.ibeans.api.channel.CHANNEL;
 
@@ -31,8 +34,12 @@ public class DynamicRequestInterfaceBinding extends DefaultRequestInterfaceBindi
             int timeout = event.getMessage().getInboundProperty(CHANNEL.TIMEOUT, event.getMuleContext().getConfiguration().getDefaultResponseTimeout());
             if (inboundEndpoint instanceof DynamicRequestEndpoint)
             {
-                return new DefaultMuleEvent(((DynamicRequestEndpoint) inboundEndpoint).request(timeout,
-                    event.getMessage()), event);
+                MuleMessage message =((DynamicRequestEndpoint) inboundEndpoint).request(timeout, event);
+                if(message == null)
+                {
+                    message = new DefaultMuleMessage(NullPayload.getInstance(), event.getMuleContext());
+                }
+                return new DefaultMuleEvent(message, event);
             }
             else
             {
@@ -43,7 +50,7 @@ public class DynamicRequestInterfaceBinding extends DefaultRequestInterfaceBindi
         }
         catch (Exception e)
         {
-            throw new MessagingException(CoreMessages.failedToInvoke("inboundEndpoint.request()"), event.getMessage(), e);
+            throw new MessagingException(CoreMessages.failedToInvoke("inboundEndpoint.request()"), event, e);
         }
     }
 }
