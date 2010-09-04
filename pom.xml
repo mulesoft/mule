@@ -147,7 +147,6 @@
         <xmlResolverVersion>1.2</xmlResolverVersion>
         <xmlSecurityVersion>1.4.0</xmlSecurityVersion>
         <xstreamVersion>1.2.2</xstreamVersion>
-        <yourKitVersion>9.0.8</yourKitVersion>
         <xaPoolVersion>1.5.0</xaPoolVersion>
     </properties>
 
@@ -364,7 +363,7 @@
             <dependency>
                 <groupId>com.yourkit</groupId>
                 <artifactId>yjp-controller-api-redist</artifactId>
-                <version>${yourKitVersion}</version>
+                <version>9.0.8</version>
             </dependency>
             <!-- For unit tests only -->
             <dependency>
