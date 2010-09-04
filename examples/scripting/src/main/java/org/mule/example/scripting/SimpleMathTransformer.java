@@ -37,7 +37,7 @@ public class SimpleMathTransformer extends AbstractTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         double data = NumberUtils.toDouble(src);
         if (data == NumberUtils.DOUBLE_ERROR)

@@ -12,7 +12,6 @@
     <property environment="env"/>
 
     <property name="dir.java" value="src"/>
-    <property name="dir.conf" value="conf"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
 
@@ -73,7 +72,7 @@
 
         <!-- Copy all resources to the output folder as well -->
         <copy todir="${dir.classes}">
-            <fileset dir="${dir.conf}"/>
+            <fileset dir="src/main/resources"/>
         </copy>
     </target>
 
@@ -83,39 +82,22 @@
 
         <jar jarfile="${dir.build}/${app.name}.jar"
              basedir="${dir.classes}"/>
+             
+        <zip destfile="${app.name}.zip">
+            <zipfileset file="${dir.build}/${app.name}.jar" fullpath="lib/mule-example-scripting.jar"/>
+            <zipfileset file="src/main/app/mule-config.xml" fullpath="mule-config.xml"/>
+            <fileset dir="${dir.build}">
+                <include name="lib/**"/>
+            </fileset>
+        </zip>
    </target>
 
    <target name="deploy"
            depends="package"
            description="Deploy the application to the Mule server">
 
-            <!-- scripting-groovy app -->
-            <copy file="${dir.build}/${app.name}.jar"
-                  todir="${dir.mule.home}/apps/scripting-groovy/lib"
-                  overwrite="true" verbose="true"/>
-            <copy file="conf/change-machine.xml"
-                  tofile="${dir.mule.home}/apps/scripting-groovy/mule-config.xml"/>
-            <copy file="conf/greedy.groovy"
-                  tofile="${dir.mule.home}/apps/scripting-groovy/classes/greedy.groovy"/>
-            <copy file="conf/groovy-usd.properties"
-                  tofile="${dir.mule.home}/apps/scripting-groovy/classes/default-config.properties"/>
-
-            <!-- scripting-python app -->
-            <copy file="${dir.build}/${app.name}.jar"
-                  todir="${dir.mule.home}/apps/scripting-python/lib"
-                  overwrite="true" verbose="true"/>
-            <copy file="conf/change-machine.xml"
-                  tofile="${dir.mule.home}/apps/scripting-python/mule-config.xml"/>
-            <copy file="conf/greedy.py"
-                  tofile="${dir.mule.home}/apps/scripting-python/classes/greedy.py"/>
-            <copy file="conf/python-gbp.properties"
-                  tofile="${dir.mule.home}/apps/scripting-python/classes/default-config.properties"/>
-            <copy todir="${dir.mule.home}/apps/scripting-python/lib"
-                  overwrite="true" verbose="true">
-                <fileset dir="${dir.build}/lib">
-                    <include name="**/*.jar"/>
-                </fileset>
-            </copy>
+            <copy file="${app.name}.zip" todir="${dir.mule.home}/apps" overwrite="true"/>
+            
             <!-- workaround for MULE-4921 -->
             <copy file="${dir.build}/lib/jython-engine-1.1-jdk14.jar" todir="${dir.mule.home}/lib/user"/>
             <copy file="${dir.build}/lib/jython-2.2.1.jar" todir="${dir.mule.home}/lib/user"/>

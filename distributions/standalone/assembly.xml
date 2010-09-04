@@ -217,15 +217,6 @@
         <directory>../../examples/scripting/dist</directory>
         <outputDirectory>examples/scripting</outputDirectory>
     </fileSet>
-    <fileSet>
-        <directory>../../examples/scripting/dist</directory>
-        <outputDirectory>examples/scripting</outputDirectory>
-        <fileMode>755</fileMode>
-        <includes>
-            <include>scripting</include>
-            <include>scripting.bat</include>
-        </includes>
-    </fileSet>
 
     <!--
     ===============================
@@ -523,22 +514,28 @@
 
     <!-- Examples -->
     <dependencySet>
-        <outputDirectory>examples/echo</outputDirectory>
-        <includes>
-            <include>org.mule.examples:mule-example-echo</include>
-        </includes>
+      <outputDirectory>examples/echo</outputDirectory>
+      <includes>
+        <include>org.mule.examples:mule-example-echo</include>
+      </includes>
     </dependencySet>
     <dependencySet>
-        <outputDirectory>examples/hello</outputDirectory>
-        <includes>
-            <include>org.mule.examples:mule-example-hello</include>
-        </includes>
+      <outputDirectory>examples/hello</outputDirectory>
+      <includes>
+        <include>org.mule.examples:mule-example-hello</include>
+      </includes>
     </dependencySet>
     <dependencySet>
-        <outputDirectory>examples/errorhandler</outputDirectory>
-        <includes>
-            <include>org.mule.examples:mule-example-errorhandler</include>
-        </includes>
+      <outputDirectory>examples/errorhandler</outputDirectory>
+      <includes>
+        <include>org.mule.examples:mule-example-errorhandler</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>examples/scripting</outputDirectory>
+      <includes>
+        <include>org.mule.examples:mule-example-scripting</include>
+      </includes>
     </dependencySet>
   </dependencySets>
 </assembly>

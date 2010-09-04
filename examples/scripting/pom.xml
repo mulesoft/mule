@@ -8,6 +8,7 @@
     </parent>
     <artifactId>mule-example-scripting</artifactId>
     <name>Scripting Example</name>
+    <packaging>mule</packaging>
     <description>A simple example that demonstrates Mule's JSR-223 Scripting support.</description>
 
     <dependencies>
@@ -15,29 +16,32 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
             <groupId>javax.script</groupId>
             <artifactId>jython-engine</artifactId>
-            <scope>provided</scope>
+<!--            <scope>provided</scope>-->
             <classifier>jdk14</classifier>
         </dependency>
         <dependency>
             <!-- This is the actual language implementation -->
             <groupId>org.python</groupId>
             <artifactId>jython</artifactId>
-            <scope>provided</scope>
+<!--            <scope>provided</scope>-->
         </dependency>
         
         <!-- Unit tests only -->
@@ -54,4 +58,15 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/main/app</directory>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+    </build>
 </project>

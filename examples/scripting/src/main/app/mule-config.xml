@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.0/mule-scripting.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
+
+    <description>
+        This example demonstrates invoking a JSR-223 script as the service component.
+    </description>
+
+    <http:body-to-parameter-map-transformer name="HttpRequestToMap"/>
+    
+    <expression-transformer name="ExtractAmount">
+        <return-argument evaluator="map-payload" expression="amount"/>
+    </expression-transformer>
+    
+    <custom-transformer name="StringToNumber" class="org.mule.example.scripting.StringToNumber"/>
+    
+    <custom-transformer name="DollarsToCents" class="org.mule.example.scripting.SimpleMathTransformer">
+        <spring:property name="operation" value="multiply"/>
+        <spring:property name="factor" value="100"/>
+    </custom-transformer>
+    
+    <model name="main">
+        <service name="Accumulator">
+            <inbound>
+                <http:inbound-endpoint host="localhost" port="47493" path="change-machine"
+                    exchange-pattern="request-response" 
+                    transformer-refs="HttpRequestToMap"/>
+            </inbound>
+            <outbound>
+                <filtering-router>
+                    <vm:outbound-endpoint path="groovy-script" exchange-pattern="request-response">
+                        <transformer ref="ExtractAmount StringToNumber DollarsToCents"/>
+                    </vm:outbound-endpoint>
+                    <expression-filter evaluator="groovy" 
+                        expression="return payload.currency == 'USD'"/>
+                </filtering-router>
+
+                <filtering-router>
+                    <vm:outbound-endpoint path="jython-script" exchange-pattern="request-response">
+                        <transformer ref="ExtractAmount StringToNumber DollarsToCents"/>
+                    </vm:outbound-endpoint>
+                    <expression-filter evaluator="groovy" 
+                        expression="return payload.currency == 'GBP'"/>
+                </filtering-router>
+            </outbound>
+        </service>
+
+        <service name="GroovyScriptService">
+            <inbound>
+                <vm:inbound-endpoint path="groovy-script" exchange-pattern="request-response"/>
+            </inbound>
+            <script:component>
+                <script:script file="greedy.groovy">
+                    <property key="currency" value="USD"/>
+                </script:script>
+            </script:component>
+        </service>
+        
+        <service name="JythonScriptService">
+            <inbound>
+                <vm:inbound-endpoint path="jython-script" exchange-pattern="request-response"/>
+            </inbound>
+            <script:component>
+                <script:script file="greedy.py">
+                    <property key="currency" value="GBP"/>
+                </script:script>
+            </script:component>
+        </service>
+    </model>
+</mule>

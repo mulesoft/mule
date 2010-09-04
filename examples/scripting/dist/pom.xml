@@ -6,6 +6,7 @@
     <artifactId>mule-example-scripting</artifactId>
     <version>1.0</version>
     <name>Scripting Example</name>
+    <packaging>mule</packaging>
     <description>A simple example that demonstrates Mule's JSR-223 Scripting support.</description>
 
     <properties>
@@ -24,21 +25,25 @@
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${muleVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
             <version>${muleVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${muleVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${muleVersion}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
@@ -48,14 +53,12 @@
             <version>1.1</version>
             <!-- we use our own retrotranslated version -->
             <classifier>jdk14</classifier>
-            <scope>provided</scope>
         </dependency>
         <!-- This is the actual language implementation -->
         <dependency>
             <groupId>org.python</groupId>
             <artifactId>jython</artifactId>
             <version>2.2.1</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -120,15 +123,14 @@
         <defaultGoal>install</defaultGoal>
         <finalName>${artifactId}</finalName>
 
-        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
-        <resources>
-            <resource>
-                <directory>conf</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/main/app</directory>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
     
         <plugins>
             <plugin>
@@ -160,6 +162,12 @@
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <version>1.1</version>
+                <extensions>true</extensions>
+            </plugin>
             <!-- "mvn install" will copy the application to the $MULE_HOME/apps directory,
                 overwriting the previous one. -->
             <plugin>
@@ -174,13 +182,8 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${basedir}/conf/change-machine.xml" tofile="${MULE_HOME}/apps/scripting-groovy/mule-config.xml"/>
-                                <copy file="${basedir}/conf/greedy.groovy" tofile="${MULE_HOME}/apps/scripting-groovy/classes/greedy.groovy"/>
-                                <copy file="${basedir}/conf/groovy-usd.properties" tofile="${MULE_HOME}/apps/scripting-groovy/classes/default-config.properties"/>
-
-                                <copy file="${basedir}/conf/change-machine.xml" tofile="${MULE_HOME}/apps/scripting-python/mule-config.xml"/>
-                                <copy file="${basedir}/conf/greedy.py" tofile="${MULE_HOME}/apps/scripting-python/classes/greedy.py"/>
-                                <copy file="${basedir}/conf/python-gbp.properties" tofile="${MULE_HOME}/apps/scripting-python/classes/default-config.properties"/>
+                                <copy file="${project.build.directory}/${artifactId}.zip" 
+                                    todir="${env.MULE_HOME}/apps" overwrite="true"/>
                             </tasks>
                         </configuration>
                     </execution>
@@ -191,57 +194,6 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>2.1</version>
                 <executions>
-                    <execution>
-                        <id>copy-groovy-artifacts</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/scripting-groovy/lib</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${groupId}</groupId>
-                                    <artifactId>${artifactId}</artifactId>
-                                    <version>${version}</version>
-                                    <destFileName>${artifactId}.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-python-artifacts</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/scripting-python/lib</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${groupId}</groupId>
-                                    <artifactId>${artifactId}</artifactId>
-                                    <version>${version}</version>
-                                    <destFileName>${artifactId}.jar</destFileName>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>javax.script</groupId>
-                                    <artifactId>jython-engine</artifactId>
-                                    <version>1.1</version>
-                                    <classifier>jdk14</classifier>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.python</groupId>
-                                    <artifactId>jython</artifactId>
-                                    <version>2.2.1</version>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
                     <!-- workaround for MULE-4921 -->
                     <execution>
                         <id>copy-python-artifacts-to-mule-libs</id>
