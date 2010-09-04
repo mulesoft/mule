@@ -9,9 +9,6 @@
  */
 package org.mule.routing.filters;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -22,6 +19,9 @@ import java.text.MessageFormat;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
 
 /**
  * Allows boolean expressions to be executed on a message. Note that when using this filter you must be able to either specify
@@ -123,13 +123,11 @@ public class ExpressionFilter implements Filter, MuleContextAware
         {
             Thread.currentThread().setContextClassLoader(expressionEvaluationClassLoader);
             result = muleContext.getExpressionManager().evaluate(expr, message, false);
-
         }
         finally
         {
             // Restore original context class-loader
             Thread.currentThread().setContextClassLoader(originalContextClassLoader);
-
         }
 
         if (result == null)
@@ -258,6 +256,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
         this.nullReturnsTrue = nullReturnsTrue;
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (this == obj) return true;
@@ -269,6 +268,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
             && nullReturnsTrue == other.nullReturnsTrue;
     }
 
+    @Override
     public int hashCode()
     {
         return hash(new Object[]{this.getClass(), config, delegateFilter, nullReturnsTrue});
