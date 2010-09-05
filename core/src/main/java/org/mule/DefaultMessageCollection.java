@@ -186,4 +186,19 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     {
         return new DefaultMessageCollection(this, muleContext);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MuleMessage createInboundMessage(boolean reinitialize) throws Exception
+    {
+        DefaultMessageCollection newMessage = new DefaultMessageCollection(getMuleContext());
+        MuleMessage[] messages = getMessagesAsArray();
+        for (MuleMessage message : messages)
+        {
+            newMessage.addMessage(message.createInboundMessage(reinitialize));
+        }
+        return newMessage;
+    }
 }

@@ -56,6 +56,13 @@ public interface ImmutableEndpoint extends Serializable
     EndpointURI getEndpointURI();
 
     /**
+     * This returns the address of the endpoint.  When this contains a template, it may not be a URI
+     *
+     * @return the address on which the endpoint sends or receives data
+     */
+    String getAddress();
+
+    /**
      * Decides the encoding to be used for events received by this endpoint
      *
      * @return the encoding set on the endpoint or null if no codin has been

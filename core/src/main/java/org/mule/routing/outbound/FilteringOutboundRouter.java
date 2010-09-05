@@ -173,7 +173,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
                 return routes.get(index);
             }
             OutboundEndpoint ep = (OutboundEndpoint) mp;
-            String uri = ep.getEndpointURI().getUri().toString();
+            String uri = ep.getAddress();
 
             if (logger.isDebugEnabled())
             {
@@ -201,6 +201,10 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
             {
 
                 String newUriString = parser.parse(props, uri);
+                if (parser.isContainsTemplate(newUriString))
+                {
+                    newUriString = this.getMuleContext().getExpressionManager().parse(newUriString, message, true);
+                }
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Uri after parsing is: " + uri);
@@ -208,7 +212,8 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
                 try
                 {
                     EndpointURI newUri = new MuleEndpointURI(newUriString, muleContext);
-                    if (!newUri.getScheme().equalsIgnoreCase(ep.getEndpointURI().getScheme()))
+                    EndpointURI endpointURI = ep.getEndpointURI();
+                    if (endpointURI != null && !newUri.getScheme().equalsIgnoreCase(endpointURI.getScheme()))
                     {
                         throw new CouldNotRouteOutboundMessageException(
                             CoreMessages.schemeCannotChangeForRouter(ep.getEndpointURI().getScheme(),

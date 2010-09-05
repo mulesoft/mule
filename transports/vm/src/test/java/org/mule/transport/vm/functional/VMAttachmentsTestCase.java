@@ -45,8 +45,8 @@ public class VMAttachmentsTestCase extends FunctionalTestCase
         }
 
         //TODO MULE-5000 attachments should be on the inbound
-        assertEquals(1, reply.getOutboundAttachmentNames().size());
-        assertNotNull(reply.getOutboundAttachment("mule"));
-        assertTrue(reply.getOutboundAttachment("mule").getContentType().startsWith("image/gif"));
+        assertEquals(1, reply.getInboundAttachmentNames().size());
+        assertNotNull(reply.getInboundAttachment("mule"));
+        assertTrue(reply.getInboundAttachment("mule").getContentType().startsWith("image/gif"));
     }
 }

@@ -185,6 +185,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      */
     protected Object process(Object data, MuleEventContext context) throws Exception
     {
+        // System.out.println(data + " at " + new java.util.Date());
         if (enableMessageHistory)
         {
             messageHistory.add(data);

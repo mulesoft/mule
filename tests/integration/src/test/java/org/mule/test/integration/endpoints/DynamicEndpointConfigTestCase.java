@@ -2,6 +2,7 @@ package org.mule.test.integration.endpoints;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.DataType;
 import org.mule.tck.FunctionalTestCase;
 
 /**
@@ -21,10 +22,14 @@ public class DynamicEndpointConfigTestCase extends FunctionalTestCase
 
         MuleMessage msg = new DefaultMuleMessage("Data", muleContext);
         msg.setOutboundProperty("testProp", "testPath");
-        final MuleMessage response = muleContext.getClient().send("vm://in", msg);
+        MuleMessage response = muleContext.getClient().send("vm://in1", msg);
         assertNotNull(response);
         assertNull(response.getExceptionPayload());
-        // TODO update asssertions once we get over the original NPE
-        assertEquals("Data Received", response.getPayload());
+        assertEquals("Data Received", response.getPayload(DataType.STRING_DATA_TYPE));
+
+        response = muleContext.getClient().send("vm://in2", msg);
+        assertNotNull(response);
+        assertNull(response.getExceptionPayload());
+        assertEquals("Data Received", response.getPayload(DataType.STRING_DATA_TYPE));
     }
 }

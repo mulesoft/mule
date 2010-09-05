@@ -53,6 +53,11 @@ public class ConnectableLifecycleManager<O> extends SimpleLifecycleManager<O>
     @Override
     public void fireStopPhase(LifecycleCallback<O> callback) throws MuleException
     {
+        // We are sometimes stopped by our owner when already stopped
+        if (currentPhase == Stoppable.PHASE_NAME)
+        {
+            return;
+        }
         checkPhase(Stoppable.PHASE_NAME);
         if (logger.isInfoEnabled())
         {

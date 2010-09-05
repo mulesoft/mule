@@ -30,6 +30,7 @@ public class RouterTestUtils
     {
         Mock mockEndpoint = MuleTestUtils.getMockOutboundEndpoint();
         mockEndpoint.matchAndReturn("getEndpointURI", toMock.getEndpointURI());
+        mockEndpoint.matchAndReturn("getAddress", toMock.getEndpointURI().getUri().toString());
         mockEndpoint.matchAndReturn("toString", toMock.toString());
         mockEndpoint.matchAndReturn("getExchangePattern", toMock.getExchangePattern());
         mockEndpoint.matchAndReturn("getProperties", toMock.getProperties());

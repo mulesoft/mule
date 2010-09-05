@@ -139,7 +139,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
     protected MuleEvent createMuleEvent(MuleMessage message, OutboundEndpoint endpoint)
     {
-        DefaultMuleSession session = new DefaultMuleSession(new MuleClientFlowConstruct(), muleContext);
+        DefaultMuleSession session = new DefaultMuleSession(new MuleClientFlowConstruct(muleContext), muleContext);
         return new DefaultMuleEvent(message, endpoint, session);
     }
 
@@ -207,6 +207,13 @@ public class DefaultLocalMuleClient implements LocalMuleClient
      */
     static public class MuleClientFlowConstruct implements FlowConstruct
     {
+        MuleContext muleContext;
+
+        public MuleClientFlowConstruct(MuleContext muleContext)
+        {
+            this.muleContext = muleContext;
+        }
+
         public String getName()
         {
             return "MuleClient";
@@ -214,7 +221,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
         public MessagingExceptionHandler getExceptionListener()
         {
-            return new DefaultServiceExceptionStrategy();
+            return new DefaultServiceExceptionStrategy(muleContext);
         }
 
         public LifecycleState getLifecycleState()
@@ -229,7 +236,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
         public MuleContext getMuleContext()
         {
-            return null;
+            return muleContext;
         }
 
         public MessageInfoMapping getMessageInfoMapping()

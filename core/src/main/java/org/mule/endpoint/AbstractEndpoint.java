@@ -199,6 +199,19 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable
         return endpointUri;
     }
 
+    public String getAddress()
+    {
+        EndpointURI uri = getEndpointURI();
+        if (uri != null)
+        {
+            return uri.getUri().toString();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public String getEncoding()
     {
         return endpointEncoding;

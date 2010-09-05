@@ -68,6 +68,19 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
         validateUriTemplate(uriTemplate);
     }
 
+    public String getAddress()
+    {
+        EndpointURI uri = getEndpointURI();
+        if (uri != null)
+        {
+            return uri.getUri().toString();
+        }
+        else
+        {
+            return uriTemplate;
+        }
+    }
+
     protected void validateUriTemplate(String uri) throws MalformedEndpointException
     {
         if (uri.indexOf(":") > uri.indexOf(ExpressionManager.DEFAULT_EXPRESSION_PREFIX))

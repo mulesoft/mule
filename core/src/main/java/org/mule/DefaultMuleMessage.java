@@ -47,6 +47,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1635,5 +1636,69 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             }
         }
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public MuleMessage createInboundMessage(boolean reinitialize) throws Exception
+    {
+        DefaultMuleMessage newMessage =  new DefaultMuleMessage(getPayload(), this, getMuleContext());
+        copyToInbound(newMessage, reinitialize);
+        return newMessage;
+    }
+
+    /*
+     ** copy outbound artifacts to inbound artifacts in the new message
+     */
+    protected void copyToInbound(DefaultMuleMessage newMessage, boolean reinitialize) throws Exception
+    {
+
+        //Copy message, but put all outbound properties and attachments on inbound
+        //We ignore inbound and invocation scopes since the VM receiver needs to behave the
+        //same way as any other receiver in Mule and would only receive inbound headers and attachments
+        Map<String, DataHandler> attachments = new HashMap<String, DataHandler>(3);
+        for (String name : getOutboundAttachmentNames())
+        {
+            attachments.put(name, getOutboundAttachment(name));
+        }
+
+        Map<String, Object> properties = new HashMap<String, Object>(3);
+        for (String name : getOutboundPropertyNames())
+        {
+            properties.put(name, getOutboundProperty(name));
+        }
+
+
+        if (reinitialize)
+        {
+            newMessage.clearProperties(PropertyScope.INBOUND);
+            newMessage.clearProperties(PropertyScope.INVOCATION);
+            newMessage.clearProperties(PropertyScope.OUTBOUND);
+        }
+
+        for (String s : properties.keySet())
+        {
+            newMessage.setInboundProperty(s, properties.get(s));
+        }
+
+        if (reinitialize)
+        {
+            for (String s : newMessage.getOutboundAttachmentNames())
+            {
+                newMessage.removeAttachment(s);
+            }
+        }
+
+        for (String s : attachments.keySet())
+        {
+            newMessage.addInboundAttachment(s, attachments.get(s));
+        }
+
+        newMessage.setCorrelationId(getCorrelationId());
+        newMessage.setCorrelationGroupSize(getCorrelationGroupSize());
+        newMessage.setCorrelationSequence(getCorrelationSequence());
+        newMessage.setReplyTo(getReplyTo());
+        newMessage.setEncoding(getEncoding());
     }
 }

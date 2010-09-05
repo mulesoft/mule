@@ -112,7 +112,7 @@ public class RemoteDispatcher implements Disposable
         MuleMessage result = null;
         
         MuleEvent resultEvent = syncServerEndpoint.process(new DefaultMuleEvent(msg, syncServerEndpoint,
-            new DefaultMuleSession(new MuleClientFlowConstruct(), muleContext)));
+            new DefaultMuleSession(new MuleClientFlowConstruct(muleContext), muleContext)));
         if (resultEvent != null)
         {
             result = resultEvent.getMessage();

@@ -13,15 +13,30 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
 
+    <http:endpoint name="out"
+                       address="http://localhost:62345/testPath"
+                       exchange-pattern="request-response"/>
+
     <model name="model">
-        <service name="service">
+        <service name="service1A">
             <inbound>
-                <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+                <vm:inbound-endpoint path="in1" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <filtering-router>
                     <outbound-endpoint address="http://localhost:62345/#[header:INBOUND:testProp]"
                                        exchange-pattern="request-response"/>
+                </filtering-router>
+            </outbound>
+        </service>
+
+        <service name="service1B">
+            <inbound>
+                <vm:inbound-endpoint path="in2" exchange-pattern="request-response"/>
+            </inbound>
+            <outbound>
+                <filtering-router>
+                    <outbound-endpoint ref="out"/>
                 </filtering-router>
             </outbound>
         </service>

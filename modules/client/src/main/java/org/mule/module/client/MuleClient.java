@@ -727,7 +727,7 @@ public class MuleClient implements Disposable
     {
         try
         {            
-            DefaultMuleSession session = new DefaultMuleSession(new DefaultLocalMuleClient.MuleClientFlowConstruct(), muleContext);
+            DefaultMuleSession session = new DefaultMuleSession(new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext), muleContext);
 
             if (user != null)
             {

@@ -72,6 +72,19 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         }
     }
 
+    public String getAddress()
+    {
+        EndpointURI uri = getEndpointURI();
+        if (uri != null)
+        {
+            return uri.getUri().toString();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public void setEndpointURI(EndpointURI dynamicEndpointURI)
     {
         this.dynamicEndpointURI = dynamicEndpointURI;

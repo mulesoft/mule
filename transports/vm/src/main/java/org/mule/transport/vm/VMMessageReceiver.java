@@ -15,6 +15,7 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -115,9 +116,14 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         try
         {
             // Rewrite the message to treat it as a new message
-            MuleMessage newMessage = createMessageCopy(message);
+            MuleMessage newMessage = message.createInboundMessage(true);
             MuleEvent event =  routeMessage(newMessage);
-            return event == null ? null : event.getMessage();
+            MuleMessage returnedMessage = event == null ? null : event.getMessage();
+            if (returnedMessage != null)
+            {
+                returnedMessage = returnedMessage.createInboundMessage(false);
+            }
+            return returnedMessage;
         }
         catch (Exception e)
         {
@@ -125,7 +131,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         }
     }
     
-    protected MuleMessage createMessageCopy(MuleMessage message) throws Exception
+    protected MuleMessage createMessageCopy(MuleMessage message, boolean reinitialize) throws Exception
     {
         //Copy message, but put all outbound properties and attachments on inbound
         //We ignore inbound and invocation scopes since the VM receiver needs to behave the
@@ -143,18 +149,24 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         }
 
         DefaultMuleMessage newMessage =  new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());
-        newMessage.clearProperties(PropertyScope.INBOUND);
-        newMessage.clearProperties(PropertyScope.INVOCATION);
-        newMessage.clearProperties(PropertyScope.OUTBOUND);
+        if (reinitialize)
+        {
+            newMessage.clearProperties(PropertyScope.INBOUND);
+            newMessage.clearProperties(PropertyScope.INVOCATION);
+            newMessage.clearProperties(PropertyScope.OUTBOUND);
+        }
 
         for (String s : properties.keySet())
         {
             newMessage.setInboundProperty(s, properties.get(s));
         }
 
-        for (String s : newMessage.getOutboundAttachmentNames())
+        if (reinitialize)
         {
-            newMessage.removeAttachment(s);
+            for (String s : newMessage.getOutboundAttachmentNames())
+            {
+                newMessage.removeAttachment(s);
+            }
         }
 
         for (String s : attachments.keySet())
@@ -251,7 +263,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         MuleMessage message = (MuleMessage) msg;
 
         // Rewrite the message to treat it as a new message
-        MuleMessage newMessage = createMessageCopy(message);
+        MuleMessage newMessage = message.createInboundMessage(true);
         routeMessage(newMessage);
     }
 

@@ -728,4 +728,11 @@ public interface MuleMessage extends Serializable
     <T> T getSessionProperty(String name);
 
     void setSessionProperty(String key, Object value);
+
+    /**
+     * Copy an inbound message to an outbound one, moving all message properties and attachments
+     * @param reinitialize whether to reinitilaize the created message
+     * @return the inbound message
+     */
+    MuleMessage createInboundMessage(boolean reinitialize) throws Exception;
 }

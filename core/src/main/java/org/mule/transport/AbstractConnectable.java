@@ -10,6 +10,7 @@
 
 package org.mule.transport;
 
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
@@ -346,6 +347,17 @@ public abstract class AbstractConnectable<O> implements Connectable, LifecycleSt
         {
             connectAndThenStart();
         }
+        else if (connecting.get() && isDoStartMustFollowDoConnect())
+        {
+            try
+            {
+                callDoStartWhenItIsConnected();
+            }
+            catch (InterruptedException e)
+            {
+                throw new StartException(CoreMessages.failedToStart("Connectable: " + this), e, AbstractConnectable.this);
+            }
+        }
         else
         {
             try
@@ -606,5 +618,13 @@ public abstract class AbstractConnectable<O> implements Connectable, LifecycleSt
     protected MuleMessage createNullMuleMessage() throws MuleException
     {
         return createMuleMessage(null);
+    }
+
+    /**
+     * @return true if doStart() must come strictly after the completion of doConnect()
+     */
+    protected boolean isDoStartMustFollowDoConnect()
+    {
+        return false;
     }
 }
