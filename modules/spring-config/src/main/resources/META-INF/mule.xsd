@@ -1524,6 +1524,11 @@
     </xsd:complexType>   
     
     <xsd:element name="flow-ref" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allows a 'flow' to be referenced such that the message processing will continue in the referenced flow before returning.  Message processing in the referenced 'flow' will occur within the context of the referenced flow and will therefore use it's exception strategy etc.
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="abstractMessageProcessorType">
