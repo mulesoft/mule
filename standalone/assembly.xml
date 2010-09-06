@@ -227,15 +227,6 @@
         <directory>../../examples/stockquote/dist</directory>
         <outputDirectory>examples/stockquote</outputDirectory>
     </fileSet>
-    <fileSet>
-        <directory>../../examples/stockquote/dist</directory>
-        <outputDirectory>examples/stockquote</outputDirectory>
-        <fileMode>755</fileMode>
-        <includes>
-            <include>stockquote</include>
-            <include>stockquote.bat</include>
-        </includes>
-    </fileSet>
 
     <!--
     ============================
@@ -535,6 +526,12 @@
       <outputDirectory>examples/scripting</outputDirectory>
       <includes>
         <include>org.mule.examples:mule-example-scripting</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>examples/stockquote</outputDirectory>
+      <includes>
+        <include>org.mule.examples:mule-example-stockquote</include>
       </includes>
     </dependencySet>
   </dependencySets>
