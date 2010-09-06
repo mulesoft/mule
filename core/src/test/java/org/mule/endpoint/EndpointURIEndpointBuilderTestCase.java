@@ -16,10 +16,12 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.transformer.Transformer;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.transaction.MuleTransactionConfig;
+import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.ObjectNameHelper;
 
 public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
@@ -96,6 +98,35 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         assertEquals(endpoint.getSecurityFilter(), builder.getSecurityFilter());
         assertEquals(endpoint.getRetryPolicyTemplate(), builder.getRetryPolicyTemplate(builder.getConnector()));
         assertEquals(MessageExchangePattern.ONE_WAY, builder.getExchangePattern());
+    }
+    
+    /**
+     * Assert that the builder state (message prococessors/transformers) doesn't change when endpont is built
+     * multiple times
+     * 
+     * @throws Exception
+     */
+    public void testEndpointBuilderTransformersState() throws Exception
+    {
+        muleContext.getRegistry().registerObject("tran1", new StringAppendTransformer("1"));
+        muleContext.getRegistry().registerObject("tran2", new StringAppendTransformer("2"));
+
+        String uri = "test://address?transformers=tran1&responseTransformers=tran2";
+        EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(uri, muleContext);
+        endpointBuilder.setTransformers(java.util.Collections.<Transformer> singletonList(new StringAppendTransformer(
+            "3")));
+        endpointBuilder.setResponseTransformers(java.util.Collections.<Transformer> singletonList(new StringAppendTransformer(
+            "4")));
+
+        InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();
+
+        assertEquals(2, endpoint.getMessageProcessors().size());
+        assertEquals(2, endpoint.getResponseMessageProcessors().size());
+
+        endpoint = endpointBuilder.buildInboundEndpoint();
+
+        assertEquals(2, endpoint.getMessageProcessors().size());
+        assertEquals(2, endpoint.getResponseMessageProcessors().size());
     }
     
     private static class SensingEndpointURIEndpointBuilder extends EndpointURIEndpointBuilder

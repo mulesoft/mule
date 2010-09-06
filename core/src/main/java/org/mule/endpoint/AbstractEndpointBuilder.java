@@ -15,7 +15,6 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
@@ -24,11 +23,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
@@ -183,11 +178,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
 
         EndpointURI endpointURI = uriBuilder.getEndpoint();
         endpointURI.initialise();
-
-        addTransformersFromUri(endpointURI);
-        addResponseTransformersFromUri(endpointURI);
-        addTransformers();
-        addResponseTransformers();
+        
+        List<MessageProcessor> mergedProcessors = addTransformerProcessors(endpointURI);
+        List<MessageProcessor> mergedResponseProcessors = addResponseTransformerProcessors(endpointURI);
 
         Connector connector = getConnector();
         if (connector != null && !connector.supportsProtocol(endpointURI.getFullScheme()))
@@ -212,7 +205,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 getDefaultDeleteUnacceptedMessages(connector),
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
-                getMessageProcessorsFactory(), messageProcessors, responseMessageProcessors,
+                getMessageProcessorsFactory(), mergedProcessors, mergedResponseProcessors,
                 isDisableTransportTransformer(), mimeType);
     }
 
@@ -238,10 +231,8 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         EndpointURI endpointURI = uriBuilder.getEndpoint();
         endpointURI.initialise();
 
-        addTransformersFromUri(endpointURI);
-        addResponseTransformersFromUri(endpointURI);
-        addTransformers();
-        addResponseTransformers();
+        List<MessageProcessor> mergedProcessors = addTransformerProcessors(endpointURI);
+        List<MessageProcessor> mergedResponseProcessors = addResponseTransformerProcessors(endpointURI);
 
         Connector connector = getConnector();
         if (connector != null && !connector.supportsProtocol(getScheme()))
@@ -257,8 +248,27 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                 getDefaultDeleteUnacceptedMessages(connector), 
                 messageExchangePattern, getResponseTimeout(connector), getInitialState(connector),
                 getEndpointEncoding(connector), name, muleContext, getRetryPolicyTemplate(connector),
-                responsePropertiesList,  getMessageProcessorsFactory(), messageProcessors,
-                responseMessageProcessors, isDisableTransportTransformer(), mimeType);
+                responsePropertiesList,  getMessageProcessorsFactory(), mergedProcessors,
+                mergedResponseProcessors, isDisableTransportTransformer(), mimeType);
+    }
+    
+    protected List<MessageProcessor> addTransformerProcessors(EndpointURI endpointURI)
+        throws TransportFactoryException
+    {
+        List<MessageProcessor> tempProcessors = new LinkedList<MessageProcessor>(messageProcessors);
+        tempProcessors.addAll(getTransformersFromUri(endpointURI));
+        tempProcessors.addAll(transformers);
+        return tempProcessors;
+    }
+
+    protected List<MessageProcessor> addResponseTransformerProcessors(EndpointURI endpointURI)
+        throws TransportFactoryException
+    {
+        List<MessageProcessor> tempResponseProcessors = new LinkedList<MessageProcessor>(
+            responseMessageProcessors);
+        tempResponseProcessors.addAll(getResponseTransformersFromUri(endpointURI));
+        tempResponseProcessors.addAll(responseTransformers);
+        return tempResponseProcessors;
     }
 
     protected void prepareToBuildEndpoint()
@@ -471,13 +481,14 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return muleContext.getConfiguration().getDefaultResponseTimeout();
     }
 
-    protected void addTransformersFromUri(EndpointURI endpointURI) throws TransportFactoryException
+    protected List<Transformer> getTransformersFromUri(EndpointURI endpointURI)
+        throws TransportFactoryException
     {
         if (endpointURI.getTransformers() != null)
         {
             if (!CollectionUtils.containsType(messageProcessors, Transformer.class))
             {
-                messageProcessors.addAll(getTransformersFromString(endpointURI.getTransformers()));
+                return getTransformersFromString(endpointURI.getTransformers());
             }
             else
             {
@@ -486,15 +497,17 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                             + "' has transformer(s) configured, transformers configured as uri paramaters will be ignored.");
             }
         }
+        return Collections.emptyList();
     }
 
-    protected void addResponseTransformersFromUri(EndpointURI endpointURI) throws TransportFactoryException
+    protected List<Transformer> getResponseTransformersFromUri(EndpointURI endpointURI)
+        throws TransportFactoryException
     {
         if (endpointURI.getResponseTransformers() != null)
         {
             if (!CollectionUtils.containsType(responseMessageProcessors, Transformer.class))
             {
-                responseMessageProcessors.addAll(getTransformersFromString(endpointURI.getResponseTransformers()));
+                return getTransformersFromString(endpointURI.getResponseTransformers());
             }
             else
             {
@@ -503,18 +516,9 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
                             + "' has response transformer(s) configured, response transformers configured as uri paramaters will be ignored.");
             }
         }
+        return Collections.emptyList();
     }
     
-    protected void addTransformers() 
-    {
-        messageProcessors.addAll(transformers);
-    }
-
-    protected void addResponseTransformers() 
-    {
-        responseMessageProcessors.addAll(responseTransformers);
-    }
-
     protected String getMimeType()
     {
         return mimeType;
