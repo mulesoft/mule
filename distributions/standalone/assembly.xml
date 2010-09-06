@@ -529,6 +529,12 @@
       </includes>
     </dependencySet>
     <dependencySet>
+      <outputDirectory>examples/gpswalker</outputDirectory>
+      <includes>
+        <include>org.mule.examples:mule-example-gpswalker</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
       <outputDirectory>examples/stockquote</outputDirectory>
       <includes>
         <include>org.mule.examples:mule-example-stockquote</include>

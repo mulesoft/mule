@@ -1,3 +1,15 @@
-To build and run the gpswalker example, run 'mvn' from the command line.
++--------------------+
+| GPS Walker Example |
++--------------------+
+Simulates plotting GPS coordinates
 
-Then open the following url in your browser: http://localhost:8888 
++---------------------+
+| Running the example |
++---------------------+
+Simply copy the pre-built application archive (mule-example-gpswalker.zip) to the
+application folder ($MULE_HOME/apps) and start Mule. To access the web service 
+invoke
+
+    http://localhost:8081/services/gps/index.html
+
+from your browser.

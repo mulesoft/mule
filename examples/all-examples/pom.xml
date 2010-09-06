@@ -31,6 +31,12 @@
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-gpswalker</artifactId>
+            <version>${version}</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-hello</artifactId>
             <version>${version}</version>
             <type>zip</type>

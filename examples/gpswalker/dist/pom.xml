@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.examples</groupId>    
     <artifactId>mule-example-gpswalker</artifactId>
-    <packaging>war</packaging>
+    <packaging>mule</packaging>
     <name>GPS Walker Example</name>
     <version>1.0</version>
 
@@ -14,25 +14,24 @@
     <description>Simulates plotting GPS coordinates</description>
 
     <build>
-        <defaultGoal>tomcat:run</defaultGoal>
+        <defaultGoal>install</defaultGoal>
+
         <plugins>
-             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>tomcat-maven-plugin</artifactId>
-                <version>1.0-beta-1</version>
-                <configuration>
-                    <path>/</path>
-                    <port>8888</port>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.1</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <version>1.1</version>
+                <extensions>true</extensions>
             </plugin>
         </plugins>
     </build>
@@ -42,23 +41,19 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
             <version>${muleVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-quartz</artifactId>
             <version>${muleVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ajax</artifactId>
             <version>${muleVersion}</version>
-            <exclusions>
-                <!-- this example runs in tomcat. Avoid class loading conflicts with the servlet API -->
-                <exclusion>
-                    <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
