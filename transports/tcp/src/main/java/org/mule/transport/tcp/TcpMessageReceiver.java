@@ -210,7 +210,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
 
     protected Work createWork(Socket socket) throws IOException
     {
-        return new TcpWorker(socket, this, ((TcpConnector) connector).getNextMessageExceptionPolicy());
+        return new TcpWorker(socket, this);
     }
 
     protected class TcpWorker extends AbstractReceiverResourceWorker implements Disposable, Expirable
@@ -223,21 +223,11 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
         protected boolean dataInWorkFinished = false;
         protected Object notify = new Object();
         private boolean moreMessages = true;
-        private NextMessageExceptionPolicy nextMessageExceptionPolicy;
         
-        public TcpWorker(Socket socket,
-                         AbstractMessageReceiver receiver) throws IOException
-        {
-            this(socket, receiver, new DefaultMessageExceptionPolicy());
-        }
-        
-        public TcpWorker(Socket socket,
-                         AbstractMessageReceiver receiver,
-                         NextMessageExceptionPolicy nextMessageExceptionPolicy) throws IOException
+        public TcpWorker(Socket socket, AbstractMessageReceiver receiver) throws IOException
         {
             super(socket, receiver, ((TcpConnector) connector).getTcpProtocol().createResponse(socket));
             this.socket = socket;
-            this.nextMessageExceptionPolicy = nextMessageExceptionPolicy;
 
             final TcpConnector tcpConnector = ((TcpConnector) connector);
             protocol = tcpConnector.getTcpProtocol();
@@ -393,7 +383,7 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             }
             catch (SocketTimeoutException e)
             {
-                this.nextMessageExceptionPolicy.handleException(e, TcpMessageReceiver.this, this);
+                ((TcpConnector) connector).getKeepAliveMonitor().removeExpirable(this);
             }
             finally
             {

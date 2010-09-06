@@ -71,7 +71,6 @@ public class TcpConnector extends AbstractConnector
     private GenericKeyedObjectPool socketsPool = new GenericKeyedObjectPool();
     private int keepAliveTimeout = 0;
     private ExpiryMonitor keepAliveMonitor;
-    private NextMessageExceptionPolicy nextMessageExceptionPolicy;
 
     /** 
      * If set, the socket is not closed after sending a message.  This attribute 
@@ -149,6 +148,7 @@ public class TcpConnector extends AbstractConnector
         return parameter != Connector.INT_VALUE_NOT_SET && parameter != socketValue;
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         socketsPool.setFactory(getSocketFactory());
@@ -159,6 +159,7 @@ public class TcpConnector extends AbstractConnector
         socketsPool.setWhenExhaustedAction(GenericKeyedObjectPool.WHEN_EXHAUSTED_BLOCK);
     }
 
+    @Override
     protected void doDispose()
     {
         logger.debug("Closing TCP connector");
@@ -247,21 +248,25 @@ public class TcpConnector extends AbstractConnector
         }
     }
 
+    @Override
     protected void doConnect() throws Exception
     {
         // template method
     }
 
+    @Override
     protected void doDisconnect() throws Exception
     {
         socketsPool.clear();
     }
 
+    @Override
     protected void doStart() throws MuleException
     {
         // template method
     }
 
+    @Override
     protected void doStop() throws MuleException
     {
         // template method
@@ -289,6 +294,7 @@ public class TcpConnector extends AbstractConnector
      *
      * @deprecated The time out should be set explicitly for each
      */
+    @Deprecated
     public void setTimeout(int timeout)
     {
         setClientSoTimeout(timeout);
@@ -316,12 +322,14 @@ public class TcpConnector extends AbstractConnector
     }
 
     /** @deprecated Should use {@link #getSendBufferSize()} or {@link #getReceiveBufferSize()} */
+    @Deprecated
     public int getBufferSize()
     {
         return sendBufferSize;
     }
 
     /** @deprecated Should use {@link #setSendBufferSize(int)} or {@link #setReceiveBufferSize(int)} */
+    @Deprecated
     public void setBufferSize(int bufferSize)
     {
         sendBufferSize = valueOrDefault(bufferSize, 1, DEFAULT_BUFFER_SIZE);
@@ -370,6 +378,7 @@ public class TcpConnector extends AbstractConnector
     /**
      * @deprecated should use {@link #getReceiveBacklog()}
      */
+    @Deprecated
     public int getBacklog()
     {
         return receiveBacklog;
@@ -379,6 +388,7 @@ public class TcpConnector extends AbstractConnector
      * @param backlog
      * @deprecated should use {@link #setReceiveBacklog(int)}
      */
+    @Deprecated
     public void setBacklog(int backlog)
     {
         this.receiveBacklog = backlog;
@@ -394,6 +404,7 @@ public class TcpConnector extends AbstractConnector
         this.tcpProtocol = tcpProtocol;
     }
 
+    @Override
     public boolean isResponseEnabled()
     {
         return true;
@@ -493,27 +504,6 @@ public class TcpConnector extends AbstractConnector
     public void setKeepAliveTimeout(int keepAliveTimeout)
     {
         this.keepAliveTimeout = keepAliveTimeout;
-    }
-
-    /**
-     * @return the exception policy to be used when trying to receive the next message
-     */
-    public NextMessageExceptionPolicy getNextMessageExceptionPolicy()
-    {
-        if (this.nextMessageExceptionPolicy == null) {
-            this.nextMessageExceptionPolicy = new DefaultMessageExceptionPolicy();
-        }
-        return nextMessageExceptionPolicy;
-    }
-
-    /**
-     * Set the exception policy to be used when trying to receive the next message
-     * 
-     * @param nextMessageExceptionPolicy the exception policy to be used
-     */
-    public void setNextMessageExceptionPolicy(NextMessageExceptionPolicy nextMessageExceptionPolicy)
-    {
-        this.nextMessageExceptionPolicy = nextMessageExceptionPolicy;
     }
     
     @Override
