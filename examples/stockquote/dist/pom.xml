@@ -51,14 +51,7 @@
             <version>${muleVersion}</version>
             <scope>provided</scope>
         </dependency>
-        <!--  for the groovy expression evaluator -->
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-scripting</artifactId>
-            <version>${muleVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-        
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -74,6 +67,12 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
+            <version>${muleVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-scripting</artifactId>
             <version>${muleVersion}</version>
             <scope>test</scope>
         </dependency>
@@ -109,7 +108,7 @@
             <layout>legacy</layout>
         </repository>
     </repositories>
-    
+
     <pluginRepositories>
         <pluginRepository>
             <id>apache-plugin-snapshots</id>
