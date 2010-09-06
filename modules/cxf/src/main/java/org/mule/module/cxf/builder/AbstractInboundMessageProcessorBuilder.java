@@ -26,14 +26,13 @@ import org.mule.module.cxf.support.CxfUtils;
 import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.module.cxf.support.MuleProtocolHeadersOutInterceptor;
+import org.mule.module.cxf.support.MuleServiceConfiguration;
 import org.mule.util.ClassUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.Configurer;
@@ -97,7 +96,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         {
             throw new DefaultMuleException(e);
         }
-       
+
         // The binding - i.e. SOAP, XML, HTTP Binding, etc
         if (bindingId != null)
         {
@@ -159,14 +158,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         }
 
         ReflectionServiceFactoryBean svcFac = sfb.getServiceFactory();
-
-        addIgnoredMethods(svcFac, Callable.class.getName());
-        addIgnoredMethods(svcFac, Initialisable.class.getName());
-        addIgnoredMethods(svcFac, Disposable.class.getName());
-        addIgnoredMethods(svcFac, ServiceAware.class.getName());
-
-        // HACK because CXF expects a QName for the service
-        initServiceName(getServiceClass(), service, namespace, svcFac);
+        initServiceFactory(svcFac);
 
         CxfInboundMessageProcessor processor = new CxfInboundMessageProcessor();
         configureMessageProcessor(sfb, processor);
@@ -174,12 +166,12 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
 
         Bus bus = configuration.getCxfBus();
         sfb.setBus(bus);
-        sfb.getServiceFactory().setBus(bus);
+        svcFac.setBus(bus);
         
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer)
         {
-            configurer.configureBean(sfb.getServiceFactory().getEndpointName().toString(), sfb);
+            configurer.configureBean(svcFac.getEndpointName().toString(), sfb);
         }
         
         sfb.setProperties(properties);
@@ -213,34 +205,22 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         return "http://internalMuleCxfRegistry/" + hashCode();
     }
 
-    
     /**
-     * Gross hack to support getting the service namespace from CXF if one wasn't
-     * supplied.
+     * This method configures the {@link ReflectionServiceFactoryBean}.
      */
-    private void initServiceName(Class<?> exposedInterface,
-                                 String name,
-                                 String namespace,
-                                 ReflectionServiceFactoryBean svcFac)
+    private void initServiceFactory(ReflectionServiceFactoryBean svcFac)
     {
-        svcFac.setServiceClass(exposedInterface);
+        addIgnoredMethods(svcFac, Callable.class.getName());
+        addIgnoredMethods(svcFac, Initialisable.class.getName());
+        addIgnoredMethods(svcFac, Disposable.class.getName());
+        addIgnoredMethods(svcFac, ServiceAware.class.getName());
+
+        svcFac.getServiceConfigurations().add(0, new MuleServiceConfiguration(this));
+
+        svcFac.setServiceClass(getServiceClass());
         for (AbstractServiceConfiguration c : svcFac.getServiceConfigurations())
         {
             c.setServiceFactory(svcFac);
-        }
-
-        if (name != null && namespace == null)
-        {
-            namespace = svcFac.getServiceQName().getNamespaceURI();
-        }
-        else if (name == null && namespace != null)
-        {
-            name = svcFac.getServiceQName().getLocalPart();
-        }
-
-        if (name != null)
-        {
-            svcFac.setServiceName(new QName(namespace, name));
         }
     }
 

@@ -57,6 +57,7 @@ public class ProxyServiceConfiguration extends DefaultServiceConfiguration
                     .getExtension(WSDLManager.class)
                     .getDefinition(getServiceFactory().getWsdlURL());
                 Service service = getServiceFromDefinition(definition);
+                setServiceNamespace(service.getQName().getNamespaceURI());
                 return new QName(getServiceNamespace(), ((Port) service.getPorts().values().iterator().next()).getName());
             }
             else

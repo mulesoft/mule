@@ -16,6 +16,8 @@ import org.mule.util.ExceptionUtils;
 
 import java.net.URL;
 
+import org.apache.cxf.service.factory.ServiceConstructionException;
+
 public class ProxyServiceConfigurationTestCase extends AbstractMuleTestCase
 {
     public void testGetEndpointName_CorrectNameSpace()
@@ -35,8 +37,8 @@ public class ProxyServiceConfigurationTestCase extends AbstractMuleTestCase
         catch (RuntimeException e)
         {
             Throwable rootCause = ExceptionUtils.getRootCause(e);
-            assertTrue("Exception must be of type " + ComponentNotFoundRuntimeException.class
-                       + ", instead of " + rootCause, rootCause instanceof ComponentNotFoundRuntimeException);
+            assertTrue("Exception must be of type " + ServiceConstructionException.class + ", instead of "
+                       + rootCause, rootCause instanceof ServiceConstructionException);
         }
     }
 
