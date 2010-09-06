@@ -27,7 +27,9 @@ import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.endpoint.AbstractEndpoint;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.message.DefaultExceptionPayload;
+import org.mule.processor.NullMessageProcessor;
 import org.mule.tck.security.TestSecurityFilter;
 import org.mule.transformer.simple.InboundAppendTransformer;
 import org.mule.transformer.simple.ResponseAppendTransformer;
@@ -278,6 +280,24 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertNotNull(result);
         assertEquals(RESPONSE_MESSAGE + ResponseAppendTransformer.APPEND_STRING,
             result.getMessage().getPayloadAsString());
+    }
+    
+    public void testObjectAwareInjection() throws Exception
+    {
+        EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URI, muleContext);
+        endpointBuilder.addMessageProcessor(new ObjectAwareProcessor());
+
+        endpoint = endpointBuilder.buildInboundEndpoint();
+        endpoint.setListener(new NullMessageProcessor());
+        endpoint.setFlowConstruct(getTestService());
+        endpoint.start();
+
+        ObjectAwareProcessor objectAware = (ObjectAwareProcessor) endpoint.getMessageProcessors().get(0);
+        
+        assertEquals(muleContext, objectAware.context);
+        assertEquals(endpoint, objectAware.endpoint);
+
+        endpoint.stop();
     }
 
     protected MuleMessage createTestRequestMessage()

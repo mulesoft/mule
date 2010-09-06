@@ -13,14 +13,17 @@ package org.mule.endpoint;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointException;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
@@ -290,4 +293,26 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
         }
     }
 
+    public class ObjectAwareProcessor implements MessageProcessor, EndpointAware, MuleContextAware
+    {
+
+        public MuleContext context;
+        public ImmutableEndpoint endpoint;
+
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            return null;
+        }
+
+        public void setEndpoint(ImmutableEndpoint endpoint)
+        {
+            this.endpoint = endpoint;
+        }
+
+        public void setMuleContext(MuleContext context)
+        {
+            this.context = context;
+        }
+    }
+    
 }

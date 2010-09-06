@@ -16,14 +16,13 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
-import org.mule.api.routing.filter.Filter;
-import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnector;
@@ -96,6 +95,10 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         MessageProcessor chain = factory.createOutboundMessageProcessorChain(this, flowContruct,
             ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this));
         
+        if (chain instanceof MuleContextAware)
+        {
+            ((MuleContextAware) chain).setMuleContext(getMuleContext());
+        }
         if (chain instanceof Initialisable)
         {
             ((Initialisable) chain).initialise();

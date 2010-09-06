@@ -27,6 +27,7 @@ import org.mule.api.transport.MessageDispatcher;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.tck.security.TestSecurityFilter;
 import org.mule.tck.testmodels.mule.TestMessageDispatcher;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
@@ -212,6 +213,20 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         endpoint.process(testOutboundEvent);
 
         assertEquals(testTimeout, dispacher.sensedSendEvent.getTimeout());
+    }
+    
+    public void testObjectAwareInjection() throws Exception
+    {
+        EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URI, muleContext);
+        endpointBuilder.addMessageProcessor(new ObjectAwareProcessor());
+
+        OutboundEndpoint endpoint = endpointBuilder.buildOutboundEndpoint();
+        endpoint.process(createTestOutboundEvent(endpoint));
+        
+        ObjectAwareProcessor objectAware = (ObjectAwareProcessor) endpoint.getMessageProcessors().get(0);
+        
+        assertEquals(muleContext, objectAware.context);
+        assertEquals(endpoint, objectAware.endpoint);
     }
 
     public void testTransaction()

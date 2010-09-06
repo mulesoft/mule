@@ -55,9 +55,6 @@ public class FeedSplitter extends AbstractSplitter
     @Override
     protected List<MuleMessage> splitMessage(MuleEvent event) throws MuleException
     {
-        //TODO MULE-5048, should not need to set this manually
-        setMuleContext(event.getMuleContext());
-        
         List<MuleMessage> messages = new ArrayList<MuleMessage>();        
         if(event.getMessage().getInboundProperty("Content-Length", -1) == 0)
         {
