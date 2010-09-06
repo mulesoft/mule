@@ -33,8 +33,8 @@ public class BindingReturnTypeTestCase extends FunctionalTestCase
         assertNotNull(response);
         assertNull(response.getExceptionPayload());
         //TODO MULE-4990 this should really be in the inbound scope 
-        //assertTrue(response.getInboundProperty(PROCESSED, false));
-        assertTrue(response.getOutboundProperty(PROCESSED, false));
+        assertTrue(response.getInboundProperty(PROCESSED, false));
+        //assertTrue(response.getOutboundProperty(PROCESSED, false));
         String expected = "Hello " + TEST_MESSAGE + " " + MAGIC_NUMBER;
         assertEquals(expected, response.getPayload());
     }

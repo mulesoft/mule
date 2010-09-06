@@ -77,8 +77,8 @@ public class JXPathTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         MuleMessage response = client.send("vm://in", xml, null);
         assertNotNull(response);
-        assertNotNull(response.getProperty("nameProperty"));
-        assertEquals("African Coffee Table", response.getProperty("nameProperty"));
+        assertNotNull(response.getInboundProperty("nameProperty"));
+        assertEquals("African Coffee Table", response.getInboundProperty("nameProperty"));
     }
 }
 

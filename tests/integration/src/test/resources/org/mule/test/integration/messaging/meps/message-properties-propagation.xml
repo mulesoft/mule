@@ -36,6 +36,11 @@
                             <!-- take the content-type from the client's request -->
                             <add-message-property key="Content-Type" value="#[header:INBOUND:Content-Type]"/>
                         </message-properties-transformer>
+                        <response>
+                            <message-properties-transformer scope="outbound">
+                                <add-message-property key="Content-Type" value="#[header:INBOUND:Content-Type]"/>
+                            </message-properties-transformer>
+                        </response>
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -47,7 +52,13 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="cxfService" exchange-pattern="request-response" />
+                    <outbound-endpoint ref="cxfService" exchange-pattern="request-response">
+                        <response>
+                            <message-properties-transformer scope="outbound">
+                                <add-message-property key="Content-Type" value="#[header:INBOUND:Content-Type]"/>
+                            </message-properties-transformer>
+                        </response>
+                    </outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>

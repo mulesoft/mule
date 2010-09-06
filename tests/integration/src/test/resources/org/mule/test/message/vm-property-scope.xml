@@ -31,6 +31,11 @@
                         <message-properties-transformer scope="outbound">
                             <add-message-property key="foo" value="#[header:INBOUND:foo]"/>
                         </message-properties-transformer>
+                        <response>
+                            <message-properties-transformer scope="outbound">
+                                <add-message-property key="foo" value="#[header:INBOUND:foo]"/>
+                            </message-properties-transformer>
+                        </response>
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>

@@ -116,12 +116,12 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         try
         {
             // Rewrite the message to treat it as a new message
-            MuleMessage newMessage = message.createInboundMessage(true);
+            MuleMessage newMessage = message.createInboundMessage();
             MuleEvent event =  routeMessage(newMessage);
             MuleMessage returnedMessage = event == null ? null : event.getMessage();
             if (returnedMessage != null)
             {
-                returnedMessage = returnedMessage.createInboundMessage(false);
+                returnedMessage = returnedMessage.createInboundMessage();
             }
             return returnedMessage;
         }
@@ -263,7 +263,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         MuleMessage message = (MuleMessage) msg;
 
         // Rewrite the message to treat it as a new message
-        MuleMessage newMessage = message.createInboundMessage(true);
+        MuleMessage newMessage = message.createInboundMessage();
         routeMessage(newMessage);
     }
 

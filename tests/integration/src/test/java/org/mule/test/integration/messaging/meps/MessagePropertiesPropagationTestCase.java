@@ -147,8 +147,8 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
         MuleMessage response = client.send("vm://httpService2", "symbol=IBM", props);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().contains("PreviousClose"));
-        assertEquals("thing", response.getOutboundProperty("some"));
-        assertEquals("stuff", response.getOutboundProperty("other"));
+        assertEquals("thing", response.getInboundProperty("some"));
+        assertEquals("stuff", response.getInboundProperty("other"));
     }
 
     /**

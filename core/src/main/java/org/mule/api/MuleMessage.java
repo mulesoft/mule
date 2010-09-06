@@ -731,8 +731,7 @@ public interface MuleMessage extends Serializable
 
     /**
      * Copy an inbound message to an outbound one, moving all message properties and attachments
-     * @param reinitialize whether to reinitilaize the created message
      * @return the inbound message
      */
-    MuleMessage createInboundMessage(boolean reinitialize) throws Exception;
+    MuleMessage createInboundMessage() throws Exception;
 }

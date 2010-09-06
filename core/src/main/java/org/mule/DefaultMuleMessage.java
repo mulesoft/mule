@@ -1641,17 +1641,17 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
-    public MuleMessage createInboundMessage(boolean reinitialize) throws Exception
+    public MuleMessage createInboundMessage() throws Exception
     {
         DefaultMuleMessage newMessage =  new DefaultMuleMessage(getPayload(), this, getMuleContext());
-        copyToInbound(newMessage, reinitialize);
+        copyToInbound(newMessage);
         return newMessage;
     }
 
     /*
      ** copy outbound artifacts to inbound artifacts in the new message
      */
-    protected void copyToInbound(DefaultMuleMessage newMessage, boolean reinitialize) throws Exception
+    protected void copyToInbound(DefaultMuleMessage newMessage) throws Exception
     {
 
         //Copy message, but put all outbound properties and attachments on inbound
@@ -1669,25 +1669,18 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             properties.put(name, getOutboundProperty(name));
         }
 
-
-        if (reinitialize)
-        {
-            newMessage.clearProperties(PropertyScope.INBOUND);
-            newMessage.clearProperties(PropertyScope.INVOCATION);
-            newMessage.clearProperties(PropertyScope.OUTBOUND);
-        }
+        newMessage.clearProperties(PropertyScope.INBOUND);
+        newMessage.clearProperties(PropertyScope.INVOCATION);
+        newMessage.clearProperties(PropertyScope.OUTBOUND);
 
         for (String s : properties.keySet())
         {
             newMessage.setInboundProperty(s, properties.get(s));
         }
 
-        if (reinitialize)
+        for (String s : newMessage.getOutboundAttachmentNames())
         {
-            for (String s : newMessage.getOutboundAttachmentNames())
-            {
-                newMessage.removeAttachment(s);
-            }
+            newMessage.removeAttachment(s);
         }
 
         for (String s : attachments.keySet())
