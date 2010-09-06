@@ -34,14 +34,12 @@
             <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
             <groupId>javax.script</groupId>
             <artifactId>jython-engine</artifactId>
-<!--            <scope>provided</scope>-->
             <classifier>jdk14</classifier>
         </dependency>
         <dependency>
             <!-- This is the actual language implementation -->
             <groupId>org.python</groupId>
             <artifactId>jython</artifactId>
-<!--            <scope>provided</scope>-->
         </dependency>
         
         <!-- Unit tests only -->
