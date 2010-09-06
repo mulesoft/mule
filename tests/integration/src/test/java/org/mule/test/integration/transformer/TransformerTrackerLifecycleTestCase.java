@@ -1,5 +1,5 @@
 /*
- * $Id:  $
+ * $Id$
  * -------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -33,9 +33,7 @@ public class TransformerTrackerLifecycleTestCase extends FunctionalTestCase
         muleContext.dispose();
 
         //TODO MULE-5002 initialise called twice
-        assertEquals("[setProperty, setMuleContext, initialise, initialise, start, stop]", ltt.getTracker()
-                .toString());
-
+        assertEquals("[setProperty, setMuleContext, initialise, setMuleContext, initialise, start, stop]", 
+            ltt.getTracker().toString());
     }
-
 }
