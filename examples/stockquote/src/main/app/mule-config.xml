@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:xm="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+      xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.0/mule-cxf.xsd
+        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.0/mule-xml.xsd">
+
+    <!-- 
+        If you need to use a web proxy to access www.webservicesx.com configure your proxy settings
+        in proxy.properties and uncomment this block.
+
+    <context:property-placeholder location="proxy.properties"/>
+
+    <http:connector name="HttpConnector"
+                    proxyHostname="${proxyHostname}"
+                    proxyPassword="${proxyPassword}"
+                    proxyPort="${proxyPort}"
+                    proxyUsername="${proxyUsername}"/>            
+     -->
+
+    <object-to-string-transformer name="ToString"/>
+
+    <xml-entity-decoder-transformer name="XmlDecoder"/>
+
+    <xm:xslt-transformer name="XsltRest" xsl-file="xsl/rest-stock.xsl"/>
+
+    <xm:xslt-transformer name="XsltSoap" xsl-file="xsl/soap-stock.xsl"/>
+
+    <xm:xml-to-object-transformer name="XmlToObject"/>
+
+    <expression-transformer name="ExtractSymbol">
+        <return-argument evaluator="map-payload" expression="symbol"/>
+    </expression-transformer>
+
+    <flow name="HTTP input">
+        <http:inbound-endpoint host="localhost" port="48309" path="stockquote">
+            <http:body-to-parameter-map-transformer/>
+            <response>
+                <object-to-string-transformer/>
+            </response>
+        </http:inbound-endpoint>
+        <choice>
+            <when expression="groovy:payload.method == 'REST'">
+                <vm:outbound-endpoint path="rest" exchange-pattern="request-response"/>
+            </when>
+            <when expression="groovy:payload.method == 'SOAP'">
+                <vm:outbound-endpoint path="soap" exchange-pattern="request-response"/>
+            </when>
+            <when expression="groovy:payload.method == 'WSDL'">
+                <vm:outbound-endpoint path="wsdl" exchange-pattern="request-response"/>
+            </when>
+        </choice>
+    </flow>
+    
+    <model>
+        <service name="REST">
+            <inbound>
+                <vm:inbound-endpoint path="rest" exchange-pattern="request-response"
+                    transformer-refs="ExtractSymbol"
+                    responseTransformer-refs="ToString XmlDecoder XsltRest XmlToObject"/>
+            </inbound>
+            <http:rest-service-component
+                    serviceUrl="http://www.webservicex.net/stockquote.asmx/GetQuote"
+                    httpMethod="POST">
+                <http:payloadParameterName value="symbol"/>
+            </http:rest-service-component>
+        </service>
+        
+        <service name="SOAP">
+            <inbound>
+                <vm:inbound-endpoint path="soap" exchange-pattern="request-response"
+                    transformer-refs="ExtractSymbol"
+                    responseTransformer-refs="XmlDecoder XsltSoap XmlToObject"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint
+                            address="http://www.webservicex.net/stockquote.asmx"
+                            exchange-pattern="request-response">
+                        <cxf:jaxws-client
+                            clientClass="net.webservicex.StockQuote"
+                            operation="GetQuote" 
+                            port="StockQuoteSoap" 
+                            wsdlLocation="classpath:stockquote.wsdl" />
+                    </outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+        
+        <service name="WSDL">
+            <inbound>
+                <vm:inbound-endpoint path="wsdl" exchange-pattern="request-response"
+                    transformer-refs="ExtractSymbol"
+                    responseTransformer-refs="XmlDecoder XsltSoap XmlToObject"/>
+                <forwarding-router/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint 
+                        address="wsdl-cxf:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"
+                        exchange-pattern="request-response"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>

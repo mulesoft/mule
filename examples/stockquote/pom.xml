@@ -8,6 +8,7 @@
     </parent>
     <artifactId>mule-example-stockquote</artifactId>
     <name>Stock Quotes Example</name>
+    <packaging>mule</packaging>
     <description>This example demonstrates how to invoke an ASPX web service from Mule and transform the result using XSLT and deserialise the result to a StockQuote javabean. The examples demonstrates invoking the service using REST and SOAP.</description>
 
     <dependencies>
@@ -15,26 +16,25 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-stdio</artifactId>
-            <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- test dependencies -->
@@ -51,4 +51,15 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/main/app</directory>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+    </build>
 </project>

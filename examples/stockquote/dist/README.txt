@@ -10,53 +10,23 @@ For more information, refer http://www.mulesoft.org/documentation/display/MULE3I
 +---------------------+
 | Running the example |
 +---------------------+
-Simply use the shell script (Unix/Linux) or batch file (Windows) provided in
-this directory to run the example.
+Simply copy the pre-built application archive to the application folder
+($MULE_HOME/apps) and start Mule. To access the web service 
+invoke
 
-Alternatively, if you have added Mule to your executable path as recommended in
-Mule's README.txt, you can run the example from the command line as follows:
+	http://localhost:48309/stockquote?symbol=CSCO&method=REST
 
-    Linux / Unix
-    ------------
-    mule -config file:conf/soap-config.xml
-    mule -config file:conf/wsdl-config.xml
-    mule -config file:conf/rest-config.xml
-     or
-    export MULE_LIB=./conf
-    mule -config soap-config.xml
-    mule -config wsdl-config.xml
-    mule -config rest-config.xml
-
-    Windows
-    -------
-    mule.bat -config file:conf/soap-config.xml
-    mule.bat -config file:conf/wsdl-config.xml
-    mule.bat -config file:conf/rest-config.xml
-     or
-    SET MULE_LIB=.\conf
-    mule.bat -config soap-config.xml
-    mule.bat -config wsdl-config.xml
-    mule.bat -config rest-config.xml
+from your browser.
 
 +-------------------+
 | Firewall settings |
 +-------------------+
-
 If you are behind a firewall, you will need to configure the settings for your
-HTTP proxy in the ./conf/proxy.properties file.  Then you can run the example as
-follows:
-
-    Linux / Unix
-    ------------
-    mule -config file:conf/soap-config.xml -props ./conf/proxy.properties
-    mule -config file:conf/wsdl-config.xml -props ./conf/proxy.properties
-    mule -config file:conf/rest-config.xml -props ./conf/proxy.properties
-
-    Windows
-    -------
-    mule.bat -config file:conf/soap-config.xml -props .\conf\proxy.properties
-    mule.bat -config file:conf/wsdl-config.xml -props .\conf\proxy.properties
-    mule.bat -config file:conf/rest-config.xml -props .\conf\proxy.properties
+HTTP proxy in the proxy.properties file. Go to the unpacked application inside
+the application folder ($MULE_HOME/apps). Put your proxy configuration in
+proxy.properties (located in the classes folder) and uncomment the proxy
+settings section in mule-config.xml. Mule will automatically redeploy the
+example and activate the config changes.
 
 +----------------------+
 | Building the example |
@@ -66,5 +36,4 @@ in Mule's README.txt
 
 Depending on the build tool you are using (Ant or Maven), you can build the
 example by simply running "ant" or "mvn".  This will compile the example
-classes, produce a jar file, and copy everything to $MULE_HOME/lib/user, which
-is where your custom classes and configuration files should go.
+classes, produce an application zip file, and copy everything to $MULE_HOME/apps.
