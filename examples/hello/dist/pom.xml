@@ -93,7 +93,7 @@
             </releases>
         </repository>
     </repositories>
-    
+
     <pluginRepositories>
         <pluginRepository>
             <id>apache-plugin-snapshots</id>
@@ -161,7 +161,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${project.build.directory}/${artifactId}.zip" 
+                                <copy file="${project.build.directory}/${artifactId}.zip"
                                     todir="${env.MULE_HOME}/apps" overwrite="true"/>
                             </tasks>
                         </configuration>
