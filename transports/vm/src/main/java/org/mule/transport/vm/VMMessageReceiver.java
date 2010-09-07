@@ -44,7 +44,6 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
 {
 
     private VMConnector connector;
-    private final Object lock = new Object();
 
     public VMMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
         throws CreateException
@@ -99,16 +98,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     {
         // Rewrite the message to treat it as a new message
         MuleMessage newMessage = new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());
-
-        /*
-         * TODO review: onEvent can only be called by the VMMessageDispatcher - why is
-         * this lock here and do we still need it? what can break if this receiver is run
-         * concurrently by multiple dispatchers, which are isolated?
-         */
-        synchronized (lock)
-        {
-            routeMessage(newMessage);
-        }
+        routeMessage(newMessage);
     }
 
     public MuleMessage onCall(MuleMessage message, boolean synchronous) throws MuleException
