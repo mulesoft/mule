@@ -283,7 +283,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         message.setOutboundProperty("foo", "fooOutbound");
         message.setInvocationProperty("bar", "barInvocation");
         message.setInvocationProperty("foo", "fooInvocation");
-        message.setInboundProperty("foo", "fooInbound");
+        message.setProperty("foo", "fooInbound", PropertyScope.INBOUND);
         message.setSessionProperty("foo", "fooSession");
 
 

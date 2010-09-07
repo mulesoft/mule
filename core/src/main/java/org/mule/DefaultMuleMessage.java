@@ -141,12 +141,19 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         this(message, (Map<String, Object>) null, muleContext);
     }
 
-    public DefaultMuleMessage(Object message, Map<String, Object> properties, MuleContext muleContext)
+    public DefaultMuleMessage(Object message, Map<String, Object> outboundProperties, MuleContext muleContext)
     {
-        this(message, properties, null, muleContext);
+        this(message, outboundProperties, null, muleContext);
     }
 
-    public DefaultMuleMessage(Object message, Map<String, Object> properties, Map<String, DataHandler> attachments, MuleContext muleContext)
+    public DefaultMuleMessage(Object message, Map<String, Object> outboundProperties, Map<String, DataHandler> attachments, MuleContext muleContext)
+    {
+        this(message, null, outboundProperties, attachments, muleContext);   
+    }
+
+    public DefaultMuleMessage(Object message, Map<String, Object> inboundProperties,
+                              Map<String, Object> outboundProperties, Map<String, DataHandler> attachments,
+                              MuleContext muleContext)
     {
         setMuleContext(muleContext);
         initAppliedTransformerHashCodes();
@@ -162,7 +169,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             setPayload(message);
             originalPayload = message;
         }
-        addProperties(properties);
+        addProperties(inboundProperties, PropertyScope.INBOUND);
+        addProperties(outboundProperties);
 
         //Add inbound attachments
         if (attachments != null)

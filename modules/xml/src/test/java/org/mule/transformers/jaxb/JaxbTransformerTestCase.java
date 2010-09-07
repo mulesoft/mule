@@ -47,7 +47,7 @@ public class JaxbTransformerTestCase extends AbstractMuleTestCase
     public void testCustomTransformWithMuleMessage() throws Exception
     {
         ByteArrayInputStream in = new ByteArrayInputStream(PERSON_XML.getBytes());
-        MuleMessage msg = new DefaultMuleMessage(in, muleContext);
+        DefaultMuleMessage msg = new DefaultMuleMessage(in, muleContext);
         msg.setInboundProperty("foo", "fooValue");
         //List<EmailAddress> emailAddresses = iBeansContext.transform(msg, new ListDataType<List<EmailAddress>>(EmailAddress.class));
         List<EmailAddress> emailAddresses = msg.getPayload(new ListDataType<List<EmailAddress>>(EmailAddress.class));

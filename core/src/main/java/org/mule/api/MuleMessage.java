@@ -82,18 +82,12 @@ public interface MuleMessage extends Serializable
      *
      * @param key the key on which to associate the value
      * @param value the property value
-     * @see #setInboundProperty(String, Object)
      * @see #setInvocationProperty(String, Object)
      * @see #setOutboundProperty(String, Object)
      * @see #setSessionProperty(String, Object)
      */
     @Deprecated
     void setProperty(String key, Object value);
-
-    /**
-     * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
-     */
-    void setInboundProperty(String key, Object value);
 
     /**
      * @see #setProperty(String, Object, org.mule.api.transport.PropertyScope)
@@ -114,7 +108,6 @@ public interface MuleMessage extends Serializable
      * @param value the property value
      * @param scope The scope at which to set the property at
      * @see PropertyScope
-     * @see #setInboundProperty(String, Object)
      * @see #setInvocationProperty(String, Object)
      * @see #setOutboundProperty(String, Object) 
      * @see #setSessionProperty(String, Object)

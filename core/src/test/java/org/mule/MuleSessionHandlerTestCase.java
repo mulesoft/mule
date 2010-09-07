@@ -36,7 +36,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     /** @see EE-1705/MULE-4567 */
     public void testSessionProperties() throws Exception 
     {
-        MuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
         MuleSession session = new DefaultMuleSession(muleContext);
         
@@ -72,7 +72,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     /** @see EE-1774 */
     public void testNonSerializableSessionProperties() throws Exception 
     {
-        MuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         MuleSession session = new DefaultMuleSession(muleContext);
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
         
@@ -120,7 +120,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     /** @see EE-1820 */
     public void testSessionPropertiesLegacyFormat() throws Exception 
     {
-        MuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler handler = new LegacySessionHandler();
         MuleSession session = new DefaultMuleSession(muleContext);
         
@@ -156,7 +156,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     /** @see MULE-4720 */
     public void testSecurityContext() throws Exception 
     {
-        MuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
         SessionHandler handler = new SerializeAndEncodeSessionHandler();
         MuleSession session = new DefaultMuleSession(muleContext);
         

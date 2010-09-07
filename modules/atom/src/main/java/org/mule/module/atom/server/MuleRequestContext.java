@@ -11,6 +11,7 @@ package org.mule.module.atom.server;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
@@ -197,7 +198,7 @@ public class MuleRequestContext extends AbstractRequestContext implements Reques
         {
             case REQUEST:
                 // note it's not a usual Mule property scope, abdera puts and checks for things here
-                request.setInboundProperty(name, value);
+                request.setProperty(name, value, PropertyScope.INBOUND);
                 break;
             case SESSION:
                 event.getSession().setProperty(name, value);

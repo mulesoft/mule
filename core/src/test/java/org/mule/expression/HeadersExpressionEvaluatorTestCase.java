@@ -129,7 +129,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
 public void testHeadersWithScopes() throws Exception
     {
         MessageHeadersExpressionEvaluator eval = new MessageHeadersExpressionEvaluator();
-        MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("test", props, muleContext);
         message.setProperty("faz", "fazvalue", PropertyScope.INVOCATION);
 
         Object result = eval.evaluate("OUTBOUND:foo, OUTBOUND:baz", message);

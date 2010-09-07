@@ -11,6 +11,7 @@
 package org.mule.transport.xmpp.transformers;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.xmpp.XmppConnector;
@@ -41,7 +42,7 @@ public class XmppPacketToObject extends AbstractMessageTransformer
         String subject = xmppMessage.getSubject();
         if (StringUtils.isNotEmpty(subject))
         {
-            muleMessage.setInboundProperty(XmppConnector.XMPP_SUBJECT, subject);
+            muleMessage.setProperty(XmppConnector.XMPP_SUBJECT, subject, PropertyScope.INBOUND);
         }
     }
 

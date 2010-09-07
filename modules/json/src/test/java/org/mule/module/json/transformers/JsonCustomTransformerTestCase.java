@@ -53,7 +53,7 @@ public class JsonCustomTransformerTestCase extends AbstractMuleTestCase
     public void testCustomTransformWithMuleMessage() throws Exception
     {
         ByteArrayInputStream in = new ByteArrayInputStream(EMAIL_JSON.getBytes());
-        MuleMessage message = new DefaultMuleMessage(in, muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage(in, muleContext);
         message.setInboundProperty("foo", "fooValue");
         EmailAddress emailAddress = message.getPayload(new SimpleDataType<EmailAddress>(EmailAddress.class));
         assertNotNull(emailAddress);

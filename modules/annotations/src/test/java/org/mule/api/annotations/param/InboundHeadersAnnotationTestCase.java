@@ -44,7 +44,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
     public void testSingleHeaderWithType() throws Exception
     {
         Apple apple = new Apple();
-        eventContext.getMessage().setInboundProperty("apple", apple);
+        eventContext.getMessage().setProperty("apple", apple, PropertyScope.INBOUND);
         InvocationResult response = invokeResolver("processHeaderWithType", eventContext);
         assertEquals(apple, response.getResult());
     }
@@ -52,7 +52,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
     public void testSingleHeaderWithBaseType() throws Exception
     {
         Apple apple = new Apple();
-        eventContext.getMessage().setInboundProperty("apple", apple);
+        eventContext.getMessage().setProperty("apple", apple, PropertyScope.INBOUND);
         InvocationResult response = invokeResolver("processHeaderWithBaseType", eventContext);
         assertEquals(apple, response.getResult());
     }
@@ -145,7 +145,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
 
     public void testMapHeadersWildcard() throws Exception
     {
-        eventContext.getMessage().setInboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8");
+        eventContext.getMessage().setProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8", PropertyScope.INBOUND);
         InvocationResult response = invokeResolver("processHeadersWildcard", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) response.getResult();
@@ -156,7 +156,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
 
     public void testMapHeadersMultiWildcard() throws Exception
     {
-        eventContext.getMessage().setInboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8");
+        eventContext.getMessage().setProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8", PropertyScope.INBOUND);
         InvocationResult response = invokeResolver("processHeadersMultiWildcard", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) response.getResult();
@@ -174,11 +174,11 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
 
     public void testMapHeadersWithGenerics() throws Exception
     {
-        eventContext.getMessage().setInboundProperty("apple", new Apple());
-        eventContext.getMessage().setInboundProperty("banana", new Banana());
-        eventContext.getMessage().setInboundProperty("orange", new Orange());
+        eventContext.getMessage().setProperty("apple", new Apple(), PropertyScope.INBOUND);
+        eventContext.getMessage().setProperty("banana", new Banana(), PropertyScope.INBOUND);
+        eventContext.getMessage().setProperty("orange", new Orange(), PropertyScope.INBOUND);
 
-        eventContext.getMessage().setInboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8");
+        eventContext.getMessage().setProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8", PropertyScope.INBOUND);
         InvocationResult response = invokeResolver("processHeadersWithGenerics", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) response.getResult();
@@ -274,7 +274,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
 
     public void testListHeadersWilcard() throws Exception
     {
-        eventContext.getMessage().setInboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8");
+        eventContext.getMessage().setProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8", PropertyScope.INBOUND);
         InvocationResult response = invokeResolver("processHeadersListWildcard", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<?> result = (List<?>) response.getResult();
@@ -286,7 +286,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
 
     public void testListHeadersMultiWilcard() throws Exception
     {
-        eventContext.getMessage().setInboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8");
+        eventContext.getMessage().setProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8", PropertyScope.INBOUND);
         InvocationResult response = invokeResolver("processHeadersListMultiWildcard", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<?> result = (List<?>) response.getResult();
@@ -310,11 +310,11 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         Apple apple = new Apple();
         Banana banana = new Banana();
         Orange orange = new Orange();
-        eventContext.getMessage().setInboundProperty("apple", apple);
-        eventContext.getMessage().setInboundProperty("banana", banana);
-        eventContext.getMessage().setInboundProperty("orange", orange);
+        eventContext.getMessage().setProperty("apple", apple, PropertyScope.INBOUND);
+        eventContext.getMessage().setProperty("banana", banana, PropertyScope.INBOUND);
+        eventContext.getMessage().setProperty("orange", orange, PropertyScope.INBOUND);
 
-        eventContext.getMessage().setInboundProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8");
+        eventContext.getMessage().setProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8", PropertyScope.INBOUND);
         InvocationResult response = invokeResolver("processHeadersListWithGenerics", eventContext);
         assertTrue("Message payload should be a List", response.getResult() instanceof List);
         List<?> result = (List<?>) response.getResult();

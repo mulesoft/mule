@@ -47,7 +47,7 @@ public class MuleRequestMessage implements Request
 
     public void addHeader(String name, Object value)
     {
-        message.setInboundProperty(name, value);
+        message.setProperty(name, value, PropertyScope.INBOUND);
     }
 
     public Object removeHeader(String name)

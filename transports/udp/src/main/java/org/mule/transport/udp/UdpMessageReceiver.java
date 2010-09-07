@@ -19,6 +19,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.ConnectException;
@@ -268,7 +269,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                 final SocketAddress clientAddress = socket.getRemoteSocketAddress();
                 if (clientAddress != null)
                 {
-                    message.setInboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, clientAddress);
+                    message.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, clientAddress, PropertyScope.INBOUND);
                 }
                 MuleEvent event = routeMessage(message);
                 returnMessage = event == null ? null : event.getMessage();

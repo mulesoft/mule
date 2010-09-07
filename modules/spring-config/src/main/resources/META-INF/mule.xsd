@@ -2964,7 +2964,6 @@
                     </xsd:annotation>
                     <xsd:simpleType>
                         <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="inbound"/>
                             <xsd:enumeration value="invocation"/>
                             <xsd:enumeration value="outbound"/>
                             <xsd:enumeration value="session"/>

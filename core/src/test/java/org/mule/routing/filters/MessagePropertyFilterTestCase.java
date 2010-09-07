@@ -16,6 +16,9 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
 {
     public void testMessagePropertyFilter() throws Exception
@@ -40,7 +43,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
 
     public void testMessagePropertyFilterInboundScope() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("blah", muleContext);
         RequestContext.setEvent(getTestEvent(message));
         MessagePropertyFilter filter = new MessagePropertyFilter("inbound:foo=bar");
         assertEquals("inbound", filter.getScope());
@@ -52,13 +55,16 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
 
     public void testMessagePropertyFilterWithURL() throws Exception
     {
-        MuleMessage message = new DefaultMuleMessage("blah", muleContext);
+        DefaultMuleMessage message = new DefaultMuleMessage("blah", muleContext);
         RequestContext.setEvent(getTestEvent(message));
         MessagePropertyFilter filter = new MessagePropertyFilter("inbound:foo=http://foo.com");
         assertEquals("inbound", filter.getScope());
 
         assertFalse(filter.accept(message));
-        message.setInboundProperty("foo", "http://foo.com");
+
+        Map inboundProps = new HashMap();
+        inboundProps.put("foo", "http://foo.com");
+        message = new DefaultMuleMessage("blah", inboundProps, null, null, muleContext);
         assertTrue("Filter didn't accept the message", filter.accept(message));
 
         //Checking here that a ':' in the value doesn't throw things off

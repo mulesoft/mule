@@ -20,6 +20,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageRequester;
+import org.mule.api.transport.PropertyScope;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.AbstractFlowConstuctTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -93,7 +94,7 @@ public abstract class AbstractWSProxyTestCase extends AbstractFlowConstuctTestCa
         });
 
         final MuleEvent event = MuleTestUtils.getTestInboundEvent("hello", muleContext);
-        event.getMessage().setInboundProperty("http.request", "test://foo?WSDL");
+        event.getMessage().setProperty("http.request", "test://foo?WSDL", PropertyScope.INBOUND);
         final MuleEvent response = directInboundMessageSource.process(event);
 
         assertEquals("fake_wsdl " + InetAddress.getLocalHost().getHostName(), response.getMessageAsString());
@@ -103,7 +104,7 @@ public abstract class AbstractWSProxyTestCase extends AbstractFlowConstuctTestCa
     {
         startWsProxy();
         final MuleEvent event = MuleTestUtils.getTestInboundEvent("hello", muleContext);
-        event.getMessage().setInboundProperty("http.request", "http://foo");
+        event.getMessage().setProperty("http.request", "http://foo", PropertyScope.INBOUND);
         final MuleEvent response = directInboundMessageSource.process(event);
 
         assertEquals("hello", response.getMessageAsString());

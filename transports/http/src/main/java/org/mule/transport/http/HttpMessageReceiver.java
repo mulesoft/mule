@@ -27,6 +27,7 @@ import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.session.DefaultMuleSession;
@@ -223,7 +224,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 path = path.substring(0, i);
             }
 
-            message.setInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path);
+            message.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, path, PropertyScope.INBOUND);
             
             if (logger.isDebugEnabled())
             {
@@ -238,8 +239,9 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             // A) the request was not served or B) a null result was returned
             if (receiver != null)
             {
-                message.setInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY,
-                                           HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath()));
+                message.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY,
+                                           HttpConnector.normalizeUrl(receiver.getEndpointURI().getPath()),
+                                           PropertyScope.INBOUND);
 
                 preRouteMessage(message);
                 MuleEvent returnEvent = receiver.routeMessage(message);
@@ -386,7 +388,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
 
         protected void preRouteMessage(MuleMessage message) throws MessagingException
         {
-            message.setInboundProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, remoteClientAddress);
+            message.setProperty(MuleProperties.MULE_REMOTE_CLIENT_ADDRESS, remoteClientAddress, PropertyScope.INBOUND);
         }
 
         public void release()

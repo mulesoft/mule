@@ -67,7 +67,7 @@ public abstract class AbstractAnnotatedEntrypointResolverTestCase extends Abstra
             attachments.put("bar", new DataHandler(new StringDataSource("barValue")));
             attachments.put("baz", new DataHandler(new StringDataSource("bazValue")));
         }
-        MuleMessage message;
+        DefaultMuleMessage message;
         if(inboundScope)
         {
             message = new DefaultMuleMessage("test", null, attachments, muleContext);

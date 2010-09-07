@@ -19,6 +19,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.NoReceiverForEndpointException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.endpoint.DynamicURIInboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.WildcardFilter;
@@ -96,7 +97,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
 
         EndpointURI uri = receiver.getEndpointURI();
         String reqUri = request.getRequestURI();
-        requestMessage.setInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, reqUri);
+        requestMessage.setProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY, reqUri, PropertyScope.INBOUND);
 
         String queryString = request.getQueryString();
         if (queryString != null)
@@ -104,7 +105,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
             reqUri += "?" + queryString;
         }
 
-        requestMessage.setInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY, reqUri);
+        requestMessage.setProperty(HttpConnector.HTTP_REQUEST_PROPERTY, reqUri, PropertyScope.INBOUND);
 
         String path;
         if ("servlet".equals(uri.getScheme()))
@@ -143,7 +144,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
             path = HttpConnector.normalizeUrl(uri.getPath());
         }
 
-        requestMessage.setInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, path);
+        requestMessage.setProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY, path, PropertyScope.INBOUND);
 
         // Call this to keep API compatability
         setupRequestMessage(request, requestMessage);
@@ -211,7 +212,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
             MessageReceiver receiver = getReceiverForURI(request);
             
             MuleMessage requestMessage = receiver.createMuleMessage(request);
-            requestMessage.setInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod());
+            requestMessage.setProperty(HttpConnector.HTTP_METHOD_PROPERTY, request.getMethod(), PropertyScope.INBOUND);
 
             setupRequestMessage(request, requestMessage, receiver);
 

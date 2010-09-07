@@ -43,7 +43,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
         AnnotatedComponent2 component = new AnnotatedComponent2();
         MuleEventContext context = getTestEventContext(TEST_PAYLOAD);
-        context.getMessage().setInboundProperty("foo", "fooValue");
+        context.getMessage().setProperty("foo", "fooValue", PropertyScope.INBOUND);
         //Since AnnotatedComponent2 has two annotated methods we need to set the method to call
         context.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, "doSomething", PropertyScope.INVOCATION);
         InvocationResult result = resolver.invoke(component, context);
@@ -58,7 +58,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
         AnnotatedComponent1 component = new AnnotatedComponent1();
         MuleEventContext context = getTestEventContext(TEST_PAYLOAD);
-        context.getMessage().setInboundProperty("foo", "fooValue");
+        context.getMessage().setProperty("foo", "fooValue", PropertyScope.INBOUND);
         //No need to set the method property if the component only has a single annotated method
         InvocationResult result = resolver.invoke(component, context);
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
