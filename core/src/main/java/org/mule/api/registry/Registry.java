@@ -10,7 +10,6 @@
 
 package org.mule.api.registry;
 
-import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleException;
