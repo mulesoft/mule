@@ -10,9 +10,10 @@ For more information, refer to http://www.mulesoft.org/documentation/display/MUL
 +---------------------+
 Simply copy the pre-built application archive (mule-example-echo-app.zip) to the
 application folder ($MULE_HOME/apps) and start Mule. To access the web service 
-invoke
+invoke one of the following:
 
     http://localhost:47493/change-machine?amount=2.42&currency=USD
+    http://localhost:47493/change-machine?amount=2.42&currency=GBP
 
 from your browser.
 

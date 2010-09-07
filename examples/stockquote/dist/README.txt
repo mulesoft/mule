@@ -12,9 +12,11 @@ For more information, refer http://www.mulesoft.org/documentation/display/MULE3I
 +---------------------+
 Simply copy the pre-built application archive to the application folder
 ($MULE_HOME/apps) and start Mule. To access the web service 
-invoke
+invoke one of the following:
 
 	http://localhost:48309/stockquote?symbol=CSCO&method=REST
+	http://localhost:48309/stockquote?symbol=CSCO&method=SOAP
+	http://localhost:48309/stockquote?symbol=CSCO&method=WSDL
 
 from your browser.
 
