@@ -16,7 +16,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageRouter;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
@@ -27,7 +26,7 @@ import org.mule.transport.NullPayload;
  * <code>ChainingRouter</code> is used to pass a Mule event through multiple
  * targets using the result of the first as the input for the second.
  */
-public class ChainingRouter extends FilteringOutboundRouter implements MessageRouter
+public class ChainingRouter extends FilteringOutboundRouter
 {
     @Override
     public void initialise() throws InitialisationException
