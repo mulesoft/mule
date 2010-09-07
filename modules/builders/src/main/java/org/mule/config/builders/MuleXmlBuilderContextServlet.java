@@ -26,6 +26,7 @@ public class MuleXmlBuilderContextServlet extends HttpServlet
 
     private MuleXmlBuilderContextListener contextListener;
 
+    @Override
     public void init() throws ServletException
     {
         if (contextListener != null)
@@ -37,6 +38,7 @@ public class MuleXmlBuilderContextServlet extends HttpServlet
         contextListener.initialize(getServletContext());
     }
 
+    @Override
     protected void service(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
@@ -48,6 +50,7 @@ public class MuleXmlBuilderContextServlet extends HttpServlet
         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
     }
 
+    @Override
     public void destroy()
     {
         if (contextListener != null)
