@@ -4,19 +4,19 @@
       xmlns:ajax="http://www.mulesoft.org/schema/mule/ajax"
       xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
       xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.0/mule-quartz.xsd
-       http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
+        http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.0/mule-quartz.xsd
+        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
     <ajax:connector name="ajaxServer" serverUrl="http://localhost:8081/services/gps" resourceBase="${app.home}/docroot"/>
 
-        <flow name="StrollerService">
-            <quartz:inbound-endpoint repeatInterval="3000" startDelay="3000" jobName="walkGenerator">
-                <quartz:event-generator-job/>
-            </quartz:inbound-endpoint>
-            <component>
-                <singleton-object class="org.mule.example.gpswalker.CityStroller"/>
-            </component>
-            <ajax:outbound-endpoint channel="/gpswalker"/>
-        </flow>
+    <flow name="StrollerService">
+        <quartz:inbound-endpoint repeatInterval="3000" startDelay="3000" jobName="walkGenerator">
+            <quartz:event-generator-job/>
+        </quartz:inbound-endpoint>
+        <component>
+            <singleton-object class="org.mule.example.gpswalker.CityStroller"/>
+        </component>
+        <ajax:outbound-endpoint channel="/gpswalker"/>
+    </flow>
 </mule>
