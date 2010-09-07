@@ -535,6 +535,12 @@
       </includes>
     </dependencySet>
     <dependencySet>
+      <outputDirectory>examples/notifications</outputDirectory>
+      <includes>
+        <include>org.mule.examples:mule-example-notifications</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
       <outputDirectory>examples/stockquote</outputDirectory>
       <includes>
         <include>org.mule.examples:mule-example-stockquote</include>
