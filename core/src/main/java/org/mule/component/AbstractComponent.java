@@ -345,7 +345,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
 
     protected void fireComponentNotification(MuleMessage message, int action)
     {
-        if (notificationHandler.isNotificationEnabled(ComponentMessageNotification.class))
+        if (notificationHandler != null && notificationHandler.isNotificationEnabled(ComponentMessageNotification.class))
         {
             notificationHandler.fireNotification(new ComponentMessageNotification(message, this, flowConstruct, action));
         }
