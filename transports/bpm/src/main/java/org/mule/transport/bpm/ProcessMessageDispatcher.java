@@ -119,7 +119,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         processId = event.getMessage().getInvocationProperty(ProcessConnector.PROPERTY_PROCESS_ID);
         if (processId == null)
         {
-            processId = event.getMessage().getOutboundProperty(ProcessConnector.PROPERTY_PROCESS_ID); 
+            processId = event.getMessage().getInboundProperty(ProcessConnector.PROPERTY_PROCESS_ID); 
         }
         processVariables.remove(ProcessConnector.PROPERTY_PROCESS_ID);
 

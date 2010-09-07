@@ -1,12 +1,3 @@
 #
 # Test cases listed in this file are not run.
 #
-
-# MULE-4864
-org.mule.transport.jbpm.MessagingExceptionTestCase
-
-# MULE-4945 Broken by lifecycle changes RM owning
-org.mule.transport.jbpm.ForkedProcessTestCase
-
-# temporary exclude
-org.mule.transport.jbpm.VariablesTestCase

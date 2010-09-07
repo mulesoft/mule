@@ -30,7 +30,6 @@ public class BpmNamespaceHandlerTestCase extends FunctionalTestCase
         ProcessConnector c = (ProcessConnector)muleContext.getRegistry().lookupConnector("bpmConnectorDefaults");
         assertNotNull(c);
         
-        assertFalse(c.isAllowGlobalDispatcher());
         assertFalse(c.isAllowGlobalReceiver());
         assertNull(c.getProcessIdField());
         
@@ -48,7 +47,6 @@ public class BpmNamespaceHandlerTestCase extends FunctionalTestCase
         ProcessConnector c = (ProcessConnector)muleContext.getRegistry().lookupConnector("bpmConnector1");
         assertNotNull(c);
         
-        assertTrue(c.isAllowGlobalDispatcher());
         assertTrue(c.isAllowGlobalReceiver());
         assertEquals("myId", c.getProcessIdField());
         

@@ -85,50 +85,25 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         }
         message.addProperties(messageProperties);
 
+        //TODO should probably cache this
+        EndpointBuilder endpointBuilder = connector.getMuleContext().getRegistry().lookupEndpointFactory().getEndpointBuilder(endpoint);
+        endpointBuilder.setExchangePattern(exchangePattern);
+        OutboundEndpoint ep = endpointBuilder.buildOutboundEndpoint();
+       
+        DefaultMuleEvent event = new DefaultMuleEvent(message, ep, new DefaultMuleSession(flowConstruct, connector.getMuleContext()));
+        MuleEvent resultEvent = ep.process(event);
+        
         MuleMessage response = null;
-        if (connector.isAllowGlobalDispatcher())
+        if (resultEvent != null)
         {
-            //TODO should probably cache this
-            EndpointBuilder endpointBuilder = connector.getMuleContext().getRegistry()
-                .lookupEndpointFactory().getEndpointBuilder(endpoint);
-            endpointBuilder.setExchangePattern(exchangePattern);
-            OutboundEndpoint ep = endpointBuilder.buildOutboundEndpoint();
-
-            DefaultMuleEvent event = new DefaultMuleEvent(message, ep, new DefaultMuleSession(flowConstruct, connector.getMuleContext()));
-            if (exchangePattern.hasResponse())
+            response = resultEvent.getMessage();
+            if (response.getExceptionPayload() != null)
             {
-                MuleEvent resultEvent = ep.process(event);
-                if (resultEvent != null)
-                {
-                    return resultEvent.getMessage();
-                }
-                else
-                {
-                    return null;
-                }
+                throw new ConnectorException(MessageFactory.createStaticMessage("Unable to send or route message"), getConnector(), response.getExceptionPayload().getRootException());
             }
-            else
-            {
-                ep.process(event);
-            }
-        }
-        else
-        {
-            message.setOutboundProperty(ProcessConnector.PROPERTY_ENDPOINT, endpoint);
-            MuleEvent event = routeMessage(message);
-            response = event == null ? null : event.getMessage();
         }
         
-        // TODO MULE-4864 Exceptions are not always caught here
-        if (response != null && response.getExceptionPayload() != null)
-        {
-             throw new ConnectorException(
-                 MessageFactory.createStaticMessage("Unable to send or route message"), getConnector(), response.getExceptionPayload().getRootException());
-        }
-        else
-        {
-            return response;
-        }        
+        return response;
     }
 
     private class Worker implements Work

@@ -75,9 +75,9 @@
             </outbound>
         </service>
 
-        <service name="ServiceA" initialState="stopped">
+        <service name="ServiceA" initialState="paused">
             <inbound>
-                <vm:inbound-endpoint path="queueA"/>
+                <vm:inbound-endpoint path="queueA" exchange-pattern="one-way"/>
             </inbound>
             <test:component>
                 <test:return-data>Response A</test:return-data>
@@ -91,7 +91,7 @@
         
         <service name="ServiceB">
             <inbound>
-                <vm:inbound-endpoint path="queueB"/>
+                <vm:inbound-endpoint path="queueB" exchange-pattern="one-way"/>
             </inbound>
             <test:component>
                 <test:return-data>Response B</test:return-data>

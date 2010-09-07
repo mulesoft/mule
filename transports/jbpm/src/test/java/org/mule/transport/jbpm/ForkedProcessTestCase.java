@@ -49,7 +49,7 @@ public class ForkedProcessTestCase extends AbstractJbpmTestCase
             assertEquals("waitForResponseA", bpms.getState(process));
 
             // Start ServiceA
-            muleContext.getRegistry().lookupService("ServiceA").start();
+            muleContext.getRegistry().lookupService("ServiceA").resume();
             Thread.sleep(2000);
                         
             // The process should have ended.
