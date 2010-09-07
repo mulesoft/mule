@@ -68,6 +68,12 @@
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-notifications</artifactId>
+            <version>${version}</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-scripting</artifactId>
             <version>${version}</version>
             <type>zip</type>

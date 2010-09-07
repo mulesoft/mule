@@ -7,64 +7,34 @@
         <version>3.0.0-RC3-SNAPSHOT</version>
     </parent>
     <artifactId>mule-example-notifications</artifactId>
-    <packaging>war</packaging>
+    <packaging>mule</packaging>
     <name>Notifications Example</name>
     <description>Demonstrates capturing and firing notifications and uses AJAX to send notifications to the browser.</description>
 
-    <build>
-        <plugins>
-             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>tomcat-maven-plugin</artifactId>
-                <version>1.0-beta-1</version>
-                <configuration>
-                    <path>/</path>
-                    <port>8888</port>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                    <encoding>ISO-8859-1</encoding>
-                </configuration>
-            </plugin>
-
-        </plugins>
-    </build>
-
     <dependencies>
-
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-management</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-json</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ajax</artifactId>
             <version>${version}</version>
-            <exclusions>
-                <!-- this example runs in tomcat. Avoid class loading conflicts with the servlet API -->
-                <exclusion>
-                    <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <scope>provided</scope>
         </dependency>
-       
     </dependencies>
 </project>
