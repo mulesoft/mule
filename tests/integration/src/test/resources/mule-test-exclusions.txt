@@ -93,7 +93,6 @@ org.mule.test.integration.message.MessagePropertyInResponseTransformersTestCase
 
 # Broken by BL-165
 org.mule.test.integration.exceptions.ExceptionStrategyTransactionTestCase
-org.mule.context.notification.EndpointMessageNotificationTestCase
 
 # MULE-4976 (broken with migration to Spring 3)
 org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCase

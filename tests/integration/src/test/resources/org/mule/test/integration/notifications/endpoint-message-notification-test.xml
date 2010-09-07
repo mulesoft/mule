@@ -25,7 +25,7 @@
 
         <service name="service-1">
             <inbound>
-                <vm:inbound-endpoint path="in-1" exchange-pattern="one-way" connector-ref="direct"/>
+                <vm:inbound-endpoint path="in-1" exchange-pattern="request-response" connector-ref="direct"/>
             </inbound>
             <echo-component/>
         </service>
