@@ -19,10 +19,17 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.spring.SpringRegistry;
 import org.mule.module.cxf.transport.MuleUniversalTransport;
 
+import java.lang.reflect.Field;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.springframework.context.ApplicationContext;
@@ -32,11 +39,12 @@ import org.springframework.context.ApplicationContext;
  */
 public class CxfConfiguration implements Initialisable, Disposable, MuleContextAware
 {
-
     public static final String CXF = "cxf";
     public static final String CONFIGURATION_LOCATION = "configurationLocation";
     public static final String DEFAULT_MULE_NAMESPACE_URI = "http://www.muleumo.org";
     public static final String BUS_PROPERTY = CXF;
+
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     // The CXF Bus object
     private Bus bus;
@@ -97,6 +105,22 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
     public void dispose()
     {
         bus.shutdown(true);
+        // clear static caches preventing memory leaks on redeploy
+        // needed because cxf core classes are loaded by the Mule system classloader, not app's
+        JAXBDataBinding.clearCaches();
+        try
+        {
+            // ASMHelper.LOADER_MAP is a protected static field
+            final Field cacheField = ASMHelper.class.getDeclaredField("LOADER_MAP");
+            cacheField.setAccessible(true);
+            // static field
+            final Map cache = (Map) cacheField.get(null);
+            cache.clear();
+        }
+        catch (Throwable t)
+        {
+            logger.warn("Error disposing CxfConfiguration", t);
+        }
     }
 
     public Bus getCxfBus()
