@@ -12,11 +12,14 @@ package org.mule.transport.jms.integration;
 
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
+import org.mule.util.ExceptionUtils;
 
 import java.util.Properties;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -39,6 +42,14 @@ public abstract class AbstractJmsSingleTransactionSingleServiceTestCase extends 
     public static final String JMS_QUEUE_OUTPUT_CONF_D = "out4";
     public static final String JMS_QUEUE_INPUT_CONF_E = "in5";
     public static final String JMS_QUEUE_OUTPUT_CONF_E = "out5";
+
+    @Before
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        muleContext.setExceptionListener(new TestExceptionStrategy());
+    }
 
     @Override
     protected Properties getStartUpProperties()
@@ -136,19 +147,25 @@ public abstract class AbstractJmsSingleTransactionSingleServiceTestCase extends 
 
         send(scenarioCommit);
 
-        TestExceptionStrategy exceptionStrategy = (TestExceptionStrategy) 
-            muleContext.getRegistry().lookupService(serviceName).getExceptionListener();
-        exceptionStrategy.setExceptionCallback(new ExceptionCallback()
+        final ExceptionCallback exceptionCallback = new ExceptionCallback()
         {
             public void onException(Throwable t)
             {
-                assertTrue(t.getCause().getCause() instanceof org.mule.transaction.IllegalTransactionStateException);
+                assertTrue(ExceptionUtils.containsType(t,
+                    org.mule.transaction.IllegalTransactionStateException.class));
                 assertEquals(1, exceptionLatch.getCount()); // make sure this
                                                             // exception doesn't
                                                             // happen more than once
                 exceptionLatch.countDown();
             }
-        });
+        };
+        TestExceptionStrategy exceptionStrategy = (TestExceptionStrategy) muleContext.getRegistry()
+            .lookupService(serviceName)
+            .getExceptionListener();
+        exceptionStrategy.setExceptionCallback(exceptionCallback);
+
+        TestExceptionStrategy globalExceptionStrategy = (TestExceptionStrategy) muleContext.getExceptionListener();
+        globalExceptionStrategy.setExceptionCallback(exceptionCallback);
 
         assertTrue(exceptionLatch.await(10, TimeUnit.SECONDS));
         receive(scenarioNotReceive);
