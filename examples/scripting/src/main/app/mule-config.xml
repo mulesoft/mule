@@ -31,52 +31,40 @@
         <spring:property name="factor" value="100"/>
     </custom-transformer>
     
-    <model name="main">
-        <service name="Accumulator">
-            <inbound>
-                <http:inbound-endpoint host="localhost" port="47493" path="change-machine"
-                    exchange-pattern="request-response" 
-                    transformer-refs="HttpRequestToMap"/>
-            </inbound>
-            <outbound>
-                <filtering-router>
-                    <vm:outbound-endpoint path="groovy-script" exchange-pattern="request-response">
-                        <transformer ref="ExtractAmount StringToNumber DollarsToCents"/>
-                    </vm:outbound-endpoint>
-                    <expression-filter evaluator="groovy" 
-                        expression="return payload.currency == 'USD'"/>
-                </filtering-router>
+    <flow name="http-inbound">
+        <http:inbound-endpoint host="localhost" port="47493" path="change-machine"
+            exchange-pattern="request-response" transformer-refs="HttpRequestToMap"/>
 
-                <filtering-router>
-                    <vm:outbound-endpoint path="jython-script" exchange-pattern="request-response">
-                        <transformer ref="ExtractAmount StringToNumber DollarsToCents"/>
-                    </vm:outbound-endpoint>
-                    <expression-filter evaluator="groovy" 
-                        expression="return payload.currency == 'GBP'"/>
-                </filtering-router>
-            </outbound>
-        </service>
+        <choice>
+            <when expression="groovy:return payload.currency == 'USD'">
+                <vm:outbound-endpoint path="groovy-script" exchange-pattern="request-response">
+                    <transformer ref="ExtractAmount StringToNumber DollarsToCents"/>
+                </vm:outbound-endpoint>
+             </when>
+             
+             <when expression="groovy:return payload.currency == 'GBP'">
+                <vm:outbound-endpoint path="jython-script" exchange-pattern="request-response">
+                    <transformer ref="ExtractAmount StringToNumber DollarsToCents"/>
+                </vm:outbound-endpoint>
+             </when>
+        </choice>
+    </flow>
+    
+    <flow name="GroovyScript">
+        <vm:inbound-endpoint path="groovy-script" exchange-pattern="request-response"/>
+        <script:component>
+            <script:script file="greedy.groovy">
+                <property key="currency" value="USD"/>
+            </script:script>
+        </script:component>
+    </flow>
 
-        <service name="GroovyScriptService">
-            <inbound>
-                <vm:inbound-endpoint path="groovy-script" exchange-pattern="request-response"/>
-            </inbound>
-            <script:component>
-                <script:script file="greedy.groovy">
-                    <property key="currency" value="USD"/>
-                </script:script>
-            </script:component>
-        </service>
-        
-        <service name="JythonScriptService">
-            <inbound>
-                <vm:inbound-endpoint path="jython-script" exchange-pattern="request-response"/>
-            </inbound>
-            <script:component>
-                <script:script file="greedy.py">
-                    <property key="currency" value="GBP"/>
-                </script:script>
-            </script:component>
-        </service>
-    </model>
+    <flow name="JythonScript">
+        <vm:inbound-endpoint path="jython-script" exchange-pattern="request-response"/>
+        <script:component>
+            <script:script file="greedy.py">
+                <property key="currency" value="GBP"/>
+            </script:script>
+        </script:component>
+    </flow>
 </mule>
