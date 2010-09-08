@@ -44,11 +44,11 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         super("Endpoint Logger Agent");
         // List of notifications to ignore, because when these notifications are
         // received the notification endpoint is no longer available
-        ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_STOPPED));
-        ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSING));
-        ignoredNotifications.add(new Integer(MuleContextNotification.CONTEXT_DISPOSED));
-        ignoredNotifications.add(new Integer(ModelNotification.MODEL_STOPPED));
-        ignoredNotifications.add(new Integer(ModelNotification.MODEL_DISPOSED));
+        ignoredNotifications.add(MuleContextNotification.CONTEXT_STOPPED);
+        ignoredNotifications.add(MuleContextNotification.CONTEXT_DISPOSING);
+        ignoredNotifications.add(MuleContextNotification.CONTEXT_DISPOSED);
+        ignoredNotifications.add(ModelNotification.MODEL_STOPPED);
+        ignoredNotifications.add(ModelNotification.MODEL_DISPOSED);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
         buf.append(getName()).append(": ");
         if (endpoint != null)
         {
-            buf.append("Forwarding notifications to: " + endpoint.getEndpointURI().getAddress());
+            buf.append("Forwarding notifications to: ").append(endpoint.getEndpointURI().getAddress());
         }
         return buf.toString();
     }
