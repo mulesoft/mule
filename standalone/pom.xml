@@ -259,7 +259,7 @@
             <artifactId>activemq-core</artifactId>
             <scope>provided</scope>
         </dependency>
-        <!-- 
+        <!--
             Exclude the transitive dependencies of the scripting example
          -->
         <dependency>
@@ -271,7 +271,28 @@
         <dependency>
             <groupId>org.python</groupId>
             <artifactId>jython</artifactId>
-            <scope>provided</scope>        
+            <scope>provided</scope>
+        </dependency>
+        <!--
+            Exclude the transitive dependencies of the bookstore example
+         -->
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jsp-2.1-jetty</artifactId>
+            <version>${jettyVersion}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- re-add our ant dependency as it gets transitively excluded by jetty's jsp support -->
+        <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>${antVersion}-osgi</version>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>serializer</artifactId>
+            <version>2.7.1</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
