@@ -1745,6 +1745,98 @@
         </xsd:complexContent>
     </xsd:complexType>
     
+    <xsd:element name="validator" type="validatorType" substitutionGroup="abstract-flow-construct">
+        <xsd:annotation>
+            <xsd:documentation>
+                A validator with a single request-response inbound endpoint and a single one-way outbound endpoint.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="validatorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A validator with a single request-response inbound endpoint and a single one-way outbound endpoint.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="baseFlowConstructType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-inbound-endpoint" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The endpoint on which messages are received.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="abstract-filter" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The filter to use to validate incoming message: accepted messages are considered valid.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="1">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The endpoint to which messages are sent.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="inboundAddress" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The address on which this bridge is listening.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="inboundEndpoint-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The endpoint on which this bridge is listening.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="validationFilter-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The filter to use to validate incoming message: accepted messages are considered valid.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>                
+                <xsd:attribute name="outboundAddress" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The address to which messages are sent.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="outboundEndpoint-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The endpoint to which messages are sent.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="ackExpression" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An expression used to build the content of the response in case a valid message has been received.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="nackExpression" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An expression used to build the content of the response in case an invalid message has been received.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+        
     <!--==============================================================-->
     <!-- Components                                              -->
     <!--==============================================================-->

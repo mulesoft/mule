@@ -12,6 +12,7 @@ package org.mule.construct;
 
 import org.apache.commons.lang.Validate;
 import org.mule.MessageExchangePattern;
+import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -155,8 +156,7 @@ public class Validator extends AbstractFlowConstruct
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             super.processNext(event);
-            return event;
+            return RequestContext.cloneAndUpdateEventEndpoint(event, this);
         }
-
     }
 }

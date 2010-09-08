@@ -81,6 +81,7 @@ import org.mule.config.spring.parsers.specific.StaticComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
 import org.mule.config.spring.parsers.specific.TransactionManagerDefinitionParser;
+import org.mule.config.spring.parsers.specific.ValidatorDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.EndpointRefParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
@@ -231,7 +232,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("bean-builder-transformer", new MessageProcessorDefinitionParser(BeanBuilderTransformer.class));
         
-        ChildDefinitionParser beanPropertyParser = new ChildDefinitionParser("argument", ExpressionArgument.class);
+        final ChildDefinitionParser beanPropertyParser = new ChildDefinitionParser("argument", ExpressionArgument.class);
         beanPropertyParser.addAlias("property-name", "name");
         registerBeanDefinitionParser("bean-property", beanPropertyParser);
 
@@ -319,6 +320,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("flow", new FlowDefinitionParser());
         registerBeanDefinitionParser("simple-service", new SimpleServiceDefinitionParser());
         registerBeanDefinitionParser("bridge", new BridgeDefinitionParser());
+        registerBeanDefinitionParser("validator", new ValidatorDefinitionParser());
 
         registerBeanDefinitionParser("flow-ref", new FlowRefDefinitionParser());
         
