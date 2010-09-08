@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-       xsi:schemaLocation="
-            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
-            http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
-            http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
     <description>
-    This configuration is identical to the other Hello World example, except that instead of using the console 
-    for I/O, other methods are used.  The example demonstrates how easy it is to swap out different transports 
-    while never affecting the application.
+    This configuration uses an HTTP endpoint to receive requests.
     </description>
+    
     <!--
     To invoke the Hello service over HTTP, hit the following URL in your browser:
 
@@ -43,11 +42,6 @@
     <custom-transformer name="HttpRequestToParameter" class="org.mule.transport.servlet.transformers.HttpRequestToParameter"/>
     <custom-transformer name="ObjectToString" class="org.mule.transformer.simple.ObjectToString"/>
 
-    <!-- workaround for http://mule.mulesoft.org/jira/browse/MULE-1827 -->
-    <message-properties-transformer name="PlainTextResponseTransformer">
-        <add-message-property key="Content-Type" value="text/plain"/>
-    </message-properties-transformer>
-
     <model name="helloSample">
         <!--
             This service receives input from 3 different endpoints (http, servlet, vm) and routes 
@@ -55,12 +49,7 @@
         -->
         <service name="GreeterUMO">
             <inbound>
-                <!-- 
-                  Incoming HTTP requests
-                  
-                  Note: the REST endpoint currently only works on the servlet transport only
-                  since the HttpRequestToParameter transformer only supports servlets.
-                 -->
+                <!-- Incoming HTTP requests -->
                 <inbound-endpoint address="http://localhost:8888" transformer-refs="HttpRequestToNameString" exchange-pattern="request-response">
                     <not-filter>
                         <wildcard-filter pattern="/favicon.ico"/>   
@@ -73,14 +62,13 @@
                         <wildcard-filter pattern="/favicon.ico"/>   
                     </not-filter>
                 </inbound-endpoint>
-                <inbound-endpoint address="servlet://rest" transformer-refs="HttpRequestToParameter StringToNameString" responseTransformer-refs="PlainTextResponseTransformer" exchange-pattern="request-response"/>
 
                 <!-- Incoming VM requests -->
                 <vm:inbound-endpoint path="greeter" transformer-refs="StringToNameString" exchange-pattern="request-response"/>
             </inbound>
-
+            
             <component class="org.mule.example.hello.Greeter"/>
-
+            
             <outbound>
                 <filtering-router>
                     <vm:outbound-endpoint path="chitchatter" exchange-pattern="request-response"/>
@@ -99,15 +87,6 @@
             </default-service-exception-strategy>
         </service>
 
-        <!-- note the response transformer on this component. even though there is no outbound provider
-        the transformer will transform the result event and pass it back as the http response -->
-        <service name="ChitChatUMO">
-            <inbound>
-                <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString" responseTransformer-refs="ChatStringToString" exchange-pattern="request-response"/>
-            </inbound>
-            <component class="org.mule.example.hello.ChitChatter"/>
-        </service>
-
         <!-- This error handler returns user error messages to caller. Errors could also be routed elsewhere,
             e.g. into an error file, send via email to a list, stored in a database, etc. -->
         <service name="UserErrorHandler">
@@ -115,19 +94,18 @@
                 <vm:inbound-endpoint path="userErrorHandler" responseTransformer-refs="ExceptionToString" exchange-pattern="request-response"/>
             </inbound>
         </service>
-
-        <!-- Handle any unexpected errors. Errors could also be routed elsewhere,
-            e.g. into an error file, send via email to a list, stored in a database, etc. -->
-        <service name="SystemErrorHandler">
-            <inbound>
-                <vm:inbound-endpoint path="systemErrorHandler" exchange-pattern="request-response"/>
-            </inbound>
-
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="stdio://ERR" exchange-pattern="one-way"/>
-                </pass-through-router>
-            </outbound>
-        </service>
     </model>
+    
+    <flow name="ChitChat">
+        <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString" 
+            responseTransformer-refs="ChatStringToString" exchange-pattern="request-response"/>
+        <component class="org.mule.example.hello.ChitChatter"/>
+    </flow>
+    
+    <!-- Handle any unexpected errors. Errors could also be routed elsewhere,
+        e.g. into an error file, send via email to a list, stored in a database, etc. -->
+    <flow name="SystemErrorHandler">
+        <vm:inbound-endpoint path="systemErrorHandler" exchange-pattern="request-response"/>
+        <outbound-endpoint address="stdio://ERR" exchange-pattern="one-way"/>
+    </flow>
 </mule>
