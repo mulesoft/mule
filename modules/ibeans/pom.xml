@@ -92,7 +92,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xannotations</artifactId>
-            <version>3.0-SNAPSHOT</version>
+            <version>3.0.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -108,4 +108,28 @@
             <artifactId>mockito-all</artifactId>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>annotationsx-repo</id>
+            <name>Annotation Extentions repository</name>
+            <url>http://repository.annotations.muleforge.org</url>
+        </repository>
+        <repository>
+            <id>ibeans-snapshot-repo</id>
+            <name>IBeans SNAPSHOT repository</name>
+            <url>http://snapshots.repository.ibeans.muleforge.org</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>ibeans-repo</id>
+            <name>IBeans repository</name>
+            <url>http://repository.ibeans.muleforge.org</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 </project>
