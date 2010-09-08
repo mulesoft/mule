@@ -39,14 +39,10 @@
 
     <custom-agent class="org.mule.example.notifications.HeartbeatAgent" name="heartbeat"/>
 
-    <model>
-        <service name="TestEchoService">
-            <inbound>
-                <ajax:inbound-endpoint channel="/services/echo">
-                    <custom-security-filter class="org.mule.example.notifications.DummySecurityFilter"/>
-                </ajax:inbound-endpoint>
-            </inbound>
-            <echo-component/>
-        </service>
-    </model>
+    <flow name="TestEcho">
+        <ajax:inbound-endpoint channel="/services/echo">
+            <custom-security-filter class="org.mule.example.notifications.DummySecurityFilter"/>
+        </ajax:inbound-endpoint>
+        <echo-component/>
+    </flow>
 </mule>
