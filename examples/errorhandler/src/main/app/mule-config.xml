@@ -66,91 +66,77 @@
         All transformers must be declared here to be referenced by their names in the 
         endpoint definitions 
     -->
-    <email:string-to-email-transformer name="StringToEmailMessage"/>
-    <xm:xml-to-object-transformer name="XMLToExceptionBean"
-                                  returnClass="org.mule.example.errorhandler.ExceptionBean"/>
     <xm:object-to-xml-transformer name="ExceptionBeanToXML" 
                                   returnClass="java.lang.String"/>
-    <custom-transformer name="ExceptionBeanToErrorMessage" 
-                             class="org.mule.example.errorhandler.ExceptionBeanToErrorMessage"
-                             returnClass="org.mule.example.errorhandler.ErrorMessage"/>
-    <custom-transformer name="ErrorMessageToException" 
-                             class="org.mule.example.errorhandler.ErrorMessageToException"
-                             returnClass="java.lang.Throwable"/>
+
+    <xm:xml-to-object-transformer name="XMLToExceptionBean"
+                                  returnClass="org.mule.example.errorhandler.ExceptionBean"/>
+                             
     <custom-transformer name="ErrorMessageToExceptionBean" 
-                             class="org.mule.example.errorhandler.ErrorMessageToExceptionBean"
-                             returnClass="org.mule.example.errorhandler.ExceptionBean"/>
+                        class="org.mule.example.errorhandler.ErrorMessageToExceptionBean"
+                        returnClass="org.mule.example.errorhandler.ExceptionBean"/>
 
-    <model name="errorhandler-test">
-        <service name="Error Manager">
-            <inbound>
-                <file:inbound-endpoint path="${app.home}/test-data/in">
-                    <!-- Ignore other files than our XML error input. When running this example from
-                         a svn checkout the file connector would try to process subversion's meta
-                         dirs which is not what we want.
-                    -->
-                    <file:filename-wildcard-filter pattern="*.xml"/>
-                    <transformer ref="XMLToExceptionBean ExceptionBeanToErrorMessage" />
-                </file:inbound-endpoint>
-            </inbound>
+    <custom-transformer name="ExceptionBeanToErrorMessage"
+                        class="org.mule.example.errorhandler.ExceptionBeanToErrorMessage"
+                        returnClass="org.mule.example.errorhandler.ErrorMessage"/>
+
+    <flow name="errorhandler">
+        <file:inbound-endpoint path="${app.home}/test-data/in">
+            <!-- Ignore other files than our XML error input. When running this example from
+                 a svn checkout the file connector would try to process subversion's meta
+                 dirs which is not what we want.
+            -->
+            <file:filename-wildcard-filter pattern="*.xml"/>
+            <transformer ref="XMLToExceptionBean"/>
+            <transformer ref="ExceptionBeanToErrorMessage"/>
+        </file:inbound-endpoint>
+        <pooled-component>
+            <prototype-object class="org.mule.example.errorhandler.ErrorManager">
+                <properties>
+                    <spring:entry key="handlers">
+                        <spring:list>
+                            <spring:ref local="fatalHandler"/>
+                            <spring:ref local="defaultHandler"/>
+                            <spring:ref local="businessHandler"/>
+                        </spring:list>
+                    </spring:entry>
+                </properties>
+             </prototype-object>
+        </pooled-component>
+        <choice>
+            <when expression="groovy:payload.throwable instanceof org.mule.api.DefaultMuleException">
+                <file:outbound-endpoint path="${app.home}/test-data/exceptions" 
+                                        outputPattern="Exception-[function:uuid].xml">
+                    <transformer ref="ErrorMessageToExceptionBean" />
+                    <transformer ref="ExceptionBeanToXML" />
+                </file:outbound-endpoint>
+            </when>
             
-            <pooled-component>
-                <prototype-object class="org.mule.example.errorhandler.ErrorManager">
-                    <properties>
-                        <spring:entry key="handlers">
-                            <spring:list>
-                                <spring:ref local="fatalHandler"/>
-                                <spring:ref local="defaultHandler"/>
-                                <spring:ref local="businessHandler"/>
-                            </spring:list>
-                        </spring:entry>
-                    </properties>
-                 </prototype-object>
-            </pooled-component>
-
-            <outbound>
-                <filtering-router>
-                    <file:outbound-endpoint path="${app.home}/test-data/exceptions" 
-                                            outputPattern="Exception-[function:uuid].xml">
-                        <transformer ref="ErrorMessageToExceptionBean" />
-                        <transformer ref="ExceptionBeanToXML" />
-                    </file:outbound-endpoint>
-                    <!-- Check ErrorMessage.getThrowable() exception type -->
-                    <expression-filter evaluator="groovy" expression="payload.throwable instanceof org.mule.api.DefaultMuleException"/>
-                </filtering-router>
-                
-                <filtering-router>
-                    <smtp:outbound-endpoint user="${smtp.username}" password="${smtp.password}"
-                                            host="${smtp.host}" port="${smtp.port}"
-                                            to="${email.toAddress}" from="${email.fromAddress}"
-                                            subject="${email.subject}">
-                        <!-- Check ErrorMessage.getThrowable() exception type -->
-                        <expression-filter evaluator="groovy" expression="payload.throwable instanceof org.mule.api.lifecycle.FatalException"/>
-                        <transformer ref="ErrorMessageToExceptionBean" />
-                        <transformer ref="ExceptionBeanToXML" />
-                        <transformer ref="StringToEmailMessage"/>
-                     </smtp:outbound-endpoint>
-                </filtering-router>
-                
-                <filtering-router>
-                    <outbound-endpoint address="jms://exception.queue" exchange-pattern="one-way">
-                        <transformer ref="ErrorMessageToExceptionBean" />
-                        <transformer ref="ExceptionBeanToXML" />
-                    </outbound-endpoint>
-                    <!-- Check ErrorMessage.getThrowable() exception type -->
-                    <expression-filter evaluator="groovy" expression="payload.throwable instanceof org.mule.example.errorhandler.exceptions.BusinessException"/>
-                </filtering-router>
-                
-                <custom-catch-all-strategy class="org.mule.routing.LoggingCatchAllStrategy"/>
-            </outbound>
-        </service>
-        
-        <service name="Business Error Manager">
-            <inbound>
-                <inbound-endpoint address="jms://exception.queue" exchange-pattern="one-way"
-                               transformer-refs="XMLToExceptionBean ExceptionBeanToErrorMessage"/>
-            </inbound>
-            <component class="org.mule.example.errorhandler.BusinessErrorManager"/>
-        </service>
-    </model>
+            <when expression="groovy:payload.throwable instanceof org.mule.api.lifecycle.FatalException">
+                <smtp:outbound-endpoint user="${smtp.username}" password="${smtp.password}"
+                                        host="${smtp.host}" port="${smtp.port}"
+                                        to="${email.toAddress}" from="${email.fromAddress}"
+                                        subject="${email.subject}">
+                    <transformer ref="ErrorMessageToExceptionBean" />
+                    <transformer ref="ExceptionBeanToXML" />
+                    <email:string-to-email-transformer/>
+                 </smtp:outbound-endpoint>
+            </when>
+            
+            <when expression="groovy:payload.throwable instanceof org.mule.example.errorhandler.exceptions.BusinessException">
+                <jms:outbound-endpoint queue="exception.queue" exchange-pattern="one-way">
+                    <transformer ref="ErrorMessageToExceptionBean" />
+                    <transformer ref="ExceptionBeanToXML" />
+                </jms:outbound-endpoint>
+            </when>
+        </choice>
+    </flow>
+    
+    <flow name="Business Error Manager">
+        <jms:inbound-endpoint queue="exception.queue">
+            <transformer ref="XMLToExceptionBean"/>
+            <transformer ref="ExceptionBeanToErrorMessage"/>
+        </jms:inbound-endpoint>
+        <component class="org.mule.example.errorhandler.BusinessErrorManager"/>
+    </flow>
 </mule>
