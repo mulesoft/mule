@@ -15,7 +15,7 @@
     
     <model name="test">
 
-		<service name="secureProxy">
+        <service name="secureProxy">
               <description>
                   Secure Proxy using Spring Security
               </description>

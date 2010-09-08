@@ -268,9 +268,9 @@
                     </xsd:documentation>
                 </xsd:annotation>
                 <xsd:complexType>
-                	<xsd:sequence>
-                		<xsd:element ref="configuration" minOccurs="0" maxOccurs="1"/>
-                	</xsd:sequence>
+                    <xsd:sequence>
+                        <xsd:element ref="configuration" minOccurs="0" maxOccurs="1"/>
+                    </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
             <xsd:element name="databinding" type="databindingType" minOccurs="0">

@@ -22,9 +22,9 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleTestCase
 {
     String msg = 
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
-    		"<ns1:echo xmlns:ns1=\"http://simple.component.api.mule.org/\">" +
-    		    "<ns1:return>hello</ns1:return>" +
-    		"</ns1:echo>" + 
+            "<ns1:echo xmlns:ns1=\"http://simple.component.api.mule.org/\">" +
+                "<ns1:return>hello</ns1:return>" +
+            "</ns1:echo>" +
         "</soap:Body></soap:Envelope>";
 
     boolean gotEvent = false;

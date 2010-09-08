@@ -15,7 +15,7 @@
         <service name="greeterService">
             <inbound>
                 <inbound-endpoint address="http://localhost:63081/services/greeter" exchange-pattern="request-response" >
-                	<cxf:simple-service/>
+                    <cxf:simple-service/>
                 </inbound-endpoint>
             </inbound>
             <component>
@@ -32,25 +32,25 @@
                 <pass-through-router>
                     <outbound-endpoint
                         address="http://localhost:63081/services/greeter"
-	                    exchange-pattern="request-response">
-                      	<cxf:simple-client
-	                        serviceClass="org.apache.hello_world_soap_http.Greeter"
-	                        operation="greetMe">
-	                        <!--
-	                            Aegis will use file
-	                            resources/org/apache/hello_world_soap_http/Greeter.aegis.xml
-	                            to configure the call to the webservice.
-	                        -->
-	                        <cxf:databinding>
-	                            <spring:bean
-	                                class="org.apache.cxf.aegis.databinding.AegisDatabinding">
-	                                <spring:property name="configuration">
-	                                    <spring:bean
-	                                        class="org.apache.cxf.aegis.type.TypeCreationOptions" />
-	                                </spring:property>
-	                            </spring:bean>
-	                        </cxf:databinding>
-	                    </cxf:simple-client>
+                        exchange-pattern="request-response">
+                          <cxf:simple-client
+                            serviceClass="org.apache.hello_world_soap_http.Greeter"
+                            operation="greetMe">
+                            <!--
+                                Aegis will use file
+                                resources/org/apache/hello_world_soap_http/Greeter.aegis.xml
+                                to configure the call to the webservice.
+                            -->
+                            <cxf:databinding>
+                                <spring:bean
+                                    class="org.apache.cxf.aegis.databinding.AegisDatabinding">
+                                    <spring:property name="configuration">
+                                        <spring:bean
+                                            class="org.apache.cxf.aegis.type.TypeCreationOptions" />
+                                    </spring:property>
+                                </spring:bean>
+                            </cxf:databinding>
+                        </cxf:simple-client>
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>

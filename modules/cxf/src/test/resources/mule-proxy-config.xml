@@ -15,7 +15,7 @@
         <service name="WebService">
             <inbound>
                 <inbound-endpoint address="http://localhost:6065" exchange-pattern="request-response">
-                	<cxf:simple-service />
+                    <cxf:simple-service />
                 </inbound-endpoint>
             </inbound>
             <echo-component/>

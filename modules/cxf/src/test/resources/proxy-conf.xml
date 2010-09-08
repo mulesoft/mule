@@ -30,13 +30,13 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint
-	                        address="http://localhost:63081/services/greeter"
-	                        exchange-pattern="request-response">
-	                    <cxf:jaxws-client
-	                        clientClass="org.apache.hello_world_soap_http.SOAPService"
-	                        port="SoapPort"
-	                        operation="greetMe"
-	                        wsdlLocation="classpath:/wsdl/hello_world.wsdl"/>
+                            address="http://localhost:63081/services/greeter"
+                            exchange-pattern="request-response">
+                        <cxf:jaxws-client
+                            clientClass="org.apache.hello_world_soap_http.SOAPService"
+                            port="SoapPort"
+                            operation="greetMe"
+                            wsdlLocation="classpath:/wsdl/hello_world.wsdl"/>
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -58,7 +58,7 @@
                 <pass-through-router>
                     <outbound-endpoint address="http://localhost:63081/services/greeter" 
                                        exchange-pattern="request-response">
-                    	<cxf:proxy-client />    
+                        <cxf:proxy-client />
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -75,7 +75,7 @@
                 <pass-through-router>
                     <outbound-endpoint address="http://localhost:63081/services/greeter" 
                                        exchange-pattern="request-response">
-                    	<cxf:proxy-client />    
+                        <cxf:proxy-client />
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -98,9 +98,9 @@
                 <inbound-endpoint address="http://localhost:63081/services/Echo" 
                                   exchange-pattern="request-response">
                     <cxf:proxy-service>
-	                    <cxf:features>
-	                        <cxf-core:logging/>
-	                    </cxf:features>
+                        <cxf:features>
+                            <cxf-core:logging/>
+                        </cxf:features>
                     </cxf:proxy-service>
                 </inbound-endpoint>
             </inbound>
@@ -123,12 +123,12 @@
                 <inbound-endpoint address="http://localhost:63081/services/proxy" 
                                       exchange-pattern="request-response">
                     <cxf:proxy-service>
-	                    <cxf:inInterceptors>
-	                        <spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
-	                    </cxf:inInterceptors>
-	                    <cxf:outInterceptors>
-	                        <spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
-	                    </cxf:outInterceptors>
+                        <cxf:inInterceptors>
+                            <spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
+                        </cxf:inInterceptors>
+                        <cxf:outInterceptors>
+                            <spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
+                        </cxf:outInterceptors>
                     </cxf:proxy-service>
                 </inbound-endpoint>
             </inbound>
@@ -136,7 +136,7 @@
                 <pass-through-router>
                     <outbound-endpoint address="http://localhost:63081/services/Echo" 
                                        exchange-pattern="request-response">
-                    	<cxf:proxy-client />    
+                        <cxf:proxy-client />
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -153,7 +153,7 @@
                 <pass-through-router>
                     <outbound-endpoint address="http://localhost:63081/services/Echo" 
                                        exchange-pattern="request-response">
-                    	<cxf:proxy-client payload="envelope"/>    
+                        <cxf:proxy-client payload="envelope"/>
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -163,10 +163,10 @@
             <inbound>
                 <inbound-endpoint address="http://localhost:63081/services/proxyWithWsdl" 
                                   exchange-pattern="request-response">
-                	<cxf:proxy-service
-	                    service="WebService"
-	                    wsdlLocation="localWsdl.wsdl" 
-	                    namespace="http://www.muleumo.org"/>
+                    <cxf:proxy-service
+                        service="WebService"
+                        wsdlLocation="localWsdl.wsdl"
+                        namespace="http://www.muleumo.org"/>
                 </inbound-endpoint>
             </inbound>
             <test:component/>
@@ -174,7 +174,7 @@
                 <pass-through-router>
                     <outbound-endpoint address="http://localhost:63081/services/Echo" 
                                        exchange-pattern="request-response">
-                    	<cxf:proxy-client />    
+                        <cxf:proxy-client />
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -184,10 +184,10 @@
             <inbound>
                 <inbound-endpoint address="http://localhost:63081/services/proxyWithWsdl2" 
                                   exchange-pattern="request-response">
-                	<cxf:proxy-service
-	                    service="WebService2"
-	                    wsdlLocation="localWsdl.wsdl"
-	                    namespace="http://www.muleumo.org"/>
+                    <cxf:proxy-service
+                        service="WebService2"
+                        wsdlLocation="localWsdl.wsdl"
+                        namespace="http://www.muleumo.org"/>
                 </inbound-endpoint>
                 
             </inbound>
@@ -196,7 +196,7 @@
                 <pass-through-router>
                     <outbound-endpoint address="http://localhost:63081/services/Echo" 
                                        exchange-pattern="request-response">
-                    	<cxf:proxy-client />    
+                        <cxf:proxy-client />
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -207,7 +207,7 @@
             <inbound>
                 <inbound-endpoint address="http://localhost:63081/services/proxyWithTransform" 
                                   exchange-pattern="request-response">
-                	<cxf:proxy-service />                  
+                    <cxf:proxy-service />
                 </inbound-endpoint>
             </inbound>
             <outbound>
@@ -228,17 +228,17 @@
                 <inbound-endpoint address="http://localhost:63081/services/routeBasedOnSoapAction" 
                                   exchange-pattern="request-response">
                     <cxf:proxy-service>
-	                    <cxf:features>
-	                        <cxf-core:logging/>
-	                    </cxf:features>
+                        <cxf:features>
+                            <cxf-core:logging/>
+                        </cxf:features>
                     </cxf:proxy-service>
                 </inbound-endpoint>
                 <inbound-endpoint address="http://localhost:63081/services/routeBasedOnSoapActionAsync" 
                                   exchange-pattern="one-way">
                     <cxf:proxy-service>
-	                    <cxf:features>
-	                        <cxf-core:logging/>
-	                    </cxf:features>
+                        <cxf:features>
+                            <cxf-core:logging/>
+                        </cxf:features>
                     </cxf:proxy-service>
                 </inbound-endpoint>
             </inbound>
@@ -246,7 +246,7 @@
                 <filtering-router>
                     <outbound-endpoint address="http://localhost:63081/services/Echo" 
                                        exchange-pattern="request-response">
-                    	<cxf:proxy-client />    
+                        <cxf:proxy-client />
                     </outbound-endpoint>
                     <message-property-filter pattern="SOAPAction=http://acme.com/no-transform" scope="inbound"/>
                 </filtering-router>
@@ -264,7 +264,7 @@
                     <outbound-endpoint address="http://localhost:63081/services/oneway" 
                                        exchange-pattern="request-response"
                                        responseTimeout="2000">
-                    	<cxf:proxy-client />    
+                        <cxf:proxy-client />
                     </outbound-endpoint>
                     <message-property-filter pattern="SOAPAction=http://acme.com/oneway" scope="inbound"/>
                 </filtering-router>
@@ -275,7 +275,7 @@
             <inbound>
                 <inbound-endpoint address="http://localhost:63081/services/oneway"
                     exchange-pattern="request-response">
-                	<cxf:jaxws-service />    
+                    <cxf:jaxws-service />
                 </inbound-endpoint>
             </inbound>
             <component>

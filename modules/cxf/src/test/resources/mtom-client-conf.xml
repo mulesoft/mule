@@ -42,13 +42,13 @@
                       address="http://localhost:63081/services/employeeDirectory"
                       exchange-pattern="request-response">
                       <cxf:jaxws-client clientClass="org.mule.example.employee.EmployeeDirectory_Service"
-	                      operation="addEmployee" 
-	                      port="EmployeeDirectoryPort" 
-	                      wsdlLocation="classpath:employeeDirectory.wsdl"
-	                      mtomEnabled="true">
-	                      <cxf:outInterceptors>
-	                        <spring:bean class="org.mule.module.cxf.employee.AttachmentVerifyInterceptor"/>
-	                      </cxf:outInterceptors>
+                          operation="addEmployee"
+                          port="EmployeeDirectoryPort"
+                          wsdlLocation="classpath:employeeDirectory.wsdl"
+                          mtomEnabled="true">
+                          <cxf:outInterceptors>
+                            <spring:bean class="org.mule.module.cxf.employee.AttachmentVerifyInterceptor"/>
+                          </cxf:outInterceptors>
                       </cxf:jaxws-client>
                   </outbound-endpoint>
               </pass-through-router>

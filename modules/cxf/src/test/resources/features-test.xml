@@ -13,12 +13,12 @@
                http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 
     <endpoint name="endpoint" address="http://www.example.com" exchange-pattern="request-response">
-	    <cxf:jaxws-service serviceClass="org.apache.hello_world_soap_http.GreeterImpl">
-	        <cxf:features>
-	            <c:logging/>
-	            <c:logging/>
-	        </cxf:features>
-	    </cxf:jaxws-service>
-	</endpoint>
+        <cxf:jaxws-service serviceClass="org.apache.hello_world_soap_http.GreeterImpl">
+            <cxf:features>
+                <c:logging/>
+                <c:logging/>
+            </cxf:features>
+        </cxf:jaxws-service>
+    </endpoint>
 </mule>
 

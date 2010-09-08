@@ -22,7 +22,7 @@
     <service name="echoService">
       <inbound>
         <inbound-endpoint address="vm://echo" exchange-pattern="request-response">
-        	<cxf:simple-service />
+            <cxf:simple-service />
         </inbound-endpoint>
       </inbound>
       <echo-component/>

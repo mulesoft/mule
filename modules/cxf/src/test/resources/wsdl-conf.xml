@@ -16,7 +16,7 @@
         <service name="mycomponent">
             <inbound>
                 <inbound-endpoint address="servlet://mycomponent" exchange-pattern="request-response">
-                	<cxf:simple-service serviceClass="org.mule.api.lifecycle.Callable" />
+                    <cxf:simple-service serviceClass="org.mule.api.lifecycle.Callable" />
                 </inbound-endpoint>
             </inbound>
             <test:component/>
@@ -25,7 +25,7 @@
         <service name="cxfService">
             <inbound>
                 <inbound-endpoint address="http://localhost:63082/cxfService" exchange-pattern="request-response">
-                	<cxf:simple-service serviceClass="org.mule.api.lifecycle.Callable" />
+                    <cxf:simple-service serviceClass="org.mule.api.lifecycle.Callable" />
                 </inbound-endpoint>
             </inbound>
             <test:component/>

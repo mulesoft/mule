@@ -27,7 +27,7 @@
             <inbound>
                 <inbound-endpoint address="jetty://localhost:63082/services/EchoProxy"
                                   exchange-pattern="request-response" connector-ref="jettyConnector">
-				    <cxf:proxy-service />
+                    <cxf:proxy-service />
                 </inbound-endpoint>
             </inbound>
             <outbound>
@@ -45,7 +45,7 @@
                 <inbound-endpoint
                         address="jetty://localhost:63081/services/Echo" exchange-pattern="request-response"
                         connector-ref="jettyConnector">
-                	<cxf:simple-service />        
+                    <cxf:simple-service />
                 </inbound-endpoint>
             </inbound>
             <component class="org.mule.component.simple.EchoComponent"/>

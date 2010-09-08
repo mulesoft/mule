@@ -16,19 +16,19 @@
   <endpoint 
       name="cxfOutbound" 
       address="http://localhost:63081/services/greeter"
-	  exchange-pattern="request-response">
-	  <cxf:jaxws-client
-	      clientClass="org.apache.hello_world_soap_http.SOAPService" 
-	      port="SoapPort" 
-	      wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-	      operation="greetMe">
-	      <cxf:inInterceptors>
-	          <spring:bean id="foo1" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>    
-	      </cxf:inInterceptors>
-	      <cxf:outInterceptors>
-	          <spring:bean id="foo2" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>    
-	      </cxf:outInterceptors>
-	  </cxf:jaxws-client>
+      exchange-pattern="request-response">
+      <cxf:jaxws-client
+          clientClass="org.apache.hello_world_soap_http.SOAPService"
+          port="SoapPort"
+          wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+          operation="greetMe">
+          <cxf:inInterceptors>
+              <spring:bean id="foo1" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+          </cxf:inInterceptors>
+          <cxf:outInterceptors>
+              <spring:bean id="foo2" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+          </cxf:outInterceptors>
+      </cxf:jaxws-client>
       <message-properties-transformer> 
         <add-message-property key="http.version" value="HTTP/1.0"/> 
       </message-properties-transformer> 
@@ -37,16 +37,16 @@
   <endpoint 
       name="cxfOutbound2" 
       address="http://localhost:63081/services/greeter"
-	  exchange-pattern="request-response">
+      exchange-pattern="request-response">
       <message-properties-transformer> 
         <add-message-property key="http.version" value="HTTP/1.0"/> 
       </message-properties-transformer>
-	  <cxf:jaxws-client 
-	      clientClass="org.apache.hello_world_soap_http.SOAPService" 
-	      port="SoapPort" 
-	      wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-	      operation="greetMe">
-	  </cxf:jaxws-client>
+      <cxf:jaxws-client
+          clientClass="org.apache.hello_world_soap_http.SOAPService"
+          port="SoapPort"
+          wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+          operation="greetMe">
+      </cxf:jaxws-client>
   </endpoint>
   
   <model name="TestCxfModel">

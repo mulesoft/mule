@@ -17,7 +17,7 @@
             <inbound>
                 <inbound-endpoint address="servlet://mycomponent"
                     exchange-pattern="request-response">
-                	<cxf:jaxws-service />    
+                    <cxf:jaxws-service />
                 </inbound-endpoint>
             </inbound>
             <component class="org.mule.module.cxf.testmodels.Echo"/>

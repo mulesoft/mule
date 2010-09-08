@@ -13,13 +13,13 @@
             <inbound>
                 <inbound-endpoint address="http://localhost:63081/services/Echo" exchange-pattern="request-response">
                     <cxf:simple-service>
-	                    <cxf:databinding>
-	                        <spring:bean class="org.apache.cxf.aegis.databinding.AegisDatabinding">
-	                            <spring:property name="configuration">
-	                                <spring:bean class="org.apache.cxf.aegis.type.TypeCreationOptions" />
-	                            </spring:property>
-	                        </spring:bean>
-	                    </cxf:databinding>
+                        <cxf:databinding>
+                            <spring:bean class="org.apache.cxf.aegis.databinding.AegisDatabinding">
+                                <spring:property name="configuration">
+                                    <spring:bean class="org.apache.cxf.aegis.type.TypeCreationOptions" />
+                                </spring:property>
+                            </spring:bean>
+                        </cxf:databinding>
                     </cxf:simple-service>
                 </inbound-endpoint>
             </inbound>

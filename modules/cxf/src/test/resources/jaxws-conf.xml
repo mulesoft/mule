@@ -15,9 +15,9 @@
           <inbound-endpoint address="http://localhost:63081/services/Echo"
             exchange-pattern="request-response">
             <cxf:jaxws-service>
-	            <cxf:features>
-	              <cxf-core:logging/>
-	            </cxf:features>
+                <cxf:features>
+                  <cxf-core:logging/>
+                </cxf:features>
             </cxf:jaxws-service>
           </inbound-endpoint>
       </inbound>
