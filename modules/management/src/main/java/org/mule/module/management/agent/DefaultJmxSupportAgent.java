@@ -170,7 +170,7 @@ public class DefaultJmxSupportAgent extends AbstractAgent
         JmxAgent agent;
         try
         {
-            agent = (JmxAgent) muleContext.getRegistry().lookupObject(JmxAgent.class);
+            agent = muleContext.getRegistry().lookupObject(JmxAgent.class);
             if (agent == null)
             {
                 // nothing registered yet
