@@ -89,6 +89,12 @@
  %>
 
 <br/>
-<a href="/<%=request.getContextPath()%>">Return to Home Page</a>
+<%
+	String host = request.getServerName();
+	int port = request.getServerPort();
+	String contextPath = request.getContextPath();
+	String url = "http://" + host + ":" + port + contextPath;
+%>
+<a href="<%=url%>">Return to Home Page</a>
 </body>
 </html>

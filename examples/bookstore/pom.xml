@@ -8,8 +8,8 @@
         <artifactId>mule-examples</artifactId>
         <version>3.1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-example-bookstore-parent</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>mule-example-bookstore</artifactId>
+    <packaging>mule</packaging>
     <name>Bookstore Example</name>
     <description>Bookstore Example App</description>
 
@@ -18,26 +18,89 @@
         in the dist directory, too
     -->
     <properties>
-        <muleVersion>3.1.0-SNAPSHOT</muleVersion>
-        <cxfVersion>2.1.2</cxfVersion>
-        <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
-        <jettyVersion>6.1.22</jettyVersion>
         <xalanVersion>2.7.1</xalanVersion>
     </properties>
 
-    <modules>
-        <module>api</module>
-        <module>admin-web</module>
-        <module>bookstore-web</module>
-    </modules>
-
+    <dependencies>
+        <!-- Contains MuleXmlBuilderContextListener -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-builders</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Transports used by the Mule config -->
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-servlet</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-cxf</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-email</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-jetty</artifactId>
+            <version>${version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- CXF assumes you have an XSLT engine available -->
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>${xalanVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>serializer</artifactId>
+            <version>${xalanVersion}</version>
+        </dependency>
+        <!-- for Jetty's JSP support -->
+        <dependency>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jsp-2.1-jetty</artifactId>
+            <version>${jettyVersion}</version>
+        </dependency>
+        
+        <!-- Unit tests -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
     <build>
-        <!-- TODO We could make tomcat:run the top-level goal so that typing "mvn" would run both webapps.
-        However, there's no way to fork the two modules yet, so the first one blocks the second one, see:
-        https://jira.codehaus.org/browse/MTOMCAT-20
-
-        <defaultGoal>tomcat:run</defaultGoal>
-        -->
-        <defaultGoal>install</defaultGoal>
+        <testResources>
+            <testResource>
+                <directory>src/main/app</directory>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
     </build>
 </project>

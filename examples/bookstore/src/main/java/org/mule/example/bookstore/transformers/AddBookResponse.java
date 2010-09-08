@@ -37,5 +37,3 @@ public class AddBookResponse extends AbstractTransformer
         return HtmlTemplate.wrapHtmlBody(response);
     }
 }
-
-
