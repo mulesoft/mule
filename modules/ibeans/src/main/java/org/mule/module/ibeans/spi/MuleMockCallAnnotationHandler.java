@@ -10,9 +10,12 @@
 package org.mule.module.ibeans.spi;
 
 import org.mule.api.MuleContext;
+import org.mule.transport.http.HttpConstants;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.activation.DataSource;
@@ -62,7 +65,10 @@ public class MuleMockCallAnnotationHandler extends MuleCallAnnotationHandler imp
             result = ctx.getMethod().invoke(mock, ctx.getArgs());
         }
 
-        Response response = (result instanceof Response ? (Response)result : plugin.createResponse(result, null, null));
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(HttpConstants.HEADER_CONTENT_TYPE, (ctx.getInvocationReturnType()==null ?
+                    ctx.getReturnType().getMimeType() : ctx.getInvocationReturnType().getMimeType()));
+        Response response = (result instanceof Response ? (Response)result : plugin.createResponse(result, props, null));
 
         //Now handled in the test case
         if (callback != null)
