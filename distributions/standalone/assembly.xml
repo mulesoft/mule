@@ -92,9 +92,6 @@
             <exclude>**/*.iml</exclude>
             <exclude>**/*.ipr</exclude>
             <exclude>**/*.iws</exclude>
-            <!-- Exclude the webapp tests because Ant is not smart enough to deal
-                with multiple Jetty versions. -->
-            <exclude>webapp/src/test/**</exclude>
         </excludes>
     </fileSet>
 
@@ -226,46 +223,6 @@
     <fileSet>
         <directory>../../examples/stockquote/dist</directory>
         <outputDirectory>examples/stockquote</outputDirectory>
-    </fileSet>
-
-    <!--
-    ============================
-        Mule Examples: Webapp
-    ============================
-    -->
-    <fileSet>
-        <directory>../../examples/webapp/dist</directory>
-        <outputDirectory>examples/webapp</outputDirectory>
-    </fileSet>
-    <!-- Copy configs from other examples -->
-    <fileSet>
-        <directory>../../examples/echo/conf</directory>
-        <outputDirectory>examples/webapp/conf</outputDirectory>
-        <includes>
-            <include>echo-config.xml</include>
-        </includes>
-    </fileSet>
-    <fileSet>
-        <directory>../../examples/hello/conf</directory>
-        <outputDirectory>examples/webapp/conf</outputDirectory>
-        <includes>
-            <include>hello-http-config.xml</include>
-        </includes>
-    </fileSet>
-    <fileSet>
-        <directory>../../examples/loanbroker/esn/conf</directory>
-        <outputDirectory>examples/webapp/conf</outputDirectory>
-        <includes>
-            <include>loan-broker-sync-config.xml</include>
-            <include>loan-broker-vm-endpoints-config.xml</include>
-        </includes>
-    </fileSet>
-    <fileSet>
-        <directory>../../examples/stockquote/conf</directory>
-        <outputDirectory>examples/webapp/conf</outputDirectory>
-        <includes>
-            <include>stockquote-rest-config.xml</include>
-        </includes>
     </fileSet>
 
     <!--
