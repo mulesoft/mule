@@ -10,7 +10,6 @@
 
 package org.mule.transport;
 
-import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
@@ -18,7 +17,6 @@ import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
@@ -594,7 +592,7 @@ public abstract class AbstractConnectable<O> implements Connectable, LifecycleSt
         }
         catch (Exception e)
         {
-            throw new CreateException(CoreMessages.failedToCreate("MuleMessage"), e);
+            throw new CreateException(CoreMessages.failedToCreate("MuleMessage"), e, this);
         }
     }
 
