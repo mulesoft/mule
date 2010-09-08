@@ -136,6 +136,15 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     private MuleContext muleContext;
     private boolean containerMode;
 
+    /**
+     * By default the Mule Expression parser will perform basic syntax checking on expressions in order to provide
+     * early feedback if an expression is malformed.  Part of the check is checking that all open braces are closed at
+     * some point. For some expressions such as groovy, there could be a scenario where a brace is deliberately used without
+     * being closed; this would cause the validation to fail.  Users can turn off validation using this flag.
+     */
+    private boolean validateExpressions = true;
+
+
     public DefaultMuleConfiguration()
     {
         this(false);
@@ -294,6 +303,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             verboseExceptions = logger.isDebugEnabled();
         }
+
+        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "validate.expressions");
+        if (p != null)
+        {
+            validateExpressions = Boolean.valueOf(p);
+        }
     }
 
     protected void validateEncoding() throws FatalException
@@ -376,6 +391,12 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             this.defaultTransactionTimeout = defaultTransactionTimeout;
         }
+    }
+
+
+    public boolean isValidateExpressions()
+    {
+        return validateExpressions;
     }
 
     public boolean isClientMode()

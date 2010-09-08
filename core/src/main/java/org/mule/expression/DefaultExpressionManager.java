@@ -9,7 +9,9 @@
  */
 package org.mule.expression;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.expression.ExpressionRuntimeException;
@@ -34,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
  * <p/>
  * Users can register or unregister {@link ExpressionEvaluator} through this interface.
  */
-public class DefaultExpressionManager implements ExpressionManager
+public class DefaultExpressionManager implements ExpressionManager, MuleContextAware
 {
 
     /**
@@ -46,6 +48,13 @@ public class DefaultExpressionManager implements ExpressionManager
     private TemplateParser parser = TemplateParser.createMuleStyleParser();
 
     private ConcurrentMap evaluators = new ConcurrentHashMap(8);
+
+    private MuleContext muleContext;
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
 
     public void registerEvaluator(ExpressionEvaluator evaluator)
     {
@@ -269,6 +278,13 @@ public class DefaultExpressionManager implements ExpressionManager
 
     public void validateExpression(String expression) throws InvalidExpressionException
     {
+        if(!muleContext.getConfiguration().isValidateExpressions())
+        {
+            if(logger.isInfoEnabled()) {
+                logger.info("Validate expressions is turned off, no checking done for: " + expression);
+            }
+            return;
+        }
         try
         {
             parser.validate(expression);

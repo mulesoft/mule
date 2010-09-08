@@ -45,7 +45,9 @@ public interface MuleConfiguration
     boolean isCacheMessageOriginalPayload();
 
     boolean isEnableStreaming();
-    
+
+    boolean isValidateExpressions();
+
     int getDefaultQueueTimeout();
     
     int getShutdownTimeout();
