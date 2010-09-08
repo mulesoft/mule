@@ -14,7 +14,6 @@ import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
 
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.w3c.dom.Element;
 
 /**
@@ -39,7 +38,7 @@ public class NamedSetterChildElementIterator extends AbstractChildElementIterato
         this.setter = setter;
     }
 
-    protected void insertBean(BeanAssembler targetAssembler, BeanDefinition childBean, Element parent, Element child)
+    protected void insertBean(BeanAssembler targetAssembler, Object childBean, Element parent, Element child)
     {
         targetAssembler.extendTarget(setter, setter, childBean);
     }

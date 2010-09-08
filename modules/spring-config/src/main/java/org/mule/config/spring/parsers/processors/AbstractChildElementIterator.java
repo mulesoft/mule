@@ -14,10 +14,12 @@ import org.mule.config.spring.parsers.PostProcessor;
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.assembly.BeanAssemblerFactory;
 import org.mule.config.spring.parsers.assembly.configuration.PropertyConfiguration;
+import org.mule.config.spring.util.SpringXMLUtils;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
+import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.beans.factory.config.BeanDefinition;
 
@@ -67,14 +69,22 @@ public abstract class AbstractChildElementIterator implements PostProcessor
 
     protected void processChildElement(ParserContext context, BeanAssembler assembler, Element parent, Element child)
     {
-        BeanDefinition childBean =
-                context.getDelegate().parseCustomElement(child, assembler.getBean().getBeanDefinition());
-        BeanAssembler targetAssembler =
-                beanAssemblerFactory.newBeanAssembler(null, null, configuration,
-                        assembler.getBean().getRawBeanDefinition());
+        Object childBean = null;
+        if (SpringXMLUtils.isBeansNamespace(child)
+            || SpringXMLUtils.isLocalName(child, BeanDefinitionParserDelegate.REF_ELEMENT))
+        {
+            childBean = context.getDelegate().parsePropertySubElement(child, null);
+        }
+        else
+        {
+            childBean = context.getDelegate().parseCustomElement(child,
+                assembler.getBean().getBeanDefinition());
+        }
+        BeanAssembler targetAssembler = beanAssemblerFactory.newBeanAssembler(null, null, configuration,
+            assembler.getBean().getRawBeanDefinition());
         insertBean(targetAssembler, childBean, parent, child);
     }
 
-    protected abstract void insertBean(BeanAssembler targetAssembler, BeanDefinition childBean, Element parent, Element child);
+    protected abstract void insertBean(BeanAssembler targetAssembler, Object childBean, Element parent, Element child);
 
 }

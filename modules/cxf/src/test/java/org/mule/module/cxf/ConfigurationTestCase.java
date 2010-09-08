@@ -10,14 +10,16 @@
 
 package org.mule.module.cxf;
 
-import org.mule.module.cxf.CxfConfiguration;
-import org.mule.tck.FunctionalTestCase;
-
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
+import org.mule.module.cxf.config.ProxyServiceFactoryBean;
+import org.mule.tck.FunctionalTestCase;
 
 public class ConfigurationTestCase extends FunctionalTestCase
 {
@@ -38,6 +40,15 @@ public class ConfigurationTestCase extends FunctionalTestCase
         }
 
         assertTrue("Did not find logging interceptor.", found);
+    }
+    
+    public void testSpringRefs() throws Exception
+    {
+        InboundEndpoint endpoint = muleContext.getRegistry().get("clientEndpoint");
+        FlowConfiguringMessageProcessor processor = (FlowConfiguringMessageProcessor) endpoint.getMessageProcessors().get(0);
+        List inInterceptors = ((ProxyServiceFactoryBean) processor.getMessageProcessorBuilder()).getInInterceptors();
+        assertEquals(muleContext.getRegistry().get("foo1"), inInterceptors.get(0));
+        assertEquals(muleContext.getRegistry().get("foo3"), inInterceptors.get(1));
     }
 
     protected String getConfigResources()

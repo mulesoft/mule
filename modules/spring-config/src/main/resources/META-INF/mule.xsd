@@ -68,6 +68,13 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
+            <xsd:element ref="spring:ref">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Allows to reference Spring beans alongside Mule elements.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
         </xsd:choice>
     </xsd:group>
 
