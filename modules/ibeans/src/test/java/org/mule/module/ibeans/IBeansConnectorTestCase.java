@@ -53,4 +53,11 @@ public class IBeansConnectorTestCase extends AbstractConnectorTestCase
         //No support for Message Requester
         assertTrue(true);
     }
+
+    @Override
+    public void testConnectorListenerSupport() throws Exception
+    {
+        //No support for Message Receiver        
+        assertTrue(true);
+    }
 }
