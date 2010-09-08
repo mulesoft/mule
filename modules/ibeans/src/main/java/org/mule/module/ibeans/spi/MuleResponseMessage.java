@@ -43,11 +43,11 @@ public class MuleResponseMessage implements Response
         if(message.getDataType()==null)
         {
             //s this is response
-            String mime = message.getInboundProperty(MuleProperties.CONTENT_TYPE_PROPERTY);
+            String mime = message.findPropertyInAnyScope(MuleProperties.CONTENT_TYPE_PROPERTY,null);
             if (mime == null)
             {
                 //case insensitive
-                mime = message.getInboundProperty("ContentType");
+                mime = message.findPropertyInAnyScope("ContentType", null);
             }
             if(mime==null) mime = MimeTypes.ANY.getBaseType();
 
@@ -118,12 +118,12 @@ public class MuleResponseMessage implements Response
 
     public DataHandler getAttachment(String name)
     {
-        return message.getAttachment(name);
+        return message.getInboundAttachment(name);
     }
 
     public Set<String> getAttachmentNames()
     {
-        return message.getAttachmentNames();
+        return message.getInboundAttachmentNames();
     }
 
     public MuleMessage getMessage()

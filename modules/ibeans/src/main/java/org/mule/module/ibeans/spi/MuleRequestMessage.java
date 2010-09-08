@@ -47,7 +47,7 @@ public class MuleRequestMessage implements Request
 
     public void addHeader(String name, Object value)
     {
-        message.setProperty(name, value, PropertyScope.INBOUND);
+        message.setOutboundProperty(name, value);
     }
 
     public Object removeHeader(String name)
@@ -69,7 +69,7 @@ public class MuleRequestMessage implements Request
     {
         try
         {
-            message.addAttachment(name, handler);
+            message.addOutboundAttachment(name, handler);
         }
         catch (Exception e)
         {
@@ -79,11 +79,11 @@ public class MuleRequestMessage implements Request
 
     public DataHandler removeAttachment(String name)
     {
-        DataHandler dh = message.getAttachment(name);
+        DataHandler dh = message.getOutboundAttachment(name);
         try
         {
             if(dh!=null)
-            message.removeAttachment(name);
+            message.removeOutboundAttachment(name);
         }
         catch (Exception e)
         {
@@ -94,12 +94,12 @@ public class MuleRequestMessage implements Request
 
     public DataHandler getAttachment(String name)
     {
-        return message.getAttachment(name);
+        return message.getOutboundAttachment(name);
     }
 
     public Set<String> getAttachmentNames()
     {
-        return message.getAttachmentNames();
+        return message.getOutboundAttachmentNames();
     }
 
     public int getTimeout()

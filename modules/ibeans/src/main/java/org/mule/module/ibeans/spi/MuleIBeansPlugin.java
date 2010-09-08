@@ -15,6 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.registry.RegistryMap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +122,7 @@ public class MuleIBeansPlugin implements IBeansPlugin<MuleRequestMessage, MuleRe
         {
             try
             {
-                message.addAttachment(dataSource.getName(), new DataHandler(dataSource));
+                message.addOutboundAttachment(dataSource.getName(), new DataHandler(dataSource));
             }
             catch (Exception e)
             {
@@ -141,38 +142,7 @@ public class MuleIBeansPlugin implements IBeansPlugin<MuleRequestMessage, MuleRe
 
     public MuleResponseMessage createResponse(Object payload, Map<String, Object> headers, Map<String, DataHandler> attachments) throws IBeansException
     {
-        //TODO MimeType
-        DefaultMuleMessage message = new DefaultMuleMessage(payload, muleContext);
-
-        if (headers != null)
-        {
-            for (Map.Entry<String, Object> entry : headers.entrySet())
-            {
-                try
-                {
-                    message.setInboundProperty(entry.getKey(), entry.getValue());
-                }
-                catch (Exception e)
-                {
-                    throw new IBeansException(e);
-                }
-            }
-        }
-
-        if (attachments != null)
-        {
-            for (Map.Entry<String, DataHandler> entry : attachments.entrySet())
-            {
-                try
-                {
-                    message.addAttachment(entry.getKey(), entry.getValue());
-                }
-                catch (Exception e)
-                {
-                    throw new IBeansException(e);
-                }
-            }
-        }
+        MuleMessage message = new DefaultMuleMessage(payload, headers, new HashMap<String, Object>(), attachments, muleContext);
         try
         {
             return new MuleResponseMessage(message);

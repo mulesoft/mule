@@ -16,6 +16,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.module.ibeans.spi.support.DataTypeConverter;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transport.NullPayload;
 
 import java.lang.reflect.Method;
 
@@ -98,6 +99,10 @@ public class MuleResponseTransformInterceptor extends AbstractCallInterceptor
             }
 
 
+        }
+        if(finalResult instanceof NullPayload)
+        {
+            finalResult = null;
         }
         invocationContext.setResult(finalResult);
     }
