@@ -21,6 +21,5 @@ public class GuiInstallerLicenseHandler
     public static void main(String args[]) throws Exception
     {
         System.setProperty("mule.home", args[0]);
-        LicenseHandler.saveLicenseInfo(new LicenseHandler.LicenseInfo());
     }
 }

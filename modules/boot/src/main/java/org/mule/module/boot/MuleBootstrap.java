@@ -93,7 +93,6 @@ public class MuleBootstrap
         }
         
         setSystemMuleVersion();
-        requestLicenseAcceptance();
     }
     
     public static File lookupMuleHome() throws Exception
@@ -123,16 +122,8 @@ public class MuleBootstrap
             muleBase = new File(muleBaseVar).getCanonicalFile();
         }
         return muleBase;
-    }    
-    
-    private static void requestLicenseAcceptance() throws Exception
-    {
-        if (!LicenseHandler.isLicenseAccepted() && !LicenseHandler.getAcceptance())
-        {
-            WrapperManager.stop(-1);
-        }        
     }
-    
+
     private static void setSystemMuleVersion()
     {
         InputStream propertiesStream = null;
