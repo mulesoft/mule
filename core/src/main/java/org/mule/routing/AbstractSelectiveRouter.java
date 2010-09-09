@@ -19,6 +19,7 @@ import org.apache.commons.collections.ListUtils;
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -57,9 +58,9 @@ public abstract class AbstractSelectiveRouter
         routerStatistics = new RouterStatistics(RouterStatistics.TYPE_OUTBOUND);
     }
 
-    public void setFlowConstruct(FlowConstruct pattern)
+    public void setFlowConstruct(FlowConstruct flowConstruct)
     {
-        this.flowConstruct = pattern;
+        this.flowConstruct = flowConstruct;
     }
 
     public void initialise() throws InitialisationException
@@ -133,7 +134,8 @@ public abstract class AbstractSelectiveRouter
     {
         synchronized (conditionalMessageProcessors)
         {
-            conditionalMessageProcessors.add(new MessageProcessorFilterPair(processor, filter));
+            MessageProcessorFilterPair addedPair = new MessageProcessorFilterPair(processor, filter);
+            conditionalMessageProcessors.add(transitionLifecycleManagedObjectForAddition(addedPair));
         }
     }
 
@@ -143,7 +145,9 @@ public abstract class AbstractSelectiveRouter
         {
             public void updateAt(int index)
             {
-                conditionalMessageProcessors.remove(index);
+                MessageProcessorFilterPair removedPair = conditionalMessageProcessors.remove(index);
+
+                transitionLifecycleManagedObjectForRemoval(removedPair);
             }
         });
     }
@@ -154,7 +158,12 @@ public abstract class AbstractSelectiveRouter
         {
             public void updateAt(int index)
             {
-                conditionalMessageProcessors.set(index, new MessageProcessorFilterPair(processor, filter));
+                MessageProcessorFilterPair addedPair = new MessageProcessorFilterPair(processor, filter);
+
+                MessageProcessorFilterPair removedPair = conditionalMessageProcessors.set(index,
+                    transitionLifecycleManagedObjectForAddition(addedPair));
+
+                transitionLifecycleManagedObjectForRemoval(removedPair);
             }
         });
     }
@@ -202,6 +211,55 @@ public abstract class AbstractSelectiveRouter
         }
 
         return ListUtils.union(conditionalMessageProcessors, Collections.singletonList(defaultProcessor));
+    }
+
+    private <O> O transitionLifecycleManagedObjectForAddition(O managedObject)
+    {
+        try
+        {
+            if ((flowConstruct != null) && (managedObject instanceof FlowConstructAware))
+            {
+                ((FlowConstructAware) managedObject).setFlowConstruct(flowConstruct);
+            }
+
+            if ((initialised.get()) && (managedObject instanceof Initialisable))
+            {
+                ((Initialisable) managedObject).initialise();
+            }
+
+            if ((started.get()) && (managedObject instanceof Startable))
+            {
+                ((Startable) managedObject).start();
+            }
+        }
+        catch (MuleException me)
+        {
+            throw new MuleRuntimeException(me);
+        }
+
+        return managedObject;
+    }
+
+    private <O> O transitionLifecycleManagedObjectForRemoval(O managedObject)
+    {
+        try
+        {
+            if (managedObject instanceof Stoppable)
+            {
+                ((Stoppable) managedObject).stop();
+            }
+
+            if (managedObject instanceof Disposable)
+            {
+                ((Disposable) managedObject).dispose();
+            }
+        }
+        catch (MuleException me)
+        {
+            throw new MuleRuntimeException(me);
+        }
+
+        return managedObject;
     }
 
     private MuleEvent routeWithProcessor(MessageProcessor processor, MuleEvent event) throws MuleException
@@ -256,7 +314,6 @@ public abstract class AbstractSelectiveRouter
     {
         synchronized (conditionalMessageProcessors)
         {
-
             for (int i = 0; i < conditionalMessageProcessors.size(); i++)
             {
                 if (conditionalMessageProcessors.get(i).getMessageProcessor().equals(processor))

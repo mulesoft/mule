@@ -90,7 +90,7 @@ public class MessageProcessorFilterPair implements FlowConstructAware, Lifecycle
         {
             ((Startable) messageProcessor).start();
         }
-        if (filter instanceof Initialisable)
+        if (filter instanceof Startable)
         {
             ((Startable) filter).start();
         }
@@ -102,7 +102,7 @@ public class MessageProcessorFilterPair implements FlowConstructAware, Lifecycle
         {
             ((Stoppable) messageProcessor).stop();
         }
-        if (filter instanceof Initialisable)
+        if (filter instanceof Stoppable)
         {
             ((Stoppable) filter).stop();
         }
@@ -114,7 +114,7 @@ public class MessageProcessorFilterPair implements FlowConstructAware, Lifecycle
         {
             ((Disposable) messageProcessor).dispose();
         }
-        if (filter instanceof Initialisable)
+        if (filter instanceof Disposable)
         {
             ((Disposable) filter).dispose();
         }
