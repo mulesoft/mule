@@ -21,7 +21,6 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
-import org.mule.routing.outbound.OutboundPassThroughRouter;
 
 /**
  * A simple bridge between a single inbound endpoint and a single outbound endpoint.
@@ -58,11 +57,7 @@ public class Bridge extends AbstractFlowConstruct
     {
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageObserver());
-
-        final OutboundPassThroughRouter outboundRouter = new OutboundPassThroughRouter();
-        outboundRouter.setMuleContext(muleContext);
-        outboundRouter.addRoute(outboundEndpoint);
-        builder.chain(outboundRouter);
+        builder.chain(outboundEndpoint);
     }
 
     @Override
