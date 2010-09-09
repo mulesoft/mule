@@ -278,7 +278,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
 
     public void validateExpression(String expression) throws InvalidExpressionException
     {
-        if(muleContext != null && !muleContext.getConfiguration().isValidateExpressions())
+        if(!muleContext.getConfiguration().isValidateExpressions())
         {
             if(logger.isInfoEnabled()) {
                 logger.info("Validate expressions is turned off, no checking done for: " + expression);
