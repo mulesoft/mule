@@ -35,7 +35,7 @@ import java.util.Arrays;
  */
 public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleServiceBuilder, SimpleService>
 {
-    protected Type type = SimpleService.Type.DEFAULT;
+    protected Type type = SimpleService.Type.DIRECT;
     protected Component component;
 
     @Override

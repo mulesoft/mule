@@ -1561,7 +1561,7 @@
             </xsd:annotation>
             <xsd:simpleType>
                 <xsd:restriction base="xsd:NMTOKEN">
-                    <xsd:enumeration value="default">
+                    <xsd:enumeration value="direct">
                       <xsd:annotation>
                         <xsd:documentation>
                           Pass the inbound messages unaltered to the component.  

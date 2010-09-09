@@ -97,7 +97,7 @@ public class SimpleService extends AbstractFlowConstruct
         /**
          * Pass the inbound messages unaltered to the component.
          */
-        DEFAULT
+        DIRECT
         {
             @Override
             public void validate(Component component) throws FlowConstructInvalidException
