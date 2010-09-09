@@ -23,7 +23,7 @@ import org.springframework.beans.factory.FactoryBean;
 public class MessageProcessorFilterPairFactoryBean implements FactoryBean, MuleContextAware
 {
     private MessageProcessor messageProcessor;
-    private Filter filter;
+    private Filter filter = new ExpressionFilter();
 
     public void setFilter(Filter filter)
     {
@@ -37,7 +37,17 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean, MuleC
     
     public void setExpression(String expression)
     {
-        this.filter = new ExpressionFilter(expression);
+        ((ExpressionFilter)filter).setExpression(expression);
+    }
+    
+    public void setEvaluator(String evaluator)
+    {
+        ((ExpressionFilter)filter).setEvaluator(evaluator);
+    }
+    
+    public void setCustomEvaluator(String customEvaluator)
+    {
+        ((ExpressionFilter)filter).setCustomEvaluator(customEvaluator);
     }
 
     public Object getObject() throws Exception

@@ -207,10 +207,10 @@
     <flow name="loan-broker">
         <vm:inbound-endpoint path="choice2-in" exchange-pattern="request-response"/>
         <choice>
-            <when expression="groovy:payload=='foo'">
+            <when expression="payload=='foo'" evaluator="groovy">
                 <append-string-transformer message=" Hello foo" />
             </when>
-            <when expression="groovy:payload=='bar'">
+            <when expression="payload=='bar'" evaluator="groovy">
                 <append-string-transformer message=" Hello bar" />
             </when>
             <otherwise>

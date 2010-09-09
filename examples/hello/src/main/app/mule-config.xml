@@ -65,10 +65,10 @@
         <component class="org.mule.example.hello.Greeter"/>
 
         <choice>
-            <when expression="#[groovy:payload instanceof org.mule.example.hello.NameString]">
+            <when expression="payload instanceof org.mule.example.hello.NameString" evaluator="groovy">
                 <vm:outbound-endpoint path="chitchatter" exchange-pattern="request-response"/>
             </when>
-            <when expression="#[groovy:payload instanceof java.lang.Exception]">
+            <when expression="payload instanceof java.lang.Exception" evaluator="groovy">
                 <vm:outbound-endpoint path="userErrorHandler" exchange-pattern="request-response"/>
             </when>
         </choice>

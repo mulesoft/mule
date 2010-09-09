@@ -28,7 +28,7 @@
         <regex-filter pattern="turnip" />
         <outbound-endpoint ref="veggie-channel" />
       </when>
-      <when expression="#[regex:.*berry]">
+      <when expression=".*berry" evaluator="regex">
         <outbound-endpoint ref="fruit-channel" />
       </when>
       <otherwise>

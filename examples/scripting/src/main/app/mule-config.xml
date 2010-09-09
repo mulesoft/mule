@@ -36,13 +36,13 @@
             exchange-pattern="request-response" transformer-refs="HttpRequestToMap"/>
 
         <choice>
-            <when expression="#[groovy:return payload.currency == 'USD']">
+            <when expression="payload.currency == 'USD'" evaluator="groovy">
                 <vm:outbound-endpoint path="groovy-script" exchange-pattern="request-response">
                     <transformer ref="ExtractAmount StringToNumber DollarsToCents"/>
                 </vm:outbound-endpoint>
              </when>
              
-             <when expression="#[groovy:return payload.currency == 'GBP']">
+             <when expression="payload.currency == 'GBP'" evaluator="groovy">
                 <vm:outbound-endpoint path="jython-script" exchange-pattern="request-response">
                     <transformer ref="ExtractAmount StringToNumber DollarsToCents"/>
                 </vm:outbound-endpoint>

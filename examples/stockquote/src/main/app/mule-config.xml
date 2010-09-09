@@ -51,13 +51,13 @@
             </response>
         </http:inbound-endpoint>
         <choice>
-            <when expression="groovy:payload.method == 'REST'">
+            <when expression="payload.method == 'REST'" evaluator="groovy">
                 <vm:outbound-endpoint path="rest" exchange-pattern="request-response"/>
             </when>
-            <when expression="groovy:payload.method == 'SOAP'">
+            <when expression="payload.method == 'SOAP'" evaluator="groovy">
                 <vm:outbound-endpoint path="soap" exchange-pattern="request-response"/>
             </when>
-            <when expression="groovy:payload.method == 'WSDL'">
+            <when expression="payload.method == 'WSDL'" evaluator="groovy">
                 <vm:outbound-endpoint path="wsdl" exchange-pattern="request-response"/>
             </when>
         </choice>
