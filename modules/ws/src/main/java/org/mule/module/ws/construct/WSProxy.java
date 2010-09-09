@@ -10,6 +10,11 @@
 
 package org.mule.module.ws.construct;
 
+import java.net.InetAddress;
+import java.net.URI;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -27,17 +32,10 @@ import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.processor.StopFurtherMessageProcessingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
-import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transformer.TransformerTemplate.TransformerCallback;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
-
-import java.net.InetAddress;
-import java.net.URI;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class is implemented to act as a Proxy for a Web Service. It listens for
@@ -125,11 +123,7 @@ public class WSProxy extends AbstractFlowConstruct
         builder.chain(proxyMessageProcessor);
         builder.chain(new StopFurtherMessageProcessingMessageProcessor());
         builder.chain(new TransformerTemplate(new CopyInboundToOutboundPropertiesTransformerCallback()));
-
-        final OutboundPassThroughRouter outboundRouter = new OutboundPassThroughRouter();
-        outboundRouter.setMuleContext(muleContext);
-        outboundRouter.addRoute(outboundEndpoint);
-        builder.chain(outboundRouter);
+        builder.chain(outboundEndpoint);
     }
 
     @Override
