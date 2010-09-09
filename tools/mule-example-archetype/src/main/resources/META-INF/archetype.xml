@@ -21,19 +21,20 @@
             <name>transports</name>
             <description>Which Mule transports do you want to include in this project?
 
-(options: ejb, file, ftp, http, https, imap, imaps, jbpm, jdbc,
+(options: ajax, ejb, file, ftp, http, https, imap, imaps, jbpm, jdbc,
           jetty, jetty-ssl, jms, jnp, multicast, pop3, pop3s, quartz, rmi, servlet,
-          smtp, smtps, servlet, ssl, tls, stdio, tcp, udp, vm, xmpp):
+          smtp, smtps, ssl, tls, stdio, tcp, udp, vm, xmpp):
 
             </description>
-            <defvalue>file,http,jdbc,jms,stdio,vm</defvalue>
+            <defvalue>file,http,jdbc,jms,vm</defvalue>
         </variable>
         <variable>
             <name>modules</name>
             <description>Which Mule modules do you want to include in this project?
 
-(options: builders, client, cxf, jaas, jbossts, management, ognl, pgp, scripting,
-          spring-extras, sxc, xml):
+(options: acegi, annotations, atom, boot, builders, client, cxf, guice, ibeans,
+          jaas, jbossts, jersey, json, management, ognl, pgp, rss, scripting,
+          spring-extras, spring-security, sxc, ws, xml):
 
             </description>
             <defvalue>client,cxf,management,scripting,sxc,xml</defvalue>
@@ -68,22 +69,13 @@
             <output>dist/pom.xml</output>
         </template>
         <template>
-            <file>dist/exec.bat.vm</file>
-            <output>dist/${ModuleNameLower}.bat</output>
-        </template>
-        <template>
-            <file>dist/exec.sh.vm</file>
-            <output>dist/${ModuleNameLower}</output>
-        </template>
-        <template>
             <file>dist/README.txt.vm</file>
             <output>dist/README.txt</output>
         </template>
 
         <template>
-            <file>src/main/resources/config.xml.vm</file>
-            <output>
-                conf/${ModuleNameLower}-config.xml
+            <file>src/main/app/config.xml.vm</file>
+            <output>src/main/app/mule-config.xml
             </output>
         </template>
 
