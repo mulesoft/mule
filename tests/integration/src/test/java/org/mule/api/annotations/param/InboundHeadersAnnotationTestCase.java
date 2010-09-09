@@ -19,8 +19,10 @@ import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
 {
@@ -182,8 +184,9 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) message.getPayload();
+        printResult(result);
         //Will match all Mule headers
-        assertEquals(2, result.size());
+        assertEquals(3, result.size());
         assertEquals("vm://headersWildcard", result.get(MuleProperties.MULE_ENDPOINT_PROPERTY));
         assertTrue(result.keySet().contains(MuleProperties.MULE_SESSION_PROPERTY));
     }
@@ -195,8 +198,9 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) message.getPayload();
+        printResult(result);        
         //Will match all Mule headers
-        assertEquals(4, result.size());
+        assertEquals(5, result.size());
 
         //Match on MULE_*
         assertEquals("vm://headersMultiWildcard", result.get(MuleProperties.MULE_ENDPOINT_PROPERTY));
@@ -317,8 +321,9 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
         List<?> result = (List<?>) message.getPayload();
+        printResult(result);        
         //Will match all Mule headers
-        assertEquals(2, result.size());
+        assertEquals(3, result.size());
 
         //MULE_ENDPOINT
         assertTrue(result.contains("vm://headersListWildcard"));
@@ -332,8 +337,9 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
         List<?> result = (List<?>) message.getPayload();
+        printResult(result);
         //Will match on MULE_* and ba*
-        assertEquals(4, result.size());
+        assertEquals(5, result.size());
 
         //Match on MULE_*
 
@@ -369,5 +375,26 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.contains(apple));
         assertTrue(result.contains(orange));
         assertFalse(result.contains(banana));
+    }
+
+    public void printResult(List<?> result)
+    {
+        for(int i = 0; i < result.size(); i++)
+        {
+            System.out.println("result #" + i + ": " + result.get(i));
+        }
+    }    
+    
+    public void printResult(Map<?, ?> result)
+    {
+        Set keys = result.keySet();         // The set of keys in the map.
+        Iterator keyIter = keys.iterator();
+        System.out.println("The map contains the following associations:");
+        while (keyIter.hasNext())
+        {
+           Object key = keyIter.next();  // Get the next key.
+           Object value = result.get(key);  // Get the value for that key.
+           System.out.println( "   (" + key + "," + value + ")" );
+        }    
     }
 }
