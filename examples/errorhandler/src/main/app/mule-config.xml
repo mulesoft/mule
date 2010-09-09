@@ -104,7 +104,7 @@
              </prototype-object>
         </pooled-component>
         <choice>
-            <when expression="groovy:payload.throwable instanceof org.mule.api.DefaultMuleException">
+            <when expression="#[groovy:payload.throwable instanceof org.mule.api.DefaultMuleException]">
                 <file:outbound-endpoint path="${app.home}/test-data/exceptions" 
                                         outputPattern="Exception-[function:uuid].xml">
                     <transformer ref="ErrorMessageToExceptionBean" />
@@ -112,7 +112,7 @@
                 </file:outbound-endpoint>
             </when>
             
-            <when expression="groovy:payload.throwable instanceof org.mule.api.lifecycle.FatalException">
+            <when expression="#[groovy:payload.throwable instanceof org.mule.api.lifecycle.FatalException]">
                 <smtp:outbound-endpoint user="${smtp.username}" password="${smtp.password}"
                                         host="${smtp.host}" port="${smtp.port}"
                                         to="${email.toAddress}" from="${email.fromAddress}"
@@ -123,7 +123,7 @@
                  </smtp:outbound-endpoint>
             </when>
             
-            <when expression="groovy:payload.throwable instanceof org.mule.example.errorhandler.exceptions.BusinessException">
+            <when expression="#[groovy:payload.throwable instanceof org.mule.example.errorhandler.exceptions.BusinessException]">
                 <jms:outbound-endpoint queue="exception.queue" exchange-pattern="one-way">
                     <transformer ref="ErrorMessageToExceptionBean" />
                     <transformer ref="ExceptionBeanToXML" />
