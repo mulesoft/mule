@@ -6,7 +6,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>${groupId}</groupId>
    <artifactId>${artifactId}</artifactId>
-   <packaging>jar</packaging>
+   <packaging>mule</packaging>
    <name>Mule ${ModuleName} ${ModuleType}</name>
    <version>${version}</version>
    <description>${description}</description>
@@ -23,6 +23,21 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <version>1.1</version>
+                <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                    <encoding>ISO-8859-1</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <finalName>${artifactId}-\${version}</finalName>
@@ -32,13 +47,6 @@
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
-        </plugins>
-    </build>
-
-
-    <!-- plugins for creating site reports -->
-    <reporting>
-        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-eclipse-plugin</artifactId>
@@ -60,15 +68,13 @@
                     <jdkName>${jdk.version}</jdkName>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
-                    <encoding>ISO-8859-1</encoding>
-                </configuration>
-            </plugin>
+        </plugins>
+    </build>
+
+
+    <!-- plugins for creating site reports -->
+    <reporting>
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -140,90 +146,95 @@
 
     <!-- Mule Dependencies -->
     <dependencies>
-        <!-- Mule Modules: You will need to add and remove as necessary -->
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${mule.version}</version>
+            <scope>provided</scope>
         </dependency>
         <!-- Xml configuration -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${mule.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Mule Transports -->
-
-        #set($emailDepSet = false)
-        #set($sslDepSet = false)
-        #set($httpDepSet = false)
-        #set($jettyDepSet = false)
-        #set($rmiDepSet = false)
-        #foreach($item in $transportArray)
-          #if($item == 'smtp' || $item == 'smtps' || $item == 'pop3' || $item == 'pop3s' || $item == 'imap' || $item == 'imaps')
-            #if($emailDepSet == false)
+#set($emailDepSet = false)
+#set($sslDepSet = false)
+#set($httpDepSet = false)
+#set($jettyDepSet = false)
+#set($rmiDepSet = false)
+#foreach($item in $transportArray)
+#if($item == 'smtp' || $item == 'smtps' || $item == 'pop3' || $item == 'pop3s' || $item == 'imap' || $item == 'imaps')
+#if($emailDepSet == false)
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-email</artifactId>
             <version>${mule.version}</version>
+            <scope>provided</scope>
         </dependency>
-              #set($emailDepSet = true)
-            #end
-          #elseif($item == 'ssl' || $item == 'tls')
-            #if($sslDepSet == false)
+#set($emailDepSet = true)
+#end
+#elseif($item == 'ssl' || $item == 'tls')
+#if($sslDepSet == false)
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ssl</artifactId>
             <version>${mule.version}</version>
+            <scope>provided</scope>
         </dependency>
-              #set($sslDepSet = true)
-            #end
-          #elseif($item == 'http' || $item == 'https')
-            #if($httpDepSet == false)
+#set($sslDepSet = true)
+#end
+#elseif($item == 'http' || $item == 'https')
+#if($httpDepSet == false)
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${mule.version}</version>
+            <scope>provided</scope>
         </dependency>
-              #set($httpDepSet = true)
-            #end
-          #elseif($item == 'jetty' || $item == 'jetty-ssl')
-            #if($jettyDepSet == false)
+#set($httpDepSet = true)
+#end
+#elseif($item == 'jetty' || $item == 'jetty-ssl')
+#if($jettyDepSet == false)
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jetty</artifactId>
             <version>${mule.version}</version>
         </dependency>
-              #set($jettyDepSet = true)
-            #end
-          #elseif($item == 'rmi' || $item == 'jnp')
-            #if($rmiDepSet == false)
-        <dependency>
+#set($jettyDepSet = true)
+#end
+#elseif($item == 'rmi' || $item == 'jnp')
+#if($rmiDepSet == false)
+	    <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-rmi</artifactId>
             <version>${mule.version}</version>
+            <scope>provided</scope>
         </dependency>
-              #set($rmiDepSet = true)
-            #end
-          #else
+#set($rmiDepSet = true)
+#end
+#else
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-${item}</artifactId>
             <version>${mule.version}</version>
+            <scope>provided</scope>
         </dependency>
-          #end
-        #end
-        <!-- Mule Modules -->
+#end
+#end
 
-        #foreach($item in $moduleArray)
+        <!-- Mule Modules -->
+#foreach($item in $moduleArray)
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-${item}</artifactId>
             <version>${mule.version}</version>
+            <scope>provided</scope>
         </dependency>
-
-        #end
+#end
 
         <!-- for testing -->
         <dependency>
@@ -241,12 +252,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.2</version>
+            <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
-    #if($forgeProject == "y")
+#if($forgeProject == "y")
     <!-- Mule Forge Configuration -->
     <issueManagement>
         <system>Jira</system>
@@ -281,9 +292,9 @@
             <url>dav:https://dav.muleforge.org/${ModuleNameLower}/</url>
         </site>
     </distributionManagement>
-
     <!-- End of MuleForge Configuration -->
-    #end
+
+#end
     <repositories>
         <repository>
             <id>muleforge-repo</id>
@@ -298,7 +309,7 @@
             <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
             <layout>default</layout>
         </repository>
-        #if($forgeProject == "y")
+#if($forgeProject == "y")
         <repository>
             <!-- local repository for this forge project. Users can upload dependencies here when the artifact
                  is not available on any other repository. Its the users' responsibility to make sure that no
@@ -311,7 +322,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        #end
+#end
     </repositories>
-
 </project>

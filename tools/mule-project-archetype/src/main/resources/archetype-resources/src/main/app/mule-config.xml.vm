@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core/"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test"
 #foreach($item in $transportArray)
       xmlns:${item}="http://www.mulesoft.org/schema/mule/${item}"
 #end
@@ -15,7 +14,6 @@
 #end
     xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/${MuleMajorMinorVersion}/mule.xsd
-        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/${MuleMajorMinorVersion}/mule-test.xsd
 #foreach($item in $transportArray)
         http://www.mulesoft.org/schema/mule/${item} http://www.mulesoft.org/schema/mule/${item}/${MuleMajorMinorVersion}/mule-${item}.xsd
 #end
@@ -24,15 +22,15 @@
 #end
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-    <!--
-    TODO: You can define a test configuration here then from the ${ModuleName}TestCase you can fire events into
-    Mule (using the MuleClient) and then assert the results.
-    -->
+    <description>
+    ${description}
+    </description>
+
     <flow name="main">
-        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
+        <vm:inbound-endpoint path="in" synchronous="true"/>
 
         <!-- TODO add your service component here. This can also be a Spring bean using <spring-object bean="name"/> -->
-        <test:component appendString=" Received"/>
+        <echo-component/>
 
         <vm:outbound-endpoint path="out"/>
     </flow>
