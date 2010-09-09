@@ -15,12 +15,19 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.collections.ListUtils;
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RouterResultsHandler;
@@ -30,16 +37,96 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.management.stats.RouterStatistics;
 
-public abstract class AbstractSelectiveRouter implements SelectiveRouter, RouterStatisticsRecorder
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+public abstract class AbstractSelectiveRouter
+    implements SelectiveRouter, RouterStatisticsRecorder, Lifecycle, FlowConstructAware
 {
     private final List<MessageProcessorFilterPair> conditionalMessageProcessors = new ArrayList<MessageProcessorFilterPair>();
-    private final RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
     private MessageProcessor defaultProcessor;
+    private final RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
     private RouterStatistics routerStatistics;
+
+    final AtomicBoolean initialised = new AtomicBoolean(false);
+    final AtomicBoolean starting = new AtomicBoolean(false);
+    final AtomicBoolean started = new AtomicBoolean(false);
+    private FlowConstruct flowConstruct;
 
     public AbstractSelectiveRouter()
     {
         routerStatistics = new RouterStatistics(RouterStatistics.TYPE_OUTBOUND);
+    }
+
+    public void setFlowConstruct(FlowConstruct pattern)
+    {
+        this.flowConstruct = pattern;
+    }
+
+    public void initialise() throws InitialisationException
+    {
+        synchronized (conditionalMessageProcessors)
+        {
+            for (Object o : getLifecycleManagedObjects())
+            {
+                if (o instanceof FlowConstructAware)
+                {
+                    ((FlowConstructAware) o).setFlowConstruct(flowConstruct);
+                }
+                if (o instanceof Initialisable)
+                {
+                    ((Initialisable) o).initialise();
+                }
+            }
+        }
+        initialised.set(true);
+    }
+
+    public void start() throws MuleException
+    {
+        synchronized (conditionalMessageProcessors)
+        {
+            starting.set(true);
+            for (Object o : getLifecycleManagedObjects())
+            {
+                if (o instanceof Startable)
+                {
+                    ((Startable) o).start();
+                }
+            }
+
+            started.set(true);
+            starting.set(false);
+        }
+    }
+
+    public void stop() throws MuleException
+    {
+        synchronized (conditionalMessageProcessors)
+        {
+            for (Object o : getLifecycleManagedObjects())
+            {
+                if (o instanceof Stoppable)
+                {
+                    ((Stoppable) o).stop();
+                }
+            }
+
+            started.set(false);
+        }
+    }
+
+    public void dispose()
+    {
+        synchronized (conditionalMessageProcessors)
+        {
+            for (Object o : getLifecycleManagedObjects())
+            {
+                if (o instanceof Disposable)
+                {
+                    ((Disposable) o).dispose();
+                }
+            }
+        }
     }
 
     public void addRoute(MessageProcessor processor, Filter filter)
@@ -106,6 +193,16 @@ public abstract class AbstractSelectiveRouter implements SelectiveRouter, Router
      *         an empty collection (not null).
      */
     protected abstract Collection<MessageProcessor> selectProcessors(MuleEvent event);
+
+    private Collection<?> getLifecycleManagedObjects()
+    {
+        if (defaultProcessor == null)
+        {
+            return conditionalMessageProcessors;
+        }
+
+        return ListUtils.union(conditionalMessageProcessors, Collections.singletonList(defaultProcessor));
+    }
 
     private MuleEvent routeWithProcessor(MessageProcessor processor, MuleEvent event) throws MuleException
     {
@@ -183,6 +280,7 @@ public abstract class AbstractSelectiveRouter implements SelectiveRouter, Router
     @Override
     public String toString()
     {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+        return String.format("%s [flow-construct=%s, started=%s]", getClass().getSimpleName(),
+            flowConstruct != null ? flowConstruct.getName() : null, started);
     }
 }

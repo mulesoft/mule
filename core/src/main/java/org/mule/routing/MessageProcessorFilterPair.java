@@ -13,13 +13,22 @@ package org.mule.routing;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 
 /**
  * A holder for a pair of MessageProcessor and Filter.
  */
-public class MessageProcessorFilterPair
+public class MessageProcessorFilterPair implements FlowConstructAware, Lifecycle
 {
     private final MessageProcessor messageProcessor;
     private final Filter filter;
@@ -46,5 +55,68 @@ public class MessageProcessorFilterPair
     public String toString()
     {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    }
+
+    // This class being just a logic-less tuple, it directly delegates lifecyle
+    // events to its members, without any control.
+
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        if (messageProcessor instanceof FlowConstructAware)
+        {
+            ((FlowConstructAware) messageProcessor).setFlowConstruct(flowConstruct);
+        }
+        if (filter instanceof FlowConstructAware)
+        {
+            ((FlowConstructAware) filter).setFlowConstruct(flowConstruct);
+        }
+    }
+
+    public void initialise() throws InitialisationException
+    {
+        if (messageProcessor instanceof Initialisable)
+        {
+            ((Initialisable) messageProcessor).initialise();
+        }
+        if (filter instanceof Initialisable)
+        {
+            ((Initialisable) filter).initialise();
+        }
+    }
+
+    public void start() throws MuleException
+    {
+        if (messageProcessor instanceof Startable)
+        {
+            ((Startable) messageProcessor).start();
+        }
+        if (filter instanceof Initialisable)
+        {
+            ((Startable) filter).start();
+        }
+    }
+
+    public void stop() throws MuleException
+    {
+        if (messageProcessor instanceof Stoppable)
+        {
+            ((Stoppable) messageProcessor).stop();
+        }
+        if (filter instanceof Initialisable)
+        {
+            ((Stoppable) filter).stop();
+        }
+    }
+
+    public void dispose()
+    {
+        if (messageProcessor instanceof Disposable)
+        {
+            ((Disposable) messageProcessor).dispose();
+        }
+        if (filter instanceof Initialisable)
+        {
+            ((Disposable) filter).dispose();
+        }
     }
 }
