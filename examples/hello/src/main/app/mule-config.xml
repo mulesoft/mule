@@ -42,53 +42,44 @@
     <custom-transformer name="HttpRequestToParameter" class="org.mule.transport.servlet.transformers.HttpRequestToParameter"/>
     <custom-transformer name="ObjectToString" class="org.mule.transformer.simple.ObjectToString"/>
 
-    <model name="helloSample">
-        <!--
-            This service receives input from 3 different endpoints (http, servlet, vm) and routes 
-            them all to the same place.
-        -->
-        <service name="GreeterUMO">
-            <inbound>
-                <!-- Incoming HTTP requests -->
-                <inbound-endpoint address="http://localhost:8888" transformer-refs="HttpRequestToNameString" exchange-pattern="request-response">
-                    <not-filter>
-                        <wildcard-filter pattern="/favicon.ico"/>   
-                    </not-filter>
-                </inbound-endpoint>
-                
-                <!-- Incoming Servlet requests -->
-                <inbound-endpoint address="servlet://name" transformer-refs="HttpRequestToNameString" exchange-pattern="request-response">
-                    <not-filter>
-                        <wildcard-filter pattern="/favicon.ico"/>   
-                    </not-filter>
-                </inbound-endpoint>
+    <flow name="Hello World"> 
+        <composite-source>
+            <!-- Incoming HTTP requests -->
+            <inbound-endpoint address="http://localhost:8888" transformer-refs="HttpRequestToNameString" exchange-pattern="request-response">
+                <not-filter>
+                    <wildcard-filter pattern="/favicon.ico"/>   
+                </not-filter>
+            </inbound-endpoint>
 
-                <!-- Incoming VM requests -->
-                <vm:inbound-endpoint path="greeter" transformer-refs="StringToNameString" exchange-pattern="request-response"/>
-            </inbound>
-            
-            <component class="org.mule.example.hello.Greeter"/>
-            
-            <outbound>
-                <filtering-router>
-                    <vm:outbound-endpoint path="chitchatter" exchange-pattern="request-response"/>
-                    <payload-type-filter expectedType="org.mule.example.hello.NameString"/>
-                </filtering-router>
+            <!-- Incoming Servlet requests -->
+            <inbound-endpoint address="servlet://name" transformer-refs="HttpRequestToNameString" exchange-pattern="request-response">
+                <not-filter>
+                    <wildcard-filter pattern="/favicon.ico"/>   
+                </not-filter>
+            </inbound-endpoint>
 
-                <filtering-router>
-                    <vm:outbound-endpoint path="userErrorHandler" exchange-pattern="request-response"/>
-                    <payload-type-filter expectedType="java.lang.Exception"/>
-                </filtering-router>
-            </outbound>
+            <!-- Incoming VM requests -->
+            <vm:inbound-endpoint path="greeter" transformer-refs="StringToNameString" exchange-pattern="request-response"/>
+        </composite-source>
+        
+        <component class="org.mule.example.hello.Greeter"/>
 
-            <!-- Route unexpected errors to separate error handler -->
-            <default-service-exception-strategy>
-                <vm:outbound-endpoint path="systemErrorHandler" exchange-pattern="one-way"/>
-            </default-service-exception-strategy>
-        </service>
+        <choice>
+            <when expression="#[groovy:payload instanceof org.mule.example.hello.NameString]">
+                <vm:outbound-endpoint path="chitchatter" exchange-pattern="request-response"/>
+            </when>
+            <when expression="#[groovy:payload instanceof java.lang.Exception]">
+                <vm:outbound-endpoint path="userErrorHandler" exchange-pattern="request-response"/>
+            </when>
+        </choice>
+    
+        <!-- Route unexpected errors to separate error handler -->
+        <default-service-exception-strategy>
+            <vm:outbound-endpoint path="systemErrorHandler" exchange-pattern="one-way"/>
+        </default-service-exception-strategy>
+    </flow>
 
-        <!-- This error handler returns user error messages to caller. Errors could also be routed elsewhere,
-            e.g. into an error file, send via email to a list, stored in a database, etc. -->
+    <model>
         <service name="UserErrorHandler">
             <inbound>
                 <vm:inbound-endpoint path="userErrorHandler" responseTransformer-refs="ExceptionToString" exchange-pattern="request-response"/>
