@@ -21,6 +21,7 @@
         <module>gpswalker</module>
         <module>hello</module>
         <module>loanbroker</module>
+        <module>loanbroker-simple</module>
         <module>notifications</module>
         <module>scripting</module>
         <module>stockquote</module>

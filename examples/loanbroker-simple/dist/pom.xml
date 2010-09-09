@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.mule.examples</groupId>
-        <artifactId>mule-examples</artifactId>
-        <version>3.1.0-SNAPSHOT</version>
-    </parent>
+    <groupId>org.mule.examples</groupId>
     <artifactId>mule-example-loanbroker-simple</artifactId>
+    <version>1.0</version>
     <packaging>mule</packaging>
     <name>Simple Loanbroker Example</name>
     <description>A simple implementation of the loanbroker example from the Enterprise Integration Patterns book using the new constructs in Mule 3</description>
+
+    <properties>
+        <muleVersion>3.1.0-SNAPSHOT</muleVersion>
+    </properties>
 
     <build>
         <!--
@@ -28,12 +29,57 @@
          <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.0-beta-1</version>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>test-jar</goal>
+                            <goal>enforce</goal>
                         </goals>
+                        <configuration>
+                            <rules>
+                                <requireProperty>
+                                    <property>env.MULE_HOME</property>
+                                    <message>You must set MULE_HOME before building the example.</message>
+                                </requireProperty>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <encoding>ISO-8859-1</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <version>1.1</version>
+                <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>package-example</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy file="${project.build.directory}/${artifactId}.zip"
+                                    todir="${env.MULE_HOME}/apps" overwrite="true"/>
+                            </tasks>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -44,38 +90,38 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>
-            <version>${version}</version>
+            <version>${muleVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
-            <version>${version}</version>
+            <version>${muleVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
-            <version>${version}</version>
+            <version>${muleVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
-            <version>${version}</version>
+            <version>${muleVersion}</version>
             <scope>provided</scope>
         </dependency>
         <!-- test dependencies -->
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
-            <version>${version}</version>
+            <version>${muleVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
-            <version>${version}</version>
+            <version>${muleVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

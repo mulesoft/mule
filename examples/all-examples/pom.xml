@@ -74,6 +74,12 @@
         </dependency>
         <dependency>
             <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-loanbroker-simple</artifactId>
+            <version>${version}</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-notifications</artifactId>
             <version>${version}</version>
             <type>zip</type>
