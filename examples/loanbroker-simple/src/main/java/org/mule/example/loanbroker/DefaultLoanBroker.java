@@ -48,8 +48,8 @@ public class DefaultLoanBroker extends AbstractLoanBroker
      */
     public void setLenderList(LoanBrokerQuoteRequest request)
     {
-        Bank[] lenders = getLenders(request.getCreditProfile(), new Double(request.getCustomerRequest()
-            .getLoanAmount()));
+        Bank[] lenders = getLenders(request.getCreditProfile(), request.getCustomerRequest()
+                .getLoanAmount());
         request.setLenders(lenders);
     }
 
@@ -62,13 +62,13 @@ public class DefaultLoanBroker extends AbstractLoanBroker
         // TODO Look up the existing banks from the config/registry instead of
         // creating them programatically here.
         Bank[] lenders;
-        if ((loanAmount.doubleValue() >= 20000))
+        if ((loanAmount >= 20000))
         {
             lenders = new Bank[2];
             lenders[0] = new Bank("Bank1");
             lenders[1] = new Bank("Bank2");
         }
-        else if (((loanAmount.doubleValue() >= 10000) && (loanAmount.doubleValue() <= 19999)))
+        else if (((loanAmount >= 10000) && (loanAmount <= 19999)))
         {
             lenders = new Bank[2];
             lenders[0] = new Bank("Bank3");
