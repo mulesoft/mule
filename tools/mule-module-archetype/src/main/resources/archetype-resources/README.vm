@@ -8,22 +8,16 @@
 #set($MuleMajorMinorVersion = "$MuleVersion.substring(0, 3)")
 
 #set($transports = $transports.replaceAll(" ", ""))
-#set($modules = $modules.replaceAll(" ", ""))
-
 #if($transports.indexOf("vm") == -1)
   #set($transports = "$transports,vm")
 #end
-
-#if($transports.indexOf("stdio") == -1)
-  #set($transports = "$transports,stdio")
-#end
 #set( $transportArray = $transports.split(",") )
 
+#set($modules = $modules.replaceAll(" ", ""))
 #if($modules.indexOf("client") == -1)
   #set($modules = "$modules,client")
 #end
 #set( $moduleArray = $modules.split(",") )
-
 
 #* Setting specifict to this archetype *#
 #set($package = "org/mule/module")
@@ -33,8 +27,6 @@
 #if($newProject == "n")
   #set($description = "TODO")
 #end
-
-
 WELCOME
 =======
 #if($newProject == "y")
