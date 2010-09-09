@@ -27,6 +27,7 @@ import org.mule.util.StringUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +40,7 @@ import org.apache.commons.httpclient.HeaderElement;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.cookie.CookieSpec;
+import org.apache.commons.httpclient.cookie.MalformedCookieException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -176,8 +177,6 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         String uri;
         String statusCode = null;
         Map<String, Object> headers;
-        // This is a shortcut for now
-        Header cookieHeader;
 
         if (transportMessage instanceof HttpRequest)
         {
@@ -185,10 +184,8 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             method = httpRequest.getRequestLine().getMethod();
             httpVersion = httpRequest.getRequestLine().getHttpVersion();
             uri = httpRequest.getRequestLine().getUri();
-            headers = convertHeadersToMap(httpRequest.getHeaders());
+            headers = convertHeadersToMap(httpRequest.getHeaders(), uri);
             convertMultiPartHeaders(headers);
-
-            cookieHeader = httpRequest.getFirstHeader(HttpConnector.HTTP_COOKIES_PROPERTY);
         }
         else if (transportMessage instanceof HttpMethod)
         {
@@ -197,8 +194,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             httpVersion = HttpVersion.parse(httpMethod.getStatusLine().getHttpVersion());
             uri = httpMethod.getURI().toString();
             statusCode = String.valueOf(httpMethod.getStatusCode());
-            headers = convertHeadersToMap(httpMethod.getResponseHeaders());
-            cookieHeader = httpMethod.getResponseHeader(HttpConnector.HTTP_COOKIES_PROPERTY);
+            headers = convertHeadersToMap(httpMethod.getResponseHeaders(), uri);
         }
         else
         {
@@ -208,7 +204,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
 
         rewriteConnectionAndKeepAliveHeaders(headers);
 
-        headers = processIncomingHeaders(headers, uri, cookieHeader);
+        headers = processIncomingHeaders(headers);
 
         //Make any URI params available ans inbound message headers
         addUriParamsAsHeaders(headers, uri);
@@ -233,8 +229,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         initEncoding(message, headers);
     }
 
-    protected Map<String, Object> processIncomingHeaders(Map<String, Object> headers, String uri,
-                                                         Header cookieHeader) throws Exception
+    protected Map<String, Object> processIncomingHeaders(Map<String, Object> headers) throws Exception
     {
         Map<String, Object> outHeaders = new HashMap<String, Object>();
 
@@ -247,33 +242,6 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             {
                 headerName = headerName.substring(2);
             }
-            // Parse cookies?
-            else if (headerName.equals(HttpConnector.HTTP_COOKIES_PROPERTY))
-            {
-                if (enableCookies)
-                {
-                    CookieSpec cs = CookieHelper.getCookieSpec(cookieSpec);
-                    URI u = new URI(uri);
-
-                    Cookie[] cookies = cs.parse(u.getHost(), u.getPort(), u.getPath(),
-                            u.getScheme().equalsIgnoreCase("https"), cookieHeader);
-                    if (cookies.length > 0)
-                    {
-                        // yum!
-                        headerValue = cookies;
-                    }
-                    else
-                    {
-                        // bad cookies?!
-                        continue;
-                    }
-                }
-                else
-                {
-                    // no cookies for you!
-                    continue;
-                }
-            }
 
             // accept header & value
             outHeaders.put(headerName, headerValue);
@@ -282,14 +250,62 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         return outHeaders;
     }
 
-    private Map<String, Object> convertHeadersToMap(Header[] headers)
+    private Map<String, Object> convertHeadersToMap(Header[] headersArray, String uri)
+        throws URISyntaxException
     {
         Map<String, Object> headersMap = new CaseInsensitiveHashMap();
-        for (int i = 0; i < headers.length; i++)
+        for (int i = 0; i < headersArray.length; i++)
         {
-            headersMap.put(headers[i].getName(), headers[i].getValue());
+            final Header header = headersArray[i];
+            // Cookies are a special case because there may be more than one
+            // cookie.
+            if (HttpConnector.HTTP_COOKIES_PROPERTY.equals(header.getName())
+                || HttpConstants.HEADER_COOKIE.equals(header.getName()))
+            {
+                putCookieHeaderInMapAsAServer(headersMap, header, uri);
+            }
+            else if (HttpConstants.HEADER_COOKIE_SET.equals(header.getName()))
+            {
+                putCookieHeaderInMapAsAClient(headersMap, header, uri);
+            }
+            else
+            {
+                headersMap.put(header.getName(), header.getValue());
+            }
         }
         return headersMap;
+    }
+
+    private void putCookieHeaderInMapAsAClient(Map<String, Object> headersMap, final Header header, String uri)
+        throws URISyntaxException
+    {
+        try
+        {
+            final Cookie[] newCookies = CookieHelper.parseCookiesAsAClient(header.getValue(), cookieSpec,
+                new URI(uri));
+            final Object preExistentCookies = headersMap.get(HttpConstants.HEADER_COOKIE_SET);
+            final Object mergedCookie = CookieHelper.putAndMergeCookie(preExistentCookies, newCookies);
+            headersMap.put(HttpConstants.HEADER_COOKIE_SET, mergedCookie);
+        }
+        catch (MalformedCookieException e)
+        {
+            log.warn("Received an invalid cookie: " + header, e);
+        }
+    }
+
+    private void putCookieHeaderInMapAsAServer(Map<String, Object> headersMap, final Header header, String uri)
+        throws URISyntaxException
+    {
+        if (enableCookies)
+        {
+            Cookie[] newCookies = CookieHelper.parseCookiesAsAServer(header.getValue(), new URI(uri));
+            if (newCookies.length > 0)
+            {
+                Object oldCookies = headersMap.get(HttpConnector.HTTP_COOKIES_PROPERTY);
+                Object mergedCookies = CookieHelper.putAndMergeCookie(oldCookies, newCookies);
+                headersMap.put(HttpConnector.HTTP_COOKIES_PROPERTY, mergedCookies);
+            }
+        }
     }
 
     private void initEncoding(MuleMessage message, Map<String, Object> headers)

@@ -53,9 +53,23 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertTrue(cookieFound);
 
-        assertTrue(cookieHeaders.size() == 2);
-        assertEquals("Cookie: $Version=0; customCookie=yes", cookieHeaders.get(0));
-        assertEquals("Cookie: $Version=0; expressionCookie=MYCOOKIE", cookieHeaders.get(1));
+        assertEquals(3, cookieHeaders.size());
+        assertThereIsCookieWithThisContent("Cookie: $Version=0; customCookie=yes", cookieHeaders);
+        assertThereIsCookieWithThisContent("Cookie: $Version=0; expressionCookie=MYCOOKIE", cookieHeaders);
+        assertThereIsCookieWithThisContent("MULE_SESSION=", cookieHeaders);
+    }
+
+    private void assertThereIsCookieWithThisContent(String content, List<String> listOfRawCookies)
+    {
+        for (String rawCookie : listOfRawCookies)
+        {
+            if (rawCookie != null && rawCookie.contains(content))
+            {
+                return;
+            }
+        }
+        fail("There should be a cookie with content '" + content + "': " + listOfRawCookies);
+
     }
 
     private class SimpleHttpServer extends MockHttpServer

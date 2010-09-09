@@ -118,9 +118,9 @@ public class HttpConstants
     public static final String X_PROPERTY_PREFIX = "X-" + MuleProperties.PROPERTY_PREFIX;
 
     // case-insenitive Maps of header names to their normalized representations
-    public static final Map REQUEST_HEADER_NAMES;
-    public static final Map RESPONSE_HEADER_NAMES;
-    public static final Map ALL_HEADER_NAMES;
+    public static final Map<String, String> REQUEST_HEADER_NAMES;
+    public static final Map<String, String> RESPONSE_HEADER_NAMES;
+    public static final Map<String, String> ALL_HEADER_NAMES;
 
     // Status codes
     public static final int SC_CONTINUE = 100;
@@ -203,7 +203,8 @@ public class HttpConstants
             HEADER_PRAGMA, HEADER_TRAILER, HEADER_TRANSFER_ENCODING, HEADER_UPGRADE, HEADER_VIA, 
             HEADER_WARNING};
 
-        Map allHeaders = MapUtils.mapWithKeysAndValues(CaseInsensitiveMap.class, strings, strings);
+        Map<String, String> allHeaders = MapUtils.mapWithKeysAndValues(CaseInsensitiveMap.class, strings,
+            strings);
         allHeaders.putAll(REQUEST_HEADER_NAMES);
         allHeaders.putAll(RESPONSE_HEADER_NAMES);
         ALL_HEADER_NAMES = Collections.unmodifiableMap(allHeaders);

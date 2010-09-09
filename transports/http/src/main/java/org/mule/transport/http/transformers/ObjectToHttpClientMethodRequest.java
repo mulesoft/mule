@@ -382,7 +382,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
 
             }
             else if (!HttpConstants.RESPONSE_HEADER_NAMES.containsKey(headerName)
-                    && !HttpConnector.HTTP_INBOUND_PROPERTIES.contains(headerName))
+                    && !HttpConnector.HTTP_INBOUND_PROPERTIES.contains(headerName)
+                    && !HttpConnector.HTTP_COOKIES_PROPERTY.equals(headerName))
             {
 
                 httpMethod.addRequestHeader(headerName, headerValue);

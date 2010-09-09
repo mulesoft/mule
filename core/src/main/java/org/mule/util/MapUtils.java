@@ -24,10 +24,12 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
      * Convenience method for CollectionUtil#mapWithKeysAndValues(Class, Iterator,
      * Iterator); keys and values can be null or empty.
      */
-    public static Map mapWithKeysAndValues(Class mapClass, Object[] keys, Object[] values)
+    public static <K, V> Map<K, V> mapWithKeysAndValues(Class<? extends Map> mapClass,
+                                                        K[] keys,
+                                                        V[] values)
     {
-        Collection keyCollection = (keys != null ? Arrays.asList(keys) : Collections.EMPTY_LIST);
-        Collection valuesCollection = (values != null ? Arrays.asList(values) : Collections.EMPTY_LIST);
+        Collection<K> keyCollection = (keys != null ? Arrays.asList(keys) : Collections.EMPTY_LIST);
+        Collection<V> valuesCollection = (values != null ? Arrays.asList(values) : Collections.EMPTY_LIST);
         return mapWithKeysAndValues(mapClass, keyCollection.iterator(), valuesCollection.iterator());
     }
 
@@ -35,7 +37,9 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
      * Convenience method for CollectionUtil#mapWithKeysAndValues(Class, Iterator,
      * Iterator); keys and values can be null or empty.
      */
-    public static Map mapWithKeysAndValues(Class mapClass, Collection keys, Collection values)
+    public static <K, V> Map<K, V> mapWithKeysAndValues(Class<? extends Map> mapClass,
+                                                        Collection<K> keys,
+                                                        Collection<V> values)
     {
         keys = (keys != null ? keys : Collections.EMPTY_LIST);
         values = (values != null ? values : Collections.EMPTY_LIST);
@@ -51,9 +55,11 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
      * @param values iterator for Objects used as values
      * @return the instantiated Map
      */
-    public static Map mapWithKeysAndValues(Class mapClass, Iterator keys, Iterator values)
+    public static <K, V> Map<K, V> mapWithKeysAndValues(Class<? extends Map> mapClass,
+                                                        Iterator<K> keys,
+                                                        Iterator<V> values)
     {
-        Map m = null;
+        Map<K, V> m = null;
 
         if (mapClass == null)
         {
@@ -62,7 +68,7 @@ public class MapUtils extends org.apache.commons.collections.MapUtils
 
         try
         {
-            m = (Map) mapClass.newInstance();
+            m = mapClass.newInstance();
         }
         catch (Exception ex)
         {

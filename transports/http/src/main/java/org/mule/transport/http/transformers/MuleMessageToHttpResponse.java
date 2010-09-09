@@ -18,6 +18,7 @@ import org.mule.config.MuleManifest;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
+import org.mule.transport.http.CookieHelper;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
@@ -31,6 +32,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 
@@ -226,19 +228,41 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
         }
         response.setFallbackCharset(encoding);
 
-        @SuppressWarnings("unchecked")
         Collection<String> headerNames = HttpConstants.RESPONSE_HEADER_NAMES.values();
 
         for (String headerName : headerNames)
         {
-            String value = msg.getInvocationProperty(headerName);
-            if (value == null)
+            if (HttpConstants.HEADER_COOKIE_SET.equals(headerName))
             {
-                value = msg.getOutboundProperty(headerName);
+                // TODO This have to be improved. We shouldn't have to look in all
+                // scopes
+                Object cookiesObject = msg.getInvocationProperty(headerName);
+                if (cookiesObject == null)
+                {
+                    cookiesObject = msg.getOutboundProperty(headerName);
+                }
+                if (cookiesObject == null)
+                {
+                    cookiesObject = msg.getInboundProperty(headerName);
+                }
+                Cookie[] arrayOfCookies = CookieHelper.asArrayOfCookies(cookiesObject);
+                for (Cookie cookie : arrayOfCookies)
+                {
+                    response.addHeader(new Header(headerName,
+                        CookieHelper.formatCookieForASetCookieHeader(cookie)));
+                }
             }
-            if (value != null)
+            else
             {
-                response.setHeader(new Header(headerName, value));
+                String value = msg.getInvocationProperty(headerName);
+                if (value == null)
+                {
+                    value = msg.getOutboundProperty(headerName);
+                }
+                if (value != null)
+                {
+                    response.setHeader(new Header(headerName, value));
+                }
             }
         }
 
