@@ -12,9 +12,11 @@ package org.mule.transport.jms.integration;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationBuilder;
+import org.mule.api.transaction.Transaction;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.IOUtils;
@@ -515,6 +517,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     {
         super.doSetUp();
         client = new MuleClient(muleContext);
+        Transaction tx = TransactionCoordination.getInstance().getTransaction();
+        if (tx != null)
+        {
+            TransactionCoordination.getInstance().unbindTransaction(tx);
+            logger.warn("Transaction was active when this test began");
+        }
     }
 
     protected void doTearDown() throws Exception
@@ -527,6 +535,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         if (client != null)
         {
             client.dispose();
+        }
+        Transaction tx = TransactionCoordination.getInstance().getTransaction();
+        if (tx != null)
+        {
+            TransactionCoordination.getInstance().unbindTransaction(tx);
+            logger.warn("Transaction was active when this test ended");
         }
     }
 
