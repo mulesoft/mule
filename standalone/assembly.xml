@@ -86,6 +86,7 @@
         <excludes>
             <exclude>pom.xml</exclude>
             <exclude>all-examples/**</exclude>
+            <exclude>loanbroker/**</exclude>
             <exclude>geomail/**</exclude>
             <exclude>**/target/**</exclude>
             <exclude>**/dist/**</exclude>
@@ -153,7 +154,7 @@
         Mule Examples: Loan Broker
     ===============================
     -->
-    <fileSet>
+<!--    <fileSet>
         <directory>../../examples/loanbroker/dist</directory>
         <outputDirectory>examples/loanbroker</outputDirectory>
     </fileSet>
@@ -167,36 +168,36 @@
             <include>loanbroker-client.bat</include>
             <include>loanbroker-server.bat</include>
         </includes>
-    </fileSet>
+    </fileSet>-->
     <!-- Common classes -->
-    <fileSet>
+<!--    <fileSet>
         <directory>../../examples/loanbroker/common/dist</directory>
         <outputDirectory>examples/loanbroker/common</outputDirectory>
     </fileSet>
     <fileSet>
         <directory>../../examples/loanbroker/common-tests/dist</directory>
         <outputDirectory>examples/loanbroker/common-tests</outputDirectory>
-    </fileSet>
+    </fileSet>-->
     <!-- Credit Agency EJB -->
-    <fileSet>
+<!--    <fileSet>
         <directory>../../examples/loanbroker/credit-agency/dist</directory>
         <outputDirectory>examples/loanbroker/credit-agency</outputDirectory>
-    </fileSet>
+    </fileSet>-->
     <!-- LoanBroker ESB -->
-    <fileSet>
+<!--    <fileSet>
         <directory>../../examples/loanbroker/esb/dist</directory>
         <outputDirectory>examples/loanbroker/esb</outputDirectory>
-    </fileSet>
+    </fileSet>-->
     <!-- LoanBroker ESN -->
-    <fileSet>
+<!--    <fileSet>
         <directory>../../examples/loanbroker/esn/dist</directory>
         <outputDirectory>examples/loanbroker/esn</outputDirectory>
-    </fileSet>
+    </fileSet>-->
     <!-- LoanBroker BPM -->
-    <fileSet>
+<!--    <fileSet>
         <directory>../../examples/loanbroker/bpm/dist</directory>
         <outputDirectory>examples/loanbroker/bpm</outputDirectory>
-    </fileSet>
+    </fileSet>-->
 
     <!--
     =============================
