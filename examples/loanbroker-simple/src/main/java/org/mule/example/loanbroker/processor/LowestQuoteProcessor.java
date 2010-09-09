@@ -1,5 +1,5 @@
 /*
- * $Id: LoanQuoteRequestToCreditProfileArgs.java 17453 2010-06-02 10:27:30Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
