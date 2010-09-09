@@ -1553,7 +1553,7 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:attributeGroup name="simpleServiceTypes">
-        <xsd:attribute name="type" default="default">
+        <xsd:attribute name="type">
             <xsd:annotation>
                 <xsd:documentation>
                   Defines the type of simple service.

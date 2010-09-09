@@ -104,6 +104,16 @@
   <simple-service name="weather-xpath-consumer"
                   address="vm://weather-xpath-consumer.in"
                   component-class="org.mule.test.integration.tck.WeatherReportXpathConsumer" />
+  
+  <!-- type inheritance service, issue MULE-5071 -->
+  <simple-service name="abstract-weather-forecaster-ws"
+                  abstract="true"
+                  component-class="org.mule.test.integration.tck.WeatherForecaster"
+                  type="jax-ws" />
+                  
+  <simple-service name="concrete-weather-forecaster-ws"
+                  parent="abstract-weather-forecaster-ws"
+                  address="http://localhost:6098/weather-forecast" />
                   
   <!-- Functional testing -->
   <simple-service name="functional-test-component-1"

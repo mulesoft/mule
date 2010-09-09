@@ -92,16 +92,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
 
     public void testJaxWsService() throws Exception
     {
-        final String wsdl = new String(FileCopyUtils.copyToByteArray((InputStream) muleClient.request(
-            "http://localhost:6099/weather-forecast?wsdl", getTestTimeoutSecs() * 1000L).getPayload()));
-
-        assertTrue(wsdl.contains("GetWeatherByZipCode"));
-
-        final String weatherForecast = muleClient.send(
-            "wsdl-cxf:http://localhost:6099/weather-forecast?wsdl&method=GetWeatherByZipCode", "95050", null,
-            getTestTimeoutSecs() * 1000).getPayloadAsString();
-
-        assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
+        doTestJaxWsService(6099);
     }
 
     public void testJaxbConsumer() throws Exception
@@ -138,6 +129,11 @@ public class SimpleServiceTestCase extends FunctionalTestCase
             getFunctionalTestComponent("functional-test-component-3"));
     }
 
+    public void testInheritedType() throws Exception
+    {
+        doTestJaxWsService(6098);
+    }
+
     private void doTestFunctionalTestComponent(final String ftcUri, final String ftcName)
         throws MuleException, Exception
     {
@@ -159,5 +155,20 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         final String s = RandomStringUtils.randomAlphabetic(10);
         final String result = new String((byte[]) muleClient.send(url, s.getBytes(), null).getPayload());
         assertEquals(s + "barbaz", result);
+    }
+
+    private void doTestJaxWsService(int portNumber) throws Exception
+    {
+        final String wsdl = new String(FileCopyUtils.copyToByteArray((InputStream) muleClient.request(
+            "http://localhost:" + portNumber + "/weather-forecast?wsdl", getTestTimeoutSecs() * 1000L)
+            .getPayload()));
+
+        assertTrue(wsdl.contains("GetWeatherByZipCode"));
+
+        final String weatherForecast = muleClient.send(
+            "wsdl-cxf:http://localhost:" + portNumber + "/weather-forecast?wsdl&method=GetWeatherByZipCode",
+            "95050", null, getTestTimeoutSecs() * 1000).getPayloadAsString();
+
+        assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
     }
 }
