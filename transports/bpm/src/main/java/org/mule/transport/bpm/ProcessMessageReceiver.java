@@ -12,6 +12,7 @@ package org.mule.transport.bpm;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
+import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -23,6 +24,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.ConnectorException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transport.AbstractMessageReceiver;
@@ -71,8 +73,7 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         }
     }
 
-    protected MuleMessage generateEvent(String endpoint, Object payload, Map messageProperties, 
-        MessageExchangePattern exchangePattern) throws MuleException
+    protected MuleMessage generateEvent(String endpoint, Object payload, Map messageProperties, MessageExchangePattern exchangePattern) throws MuleException
     {
         MuleMessage message;
         if (payload instanceof MuleMessage)
@@ -83,7 +84,8 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         {
             message = createMuleMessage(payload, this.endpoint.getEncoding());
         }
-        message.addProperties(messageProperties);
+        message.addProperties(messageProperties, PropertyScope.INBOUND);
+        message.addProperties(messageProperties, PropertyScope.INVOCATION);
 
         //TODO should probably cache this
         EndpointBuilder endpointBuilder = connector.getMuleContext().getRegistry().lookupEndpointFactory().getEndpointBuilder(endpoint);
@@ -91,6 +93,18 @@ public class ProcessMessageReceiver extends AbstractMessageReceiver
         OutboundEndpoint ep = endpointBuilder.buildOutboundEndpoint();
        
         DefaultMuleEvent event = new DefaultMuleEvent(message, ep, new DefaultMuleSession(flowConstruct, connector.getMuleContext()));
+
+        // Set correlation properties in SESSION scope so that they get propagated to response messages.
+        RequestContext.setEvent(event);
+        if (messageProperties.get(ProcessConnector.PROPERTY_PROCESS_TYPE) != null)
+        {
+            event.getMessage().setSessionProperty(ProcessConnector.PROPERTY_PROCESS_TYPE, messageProperties.get(ProcessConnector.PROPERTY_PROCESS_TYPE));
+        }
+        if (messageProperties.get(ProcessConnector.PROPERTY_PROCESS_ID) != null)
+        {
+            event.getMessage().setSessionProperty(ProcessConnector.PROPERTY_PROCESS_ID, messageProperties.get(ProcessConnector.PROPERTY_PROCESS_ID));
+        }
+        
         MuleEvent resultEvent = ep.process(event);
         
         MuleMessage response = null;

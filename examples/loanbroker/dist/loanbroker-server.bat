@@ -21,7 +21,7 @@ SET ACTIVEMQ=activemq-core-4.1.2.jar
 SET OPENEJB=openejb-core-1.0.jar
 REM 3rd party libraries for LoanBroker BPM
 SET BSH=bsh-1.3.0.jar
-SET DERBYDB=derby-10.3.1.4.jar
+SET DERBYDB=derby-10.6.1.0.jar
 
 :testactivemq
 if exist "%MULE_BASE%\lib\user\%ACTIVEMQ%" goto :testopenejb

@@ -43,21 +43,21 @@ public class VariablesTestCase extends AbstractJbpmTestCase
 
             response = client.request("vm://queueA", 3000);
             assertNotNull(response);
-            assertEquals("bar", response.getOutboundProperty("foo"));
-            assertEquals(0.75, response.getOutboundProperty("fraction"));
+            assertEquals("bar", response.getInboundProperty("foo"));
+            assertEquals(0.75, response.getInboundProperty("fraction"));
 
             // Advance the process
             props = new HashMap<String, Object>();
             props.put("straw", "berry");
             props.put("time", new Date());
             response = client.send("bpm://variables/" + processId, "data", props);
-
+            
             response = client.request("vm://queueB", 3000);
             assertNotNull(response);
-            assertEquals("bar", response.getOutboundProperty("foo"));
-            assertEquals(0.75, response.getOutboundProperty("fraction"));
-            assertEquals("berry", response.getOutboundProperty("straw"));
-            final Object o = response.getOutboundProperty("time");
+            assertEquals("bar", response.getInboundProperty("foo"));
+            assertEquals(0.75, response.getInboundProperty("fraction"));
+            assertEquals("berry", response.getInboundProperty("straw"));
+            final Object o = response.getInboundProperty("time");
             assertTrue(o instanceof Date);
         }
         finally

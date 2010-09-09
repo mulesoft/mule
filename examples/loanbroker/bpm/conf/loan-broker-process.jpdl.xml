@@ -7,7 +7,7 @@
          ******************************************************************* -->
 
     <!-- Request received from customer -->
-    <mule-receive name="incomingCustomerRequest" endpoint="CustomerRequests" var="customerRequest">
+    <mule-receive name="incomingCustomerRequest" endpoint="CustomerRequests" type="org.mule.example.loanbroker.messages.CustomerQuoteRequest" var="customerRequest">
         <transition to="sendToCreditAgency" />
     </mule-receive>
 
@@ -18,7 +18,7 @@
     </mule-send>
 
     <!-- Wait for the customer's credit profile to arrive. -->
-    <mule-receive name="waitForCreditAgency" endpoint="CreditProfiles" var="creditProfile">
+    <mule-receive name="waitForCreditAgency" endpoint="CreditProfiles" type="org.mule.example.loanbroker.messages.CreditProfile" var="creditProfile">
         <timer duedate="4 hours" />
         <transition to="prepareLoanQuoteRequest" />
     </mule-receive>
@@ -72,7 +72,7 @@
     </mule-send>
 
     <mule-send name="sendCustomerResponse"
-          expr="#{loanQuote}" endpoint="CustomerResponses">
+          expr="#{loanQuote}" endpoint="CustomerResponses" synchronous="false">
         <transition to="loanApproved" />
     </mule-send>
 

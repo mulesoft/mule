@@ -51,7 +51,7 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         if (process != null)
         {
             MuleMessage msg = new DefaultMuleMessage(process, connector.getMuleContext());
-            msg.setProperty(ProcessConnector.PROPERTY_PROCESS_ID, connector.getBpms().getId(process), PropertyScope.INVOCATION);
+            msg.setProperty(ProcessConnector.PROPERTY_PROCESS_ID, connector.getBpms().getId(process), PropertyScope.SESSION);
             return msg;
         }
         else
@@ -89,19 +89,25 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
                 // Store the message's payload as a process variable.
                 processVariables.put(ProcessConnector.PROCESS_VARIABLE_INCOMING, payload);
 
-                // Store the endpoint on which the message was received as a process
-                // variable.
-                String originatingEndpoint = event.getMessage().getOutboundProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY);
+                // Store the endpoint on which the message was received as a process variable.
+                String originatingEndpoint = event.getMessage().getInboundProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY);
                 if (StringUtils.isNotEmpty(originatingEndpoint))
                 {
-                    processVariables.put(ProcessConnector.PROCESS_VARIABLE_INCOMING_SOURCE,
-                        originatingEndpoint);
+                    processVariables.put(ProcessConnector.PROCESS_VARIABLE_INCOMING_SOURCE, originatingEndpoint);
                 }
             }
         }
 
         // Retrieve the parameters
-        Object processType = event.getMessage().getInvocationProperty(ProcessConnector.PROPERTY_PROCESS_TYPE);
+        Object processType = event.getMessage().getSessionProperty(ProcessConnector.PROPERTY_PROCESS_TYPE);
+        if (processType == null)
+        {
+            processType = event.getMessage().getInvocationProperty(ProcessConnector.PROPERTY_PROCESS_TYPE);
+        }
+        if (processType == null)
+        {
+            processType = event.getMessage().getInboundProperty(ProcessConnector.PROPERTY_PROCESS_TYPE);
+        }
         processVariables.remove(ProcessConnector.PROPERTY_PROCESS_TYPE);
 
         // TODO MULE-1220 The processId for BPM is sort of like a session and so we could probably use
@@ -116,7 +122,11 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
         }
         // If processId is explicitly set for the message, this overrides the
         // processIdField.
-        processId = event.getMessage().getInvocationProperty(ProcessConnector.PROPERTY_PROCESS_ID);
+        processId = event.getMessage().getSessionProperty(ProcessConnector.PROPERTY_PROCESS_ID);
+        if (processId == null)
+        {
+            processId = event.getMessage().getInvocationProperty(ProcessConnector.PROPERTY_PROCESS_ID); 
+        }
         if (processId == null)
         {
             processId = event.getMessage().getInboundProperty(ProcessConnector.PROPERTY_PROCESS_ID); 
@@ -156,6 +166,8 @@ public class ProcessMessageDispatcher extends AbstractMessageDispatcher
 
         // //////////////////////////////////////////////////////////////////////
 
+        logger.debug("Message received: payload = " + event.getMessage().getPayload().getClass().getName() + " processType = " + processType + " processId = " + processId + " action = " + action);
+        
         // Start a new process.
         if (processId == null || action.equals(ProcessConnector.ACTION_START))
         {

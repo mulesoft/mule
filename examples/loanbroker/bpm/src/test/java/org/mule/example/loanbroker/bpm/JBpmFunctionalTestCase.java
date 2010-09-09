@@ -18,8 +18,6 @@ import org.mule.example.loanbroker.tests.AbstractAsynchronousLoanBrokerTestCase;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.NullPayload;
-import org.mule.transport.bpm.ProcessConnector;
-import org.mule.transport.jbpm.Jbpm;
 
 
 public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCase

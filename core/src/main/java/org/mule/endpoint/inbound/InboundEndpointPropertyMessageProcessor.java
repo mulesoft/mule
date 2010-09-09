@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transport.PropertyScope;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 
@@ -42,7 +43,7 @@ public class InboundEndpointPropertyMessageProcessor implements MessageProcessor
             // URI
             inboundEndpoint = endpoint.getEndpointURI().getUri().toString();
         }
-        event.getMessage().setOutboundProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint);
+        event.getMessage().setProperty(MuleProperties.MULE_ORIGINATING_ENDPOINT_PROPERTY, inboundEndpoint, PropertyScope.INBOUND);
         return event;
     }
 

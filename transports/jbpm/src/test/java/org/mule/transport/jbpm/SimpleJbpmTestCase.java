@@ -70,8 +70,8 @@ public class SimpleJbpmTestCase extends AbstractJbpmTestCase
                                    "&" + ProcessConnector.PROPERTY_PROCESS_TYPE + "=simple", "data", null);
             process = response.getPayload();
 
-            String processId = response.getInvocationProperty(ProcessConnector.PROPERTY_PROCESS_ID);
             // The process should be started and in a wait state.
+            Object processId = bpms.getId(process);
             assertNotNull(processId);
             assertEquals("dummyState", bpms.getState(process));
 
