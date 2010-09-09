@@ -10,6 +10,9 @@
 
 package org.mule.transport.http;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageTypeNotSupportedException;
@@ -19,15 +22,13 @@ import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Map;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.StatusLine;
 import org.apache.commons.httpclient.URI;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
@@ -142,5 +143,22 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         when(httpMethod.getResponseBodyAsStream()).thenReturn(body);
         
         return httpMethod;
+    }
+
+    public void testMultipleHeaderWithSameName() throws Exception
+    {
+        HttpMuleMessageFactory messageFactory = new HttpMuleMessageFactory(null);
+
+        Header[] headers = new Header[4];
+        headers[0] = new Header("k2", "priority");
+        headers[1] = new Header("k1", "top");
+        headers[2] = new Header("k2", "always");
+        headers[3] = new Header("k2", "true");
+
+        Map<String, Object> parsedHeaders = messageFactory.convertHeadersToMap(headers, "http://localhost/");
+
+        assertEquals(2, parsedHeaders.size());
+        assertEquals("top", parsedHeaders.get("k1"));
+        assertEquals("priority,always,true", parsedHeaders.get("k2"));
     }
 }

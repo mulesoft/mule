@@ -250,7 +250,7 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
         return outHeaders;
     }
 
-    private Map<String, Object> convertHeadersToMap(Header[] headersArray, String uri)
+    Map<String, Object> convertHeadersToMap(Header[] headersArray, String uri)
         throws URISyntaxException
     {
         Map<String, Object> headersMap = new CaseInsensitiveHashMap();
@@ -270,7 +270,24 @@ public class HttpMuleMessageFactory extends AbstractMuleMessageFactory
             }
             else
             {
-                headersMap.put(header.getName(), header.getValue());
+                if (headersMap.containsKey(header.getName()))
+                {
+                    if (headersMap.get(header.getName()) instanceof String)
+                    {
+                        // concat
+                        headersMap.put(header.getName(),
+                            headersMap.get(header.getName()) + "," + header.getValue());
+                    }
+                    else
+                    {
+                        // override
+                        headersMap.put(header.getName(), header.getValue());
+                    }
+                }
+                else
+                {
+                    headersMap.put(header.getName(), header.getValue());
+                }
             }
         }
         return headersMap;
