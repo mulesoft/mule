@@ -61,7 +61,7 @@ geronimo-stax-api_1.0_spec-1.0.1
 geronimo-ws-metadata_2.0_spec-1.1.2
 groovy-all-1.6.7
 hibernate-core-3.3.2.GA
-ibeans-core-1.0-dev-20100813
+ibeans-support-0.9
 ibeans-annotation-api-0.9.1
 jackson-core-asl-1.3.1
 jackson-jaxrs-1.3.1
@@ -163,6 +163,7 @@ saaj-impl-1.3-osgi
 saxon-8.9.0.4-osgi
 saxon-dom-8.9.0.4-osgi
 saxon-xqj-8.9.0.4
+scribe-0.6.7-dev-20100812
 servlet-api-2.5-20081211
 slf4j-api-1.5.0
 slf4j-log4j12-1.5.0
@@ -183,6 +184,8 @@ stax-utils-20080702-osgi
 sxc-core-0.7.3-osgi
 sxc-runtime-0.7.3-osgi
 sxc-xpath-0.7.3-osgi
+tomcat-apr-5.5.23
+tomcat-util-5.5.23
 wrapper-3.2.3
 wsdl4j-1.6.2
 wss4j-1.5.8-osgi
