@@ -7,13 +7,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config.spring;
 
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.routing.IdempotentMessageFilter;
 import org.mule.routing.IdempotentSecureHashMessageFilter;
 import org.mule.routing.MessageFilter;
+import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.store.InMemoryObjectStore;
@@ -23,6 +29,7 @@ import java.util.List;
 
 public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
 {
+    @Override
     public String getConfigResources()
     {
         return "core-namespace-routers.xml";
@@ -30,13 +37,15 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
 
     public void testIdempotentSecureHashReceiverRouter() throws Exception
     {
-        MessageProcessor r = lookupInboundRouterFromService("IdempotentSecureHashReceiverRouter");
-        assertTrue(r instanceof IdempotentSecureHashMessageFilter);
-        IdempotentSecureHashMessageFilter router = (IdempotentSecureHashMessageFilter)r;
-        assertEquals("SHA-128", router.getMessageDigestAlgorithm());
-        assertNotNull(router.getStore());
-        assertTrue(router.getStore() instanceof InMemoryObjectStore);
-        InMemoryObjectStore store = (InMemoryObjectStore)router.getStore();
+        MessageProcessor router = lookupInboundRouterFromService("IdempotentSecureHashReceiverRouter");
+        assertTrue(router instanceof IdempotentSecureHashMessageFilter);
+
+        IdempotentSecureHashMessageFilter filter = (IdempotentSecureHashMessageFilter)router;
+        assertEquals("SHA-128", filter.getMessageDigestAlgorithm());
+        assertNotNull(filter.getStore());
+        assertTrue(filter.getStore() instanceof InMemoryObjectStore);
+
+        InMemoryObjectStore<String> store = (InMemoryObjectStore<String>)filter.getStore();
         assertEquals(1001, store.getEntryTTL());
         assertEquals(1001, store.getExpirationInterval());
         assertEquals(1001, store.getMaxEntries());
@@ -44,15 +53,17 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
         assertNotNull(store.getScheduler());
     }
 
-     public void testIdempotentReceiverRouter() throws Exception
+    public void testIdempotentReceiverRouter() throws Exception
     {
-        MessageProcessor r = lookupInboundRouterFromService("IdempotentReceiverRouter");
-        assertTrue(r instanceof IdempotentMessageFilter);
-        IdempotentMessageFilter router = (IdempotentMessageFilter)r;
-        assertEquals("#[message:id]-#[message:correlationId]", router.getIdExpression());
-        assertNotNull(router.getStore());
-        assertTrue(router.getStore() instanceof TextFileObjectStore);
-        TextFileObjectStore store = (TextFileObjectStore)router.getStore();
+        MessageProcessor router = lookupInboundRouterFromService("IdempotentReceiverRouter");
+        assertTrue(router instanceof IdempotentMessageFilter);
+
+        IdempotentMessageFilter filter = (IdempotentMessageFilter)router;
+        assertEquals("#[message:id]-#[message:correlationId]", filter.getIdExpression());
+        assertNotNull(filter.getStore());
+        assertTrue(filter.getStore() instanceof TextFileObjectStore);
+
+        TextFileObjectStore store = (TextFileObjectStore)filter.getStore();
         assertEquals(-1, store.getEntryTTL());
         assertEquals(1000, store.getExpirationInterval());
         assertEquals(10000000, store.getMaxEntries());
@@ -63,17 +74,51 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
 
     public void testSelectiveConsumerRouter() throws Exception
     {
-        MessageProcessor r = lookupInboundRouterFromService("SelectiveConsumerRouter");
-        assertTrue(r instanceof MessageFilter);
+        MessageProcessor router = lookupInboundRouterFromService("SelectiveConsumerRouter");
+        assertTrue(router instanceof MessageFilter);
+    }
+
+    public void testCustomRouter() throws Exception
+    {
+        MessageProcessor router = lookupOutboundRouterFromService("CustomRouter");
+        assertTrue(router instanceof CustomOutboundRouter);
+    }
+
+    protected MessageProcessor lookupOutboundRouterFromService(String serviceName) throws Exception
+    {
+        Service service = lookupService(serviceName);
+        OutboundRouterCollection routerCollection = 
+            (OutboundRouterCollection) service.getOutboundMessageProcessor();
+        return routerCollection.getRoutes().get(0);
     }
 
     protected MessageProcessor lookupInboundRouterFromService(String serviceName) throws Exception
     {
-        Service c = muleContext.getRegistry().lookupService(serviceName);
-        assertNotNull(c);
-        List routers = ((ServiceCompositeMessageSource) c.getMessageSource()).getMessageProcessors();
+        Service service = lookupService(serviceName);
+        List<MessageProcessor> routers = 
+            ((ServiceCompositeMessageSource) service.getMessageSource()).getMessageProcessors();
         assertEquals(1, routers.size());
-        assertTrue(routers.get(0) instanceof MessageProcessor);
-        return (MessageProcessor) routers.get(0);
+        return routers.get(0);
+    }
+
+    protected Service lookupService(String serviceName)
+    {
+        Service service = muleContext.getRegistry().lookupService(serviceName);
+        assertNotNull(service);
+        return service;
+    }
+    
+    public static class CustomOutboundRouter extends AbstractOutboundRouter
+    {
+        public boolean isMatch(MuleMessage message) throws MessagingException
+        {
+            return true;
+        }
+
+        @Override
+        protected MuleEvent route(MuleEvent event) throws MessagingException
+        {
+            return event;
+        }
     }
 }

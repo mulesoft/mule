@@ -34,6 +34,17 @@
                 <selective-consumer-router/>
             </inbound>
         </service>
+
+        <service name="CustomRouter">
+            <inbound>
+                <inbound-endpoint address="test://in"/>
+            </inbound>
+            <outbound>
+                <custom-outbound-router class="org.mule.config.spring.CoreNamespaceRoutersTestCase$CustomOutboundRouter">
+                    <outbound-endpoint address="test://out"/>
+                </custom-outbound-router>
+            </outbound>
+        </service>
     </model>
 </mule>
         

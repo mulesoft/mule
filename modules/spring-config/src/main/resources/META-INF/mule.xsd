@@ -4654,7 +4654,7 @@
         </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:attributeGroup name="defaultFilteredOutboundRouterAttributes">
+    <xsd:attributeGroup name="defaultOutboundRouterAttributes">
         <xsd:attributeGroup ref="defaultCorrelationAttributes"/>
         <xsd:attribute name="transformer-refs" type="xsd:NMTOKENS">
             <xsd:annotation>
@@ -4663,6 +4663,10 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="defaultFilteredOutboundRouterAttributes">
+        <xsd:attributeGroup ref="defaultOutboundRouterAttributes"/>
         <xsd:attribute name="useTemplates" type="substitutableBoolean" default="true">
             <xsd:annotation>
                 <xsd:documentation>
@@ -5009,7 +5013,7 @@
                         </xsd:annotation>
                     </xsd:element>
                 </xsd:sequence>
-                <xsd:attributeGroup ref="defaultFilteredOutboundRouterAttributes"/>
+                <xsd:attributeGroup ref="defaultOutboundRouterAttributes"/>
                 <xsd:attribute name="class" type="substitutableClass" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
