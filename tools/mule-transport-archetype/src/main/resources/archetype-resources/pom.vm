@@ -16,14 +16,14 @@
     <properties>
         <mule.version>${MuleVersion}</mule.version>
 #if($license.id)
-           <licenseId>${license.id}</licenseId>
-           <licenseUrl>${license.url}</licenseUrl>
+        <licenseId>${license.id}</licenseId>
+        <licenseUrl>${license.url}</licenseUrl>
 #end
-           <!-- Tools properties -->
-           <eclipsePluginVersion>2.5</eclipsePluginVersion>
-           <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
-           <jdk5Name>J2SE-1.5</jdk5Name>
-           <jdk.version>1.5</jdk.version>
+        <!-- Tools properties -->
+        <eclipsePluginVersion>2.5</eclipsePluginVersion>
+        <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
+        <jdk5Name>J2SE-1.5</jdk5Name>
+        <jdk.version>1.5</jdk.version>
     </properties>
 
 #if($license.id)
@@ -34,8 +34,8 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-#end
 
+#end
     <build>
         <extensions>
             <extension>
@@ -54,8 +54,29 @@
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>${D}{eclipsePluginVersion}</version>
+                <configuration>
+                    <!-- by default download all sources when generating project files -->
+                    <downloadSources>true</downloadSources>
+                    <classpathContainers>
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${D}{vmtype}/${D}{jdk5Name}
+                        </classpathContainer>
+                    </classpathContainers>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-idea-plugin</artifactId>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                    <jdkName>${D}{jdk.version}</jdkName>
+                </configuration>
+            </plugin>
 #if($forgeProject == "y")
+
             <!-- Responsible for creating the release distribution for this project -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -81,7 +102,7 @@
             </plugin>
 
             <!-- Used for deploying zip and tar.gz  distributions to MuleForge. Called using:
-           mvn muleforge:deploy-distro-->
+                 mvn muleforge:deploy-distro -->
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>maven-muleforge-plugin</artifactId>
@@ -109,36 +130,6 @@
     <!-- plugins for creating site reports -->
     <reporting>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <version>${D}{eclipsePluginVersion}</version>
-                <configuration>
-                    <!-- by default download all sources when generating project files -->
-                    <downloadSources>true</downloadSources>
-                    <classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${D}{vmtype}/${D}{jdk5Name}
-                        </classpathContainer>
-                    </classpathContainers>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-idea-plugin</artifactId>
-                <configuration>
-                    <downloadSources>true</downloadSources>
-                    <jdkName>${D}{jdk.version}</jdkName>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${D}{jdk.version}</source>
-                    <target>${D}{jdk.version}</target>
-                    <encoding>ISO-8859-1</encoding>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
