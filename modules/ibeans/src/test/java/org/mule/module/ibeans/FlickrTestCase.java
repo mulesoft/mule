@@ -22,6 +22,9 @@ import org.ibeans.api.CallException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import static org.ibeans.impl.IBeansSupport.prettyPrintXml;
+import static org.ibeans.impl.IBeansSupport.select;
+
 public class FlickrTestCase extends AbstractMuleTestCase
 {
     public static final String SEARCH_TERM = "food";
@@ -57,7 +60,7 @@ public class FlickrTestCase extends AbstractMuleTestCase
         assertNotNull(doc);
         List<URL> photoUrls = new ArrayList<URL>();
 
-        for (Node n : IBeansSupport.select("//photo", doc))
+        for (Node n : select("//photo", doc))
         {
             photoUrls.add(getFlickr().getPhotoURL(n));
         }
@@ -92,8 +95,8 @@ public class FlickrTestCase extends AbstractMuleTestCase
         assertNotNull(doc);
         List<URL> photoUrls = new ArrayList<URL>();
 
-        System.out.println(IBeansSupport.prettyPrintXml(doc));
-        for (Node n : IBeansSupport.select("//photo", doc))
+        System.out.println(prettyPrintXml(doc));
+        for (Node n : select("//photo", doc))
         {
             photoUrls.add(getFlickr().getPhotoURL(n, FlickrIBean.IMAGE_SIZE.SmallSquare, FlickrIBean.IMAGE_TYPE.Jpeg));
         }
