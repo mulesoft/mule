@@ -8,7 +8,7 @@
     </parent>
     <artifactId>mule-module-atom</artifactId>
     <packaging>jar</packaging>
-    <name>Mule ATOM Module</name>
+    <name>ATOM</name>
     <description>Mule ATOM Endpoints and Serivce Component</description>
 
     <properties>

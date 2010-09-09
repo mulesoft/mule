@@ -8,7 +8,7 @@
     </parent>
     <artifactId>mule-module-jersey</artifactId>
     <packaging>jar</packaging>
-    <name>Jersey Module</name>
+    <name>Jersey</name>
     <description>A module for Jersey, the JAX-RS RI.</description>
 
     <dependencies>

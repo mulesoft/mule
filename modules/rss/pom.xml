@@ -8,7 +8,7 @@
     </parent>
     <artifactId>mule-module-rss</artifactId>
     <packaging>jar</packaging>
-    <name>Mule RSS Module</name>
+    <name>RSS</name>
     <description>Mule RSS Endpoints</description>
 
     <dependencies>

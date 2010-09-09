@@ -12,7 +12,7 @@
 
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-annotations</artifactId>
-    <name>Mule Annotations</name>
+    <name>Annotations</name>
     <packaging>jar</packaging>
     <description>Annotations for configuring Mule at various levels such as services, entry points, transformers and
         expressions.
@@ -25,7 +25,6 @@
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
         </dependency>
-        
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib-nodep</artifactId>
