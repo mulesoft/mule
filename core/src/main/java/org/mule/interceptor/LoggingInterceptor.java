@@ -30,7 +30,7 @@ public class LoggingInterceptor extends AbstractEnvelopeInterceptor
     {
         if (logger.isInfoEnabled())
         {
-            logger.info("About to process event for " + event.getFlowConstruct().getName());
+            logger.info("Started event processing for " + event.getFlowConstruct().getName());
         }
         return event;
 
@@ -40,7 +40,7 @@ public class LoggingInterceptor extends AbstractEnvelopeInterceptor
     {
         if (logger.isInfoEnabled())
         {
-            logger.info("Processed event for " + event.getFlowConstruct().getName());
+            logger.info("Finished event processing for " + event.getFlowConstruct().getName());
         }
         return event;
     }
