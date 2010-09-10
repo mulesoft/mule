@@ -29,8 +29,8 @@
     Mule (using the MuleClient) and then assert the results.
     -->
     <flow name="main">
-        <vm:inbound-endpoint path="in" synchronous="true"/>
-        
+        <vm:inbound-endpoint path="in" exchange-pattern="request-respose"/>
+
         <!-- TODO add your service component here. This can also be a Spring bean using <spring-object bean="name"/> -->
         <test:component appendString=" Received"/>
 
