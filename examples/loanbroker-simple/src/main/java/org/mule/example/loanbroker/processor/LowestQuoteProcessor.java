@@ -34,6 +34,7 @@ public class LowestQuoteProcessor implements MessageProcessor
         }
         else
         {
+            @SuppressWarnings("unchecked")
             List<LoanQuote> loanQuotes = (List<LoanQuote>) payload;
             for (LoanQuote loanQuote : loanQuotes)
             {
