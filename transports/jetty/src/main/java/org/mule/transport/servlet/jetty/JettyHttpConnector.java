@@ -49,8 +49,8 @@ import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.xml.XmlConfiguration;
 
 /**
- * The <code>JettyConnector</code> can be using to embed a Jetty server to receive requests on an 
- * http inound endpoint. One server is created for each connector declared, many Jetty endpoints 
+ * The <code>JettyConnector</code> can be using to embed a Jetty server to receive requests on an
+ * http inound endpoint. One server is created for each connector declared, many Jetty endpoints
  * can share the same connector.
  */
 public class JettyHttpConnector extends AbstractConnector
@@ -126,9 +126,15 @@ public class JettyHttpConnector extends AbstractConnector
             {
                 InputStream is = IOUtils.getResourceAsStream(configFile, getClass());
                 XmlConfiguration config = new XmlConfiguration(is);
-                
-                String appHome = 
+
+                String appHome =
                     muleContext.getRegistry().lookupObject(MuleProperties.APP_HOME_DIRECTORY_PROPERTY);
+                if (appHome == null)
+                {
+                    // Mule IDE sets app.home as part of the launch config it creates
+                    appHome = System.getProperty(MuleProperties.APP_HOME_DIRECTORY_PROPERTY);
+                }
+
                 if (appHome != null)
                 {
                     config.getProperties().put(MuleProperties.APP_HOME_DIRECTORY_PROPERTY, appHome);
@@ -185,9 +191,7 @@ public class JettyHttpConnector extends AbstractConnector
         {
             throw new LifecycleException(CoreMessages.failedToStop("Jetty Http Receiver"), e, this);
         }
-
     }
-
 
     /**
      * Template method where any connections should be made for the connector
