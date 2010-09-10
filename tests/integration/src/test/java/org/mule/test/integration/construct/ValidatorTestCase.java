@@ -92,7 +92,7 @@ public class ValidatorTestCase extends FunctionalTestCase
         assertEquals("GOOD:" + payload + "@" + serviceName, muleClient.send("vm://" + serviceName + ".in",
             payload, null).getPayload());
 
-        latch.await(15, TimeUnit.SECONDS);
+        latch.await(getTestTimeoutSecs(), TimeUnit.SECONDS);
         assertEquals(1, ftc.getReceivedMessagesCount());
         assertEquals(payload, ftc.getLastReceivedMessage());
         ftc.initialise();

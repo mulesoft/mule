@@ -101,9 +101,9 @@ public class BridgeTestCase extends FunctionalTestCase
         });
 
         final String payload = RandomStringUtils.randomAlphabetic(10);
-        muleClient.dispatch("jms://myDlq", payload, new HashMap<Object, Object>(Collections.singletonMap("aKey",
-            123)));
-        latch.await(15, TimeUnit.SECONDS);
+        muleClient.dispatch("jms://myDlq", payload, new HashMap<Object, Object>(Collections.singletonMap(
+            "aKey", 123)));
+        latch.await(getTestTimeoutSecs(), TimeUnit.SECONDS);
         assertEquals(1, ftc.getReceivedMessagesCount());
         assertEquals(payload, new String((byte[]) ftc.getReceivedMessage(1)));
     }
