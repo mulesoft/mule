@@ -23,9 +23,19 @@ public final class TransactionCoordination
 
     private static final TransactionCoordination instance = new TransactionCoordination();
 
-    private static final ThreadLocal<Transaction> transactions = new ThreadLocal<Transaction>();
+    /**
+     * This field could be static because it is a {@link ThreadLocal} and this class
+     * is a singleton but, as it is used as an instance field by methods
+     * {@link #getTransaction()}, {@link #unbindTransaction(Transaction)} and
+     * {@link #bindTransaction(Transaction)}, it may be more consistent to have it as
+     * an instance variable.
+     */
+    private final ThreadLocal<Transaction> transactions = new ThreadLocal<Transaction>();
 
-    // @GuardedBy("this")
+    /** Lock variable that is used to access {@link #txCounter}. */
+    private final Object txCounterLock = new Object();
+
+    /** The access to this field is guarded by {@link #txCounterLock}. */
     private int txCounter = 0;
 
     /** Do not instanciate. */
@@ -44,7 +54,7 @@ public final class TransactionCoordination
         return transactions.get();
     }
 
-    public void unbindTransaction(Transaction transaction) throws TransactionException
+    public void unbindTransaction(final Transaction transaction) throws TransactionException
     {
         Transaction oldTx = transactions.get();
 
@@ -67,18 +77,29 @@ public final class TransactionCoordination
         finally
         {
             transactions.set(null);
-
-            synchronized (this)
-            {
-                if (txCounter > 0)
-                {
-                    txCounter--;
-                }
-            }
+            logTransactionUnbound(transaction);
         }
     }
 
-    public void bindTransaction(Transaction transaction) throws TransactionException
+    private void logTransactionUnbound(final Transaction transaction)
+    {
+        // We store the txCounter in a local variable to minimize locking
+        int txCounter = 0;
+        synchronized (txCounterLock)
+        {
+            if (this.txCounter > 0)
+            {
+                txCounter = --this.txCounter;
+            }
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Unbinding transaction (" + txCounter + ") " + transaction);
+        }
+    }
+
+    public void bindTransaction(final Transaction transaction) throws TransactionException
     {
         Transaction oldTx = transactions.get();
         // special handling for transaction collection
@@ -102,19 +123,22 @@ public final class TransactionCoordination
         }
 
         transactions.set(transaction);
+        logTransactionBound(transaction);
+    }
 
-        synchronized (this)
+    private void logTransactionBound(final Transaction transaction)
+    {
+        // We store the txCounter in a local variable to minimize locking
+        int txCounter;
+        synchronized (txCounterLock)
         {
-            txCounter++;
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Binding new transaction (" + txCounter + ") " + transaction);
-            }
+            txCounter = ++this.txCounter;
         }
 
-
-        //
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Binding new transaction (" + txCounter + ") " + transaction);
+        }
     }
 
 }
