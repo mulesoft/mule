@@ -520,7 +520,7 @@
                 <xsd:attribute name="encoding" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            String encoding used for transformer outputpwd.
+                            String encoding used for transformer output.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
