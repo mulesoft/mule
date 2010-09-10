@@ -95,7 +95,7 @@ public class Bank implements ServiceAware, Serializable, BankService
 
     public String getBankName()
     {
-        return bankName;
+        return bankName == null ? "Some Bank" : bankName;
     }
 
     public void setBankName(String bankName)
