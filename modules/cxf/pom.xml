@@ -36,6 +36,15 @@
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                    <!-- We reconfigure CXF to use log4j. This affects the classes that run as part
+                         of the plugin as well -->
+                    <dependency>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                        <version>${log4jVersion}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <!-- 
                 This is absolutely necessary as the cxf-codegen-plugin already attaches
