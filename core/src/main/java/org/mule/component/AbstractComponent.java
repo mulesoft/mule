@@ -22,7 +22,6 @@ import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.notification.ServerNotificationHandler;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.interceptor.Interceptor;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -95,11 +94,6 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
                          + flowConstruct.getName());
         }
 
-        if (!(event.getEndpoint() instanceof InboundEndpoint))
-        {
-            throw new IllegalStateException(
-                "Unable to process outbound event, components only process incoming events.");
-        }
         if (!flowConstruct.getLifecycleState().isStarted() || flowConstruct.getLifecycleState().isStopping())
         {
             throw new LifecycleException(CoreMessages.isStopped(flowConstruct.getName()), this);
