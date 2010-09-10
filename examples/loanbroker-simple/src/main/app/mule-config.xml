@@ -6,7 +6,7 @@
       xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-    xsi:schemaLocation="
+      xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
@@ -21,16 +21,21 @@
 
     <!-- Flows and Services -->
 
-    <!-- 
+    <!--
          The main loan broker flow that:
            i) Receives a customer request
            ii) Performs a lookup of the customer credit profile using a component binding
            iii) Determines the bank that should be used to request quotes using 'DefaultLender'
            iv) Uses an recipient list router to send quote requests to the selected banks and aggregates responses
-           v) Selects the lowest quote from the list of quotes returned using the 'LowestQuoteProcessor'     
+           v) Selects the lowest quote from the list of quotes returned using the 'LowestQuoteProcessor'
      -->
     <flow name="loan-broker-sync">
-        <inbound-endpoint ref="CustomerRequests"/>
+        <composite-source>
+            <inbound-endpoint ref="HttpUrlCustomerRequests"/>
+            <!-- This endpoint is used by a test case to post java objects directly -->
+            <inbound-endpoint ref="CustomerRequests"/>
+        </composite-source>
+
         <component class="org.mule.example.loanbroker.DefaultLoanBroker">
             <binding interface="org.mule.example.loanbroker.creditagency.CreditAgencyService">
                 <outbound-endpoint ref="CreditAgency" />
@@ -45,29 +50,54 @@
         The credit agency service will get the credit profile for a customer
      -->
     <simple-service name="TheCreditAgencyService" address="http://localhost:18080/mule/TheCreditAgencyService"
-        component-class="org.mule.example.loanbroker.creditagency.DefaultCreditAgency" type="jax-ws" />
+                    component-class="org.mule.example.loanbroker.creditagency.DefaultCreditAgency" type="jax-ws" />
 
     <!--
         These are mock bank services that represent remote bank loan services. One or more of these are
         invoked synchronously by the loan broker.
     -->
     <simple-service name="abstractBank" abstract="true" component-class="org.mule.example.loanbroker.bank.Bank"
-        type="jax-ws" />
+                    type="jax-ws" />
     <simple-service name="bank1" parent="abstractBank" address="http://localhost:10080/mule/TheBank1" />
     <simple-service name="bank2" parent="abstractBank" address="http://localhost:20080/mule/TheBank2" />
     <simple-service name="bank3" parent="abstractBank" address="http://localhost:30080/mule/TheBank3" />
     <simple-service name="bank4" parent="abstractBank" address="http://localhost:40080/mule/TheBank4" />
     <simple-service name="bank5" parent="abstractBank" address="http://localhost:50080/mule/TheBank5" />
-    
-    
+
+
     <!--  Global Endpoints -->
 
     <http:endpoint name="CustomerRequests" address="http://localhost:11080" exchange-pattern="request-response">
         <byte-array-to-object-transformer/>
     </http:endpoint>
 
+    <http:endpoint name="HttpUrlCustomerRequests" address="http://localhost:11081"
+                   exchange-pattern="request-response">
+        <!-- Translate request params into properties map -->
+        <http:body-to-parameter-map-transformer name="HttpRequestToMap"/>
+        <!-- Create java objects for the LoanBroker requests-->
+        <script:transformer>
+            <script:script engine="groovy">
+                import org.mule.example.loanbroker.message.*
+                import org.mule.example.loanbroker.model.*
+
+                // remember 'payload' is a param map from the previous transformer
+                def customerName = payload.name ?: "Muley" // fallback to defaults if no value provided in url
+                def ssn = payload.ssn ?: 1234
+                def amount = payload.amount ?: 100000
+                def term = payload.term ?: 48
+
+                def c = new Customer(customerName,  ssn)
+                result = new CustomerQuoteRequest(c, amount, term)
+            </script:script>
+        </script:transformer>
+        <response>
+            <object-to-string-transformer/>
+        </response>
+    </http:endpoint>
+
     <endpoint name="CreditAgency" address="http://localhost:18080/mule/TheCreditAgencyService?method=getCreditProfile"
-        exchange-pattern="request-response">
+              exchange-pattern="request-response">
         <cxf:jaxws-client serviceClass="org.mule.example.loanbroker.creditagency.CreditAgencyService" />
     </endpoint>
 

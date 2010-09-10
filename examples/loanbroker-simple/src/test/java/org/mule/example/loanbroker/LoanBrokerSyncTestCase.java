@@ -18,6 +18,11 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformer.simple.ByteArrayToObject;
 import org.mule.transport.NullPayload;
+import org.mule.transport.http.HttpConstants;
+
+import java.util.Map;
+
+import org.apache.commons.collections.map.SingletonMap;
 
 public class LoanBrokerSyncTestCase extends FunctionalTestCase
 {
@@ -28,19 +33,34 @@ public class LoanBrokerSyncTestCase extends FunctionalTestCase
         return "mule-config.xml";
     }
 
-    public void testLoanBroker() throws Exception
+    public void testLoanBrokerMuleClient() throws Exception
     {
         muleContext.getRegistry().registerObject("streamToObjectTransformer", new ByteArrayToObject());
         MuleClient client = new MuleClient(muleContext);
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest request = new CustomerQuoteRequest(c, 100000, 48);
-        MuleMessage result = client.send("http://localhost:8080?responseTransformers=streamToObjectTransformer", request, null);
+        MuleMessage result = client.send("http://localhost:11080?responseTransformers=streamToObjectTransformer", request, null);
         assertNotNull("Result is null", result);
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
         assertTrue("Result should be LoanQuote but is " + result.getPayload().getClass().getName(), 
                     result.getPayload(Object.class) instanceof LoanQuote);
         LoanQuote quote = (LoanQuote)result.getPayload();
         assertTrue(quote.getInterestRate() > 0);
+    }
+
+    public void testLoanBrokerHttpUrlWithDefaults() throws Exception
+    {
+        muleContext.getRegistry().registerObject("streamToObjectTransformer", new ByteArrayToObject());
+        MuleClient client = new MuleClient(muleContext);
+        // there are some default built into the http url service (note a different port)
+        @SuppressWarnings("unchecked")
+        Map<String, String> props = new SingletonMap("http.method", HttpConstants.METHOD_GET);
+        MuleMessage result = client.send("http://localhost:11081", null, props);
+        assertNotNull("Result is null", result);
+        assertFalse("Result is null", result.getPayload() instanceof NullPayload);
+        assertNull(result.getExceptionPayload());
+
+        assertTrue("Unexpected response string", result.getPayloadAsString().matches("Some Bank, rate: \\d\\.(\\d)*$"));
     }
 
 
