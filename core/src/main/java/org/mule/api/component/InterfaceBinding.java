@@ -44,7 +44,7 @@ public interface InterfaceBinding extends MessageProcessor
      */
     MuleEvent process(MuleEvent event) throws MuleException;
 
-    void setEndpoint(ImmutableEndpoint endpoint);
+    void setEndpoint(ImmutableEndpoint endpoint) throws MuleException;
     
     ImmutableEndpoint getEndpoint();
 

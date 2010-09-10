@@ -329,7 +329,7 @@ public abstract class AbstractExceptionListener implements Initialisable, Dispos
         }
     }
 
-    protected OutboundRouter createOutboundRouter()
+    protected OutboundRouter createOutboundRouter() throws MuleException
     {
         // Use an instance of OutboundPassThroughRouter but override creation of
         // createTransactionTemplate to use a custom ExceptionListener so that

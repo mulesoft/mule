@@ -84,7 +84,7 @@ public class DefaultInterfaceBinding implements InterfaceBinding
         }
     }
 
-    public void setEndpoint(ImmutableEndpoint e)
+    public void setEndpoint(ImmutableEndpoint e) throws MuleException
     {
         if (e instanceof OutboundEndpoint)
         {

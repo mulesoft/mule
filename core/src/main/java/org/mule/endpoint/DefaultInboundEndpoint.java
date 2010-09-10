@@ -15,6 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
@@ -124,10 +125,15 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
     public MessageProcessor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException
     {
         EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
-        MessageProcessor processorChain = factory.createInboundMessageProcessorChain(this, flowConstruct, listener);
+        MessageProcessor processorChain = factory.createInboundMessageProcessorChain(this, flowConstruct,
+            listener);
         if (processorChain instanceof MuleContextAware)
         {
             ((MuleContextAware) processorChain).setMuleContext(getMuleContext());
+        }
+        if (processorChain instanceof FlowConstructAware)
+        {
+            ((FlowConstructAware) processorChain).setFlowConstruct(flowContruct);
         }
         if (processorChain instanceof Initialisable)
         {

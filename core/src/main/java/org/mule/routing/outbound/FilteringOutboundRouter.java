@@ -131,7 +131,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
     }
 
     @Override
-    public void addRoute(MessageProcessor target)
+    public void addRoute(MessageProcessor target) throws MuleException
     {
         if (!useTemplates)
         {

@@ -10,9 +10,9 @@
 
 package org.mule.api.routing;
 
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.TransactionConfig;
 
@@ -27,7 +27,7 @@ import java.util.List;
  * @see OutboundRouterCollection
  */
 public interface OutboundRouter
-    extends MatchableMessageRouter, RouterStatisticsRecorder, Initialisable, Disposable, MuleContextAware
+    extends MatchableMessageRouter, RouterStatisticsRecorder, Lifecycle, MuleContextAware, FlowConstructAware
 {
 
     void setTransactionConfig(TransactionConfig transactionConfig);

@@ -223,8 +223,9 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
      * instead.
      * 
      * @param builder instance of {@link InterceptingChainMessageProcessorBuilder}
+     * @throws MuleException 
      */
-    protected abstract void configureMessageProcessors(InterceptingChainMessageProcessorBuilder builder);
+    protected abstract void configureMessageProcessors(InterceptingChainMessageProcessorBuilder builder) throws MuleException;
 
     public String getName()
     {

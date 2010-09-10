@@ -82,10 +82,10 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
     // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder
     protected MessageProcessor initializeMessageProcessor(Object processor) throws MuleException
     {
-        if (processor instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
-        }
+//        if (processor instanceof FlowConstructAware)
+//        {
+//            ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
+//        }
         
         if (processor instanceof MessageProcessorBuilder)
         {

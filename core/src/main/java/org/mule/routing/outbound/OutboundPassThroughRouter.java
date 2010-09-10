@@ -11,6 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.filter.Filter;
@@ -30,7 +31,7 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
     }
 
     @Override
-    public void addRoute(MessageProcessor target)
+    public void addRoute(MessageProcessor target) throws MuleException
     {
         if (target == null)
         {
@@ -44,7 +45,7 @@ public class OutboundPassThroughRouter extends FilteringOutboundRouter
     }
 
     @Override
-    public void setRoutes(List<MessageProcessor> endpoints)
+    public void setRoutes(List<MessageProcessor> endpoints) throws MuleException
     {
         if (endpoints.size() > 1)
         {
