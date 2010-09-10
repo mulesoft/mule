@@ -106,7 +106,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         attachments.put("bar", new DataHandler(new StringDataSource("barValue")));
         eventContext = createEventContext(null, attachments);
 
-        eventContext.getMessage().removeAttachment("baz");
+        eventContext.getMessage().removeOutboundAttachment("baz");
 
         InvocationResult response = invokeResolver("processAttachmentsOptional", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
