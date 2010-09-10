@@ -10,23 +10,23 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <composite-processor name="composite1">
+    <processor-chain name="composite1">
         <description>Composite thats appands 'ayz'</description>
         <append-string-transformer message="x" />
         <append-string-transformer message="y" />
         <append-string-transformer message="z" />
-    </composite-processor>
+    </processor-chain>
 
     <flow name="flow">
         <vm:inbound-endpoint path="in" exchange-pattern="request-response" />
         <append-string-transformer message="1" />
         <append-string-transformer message="2" />
         <processor ref="composite1" />
-        <composite-processor>
+        <processor-chain>
             <append-string-transformer message="a" />
             <append-string-transformer message="b" />
             <append-string-transformer message="c" />
-        </composite-processor>
+        </processor-chain>
         <append-string-transformer message="3" />
         <default-service-exception-strategy />
     </flow>
@@ -109,10 +109,10 @@
         <vm:inbound-endpoint path="wiretap-in" exchange-pattern="one-way" />
         <append-string-transformer message="in" />
         <wire-tap>
-            <composite-processor>
+            <processor-chain>
                 <append-string-transformer message="tap" />
                 <vm:outbound-endpoint path="wiretap-tap" exchange-pattern="one-way" />
-            </composite-processor>
+            </processor-chain>
             <payload-type-filter expectedType="java.lang.String"/>
         </wire-tap>
         <append-string-transformer message="out" />
@@ -184,10 +184,10 @@
         <all enableCorrelation="ALWAYS">
             <vm:outbound-endpoint path="multicaster-out1" exchange-pattern="one-way" />
             <vm:outbound-endpoint path="multicaster-out2" exchange-pattern="one-way" />
-            <composite-processor>
+            <processor-chain>
                 <test:component/>
                 <vm:outbound-endpoint path="multicaster-out3" exchange-pattern="one-way" />
-            </composite-processor>
+            </processor-chain>
         </all>    
     </flow>
     

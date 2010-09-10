@@ -300,8 +300,11 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="composite-processor" type="compositeMessageProcessorType" substitutionGroup="abstract-message-processor"/>
-    <xsd:complexType name="compositeMessageProcessorType">
+    <!-- Deprecated (Use 'processor-chain') -->
+    <xsd:element name="composite-processor" type="messageProcessorChainType" substitutionGroup="abstract-message-processor"/>
+    <xsd:element name="processor-chain" type="messageProcessorChainType" substitutionGroup="abstract-message-processor"/>
+
+    <xsd:complexType name="messageProcessorChainType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
                 <xsd:sequence>

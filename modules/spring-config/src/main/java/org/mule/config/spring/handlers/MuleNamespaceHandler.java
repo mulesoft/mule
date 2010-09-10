@@ -46,7 +46,7 @@ import org.mule.config.spring.parsers.specific.BindingDefinitionParser;
 import org.mule.config.spring.parsers.specific.BridgeDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDelegatingDefinitionParser;
-import org.mule.config.spring.parsers.specific.CompositeMessageProcessorDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorChainDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
@@ -280,7 +280,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         // Message Processors
         registerBeanDefinitionParser("processor", new MessageProcessorRefDefinitionParser());
         registerMuleBeanDefinitionParser("custom-processor", new MessageProcessorDefinitionParser()).addIgnored("name");        
-        registerBeanDefinitionParser("composite-processor", new CompositeMessageProcessorDefinitionParser());        
+        // Deprecated
+        registerBeanDefinitionParser("composite-processor", new MessageProcessorChainDefinitionParser());        
+        registerBeanDefinitionParser("processor-chain", new MessageProcessorChainDefinitionParser());        
         registerBeanDefinitionParser("response", new ResponseDefinitionParser());
         registerMuleBeanDefinitionParser("message-filter", new MessageFilterDefinitionParser());
         registerBeanDefinitionParser("async", new ChildDefinitionParser("messageProcessor",

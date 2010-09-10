@@ -6,22 +6,22 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
 
 
-    <composite-processor name="composite1">
+    <processor-chain name="composite1">
         <append-string-transformer message="1" />
         <append-string-transformer message="2" />
         <append-string-transformer message="3" />
         <custom-interceptor class="org.mule.interceptor.LoggingInterceptor"/>
-    </composite-processor>
+    </processor-chain>
 
-    <composite-processor name="composite2">
+    <processor-chain name="composite2">
         <append-string-transformer message="1" />
-        <composite-processor>
+        <processor-chain>
             <append-string-transformer message="a" />
             <append-string-transformer message="b" />
             <append-string-transformer message="c" />
-        </composite-processor>
+        </processor-chain>
         <append-string-transformer message="2" />
-    </composite-processor>
+    </processor-chain>
 
     <endpoint name="endpoint" address="test://test">
         <processor ref="composite1" />

@@ -18,10 +18,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-/**
- * Spring FactoryBean used to create concrete instances of outbound endpoints
- */
-public class CompositeMessageProcessorFactoryBean implements FactoryBean
+public class MessageProcessorChainFactoryBean implements FactoryBean
 {
 
     protected List processors;
