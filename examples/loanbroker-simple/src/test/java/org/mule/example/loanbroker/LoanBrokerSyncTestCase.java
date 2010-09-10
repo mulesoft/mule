@@ -60,7 +60,7 @@ public class LoanBrokerSyncTestCase extends FunctionalTestCase
         assertFalse("Result is null", result.getPayload() instanceof NullPayload);
         assertNull(result.getExceptionPayload());
 
-        assertTrue("Unexpected response string", result.getPayloadAsString().matches("Some Bank, rate: \\d\\.(\\d)*$"));
+        assertTrue("Unexpected response string", result.getPayloadAsString().matches("Bank #\\d, rate: \\d\\.(\\d)*$"));
     }
 
 
