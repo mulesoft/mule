@@ -128,6 +128,12 @@
             </script:script>
         </script:transformer>
         <response>
+            <!--
+                If there's an exception payload, return a short message to the requestor, otherwise original payload
+            -->
+            <expression-transformer>
+                <return-argument evaluator="groovy" expression="message.exceptionPayload?.message ?: payload"/>
+            </expression-transformer>
             <object-to-string-transformer/>
         </response>
     </http:endpoint>
