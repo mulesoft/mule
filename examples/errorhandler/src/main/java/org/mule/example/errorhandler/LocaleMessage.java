@@ -30,7 +30,7 @@ public class LocaleMessage extends MessageFactory
         return factory.getString(BUNDLE_PATH, 1, e);
     }
 
-    public static String unhandledException(Class class1, Class class2)
+    public static String unhandledException(Class<?> class1, Class<?> class2)
     {
         return factory.getString(BUNDLE_PATH, 2, StringMessageUtils.toString(class1), 
             StringMessageUtils.toString(class2));
@@ -46,7 +46,7 @@ public class LocaleMessage extends MessageFactory
         return factory.getString(BUNDLE_PATH, 4, detailMessage);
     }
 
-    public static String errorClass(Class class1)
+    public static String errorClass(Class<?> class1)
     {
         return factory.getString(BUNDLE_PATH, 5, class1.getName());
     }
@@ -57,7 +57,7 @@ public class LocaleMessage extends MessageFactory
         return factory.getString(BUNDLE_PATH, 6, handlerDescription);
     }
 
-    public static String defaultFatalHandling(Class class1)
+    public static String defaultFatalHandling(Class<?> class1)
     {
         return factory.getString(BUNDLE_PATH, 7, StringMessageUtils.toString(class1));
     }
@@ -67,7 +67,7 @@ public class LocaleMessage extends MessageFactory
         return factory.getString(BUNDLE_PATH, 8, e);
     }
 
-    public static String defaultHandling(Class class1, ExceptionHandler eh, Exception e)
+    public static String defaultHandling(Class<?> class1, ExceptionHandler eh, Exception e)
     {
         return factory.getString(BUNDLE_PATH, 9, StringMessageUtils.toString(class1),
             ObjectUtils.toString(eh.getClass().getName() + " : " + e, "null"));
@@ -106,5 +106,11 @@ public class LocaleMessage extends MessageFactory
     public static String fatalHandlerException(Throwable t)
     {
         return factory.getString(BUNDLE_PATH, 16, t);
+    }
+
+    @Override
+    protected ClassLoader getClassLoader()
+    {
+        return getClass().getClassLoader();
     }
 }
