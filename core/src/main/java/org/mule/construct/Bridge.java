@@ -84,14 +84,17 @@ public class Bridge extends AbstractFlowConstruct
                                                    + outboundEndpoint.getExchangePattern()), this);
         }
 
-        if (transacted && !outboundEndpoint.getTransactionConfig().isConfigured())
+        if (transacted
+            && ((outboundEndpoint.getTransactionConfig() == null) || (!outboundEndpoint.getTransactionConfig()
+                .isConfigured())))
         {
             throw new FlowConstructInvalidException(
                 MessageFactory.createStaticMessage("A transacted bridge requires a transacted outbound endpoint"),
                 this);
         }
 
-        if (!transacted && outboundEndpoint.getTransactionConfig().isConfigured())
+        if ((!transacted) && (outboundEndpoint.getTransactionConfig() != null)
+            && (outboundEndpoint.getTransactionConfig().isConfigured()))
         {
             throw new FlowConstructInvalidException(
                 MessageFactory.createStaticMessage("A non-transacted bridge requires a non-transacted outbound endpoint"),
@@ -111,14 +114,17 @@ public class Bridge extends AbstractFlowConstruct
                                                    + inboundEndpoint.getExchangePattern()), this);
         }
 
-        if (transacted && !inboundEndpoint.getTransactionConfig().isConfigured())
+        if (transacted
+            && ((inboundEndpoint.getTransactionConfig() == null) || (!inboundEndpoint.getTransactionConfig()
+                .isConfigured())))
         {
             throw new FlowConstructInvalidException(
                 MessageFactory.createStaticMessage("A transacted bridge requires a transacted inbound endpoint"),
                 this);
         }
 
-        if (!transacted && inboundEndpoint.getTransactionConfig().isConfigured())
+        if ((!transacted) && (inboundEndpoint.getTransactionConfig() != null)
+            && (inboundEndpoint.getTransactionConfig().isConfigured()))
         {
             throw new FlowConstructInvalidException(
                 MessageFactory.createStaticMessage("A non-transacted bridge requires a non-transacted inbound endpoint"),

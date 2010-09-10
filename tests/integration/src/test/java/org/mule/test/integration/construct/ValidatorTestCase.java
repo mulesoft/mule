@@ -11,10 +11,15 @@
 package org.mule.test.integration.construct;
 
 import org.apache.commons.lang.math.RandomUtils;
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.util.concurrent.Latch;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class ValidatorTestCase extends FunctionalTestCase
 {
@@ -73,19 +78,21 @@ public class ValidatorTestCase extends FunctionalTestCase
 
     private void doTestValidMessage(String serviceName) throws MuleException, Exception, InterruptedException
     {
-        final Integer payload = RandomUtils.nextInt();
+        final FunctionalTestComponent ftc = getFunctionalTestComponent("test-service");
+        final Latch latch = new Latch();
+        ftc.setEventCallback(new EventCallback()
+        {
+            public void eventReceived(MuleEventContext context, Object component) throws Exception
+            {
+                latch.countDown();
+            }
+        });
 
+        final Integer payload = RandomUtils.nextInt();
         assertEquals("GOOD:" + payload + "@" + serviceName, muleClient.send("vm://" + serviceName + ".in",
             payload, null).getPayload());
 
-        int i = 0;
-        final FunctionalTestComponent ftc = getFunctionalTestComponent("test-service");
-        while (ftc.getReceivedMessagesCount() == 0 && i++ < 10)
-        {
-            Thread.sleep(250L);
-            System.err.print(".");
-        }
-
+        latch.await(15, TimeUnit.SECONDS);
         assertEquals(1, ftc.getReceivedMessagesCount());
         assertEquals(payload, ftc.getLastReceivedMessage());
         ftc.initialise();

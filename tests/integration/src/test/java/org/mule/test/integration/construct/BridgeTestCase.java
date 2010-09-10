@@ -10,13 +10,22 @@
 
 package org.mule.test.integration.construct;
 
+import java.util.HashMap;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.math.RandomUtils;
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.NullPayload;
+import org.mule.util.concurrent.Latch;
+
+import edu.emory.mathcs.backport.java.util.Collections;
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class BridgeTestCase extends FunctionalTestCase
 {
@@ -78,6 +87,27 @@ public class BridgeTestCase extends FunctionalTestCase
         doTestMathsService("vm://concrete-child-bridge.in");
     }
 
+    @SuppressWarnings("unchecked")
+    public void testHeterogeneousTransports() throws Exception
+    {
+        final FunctionalTestComponent ftc = getFunctionalTestComponent("dlg-file-picker");
+        final Latch latch = new Latch();
+        ftc.setEventCallback(new EventCallback()
+        {
+            public void eventReceived(MuleEventContext context, Object component) throws Exception
+            {
+                latch.countDown();
+            }
+        });
+
+        final String payload = RandomStringUtils.randomAlphabetic(10);
+        muleClient.dispatch("jms://myDlq", payload, new HashMap<Object, Object>(Collections.singletonMap("aKey",
+            123)));
+        latch.await(15, TimeUnit.SECONDS);
+        assertEquals(1, ftc.getReceivedMessagesCount());
+        assertEquals(payload, new String((byte[]) ftc.getReceivedMessage(1)));
+    }
+
     private void doTestMathsService(String url) throws MuleException
     {
         final int a = RandomUtils.nextInt(100);
@@ -88,8 +118,8 @@ public class BridgeTestCase extends FunctionalTestCase
 
     private void doTestStringMassager(String url) throws Exception, MuleException
     {
-        final String s = RandomStringUtils.randomAlphabetic(10);
-        final String result = muleClient.send(url, s.getBytes(), null).getPayloadAsString();
-        assertEquals(s + "barbaz", result);
+        final String payload = RandomStringUtils.randomAlphabetic(10);
+        final String result = muleClient.send(url, payload.getBytes(), null).getPayloadAsString();
+        assertEquals(payload + "barbaz", result);
     }
 }
