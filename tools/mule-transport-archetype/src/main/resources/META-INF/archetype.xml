@@ -99,9 +99,9 @@ i.e. JMSMessage or HttpServletRequest)</description>
                     <description>
 Which Mule transports do you want to include in this project? If you intend extending a transport you should add it here:
 
-(options: cxf, ejb, file, ftp, http, https, imap, imaps, jbpm, jdbc,
+(options: ajax, ejb, file, ftp, http, https, imap, imaps, jbpm, jdbc,
           jetty, jetty-ssl, jms, jnp, multicast, pop3, pop3s, quartz, rmi, servlet,
-          smtp, smtps, servlet, ssl, tls, stdio, tcp, udp, vm, xmpp):
+          smtp, smtps, ssl, tls, stdio, tcp, udp, vm, xmpp):
 
                     </description>
                     <defvalue>vm</defvalue>
@@ -111,8 +111,9 @@ Which Mule transports do you want to include in this project? If you intend exte
                     <description>
 Which Mule modules do you want to include in this project? The client is added for testing:
 
-(options: builders, client, jaas, jbossts, management, ognl, pgp, scripting,
-          spring-extras, sxc, xml):
+(options: acegi, annotations, atom, boot, builders, client, cxf, guice, ibeans,
+          jaas, jbossts, jersey, json, management, ognl, pgp, rss, scripting,
+          spring-extras, spring-security, sxc, ws, xml):
 
                     </description>
                     <defvalue>client</defvalue>
