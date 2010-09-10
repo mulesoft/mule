@@ -42,7 +42,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
         assertNotNull(info.get("JavaDoc"));
     }
     
-    public void testSummarizeWithDepthBeyondStracTraceLength()
+    public void testSummarizeWithDepthBeyondStackTraceLength()
     {
         Exception exception = getException();
         int numberOfStackFrames = exception.getStackTrace().length;
