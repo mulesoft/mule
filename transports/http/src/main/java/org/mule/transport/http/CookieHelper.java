@@ -202,10 +202,36 @@ public class CookieHelper
         CookieSpec cookieSpec = getCookieSpec(spec);
         boolean secure = uri.getScheme() != null && uri.getScheme().equalsIgnoreCase("https");
         String host = uri.getHost();
-        int port = uri.getPort();
+        int port = getPortFromURI(uri);
         String path = uri.getPath();
 
         return cookieSpec.parse(host, port, path, secure, cookieHeaderValue);
+    }
+
+    private static int getPortFromURI(URI uri) throws MalformedCookieException
+    {
+        int port = uri.getPort();
+        if (port < 0)
+        {
+            String scheme = uri.getScheme();
+            if (scheme.equalsIgnoreCase("https"))
+            {
+                port = 443;
+            }
+            else if (scheme.equalsIgnoreCase("http"))
+            {
+                port = 80;
+            }
+            else
+            {
+                throw new MalformedCookieException(
+                    "The uri ("
+                                    + uri
+                                    + ") does not specify a port and no default is available for its scheme ("
+                                    + scheme + ").");
+            }
+        }
+        return port;
     }
 
     /**
