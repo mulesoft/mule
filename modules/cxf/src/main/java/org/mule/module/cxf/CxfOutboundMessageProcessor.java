@@ -95,13 +95,13 @@ public class CxfOutboundMessageProcessor
         Object[] args = payloadToArguments.payloadToArrayOfArguments(payload);
 
         MuleMessage message = event.getMessage();
-        Set<?> attachmentNames = message.getAttachmentNames();
+        Set<?> attachmentNames = message.getInboundAttachmentNames();
         if (attachmentNames != null && !attachmentNames.isEmpty())
         {
             List<DataHandler> attachments = new ArrayList<DataHandler>();
             for (Object attachmentName : attachmentNames)
             {
-                attachments.add(message.getAttachment((String) attachmentName));
+                attachments.add(message.getInboundAttachment((String) attachmentName));
             }
             List<Object> temp = new ArrayList<Object>(Arrays.asList(args));
             temp.add(attachments.toArray(new DataHandler[attachments.size()]));

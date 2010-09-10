@@ -52,7 +52,6 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
 
         MuleMessageFactory factory = createMuleMessageFactory();
         MuleMessage muleMessage = factory.create(payload, encoding);
-        // TODO MULE-5034 wrong deprecation, replacing with getInboundAttachmentNames() breaks the test
         assertEquals(2, muleMessage.getInboundAttachmentNames().size());
     }
     
