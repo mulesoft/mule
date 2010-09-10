@@ -63,7 +63,6 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -611,6 +610,8 @@ public class MuleClient implements Disposable
         }
         if (messageProperties.get(MuleProperties.MULE_REMOTE_SYNC_PROPERTY) == null)
         {
+            // clone the map in case a call used an unmodifiable version
+            messageProperties = new HashMap(messageProperties);
             messageProperties.put(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, "true");
         }
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
