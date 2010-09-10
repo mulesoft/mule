@@ -31,13 +31,13 @@ public class ReturnAnnotationTestCase extends AbstractIBeansTestCase
             return;
         }
 
-        String result = search.searchAskAndReturnURLString("foo");
+        String result = search.searchGoogleAndReturnURLString("foo");
         assertNotNull(result);
-        assertEquals("http://www.ask.com/web?q=foo&search=search", result);
+        assertEquals("http://www.google.com/search?q=foo", result);
 
-        URL url = search.searchAskAndReturnURL("foo");
+        URL url = search.searchGoogleAndReturnURL("foo");
         assertNotNull(url);
-        assertEquals("http://www.ask.com/web?q=foo&search=search", url.toString());
+        assertEquals("http://www.google.com/search?q=foo", url.toString());
     }
 
     @Transformer

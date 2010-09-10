@@ -27,7 +27,7 @@ public class CallVoidReturnTestCase extends AbstractIBeansTestCase
         }
 
         //we just need to test that the call doesn't fail
-        search.searchAskAndReturnVoid("foo");
+        search.searchGoogleAndReturnVoid("foo");
     }
 
 }

@@ -23,12 +23,22 @@ public interface SearchIBean
     @Call(uri = "http://www.google.com/searchX?q={term}")
     public String searchGoogle(@UriParam("term") String searchTerm) throws CallException;
 
+    @Call(uri = "http://www.google.com/search?q={term}")
+    @Return("#[header:ibeans.call.uri]")
+    public String searchGoogleAndReturnURLString(@UriParam("term") String searchTerm) throws CallException;    
+    
+    @Call(uri = "http://www.google.com/search?q={term}")
+    @Return("#[header:ibeans.call.uri]")
+    public URL searchGoogleAndReturnURL(@UriParam("term") String searchTerm) throws CallException;    
+    
+    @Call(uri = "http://www.google.com/search?q={term}")
+    public void searchGoogleAndReturnVoid(@UriParam("term") String searchTerm) throws CallException;    
+    
     @Call(uri = "http://search.yahoo.com/search?p={term}")
     public String searchYahoo(@UriParam("term") String searchTerm) throws Exception;
 
     @Call(uri = "http://www.ask.com/web?q={term}&search=search")
     public String searchAsk(@UriParam("term") String searchTerm) throws CallException;
-
 
     @Call(uri = "http://www.ask.com/web?q={term}&search=search")
     @Return("#[header:ibeans.call.uri]")
