@@ -166,7 +166,6 @@ description=${description}
 muleVersion=${muleVersion}
 hasCustomSchema=${hasCustomSchema}
 hasBootstrap=${hasBootstrap}
-projectType=${projectType}
 package=${package}
 forgeProject=${forgeProject}
 

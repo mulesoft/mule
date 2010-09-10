@@ -24,7 +24,6 @@
 #set($groupId = "org.mule.examples")
 #set($artifactId = "mule-example-${ModuleNameLower}")
 #set($ModuleType = "Example")
-
 WELCOME
 =======
 Congratulations you have just created a new Mule example project!

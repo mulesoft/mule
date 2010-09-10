@@ -1,3 +1,4 @@
+#set($D = '$')
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -32,15 +33,15 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
+                    <source>${D}{jdk.version}</source>
+                    <target>${D}{jdk.version}</target>
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <finalName>${artifactId}-\${version}</finalName>
+                    <finalName>${D}{artifactId}-${D}{version}</finalName>
                     <descriptors>
                         <descriptor>assembly.xml</descriptor>
                     </descriptors>
@@ -50,12 +51,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-eclipse-plugin</artifactId>
-                <version>${eclipsePluginVersion}</version>
+                <version>${D}{eclipsePluginVersion}</version>
                 <configuration>
                     <!-- by default download all sources when generating project files -->
                     <downloadSources>true</downloadSources>
                     <classpathContainers>
-                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${vmtype}/${jdk5Name}
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER/${D}{vmtype}/${D}{jdk5Name}
                         </classpathContainer>
                     </classpathContainers>
                 </configuration>
@@ -65,7 +66,7 @@
                 <artifactId>maven-idea-plugin</artifactId>
                 <configuration>
                     <downloadSources>true</downloadSources>
-                    <jdkName>${jdk.version}</jdkName>
+                    <jdkName>${D}{jdk.version}</jdkName>
                 </configuration>
             </plugin>
         </plugins>
@@ -79,7 +80,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <source>${jdk.version}</source>
+                    <source>${D}{jdk.version}</source>
                 </configuration>
             </plugin>
             <plugin>
@@ -98,7 +99,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
                 <configuration>
-                    <targetJdk>${jdk.version}</targetJdk>
+                    <targetJdk>${D}{jdk.version}</targetJdk>
                 </configuration>
             </plugin>
             <plugin>
@@ -149,14 +150,14 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- Xml configuration -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -172,7 +173,7 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-email</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
             <scope>provided</scope>
         </dependency>
 #set($emailDepSet = true)
@@ -182,7 +183,7 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ssl</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
             <scope>provided</scope>
         </dependency>
 #set($sslDepSet = true)
@@ -192,7 +193,7 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
             <scope>provided</scope>
         </dependency>
 #set($httpDepSet = true)
@@ -202,7 +203,7 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jetty</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
         </dependency>
 #set($jettyDepSet = true)
 #end
@@ -211,7 +212,7 @@
 	    <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-rmi</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
             <scope>provided</scope>
         </dependency>
 #set($rmiDepSet = true)
@@ -220,7 +221,7 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-${item}</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
             <scope>provided</scope>
         </dependency>
 #end
@@ -231,7 +232,7 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-${item}</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
             <scope>provided</scope>
         </dependency>
 #end
@@ -240,7 +241,7 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
-            <version>${mule.version}</version>
+            <version>${D}{mule.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

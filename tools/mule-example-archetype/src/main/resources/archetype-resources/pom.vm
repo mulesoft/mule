@@ -11,7 +11,7 @@
     <name>Mule ${ModuleName} ${ModuleType}</name>
     <version>${version}</version>
     <description>${description}</description>
-    <url>http://www.muleforge.org/projects/${shortId}</url>
+    <url>http://www.muleforge.org/projects/${artifactId}</url>
 
    <properties>
         <mule.version>${MuleVersion}</mule.version>

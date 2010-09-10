@@ -1,3 +1,4 @@
+#set($D = '$')
 +--------------+
 | ${ModuleName} Example |
 +--------------+
@@ -9,7 +10,7 @@ TODO Add a URL for more information/documentation
 | Running the example |
 +---------------------+
 Simply build the example and copy the packaged application to Mule's application
-folder ($MULE_HOME/apps).
+folder (${D}MULE_HOME/apps).
 
 +----------------------+
 | Building the example |
