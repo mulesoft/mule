@@ -42,14 +42,14 @@ public class ObjectToMimeMessage extends StringToEmailMessage
     protected void setContent(Object payload, Message msg, String contentType, MuleMessage message)
         throws Exception
     {
-        if (message.getAttachmentNames().size() > 0)
+        if (message.getInboundAttachmentNames().size() > 0)
         {
             // The content type must be multipart/mixed
             MimeMultipart multipart = new MimeMultipart("mixed");
             multipart.addBodyPart(getPayloadBodyPart(message.getPayload(), contentType));
-            for (String name : message.getAttachmentNames())
+            for (String name : message.getInboundAttachmentNames())
             {
-                BodyPart part = getBodyPartForAttachment(message.getAttachment(name), name);
+                BodyPart part = getBodyPartForAttachment(message.getInboundAttachment(name), name);
                 // Check message props for extra headers
                 addBodyPartHeaders(part, name, message);
                 multipart.addBodyPart(part);
