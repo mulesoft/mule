@@ -62,7 +62,7 @@
     
     <!--  Global Endpoints -->
 
-    <http:endpoint name="CustomerRequests" address="http://localhost:8080" exchange-pattern="request-response">
+    <http:endpoint name="CustomerRequests" address="http://localhost:11080" exchange-pattern="request-response">
         <byte-array-to-object-transformer/>
     </http:endpoint>
 
