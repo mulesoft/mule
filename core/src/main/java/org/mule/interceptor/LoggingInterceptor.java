@@ -10,10 +10,9 @@
 
 package org.mule.interceptor;
 
-import org.mule.api.MuleEvent;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.api.MuleEvent;
 
 /**
  * <code>LoggingInterceptor</code> is a simple interceptor that logs a message before
@@ -26,6 +25,7 @@ public class LoggingInterceptor extends AbstractEnvelopeInterceptor
      */
     private static Log logger = LogFactory.getLog(LoggingInterceptor.class);
 
+    @Override
     public MuleEvent before(MuleEvent event)
     {
         if (logger.isInfoEnabled())
@@ -36,9 +36,10 @@ public class LoggingInterceptor extends AbstractEnvelopeInterceptor
 
     }
 
+    @Override
     public MuleEvent after(MuleEvent event)
     {
-        if (logger.isInfoEnabled())
+        if (logger.isInfoEnabled() && (event != null))
         {
             logger.info("Finished event processing for " + event.getFlowConstruct().getName());
         }
