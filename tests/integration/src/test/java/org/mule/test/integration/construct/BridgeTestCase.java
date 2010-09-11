@@ -10,8 +10,6 @@
 
 package org.mule.test.integration.construct;
 
-import java.util.HashMap;
-
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleEventContext;
@@ -24,12 +22,10 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class BridgeTestCase extends FunctionalTestCase
 {
-
     private MuleClient muleClient;
 
     @Override
@@ -46,38 +42,38 @@ public class BridgeTestCase extends FunctionalTestCase
         return "org/mule/test/integration/construct/bridge-config.xml";
     }
 
-    public void testSynchronousBridge() throws Exception
+    public void testSynchronous() throws Exception
     {
         doTestMathsService("vm://synchronous-bridge.in");
     }
 
-    public void testAsynchronousBridge() throws Exception
+    public void testAsynchronous() throws Exception
     {
         final MuleMessage result = muleClient.send("vm://asynchronous-bridge.in", "foobar", null);
         assertEquals(NullPayload.getInstance(), result.getPayload());
     }
 
-    public void testBridgeWithTransformers() throws Exception
+    public void testTransformers() throws Exception
     {
         doTestStringMassager("vm://transforming-bridge.in");
     }
 
-    public void testBridgeWithEndpointReferences() throws Exception
+    public void testEndpointReferences() throws Exception
     {
         doTestMathsService("vm://endpoint-ref-bridge.in");
     }
 
-    public void testBridgeWithChildEndpoints() throws Exception
+    public void testChildEndpoints() throws Exception
     {
         doTestMathsService("vm://child-endpoint-bridge.in");
     }
 
-    public void testBridgeWithExceptionHandler() throws Exception
+    public void testExceptionHandler() throws Exception
     {
         doTestMathsService("vm://exception-bridge.in");
     }
 
-    public void testTransactedBridge() throws Exception
+    public void testVmTransacted() throws Exception
     {
         doTestMathsService("vm://transacted-bridge.in");
     }
@@ -87,10 +83,20 @@ public class BridgeTestCase extends FunctionalTestCase
         doTestMathsService("vm://concrete-child-bridge.in");
     }
 
-    @SuppressWarnings("unchecked")
     public void testHeterogeneousTransports() throws Exception
     {
-        final FunctionalTestComponent ftc = getFunctionalTestComponent("dlg-file-picker");
+        doJmsBasedTest("jms://myDlq", "dlq-file-picker");
+    }
+
+    public void testJmsTransactions() throws Exception
+    {
+        doJmsBasedTest("jms://myQueue", "topic-listener");
+    }
+
+    private void doJmsBasedTest(String jmsDestinationUri, String ftcName)
+        throws Exception, MuleException, InterruptedException
+    {
+        final FunctionalTestComponent ftc = getFunctionalTestComponent(ftcName);
         final Latch latch = new Latch();
         ftc.setEventCallback(new EventCallback()
         {
@@ -101,11 +107,10 @@ public class BridgeTestCase extends FunctionalTestCase
         });
 
         final String payload = RandomStringUtils.randomAlphabetic(10);
-        muleClient.dispatch("jms://myDlq", payload, new HashMap<Object, Object>(Collections.singletonMap(
-            "aKey", 123)));
+        muleClient.dispatch(jmsDestinationUri, payload, null);
         latch.await(getTestTimeoutSecs(), TimeUnit.SECONDS);
         assertEquals(1, ftc.getReceivedMessagesCount());
-        assertEquals(payload, new String((byte[]) ftc.getReceivedMessage(1)));
+        assertEquals(payload, byteArrayOrStringtoString(ftc.getReceivedMessage(1)));
     }
 
     private void doTestMathsService(String url) throws MuleException
@@ -121,5 +126,15 @@ public class BridgeTestCase extends FunctionalTestCase
         final String payload = RandomStringUtils.randomAlphabetic(10);
         final String result = muleClient.send(url, payload.getBytes(), null).getPayloadAsString();
         assertEquals(payload + "barbaz", result);
+    }
+
+    private String byteArrayOrStringtoString(Object o)
+    {
+        if (o instanceof String)
+        {
+            return (String) o;
+        }
+
+        return new String((byte[]) o);
     }
 }
