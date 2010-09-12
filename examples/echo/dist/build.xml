@@ -62,11 +62,11 @@
 
         <jar jarfile="${dir.build}/${app.name}.jar" 
              basedir="${dir.classes}"/>
-    	
-    	<zip destfile="${app.name}.zip">
+        
+        <zip destfile="${app.name}.zip">
             <zipfileset file="${dir.build}/${app.name}.jar" fullpath="lib/mule-example-echo.jar"/>
             <zipfileset file="src/main/app/mule-config.xml" fullpath="mule-config.xml"/>
-    	</zip>
+        </zip>
     </target>
 
     <target name="deploy" 
@@ -105,7 +105,7 @@
             <classpath>
                 <pathelement location="${dir.build}/classes"/>
                 <pathelement location="${dir.java}/test/resources"/>
-            	<pathelement location="src/main/app"/>
+                <pathelement location="src/main/app"/>
                 <path refid="classpath.mule"/>
             </classpath>
             <formatter type="plain" usefile="false"/>
