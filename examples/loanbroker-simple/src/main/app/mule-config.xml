@@ -99,7 +99,7 @@
         <byte-array-to-object-transformer/>
     </http:endpoint>
 
-    <http:endpoint name="HttpUrlCustomerRequests" address="http://localhost:11081"
+    <http:endpoint name="HttpUrlCustomerRequests" address="http://0.0.0.0:11081"
                    exchange-pattern="request-response">
         <!-- Translate request params into properties map -->
         <http:body-to-parameter-map-transformer name="HttpRequestToMap"/>
