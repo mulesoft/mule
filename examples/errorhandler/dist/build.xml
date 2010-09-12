@@ -70,7 +70,6 @@
 
         <!-- Copy all resources to the output folder as well -->
         <copy todir="${dir.classes}">
-            <fileset dir="${dir.conf}"/>
             <fileset dir="${dir.resources}"/>
             <fileset dir="src/main/app"/>
         </copy>
