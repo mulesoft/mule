@@ -5,9 +5,10 @@ Copy the pre-built application archive (mule-example-loanbroker-simple.zip) to t
 folder ($MULE_HOME/apps) and start Mule. When Mule is running go to your browser
 to run it:
 
-    http://localhost:8888/?name=Ross
+    http://localhost:11081
 
-You can change 'Ross' to any string you want.
+You will see something like this as your loan quote:
+Bank #2, rate: 2.429746910752354
 
 For more information, refer to http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples
 
@@ -17,7 +18,5 @@ For more information, refer to http://www.mulesoft.org/documentation/display/MUL
 First, make sure you have set the MULE_HOME environment variable as recommended 
 in Mule's README.txt
 
-Depending on the build tool you are using (Ant or Maven), you can build the 
-example by simply running "ant" or "mvn".  This will compile the example 
-classes, produce an application zip file and copy it to 
-$MULE_HOME/apps.
+You can build the example by simply running "mvn".  This will compile the example 
+classes, produce an application zip file and copy it to $MULE_HOME/apps.
