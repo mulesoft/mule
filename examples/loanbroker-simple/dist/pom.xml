@@ -13,6 +13,8 @@
     </properties>
 
     <build>
+        <defaultGoal>install</defaultGoal>
+        <finalName>${artifactId}</finalName>
         <!--
             The mule config file is located in src/main/app where the maven-mule-plugin picks it
             up. To have this config available during testing, add src/main/app to the test resources.
