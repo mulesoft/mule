@@ -24,7 +24,7 @@
     </description>
 
     <flow name="EchoFlow">
-        <inbound-endpoint address="http://0.0.0.0:65082/services/EchoUMO" exchange-pattern="request-response"/>
+        <inbound-endpoint address="http://localhost:65082/services/EchoUMO" exchange-pattern="request-response"/>
         <cxf:jaxws-service serviceClass="org.mule.example.echo.Echo"/>
         <component>
             <singleton-object class="org.mule.example.echo.Echo" />
