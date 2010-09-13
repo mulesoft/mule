@@ -1,8 +1,7 @@
-+---------------------+
-| Hello World Example |
-+---------------------+
-This example uses two components to create a hello world message. Simply copy
-the pre-built application archive (mule-example-echo-app.zip) to the application
++----------------------------+
+| Loan Broker Simple Example |
++----------------------------+
+Copy the pre-built application archive (mule-example-loanbroker-simple.zip) to the application
 folder ($MULE_HOME/apps) and start Mule. When Mule is running go to your browser
 to run it:
 
