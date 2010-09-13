@@ -66,9 +66,7 @@
           inboundAddress="jms://myQueue"
           outboundAddress="jms://topic:myTopic" />
 
-  <file:connector name="fileConnector"
-                  streaming="false"
-                  outputPattern="bridge-test-#[function:uuid].dlq" />
+  <file:connector name="fileConnector" streaming="false" />
 
   <bridge name="dlqDumper"
           exchange-pattern="one-way"
