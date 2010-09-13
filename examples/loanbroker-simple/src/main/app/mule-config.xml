@@ -114,7 +114,7 @@
                 // remember 'payload' is a Map/String,String/ from the previous transformer
                 def customerName = payload.name ?: "Muley" // fallback to defaults if no value provided in url
                 def ssn = (payload.ssn ?: 1234) as Integer
-                def amount = (payload.amount ?: 100000) as Integer
+                def amount = (payload.amount ?: 20000) as Integer
                 def term = (payload.term ?: 48) as Integer
 
                 def c = new Customer(customerName,  ssn)

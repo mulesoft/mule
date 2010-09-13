@@ -12,9 +12,9 @@ interest rate. There are some default request values built-in for this demo.
 
 Now, modify the loan amount requested, and see different banks responding:
 
-    http://localhost:11081/?amount=20000
+    http://localhost:11081/?amount=100
 
-Try different amounts. Also try invalid numbers to see the error handling in action.
+Try different amounts (100, 10000, 20000). Also try invalid numbers to see the error handling in action.
 
 +----------------------+
 | Building the example |
