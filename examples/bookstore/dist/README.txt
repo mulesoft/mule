@@ -1,25 +1,45 @@
-+--------------------------+
-| Bookstore Webapp Example |
-+--------------------------+
++-------------------+
+| Bookstore Example |
++-------------------+
 This example illustrates:
-1. How to start up Mule inside a Webapp
-2. How to interface with Mule via the Servlet Transport
-3. How to interface with Mule via CXF Web Services
+1. How to interface with Mule via the Servlet Transport
+2. How to interface with Mule via CXF Web Services
 
 It consists of two webapps consuming Mule services, one with Mule running 
 inside it.
 
 For more information, refer to 
-http://www.mulesoft.org/documentation/display/MULE3INTRO/Bookstore+Webapp+Example
+http://www.mulesoft.org/documentation/display/MULE3INTRO/Bookstore+Example
 
 +---------------------+
 | Running the example |
 +---------------------+
+Simply copy the pre-built application archive (mule-example-bookstore-app.zip) to the
+application folder ($MULE_HOME/apps) and start Mule. 
 
-bookstore-web$  mvn tomcat:run
-admin-web$      mvn tomcat:run
+If you want to receive emails when books are ordered, update the $MULE_HOME/apps/mule-example-bookstore-app/classes/email.properties file with your gmail credentials.  Then touch the $MULE_HOME/apps/mule-example-bookstore-app/mule-config.xml
+to reload the app.
 
-Applications will then be available at:
+To access the web service 
+invoke
 
-bookstore-web: http://localhost:8888
-admin-web:     http://localhost:8889
+    http://localhost:8083/bookstore/
+    http://localhost:8083/bookstore-admin/
+
+from your browser.  From the bookstore webapp, you can search and order books.
+From the bookstore-admin webapp, you can add books and get stats on ordered books.
+
++----------------------+
+| Building the example |
++----------------------+
+The only custom classes in here are used by CXF. These must be built using 
+Java 1.5 because they use annotations.
+
+First, make sure you have set the MULE_HOME environment variable as recommended
+in Mule's README.txt
+
+Then update the src/main/resources/email.properties file with your gmail credentials.
+
+You can  build the example by simply running "mvn".  This will compile the example 
+classes and produce a zip file that will be copied into the application folder 
+($MULE_HOME/apps).
