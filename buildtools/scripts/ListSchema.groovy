@@ -7,8 +7,11 @@
   - generate a list of the schema and their deploy location (disabled)
   - generate a set of commands that can be used to deploy the schema
 
-  The last part is going to depend on the deploy method, so the final
-  user will need to edit the code (see generateDeployCommand below).
+  This script will generate a script to upload the schemas via curl.  
+  It uses davfs to locate the schema locations.  The generated script
+  requires that you set the following environment variables:
+  - CURLUSER = your davfs username
+  - CURLPASSWD =  your davfs password
 
   It expects to be run in the buildtools/scripts directory (see "root"
   variable below).
@@ -20,6 +23,9 @@
      -> http://www.mulesoft.org/schema/mule/acegi/3.0/mule-acegi.xsd
     core/src/main/resources/META-INF/mule.xsd
      -> http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+
+  This script and the generated script have only been verified to 
+  work on Linux.
 
   $Id$
 */
@@ -200,8 +206,12 @@ def generateDeployCommand = {
     source = schemaSources[name]
     pathUri = new URI(schemaDestinationPaths[name])
     schemaUri = new URI(schemaDestinations[name])
-    println "mkdir -p ${davfs}${pathUri.path}"
-    println "cp $source ${davfs}${schemaUri.path}"
+//    println "mkdir -p ${davfs}${pathUri.path}"
+    println "curl -T $source https://dav.codehaus.org/dist/mule${schemaUri.path} --user " + '$CURLUSER:$CURLPASSWD'
+    println "echo curl result code: " + '$?'
+    println "echo diff result"
+    println "diff $source ${davfs}${schemaUri.path}"
+    println "echo diff result code: " + '$?'
   }
 }
 
