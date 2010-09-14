@@ -17,8 +17,10 @@ http://www.mulesoft.org/documentation/display/MULE3INTRO/Bookstore+Example
 Simply copy the pre-built application archive (mule-example-bookstore-app.zip) to the
 application folder ($MULE_HOME/apps) and start Mule. 
 
-If you want to receive emails when books are ordered, update the $MULE_HOME/apps/mule-example-bookstore-app/classes/email.properties file with your gmail credentials.  Then touch the $MULE_HOME/apps/mule-example-bookstore-app/mule-config.xml
-to reload the app.
+If you want to receive emails when books are ordered, update the 
+$MULE_HOME/apps/mule-example-bookstore/classes/email.properties file with your 
+gmail credentials.  Then touch the $MULE_HOME/apps/mule-example-bookstore/mule-config.xml
+file to reload the app.
 
 To access the web service 
 invoke

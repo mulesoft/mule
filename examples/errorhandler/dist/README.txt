@@ -8,6 +8,23 @@ BusinessErrorManager.
 
 For more information, refer to http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples
 
++---------------------+
+| Running the example |
++---------------------+
+You will need two shell windows in order to run this application.
+
+In one window, Simply copy the pre-built application archive 
+(mule-example-errorhandler.zip) to the application folder ($MULE_HOME/apps) 
+and start Mule.
+
+If you want to receive emails when certain exceptions occur, update the $MULE_HOME/apps/mule-example-errorhandler/classes/email.properties file with your 
+mail server credentials.  Then touch the $MULE_HOME/apps/mule-example-errorhandler/mule-config.xml
+to reload the app.
+
+In the second window, copy the files (one by one so you can see the results) 
+from the $MULE_HOME/apps/mule-example-errorhandler/test-data/out directory to the 
+$MULE_HOME/apps/mule-example-errorhandler/test-data/in directory.
+
 +----------------------+
 | Building the example |
 +----------------------+
@@ -15,10 +32,9 @@ First, make sure you have set the MULE_HOME environment variable as recommended
 in Mule's README.txt
 
 Depending on the build tool you are using (Ant or Maven), you can build the 
-example by simply running "ant" or "mvn".  This will download any additional 
-libraries, compile the example classes, produce a jar file, and copy everything 
-to $MULE_HOME/apps/errorhandler, which is where your custom classes and configuration 
-files should go.
+example by simply running "ant" or "mvn".  This will compile the example 
+classes and produce a zip file that will be copied into the application folder 
+($MULE_HOME/apps).
 
 (If you are unable to download the libraries it may be because you are behind a 
 firewall and have not configured your build tool to use your HTTP proxy.  Please 
@@ -26,26 +42,3 @@ refer to the following information.)
     Ant users:     http://ant.apache.org/manual-beta/proxy.html
     Maven users:   http://maven.apache.org/guides/mini/guide-proxies.html
 
-+---------------------+
-| Running the example |
-+---------------------+
-You will need two shell windows in order to run this application.
-
-In the first window, use the shell script (Unix/Linux) or batch file (Windows) 
-provided in this directory to run the example.
-
-Alternatively, if you have added Mule to your executable path as recommended in
-INSTALL.txt, you can run the example from the command line as follows:
-
-    Linux / Unix
-    ------------
-    ./errorhandler
-
-    Windows
-    -------
-    ./errorhandler.bat
-
-In the second window, copy the files (one by one so you can see the results) 
-from the ./test-data/out directory to the ./test-data/in directory.  Note that 
-for the FatalException.xml file, Mule will attempt to construct and send an 
-alert email using the SMTP configuration as specified in ./conf/email.properties.

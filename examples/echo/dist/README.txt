@@ -9,7 +9,7 @@ For more information, refer to http://www.mulesoft.org/documentation/display/MUL
 +---------------------+
 | Running the example |
 +---------------------+
-Simply copy the pre-built application archive (mule-example-echo-app.zip) to the
+Simply copy the pre-built application archive (mule-example-echo.zip) to the
 application folder ($MULE_HOME/apps) and start Mule. To access the web service 
 invoke
 
