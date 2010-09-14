@@ -42,8 +42,7 @@ public class InterceptorDefinitionParser extends ChildDefinitionParser
         String parentName = e.getParentNode().getLocalName().toLowerCase();
         if ("flow".equals(parentName) || "inbound".equals(parentName) || "endpoint".equals(parentName)
             || "inbound-endpoint".equals(parentName) || "outbound-endpoint".equals(parentName)
-            || "async-reply".equals(parentName) || "composite-processor".equals(parentName)
-            || "processor-chain".equals(parentName))
+            || "async-reply".equals(parentName) || "processor-chain".equals(parentName))
         {
             return "messageProcessor";
         }
