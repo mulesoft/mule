@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:tns="http://www.wcs.com/2010/07/14/emop.wsdl" xmlns:xsdl="http://www.wcs.com/2010/07/14/emop"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:ns="http://www.wcs.com/emop" name="scratchcardValidateAndPay"
+	targetNamespace="http://www.wcs.com/2010/07/14/emop.wsdl">
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://www.wcs.com/2010/07/14/emop">
+			<xsd:element name="ScratchcardValidateAndPayRequestBody">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="ScratchcardNumber" type="xsd:string" />
+						<xsd:element name="VirnNumber" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="ScratchcardValidateAndPayResponseBody">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="ResultCode" type="xsd:string" />
+						<xsd:element name="ValidationResultCode" type="xsd:string" />
+						<xsd:element name="ScratchcardNo" type="xsd:string" />
+						<xsd:element name="WonAmount" type="xsd:integer" />
+						<xsd:element name="Currency" type="xsd:string" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:complexType name="EmopHeader">
+				<xsd:attribute name="UserName" type="xsd:string" />
+				<xsd:attribute name="Password" type="xsd:string" />
+			</xsd:complexType>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="ScratchcardValidateAndPayRequest">
+		<wsdl:part name="header" type="xsdl:EmopHeader" />
+		<wsdl:part name="requestBody" element="xsdl:ScratchcardValidateAndPayRequestBody">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="ScratchcardValidateAndPayResponse">
+		<wsdl:part name="header" type="xsdl:EmopHeader" />
+		<wsdl:part name="responseBody" element="xsdl:ScratchcardValidateAndPayResponseBody" />
+	</wsdl:message>
+	<wsdl:portType name="IntegrationLayerService">
+		<wsdl:operation name="validateAndPayScratchCard">
+			<wsdl:input message="tns:ScratchcardValidateAndPayRequest" />
+			<wsdl:output message="tns:ScratchcardValidateAndPayResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="IntegrationLayerServiceBinding" type="tns:IntegrationLayerService">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" required="true" />
+		<wsdl:operation name="validateAndPayScratchCard">
+			<soap:operation soapAction="" />
+			<wsdl:input message="tns:ScratchcardValidateAndPayRequest">
+				<soap:body parts="requestBody" use="literal" />
+				<soap:header use="literal" message="tns:ScratchcardValidateAndPayRequest"
+					part="header" />
+			</wsdl:input>
+			<wsdl:output message="tns:ScratchcardValidateAndPayResponse">
+				<soap:body parts="responseBody" use="literal" />
+				<soap:header use="literal" message="tns:ScratchcardValidateAndPayResponse"
+					part="header" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="IntegrationLayerService">
+		<wsdl:port name="IntegrationLayerServicePort" binding="tns:IntegrationLayerServiceBinding">
+			<soap:address location="http://www.wcs.com/emop/IntegrationLayerServicePort" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
+

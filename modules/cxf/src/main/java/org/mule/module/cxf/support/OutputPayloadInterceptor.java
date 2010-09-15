@@ -16,6 +16,7 @@ import org.mule.module.xml.transformer.DelayedResult;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javanet.staxutils.ContentHandlerToXMLStreamWriter;
@@ -62,7 +63,7 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
                 try
                 {
                     MuleMessage muleMsg = (MuleMessage) o;
-                    final Object payload = muleMsg.getPayload();
+                    final Object payload = cleanUpPayload(muleMsg.getPayload());
                     
                     if (payload instanceof DelayedResult)
                     {
@@ -104,6 +105,36 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
             }
             
         }
+    }
+
+    protected Object cleanUpPayload(final Object payload)
+    {
+        final Object cleanedUpPayload;
+        if (payload instanceof Object[])
+        {
+            final Object[] payloadArray = (Object[]) payload;
+            final List<Object> payloadList = new ArrayList<Object>(payloadArray.length);
+            for (Object object : payloadArray)
+            {
+                if (object != null && object != MessageContentsList.REMOVED_MARKER)
+                {
+                    payloadList.add(object);
+                }
+            }
+            if (payloadList.size() == payloadArray.length)
+            {
+                cleanedUpPayload = payload; // no cleanup was done
+            }
+            else
+            {
+                cleanedUpPayload = payloadList.size() == 1 ? payloadList.get(0) : payloadList.toArray();
+            }
+        }
+        else
+        {
+            cleanedUpPayload = payload;
+        }
+        return cleanedUpPayload;
     }
 
     protected Object getDelayedResultCallback(final DelayedResult r)
