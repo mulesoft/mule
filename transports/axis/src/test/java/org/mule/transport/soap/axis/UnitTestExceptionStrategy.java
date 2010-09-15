@@ -10,6 +10,7 @@
 
 package org.mule.transport.soap.axis;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.exception.DefaultServiceExceptionStrategy;
 
@@ -22,31 +23,34 @@ public class UnitTestExceptionStrategy extends DefaultServiceExceptionStrategy
      * Record all exceptions that this ExceptionStrategy handles so Unit Test
      * can query them and make their assertions.
      */
-    private List messagingExceptions = null;
+    private List<Throwable> messagingExceptions = null;
     
-    public UnitTestExceptionStrategy()
+    public UnitTestExceptionStrategy(MuleContext context)
     {
-        super();
-        messagingExceptions = new ArrayList();
+        super(context);
+        messagingExceptions = new ArrayList<Throwable>();
     }
     
+    @Override
     protected void logFatal(MuleMessage message, Throwable t)
     {
         logger.debug("logFatal", t);
     }
 
+    @Override
     protected void logException(Throwable t)
     {
         logger.debug("logException", t);
     }
 
+    @Override
     public void handleMessagingException(MuleMessage message, Throwable t)
     {
         messagingExceptions.add(t);
         super.handleMessagingException(message, t);
     }
     
-    public List getMessagingExceptions()
+    public List<Throwable> getMessagingExceptions()
     {
         return messagingExceptions;
     }

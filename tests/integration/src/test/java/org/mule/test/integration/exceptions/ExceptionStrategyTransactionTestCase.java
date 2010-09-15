@@ -10,6 +10,7 @@
 
 package org.mule.test.integration.exceptions;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.TransactionException;
@@ -27,6 +28,7 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase
 
     private static String failure;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/exceptions/exception-strategy-transaction-test.xml";
@@ -62,9 +64,13 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase
 
     static class AssertRollbackServiceExceptionStrategy extends DefaultServiceExceptionStrategy
     {
-
         private int visits = 0;
 
+        public AssertRollbackServiceExceptionStrategy(MuleContext context)
+        {
+            super(context);
+        }
+        
         @Override
         protected void routeException(MuleMessage message, MessageProcessor target, Throwable t)
         {

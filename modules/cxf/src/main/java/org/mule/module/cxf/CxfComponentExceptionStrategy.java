@@ -10,6 +10,7 @@
 
 package org.mule.module.cxf;
 
+import org.mule.api.MuleContext;
 import org.mule.exception.DefaultServiceExceptionStrategy;
 
 import org.apache.cxf.interceptor.Fault;
@@ -21,6 +22,12 @@ import org.apache.cxf.interceptor.Fault;
  */
 public class CxfComponentExceptionStrategy extends DefaultServiceExceptionStrategy
 {
+    public CxfComponentExceptionStrategy(MuleContext context)
+    {
+        super(context);
+    }
+    
+    @Override
     protected void defaultHandler(Throwable t)
     {
         if (t.getCause() instanceof Fault)

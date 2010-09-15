@@ -33,7 +33,7 @@ public class SimpleServiceBuilderTestCase extends AbstractMuleTestCase
             .inboundResponseTransformers(new ObjectToByteArray(), new GZipCompressTransformer())
             .component(EchoComponent.class)
             .type(Type.DIRECT)
-            .exceptionStrategy(new DefaultServiceExceptionStrategy())
+            .exceptionStrategy(new DefaultServiceExceptionStrategy(muleContext))
             .build(muleContext);
 
         assertEquals("test-simple-service-full", simpleService.getName());

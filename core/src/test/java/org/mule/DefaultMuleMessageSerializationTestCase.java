@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.simple.ObjectToByteArray;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
 import org.mule.util.StringDataSource;
 import org.mule.util.store.DeserializationPostInitialisable;
@@ -24,6 +25,7 @@ import java.io.InputStream;
 import javax.activation.DataHandler;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
+
 import org.apache.commons.lang.SerializationUtils;
 
 public class DefaultMuleMessageSerializationTestCase extends AbstractMuleTestCase
@@ -108,7 +110,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleTestCas
         {
             super();
             registerSourceType(new SimpleDataType<NonSerializable>(NonSerializable.class));
-            setReturnClass(byte[].class);
+            setReturnDataType(DataTypeFactory.BYTE_ARRAY);
         }
         
         @Override

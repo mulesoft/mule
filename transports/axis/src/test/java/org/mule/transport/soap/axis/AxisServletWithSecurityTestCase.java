@@ -34,6 +34,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
 
     private Server httpServer;
 
+    @Override
     protected String getConfigResources()
     {
         return "axis-servlet-security-config.xml";
@@ -70,7 +71,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
 
     public void testSecurityWithServletsUsingGet() throws Exception
     {
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://ross:ross@localhost:" + HTTP_PORT

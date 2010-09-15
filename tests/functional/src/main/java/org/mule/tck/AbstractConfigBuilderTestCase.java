@@ -47,6 +47,7 @@ import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.transformer.TransformerUtils;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.AbstractConnector;
 
 public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfigBuilderTestCase
@@ -124,7 +125,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         Transformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
-        assertEquals(t.getReturnClass(), java.lang.String.class);
+        assertEquals(t.getReturnDataType(), DataTypeFactory.STRING);
         assertNotNull(((TestCompressionTransformer) t).getContainerProperty());
     }
 
@@ -347,7 +348,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         Service orange = muleContext.getRegistry().lookupService("orangeComponent");
         assertNotNull(orange);
         assertTrue(orange.getComponent() instanceof JavaComponent);
-        InterfaceBinding r = (InterfaceBinding) ((JavaComponent) orange.getComponent()).getInterfaceBindings().get(0);
+        InterfaceBinding r = ((JavaComponent) orange.getComponent()).getInterfaceBindings().get(0);
         assertNotNull(r);
 
         //TODO Grab an instance of the service object itself and test that the proxy has been injected

@@ -10,6 +10,7 @@
 
 package org.mule;
 
+import org.mule.api.MuleContext;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.ExceptionNotification;
@@ -25,7 +26,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
     // MULE-1404
     public void testExceptions() throws Exception
     {
-        InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy();
+        InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext);
         strategy.setMuleContext(muleContext);
         strategy.handleException(new IllegalArgumentException("boom"));
         assertEquals(1, strategy.getCount());
@@ -52,7 +53,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
         });
 
         // throwing exception
-        InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy();
+        InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext);
         strategy.setMuleContext(muleContext);
         strategy.handleException(new IllegalArgumentException("boom"));
 
@@ -66,6 +67,11 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
     {
         private volatile int count = 0;
 
+        public InstrumentedExceptionStrategy(MuleContext muleContext)
+        {
+            super(muleContext);
+        }
+        
         @Override
         public void handleException(Exception exception)
         {

@@ -36,6 +36,7 @@ import org.mule.tck.testmodels.mule.TestEntryPointResolverSet;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestResponseAggregator;
 import org.mule.transformer.TransformerUtils;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -121,7 +122,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         Transformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
         assertNotNull(t);
         assertTrue(t instanceof TestCompressionTransformer);
-        assertEquals(t.getReturnClass(), String.class);
+        assertEquals(t.getReturnDataType(), DataTypeFactory.STRING);
         assertNotNull(((TestCompressionTransformer) t).getContainerProperty());
     }
 
@@ -271,7 +272,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(10001, messageRouter.getTimeout().longValue());
         assertEquals(1, messageRouter.getMessageProcessors().size());
         
-        MessageProcessor router = (MessageProcessor) messageRouter.getMessageProcessors().get(0);
+        MessageProcessor router = messageRouter.getMessageProcessors().get(0);
         assertTrue(router instanceof TestResponseAggregator);
         assertNotNull(messageRouter.getEndpoints());
         assertEquals(2, messageRouter.getEndpoints().size());
