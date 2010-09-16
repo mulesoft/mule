@@ -17,7 +17,6 @@ import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationWrapper;
 import org.mule.module.launcher.application.PriviledgedMuleApplication;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.util.CollectionUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.Latch;
@@ -29,7 +28,6 @@ import java.util.Collection;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
@@ -173,10 +171,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
      */
     private Application findApp(final String appName, int totalAppsExpected)
     {
+        // list all apps to validate total count
         final List<Application> apps = deploymentService.getApplications();
         assertNotNull(apps);
         assertEquals(totalAppsExpected, apps.size());
-        final Application app = (Application) CollectionUtils.find(apps, new BeanPropertyValueEqualsPredicate("appName", appName));
+        final Application app = deploymentService.findApplication(appName);
         assertNotNull(app);
         return app;
     }
