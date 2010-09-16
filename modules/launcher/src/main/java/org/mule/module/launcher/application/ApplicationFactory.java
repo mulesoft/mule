@@ -2,6 +2,7 @@ package org.mule.module.launcher.application;
 
 import org.mule.module.launcher.AppBloodhound;
 import org.mule.module.launcher.DefaultAppBloodhound;
+import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 import java.io.IOException;
@@ -12,13 +13,22 @@ import java.io.IOException;
  */
 public class ApplicationFactory
 {
-    public static Application createApp(String appName) throws IOException
+    protected DeploymentService deploymentService;
+
+    public ApplicationFactory(DeploymentService deploymentService)
+    {
+        this.deploymentService = deploymentService;
+    }
+
+    public Application createApp(String appName) throws IOException
     {
         AppBloodhound bh = new DefaultAppBloodhound();
         final ApplicationDescriptor descriptor = bh.fetch(appName);
         if (descriptor.isPriviledged())
         {
-            return new ApplicationWrapper(new PriviledgedMuleApplication(appName));
+            final PriviledgedMuleApplication delegate = new PriviledgedMuleApplication(appName);
+            delegate.setDeploymentService(deploymentService);
+            return new ApplicationWrapper(delegate);
         }
         else
         {

@@ -11,7 +11,6 @@
 package org.mule.module.launcher;
 
 import org.mule.module.launcher.application.Application;
-import org.mule.module.launcher.application.ApplicationFactory;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.FilenameUtils;
@@ -29,18 +28,12 @@ public class DefaultMuleDeployer implements MuleDeployer
 {
 
     protected transient final Log logger = LogFactory.getLog(getClass());
-    private DeploymentService deploymentService;
-    private ApplicationFactory applicationFactory;
+    protected DeploymentService deploymentService;
+
 
     public DefaultMuleDeployer(DeploymentService deploymentService)
     {
-        this(deploymentService, new ApplicationFactory());
-    }
-
-    public DefaultMuleDeployer(DeploymentService deploymentService, ApplicationFactory applicationFactory)
-    {
         this.deploymentService = deploymentService;
-        this.applicationFactory = applicationFactory;
     }
 
     public void deploy(Application app)
@@ -130,6 +123,6 @@ public class DefaultMuleDeployer implements MuleDeployer
         }
 
         // appname is never null by now
-        return ApplicationFactory.createApp(appName);
+        return deploymentService.getAppFactory().createApp(appName);
     }
 }

@@ -46,11 +46,14 @@ public class DeploymentService
 
     protected transient final Log logger = LogFactory.getLog(getClass());
     protected MuleDeployer deployer;
+    protected ApplicationFactory appFactory;
+
     private List<Application> applications = new ArrayList<Application>();
 
     public DeploymentService()
     {
         deployer = new DefaultMuleDeployer(this);
+        appFactory = new ApplicationFactory(this);
     }
 
     public void start()
@@ -106,7 +109,7 @@ public class DeploymentService
             final Application a;
             try
             {
-                a = ApplicationFactory.createApp(app);
+                a = appFactory.createApp(app);
                 applications.add(a);
             }
             catch (IOException e)
@@ -195,6 +198,11 @@ public class DeploymentService
     public void setDeployer(MuleDeployer deployer)
     {
         this.deployer = deployer;
+    }
+
+    public ApplicationFactory getAppFactory()
+    {
+        return appFactory;
     }
 
     /**
@@ -317,7 +325,7 @@ public class DeploymentService
                 logger.info("================== New Exploded Application: " + appName);
             }
 
-            Application a = ApplicationFactory.createApp(appName);
+            Application a = appFactory.createApp(appName);
             // add to the list of known apps first to avoid deployment loop on failure
             applications.add(a);
             deployer.deploy(a);
