@@ -19,6 +19,13 @@ public class ApplicationDescriptor
     public static final String DEFAULT_CONFIGURATION_RESOURCE = "mule-config.xml";
     public static final String DEFAULT_APP_PROPERTIES_RESOURCE = "mule-app.properties";
 
+    /**
+     * Required to support the '-config spring' shortcut. Don't use a class object so
+     * the core doesn't depend on mule-module-spring.
+     */
+    public static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
+
+
     private String appName;
     private String encoding;
     private String configurationBuilder;
@@ -28,11 +35,8 @@ public class ApplicationDescriptor
     private Map<String, String> appProperties = new HashMap<String, String>();
 
     private boolean redeploymentEnabled = true;
-    /**
-     * Required to support the '-config spring' shortcut. Don't use a class object so
-     * the core doesn't depend on mule-module-spring.
-     */
-    public static final String CLASSNAME_SPRING_CONFIG_BUILDER = "org.mule.config.spring.SpringXmlConfigurationBuilder";
+
+    private boolean priviledged = false;
 
     public String getAppName()
     {
@@ -124,5 +128,15 @@ public class ApplicationDescriptor
     public void setRedeploymentEnabled(boolean redeploymentEnabled)
     {
         this.redeploymentEnabled = redeploymentEnabled;
+    }
+
+    public boolean isPriviledged()
+    {
+        return priviledged;
+    }
+
+    public void setPriviledged(boolean priviledged)
+    {
+        this.priviledged = priviledged;
     }
 }

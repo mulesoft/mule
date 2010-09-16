@@ -11,6 +11,7 @@
 package org.mule.module.launcher;
 
 import org.mule.api.MuleContext;
+import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 /**
  * Decorates the target deployer to properly switch out context classloader for deployment
@@ -150,6 +151,11 @@ public class ApplicationWrapper implements Application
     public String getAppName()
     {
         return delegate.getAppName();
+    }
+
+    public ApplicationDescriptor getDescriptor()
+    {
+        return delegate.getDescriptor();
     }
 
     @Override

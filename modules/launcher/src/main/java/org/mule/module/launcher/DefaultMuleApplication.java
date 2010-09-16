@@ -105,6 +105,11 @@ public class DefaultMuleApplication implements Application
         return appName;
     }
 
+    public ApplicationDescriptor getDescriptor()
+    {
+        return descriptor;
+    }
+
     public void setAppName(String appName)
     {
         this.appName = appName;

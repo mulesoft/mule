@@ -27,6 +27,14 @@ import org.apache.commons.lang.BooleanUtils;
  */
 public class PropertiesDescriptorParser implements DescriptorParser
 {
+    protected static final String PROPERTY_ENCODING = "encoding";
+    protected static final String PROPERTY_CONFIG_BUILDER = "config.builder";
+    protected static final String PROPERTY_DOMAIN = "domain";
+    // support not yet implemented for CL reversal
+    protected static final String PROPERTY_CLASSLOADER_PARENT_FIRST = "classloader.parentFirst";
+    protected static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
+    protected static final String PROPERTY_REDEPLOYMENT_ENABLED = "redeployment.enabled";
+    protected static final String PROPERTY_PRIVILEDGED = "priviledged";
 
     public ApplicationDescriptor parse(File descriptor) throws IOException
     {
@@ -34,9 +42,9 @@ public class PropertiesDescriptorParser implements DescriptorParser
         p.load(new FileInputStream(descriptor));
 
         ApplicationDescriptor d = new ApplicationDescriptor();
-        d.setEncoding(p.getProperty("encoding"));
-        d.setConfigurationBuilder(p.getProperty("config.builder"));
-        d.setDomain(p.getProperty("domain"));
+        d.setEncoding(p.getProperty(PROPERTY_ENCODING));
+        d.setConfigurationBuilder(p.getProperty(PROPERTY_CONFIG_BUILDER));
+        d.setDomain(p.getProperty(PROPERTY_DOMAIN));
 
         // get a ref to an optional app props file (right next to the descriptor)
         final File appPropsFile = new File(descriptor.getParent(), ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE);
@@ -53,9 +61,9 @@ public class PropertiesDescriptorParser implements DescriptorParser
         }
         
         // supports true (case insensitive), yes, on as positive values
-        d.setParentFirstClassLoader(BooleanUtils.toBoolean(p.getProperty("classloader.parentFirst", Boolean.TRUE.toString())));
+        d.setParentFirstClassLoader(BooleanUtils.toBoolean(p.getProperty(PROPERTY_CLASSLOADER_PARENT_FIRST, Boolean.TRUE.toString())));
 
-        final String resProps = p.getProperty("config.resources");
+        final String resProps = p.getProperty(PROPERTY_CONFIG_RESOURCES);
         String[] urls;
         if (StringUtils.isBlank(resProps))
         {
@@ -68,7 +76,9 @@ public class PropertiesDescriptorParser implements DescriptorParser
         d.setConfigResources(urls);
 
         // supports true (case insensitive), yes, on as positive values
-        d.setRedeploymentEnabled(BooleanUtils.toBoolean(p.getProperty("redeployment.enabled", Boolean.TRUE.toString())));
+        d.setRedeploymentEnabled(BooleanUtils.toBoolean(p.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, Boolean.TRUE.toString())));
+
+        d.setPriviledged(BooleanUtils.toBoolean(p.getProperty(PROPERTY_PRIVILEDGED, Boolean.FALSE.toString())));
 
         return d;
     }

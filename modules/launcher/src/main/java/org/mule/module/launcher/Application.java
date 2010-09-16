@@ -11,6 +11,7 @@
 package org.mule.module.launcher;
 
 import org.mule.api.MuleContext;
+import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 public interface Application
 {
@@ -34,4 +35,6 @@ public interface Application
     ClassLoader getDeploymentClassLoader();
 
     String getAppName();
+
+    ApplicationDescriptor getDescriptor();
 }
