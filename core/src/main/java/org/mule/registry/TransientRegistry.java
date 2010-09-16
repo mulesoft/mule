@@ -70,7 +70,7 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
-    @java.lang.Override
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         applyProcessors(lookupObjects(Connector.class), null);
@@ -302,7 +302,7 @@ public class TransientRegistry extends AbstractRegistry
      * to the object when it is removed.
      *
      * @param key the name or key of the object to remove from the registry
-     * @param metadata Meta data flags supported are {@link org.mule.api.registry.MuleRegistry.LIFECYCLE_BYPASS_FLAG}
+     * @param metadata Meta data flags supported are {@link org.mule.api.registry.MuleRegistry#LIFECYCLE_BYPASS_FLAG}
      * @throws RegistrationException if there is a problem unregistering the object. Typically this will be because
      * the object's lifecycle threw an exception
      */
