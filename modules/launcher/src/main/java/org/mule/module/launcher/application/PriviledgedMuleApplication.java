@@ -11,7 +11,7 @@ import org.mule.module.launcher.DeploymentService;
 public class PriviledgedMuleApplication extends DefaultMuleApplication
 {
 
-    public static final String REGISTRY_KEY_DEPLOYMENT_SERVICE = "deploymentService";
+    public static final String REGISTRY_KEY_DEPLOYMENT_SERVICE = "_deploymentService";
 
     protected DeploymentService deploymentService;
 
