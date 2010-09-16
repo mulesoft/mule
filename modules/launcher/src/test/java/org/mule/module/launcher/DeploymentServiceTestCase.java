@@ -10,11 +10,14 @@
 
 package org.mule.module.launcher;
 
+import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationWrapper;
 import org.mule.module.launcher.application.PriviledgedMuleApplication;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.CollectionUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.Latch;
@@ -22,9 +25,11 @@ import org.mule.util.concurrent.Latch;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
@@ -89,19 +94,47 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         assertAppsDir(NONE, new String[] {"priviledged-dummy-app"});
 
-        final Application app = findApp("priviledged-dummy-app");
+        final Application app = findApp("priviledged-dummy-app", 1);
         // now that we're sure it's the app we wanted, assert the registry has everything
         // a 'priviledged' app would have had
-        // TODO some constants for priviledged registry key names
         final Object obj = app.getMuleContext().getRegistry().lookupObject(PriviledgedMuleApplication.REGISTRY_KEY_DEPLOYMENT_SERVICE);
         assertNotNull("Priviledged objects have not been registered", obj);
         assertTrue(((ApplicationWrapper) app).getDelegate() instanceof PriviledgedMuleApplication);
     }
 
+    public void testPriviledgedCrossAppAccess() throws Exception
+    {
+        URL url = getClass().getResource("/priviledged-dummy-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        url = getClass().getResource("/dummy-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        deploymentService.start();
+
+        // a basic latch isn't ideal here, as there are 2 apps to deploy
+        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+
+        assertAppsDir(NONE, new String[] {"dummy-app", "priviledged-dummy-app"});
+
+        final Application privApp = findApp("priviledged-dummy-app", 2);
+        final Application dummyApp = findApp("dummy-app", 2);
+        assertTrue(((ApplicationWrapper) privApp).getDelegate() instanceof PriviledgedMuleApplication);
+
+        final MuleContext muleContext1 = privApp.getMuleContext();
+        System.out.println("muleContext1 = " + muleContext1);
+        assertNotSame(muleContext1, muleContext);
+        assertNotSame(privApp.getDeploymentClassLoader(), dummyApp.getDeploymentClassLoader());
+        final Collection<FlowConstruct> flowConstructs = dummyApp.getMuleContext().getRegistry().lookupObjects(FlowConstruct.class);
+        assertFalse("No FlowConstructs found in the sibling app", flowConstructs.isEmpty());
+    }
+
     public void testDeployZipOnStartup() throws Exception
     {
         final URL url = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found", url);
+        assertNotNull("Test app file not found " + url, url);
         addAppArchive(url);
 
         deploymentService.start();
@@ -111,7 +144,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertAppsDir(NONE, new String[] {"dummy-app"});
 
         // just assert no priviledged entries were put in the registry
-        final Application app = findApp("dummy-app");
+        final Application app = findApp("dummy-app", 1);
         final Object obj = app.getMuleContext().getRegistry().lookupObject(PriviledgedMuleApplication.REGISTRY_KEY_DEPLOYMENT_SERVICE);
         assertNull(obj);
         assertFalse(((ApplicationWrapper) app).getDelegate() instanceof PriviledgedMuleApplication);
@@ -120,7 +153,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     public void testUpdateAppViaZip() throws Exception
     {
         final URL url = getClass().getResource("/dummy-app.zip");
-        assertNotNull("Test app file not found", url);
+        assertNotNull("Test app file not found " + url, url);
         addAppArchive(url);
 
         deploymentService.start();
@@ -138,14 +171,13 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     /**
      * Find a deployed app, performing some basic assertions.
      */
-    private Application findApp(final String appName)
+    private Application findApp(final String appName, int totalAppsExpected)
     {
         final List<Application> apps = deploymentService.getApplications();
         assertNotNull(apps);
-        assertEquals(1, apps.size());
-        final Application app = apps.get(0);
+        assertEquals(totalAppsExpected, apps.size());
+        final Application app = (Application) CollectionUtils.find(apps, new BeanPropertyValueEqualsPredicate("appName", appName));
         assertNotNull(app);
-        assertEquals("Wrong application name", appName, app.getAppName());
         return app;
     }
 

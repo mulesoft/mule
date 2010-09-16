@@ -183,6 +183,15 @@ public class DeploymentService
     }
 
     /**
+     * Find an active application.
+     * @return null if not found
+     */
+    public Application findApplication(String appName)
+    {
+        return (Application) CollectionUtils.find(applications, new BeanPropertyValueEqualsPredicate("appName", appName));
+    }
+
+    /**
      * @return immutable applications list
      */
     public List<Application> getApplications()
