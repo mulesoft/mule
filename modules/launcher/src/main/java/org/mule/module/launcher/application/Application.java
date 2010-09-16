@@ -8,9 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher;
+package org.mule.module.launcher.application;
 
 import org.mule.api.MuleContext;
+import org.mule.module.launcher.DeploymentStartException;
+import org.mule.module.launcher.InstallException;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 public interface Application

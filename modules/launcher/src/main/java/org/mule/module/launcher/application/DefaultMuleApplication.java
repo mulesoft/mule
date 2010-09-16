@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher;
+package org.mule.module.launcher.application;
 
 import org.mule.MuleServer;
 import org.mule.api.MuleContext;
@@ -23,6 +23,18 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
+import org.mule.module.launcher.AbstractFileWatcher;
+import org.mule.module.launcher.AppBloodhound;
+import org.mule.module.launcher.ApplicationMuleContextBuilder;
+import org.mule.module.launcher.ConfigChangeMonitorThreadFactory;
+import org.mule.module.launcher.DefaultAppBloodhound;
+import org.mule.module.launcher.DefaultMuleSharedDomainClassLoader;
+import org.mule.module.launcher.DeploymentInitException;
+import org.mule.module.launcher.DeploymentStartException;
+import org.mule.module.launcher.DeploymentStopException;
+import org.mule.module.launcher.InstallException;
+import org.mule.module.launcher.MuleApplicationClassLoader;
+import org.mule.module.launcher.MuleSharedDomainClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ClassUtils;

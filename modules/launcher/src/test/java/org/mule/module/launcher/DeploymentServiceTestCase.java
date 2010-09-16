@@ -11,6 +11,7 @@
 package org.mule.module.launcher;
 
 import org.mule.api.config.MuleProperties;
+import org.mule.module.launcher.application.Application;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;

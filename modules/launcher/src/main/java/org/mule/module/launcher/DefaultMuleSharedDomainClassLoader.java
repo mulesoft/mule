@@ -16,7 +16,7 @@ package org.mule.module.launcher;
 public class DefaultMuleSharedDomainClassLoader extends MuleSharedDomainClassLoader
 {
 
-    protected static final String DEFAULT_DOMAIN_NAME = "default";
+    public static final String DEFAULT_DOMAIN_NAME = "default";
 
     public DefaultMuleSharedDomainClassLoader(ClassLoader parent)
     {

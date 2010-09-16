@@ -11,6 +11,8 @@
 package org.mule.module.launcher;
 
 import org.mule.config.StartupContext;
+import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.application.ApplicationFactory;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.FileUtils;

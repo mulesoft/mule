@@ -1,5 +1,7 @@
-package org.mule.module.launcher;
+package org.mule.module.launcher.application;
 
+import org.mule.module.launcher.AppBloodhound;
+import org.mule.module.launcher.DefaultAppBloodhound;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 import java.io.IOException;

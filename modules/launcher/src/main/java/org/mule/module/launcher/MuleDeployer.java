@@ -10,6 +10,8 @@
 
 package org.mule.module.launcher;
 
+import org.mule.module.launcher.application.Application;
+
 import java.io.IOException;
 import java.net.URL;
 
