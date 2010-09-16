@@ -13,6 +13,8 @@ package org.mule.module.launcher;
 import org.mule.api.MuleContext;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
+import java.io.IOException;
+
 /**
  * Decorates the target deployer to properly switch out context classloader for deployment
  * one where applicable. E.g. init() phase may load custom classes for an application, which
@@ -24,9 +26,19 @@ public class ApplicationWrapper implements Application
 
     private Application delegate;
 
-    public ApplicationWrapper(Application delegate)
+    public ApplicationWrapper(String appName) throws IOException
     {
-        this.delegate = delegate;
+        AppBloodhound bh = new DefaultAppBloodhound();
+        final ApplicationDescriptor descriptor = bh.fetch(appName);
+        if (descriptor.isPriviledged())
+        {
+            // TODO implement
+            //delegate = new PriviledgedMuleApplication(appName);
+        }
+        else
+        {
+            delegate = new DefaultMuleApplication(appName);
+        }
     }
 
     public void dispose()

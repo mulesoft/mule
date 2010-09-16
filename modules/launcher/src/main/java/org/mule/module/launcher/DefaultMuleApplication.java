@@ -198,6 +198,12 @@ public class DefaultMuleApplication implements Application
                 DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
                 this.muleContext = muleContextFactory.createMuleContext(builders, new ApplicationMuleContextBuilder(descriptor));
 
+                if (descriptor.isPriviledged())
+                {
+                    // TODO implement
+                    this.muleContext.getRegistry().registerObject("deploymentService", null);
+                }
+
                 if (descriptor.isRedeploymentEnabled())
                 {
                     createRedeployMonitor();

@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.URL;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
@@ -125,7 +124,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
     private class TestDeployer implements MuleDeployer
     {
-        MuleDeployer delegate = new DefaultMuleDeployer();
+        MuleDeployer delegate = new DefaultMuleDeployer(deploymentService);
 
         public void deploy(Application app)
         {

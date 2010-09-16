@@ -27,6 +27,12 @@ public class DefaultMuleDeployer implements MuleDeployer
 {
 
     protected transient final Log logger = LogFactory.getLog(getClass());
+    private DeploymentService deploymentService;
+
+    public DefaultMuleDeployer(DeploymentService deploymentService)
+    {
+        this.deploymentService = deploymentService;
+    }
 
     public void deploy(Application app)
     {
@@ -115,6 +121,6 @@ public class DefaultMuleDeployer implements MuleDeployer
         }
 
         // appname is never null by now
-        return new ApplicationWrapper(new DefaultMuleApplication(appName));
+        return new ApplicationWrapper(appName);
     }
 }

@@ -43,8 +43,13 @@ public class DeploymentService
     protected ScheduledExecutorService appDirMonitorTimer;
 
     protected transient final Log logger = LogFactory.getLog(getClass());
-    protected MuleDeployer deployer = new DefaultMuleDeployer();
+    protected MuleDeployer deployer;
     private List<Application> applications = new ArrayList<Application>();
+
+    public DeploymentService()
+    {
+        deployer = new DefaultMuleDeployer(this);
+    }
 
     public void start()
     {
@@ -96,8 +101,17 @@ public class DeploymentService
 
         for (String app : apps)
         {
-            final ApplicationWrapper a = new ApplicationWrapper(new DefaultMuleApplication(app));
-            applications.add(a);
+            final ApplicationWrapper a;
+            try
+            {
+                a = new ApplicationWrapper(app);
+                applications.add(a);
+            }
+            catch (IOException e)
+            {
+                // TODO logging
+                e.printStackTrace();
+            }
         }
 
 
@@ -301,7 +315,7 @@ public class DeploymentService
                 logger.info("================== New Exploded Application: " + appName);
             }
 
-            Application a = new ApplicationWrapper(new DefaultMuleApplication(appName));
+            Application a = new ApplicationWrapper(appName);
             // add to the list of known apps first to avoid deployment loop on failure
             applications.add(a);
             deployer.deploy(a);
