@@ -38,8 +38,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
     protected static final int LATCH_TIMEOUT = 10000;
     protected static final String[] NONE = new String[0];
-    // TODO use a common constants class
-    protected static final String PRIVILEDGED_KEY_DEPLOYMENT_SERVICE = "deploymentService";
 
     protected File muleHome;
     protected File appsDir;
@@ -95,7 +93,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         // now that we're sure it's the app we wanted, assert the registry has everything
         // a 'priviledged' app would have had
         // TODO some constants for priviledged registry key names
-        final Object obj = app.getMuleContext().getRegistry().lookupObject(PRIVILEDGED_KEY_DEPLOYMENT_SERVICE);
+        final Object obj = app.getMuleContext().getRegistry().lookupObject(PriviledgedMuleApplication.REGISTRY_KEY_DEPLOYMENT_SERVICE);
         assertNotNull("Priviledged objects have not been registered", obj);
         assertTrue(((ApplicationWrapper) app).getDelegate() instanceof PriviledgedMuleApplication);
     }
@@ -114,7 +112,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         // just assert no priviledged entries were put in the registry
         final Application app = findApp("dummy-app");
-        final Object obj = app.getMuleContext().getRegistry().lookupObject(PRIVILEDGED_KEY_DEPLOYMENT_SERVICE);
+        final Object obj = app.getMuleContext().getRegistry().lookupObject(PriviledgedMuleApplication.REGISTRY_KEY_DEPLOYMENT_SERVICE);
         assertNull(obj);
         assertFalse(((ApplicationWrapper) app).getDelegate() instanceof PriviledgedMuleApplication);
     }

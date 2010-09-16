@@ -11,6 +11,8 @@ import org.mule.module.launcher.DeploymentService;
 public class PriviledgedMuleApplication extends DefaultMuleApplication
 {
 
+    public static final String REGISTRY_KEY_DEPLOYMENT_SERVICE = "deploymentService";
+
     protected DeploymentService deploymentService;
 
     protected PriviledgedMuleApplication(String appName)
@@ -32,7 +34,7 @@ public class PriviledgedMuleApplication extends DefaultMuleApplication
         {
             if (getDescriptor().isPriviledged())
             {
-                getMuleContext().getRegistry().registerObject("deploymentService", deploymentService);
+                getMuleContext().getRegistry().registerObject(REGISTRY_KEY_DEPLOYMENT_SERVICE, deploymentService);
             }
         }
         catch (RegistrationException e)
