@@ -39,7 +39,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
         d.setDomain(p.getProperty("domain"));
 
         // get a ref to an optional app props file (right next to the descriptor)
-        final File appPropsFile = new File(descriptor.getParent(), "mule-app.properties");
+        final File appPropsFile = new File(descriptor.getParent(), ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE);
         if (appPropsFile.exists() && appPropsFile.canRead())
         {
             final Properties props = PropertiesUtils.loadProperties(appPropsFile.toURI().toURL());
