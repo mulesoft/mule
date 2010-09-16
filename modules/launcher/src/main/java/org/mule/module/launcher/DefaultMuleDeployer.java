@@ -30,10 +30,17 @@ public class DefaultMuleDeployer implements MuleDeployer
 
     protected transient final Log logger = LogFactory.getLog(getClass());
     private DeploymentService deploymentService;
+    private ApplicationFactory applicationFactory;
 
     public DefaultMuleDeployer(DeploymentService deploymentService)
     {
+        this(deploymentService, new ApplicationFactory());
+    }
+
+    public DefaultMuleDeployer(DeploymentService deploymentService, ApplicationFactory applicationFactory)
+    {
         this.deploymentService = deploymentService;
+        this.applicationFactory = applicationFactory;
     }
 
     public void deploy(Application app)

@@ -66,7 +66,7 @@ public class DefaultMuleApplication implements Application
     private String appName;
     private MuleContext muleContext;
     private ClassLoader deploymentClassLoader;
-    protected ApplicationDescriptor descriptor;
+    private ApplicationDescriptor descriptor;
 
     protected String[] absoluteResourcePaths;
 
@@ -209,12 +209,6 @@ public class DefaultMuleApplication implements Application
 
                 DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
                 this.muleContext = muleContextFactory.createMuleContext(builders, new ApplicationMuleContextBuilder(descriptor));
-
-                if (descriptor.isPriviledged())
-                {
-                    // TODO implement
-                    this.muleContext.getRegistry().registerObject("deploymentService", "TODO");
-                }
 
                 if (descriptor.isRedeploymentEnabled())
                 {

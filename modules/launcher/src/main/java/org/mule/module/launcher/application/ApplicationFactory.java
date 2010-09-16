@@ -7,7 +7,8 @@ import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import java.io.IOException;
 
 /**
- *
+ * Responsible for creating application objects. E.g. handles the default/priviledged app,
+ * wrapper objects, etc.
  */
 public class ApplicationFactory
 {
@@ -17,9 +18,7 @@ public class ApplicationFactory
         final ApplicationDescriptor descriptor = bh.fetch(appName);
         if (descriptor.isPriviledged())
         {
-            // TODO implement
-            //delegate = new PriviledgedMuleApplication(appName);
-            return new ApplicationWrapper(new DefaultMuleApplication(appName));
+            return new ApplicationWrapper(new PriviledgedMuleApplication(appName));
         }
         else
         {

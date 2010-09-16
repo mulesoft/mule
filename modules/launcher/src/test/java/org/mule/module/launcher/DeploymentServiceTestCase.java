@@ -12,6 +12,8 @@ package org.mule.module.launcher;
 
 import org.mule.api.config.MuleProperties;
 import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.application.ApplicationWrapper;
+import org.mule.module.launcher.application.PriviledgedMuleApplication;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -92,9 +94,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final Application app = findApp("priviledged-dummy-app");
         // now that we're sure it's the app we wanted, assert the registry has everything
         // a 'priviledged' app would have had
-        // TODO some constants for priviledged registry ken names
+        // TODO some constants for priviledged registry key names
         final Object obj = app.getMuleContext().getRegistry().lookupObject(PRIVILEDGED_KEY_DEPLOYMENT_SERVICE);
         assertNotNull("Priviledged objects have not been registered", obj);
+        assertTrue(((ApplicationWrapper) app).getDelegate() instanceof PriviledgedMuleApplication);
     }
 
     public void testDeployZipOnStartup() throws Exception
@@ -113,6 +116,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final Application app = findApp("dummy-app");
         final Object obj = app.getMuleContext().getRegistry().lookupObject(PRIVILEDGED_KEY_DEPLOYMENT_SERVICE);
         assertNull(obj);
+        assertFalse(((ApplicationWrapper) app).getDelegate() instanceof PriviledgedMuleApplication);
     }
 
     public void testUpdateAppViaZip() throws Exception

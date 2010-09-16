@@ -168,4 +168,9 @@ public class ApplicationWrapper implements Application
     {
         return String.format("%s(%s)", getClass().getName(), delegate);
     }
+
+    public Application getDelegate()
+    {
+        return delegate;
+    }
 }
