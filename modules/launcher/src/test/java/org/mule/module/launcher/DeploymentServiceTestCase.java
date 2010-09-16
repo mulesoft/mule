@@ -19,6 +19,7 @@ import org.mule.util.concurrent.Latch;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -34,6 +35,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
     protected static final int LATCH_TIMEOUT = 10000;
     protected static final String[] NONE = new String[0];
+    // TODO use a common constants class
+    protected static final String PRIVILEDGED_KEY_DEPLOYMENT_SERVICE = "deploymentService";
 
     protected File muleHome;
     protected File appsDir;
@@ -73,6 +76,26 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         super.doTearDown();
     }
 
+    public void testPriviledgedApp() throws Exception
+    {
+        final URL url = getClass().getResource("/priviledged-dummy-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        deploymentService.start();
+
+        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+
+        assertAppsDir(NONE, new String[] {"priviledged-dummy-app"});
+
+        final Application app = findApp("priviledged-dummy-app");
+        // now that we're sure it's the app we wanted, assert the registry has everything
+        // a 'priviledged' app would have had
+        // TODO some constants for priviledged registry ken names
+        final Object obj = app.getMuleContext().getRegistry().lookupObject(PRIVILEDGED_KEY_DEPLOYMENT_SERVICE);
+        assertNotNull("Priviledged objects have not been registered", obj);
+    }
+
     public void testDeployZipOnStartup() throws Exception
     {
         final URL url = getClass().getResource("/dummy-app.zip");
@@ -84,6 +107,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
 
         assertAppsDir(NONE, new String[] {"dummy-app"});
+
+        // just assert no priviledged entries were put in the registry
+        final Application app = findApp("dummy-app");
+        final Object obj = app.getMuleContext().getRegistry().lookupObject(PRIVILEDGED_KEY_DEPLOYMENT_SERVICE);
+        assertNull(obj);
     }
 
     public void testUpdateAppViaZip() throws Exception
@@ -104,6 +132,20 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertAppsDir(NONE, new String[] {"dummy-app"});
     }
 
+    /**
+     * Find a deployed app, performing some basic assertions.
+     */
+    private Application findApp(final String appName)
+    {
+        final List<Application> apps = deploymentService.getApplications();
+        assertNotNull(apps);
+        assertEquals(1, apps.size());
+        final Application app = apps.get(0);
+        assertNotNull(app);
+        assertEquals("Wrong application name", appName, app.getAppName());
+        return app;
+    }
+
     private void assertAppsDir(String[] expectedZips, String[] expectedApps)
     {
         final String[] actualZips = appsDir.list(new SuffixFileFilter(".zip"));
@@ -112,6 +154,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertArrayEquals("Invalid Mule exploded applications set", expectedApps, actualApps);
     }
 
+    /**
+     * Copies a given app archive to the apps folder for deployment.
+     */
     private void addAppArchive(URL url) throws IOException
     {
         // copy is not atomic, copy to a temp file and rename instead (rename is atomic)

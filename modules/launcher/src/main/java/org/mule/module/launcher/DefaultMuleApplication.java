@@ -58,7 +58,7 @@ public class DefaultMuleApplication implements Application
 
     protected String[] absoluteResourcePaths;
 
-    public DefaultMuleApplication(String appName)
+    protected DefaultMuleApplication(String appName)
     {
         this.appName = appName;
     }
@@ -201,7 +201,7 @@ public class DefaultMuleApplication implements Application
                 if (descriptor.isPriviledged())
                 {
                     // TODO implement
-                    this.muleContext.getRegistry().registerObject("deploymentService", null);
+                    this.muleContext.getRegistry().registerObject("deploymentService", "TODO");
                 }
 
                 if (descriptor.isRedeploymentEnabled())

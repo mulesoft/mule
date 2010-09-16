@@ -26,19 +26,9 @@ public class ApplicationWrapper implements Application
 
     private Application delegate;
 
-    public ApplicationWrapper(String appName) throws IOException
+    protected ApplicationWrapper(Application delegate) throws IOException
     {
-        AppBloodhound bh = new DefaultAppBloodhound();
-        final ApplicationDescriptor descriptor = bh.fetch(appName);
-        if (descriptor.isPriviledged())
-        {
-            // TODO implement
-            //delegate = new PriviledgedMuleApplication(appName);
-        }
-        else
-        {
-            delegate = new DefaultMuleApplication(appName);
-        }
+        this.delegate = delegate;
     }
 
     public void dispose()
@@ -173,9 +163,6 @@ public class ApplicationWrapper implements Application
     @Override
     public String toString()
     {
-        return String.format("%s(%s)@%s", getClass().getName(),
-                             delegate,
-                             Integer.toHexString(System.identityHashCode(this)));
-
+        return String.format("%s(%s)", getClass().getName(), delegate);
     }
 }

@@ -121,6 +121,6 @@ public class DefaultMuleDeployer implements MuleDeployer
         }
 
         // appname is never null by now
-        return new ApplicationWrapper(appName);
+        return ApplicationFactory.createApp(appName);
     }
 }

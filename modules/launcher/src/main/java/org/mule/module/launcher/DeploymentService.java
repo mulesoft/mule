@@ -101,10 +101,10 @@ public class DeploymentService
 
         for (String app : apps)
         {
-            final ApplicationWrapper a;
+            final Application a;
             try
             {
-                a = new ApplicationWrapper(app);
+                a = ApplicationFactory.createApp(app);
                 applications.add(a);
             }
             catch (IOException e)
@@ -315,7 +315,7 @@ public class DeploymentService
                 logger.info("================== New Exploded Application: " + appName);
             }
 
-            Application a = new ApplicationWrapper(appName);
+            Application a = ApplicationFactory.createApp(appName);
             // add to the list of known apps first to avoid deployment loop on failure
             applications.add(a);
             deployer.deploy(a);
