@@ -17,6 +17,7 @@ import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationWrapper;
 import org.mule.module.launcher.application.PriviledgedMuleApplication;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.util.CollectionUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.Latch;
@@ -24,6 +25,7 @@ import org.mule.util.concurrent.Latch;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -185,7 +187,8 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final String[] actualZips = appsDir.list(new SuffixFileFilter(".zip"));
         assertArrayEquals("Invalid Mule application archives set", expectedZips, actualZips);
         final String[] actualApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-        assertArrayEquals("Invalid Mule exploded applications set", expectedApps, actualApps);
+        assertTrue("Invalid Mule exploded applications set",
+                   CollectionUtils.isEqualCollection(Arrays.asList(expectedApps), Arrays.asList(actualApps)));
     }
 
     /**
