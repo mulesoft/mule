@@ -11,8 +11,10 @@
 package org.mule.module.launcher;
 
 import org.mule.api.MuleContext;
+import org.mule.api.component.JavaComponent;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.construct.SimpleService;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationWrapper;
 import org.mule.module.launcher.application.PriviledgedMuleApplication;
@@ -129,6 +131,13 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertNotSame(privApp.getDeploymentClassLoader(), dummyApp.getDeploymentClassLoader());
         final Collection<FlowConstruct> flowConstructs = dummyApp.getMuleContext().getRegistry().lookupObjects(FlowConstruct.class);
         assertFalse("No FlowConstructs found in the sibling app", flowConstructs.isEmpty());
+        FlowConstruct fc = flowConstructs.iterator().next();
+        assertTrue(fc instanceof SimpleService);
+        SimpleService service = (SimpleService) fc;
+        // note that we don't have this class available to this test directly
+        //((JavaComponent) component).getObjectFactory().getObjectClass()
+        Class<?> clazz = ((JavaComponent) service.getComponent()).getObjectType();
+        assertEquals("Wrong component implementation class", "org.mule.module.launcher.EchoTest", clazz.getName());
     }
 
     public void testDeployZipOnStartup() throws Exception
