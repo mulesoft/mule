@@ -135,7 +135,6 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertTrue(fc instanceof SimpleService);
         SimpleService service = (SimpleService) fc;
         // note that we don't have this class available to this test directly
-        //((JavaComponent) component).getObjectFactory().getObjectClass()
         Class<?> clazz = ((JavaComponent) service.getComponent()).getObjectType();
         assertEquals("Wrong component implementation class", "org.mule.module.launcher.EchoTest", clazz.getName());
     }
