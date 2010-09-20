@@ -1,7 +1,7 @@
 GETTING STARTED WITH MULE
 =========================
 
-This file describes the basics of how to get started using Mule. 
+This file describes the basics of how to get started using Mule.
 For full deta ils,see the Mule Getting Started Guide at:
 http://www.mulesoft.org/documentation/display/MULE3INTRO/Home
 
@@ -25,7 +25,7 @@ Linux/Unix:
 
 Windows:
     set MULE_HOME=C:\Mule
-    set PATH=%PATH%;%MULE_HOME%\bin 
+    set PATH=%PATH%;%MULE_HOME%\bin
 
 
 Distribution Contents
@@ -33,7 +33,7 @@ Distribution Contents
 
 The Mule distribution contains the following directories and files:
 
-/bin            Shell and batch scripts for controlling Mule from the command 
+/bin            Shell and batch scripts for controlling Mule from the command
                 line
 /conf           Configuration files
 /docs           API documentation (Javadoc) for Mule and its sub-projects
@@ -43,8 +43,8 @@ The Mule distribution contains the following directories and files:
 /lib/mule       Mule libraries
 /lib/opt        Third-party libraries
 /lib/user       Your custom classes and libraries. This directory comes before
-                /lib/mule on the classpath and can be used to patch the 
-                distributed Mule classes. You must restart Mule after adding 
+                /lib/mule on the classpath and can be used to patch the
+                distributed Mule classes. You must restart Mule after adding
                 files to this directory.
 /licenses       License information for all libraries shipped with Mule
 /logs           Log file output when running in background mode
@@ -64,25 +64,14 @@ This section describes how to run Mule.
 Starting with the Examples
 --------------------------
 
-To run Mule, you must specify a configuration file to use. Typically,
-this is an XML file called mule-config.xml. The examples directory
-provides you with several examples of Mule applications including
-their configuration files, which you can use as the starting point
-for creating your configuration file. For more information,
-see http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples.
+The examples directory provides you with several examples of Mule
+applications including their configuration files, which you can
+use as the starting point for creating your configuration file.
 
-
-Working with Configuration Files
---------------------------------
-
-If needed, you can specify more than one configuration file in a
-comma-separated list. This approach is useful for splitting up
-your Mule configuration to make it more manageable. All configuration
-files must be on the classpath prior to startup. A convenient way
-to achieve this is by placing them in the /conf or /lib/user directory
-Alternatively, you can specify an explicit path to their location on
-the file system. If you make changes to a configuration file, you must
-restart Mule for the changes to take effect.
+All of the examples come pre-built. To test an example, just copy
+its zip file to the applications folder ($MULE_HOME/apps) and
+start Mule. For more information see
+http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples.
 
 
 Using the Command Prompt
@@ -90,27 +79,17 @@ Using the Command Prompt
 
 To run Mule, you enter the following command at the command prompt:
 
-    mule [-config your-config.xml]
+    mule
 
-where your-config.xml is the Mule XML configuration file you want to use.
-This command runs Mule in the foreground. To stop Mule, enter Ctrl-C.
+To stop Mule, enter Ctrl-C.
 
 To run Mule in the background as a daemon, enter the following command
 instead, using start, stop, or restart as the first parameter as needed:
 
-    mule start|stop|restart [-config <your-config.xml>]
+    mule start|stop|restart
 
-For more information on running Mule, see: 
+For more information on running Mule, see:
 http://www.mulesoft.org/documentation/display/MULE3INTRO/Running+Mule.
-
-
-Additional Setup for Community Edition Users
---------------------------------------------
-
-If you are running Mule Community Edition, the Common Public Attribution 
-License (CPAL) is displayed page by page when you start Mule for the first 
-time.  To advance a page, press Enter. At the end of the license display, 
-type y to accept the license file and proceed with startup.
 
 
 Where Do I Go Next?
@@ -120,16 +99,16 @@ This document has provided a brief overview of getting started
 with Mule. Following is information about where to go next.
 
 - For information on more ways to run Mule and how to get started using
-the examples, go to the Getting Started Guide at: 
+the examples, go to the Getting Started Guide at:
 http://www.mulesoft.org/documentation/display/MULE3INTRO/Home
 
 - For complete information on using Mule, go to the Mule User Guide at:
-http://www.mulesoft.org/documentation/display/MULE3USER/Home. You will need to 
-register to view these pages, but registration is free and only takes a few 
+http://www.mulesoft.org/documentation/display/MULE3USER/Home. You will need to
+register to view these pages, but registration is free and only takes a few
 moments.
 
 - If you need assistance and are a Mule Enterprise customer,
-see the support page at: 
+see the support page at:
 http://www.mulesoft.com/enterprise-subscriptions-and-support
 
 - If you are evaluating Mule and want to find out about subscription
