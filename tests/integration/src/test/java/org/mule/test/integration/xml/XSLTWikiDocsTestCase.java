@@ -9,19 +9,20 @@
  */
 package org.mule.test.integration.xml;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.IOUtils;
-import org.mule.module.client.MuleClient;
-import org.mule.api.MuleMessage;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.custommonkey.xmlunit.XMLUnit;
 
 //START SNIPPET: test-code
 public class XSLTWikiDocsTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/xml/xslt-functional-test.xml";
@@ -44,7 +45,7 @@ public class XSLTWikiDocsTestCase extends FunctionalTestCase
             MuleClient client = new MuleClient(muleContext);
 
             //These are the message roperties that will get passed into the XQuery context
-            Map props = new HashMap();
+            Map<String, Object> props = new HashMap<String, Object>();
             props.put("ListTitle", "MyList");
             props.put("ListRating", new Integer(6));
 

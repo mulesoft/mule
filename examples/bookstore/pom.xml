@@ -27,38 +27,32 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <!-- Transports used by the Mule config -->
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-servlet</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-email</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jetty</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <!-- CXF assumes you have an XSLT engine available -->
         <dependency>
@@ -94,13 +88,40 @@
     </dependencies>
     
     <build>
-        <testResources>
-            <testResource>
-                <directory>src/main/app</directory>
-            </testResource>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-builders</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-servlet</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-cxf</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-email</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-vm</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-jetty</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>

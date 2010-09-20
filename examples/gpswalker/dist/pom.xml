@@ -41,7 +41,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.1</version>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
@@ -51,8 +51,24 @@
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>maven-mule-plugin</artifactId>
-                <version>1.1</version>
+                <version>1.3</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-builders</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-quartz</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-ajax</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -82,19 +98,16 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
             <version>${muleVersion}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-quartz</artifactId>
             <version>${muleVersion}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ajax</artifactId>
             <version>${muleVersion}</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

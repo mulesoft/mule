@@ -11,24 +11,47 @@
     <packaging>mule</packaging>
     <description>A simple example that demonstrates Mule's JSR-223 Scripting support.</description>
 
+    <build>
+         <plugins>
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-scripting</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-client</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-http</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
@@ -56,15 +79,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
-    <build>
-        <testResources>
-            <testResource>
-                <directory>src/main/app</directory>
-            </testResource>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
-    </build>
 </project>

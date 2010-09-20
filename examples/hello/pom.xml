@@ -11,30 +11,56 @@
     <name>Hello Example</name>
     <description>Shows how to configure multiple components to interact on a single request and how to manage event transformations.</description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.mule</groupId>
+                            <artifactId>mule-core</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-http</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-servlet</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-vm</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-servlet</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- test dependencies -->
@@ -45,15 +71,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
-    <build>
-        <testResources>
-            <testResource>
-                <directory>src/main/app</directory>
-            </testResource>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
-    </build>
 </project>

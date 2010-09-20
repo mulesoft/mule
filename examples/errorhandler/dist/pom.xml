@@ -28,49 +28,41 @@
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <version>${muleVersion}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${muleVersion}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-extras</artifactId>
             <version>${muleVersion}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${muleVersion}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
             <version>${muleVersion}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-email</artifactId>
             <version>${muleVersion}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jms</artifactId>
             <version>${muleVersion}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-file</artifactId>
             <version>${muleVersion}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -227,7 +219,6 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
             <version>${javaMailVersion}</version>
-            <scope>provided></scope>
         </dependency>
     </dependencies>
 
@@ -279,19 +270,6 @@
         <defaultGoal>install</defaultGoal>
         <finalName>${artifactId}</finalName>
 
-        <!--
-            src/main/app contains the config file. Add this folder to the test resources so that
-            our unit tests can find it.
-         -->
-        <testResources>
-            <testResource>
-                <directory>src/main/app</directory>
-            </testResource>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -316,7 +294,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.1</version>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
@@ -326,8 +304,48 @@
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>maven-mule-plugin</artifactId>
-                <version>1.1</version>
+                <version>1.3</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.mule</groupId>
+                            <artifactId>mule-core</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-spring-config</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-spring-extras</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-xml</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-scripting</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-email</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-jms</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-file</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>javax.mail</groupId>
+                            <artifactId>mail</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </configuration>
             </plugin>
             <!--
                 "mvn install" will copy the application to the $MULE_HOME/apps directory, overwriting the

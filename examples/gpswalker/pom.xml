@@ -13,32 +13,56 @@
     <description>Simulates plotting GPS coordinates.
         To run directly in Maven use the 'mvn exec:exec' command and go to http://localhost:8081/index.html</description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-builders</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-annotations</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-quartz</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-ajax</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
-        <!-- note that Mule core dependencies are scoped as provided since they will be available in the contianer in the
-        shared class loader -->
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-annotations</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-quartz</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ajax</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

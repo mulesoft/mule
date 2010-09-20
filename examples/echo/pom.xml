@@ -11,20 +11,7 @@
     <name>Echo Example</name>
     <description>Is a simple component example that demonstrates how to expose a component over multiple transports (soap and stream).</description>
 
-    <build>
-        <!-- 
-            The mule config file is located in src/main/app where the maven-mule-plugin picks it
-            up. To have this config available during testing, add src/main/app to the test resources.
-        -->
-        <testResources>
-            <testResource>
-                <directory>${basedir}/src/test/resources</directory>
-            </testResource>
-            <testResource>
-                <directory>${basedir}/src/main/app</directory>
-            </testResource>
-        </testResources>
-    
+    <build>    
          <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -37,6 +24,27 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-cxf</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-vm</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-client</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -45,19 +53,16 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- test dependencies -->
