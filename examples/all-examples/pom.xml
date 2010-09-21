@@ -47,7 +47,10 @@
             <version>${version}</version>
             <type>zip</type>
         </dependency>
-        <dependency>
+        <!--
+            LoanBroker examples aren't bundled (only the loanbroker-simple app.
+        -->
+        <!--<dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-bpm</artifactId>
             <version>${version}</version>
@@ -71,7 +74,7 @@
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-esn</artifactId>
             <version>${version}</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.mule.examples</groupId>
             <artifactId>mule-example-loanbroker-simple</artifactId>
