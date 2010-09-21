@@ -1,5 +1,5 @@
 /*
- * $Id: JmsStreamMessageTestCase.java 11700 2008-05-08 11:16:01Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

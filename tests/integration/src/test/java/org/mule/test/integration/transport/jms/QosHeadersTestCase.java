@@ -1,5 +1,5 @@
 /*
- * $Id:QosHeadersTestCase.java 7261 2007-06-27 02:23:03Z aperepel $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
