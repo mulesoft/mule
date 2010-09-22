@@ -17,7 +17,7 @@
          key store is being used in the tests -->
 
     <imaps:connector name="imapsConnector" backupEnabled="false" backupFolder="newBackup" checkFrequency="1234"
-                     mailboxFolder="newMailbox" deleteReadMessages="false">
+                     mailboxFolder="newMailbox" deleteReadMessages="false" defaultProcessMessageAction="NONE">
         <imaps:tls-client path="empty.jks" storePassword="password"/>
         <imaps:tls-trust-store path="empty.jks" storePassword="password"/>
     </imaps:connector>

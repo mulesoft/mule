@@ -11,15 +11,37 @@ package org.mule.transport.email.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
+import org.mule.config.spring.parsers.assembly.configuration.SimplePropertyConfiguration;
+import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
 import org.mule.transport.email.transformers.EmailMessageToString;
 import org.mule.transport.email.transformers.MimeMessageToRfc822ByteArray;
 import org.mule.transport.email.transformers.ObjectToMimeMessage;
 import org.mule.transport.email.transformers.Rfc822ByteArraytoMimeMessage;
 import org.mule.transport.email.transformers.StringToEmailMessage;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.mail.Flags;
+
 public class EmailNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
+    static ValueMap DEFAULT_PROCESS_MESSAGE_ACTION;
+    
+    static {
+        Map<String, Flags.Flag> mapping = new HashMap<String, Flags.Flag>();
+        mapping.put("ANSWERED", Flags.Flag.ANSWERED);
+        mapping.put("DELETED", Flags.Flag.DELETED);
+        mapping.put("DRAFT", Flags.Flag.DRAFT);
+        mapping.put("FLAGGED", Flags.Flag.FLAGGED);
+        mapping.put("RECENT", Flags.Flag.RECENT);
+        mapping.put("SEEN", Flags.Flag.SEEN);
+        mapping.put("USER", Flags.Flag.USER);
+        mapping.put("NONE", null);
+        DEFAULT_PROCESS_MESSAGE_ACTION = new SimplePropertyConfiguration.IndentityMapValueMap(mapping);
+    };
+    
     public void init()
     {
         registerBeanDefinitionParser("email-to-string-transformer", new MessageProcessorDefinitionParser(EmailMessageToString.class));

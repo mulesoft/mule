@@ -60,7 +60,7 @@
                 <xsd:attribute name="deleteReadMessages" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether to delete messages from the server when they have been downloaded. The default is true. If set to false, the messages are set to SEEN.
+                            Whether to delete messages from the server when they have been downloaded. The default is true. If set to false, the messages are set to defaultProcessMessageAction attribute value.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -70,6 +70,13 @@
                             The remote folder to move mail to once it has been read.  It is recommended that @deleteReadMessages is set to false when this is used.
                             This is very useful when working with public email services such as GMail where marking messages for deletion doesn't work. Instead
                             set the @moveToFolder=[GMail]/Trash.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="defaultProcessMessageAction" type="xsd:string" default="SEEN">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The action performed if the deleteReadMessages attribute is set to false.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

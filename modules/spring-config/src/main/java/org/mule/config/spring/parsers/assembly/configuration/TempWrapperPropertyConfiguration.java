@@ -123,7 +123,7 @@ public class TempWrapperPropertyConfiguration implements PropertyConfiguration
     public Object translateValue(String name, String value)
     {
         Object intermediate = delegate.translateValue(name, value);
-        if (intermediate.equals(value))
+        if (intermediate != null && intermediate.equals(value))
         {
             return extra.translateValue(name, value);
         }

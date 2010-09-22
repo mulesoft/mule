@@ -13,6 +13,8 @@ import org.mule.api.MuleException;
 import org.mule.transport.email.ImapConnector;
 import org.mule.transport.email.ImapsConnector;
 
+import javax.mail.Flags;
+
 public class ImapNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerTestCase
 {
     protected String getConfigResources()
@@ -35,6 +37,8 @@ public class ImapNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
+        
+        assertEquals(Flags.Flag.SEEN, c.getDefaultProcessMessageAction());
     }
 
     public void testSecureConfig() throws Exception
@@ -59,6 +63,8 @@ public class ImapNamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
+        
+        assertNull(c.getDefaultProcessMessageAction());
     }
 
     public void testEndpoint() throws MuleException

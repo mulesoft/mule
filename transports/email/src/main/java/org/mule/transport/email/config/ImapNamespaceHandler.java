@@ -10,11 +10,12 @@
 package org.mule.transport.email.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
+import org.mule.config.spring.parsers.MuleDefinitionParserConfiguration;
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.email.ImapConnector;
 
 /**
- * Reigsters a Bean Definition Parser for handling <code><tcp:connector></code> elements.
+ * Registers a Bean Definition Parser for handling <code><imap:connector></code> elements.
  *
  */
 public class ImapNamespaceHandler extends AbstractMuleNamespaceHandler
@@ -23,7 +24,9 @@ public class ImapNamespaceHandler extends AbstractMuleNamespaceHandler
     public void init()
     {
         registerStandardTransportEndpoints(ImapConnector.IMAP, URIBuilder.USERHOST_ATTRIBUTES);
-        registerConnectorDefinitionParser(ImapConnector.class);
+
+        MuleDefinitionParserConfiguration parser = registerConnectorDefinitionParser(ImapConnector.class);
+        parser.addMapping("defaultProcessMessageAction", EmailNamespaceHandler.DEFAULT_PROCESS_MESSAGE_ACTION);
     }
 
 }

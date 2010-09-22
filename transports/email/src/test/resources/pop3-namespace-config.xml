@@ -17,7 +17,7 @@
          key store is being used in the tests -->
 
     <pop3s:connector name="pop3sConnector" backupEnabled="true" backupFolder="newBackup" checkFrequency="1234"
-                     mailboxFolder="newMailbox" deleteReadMessages="false">
+                     mailboxFolder="newMailbox" deleteReadMessages="false" defaultProcessMessageAction="ANSWERED">
         <pop3s:tls-client path="empty.jks" storePassword="password"/>
         <pop3s:tls-trust-store path="empty.jks" storePassword="password"/>
     </pop3s:connector>

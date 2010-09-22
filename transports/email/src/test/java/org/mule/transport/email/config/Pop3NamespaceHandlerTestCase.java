@@ -13,6 +13,8 @@ import org.mule.api.MuleException;
 import org.mule.transport.email.Pop3Connector;
 import org.mule.transport.email.Pop3sConnector;
 
+import javax.mail.Flags;
+
 /**
  * TODO
  */
@@ -39,6 +41,7 @@ public class Pop3NamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
 
+        assertEquals(Flags.Flag.SEEN, c.getDefaultProcessMessageAction());
     }
 
     public void testSecureConfig() throws Exception
@@ -63,6 +66,8 @@ public class Pop3NamespaceHandlerTestCase extends AbstractEmailNamespaceHandlerT
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
+        
+        assertEquals(Flags.Flag.ANSWERED, c.getDefaultProcessMessageAction());
     }
 
     public void testEndpoint() throws MuleException
