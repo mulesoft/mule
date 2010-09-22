@@ -88,7 +88,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
                 throw new ServletException(ServletMessages.noServletConnectorFound(name).toString());
             }
         }
-        this.useCachedHttpServletRequest = connector.isUseCachedHttpServletRequest();
+        this.useCachedHttpServletRequest = servletConnector.isUseCachedHttpServletRequest();
         return servletConnector;
     }
 
