@@ -51,6 +51,8 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     private static final long serialVersionUID = 6631307373079767439L;
 
     protected ServletConnector connector = null;
+    
+    private boolean useCachedHttpServletRequest = false;
 
     @Override
     protected void doInit() throws ServletException
@@ -86,7 +88,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
                 throw new ServletException(ServletMessages.noServletConnectorFound(name).toString());
             }
         }
-
+        this.useCachedHttpServletRequest = connector.isUseCachedHttpServletRequest();
         return servletConnector;
     }
 
@@ -209,6 +211,10 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
+        	if (this.useCachedHttpServletRequest)
+            {
+                request = new CachedHttpServletRequest(request);
+            }
             MessageReceiver receiver = getReceiverForURI(request);
             
             MuleMessage requestMessage = receiver.createMuleMessage(request);

@@ -8,7 +8,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/3.0/mule-servlet.xsd">
 
-    <servlet:connector name="servletConnector" servletUrl="foo"/>
+    <servlet:connector name="servletConnector" servletUrl="foo" useCachedHttpServletRequest="true"/>
 
     <servlet:endpoint name="ep" path="foo/bar"/>
 </mule>
