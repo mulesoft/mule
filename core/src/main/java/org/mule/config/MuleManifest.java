@@ -38,7 +38,8 @@ public class MuleManifest
 
     public static String getProductVersion()
     {
-        return getManifestProperty("Implementation-Version");
+        final String version = getManifestProperty("Implementation-Version");
+        return version == null ? "Unknown" : version;
     }
 
     public static String getVendorName()
