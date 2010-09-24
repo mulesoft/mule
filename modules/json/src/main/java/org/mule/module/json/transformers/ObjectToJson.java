@@ -15,8 +15,9 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.module.json.filters.IsJsonFilter;
 import org.mule.transformer.types.DataTypeFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -95,23 +96,30 @@ public class ObjectToJson extends AbstractJsonTransformer
             src = this.getException(message.getExceptionPayload().getException());
         }
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        StringWriter writer = new StringWriter();
         try
         {
-            getMapper().writeValue(baos, src);
+            getMapper().writeValue(writer, src);
         }
         catch (IOException e)
         {
             throw new TransformerException(this, e);
         }
-
-        if (returnType.equals(byte[].class))
+        
+        if (returnType.getType().equals(byte[].class))
         {
-            return baos.toByteArray();
+            try
+            {
+                return writer.toString().getBytes(outputEncoding);
+            }
+            catch (UnsupportedEncodingException uee)
+            {
+                throw new TransformerException(this, uee);
+            }
         }
         else
         {
-            return baos.toString();
+            return writer.toString();
         }
     }
 

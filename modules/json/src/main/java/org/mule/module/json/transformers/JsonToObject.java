@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.util.HashMap;
@@ -65,8 +66,6 @@ public class JsonToObject extends AbstractJsonTransformer
         {
             getMapper().getDeserializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
         }
-
-
     }
 
     @Override
@@ -75,6 +74,7 @@ public class JsonToObject extends AbstractJsonTransformer
         Object src = message.getPayload();
         Object returnValue;
         InputStream is = null;
+        Reader reader = null;
 
         try
         {
@@ -94,6 +94,7 @@ public class JsonToObject extends AbstractJsonTransformer
             {
                 is = new ByteArrayInputStream((byte[]) src);
             }
+            
             if (src instanceof Reader)
             {
                 if (getReturnClass().equals(JsonData.class))
@@ -118,13 +119,14 @@ public class JsonToObject extends AbstractJsonTransformer
             }
             else
             {
+                reader = new InputStreamReader(is, outputEncoding);
                 if (getReturnClass().equals(JsonData.class))
                 {
-                    returnValue = new JsonData(is);
+                    returnValue = new JsonData(reader);
                 }
                 else
                 {
-                    returnValue = getMapper().readValue(is, getReturnClass());
+                    returnValue = getMapper().readValue(reader, getReturnClass());
                 }
             }
             return returnValue;
@@ -135,10 +137,8 @@ public class JsonToObject extends AbstractJsonTransformer
         }
         finally
         {
-            if (is != null)
-            {
-                IOUtils.closeQuietly(is);
-            }
+            IOUtils.closeQuietly(reader);
+            IOUtils.closeQuietly(is);
         }
     }
 
