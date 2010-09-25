@@ -18,13 +18,12 @@
 
     <xsd:annotation>
         <xsd:documentation>
-            Apache Abdera is a framework which helps you bulid and consume
-            Atom feeds and Atom Publishing Protocol services.
+            The Mule ATOM support makes it possible to integrate easily with Atom feeds and Atom Publishing Protocol servers via the Apache Abdera project.
         </xsd:documentation>
 
         <xsd:appinfo>
-            <schemadoc:short-name>Abdera</schemadoc:short-name>
-            <schemadoc:page-title>Abdera Module</schemadoc:page-title>
+            <schemadoc:short-name>ATOM</schemadoc:short-name>
+            <schemadoc:page-title>ATOM Module</schemadoc:page-title>
 
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
                                           requestEvents="true"
@@ -35,12 +34,99 @@
     </xsd:annotation>
 
     <xsd:element name="route-filter" type="routeFilterType"
-                 substitutionGroup="mule:abstract-filter"/>
+                 substitutionGroup="mule:abstract-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allows ATOM requests to be filtered by request path and HTTP verb.
+            </xsd:documentation>
+        </xsd:annotation>
+                 </xsd:element>
     <xsd:complexType name="routeFilterType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractFilterType">
-                <xsd:attribute name="route" type="xsd:string"/>
-                <xsd:attribute name="verbs" type="xsd:string"/>
+                <xsd:attribute name="route" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The URI request path made for an ATOM request.  This matches against the path of the request URL.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="verbs" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A comma-separated list of HTTP verbs that will be accepted by this filter. By default all
+                            verbs are accepted.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="entry-last-updated-filter" type="entryLastUpdateFilterType"
+                 substitutionGroup="mule:abstract-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                Will filter ATOM entry objects based on their last update date. This is useful for filtering older
+                entries from the feed. This filter works only on Atom Entry objects not Feed objects.
+                Typically it is better to set the lastUpdated attribute on an inbound ATOM endpoint rather than use this filter, however, this filter can be used elsewhere in a flow.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="entryLastUpdateFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractFilterType">
+                <xsd:attribute name="lastUpdate" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The date from which to filter events from.  Any entries that were last updated before this date will not be accepted. The date format is
+                            The format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25 13:00:00.
+                            If only the date is important you can omit the time part.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="acceptWithoutUpdateDate" type="mule:substitutableBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether an entry should be accepted if it doesn't have a Last Update date set.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="feed-last-updated-filter" type="feedLastUpdateFilterType"
+                 substitutionGroup="mule:abstract-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                Will filter the whole ATOM Feed based on its last update date. This is useful for processing a feed that has not been updated since a specific date.
+                This filter works only on Atom Feed objects.
+                Typically it is better to set the lastUpdated attribute on an inbound ATOM endpoint with splitFeed=false rather than use this filter, however, this filter can be used elsewhere in a flow.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="feedLastUpdateFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractFilterType">
+                <xsd:attribute name="lastUpdate" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The date from which to filter events from.  Any entries that were last updated before this date will not be accepted. The date format is
+                            The format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25 13:00:00.
+                            If only the date is important you can omit the time part.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="acceptWithoutUpdateDate" type="mule:substitutableBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether a Feed should be accepted if it doesn't have a Last Update date set.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -153,10 +239,9 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             Allows the endpoint to filter out any feed entries before the given date/time. This is only
-                            used if the feed
-                            is split. the format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25
-                            13:00:00. If only the date
-                            is important you can omit the time part
+                            used if the feed is split.
+                            The format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25
+                            13:00:00. If only the date is important you can omit the time part
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

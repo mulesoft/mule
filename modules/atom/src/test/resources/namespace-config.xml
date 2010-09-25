@@ -2,17 +2,28 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:atom="http://www.mulesoft.org/schema/mule/atom"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/3.0/mule-atom.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
+
+    <atom:feed-last-updated-filter lastUpdate="2009-10-01 13:00:00" acceptWithoutUpdateDate="false" name="feedFilter"/>
 
     <model>
         <service name="test">
             <inbound>
-                <atom:inbound-endpoint address="http://foo.com" 
-                    lastUpdate="2009-10-01" exchange-pattern="one-way"/>
+                <atom:inbound-endpoint address="http://foo.com" lastUpdate="2009-10-01" exchange-pattern="one-way"/>
             </inbound>
             <echo-component/>
         </service>
     </model>
+
+    <flow name="flowTest">
+        <vm:inbound-endpoint path="feed.in">
+            <atom:feed-splitter/>
+            <atom:entry-last-updated-filter lastUpdate="2009-10-01"/>
+        </vm:inbound-endpoint>
+        <echo-component/>
+    </flow>
 </mule>
