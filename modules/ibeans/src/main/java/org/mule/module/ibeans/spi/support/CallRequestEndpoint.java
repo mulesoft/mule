@@ -61,7 +61,7 @@ public class CallRequestEndpoint extends DynamicRequestEndpoint
     @Override
     protected void validateUriTemplate(String uri) throws MalformedEndpointException
     {
-        if (uri.indexOf(":") > uri.indexOf(parser.getStyle().getPrefix()))
+        if (uri.indexOf(parser.getStyle().getPrefix()) > -1 && uri.indexOf(":") > uri.indexOf(parser.getStyle().getPrefix()))
         {
             throw new MalformedEndpointException(CoreMessages.dynamicEndpointsMustSpecifyAScheme(), uri);
         }
