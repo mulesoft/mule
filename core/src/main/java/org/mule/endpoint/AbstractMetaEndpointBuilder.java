@@ -13,6 +13,8 @@ import org.mule.api.MuleContext;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.Connector;
+import org.mule.transport.AbstractConnector;
 import org.mule.util.BeanUtils;
 
 import java.util.Map;
@@ -68,6 +70,7 @@ public abstract class AbstractMetaEndpointBuilder extends EndpointURIEndpointBui
                 //ignore
             }
         }
+        properties.remove("connector");
         super.setProperties(properties);
     }
 
@@ -86,5 +89,16 @@ public abstract class AbstractMetaEndpointBuilder extends EndpointURIEndpointBui
         }
         return string;
     }
-    
+
+    @Override
+    protected Connector getConnector() throws EndpointException
+    {
+        AbstractConnector c = (AbstractConnector) super.getConnector();
+        EndpointURI endpointURI = uriBuilder.getEndpoint();
+        if(!c.supportsProtocol(endpointURI.getFullScheme()))
+        {
+            c.registerSupportedMetaProtocol(endpointURI.getSchemeMetaInfo());
+        }
+        return c;
+    }
 }
