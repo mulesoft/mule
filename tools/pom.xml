@@ -18,6 +18,7 @@
         <module>mule-project-archetype</module>
         <module>mule-module-archetype</module>
         <module>mule-example-archetype</module>
+        <module>ibean-archetype</module>
     </modules>
 
     <profiles>
