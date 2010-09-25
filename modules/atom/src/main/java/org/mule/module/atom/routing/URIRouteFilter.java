@@ -35,14 +35,14 @@ public class URIRouteFilter implements Filter
         route = new Route("", routePattern);
     }
 
-    public void setVerbs(String verbString)
+    public void setVerbsString(String verbString)
     {
         if (verbString.equals("*"))
         {
             return;
         }
 
-        String[] split = verbString.split(" ");
+        String[] split = verbString.split(",");
         verbs = new HashSet<String>();
         for (String s : split)
         {
@@ -52,13 +52,17 @@ public class URIRouteFilter implements Filter
 
     public void setVerbs(Set<String> verbs)
     {
-        this.verbs = verbs;
+        this.verbs = new HashSet<String>(verbs.size());
+        for (String verb : verbs)
+        {
+            this.verbs.add(verb.toUpperCase());
+        }
     }
 
     public boolean accept(MuleMessage message)
     {
         String method = message.getInboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, StringUtils.EMPTY);
-        if (verbs != null && !verbs.contains(method))
+        if (verbs != null && !verbs.contains(method.toUpperCase()))
         {
             return false;
         }

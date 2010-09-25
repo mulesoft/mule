@@ -30,7 +30,7 @@ public class EntryLastUpdatedFilter implements Filter
     private final transient Log logger = LogFactory.getLog(EntryLastUpdatedFilter.class);
     private Date lastUpdate;
 
-    private boolean acceptWithoutUpdateDate = false;
+    private boolean acceptWithoutUpdateDate = true;
 
     public EntryLastUpdatedFilter()
     {

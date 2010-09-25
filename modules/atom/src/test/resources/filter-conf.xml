@@ -15,30 +15,22 @@
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
 
-    <model name="testModel">
+    <flow name="customerService">
+        <inbound-endpoint address="http://localhost:9002" exchange-pattern="request-response"/>
+        <choice>
+            <when>
+                <atom:route-filter route="/bar/:foo"/>
+                <outbound-endpoint address="vm://queue1" exchange-pattern="request-response"/>
+            </when>
+            <when>
+                <atom:route-filter route="/baz" verbs="GET,POST"/>
+                <outbound-endpoint address="vm://queue1" exchange-pattern="request-response"/>
+            </when>
+        </choice>
+    </flow>
 
-        <service name="customerService">
-            <inbound>
-                <inbound-endpoint address="http://localhost:9002" exchange-pattern="request-response"/>
-            </inbound>
-            <outbound>
-                <filtering-router>
-                    <outbound-endpoint address="vm://queue1" exchange-pattern="request-response"/>
-                    <atom:route-filter route="/bar/:foo"/>
-
-                </filtering-router>
-                <filtering-router>
-                    <outbound-endpoint address="vm://queue1" exchange-pattern="request-response"/>
-                    <atom:route-filter route="/baz"/>
-                </filtering-router>
-            </outbound>
-        </service>
-
-        <service name="queue">
-            <inbound>
-                <inbound-endpoint address="vm://queue1" exchange-pattern="request-response"/>
-            </inbound>
-            <test:component appendString=" received"/>
-        </service>
-    </model>
+    <flow name="queue">
+        <inbound-endpoint address="vm://queue1" exchange-pattern="request-response"/>
+        <test:component appendString=" received"/>
+    </flow>
 </mule>

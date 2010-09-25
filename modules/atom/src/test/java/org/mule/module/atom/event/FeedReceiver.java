@@ -9,23 +9,20 @@
  */
 package org.mule.module.atom.event;
 
-import org.mule.api.MuleEventContext;
-import org.mule.api.lifecycle.Callable;
+import org.mule.api.annotations.param.Payload;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.abdera.model.Feed;
-import org.mule.transformer.types.DataTypeFactory;
 
-public class EventReceiver implements Callable
+public class FeedReceiver
 {
 
-    public static int receivedEntries = 0;
+    public static AtomicInteger receivedEntries = new AtomicInteger(0);
 
-    public Object onCall(MuleEventContext eventContext) throws Exception
+    public void processFeed(@Payload Feed feed) throws Exception
     {
-        Feed feed = (Feed) eventContext.getMessage().getPayload(DataTypeFactory.create(Feed.class));
         System.out.println("Received " + feed.getEntries().size() + " events");
-
-        receivedEntries = feed.getEntries().size();
-        return null;
+        receivedEntries.set(feed.getEntries().size());
     }
 }

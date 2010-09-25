@@ -46,9 +46,9 @@ public class EventTest extends FunctionalTestCase
         Document<Feed> doc = res.getDocument();
         Feed feed = doc.getRoot();
 
-        assertEquals(1, feed.getEntries().size());
+        assertTrue( feed.getEntries().size() >= 1);
 
-        assertTrue(EventReceiver.receivedEntries > 0);
+        assertTrue(EntryReceiver.receivedEntries.get() > 0);
     }
 
     @Override

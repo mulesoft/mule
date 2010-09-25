@@ -52,7 +52,7 @@ public class AtomEventTest extends FunctionalTestCase
         Thread.sleep(1000);
 
         AbderaClient aClient = new AbderaClient();
-        ClientResponse res = aClient.get("http://localhost:9002/events");
+        ClientResponse res = aClient.get("http://localhost:9003/events");
 
         Document<Feed> doc = res.getDocument();
         Feed feed = doc.getRoot();

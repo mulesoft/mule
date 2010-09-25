@@ -26,37 +26,25 @@
                              expression="'urn:uuid:' + java.util.UUID.randomUUID().toString()"/>
     </atom:entry-builder-transformer>
 
-    <model name="testModel">
 
-        <service name="EventPublisher">
-            <inbound>
-                <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
-            </inbound>
+    <flow name="EventPublisher">
+        <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
 
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint address="http://localhost:9002/events" exchange-pattern="request-response"
-                                       mimeType="application/atom+xml;type=entry">
-                        <transformer ref="defaultEntryBuilder"/>
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
+        <outbound-endpoint address="http://localhost:9003/events" exchange-pattern="request-response"
+                           mimeType="application/atom+xml;type=entry">
+            <transformer ref="defaultEntryBuilder"/>
+        </outbound-endpoint>
+    </flow>
 
-        <service name="atomPubEventStore">
-            <inbound>
-                <inbound-endpoint address="http://localhost:9002" exchange-pattern="request-response"/>
-            </inbound>
-            <atom:component provider-ref="provider"/>
-        </service>
+    <flow name="atomPubEventStore">
+        <inbound-endpoint address="http://localhost:9003" exchange-pattern="request-response"/>
+        <atom:component provider-ref="provider"/>
+    </flow>
 
-        <!--<service name="eventConsumer">-->
-        <!--<inbound>-->
-        <!--<atom:inbound-endpoint address="http://localhost:9002/events" exchange-pattern="request-response" splitFeed="false"/>-->
-        <!--</inbound>-->
-        <!--<component class="org.mule.module.atom.event.EventReceiver"/>-->
-        <!--</service>-->
-
-    </model>
-
+    <!--<service name="eventConsumer">-->
+    <!--<inbound>-->
+    <!--<atom:inbound-endpoint address="http://localhost:9002/events" exchange-pattern="request-response" splitFeed="false"/>-->
+    <!--</inbound>-->
+    <!--<component class="org.mule.module.atom.event.EntryReceiver"/>-->
+    <!--</service>-->
 </mule>
