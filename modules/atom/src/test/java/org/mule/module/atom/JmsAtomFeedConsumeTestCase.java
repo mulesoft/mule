@@ -10,34 +10,36 @@
 package org.mule.module.atom;
 
 import org.mule.api.client.LocalMuleClient;
+import org.mule.module.atom.event.EntryReceiver;
+import org.mule.module.atom.event.FeedReceiver;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
 
-public class FeedConsumeAndSplitExplicitNonHttpTestCase extends FunctionalTestCase
+public class JmsAtomFeedConsumeTestCase extends FunctionalTestCase
 {
     private final CounterCallback counter = new CounterCallback();
 
     @Override
     protected String getConfigResources()
     {
-        return "atom-consume-and-explicit-split-non-http.xml";
+        return "jms-atom-consume.xml";
     }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        FunctionalTestComponent comp = (FunctionalTestComponent)getComponent("feedConsumer");
-        comp.setEventCallback(counter);
-    }
-
-    public void testConsume() throws Exception
+    public void testConsumeFeed() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
         String feed = loadResourceAsString("sample-feed.atom");
-        client.dispatch("vm://feed.in", feed, null);
+        client.dispatch("jms://feed.in", feed, null);
         Thread.sleep(2000);
-        int count = counter.getCallbackCount();
-        assertEquals(25, count);
+        assertEquals(25, FeedReceiver.receivedEntries.get());
+    }
+
+    public void testConsumeSplitFeed() throws Exception
+    {
+        LocalMuleClient client = muleContext.getClient();
+        String feed = loadResourceAsString("sample-feed.atom");
+        client.dispatch("jms://feed.split.in", feed, null);
+        Thread.sleep(2000);                
+        assertEquals(25, EntryReceiver.receivedEntries.get());
     }
 }
