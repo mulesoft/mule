@@ -23,6 +23,7 @@
         <dependency>
             <groupId>org.ibeans</groupId>
             <artifactId>ibeans-support</artifactId>
+            <version>1.0-SNAPSHOT</version>
             <exclusions>
                 <!-- we like slf4j -->
                 <exclusion>
@@ -54,6 +55,16 @@
             <version>${version}</version>
         </dependency>
         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-cxf</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http-jetty</artifactId>
+            <version>${cxfVersion}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
@@ -83,7 +94,7 @@
         <dependency>
             <groupId>org.mule.ibeans</groupId>
             <artifactId>flickr-ibean</artifactId>
-            <version>1.0-beta-10-SNAPSHOT</version>
+            <version>1.0</version>
             <scope>test</scope>
         </dependency>
 
