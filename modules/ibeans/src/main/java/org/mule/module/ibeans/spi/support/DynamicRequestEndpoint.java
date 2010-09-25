@@ -125,7 +125,7 @@ public class DynamicRequestEndpoint extends DynamicURIInboundEndpoint
         {
             setEndpointURI(new MuleEndpointURI(newUriString, getMuleContext()));
 
-            if (!newUriString.startsWith(getEndpointURI().getScheme()))
+            if (!newUriString.startsWith(getEndpointURI().getFullScheme()))
             {
                 throw new MessagingException(CoreMessages.schemeCannotChangeForRouter(
                         this.getEndpointURI().getScheme(), getEndpointURI().getScheme()), event);
