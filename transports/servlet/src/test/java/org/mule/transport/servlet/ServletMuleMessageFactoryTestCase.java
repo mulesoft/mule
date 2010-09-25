@@ -28,13 +28,13 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpSession;
 
 public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
-{    
+{
     private static final String CHARACTER_ENCODING_PROPERTY_KEY = ServletConnector.CHARACTER_ENCODING_PROPERTY_KEY;
     private static final String CONTENT_TYPE_PROPERTY_KEY = ServletConnector.CONTENT_TYPE_PROPERTY_KEY;
     private static final String PARAMETER_MAP_PROPERTY_KEY = ServletConnector.PARAMETER_MAP_PROPERTY_KEY;
 
     private static final String REQUEST_URI = MockHttpServletRequestBuilder.REQUEST_URI;
-    
+
     private MuleMessageFactory factory;
 
     @Override
@@ -55,13 +55,13 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     {
         return new MockHttpServletRequestBuilder().buildRequest();
     }
-    
+
     @Override
     protected Object getUnsupportedTransportMessage()
     {
         return "this is not a valid transport message for ServletMuleMessageFactory";
     }
-    
+
     /**
      * Tests creating a MuleMessage from a GET request
      */
@@ -73,19 +73,19 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertNotNull(message);
         assertEquals(REQUEST_URI, message.getPayload());
     }
-    
+
     public void testGetPayloadWithQueryParameter() throws Exception
     {
         MockHttpServletRequestBuilder builder = new MockHttpServletRequestBuilder();
         builder.queryString = "foo=bar";
         Object payload = builder.buildRequest();
-        
+
         MuleMessage message = factory.create(payload, encoding);
         assertNotNull(message);
         String expected = REQUEST_URI + "?" + builder.queryString;
         assertEquals(expected, message.getPayload());
     }
-    
+
     public void testPostPayload() throws Exception
     {
         Object payload = buildPostRequest();
@@ -93,20 +93,20 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertNotNull(message);
         assertTrue(message.getPayload() instanceof InputStream);
     }
-    
+
     public void testRequestParametersAreConvertedToMessageProperties() throws Exception
     {
         Object payload = buildPostRequest();
         MuleMessage message = factory.create(payload, encoding);
         assertRequestParameterProperty("foo-value", message, "foo");
         assertRequestParameterProperty("bar-value", message, "bar");
-        
+
         Map<String, Object> parameters = retrieveMapProperty(message, PARAMETER_MAP_PROPERTY_KEY);
         assertNotNull(parameters);
         assertEquals("foo-value", parameters.get("foo"));
         assertEquals("bar-value", parameters.get("bar"));
     }
-    
+
     public void testContentEncodingWithCharsetLast() throws Exception
     {
         String contentType = "text/plain;charset=UTF-21";
@@ -115,7 +115,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertEquals("UTF-21", message.getEncoding());
         assertInboundScopedProperty(contentType, message, CONTENT_TYPE_PROPERTY_KEY);
     }
-    
+
     public void testContentEncodingWithCharsetFirst() throws Exception
     {
         String contentType = "charset=UTF-21;text/plain";
@@ -124,7 +124,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertEquals("UTF-21", message.getEncoding());
         assertInboundScopedProperty(contentType, message, CONTENT_TYPE_PROPERTY_KEY);
     }
-    
+
     public void testMessageIdFromHttpSession() throws Exception
     {
         String sessionId = UUID.getUUID();

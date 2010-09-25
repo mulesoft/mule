@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
-{    
+{
     public ServletMuleMessageFactory(MuleContext context)
     {
         super(context);
@@ -40,7 +40,7 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
     protected Object extractPayload(Object transportMessage, String encoding) throws Exception
     {
         HttpServletRequest request = (HttpServletRequest) transportMessage;
-                
+
         String method = request.getMethod();
         if (HttpConstants.METHOD_GET.equalsIgnoreCase(method))
         {
@@ -51,51 +51,51 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
             return extractPayloadFromPostRequest(request);
         }
     }
-    
+
     protected Object extractPayloadFromPostRequest(HttpServletRequest request) throws Exception
     {
         /*
          * Servlet Spec v2.5:
-         * 
+         *
          * SRV.3.1.1
          * When Parameters Are Available
-         * 
+         *
          * The following are the conditions that must be met before post form data will
          * be populated to the parameter set:
-         * 
+         *
          * 1. The request is an HTTP or HTTPS request.
          * 2. The HTTP method is POST.
          * 3. The content type is application/x-www-form-urlencoded.
          * 4. The servlet has made an initial call of any of the getParameter family of meth-
          *    ods on the request object.
-         *    
+         *
          * If the conditions are not met and the post form data is not included in the
          * parameter set, the post data must still be available to the servlet via the request
          * object's input stream. If the conditions are met, post form data will no longer be
          * available for reading directly from the request object's input stream.
-         * 
+         *
          * -----------------------------------------------------------------------------------
-         * 
+         *
          * In plain english:if you call getInputStream on a POSTed request before you call one of
          * the getParameter* methods, you'll lose the parameters. So we touch the parameters first
          * and only then we return the input stream that will be the payload of the message.
          */
         request.getParameterNames();
-        
+
         return request.getInputStream();
     }
 
     protected String queryString(HttpServletRequest request)
     {
         StringBuilder buf = new StringBuilder(request.getRequestURI());
-        
+
         String queryString = request.getQueryString();
         if (queryString != null)
         {
             buf.append("?");
             buf.append(queryString);
         }
-        
+
         return buf.toString();
     }
 
@@ -115,29 +115,29 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
     @SuppressWarnings("unchecked")
     protected void setupRequestParameters(HttpServletRequest request, DefaultMuleMessage message)
     {
-        Enumeration<String> parameterNames = request.getParameterNames();            
+        Enumeration<String> parameterNames = request.getParameterNames();
         if (parameterNames != null)
         {
             Map<String, Object> parameterProperties = new HashMap<String, Object>();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             while (parameterNames.hasMoreElements())
             {
-                String name = parameterNames.nextElement();            
+                String name = parameterNames.nextElement();
                 String key = ServletConnector.PARAMETER_PROPERTY_PREFIX + name;
                 String value = request.getParameterValues(name)[0];
 
                 parameterProperties.put(key, value);
                 parameterMap.put(name, value);
             }
-            
+
             // support for the HttpRequestToParameterMap transformer: put the map of request
             // parameters under a well defined key into the message properties as well
             parameterProperties.put(ServletConnector.PARAMETER_MAP_PROPERTY_KEY, parameterMap);
-            
+
             message.addInboundProperties(parameterProperties);
         }
     }
-    
+
     protected void setupEncoding(HttpServletRequest request, MuleMessage message)
     {
         String contentType = request.getContentType();
@@ -175,7 +175,7 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
             // MuleMessage's default is good enough in this case
         }
     }
-    
+
     protected void setupContentType(HttpServletRequest request, DefaultMuleMessage message)
     {
         String contentType = request.getContentType();
