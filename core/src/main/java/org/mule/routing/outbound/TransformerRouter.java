@@ -14,6 +14,7 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transformer.Transformer;
@@ -51,7 +52,7 @@ public class TransformerRouter extends AbstractOutboundRouter
         return message == null ? null : new DefaultMuleEvent(message, event);
     }
 
-    public boolean isMatch(MuleMessage message) throws MessagingException
+    public boolean isMatch(MuleMessage message) throws MuleException
     {
         return true;
     }

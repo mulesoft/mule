@@ -41,12 +41,33 @@
             </outbound>
         </service>
 
+
+        <service name="service1C">
+            <inbound>
+                <vm:inbound-endpoint path="in3" exchange-pattern="request-response"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <http:outbound-endpoint host="localhost" port="62346" path="xxx#[header:INBOUND:testProp]"
+                                            exchange-pattern="request-response"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
         <service name="service2">
             <inbound>
                 <http:inbound-endpoint host="localhost" port="62345" path="testPath"/>
             </inbound>
             <test:component appendString=" Received" logMessageDetails="true"/>
         </service>
+
+        <service name="service3">
+            <inbound>
+                <http:inbound-endpoint host="localhost" port="62346" path="xxxtestPath"/>
+            </inbound>
+            <test:component appendString=" Also Received" logMessageDetails="true"/>
+        </service>
+
     </model>
 
 </mule>

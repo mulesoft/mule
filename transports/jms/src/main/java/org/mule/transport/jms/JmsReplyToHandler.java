@@ -169,7 +169,7 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
         catch (Exception e)
         {
             throw new DispatchException(
-                JmsMessages.failedToCreateAndDispatchResponse(replyToDestination), returnMessage, null, e);
+                JmsMessages.failedToCreateAndDispatchResponse(replyToDestination), event, null, e);
         }
         finally
         {

@@ -11,7 +11,6 @@
 package org.mule.api.security;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.Message;
 
@@ -26,42 +25,14 @@ public class CredentialsNotSetException extends UnauthorisedException
      */
     private static final long serialVersionUID = -6271648179641734580L;
 
-    /**
-     * @deprecated use CredentialsNotSetException(Message, MuleEvent)
-     */
-    @Deprecated
-    public CredentialsNotSetException(Message message, MuleMessage muleMessage)
-    {
-        super(message, muleMessage);
-    }
-    
     public CredentialsNotSetException(Message message, MuleEvent event)
     {
         super(message, event);
     }
 
-    /**
-     * @deprecated use CredentialsNotSetException(Message, MuleEvent, Throwable)
-     */
-    @Deprecated
-    public CredentialsNotSetException(Message message, MuleMessage muleMessage, Throwable cause)
-    {
-        super(message, muleMessage, cause);
-    }
-
     public CredentialsNotSetException(Message message, MuleEvent event, Throwable cause)
     {
         super(message, event, cause);
-    }
-
-    /**
-     * @deprecated use CredentialsNotSetException(MuleEvent, SecurityContext, ImmutableEndpoint, EndpointSecurityFilter)
-     */
-    @Deprecated
-    public CredentialsNotSetException(MuleMessage muleMessage, SecurityContext context,
-        ImmutableEndpoint endpoint, EndpointSecurityFilter filter)
-    {
-        super(muleMessage, context, endpoint, filter);
     }
 
     public CredentialsNotSetException(MuleEvent event, SecurityContext context,

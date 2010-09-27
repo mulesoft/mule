@@ -56,7 +56,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
     {
         MuleMessage message = event.getMessage();
 
-        List recipients = this.getRecipients(message);
+        List recipients = this.getRecipients(event);
         List<MuleEvent> results = new ArrayList<MuleEvent>();
         
         if (enableCorrelation != CorrelationMode.NEVER)
@@ -73,7 +73,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
             }
         }
 
-        OutboundEndpoint endpoint;
+        OutboundEndpoint endpoint = null;
         MuleMessage request;
 
         for (Iterator iterator = recipients.iterator(); iterator.hasNext();)
@@ -83,12 +83,13 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
             // which case there
             // would potentially be multiple messages with the same id...
             request = new DefaultMuleMessage(message.getPayload(), message, muleContext);
-            endpoint = getRecipientEndpoint(request, recipient);
-
-            boolean sync = (this.synchronous == null ? 
-                endpoint.getExchangePattern().hasResponse() : this.synchronous.booleanValue());
             try
             {
+                endpoint = getRecipientEndpoint(request, recipient);
+    
+                boolean sync = 
+                    (this.synchronous == null ? endpoint.getExchangePattern().hasResponse() : this.synchronous.booleanValue());
+                
                 if (sync)
                 {
                     results.add(sendRequest(event, request, endpoint, true));
@@ -107,37 +108,30 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
         return resultsHandler.aggregateResults(results, event, muleContext);
     }
 
-    protected OutboundEndpoint getRecipientEndpoint(MuleMessage message, Object recipient) throws RoutingException
+    protected OutboundEndpoint getRecipientEndpoint(MuleMessage message, Object recipient) throws MuleException
     {
         OutboundEndpoint endpoint = null;
-        try
+        if (recipient instanceof OutboundEndpoint)
         {
-            if (recipient instanceof OutboundEndpoint)
-            {
-                endpoint = (OutboundEndpoint) recipient;
-            }
-            else if (recipient instanceof EndpointURI)
-            {
-                endpoint = getRecipientEndpointFromUri((EndpointURI) recipient);
-            }
-            else if (recipient instanceof String)
-            {
-                endpoint = getRecipientEndpointFromString(message, (String) recipient);
-            }
-            if (null == endpoint)
-            {
-                throw new RegistrationException(MessageFactory.createStaticMessage("Failed to create endpoint for: " + recipient));
-            }
-
-            OutboundEndpoint existingEndpoint = (OutboundEndpoint) recipientCache.putIfAbsent(recipient, endpoint);
-            if (existingEndpoint != null)
-            {
-                endpoint = existingEndpoint;
-            }
+            endpoint = (OutboundEndpoint) recipient;
         }
-        catch (MuleException e)
+        else if (recipient instanceof EndpointURI)
         {
-            throw new RoutingException(message, endpoint, e);
+            endpoint = getRecipientEndpointFromUri((EndpointURI) recipient);
+        }
+        else if (recipient instanceof String)
+        {
+            endpoint = getRecipientEndpointFromString(message, (String) recipient);
+        }
+        if (null == endpoint)
+        {
+            throw new RegistrationException(MessageFactory.createStaticMessage("Failed to create endpoint for: " + recipient));
+        }
+
+        OutboundEndpoint existingEndpoint = (OutboundEndpoint) recipientCache.putIfAbsent(recipient, endpoint);
+        if (existingEndpoint != null)
+        {
+            endpoint = existingEndpoint;
         }
         return endpoint;
     }
@@ -184,6 +178,6 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
         return true;
     }
 
-    protected abstract List getRecipients(MuleMessage message) throws CouldNotRouteOutboundMessageException;
+    protected abstract List getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException;
 
 }

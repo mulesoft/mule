@@ -105,7 +105,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         assertTrue(router.isMatch(message));
         MuleEvent event = new OutboundRoutingTestEvent(message, null);
 
-        ImmutableEndpoint ep = (ImmutableEndpoint) router.getRoute(2, message);
+        ImmutableEndpoint ep = (ImmutableEndpoint) router.getRoute(2, event);
         assertEquals("test://foo?bar&exchangePattern=request-response", ep.getEndpointURI().toString());
 
         mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);

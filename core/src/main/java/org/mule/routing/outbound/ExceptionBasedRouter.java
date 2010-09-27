@@ -20,7 +20,6 @@ import org.mule.api.expression.RequiredValueException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
-import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.routing.CorrelationMode;
@@ -45,7 +44,7 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
         List recipients = null;
         try
         {
-            recipients = getRecipients(message);
+            recipients = getRecipients(event);
         }
         catch (RequiredValueException e)
         {
@@ -58,7 +57,7 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
             recipients = new ArrayList(endpointsCount);
             for (int i = 0; i < endpointsCount; i++)
             {
-                recipients.add(getRoute(i, message));
+                recipients.add(getRoute(i, event));
             }
         }        
         
@@ -89,19 +88,19 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
         for (Iterator iterator = recipients.iterator(); iterator.hasNext();)
         {
             request = new DefaultMuleMessage(message.getPayload(), message, muleContext);
-            endpoint = getRecipientEndpoint(request, iterator.next());
-            boolean lastEndpoint = !iterator.hasNext();
-
-            // TODO MULE-4476
-            if (!lastEndpoint && !endpoint.getExchangePattern().hasResponse())
+            try
             {
-                throw new CouldNotRouteOutboundMessageException(
-                    MessageFactory.createStaticMessage("The ExceptionBasedRouter does not support asynchronous endpoints, make sure all endpoints on the router are configured as synchronous"), event, endpoint);
-            }
-            
-            if (endpoint.getExchangePattern().hasResponse())
-            {
-                try
+                endpoint = getRecipientEndpoint(request, iterator.next());
+                boolean lastEndpoint = !iterator.hasNext();
+    
+                // TODO MULE-4476
+                if (!lastEndpoint && !endpoint.getExchangePattern().hasResponse())
+                {
+                    throw new CouldNotRouteOutboundMessageException(
+                        MessageFactory.createStaticMessage("The ExceptionBasedRouter does not support asynchronous endpoints, make sure all endpoints on the router are configured as synchronous"), event, endpoint);
+                }
+                
+                if (endpoint.getExchangePattern().hasResponse())
                 {
                     MuleMessage resultMessage = null;
                     result = sendRequest(event, request, endpoint, true);
@@ -123,29 +122,17 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
                         break;
                     }
                 }
-                catch (MuleException e)
-                {
-                    if(logger.isWarnEnabled())
-                    {
-                        Throwable t = ExceptionHelper.getRootException(e);
-                        logger.warn("Failed to send to endpoint: " + endpoint.getEndpointURI().toString()
-                                + ". Error was: " + t + ". Trying next endpoint", t);
-                    }
-                }
-            }
-            else
-            {
-                try
+                else
                 {
                     sendRequest(event, request, endpoint, false);
                     success = true;
                     break;
                 }
-                catch (MuleException e)
-                {
-                    logger.info("Failed to dispatch to endpoint: " + endpoint.getEndpointURI().toString()
-                                + ". Error was: " + e.getMessage() + ". Trying next endpoint");
-                }
+            }
+            catch (MuleException e)
+            {
+                logger.info("Failed to send/dispatch to endpoint: " + endpoint.getEndpointURI().toString()
+                            + ". Error was: " + e.getMessage() + ". Trying next endpoint");
             }
         }
 

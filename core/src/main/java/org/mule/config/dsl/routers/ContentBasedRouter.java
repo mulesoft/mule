@@ -30,24 +30,24 @@ public class ContentBasedRouter extends AbstractOutboundRouter
 
         for (MessageProcessor target : routes)
         {
-            if (isMatch(message))
+            try
             {
-                MuleEvent event = RequestContext.cloneAndUpdateEventEndpoint(theEvent, target);
-                try
+                if (isMatch(message))
                 {
+                    MuleEvent event = RequestContext.cloneAndUpdateEventEndpoint(theEvent, target);
                     return target.process(event);
                 }
-                catch (MuleException e)
-                {
-                    throw new MessagingException(e.getI18nMessage(), event, e);
-                }
+            }
+            catch (MuleException e)
+            {
+                throw new MessagingException(e.getI18nMessage(), theEvent, e);
             }
         }
         //TODO
         throw new RuntimeException("Event not processed");
     }
 
-    public boolean isMatch(MuleMessage message) throws MessagingException
+    public boolean isMatch(MuleMessage message) throws MuleException
     {
         for (MessageProcessor target : routes)
         {

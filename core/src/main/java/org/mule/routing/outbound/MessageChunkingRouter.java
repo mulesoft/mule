@@ -66,8 +66,7 @@ public class MessageChunkingRouter extends FilteringOutboundRouter
             }
             catch (Exception e)
             {
-                throw new RoutingException(CoreMessages.failedToReadPayload(), event, getRoute(0,
-                    message), e);
+                throw new RoutingException(CoreMessages.failedToReadPayload(), event, getRoute(0, event), e);
             }
 
             int parts = data.length / messageSize;

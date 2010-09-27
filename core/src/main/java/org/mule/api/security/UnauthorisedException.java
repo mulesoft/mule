@@ -12,7 +12,6 @@ package org.mule.api.security;
 
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
@@ -38,42 +37,14 @@ public class UnauthorisedException extends SecurityException
         super(message, RequestContext.getEvent(), cause);
     }
 
-    /**
-     * @deprecated use UnauthorisedException(Message, MuleEvent)
-     */
-    @Deprecated
-    public UnauthorisedException(Message message, MuleMessage muleMessage)
-    {
-        super(message, muleMessage);
-    }
-
     public UnauthorisedException(Message message, MuleEvent event)
     {
         super(message, event);
     }
 
-    /**
-     * @deprecated use 
-     */
-    @Deprecated
-    public UnauthorisedException(Message message, MuleMessage muleMessage, Throwable cause)
-    {
-        super(message, muleMessage, cause);
-    }
-
     public UnauthorisedException(Message message, MuleEvent event, Throwable cause)
     {
         super(message, event, cause);
-    }
-
-    /**
-     * @deprecated use UnauthorisedException(MuleEvent, SecurityContext, ImmutableEndpoint, EndpointSecurityFilter)
-     */
-    @Deprecated
-    public UnauthorisedException(MuleMessage message, SecurityContext context, 
-        ImmutableEndpoint endpoint, EndpointSecurityFilter filter)
-    {
-        super(constructMessage(context, endpoint, filter), message);
     }
 
     public UnauthorisedException(MuleEvent event, SecurityContext context, 

@@ -11,6 +11,7 @@
 package org.mule.transport.ftp;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
@@ -538,13 +539,13 @@ public class FtpConnector extends AbstractConnector
      *         does not support streaming
      * @throws org.mule.api.MuleException
      */
-    public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleMessage message)
+    public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event)
         throws MuleException
     {
         try
         {
             final EndpointURI uri = endpoint.getEndpointURI();
-            String filename = getFilename(endpoint, message);
+            String filename = getFilename(endpoint, event.getMessage());
 
             final FTPClient client;
             try
@@ -599,7 +600,7 @@ public class FtpConnector extends AbstractConnector
         }
         catch (Exception e)
         {
-            throw new DispatchException(CoreMessages.streamingFailedNoStream(), message, endpoint, e);
+            throw new DispatchException(CoreMessages.streamingFailedNoStream(), event, endpoint, e);
         }
     }
 

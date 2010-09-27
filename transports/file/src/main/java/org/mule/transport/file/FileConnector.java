@@ -11,6 +11,7 @@
 package org.mule.transport.file;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -510,9 +511,10 @@ public class FileConnector extends AbstractConnector
      *         does not support streaming
      * @throws org.mule.api.MuleException
      */
-    public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleMessage message)
+    public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event)
             throws MuleException
     {
+        MuleMessage message = event.getMessage();
         String address = endpoint.getEndpointURI().getAddress();
         String writeToDirectory = message.getOutboundProperty(FileConnector.PROPERTY_WRITE_TO_DIRECTORY);
         if (writeToDirectory == null)
@@ -563,8 +565,7 @@ public class FileConnector extends AbstractConnector
         }
         catch (IOException e)
         {
-            throw new DispatchException(CoreMessages.streamingFailedNoStream(), message,
-                    endpoint, e);
+            throw new DispatchException(CoreMessages.streamingFailedNoStream(), event, endpoint, e);
         }
     }
 

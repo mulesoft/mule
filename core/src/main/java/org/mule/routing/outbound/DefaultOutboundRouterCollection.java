@@ -93,29 +93,29 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
                 outboundRouterMessage = message;
             }
 
-            if (outboundRouter.isMatch(outboundRouterMessage))
+            try
             {
-                matchfound = true;
-                // Manage outbound only transactions here
-                final OutboundRouter router = outboundRouter;
-
-                try
+                if (outboundRouter.isMatch(outboundRouterMessage))
                 {
+                    matchfound = true;
+                    // Manage outbound only transactions here
+                    final OutboundRouter router = outboundRouter;
+    
                     result = router.process(event);
+    
+                    if (!isMatchAll())
+                    {
+                        return result;
+                    }
                 }
-                catch (MessagingException e)
-                {
-                    throw e;
-                }
-                catch (Exception e)
-                {
-                    throw new RoutingException(event, router, e);
-                }
-
-                if (!isMatchAll())
-                {
-                    return result;
-                }
+            }
+            catch (MessagingException e)
+            {
+                throw e;
+            }
+            catch (Exception e)
+            {
+                throw new RoutingException(event, outboundRouter, e);
             }
         }
 

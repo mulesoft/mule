@@ -11,7 +11,6 @@
 package org.mule.api.routing;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.Message;
 
@@ -27,28 +26,9 @@ public class ResponseTimeoutException extends RoutingException
      */
     private static final long serialVersionUID = 6882278747922113240L;
 
-    /**
-     * @deprecated use ResponseTimeoutException(Message, MuleEvent, RoutingTarget)
-     */
-    @Deprecated
-    public ResponseTimeoutException(Message message, MuleMessage muleMessage, MessageProcessor target)
-    {
-        super(message, muleMessage, target);
-    }
-
     public ResponseTimeoutException(Message message, MuleEvent event, MessageProcessor target)
     {
         super(message, event, target);
-    }
-
-    /**
-     * @deprecated use ResponseTimeoutException(Message, MuleEvent, RoutingTarget, Throwable)
-     */
-    @Deprecated
-    public ResponseTimeoutException(Message message, MuleMessage muleMessage, MessageProcessor target,
-        Throwable cause)
-    {
-        super(message, muleMessage, target, cause);
     }
 
     public ResponseTimeoutException(Message message, MuleEvent event, MessageProcessor target,

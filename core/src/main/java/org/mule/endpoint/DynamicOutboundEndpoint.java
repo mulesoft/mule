@@ -32,6 +32,7 @@ import org.mule.transport.service.TransportFactoryException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -59,7 +60,7 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
     protected String uriTemplate;
 
     private EndpointBuilder builder;
-
+    
     public DynamicOutboundEndpoint(MuleContext muleContext, EndpointBuilder builder, String uriTemplate) throws MalformedEndpointException
     {
         super(new NullOutboundEndpoint(muleContext));
@@ -152,27 +153,13 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
     @Override
     public boolean equals(Object o)
     {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof DynamicOutboundEndpoint))
-        {
-            return false;
-        }
-
-        DynamicOutboundEndpoint that = (DynamicOutboundEndpoint) o;
-        if (uriTemplate != null ? !uriTemplate.equals(that.uriTemplate) : that.uriTemplate != null)
-        {
-            return false;
-        }
-        return false;
+        return this == o;
     }
 
     @Override
     public int hashCode()
     {
-        return new Double(Math.random()).intValue();
+        return System.identityHashCode(this);
     }
 
     protected static class NullOutboundEndpoint extends AbstractEndpoint implements OutboundEndpoint

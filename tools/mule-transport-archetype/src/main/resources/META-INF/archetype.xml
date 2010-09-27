@@ -122,10 +122,7 @@ Which Mule modules do you want to include in this project? The client is added f
         </variable>
         <variable>
             <name>hasRequestor</name>
-            <description>Can the transport request individual messages from the underlying resource? [y] or [n]
-(If you are upgrading a 1.x transport, select this if your transport implemented the receive()
-method on the Dispatcher)
-            </description>
+            <description>Can the transport request individual messages from the underlying resource? [y] or [n]</description>
             <defvalue>n</defvalue>
         </variable>
 

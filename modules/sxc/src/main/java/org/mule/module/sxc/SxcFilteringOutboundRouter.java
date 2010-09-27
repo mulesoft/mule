@@ -10,11 +10,12 @@
 
 package org.mule.module.sxc;
 
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.routing.RoutingException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
@@ -147,7 +148,7 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
     }
 
     @Override
-    public boolean isMatch(MuleMessage message) throws RoutingException
+    public boolean isMatch(MuleMessage message) throws MuleException
     {
         ReversibleXMLStreamReader reader = null;
         try
@@ -165,7 +166,7 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
         }
         catch (Exception e)
         {
-            throw new RoutingException(message, this, e);
+            throw new DefaultMuleException(e);
         }
         finally
         {
@@ -188,7 +189,7 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
         }
     }
 
-    public boolean testMatch(MuleMessage message) throws RoutingException
+    public boolean testMatch(MuleMessage message) throws MuleException
     {
         return super.isMatch(message);
     }

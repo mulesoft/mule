@@ -17,7 +17,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouterCollection;
-import org.mule.api.routing.RoutingException;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -362,7 +361,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         }
 
         @Override
-        public boolean isMatch(MuleMessage message) throws RoutingException
+        public boolean isMatch(MuleMessage message) throws MuleException
         {
             if (expectCopy)
             {
@@ -403,7 +402,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         }
 
         @Override
-        public boolean isMatch(MuleMessage message) throws RoutingException
+        public boolean isMatch(MuleMessage message) throws MuleException
         {
             if (expectCopy)
             {

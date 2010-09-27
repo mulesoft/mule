@@ -12,6 +12,7 @@ package org.mule.config.spring;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouterCollection;
@@ -110,7 +111,7 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
     
     public static class CustomOutboundRouter extends AbstractOutboundRouter
     {
-        public boolean isMatch(MuleMessage message) throws MessagingException
+        public boolean isMatch(MuleMessage message) throws MuleException
         {
             return true;
         }

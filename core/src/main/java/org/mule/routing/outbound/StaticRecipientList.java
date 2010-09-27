@@ -10,7 +10,7 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
@@ -33,9 +33,9 @@ public class StaticRecipientList extends AbstractRecipientList
 
     private volatile List recipients = Collections.EMPTY_LIST;
 
-    protected List getRecipients(MuleMessage message)
+    protected List getRecipients(MuleEvent event)
     {
-        Object msgRecipients = message.removeProperty(RECIPIENTS_PROPERTY);
+        Object msgRecipients = event.getMessage().removeProperty(RECIPIENTS_PROPERTY);
 
         if (msgRecipients == null)
         {

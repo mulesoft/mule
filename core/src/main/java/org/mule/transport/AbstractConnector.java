@@ -2343,10 +2343,9 @@ public abstract class AbstractConnector implements Connector, WorkListener
      * @return the output stream to use for this request
      * @throws MuleException in case of any error
      */
-    public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleMessage message) throws MuleException
+    public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event) throws MuleException
     {
-        throw new UnsupportedOperationException(CoreMessages.streamingNotSupported(this.getProtocol())
-                .toString());
+        throw new UnsupportedOperationException(CoreMessages.streamingNotSupported(this.getProtocol()).toString());
     }
 
     public MuleContext getMuleContext()

@@ -1,8 +1,5 @@
 <index version="3.0">
-    <transport dist="ce">ajax</transport>
-    <transport dist="ce">axis</transport>
     <transport dist="ce">bpm</transport>
-    <transport dist="ce">cxf</transport>
     <transport dist="ce">ejb</transport>
     <transport dist="ce">email</transport>
     <transport dist="ce" schema="http://svn.codehaus.org/mule/branches/mule-3.x/transports/email/src/main/resources/META-INF/mule-smtp.xsd">smtp</transport>
@@ -24,7 +21,6 @@
     <transport dist="ce" schema="http://svn.codehaus.org/mule/branches/mule-3.x/transports/rmi/src/main/resources/META-INF/mule-jnp.xsd">jnp</transport>
     <transport dist="ce">servlet</transport>
     <transport dist="ce">ssl</transport>
-    <transport dist="ce" schema="http://svn.codehaus.org/mule/branches/mule-3.x/transports/ssl/src/main/resources/META-INF/mule-tls.xsd">tls</transport>
     <transport dist="ce">stdio</transport>
     <transport dist="ce">tcp</transport>
     <transport dist="ce">udp</transport>

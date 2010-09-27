@@ -179,7 +179,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
                             RoutingNotification.ASYNC_REPLY_TIMEOUT));
 
                 throw new ResponseTimeoutException(CoreMessages.responseTimedOutWaitingForId((int) timeout,
-                    asyncReplyCorrelationId), event.getMessage(), null);
+                    asyncReplyCorrelationId), event, null);
             }
             else
             {

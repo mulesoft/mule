@@ -15,6 +15,8 @@ import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.util.ClassUtils;
 
+import java.io.File;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -50,6 +52,7 @@ public class URIBuilder
     private static final String QUERY = "?";
     private static final String AND = "&";
     private static final String EQUALS = "=";
+    private static final String BACKSLASH = "\\";
 
     public static final String META = "meta";
     public static final String PROTOCOL = "protocol";
@@ -170,9 +173,25 @@ public class URIBuilder
     public void setPath(String path)
     {
         assertNotUsed();
-        if (null != path && path.indexOf(DOTS_SLASHES) > -1)
+        if (null != path)
         {
-            throw new IllegalArgumentException("Unusual syntax in path: '" + path + "' contains " + DOTS_SLASHES);
+            if (path.indexOf(DOTS_SLASHES) > -1)
+            {
+                throw new IllegalArgumentException("Unusual syntax in path: '" + path + "' contains " + DOTS_SLASHES);
+            }
+            else if (path.contains(BACKSLASH))
+            {
+                // Windows syntax.  convert it to URI syntax
+                try
+                {
+                    URI pathUri = new File(path).toURI();
+                    path = pathUri.getPath();
+                }
+                catch (Exception ex)
+                {
+                    throw new IllegalArgumentException("Illegal syntax in path: " + path, ex);
+                }
+            }
         }
         this.path = path;
     }

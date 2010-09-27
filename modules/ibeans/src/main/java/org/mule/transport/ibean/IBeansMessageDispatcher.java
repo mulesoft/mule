@@ -94,7 +94,7 @@ public class IBeansMessageDispatcher extends AbstractMessageDispatcher
             }
             catch (Throwable e)
             {
-                throw new DispatchException(IBeansMessages.ibeanMethodNotFound(ibeanName, methodName, types), event.getMessage(), this, e);
+                throw new DispatchException(IBeansMessages.ibeanMethodNotFound(ibeanName, methodName, types), event, this, e);
             }
 
         Object result = callMethod.invoke(ibean, params);

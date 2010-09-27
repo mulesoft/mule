@@ -10,7 +10,7 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.config.i18n.CoreMessages;
@@ -33,20 +33,20 @@ public class ExpressionRecipientList extends AbstractRecipientList
     private String fullExpression;
 
     @Override
-    protected List getRecipients(MuleMessage message) throws CouldNotRouteOutboundMessageException
+    protected List getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException
     {
         String expr = getFullExpression();
         if (!muleContext.getExpressionManager().isValidExpression(expr))
         {
             throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.expressionInvalidForProperty("expression", expr), message, null);
+                    CoreMessages.expressionInvalidForProperty("expression", expr), event, null);
         }
 
-        Object msgRecipients = muleContext.getExpressionManager().evaluate(expr, message);
+        Object msgRecipients = muleContext.getExpressionManager().evaluate(expr, event.getMessage());
         if (msgRecipients == null)
         {
             throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.propertyIsNotSetOnEvent(getFullExpression()), message, null);
+                    CoreMessages.propertyIsNotSetOnEvent(getFullExpression()), event, null);
         }
         else if (msgRecipients instanceof String)
         {
@@ -60,7 +60,7 @@ public class ExpressionRecipientList extends AbstractRecipientList
         {
             logger.error("Recipients on message are neither String nor List but: " + msgRecipients.getClass());
             throw new CouldNotRouteOutboundMessageException(
-                    CoreMessages.propertyIsNotSupportedType(getFullExpression(), new Class[]{String.class, List.class}, msgRecipients.getClass()), message, null);
+                    CoreMessages.propertyIsNotSupportedType(getFullExpression(), new Class[]{String.class, List.class}, msgRecipients.getClass()), event, null);
         }
     }
 

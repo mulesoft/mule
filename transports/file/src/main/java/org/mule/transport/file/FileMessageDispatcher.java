@@ -56,7 +56,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
         // Wrap the transformed message before passing it to the filename parser
         MuleMessage message = new DefaultMuleMessage(data, event.getMessage(), event.getMuleContext());
 
-        FileOutputStream fos = (FileOutputStream) connector.getOutputStream((OutboundEndpoint) endpoint, message);
+        FileOutputStream fos = (FileOutputStream) connector.getOutputStream((OutboundEndpoint) endpoint, event);
         try
         {
             if (event.getMessage().getOutboundProperty(FileConnector.PROPERTY_FILENAME) == null)

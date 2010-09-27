@@ -23,15 +23,6 @@ public class MessageRedeliveredException extends MessagingException
      */
     private static final long serialVersionUID = 9013890402770563931L;
 
-    /**
-     * @deprecated use 
-     */
-    @Deprecated
-    public MessageRedeliveredException(MuleMessage muleMessage)
-    {
-        super(JmsMessages.messageMarkedForRedelivery(muleMessage), muleMessage);
-    }
-
     public MessageRedeliveredException(MuleEvent event)
     {
         super(JmsMessages.messageMarkedForRedelivery(event), event);

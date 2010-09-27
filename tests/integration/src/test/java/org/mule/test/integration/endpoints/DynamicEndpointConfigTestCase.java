@@ -41,5 +41,11 @@ public class DynamicEndpointConfigTestCase extends FunctionalTestCase
         assertNotNull(response);
         assertNull(response.getExceptionPayload());
         assertEquals("Data Received", response.getPayload(DataType.STRING_DATA_TYPE));
+
+        response = muleContext.getClient().send("vm://in3", msg);
+        assertNotNull(response);
+        assertNull(response.getExceptionPayload());
+        String payload = response.getPayload(DataType.STRING_DATA_TYPE);
+        assertEquals("Data Also Received", payload);
     }
 }

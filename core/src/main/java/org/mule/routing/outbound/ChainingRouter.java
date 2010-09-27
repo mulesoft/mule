@@ -41,8 +41,6 @@ public class ChainingRouter extends FilteringOutboundRouter
     @Override
     public MuleEvent route(MuleEvent event) throws RoutingException
     {
-        MuleMessage message = event.getMessage();
-
         MuleEvent resultToReturn = null;
         if (routes == null || routes.size() == 0)
         {
@@ -59,11 +57,11 @@ public class ChainingRouter extends FilteringOutboundRouter
         MessageProcessor endpoint = null;
         try
         {
-            MuleMessage intermediaryResult = message;
+            MuleMessage intermediaryResult = event.getMessage();
 
             for (int i = 0; i < endpointsCount; i++)
             {
-                endpoint = getRoute(i, intermediaryResult);
+                endpoint = getRoute(i, event);
                 // if it's not the last endpoint in the chain,
                 // enforce the synchronous call, otherwise we lose response
                 boolean lastEndpointInChain = (i == endpointsCount - 1);

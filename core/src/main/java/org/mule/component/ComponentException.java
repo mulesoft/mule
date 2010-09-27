@@ -12,7 +12,6 @@ package org.mule.component;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.component.Component;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
@@ -31,48 +30,15 @@ public class ComponentException extends MessagingException
 
     private final transient Component component;
 
-    /**
-     * @param message the exception message
-     * @deprecated use ComponentException(Message, MuleEvent, Component)
-     */
-    @Deprecated
-    public ComponentException(Message message, MuleMessage muleMessage, Component component)
-    {
-        super(generateMessage(message, component), muleMessage);
-        this.component = component;
-    }
-
     public ComponentException(Message message, MuleEvent muleMessage, Component component)
     {
         super(generateMessage(message, component), muleMessage);
         this.component = component;
     }
 
-    /**
-     * @param message the exception message
-     * @param cause the exception that cause this exception to be thrown
-     * @deprecated use ComponentException(Message, MuleEvent, Component, Throwable)
-     */
-    @Deprecated
-    public ComponentException(Message message, MuleMessage muleMessage, Component component, Throwable cause)
-    {
-        super(generateMessage(message, component), muleMessage, cause);
-        this.component = component;
-    }
-
     public ComponentException(Message message, MuleEvent event, Component component, Throwable cause)
     {
         super(generateMessage(message, component), event, cause);
-        this.component = component;
-    }
-
-    /**
-     * @deprecated use ComponentException(MuleEvent, Component, Throwable)
-     */
-    @Deprecated
-    public ComponentException(MuleMessage message, Component component, Throwable cause)
-    {
-        super(generateMessage(null, component), message, cause);
         this.component = component;
     }
 

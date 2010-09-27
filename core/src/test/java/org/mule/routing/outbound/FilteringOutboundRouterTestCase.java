@@ -137,9 +137,10 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         Map<String, Object> m = new HashMap<String, Object>();
         m.put("barValue", "bar");
         MuleMessage message = new DefaultMuleMessage("test event", m, muleContext);
+        MuleEvent event = new OutboundRoutingTestEvent(message, null);
 
         assertTrue(router.isMatch(message));
-        OutboundEndpoint ep = (OutboundEndpoint) router.getRoute(0, message);
+        OutboundEndpoint ep = (OutboundEndpoint) router.getRoute(0, event);
         // MULE-2690: assert that templated targets are not mutated
         assertNotSame(endpoint1, ep);
         // assert that the returned endpoint has a resolved URI

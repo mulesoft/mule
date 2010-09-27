@@ -11,7 +11,6 @@
 package org.mule.api.routing;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.Message;
 
@@ -27,27 +26,9 @@ public class RoutePathNotFoundException extends RoutingException
      */
     private static final long serialVersionUID = -8481434966594513066L;
 
-    /**
-     * @deprecated use RoutePathNotFoundException(MuleEvent, RoutingTarget)
-     */
-    @Deprecated
-    public RoutePathNotFoundException(MuleMessage message, MessageProcessor target)
-    {
-        super(message, target);
-    }
-
     public RoutePathNotFoundException(MuleEvent event, MessageProcessor target)
     {
         super(event, target);
-    }
-
-    /**
-     * @deprecated use RoutePathNotFoundException(MuleEvent, RoutingTarget, Throwable)
-     */
-    @Deprecated
-    public RoutePathNotFoundException(MuleMessage message, MessageProcessor target, Throwable cause)
-    {
-        super(message, target, cause);
     }
 
     public RoutePathNotFoundException(MuleEvent event, MessageProcessor target, Throwable cause)
@@ -55,28 +36,9 @@ public class RoutePathNotFoundException extends RoutingException
         super(event, target, cause);
     }
 
-    /**
-     * @deprecated use RoutePathNotFoundException(Message, MuleEvent, RoutingTarget)
-     */
-    @Deprecated
-    public RoutePathNotFoundException(Message message, MuleMessage muleMessage, MessageProcessor target)
-    {
-        super(message, muleMessage, target);
-    }
-
     public RoutePathNotFoundException(Message message, MuleEvent event, MessageProcessor target)
     {
         super(message, event, target);
-    }
-
-    /**
-     * @deprecated use 
-     */
-    @Deprecated
-    public RoutePathNotFoundException(Message message, MuleMessage muleMessage, MessageProcessor target,
-        Throwable cause)
-    {
-        super(message, muleMessage, target, cause);
     }
 
     public RoutePathNotFoundException(Message message, MuleEvent event, MessageProcessor target,

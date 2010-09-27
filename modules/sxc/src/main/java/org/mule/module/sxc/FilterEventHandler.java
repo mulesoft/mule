@@ -10,8 +10,8 @@
 
 package org.mule.module.sxc;
 
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.routing.RoutingException;
 
 import com.envoisolutions.sxc.xpath.XPathEvent;
 import com.envoisolutions.sxc.xpath.XPathEventHandler;
@@ -47,7 +47,7 @@ public class FilterEventHandler extends XPathEventHandler
         {
             // ignore
         }
-        catch (RoutingException e)
+        catch (MuleException e)
         {
             // This shouldn't happen
             throw new RuntimeException(e);

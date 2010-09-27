@@ -12,7 +12,6 @@ package org.mule.api.routing.filter;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.config.i18n.Message;
 
 
@@ -22,34 +21,9 @@ public class FilterUnacceptedException extends MessagingException
     
     private transient Filter filter;
 
-    /**
-     * @deprecated use FilterUnacceptedException(Message, MuleEvent, Filter)
-     * @param message the exception message
-     */
-    @Deprecated
-    public FilterUnacceptedException(Message message, MuleMessage muleMessage, Filter filter)
-    {
-        super(message, muleMessage);
-        this.filter = filter;
-        addInfo("Filter", filter.toString());
-    }
-
     public FilterUnacceptedException(Message message, MuleEvent event, Filter filter)
     {
         super(message, event);
-        this.filter = filter;
-        addInfo("Filter", filter.toString());
-    }
-
-    /**
-     * @deprecated use FilterUnacceptedException(Message, MuleEvent, Filter, Throwable)
-     * @param message the exception message
-     * @param cause the exception that cause this exception to be thrown
-     */
-    @Deprecated
-    public FilterUnacceptedException(Message message, MuleMessage muleMessage, Filter filter, Throwable cause)
-    {
-        super(message, muleMessage, cause);
         this.filter = filter;
         addInfo("Filter", filter.toString());
     }
@@ -61,17 +35,6 @@ public class FilterUnacceptedException extends MessagingException
         addInfo("Filter", filter.toString());
     }
 
-    /**
-     * @deprecated use FilterUnacceptedException(MuleEvent, Filter, Throwable)
-     */
-    @Deprecated
-    public FilterUnacceptedException(MuleMessage muleMessage, Filter filter, Throwable cause)
-    {
-        super(muleMessage, cause);
-        this.filter = filter;
-        addInfo("Filter", (filter == null ? "null" : filter.toString()));
-    }
-
     public FilterUnacceptedException(MuleEvent event, Filter filter, Throwable cause)
     {
         super(event, cause);
@@ -79,30 +42,9 @@ public class FilterUnacceptedException extends MessagingException
         addInfo("Filter", (filter == null ? "null" : filter.toString()));
     }
 
-    /**
-     * @param message the exception message
-     * @param cause the exception that cause this exception to be thrown
-     * @deprecated use FilterUnacceptedException(Message, MuleEvent, Throwable)
-     */
-    @Deprecated
-    public FilterUnacceptedException(Message message, MuleMessage muleMessage, Throwable cause)
-    {
-        super(message, muleMessage, cause);
-    }
-
     public FilterUnacceptedException(Message message, MuleEvent event, Throwable cause)
     {
         super(message, event, cause);
-    }
-
-    /**
-     * @param message the exception message
-     * @deprecated use FilterUnacceptedException(Message, MuleEvent)
-     */
-    @Deprecated
-    public FilterUnacceptedException(Message message, MuleMessage muleMessage)
-    {
-        super(message, muleMessage);
     }
 
     public FilterUnacceptedException(Message message, MuleEvent event)

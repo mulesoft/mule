@@ -12,6 +12,7 @@ package org.mule.api.transport;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.NamedObject;
@@ -173,7 +174,7 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
      * @return the output stream to use for this request
      * @throws MuleException
      */
-    OutputStream getOutputStream(OutboundEndpoint endpoint, MuleMessage message) throws MuleException;
+    OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event) throws MuleException;
 
     MuleContext getMuleContext();
 

@@ -78,18 +78,6 @@ public class MessagingException extends MuleException
         setMessage(generateMessage(message));
     }
 
-    /**
-     * @deprecated use MessagingException(MuleEvent, Throwable)
-     */
-    @Deprecated
-    public MessagingException(MuleMessage muleMessage, Throwable cause)
-    {
-        super(cause);
-        this.muleMessage = muleMessage;
-        this.event = null;
-        setMessage(generateMessage(getI18nMessage()));
-    }
-
     public MessagingException(MuleEvent event, Throwable cause)
     {
         super(cause);

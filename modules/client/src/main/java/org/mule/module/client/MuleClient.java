@@ -63,6 +63,7 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -726,21 +727,13 @@ public class MuleClient implements Disposable
 
     protected MuleEvent getEvent(MuleMessage message, OutboundEndpoint endpoint) throws MuleException
     {
-        try
-        {            
-            DefaultMuleSession session = new DefaultMuleSession(new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext), muleContext);
+        DefaultMuleSession session = new DefaultMuleSession(new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext), muleContext);
 
-            if (user != null)
-            {
-                message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(
-                        user.getUsername(), user.getPassword()));
-            }
-            return new DefaultMuleEvent(message, endpoint, session);
-        }
-        catch (Exception e)
+        if (user != null)
         {
-            throw new DispatchException(CoreMessages.failedToCreate("Client event"), message, endpoint, e);
+            message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(user.getUsername(), user.getPassword()));
         }
+        return new DefaultMuleEvent(message, endpoint, session);
     }
 
     protected InboundEndpoint getInboundEndpoint(String uri) throws MuleException

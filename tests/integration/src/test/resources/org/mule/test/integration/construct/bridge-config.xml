@@ -71,7 +71,7 @@
   <bridge name="dlqDumper"
           exchange-pattern="one-way"
           inboundAddress="jms://myDlq"
-          outboundAddress="file://./test?outputPattern=#[header:INBOUND:JMSMessageID].dl" />
+          outboundAddress="file://./test?outputPattern=#[function:uuid].dl" />
 
   <!--
         Test support

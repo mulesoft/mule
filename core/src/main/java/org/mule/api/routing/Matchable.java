@@ -10,7 +10,7 @@
 
 package org.mule.api.routing;
 
-import org.mule.api.MessagingException;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 
 /**
@@ -24,8 +24,8 @@ public interface Matchable
      * 
      * @param event the current event to evaluate
      * @return true if the event should be processed by this router
-     * @throws MessagingException if the event cannot be evaluated
+     * @throws MuleException if the event cannot be evaluated
      */
-    boolean isMatch(MuleMessage message) throws MessagingException;
+    boolean isMatch(MuleMessage message) throws MuleException;
 
 }

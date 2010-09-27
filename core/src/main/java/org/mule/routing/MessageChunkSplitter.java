@@ -59,7 +59,7 @@ public class MessageChunkSplitter extends AbstractSplitter
         }
         catch (Exception e)
         {
-            throw new RoutingException(CoreMessages.failedToReadPayload(), message, next, e);
+            throw new RoutingException(CoreMessages.failedToReadPayload(), event, next, e);
         }
 
         int parts = data.length / messageSize;
