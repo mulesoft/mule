@@ -23,7 +23,9 @@
         <dependency>
             <groupId>org.ibeans</groupId>
             <artifactId>ibeans-support</artifactId>
+            <!-- Reverting this change because it broke the Bamboo build
             <version>1.0-SNAPSHOT</version>
+            -->
             <exclusions>
                 <!-- we like slf4j -->
                 <exclusion>

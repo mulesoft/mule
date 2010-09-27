@@ -29,6 +29,7 @@
                 <version>2.0-alpha-4</version>
             </extension>
         </extensions>
+        <!-- Reverting this change because it broke the Bamboo build
         <plugins>
             <plugin>
                 <artifactId>maven-archetype-plugin</artifactId>
@@ -36,6 +37,7 @@
                 <extensions>true</extensions>
             </plugin>
         </plugins>
+        -->
     </build>
     <distributionManagement>
         <repository>
