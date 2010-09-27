@@ -117,7 +117,7 @@
 
     <build>
         <defaultGoal>install</defaultGoal>
-        <finalName>${artifactId}</finalName>
+        <finalName>${project.artifactId}</finalName>
     
         <plugins>
             <plugin>
@@ -190,7 +190,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${project.build.directory}/${artifactId}.zip" 
+                                <copy file="${project.build.directory}/${project.artifactId}.zip" 
                                     todir="${env.MULE_HOME}/apps" overwrite="true"/>
                             </tasks>
                         </configuration>

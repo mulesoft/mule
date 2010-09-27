@@ -11,78 +11,42 @@
     <packaging>mule</packaging>
     <description>Demonstrates using Spring as the external container to provide the objects managed by Mule and how to publish events to multiple outbound endpoints. The example consists of two components; ExecptionManager and BusinessErrorManager.</description>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.mule.tools</groupId>
-                <artifactId>maven-mule-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-spring-extras</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-xml</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-scripting</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.transports</groupId>
-                            <artifactId>mule-transport-email</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.transports</groupId>
-                            <artifactId>mule-transport-jms</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.transports</groupId>
-                            <artifactId>mule-transport-file</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>javax.mail</groupId>
-                            <artifactId>mail</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-extras</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-email</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jms</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-file</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
@@ -91,6 +55,7 @@
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- test dependencies -->

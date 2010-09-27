@@ -24,31 +24,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.mule.tools</groupId>
-                <artifactId>maven-mule-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-cxf</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.transports</groupId>
-                            <artifactId>mule-transport-vm</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-client</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-scripting</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
@@ -57,21 +32,25 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- test dependencies -->

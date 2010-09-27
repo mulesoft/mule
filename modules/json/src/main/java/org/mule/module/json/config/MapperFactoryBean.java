@@ -1,5 +1,5 @@
 /*
- * $Id:  $
+ * $Id$
  * -------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -17,19 +17,19 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
 /**
  * TODO
  */
-public class MapperFactoryBean extends AbstractFactoryBean
+public class MapperFactoryBean extends AbstractFactoryBean<ObjectMapper>
 {
     private String name;
     private Map<Class<?>, Class<?>> mixins;
 
     @Override
-    public Class getObjectType()
+    public Class<?> getObjectType()
     {
         return ObjectMapper.class;
     }
 
     @Override
-    protected Object createInstance() throws Exception
+    protected ObjectMapper createInstance() throws Exception
     {
         ObjectMapper mapper = new ObjectMapper();
         if(mixins!=null)

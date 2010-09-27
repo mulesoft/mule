@@ -30,7 +30,8 @@ public class JsonMapperResolver extends AbstractAnnotatedTransformerArgumentReso
     /**
      * {@inheritDoc}
      */
-    protected Class getArgumentClass()
+    @Override
+    protected Class<?> getArgumentClass()
     {
         return ObjectMapper.class;
     }
@@ -38,7 +39,8 @@ public class JsonMapperResolver extends AbstractAnnotatedTransformerArgumentReso
     /**
      * {@inheritDoc}
      */
-    protected Object createArgument(Class annotatedType, MuleContext context) throws Exception
+    @Override
+    protected Object createArgument(Class<?> annotatedType, MuleContext context) throws Exception
     {
         return new ObjectMapper();
     }
@@ -46,6 +48,7 @@ public class JsonMapperResolver extends AbstractAnnotatedTransformerArgumentReso
     /**
      * {@inheritDoc}
      */
+    @Override
     protected String getAnnotationsPackageName()
     {
         return ANNOTATIONS_PACKAGE_NAME;

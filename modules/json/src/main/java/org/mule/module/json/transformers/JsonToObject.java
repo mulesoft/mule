@@ -11,6 +11,7 @@ package org.mule.module.json.transformers;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.module.json.JsonData;
@@ -39,7 +40,9 @@ import java.util.Map;
  */
 public class JsonToObject extends AbstractJsonTransformer
 {
-    private Map<Class, Class> deserializationMixins = new HashMap<Class, Class>();
+    private static final DataType<JsonData> JSON_TYPE = DataTypeFactory.create(JsonData.class);
+    
+    private Map<Class<?>, Class<?>> deserializationMixins = new HashMap<Class<?>, Class<?>>();
     
     public JsonToObject()
     {
@@ -49,7 +52,7 @@ public class JsonToObject extends AbstractJsonTransformer
         this.registerSourceType(DataTypeFactory.STRING);
         this.registerSourceType(DataTypeFactory.INPUT_STREAM);
         this.registerSourceType(DataTypeFactory.BYTE_ARRAY);
-        setReturnDataType(DataTypeFactory.create(JsonData.class));
+        setReturnDataType(JSON_TYPE);
     }
 
     @Override
@@ -62,7 +65,7 @@ public class JsonToObject extends AbstractJsonTransformer
             getMapper().getDeserializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
         }
 
-        for (Map.Entry<Class, Class> entry : deserializationMixins.entrySet())
+        for (Map.Entry<Class<?>, Class<?>> entry : deserializationMixins.entrySet())
         {
             getMapper().getDeserializationConfig().addMixInAnnotations(entry.getKey(), entry.getValue());
         }
@@ -97,43 +100,44 @@ public class JsonToObject extends AbstractJsonTransformer
             
             if (src instanceof Reader)
             {
-                if (getReturnClass().equals(JsonData.class))
+                if (getReturnDataType().equals(JSON_TYPE))
                 {
                     returnValue = new JsonData((Reader) src);
                 }
                 else
                 {
-                    returnValue = getMapper().readValue((Reader) src, getReturnClass());
+                    returnValue = getMapper().readValue((Reader) src, getReturnDataType().getType());
                 }
             }
             else if (src instanceof String)
             {
-                if (getReturnClass().equals(JsonData.class))
+                if (getReturnDataType().equals(JSON_TYPE))
                 {
                     returnValue = new JsonData((String) src);
                 }
                 else
                 {
-                    returnValue = getMapper().readValue((String) src, getReturnClass());
+                    returnValue = getMapper().readValue((String) src, getReturnDataType().getType());
                 }
             }
             else
             {
                 reader = new InputStreamReader(is, outputEncoding);
-                if (getReturnClass().equals(JsonData.class))
+                if (getReturnDataType().equals(JSON_TYPE))
                 {
                     returnValue = new JsonData(reader);
                 }
                 else
                 {
-                    returnValue = getMapper().readValue(reader, getReturnClass());
+                    returnValue = getMapper().readValue(reader, getReturnDataType().getType());
                 }
             }
             return returnValue;
         }
         catch (Exception e)
         {
-            throw new TransformerException(CoreMessages.transformFailed("json", getReturnClass().getName()), this, e);
+            throw new TransformerException(CoreMessages.transformFailed("json",
+                getReturnDataType().getType().getName()), this, e);
         }
         finally
         {
@@ -142,12 +146,12 @@ public class JsonToObject extends AbstractJsonTransformer
         }
     }
 
-    public Map<Class, Class> getDeserializationMixins()
+    public Map<Class<?>, Class<?>> getDeserializationMixins()
     {
         return deserializationMixins;
     }
 
-    public void setDeserializationMixins(Map<Class, Class> deserializationMixins)
+    public void setDeserializationMixins(Map<Class<?>, Class<?>> deserializationMixins)
     {
         this.deserializationMixins = deserializationMixins;
     }

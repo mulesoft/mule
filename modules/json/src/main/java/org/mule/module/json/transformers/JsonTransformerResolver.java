@@ -1,5 +1,5 @@
 /*
- * $Id:  $
+ * $Id$
  * -------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -59,7 +59,7 @@ public class JsonTransformerResolver implements TransformerResolver, MuleContext
         muleContext = context;
     }
 
-    public Transformer resolve(DataType source, DataType result) throws ResolverException
+    public Transformer resolve(DataType<?> source, DataType<?> result) throws ResolverException
     {
         //Check the cache
         Transformer t = transformerCache.get(source.toString() + result.toString());
@@ -78,7 +78,7 @@ public class JsonTransformerResolver implements TransformerResolver, MuleContext
                 return null;
             }
             boolean marshal;
-            Class annotatedType;
+            Class<?> annotatedType;
 
             //Check the class caches before we start scanning classes
             if (getMapperResolver().getMatchingClasses().contains(result.getType()))

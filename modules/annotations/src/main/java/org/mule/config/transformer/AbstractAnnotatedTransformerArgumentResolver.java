@@ -142,7 +142,7 @@ public abstract class AbstractAnnotatedTransformerArgumentResolver implements Tr
      * The object type that this resolver will discover or create
      * @return  The object type that this resolver will discover or create
      */
-    protected abstract Class getArgumentClass();
+    protected abstract Class<?> getArgumentClass();
 
     /**
      * If the resolver cannot locate the required object of type {@link #getArgumentClass()} this method will be invoked
@@ -150,11 +150,11 @@ public abstract class AbstractAnnotatedTransformerArgumentResolver implements Tr
      *
      * @param annotatedType the annotated object that was matched
      * @param muleContext the current Mule context.
-     * @return a new instance of the object being resolved.  This method may also retain a shared instance and possible add 
+     * @return a new instance of the object being resolved.  This method may also retain a shared instance and possible add
      * configuration to the instance based on this invocation
      * @throws Exception if the object cannot be created
      */
-    protected abstract Object createArgument(Class annotatedType, MuleContext muleContext) throws Exception;
+    protected abstract Object createArgument(Class<?> annotatedType, MuleContext muleContext) throws Exception;
 
     /**
      * This resolver scans a class for annotations in this package.  Note this behaviour can be changed by overloading
