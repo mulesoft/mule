@@ -34,6 +34,13 @@ import org.apache.commons.logging.LogFactory;
 import org.tanukisoftware.wrapper.jmx.WrapperManager;
 import org.tanukisoftware.wrapper.jmx.WrapperManagerMBean;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.tanukisoftware.wrapper.WrapperSystemPropertyUtil;
+import org.tanukisoftware.wrapper.jmx.WrapperManager;
+import org.tanukisoftware.wrapper.jmx.WrapperManagerMBean;
+import org.tanukisoftware.wrapper.security.WrapperPermission;
+
 /**
  * This agent integrates Java Service Wrapper into Mule. See
  * <a href="http://wrapper.tanukisoftware.org">http://wrapper.tanukisoftware.org</a>
@@ -74,6 +81,7 @@ public class WrapperManagerAgent extends AbstractAgent
         super("wrapper-manager");
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         try
@@ -180,6 +188,7 @@ public class WrapperManagerAgent extends AbstractAgent
     // /////////////////////////////////////////////////////////////////////////
 
     /* @see org.mule.api.context.Agent#getDescription() */
+    @Override
     public String getDescription()
     {
         WrapperManagerMBean wm = (WrapperManagerMBean) wrapperManagerRef.get();
@@ -187,8 +196,52 @@ public class WrapperManagerAgent extends AbstractAgent
         {
             return "Wrapper Manager";
         }
-        else return "Wrapper Manager: Mule PID #" + wm.getJavaPID() +
-                ", Wrapper PID #" + wm.getWrapperPID();
+        else
+        {
+            return "Wrapper Manager: Mule PID #" + getJavaPID() + ", Wrapper PID #" + getWrapperPID();
+        }
+    }
+
+    /**
+     * This method is a copy of the implementation of
+     * {@link WrapperManagerMBean#getJavaPID()} and it is here because that method is
+     * not present in the {@link WrapperManagerMBean} until version 3.2.3.
+     * SpringSource's TC Server uses The wrapper version 3.2.0 so having this method
+     * here allows us to be compatible with TC Server.
+     * 
+     * @return The PID of the Java process.
+     * @see http://www.mulesoft.org/jira/browse/MULE-5106
+     */
+    public static int getJavaPID()
+    {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null)
+        {
+            sm.checkPermission(new WrapperPermission("getJavaPID"));
+        }
+
+        return WrapperSystemPropertyUtil.getIntProperty("wrapper.java.pid", 0);
+    }
+
+    /**
+     * This method is a copy of the implementation of
+     * {@link WrapperManagerMBean#getWrapperPID()} and it is here because that method
+     * is not present in the {@link WrapperManagerMBean} until version 3.2.3.
+     * SpringSource's TC Server uses The wrapper version 3.2.0 so having this method
+     * here allows us to be compatible with TC Server.
+     * 
+     * @return The PID of the Wrapper process.
+     * @see http://www.mulesoft.org/jira/browse/MULE-5106
+     */
+    public static int getWrapperPID()
+    {
+        SecurityManager sm = System.getSecurityManager();
+        if (sm != null)
+        {
+            sm.checkPermission(new WrapperPermission("getWrapperPID"));
+        }
+
+        return WrapperSystemPropertyUtil.getIntProperty("wrapper.pid", 0);
     }
 
     protected void lazyInitWrapperManager() {
