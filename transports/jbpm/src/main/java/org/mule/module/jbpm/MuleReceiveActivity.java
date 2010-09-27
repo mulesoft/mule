@@ -8,9 +8,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jbpm;
+package org.mule.module.jbpm;
 
-import org.mule.transport.bpm.ProcessConnector;
+import org.mule.module.bpm.Process;
 import org.mule.util.ClassUtils;
 
 import java.util.Map;
@@ -70,12 +70,12 @@ public class MuleReceiveActivity extends StateActivity
     public void signal(ActivityExecution execution, String signalName, Map<String, ?> parameters)
     throws Exception
     {
-        Object payload = execution.getVariable(ProcessConnector.PROCESS_VARIABLE_INCOMING);
+        Object payload = execution.getVariable(Process.PROCESS_VARIABLE_INCOMING);
 
         // Validate expected inbound endpoint
         if (endpoint != null)
         {
-            String messageSource = (String) execution.getVariable(ProcessConnector.PROCESS_VARIABLE_INCOMING_SOURCE);
+            String messageSource = (String) execution.getVariable(Process.PROCESS_VARIABLE_INCOMING_SOURCE);
             log.debug("Validating message source = " + messageSource + ", expected = " + endpoint);
             if (!endpoint.equalsIgnoreCase(messageSource))
             {

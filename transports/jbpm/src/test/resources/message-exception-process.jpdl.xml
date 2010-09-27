@@ -9,7 +9,7 @@
     </mule-receive>
 
     <mule-send name="sendAsynchronousMessageA"
-        endpoint="vm://queueC" payload="test message" synchronous="false">
+        endpoint="vm://queueC" payload="test message" exchange-pattern="one-way">
         <transition to="callService" />
     </mule-send>
 
@@ -26,23 +26,23 @@
     </decision>
 
         <mule-send name="callEchoService"
-            endpoint="vm://echo" expr="Message in a bottle." synchronous="true" var="echoResponse">
+            endpoint="vm://echo" expr="Message in a bottle." exchange-pattern="request-response" var="echoResponse">
             <transition to="sendAsynchronousMessageB" />
         </mule-send>
 
         <mule-send name="callExceptionService"
-            endpoint="vm://exceptionService" expr="Message in a bottle." synchronous="true" var="echoResponse">
+            endpoint="vm://exceptionService" expr="Message in a bottle." exchange-pattern="request-response" var="echoResponse">
             <transition to="sendAsynchronousMessageB" />
         </mule-send>
 
         <mule-send name="callExceptionTransformer"
-            endpoint="vm://exceptionTransformer" expr="Message in a bottle." synchronous="true" var="echoResponse">
+            endpoint="vm://exceptionTransformer" expr="Message in a bottle." exchange-pattern="request-response" var="echoResponse">
             <transition to="sendAsynchronousMessageB" />
         </mule-send>
 
     <!-- The flow should not reach this point because an exception occurred in the previous step. -->
     <mule-send name="sendAsynchronousMessageB"
-        endpoint="vm://queueD" payload="#{echoResponse}" synchronous="false">
+        endpoint="vm://queueD" payload="#{echoResponse}" exchange-pattern="one-way">
         <transition to="end" />
     </mule-send>
 

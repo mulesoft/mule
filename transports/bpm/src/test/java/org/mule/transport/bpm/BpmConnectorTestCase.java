@@ -11,13 +11,16 @@
 package org.mule.transport.bpm;
 
 import org.mule.api.transport.Connector;
+import org.mule.module.bpm.BPMS;
+import org.mule.module.bpm.test.TestBpms;
 import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.transport.bpm.test.TestBpms;
 
 import com.mockobjects.dynamic.Mock;
 
 /**
  * Generic connector tests.
+ * 
+ * @deprecated It is recommended to configure BPM as a component rather than a transport for 3.x
  */
 public class BpmConnectorTestCase extends AbstractConnectorTestCase
 {

@@ -17,6 +17,7 @@ import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transport.Connector;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.endpoint.inbound.InboundEndpointMimeTypeCheckingMessageProcessor;
 import org.mule.endpoint.inbound.InboundEndpointPropertyMessageProcessor;
@@ -34,10 +35,8 @@ import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.ExceptionHandlingMessageProcessor;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
-import org.mule.transport.AbstractConnector;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class DefaultEndpointMessageProcessorChainFactory implements EndpointMessageProcessorChainFactory
@@ -45,33 +44,32 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     /** Override this method to change the default MessageProcessors. */
     protected List<MessageProcessor> createInboundMessageProcessors(InboundEndpoint endpoint)
     {
-        return Arrays.asList(new MessageProcessor[] 
-        { 
-            new ExceptionHandlingMessageProcessor(),
-            new InboundEndpointMimeTypeCheckingMessageProcessor(endpoint),
-            new InboundEndpointPropertyMessageProcessor(endpoint),
-            new InboundNotificationMessageProcessor(endpoint), 
-            new InboundLoggingMessageProcessor(endpoint),
-        });        
+        List<MessageProcessor> list = new ArrayList<MessageProcessor>();
+
+        list.add(new ExceptionHandlingMessageProcessor());
+        list.add(new InboundEndpointMimeTypeCheckingMessageProcessor(endpoint));
+        list.add(new InboundEndpointPropertyMessageProcessor(endpoint));
+        list.add(new InboundNotificationMessageProcessor(endpoint));
+        list.add(new InboundLoggingMessageProcessor(endpoint));
+
+        return list;
     }
     
     /** Override this method to change the default MessageProcessors. */
     protected List<MessageProcessor> createInboundResponseMessageProcessors(InboundEndpoint endpoint)
     {
-        return Arrays.asList(new MessageProcessor[] 
-        { 
-            new ExceptionHandlingMessageProcessor(),
-            new InboundExceptionDetailsMessageProcessor(endpoint.getConnector()),
-        });
+        List<MessageProcessor> list = new ArrayList<MessageProcessor>();
+
+        list.add(new ExceptionHandlingMessageProcessor());
+        list.add(new InboundExceptionDetailsMessageProcessor(endpoint.getConnector()));
+        
+        return list;
     }
     
     /** Override this method to change the default MessageProcessors. */
-    protected List<MessageProcessor> createOutboundMessageProcessors(OutboundEndpoint endpoint)
-        throws MuleException
+    protected List<MessageProcessor> createOutboundMessageProcessors(OutboundEndpoint endpoint) throws MuleException
     {
-        // TODO Need to clean this up the class hierarchy, but I'm not sure we want
-        // to put all these things in the Connector interface.
-        AbstractConnector connector = ((AbstractConnector) endpoint.getConnector());
+        Connector connector = endpoint.getConnector();
 
         List<MessageProcessor> list = new ArrayList<MessageProcessor>();
 
@@ -88,16 +86,18 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         list.add(new OutboundEndpointPropertyMessageProcessor());
         list.add(new OutboundResponsePropertiesMessageProcessor(endpoint));
         list.add(new OutboundEndpointMimeTypeCheckingMessageProcessor(endpoint));
+
         return list;
     }
     
     /** Override this method to change the default MessageProcessors. */
-    protected List<MessageProcessor> createOutboundResponseMessageProcessors(OutboundEndpoint endpoint)
-        throws MuleException
+    protected List<MessageProcessor> createOutboundResponseMessageProcessors(OutboundEndpoint endpoint) throws MuleException
     {
-        return Arrays.asList(new MessageProcessor[]{
-            new OutboundRewriteResponseEventMessageProcessor()
-        });
+        List<MessageProcessor> list = new ArrayList<MessageProcessor>();
+
+        list.add(new OutboundRewriteResponseEventMessageProcessor());
+
+        return list;
     }
     
     public MessageProcessor createInboundMessageProcessorChain(InboundEndpoint endpoint, FlowConstruct flowConstruct, MessageProcessor target) throws MuleException

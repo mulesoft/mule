@@ -10,7 +10,7 @@
         <transition to="C" />
     </script>
 
-    <mule-send name="C" endpoint="vm://queueA" payload="${message}" synchronous="false">
+    <mule-send name="C" endpoint="vm://queueA" payload="${message}" exchange-pattern="one-way">
         <transition to="D" />
     </mule-send>
 
@@ -18,7 +18,7 @@
         <transition to="E" />
     </mule-receive>
 
-    <mule-send name="E" endpoint="vm://queueB" synchronous="false">
+    <mule-send name="E" endpoint="vm://queueB" exchange-pattern="one-way">
         <transition to="end" />
     </mule-send>
 

@@ -13,8 +13,24 @@
     <bpm:connector name="bpmConnector1" bpms-ref="testBpms"
         allowGlobalReceiver="true" processIdField="myId"/>
 
-    <spring:bean id="testBpms" class="org.mule.transport.bpm.test.TestBpms">
+    <spring:bean id="testBpms" class="org.mule.module.bpm.test.TestBpms">
         <spring:property name="foo" value="bar"/>
     </spring:bean>
+
+	<model>
+		<service name="Service1">
+			<inbound>
+				<inbound-endpoint address="test://in1" />
+			</inbound>
+		    <bpm:process bpms-ref="testBpms" processName="test" processDefinition="test.def" />
+		</service>
+
+		<service name="Service2">
+			<inbound>
+				<inbound-endpoint address="test://in2" />
+			</inbound>
+		    <bpm:process processName="test" processDefinition="test.def" processIdField="myId" />
+		</service>
+	</model>
 
 </mule>

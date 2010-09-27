@@ -7,7 +7,7 @@
     <import resource="jbpm.tx.hibernate.cfg.xml" />
 
     <process-engine-context>
-        <object class="org.mule.transport.jbpm.MuleMessageService" />
+        <object class="org.mule.module.jbpm.MuleMessageService" />
     </process-engine-context>
 
 </jbpm-configuration>

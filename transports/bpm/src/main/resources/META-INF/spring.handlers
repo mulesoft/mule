@@ -1,1 +1,1 @@
-http\://www.mulesoft.org/schema/mule/bpm=org.mule.transport.bpm.config.BpmNamespaceHandler
+http\://www.mulesoft.org/schema/mule/bpm=org.mule.module.bpm.config.BpmNamespaceHandler

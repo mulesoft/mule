@@ -13,7 +13,7 @@
 
     <!-- Send customer info. to credit agency -->
     <mule-send name="sendToCreditAgency"
-          expr="#{customerRequest.customer}" endpoint="CreditAgency" synchronous="false">
+          expr="#{customerRequest.customer}" endpoint="CreditAgency" exchange-pattern="one-way">
         <transition to="waitForCreditAgency" />
     </mule-send>
 
@@ -72,7 +72,7 @@
     </mule-send>
 
     <mule-send name="sendCustomerResponse"
-          expr="#{loanQuote}" endpoint="CustomerResponses" synchronous="false">
+          expr="#{loanQuote}" endpoint="CustomerResponses" exchange-pattern="one-way">
         <transition to="loanApproved" />
     </mule-send>
 

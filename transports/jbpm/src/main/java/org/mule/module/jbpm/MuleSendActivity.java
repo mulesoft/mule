@@ -8,12 +8,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jbpm;
+package org.mule.module.jbpm;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.transport.bpm.MessageService;
-import org.mule.transport.bpm.ProcessConnector;
+import org.mule.module.bpm.MessageService;
+import org.mule.module.bpm.Process;
 import org.mule.util.ClassUtils;
 
 import java.util.HashMap;
@@ -32,19 +33,34 @@ import org.jbpm.pvm.internal.script.ScriptManager;
 
 public class MuleSendActivity extends JpdlActivity implements EventListener
 {
-    private boolean synchronous;
+    /**
+     * Mule endpoint to send a message to.  This may be a URI or logical name (for a global endpoint).
+     */
     private String endpoint;
 
-    // Expected response type in the case of a synchronous call; if the response payload is not assignable to this class, an exception will be thrown.
+    /**
+     * Exchange pattern (REQUEST-RESPONSE, ONE-WAY, etc.)
+     */
+    private MessageExchangePattern mep;
+    
+    /** 
+     * Expected response type in the case of a synchronous call; if the response payload is not assignable to this class, an exception will be thrown.
+     */
     private Class responsePayloadClass;
 
-    // Variable into which the synchronous response will be stored.  If null, the response will not be stored at all.
+    /**
+     * Variable into which the synchronous response will be stored.  If null, the response will not be stored at all.
+     */
     private String responseVariableName;
     
-    // payloadSource may be a literal value or it may be an expression which references process variables.
+    /**
+     * payloadSource may be a literal value or it may be an expression which references process variables.
+     */
     private String payloadExpression;
 
-    // The actual payload (as an object) will be stored here.
+    /**
+     * The actual payload (as an object) will be stored here.
+     */
     private Object payloadObject;
     
     private static final Log log = Log.getLog(MuleSendActivity.class.getName());
@@ -70,10 +86,10 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
 
         if (payloadExpression == null)
         {
-            payloadObject = execution.getVariable(ProcessConnector.PROCESS_VARIABLE_DATA);
+            payloadObject = execution.getVariable(Process.PROCESS_VARIABLE_DATA);
             if (payloadObject == null)
             {
-                payloadObject = execution.getVariable(ProcessConnector.PROCESS_VARIABLE_INCOMING);
+                payloadObject = execution.getVariable(Process.PROCESS_VARIABLE_INCOMING);
             }
         }
         else
@@ -91,10 +107,8 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
 
         Map props = new HashMap();
 
-        // TODO: this probably isn't the best. I'm casting to an Impl because it's
-        // the only way I could see to get the name of the process definition
-        props.put(ProcessConnector.PROPERTY_PROCESS_TYPE, ((ExecutionImpl) execution).getProcessDefinition().getName());
-        props.put(ProcessConnector.PROPERTY_PROCESS_ID, execution.getId());
+        props.put(Process.PROPERTY_PROCESS_TYPE, ((ExecutionImpl) execution).getProcessDefinition().getName());
+        props.put(Process.PROPERTY_PROCESS_ID, execution.getId());
         String state = Jbpm.getState(execution.getProcessInstance());
         props.put("MULE_BPM_PROCESS_STATE", state);
         log.debug("process state: " + state);        
@@ -111,9 +125,9 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
 
         // Just in case the endpoint itself is an expression
         endpoint = (String) ScriptManager.getScriptManager().evaluateExpression(endpoint, null);
-        MuleMessage response = mule.generateMessage(endpoint, payloadObject, props, synchronous);
+        MuleMessage response = mule.generateMessage(endpoint, payloadObject, props, mep);
 
-        if (synchronous && response != null)
+        if (mep.hasResponse() && response != null)
         {
             Object responsePayload = response.getPayload();
     
@@ -141,24 +155,17 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
         }
     }
     
-    public boolean isSynchronous()
-    {
-        return synchronous;
-    }
-
-    public void setSynchronous(boolean synchronous)
-    {
-        this.synchronous = synchronous;
-    }
-
-    public String getEndpoint()
-    {
-        return endpoint;
-    }
-
     public void setEndpoint(String endpoint)
     {
         this.endpoint = endpoint;
+    }
+
+    public void setMessageExchangePattern(String mepString)
+    {
+        if (mepString != null)
+        {
+            this.mep = MessageExchangePattern.fromString(mepString);
+        }
     }
 
     public String getPayloadExpression()

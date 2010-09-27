@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jbpm;
+package org.mule.module.jbpm;
 
 import org.jbpm.jpdl.internal.activity.JpdlBinding;
 import org.jbpm.jpdl.internal.xml.JpdlParser;
@@ -28,7 +28,7 @@ public class MuleSendBinding extends JpdlBinding
         MuleSendActivity activity = new MuleSendActivity();
 
         // Note: The last method argument is the default value.
-        activity.setSynchronous(XmlUtil.attributeBoolean(element, "synchronous", false, parse, true));
+        activity.setMessageExchangePattern((XmlUtil.attribute(element, "exchange-pattern", false, parse, "request-response")));
         activity.setEndpoint(XmlUtil.attribute(element, "endpoint", true, parse));
         activity.setPayloadExpression(XmlUtil.attribute(element, "expr", false, parse, null));
         activity.setResponseVariableName(XmlUtil.attribute(element, "var", false, parse, null));

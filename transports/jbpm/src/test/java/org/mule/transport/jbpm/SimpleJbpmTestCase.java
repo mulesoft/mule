@@ -11,14 +11,18 @@
 package org.mule.transport.jbpm;
 
 import org.mule.api.MuleMessage;
+import org.mule.module.bpm.BPMS;
+import org.mule.module.bpm.Process;
 import org.mule.module.client.MuleClient;
-import org.mule.transport.bpm.BPMS;
+import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.bpm.ProcessConnector;
 
 /**
  * Tests the connector against jBPM with a simple process.
+ * 
+ * @deprecated It is recommended to configure BPM as a component rather than a transport for 3.x
  */
-public class SimpleJbpmTestCase extends AbstractJbpmTestCase
+public class SimpleJbpmTestCase extends FunctionalTestCase
 {
 
     protected String getConfigResources()
@@ -28,15 +32,16 @@ public class SimpleJbpmTestCase extends AbstractJbpmTestCase
 
     public void testSimpleProcess() throws Exception 
     {
-        MuleMessage response;
-        Object process;
+        ProcessConnector connector = (ProcessConnector) muleContext.getRegistry().lookupConnector("bpmConnector");
         BPMS bpms = connector.getBpms();
+        assertNotNull(bpms);
+
         MuleClient client = new MuleClient(muleContext);
         try
         {
             // Create a new process.
-            response = client.send("bpm://simple", "data", null);
-            process = response.getPayload();
+            MuleMessage response = client.send("bpm://simple", "data", null);
+            Object process = response.getPayload();
 
             String processId = (String)bpms.getId(process);
             // The process should be started and in a wait state.
@@ -58,17 +63,17 @@ public class SimpleJbpmTestCase extends AbstractJbpmTestCase
 
     public void testSimpleProcessWithParameters() throws Exception
     {
-        MuleMessage response;
-        Object process;
+        ProcessConnector connector = (ProcessConnector) muleContext.getRegistry().lookupConnector("bpmConnector");
         BPMS bpms = connector.getBpms();
+
         MuleClient client = new MuleClient(muleContext);
         try
         {
             // Create a new process.
-            response = client.send("bpm://?" +
-                                   ProcessConnector.PROPERTY_ACTION + "=" + ProcessConnector.ACTION_START +
-                                   "&" + ProcessConnector.PROPERTY_PROCESS_TYPE + "=simple", "data", null);
-            process = response.getPayload();
+            MuleMessage response = client.send("bpm://?" +
+                                   Process.PROPERTY_ACTION + "=" + Process.ACTION_START +
+                                   "&" + Process.PROPERTY_PROCESS_TYPE + "=simple", "data", null);
+            Object process = response.getPayload();
 
             // The process should be started and in a wait state.
             Object processId = bpms.getId(process);
@@ -77,9 +82,9 @@ public class SimpleJbpmTestCase extends AbstractJbpmTestCase
 
             // Advance the process one step.
             response = client.send("bpm://?" +
-                                   ProcessConnector.PROPERTY_ACTION + "=" + ProcessConnector.ACTION_ADVANCE +
-                                   "&" + ProcessConnector.PROPERTY_PROCESS_TYPE + "=simple&" +
-                                   ProcessConnector.PROPERTY_PROCESS_ID + "=" + processId, "data", null);
+                                   Process.PROPERTY_ACTION + "=" + Process.ACTION_ADVANCE +
+                                   "&" + Process.PROPERTY_PROCESS_TYPE + "=simple&" +
+                                   Process.PROPERTY_PROCESS_ID + "=" + processId, "data", null);
             process = response.getPayload();
 
             // The process should have ended.

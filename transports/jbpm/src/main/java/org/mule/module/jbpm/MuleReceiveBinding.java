@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jbpm;
+package org.mule.module.jbpm;
 
 import org.jbpm.jpdl.internal.activity.JpdlBinding;
 import org.jbpm.jpdl.internal.model.JpdlProcessDefinition;

@@ -27,6 +27,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -39,10 +41,11 @@ import org.w3c.dom.Element;
  */
 public abstract class AbstractMuleNamespaceHandler extends NamespaceHandlerSupport
 {
-
     public static final String GLOBAL_ENDPOINT = "endpoint";
     public static final String INBOUND_ENDPOINT = "inbound-endpoint";
     public static final String OUTBOUND_ENDPOINT = "outbound-endpoint"; 
+
+    protected transient final Log logger = LogFactory.getLog(getClass());
 
     /**
      * @param name The name of the element to be ignored.

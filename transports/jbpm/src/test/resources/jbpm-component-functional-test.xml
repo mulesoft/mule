@@ -14,68 +14,43 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd">
 
-	<!-- 
- 	  Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
-	 -->
-    <bpm:jbpm-connector name="bpmConnector">
-        <bpm:process-definition name="simple" resource="simple-process.jpdl.xml" />
-        <bpm:process-definition name="message" resource="message-process.jpdl.xml" />
-        <bpm:process-definition name="fork" resource="fork-process.jpdl.xml" />
-        <bpm:process-definition name="variables" resource="variables-process.jpdl.xml" />
-        <bpm:process-definition name="exception" resource="message-exception-process.jpdl.xml" />
-    </bpm:jbpm-connector>
+    <bpm:jbpm name="jbpm" />
     
-    <model name="processModel">
-        <service name="fromMessageProcess">
+    <model>
+        <service name="SimpleProcess">
             <inbound>
-                <bpm:inbound-endpoint process="message" exchange-pattern="request-response"/>
+                <vm:inbound-endpoint path="simple" exchange-pattern="request-response"/>
             </inbound>
-            <log-component />
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="echo"/>
-                </pass-through-router>
-            </outbound>
+            <bpm:process processName="simple" processDefinition="simple-process.jpdl.xml" />
         </service>
 
-        <service name="fromMessageExceptionProcess">
+        <service name="MessageProcess">
             <inbound>
-                <bpm:inbound-endpoint process="exception"/>
+                <vm:inbound-endpoint path="message" exchange-pattern="request-response"/>
             </inbound>
-            <log-component />
-            <outbound>
-                <bpm:outbound-router>
-                    <vm:outbound-endpoint path="queueC"/>
-                    <vm:outbound-endpoint path="queueD"/>
-                </bpm:outbound-router>
-            </outbound>
+            <bpm:process processName="message" processDefinition="message-process.jpdl.xml" />
         </service>
 
-        <service name="fromForkedProcess">
+        <service name="MessageExceptionProcess">
             <inbound>
-                <bpm:inbound-endpoint process="fork"/>
+                <vm:inbound-endpoint path="exception" exchange-pattern="request-response"/>
             </inbound>
-            <log-component />
-            <outbound>
-                <bpm:outbound-router>
-                    <vm:outbound-endpoint path="queueA"/>
-                    <vm:outbound-endpoint path="echo"/>
-                    <vm:outbound-endpoint path="queueB"/>
-                </bpm:outbound-router>
-            </outbound>
+            <bpm:process processName="exception" processDefinition="message-exception-process.jpdl.xml" />
         </service>
 
-        <service name="fromVariablesProcess">
+        <service name="ForkedProcess">
             <inbound>
-                <bpm:inbound-endpoint process="variables"/>
+                <vm:inbound-endpoint path="fork" exchange-pattern="request-response"/>
+                <vm:inbound-endpoint path="fork-reply" exchange-pattern="one-way"/>
             </inbound>
-            <log-component />
-            <outbound>
-                <bpm:outbound-router>
-                    <vm:outbound-endpoint path="queueA"/>
-                    <vm:outbound-endpoint path="queueB"/>
-                </bpm:outbound-router>
-            </outbound>
+            <bpm:process processName="fork" processDefinition="fork-process.jpdl.xml" />
+        </service>
+
+        <service name="VariablesProcess">
+            <inbound>
+                <vm:inbound-endpoint path="variables" exchange-pattern="request-response"/>
+            </inbound>
+            <bpm:process processName="variables" processDefinition="variables-process.jpdl.xml" />
         </service>
 
         <service name="ServiceA" initialState="paused">
@@ -87,7 +62,7 @@
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <bpm:outbound-endpoint process="fork"/>
+                    <vm:outbound-endpoint path="fork-reply" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -101,7 +76,7 @@
             </test:component>
             <outbound>
                 <pass-through-router>
-                    <bpm:outbound-endpoint process="fork"/>
+                    <vm:outbound-endpoint path="fork-reply" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

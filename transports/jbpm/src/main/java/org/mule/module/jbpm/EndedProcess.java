@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jbpm;
+package org.mule.module.jbpm;
 
 import java.util.Collection;
 import java.util.Map;
@@ -17,6 +17,9 @@ import java.util.Set;
 import org.jbpm.api.Execution;
 import org.jbpm.api.ProcessInstance;
 
+/**
+ * Placeholder used to get status for a process in a uniform way, even if it has ended.
+ */
 public class EndedProcess implements ProcessInstance
 {
     private String id;

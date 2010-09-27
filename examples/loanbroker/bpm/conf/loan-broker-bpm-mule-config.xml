@@ -16,9 +16,7 @@
        http://www.mulesoft.org/schema/mule/client http://www.mulesoft.org/schema/mule/client/3.0/mule-client.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd">
 
-    <bpm:jbpm-connector name="jBpmConnector">
-        <bpm:process name="loanBroker" resource="loan-broker-process.jpdl.xml" />
-    </bpm:jbpm-connector>
+    <bpm:jbpm name="jbpm" />
 
     <jms:activemq-connector name="jmsConnector" />
 
@@ -49,38 +47,7 @@
                 <!-- Incoming message = CreditProfile -->
                 <inbound-endpoint ref="CreditProfiles" />
             </inbound>
-            <outbound>
-                <pass-through-router>
-                    <bpm:outbound-endpoint process="LoanBroker" exchange-pattern="one-way" />
-                </pass-through-router>
-            </outbound>
-        </service>
-
-        <!-- Messages generated from the process engine -->
-        <service name="FromBPMS">
-            <inbound>
-                <bpm:inbound-endpoint process="LoanBroker" exchange-pattern="one-way" />
-            </inbound>
-            <outbound>
-                <bpm:outbound-router>
-                    <!-- Outgoing message = Customer -->
-                    <outbound-endpoint ref="CreditAgency" />
-
-                    <!-- Outgoing message = LoanQuoteRequest -->
-                    <outbound-endpoint ref="BigBank">
-                        <property key="method" value="getLoanQuote"/>
-                    </outbound-endpoint>
-                    <outbound-endpoint ref="MediumBank">
-                        <property key="method" value="getLoanQuote"/>
-                    </outbound-endpoint>
-                    <outbound-endpoint ref="SmallBank">
-                        <property key="method" value="getLoanQuote"/>
-                    </outbound-endpoint>
-
-                    <!-- Outgoing message = LoanQuote -->
-                    <outbound-endpoint ref="CustomerResponses" />
-                </bpm:outbound-router>
-            </outbound>
+            <bpm:process processName="LoanBroker" processDefinition="loan-broker-process.jpdl.xml" />
         </service>
 
 

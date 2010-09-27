@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.bpm;
+package org.mule.module.bpm;
 
 import java.util.Map;
 
@@ -31,6 +31,20 @@ public interface BPMS
      */
     public void setMessageService(MessageService msgService);
 
+    /**
+     * Deploy (not start) a process to the BPMS based on a process definition file.
+     * @param resource - process definition file
+     * @throws Exception
+     */
+    public void deployProcess(String resource) throws Exception;
+    
+    /**
+     * Undeploy a process from the BPMS.
+     * @param resource - process definition file
+     * @throws Exception
+     */
+    public void undeployProcess(String resource) throws Exception;
+    
     /**
      * Start a new process.
      * This method is REQUIRED.

@@ -253,7 +253,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     protected volatile Properties serviceOverrides;
 
     /**
-     * The strategy used for reading and writing session information to and front he
+     * The strategy used for reading and writing session information to and from the
      * transport
      */
     protected volatile SessionHandler sessionHandler = new SerializeAndEncodeSessionHandler();

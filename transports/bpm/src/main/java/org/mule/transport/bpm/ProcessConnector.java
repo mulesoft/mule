@@ -10,15 +10,18 @@
 
 package org.mule.transport.bpm;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ConfigurationException;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.bpm.BPMS;
+import org.mule.module.bpm.MessageService;
+import org.mule.module.bpm.Process;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.StringUtils;
@@ -29,10 +32,11 @@ import java.util.Map;
  * The BPM provider allows Mule events to initiate and/or advance processes in an
  * external or embedded Business Process Management System (BPMS). It also allows
  * executing processes to generate Mule events.
+ * 
+ * @deprecated It is recommended to configure BPM as a component rather than a transport for 3.x
  */
 public class ProcessConnector extends AbstractConnector implements MessageService
 {
-
     /** The underlying BPMS */
     protected BPMS bpms;
 
@@ -46,30 +50,6 @@ public class ProcessConnector extends AbstractConnector implements MessageServic
      * only receive messages for the process "MyProcess".
      */
     protected boolean allowGlobalReceiver = false;
-
-    public static final String BPM_PROPERTY_PREFIX = "BPM_";
-    
-    public static final String PROPERTY_ENDPOINT = 
-        MuleProperties.PROPERTY_PREFIX + BPM_PROPERTY_PREFIX + "ENDPOINT";
-    public static final String PROPERTY_PROCESS_TYPE = 
-        MuleProperties.PROPERTY_PREFIX + BPM_PROPERTY_PREFIX + "PROCESS_TYPE";
-    public static final String PROPERTY_PROCESS_ID = 
-        MuleProperties.PROPERTY_PREFIX + BPM_PROPERTY_PREFIX + "PROCESS_ID";
-    public static final String PROPERTY_ACTION = 
-        MuleProperties.PROPERTY_PREFIX + BPM_PROPERTY_PREFIX + "ACTION";
-    public static final String PROPERTY_TRANSITION = 
-        MuleProperties.PROPERTY_PREFIX + BPM_PROPERTY_PREFIX + "TRANSITION";
-    public static final String PROPERTY_PROCESS_STARTED = 
-        MuleProperties.PROPERTY_PREFIX + BPM_PROPERTY_PREFIX + "STARTED";
-    
-    public static final String ACTION_START = "start";
-    public static final String ACTION_ADVANCE = "advance";
-    public static final String ACTION_UPDATE = "update";
-    public static final String ACTION_ABORT = "abort";
-    
-    public static final String PROCESS_VARIABLE_INCOMING = "incoming";
-    public static final String PROCESS_VARIABLE_INCOMING_SOURCE = "incomingSource";
-    public static final String PROCESS_VARIABLE_DATA = "data";
 
     public static final String PROTOCOL = "bpm";
     public static final String GLOBAL_RECEIVER = PROTOCOL + "://*";
@@ -210,10 +190,10 @@ public class ProcessConnector extends AbstractConnector implements MessageServic
     public MuleMessage generateMessage(String endpoint,
                                       Object payloadObject,
                                       Map messageProperties,
-                                      boolean synchronous) throws Exception
+                                      MessageExchangePattern mep) throws Exception
     {
-        String processName = (String)messageProperties.get(ProcessConnector.PROPERTY_PROCESS_TYPE);
-        Object processId = messageProperties.get(ProcessConnector.PROPERTY_PROCESS_ID);
+        String processName = (String)messageProperties.get(Process.PROPERTY_PROCESS_TYPE);
+        Object processId = messageProperties.get(Process.PROPERTY_PROCESS_ID);
 
         // Look up a receiver for this process.
         ProcessMessageReceiver receiver = lookupReceiver(processName, processId);
@@ -224,9 +204,9 @@ public class ProcessConnector extends AbstractConnector implements MessageServic
                                 + ", processId = " + processId));
         }
 
-        logger.debug("Generating Mule message for process name = " + processName + " id = " + processId + ", synchronous = " + synchronous);
+        logger.debug("Generating Mule message for process name = " + processName + " id = " + processId + ", synchronous = " + mep.hasResponse());
         
-        if (synchronous)
+        if (mep.hasResponse())
         {
             // Send the process-generated Mule message synchronously.
             return receiver.generateSynchronousEvent(endpoint, payloadObject, messageProperties);

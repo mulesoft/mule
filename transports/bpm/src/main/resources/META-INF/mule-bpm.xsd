@@ -15,11 +15,11 @@
     
     <xsd:annotation>
         <xsd:documentation>
-            The BPM transport allows process engines to send and receive messages through Mule. 
+            BPM integration allows process engines to send and receive messages through Mule. 
         </xsd:documentation>
         <xsd:appinfo>
             <schemadoc:short-name>BPM</schemadoc:short-name>
-            <schemadoc:page-title>BPM Transport</schemadoc:page-title>
+            <schemadoc:page-title>BPM Integration</schemadoc:page-title>
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
                                           requestEvents="false"
                                           transactions="false" streaming="false">
@@ -28,9 +28,62 @@
         </xsd:appinfo>
     </xsd:annotation>
 
-    <xsd:element name="connector" type="bpmConnectorType" substitutionGroup="mule:abstract-connector"/>
+    <xsd:element name="process" type="processComponentType" substitutionGroup="mule:abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                A service backed by a process engine such as jBPM.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="processComponentType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractComponentType">
+                <xsd:attribute name="bpms-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to the underlying BPMS, which must implement the {javadoc:mule/transport/bpm|BPMS}org.mule.transport.bpm.BPMS{javadoc} interface to exchange messages through Mule. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="processName" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The logical name of the process.  This is used to look up the running process instance from the BPMS.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="processDefinition" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The resource containing the process definition.  This will be used to deploy the process to the BPMS.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="processIdField" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            This field will be used to correlate messages with processes.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
+    <xsd:element name="connector" type="bpmConnectorType" substitutionGroup="mule:abstract-connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
     <xsd:complexType name="abstractBpmConnectorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
                 <xsd:attribute name="allowGlobalReceiver" type="mule:substitutableBoolean" default="false">
@@ -52,6 +105,11 @@
    </xsd:complexType>
  
     <xsd:complexType name="bpmConnectorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="abstractBpmConnectorType">
                 <xsd:attribute name="bpms-ref" type="xsd:IDREF" use="required">
@@ -64,14 +122,64 @@
             </xsd:extension>
         </xsd:complexContent>
    </xsd:complexType>
+
+    <xsd:element name="jbpm" type="jbpmType" substitutionGroup="mule:abstract-extension" />
  
-    <xsd:element name="jbpm-connector" type="jBpmConnectorType" substitutionGroup="mule:abstract-connector"/>
+    <xsd:complexType name="jbpmType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+		         <xsd:sequence>
+		         	<xsd:element name="process-definition" type="processDefinitionType" minOccurs="0" maxOccurs="unbounded">
+		              <xsd:annotation>
+		                  <xsd:documentation>
+		                  	A process definition to be loaded into jBPM at startup.
+		                  </xsd:documentation>
+		              </xsd:annotation>
+		          </xsd:element>
+		         </xsd:sequence>
+		         <xsd:attribute name="name" type="mule:substitutableName">
+		             <xsd:annotation>
+		                 <xsd:documentation>
+		                 	 An optional name for this BPMS.  Refer to this from the "bpms-ref" field of your component in case you have more than one BPMS configured.
+		                 </xsd:documentation>
+		             </xsd:annotation>
+		         </xsd:attribute>
+		         <xsd:attribute name="configurationResource" type="xsd:string">
+		             <xsd:annotation>
+		                 <xsd:documentation>
+		                     The configuration file for jBPM, default is "jbpm.cfg.xml" if not specified.
+		                 </xsd:documentation>
+		             </xsd:annotation>
+		         </xsd:attribute>
+		         <xsd:attribute name="processEngine-ref" type="xsd:IDREF">
+		             <xsd:annotation>
+		                 <xsd:documentation>
+		                     A reference to the already-initialized jBPM ProcessEngine.  This is useful if you use Spring to configure your jBPM instance.  Note that the "configurationResource" attribute will be ignored.
+		                 </xsd:documentation>
+		             </xsd:annotation>
+		         </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="jbpm-connector" type="jBpmConnectorType" substitutionGroup="mule:abstract-connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:complexType name="jBpmConnectorType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="abstractBpmConnectorType">
                 <xsd:sequence>
-                	<xsd:element name="process" type="processType" maxOccurs="unbounded">
+                	<xsd:element name="process-definition" type="processDefinitionType" maxOccurs="unbounded">
 	                    <xsd:annotation>
 	                        <xsd:documentation>
 	                        	A process definition to be loaded into jBPM when the connector is initialized.
@@ -97,7 +205,7 @@
         </xsd:complexContent>
    </xsd:complexType>
  
-    <xsd:complexType name="processType">
+    <xsd:complexType name="processDefinitionType">
         <xsd:complexContent mixed="true">
             <xsd:extension base="mule:abstractExtensionType">
             	<!--
@@ -133,8 +241,19 @@
         <xsd:anyAttribute namespace="##any" processContents="lax"/>
     </xsd:complexType>
 
-    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="inboundEndpointType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="mule:inboundEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
@@ -142,8 +261,19 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="outboundEndpointType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="mule:outboundEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
@@ -151,8 +281,19 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="globalEndpointType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="mule:globalEndpointType">
                 <xsd:attributeGroup ref="addressAttributes"/>
@@ -161,6 +302,11 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="addressAttributes">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:attribute name="process" type="xsd:string"/>
     </xsd:attributeGroup>
 
@@ -168,26 +314,21 @@
     This is merely a shortcut for:
          <endpoint-selector-router selectorExpression="header:MULE_BPM_ENDPOINT">
     -->
-    <xsd:element name="outbound-router" type="bpmOutboundRouterType"
-                 substitutionGroup="mule:abstract-outbound-router"/>
+    <xsd:element name="outbound-router" type="bpmOutboundRouterType" substitutionGroup="mule:abstract-outbound-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
     <xsd:complexType name="bpmOutboundRouterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+            </xsd:documentation>
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="mule:multipleEndpointFilteringOutboundRouterType"/>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <!-- TODO MULE-3205
-    <xsd:element name="component" type="bpmComponentType" substitutionGroup="mule:abstract-component">
-        <xsd:annotation>
-            <xsd:documentation>
-                Used to embed a BPM process inside a Mule config.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="bpmComponentType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:defaultComponentType"/>
-        </xsd:complexContent>
-    </xsd:complexType>
-    -->
 </xsd:schema>

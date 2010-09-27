@@ -15,7 +15,7 @@
     </mule-send>
 
     <mule-send name="sendAsynchronousMessage"
-        endpoint="test://queue" expr="#{echoResponse}" synchronous="false">
+        endpoint="test://queue" expr="#{echoResponse}" exchange-pattern="one-way">
         <transition to="waitForResponse" />
     </mule-send>
 

@@ -8,40 +8,33 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jbpm;
+package org.mule.module.jbpm;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.bpm.BPMS;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.bpm.ProcessConnector;
 
 import org.jbpm.api.ProcessInstance;
 
-/**
- * Tests the connector against jBPM with a simple process.
- * 
- * @deprecated It is recommended to configure BPM as a component rather than a transport for 3.x
- */
-public class ForkedProcessTestCase extends FunctionalTestCase
+public class ForkedProcessComponentTestCase extends FunctionalTestCase
 {
     @Override
     protected String getConfigResources()
     {
-        return "jbpm-functional-test.xml";
+        return "jbpm-component-functional-test.xml";
     }
 
     public void testForkedProcess() throws Exception 
     {
-        ProcessConnector connector = (ProcessConnector) muleContext.getRegistry().lookupConnector("bpmConnector");
-        BPMS bpms = connector.getBpms();
+        BPMS bpms = muleContext.getRegistry().lookupObject(BPMS.class);
         assertNotNull(bpms);
 
         MuleClient client = new MuleClient(muleContext);
         try
         {
             // Create a new process.
-            MuleMessage response = client.send("bpm://fork", "data", null);                      
+            MuleMessage response = client.send("vm://fork", "data", null);                      
             ProcessInstance process = (ProcessInstance) response.getPayload();
             
             // The process should be waiting for asynchronous responses from both services

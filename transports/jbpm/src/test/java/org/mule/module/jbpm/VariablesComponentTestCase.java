@@ -8,40 +8,37 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jbpm;
+package org.mule.module.jbpm;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.bpm.BPMS;
+import org.mule.module.bpm.Process;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.bpm.ProcessConnector;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @deprecated It is recommended to configure BPM as a component rather than a transport for 3.x
- */
-public class VariablesTestCase extends FunctionalTestCase
+public class VariablesComponentTestCase extends FunctionalTestCase
 {
     @Override
     protected String getConfigResources()
     {
-        return "jbpm-functional-test.xml";
+        return "jbpm-component-functional-test.xml";
     }
 
     public void testVariables() throws Exception
     {
-        ProcessConnector connector = (ProcessConnector) muleContext.getRegistry().lookupConnector("bpmConnector");
-        BPMS bpms = connector.getBpms();
+        BPMS bpms = muleContext.getRegistry().lookupObject(BPMS.class);
         assertNotNull(bpms);
+
         MuleClient client = new MuleClient(muleContext);
         try
         {
             Map<String, Object> props = new HashMap<String, Object>();
             props.put("foo", "bar");
-            MuleMessage response = client.send("bpm://variables", "data", props);
+            MuleMessage response = client.send("vm://variables", "data", props);
             String processId = (String)bpms.getId(response.getPayload());
             assertNotNull(processId);
 
@@ -52,9 +49,10 @@ public class VariablesTestCase extends FunctionalTestCase
 
             // Advance the process
             props = new HashMap<String, Object>();
+            props.put(Process.PROPERTY_PROCESS_ID, processId);
             props.put("straw", "berry");
             props.put("time", new Date());
-            response = client.send("bpm://variables/" + processId, "data", props);
+            response = client.send("vm://variables", "data", props);
             
             response = client.request("vm://queueB", 3000);
             assertNotNull(response);

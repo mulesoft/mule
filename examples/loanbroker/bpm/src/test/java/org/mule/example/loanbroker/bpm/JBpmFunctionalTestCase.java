@@ -16,7 +16,6 @@ import org.mule.example.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.example.loanbroker.messages.LoanQuote;
 import org.mule.example.loanbroker.tests.AbstractAsynchronousLoanBrokerTestCase;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.NullPayload;
 
 
@@ -44,16 +43,6 @@ public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCa
     protected int getNumberOfRequests()
     {
         return 100;
-    }
-
-    @Override
-    protected void suitePreSetUp() throws Exception
-    {
-        // set the derby.system.home system property to make sure that all derby databases are
-        // created in maven's target directory       
-        MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
-
-        super.suitePreSetUp();
     }
 
     @Override

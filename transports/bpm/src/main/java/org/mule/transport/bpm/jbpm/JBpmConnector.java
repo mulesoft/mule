@@ -11,16 +11,18 @@
 package org.mule.transport.bpm.jbpm;
 
 import org.mule.api.MuleContext;
-import org.mule.transport.bpm.BPMS;
+import org.mule.module.bpm.BPMS;
+import org.mule.module.bpm.config.BpmNamespaceHandler;
 import org.mule.transport.bpm.ProcessConnector;
 import org.mule.util.ClassUtils;
 
 import java.util.Properties;
 
+/**
+ * @deprecated It is recommended to configure BPM as a component rather than a transport for 3.x
+ */
 public class JBpmConnector extends ProcessConnector 
-{
-    public static final String JBPM_WRAPPER_CLASS = "org.mule.transport.jbpm.Jbpm";
-    
+{    
     private String configurationResource;
     
     private Object processEngine;
@@ -35,7 +37,7 @@ public class JBpmConnector extends ProcessConnector
     @Override
     protected BPMS createBpms() throws Exception
     {
-        return (BPMS) ClassUtils.instanciateClass(JBPM_WRAPPER_CLASS, configurationResource, processDefinitions);
+        return (BPMS) ClassUtils.instanciateClass(BpmNamespaceHandler.JBPM_WRAPPER_CLASS, configurationResource, processDefinitions);
     }
 
     public void setConfigurationResource(String configurationResource)

@@ -195,4 +195,9 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
      * @return List of exchange patterns that this connector supports for outbound endpoints.
      */
     List<MessageExchangePattern> getOutboundExchangePatterns();
+    
+    /**
+     * @return The strategy used for reading and writing session information to and from the transport.
+     */
+    SessionHandler getSessionHandler();
 }

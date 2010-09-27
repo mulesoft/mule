@@ -12,8 +12,7 @@
       <transition to="sendAsynchronousMessageB" />
     </fork>
 
-        <mule-send name="sendAsynchronousMessageA" endpoint="vm://queueA" payload="Message A"
-            synchronous="false">
+        <mule-send name="sendAsynchronousMessageA" endpoint="vm://queueA" payload="Message A" exchange-pattern="one-way">
             <transition to="waitForResponseA" />
         </mule-send>
 
@@ -21,13 +20,11 @@
             <transition to="join" />
         </state>
 
-        <mule-send name="sendSynchronousMessage" endpoint="vm://echo" payload="Message in a bottle."
-            synchronous="true">
+        <mule-send name="sendSynchronousMessage" endpoint="vm://echo" payload="Message in a bottle." exchange-pattern="request-response">
             <transition to="join" />
         </mule-send>
 
-        <mule-send name="sendAsynchronousMessageB" endpoint="vm://queueB" payload="Message B"
-            synchronous="false">
+        <mule-send name="sendAsynchronousMessageB" endpoint="vm://queueB" payload="Message B" exchange-pattern="one-way">
             <transition to="waitForResponseB" />
         </mule-send>
 

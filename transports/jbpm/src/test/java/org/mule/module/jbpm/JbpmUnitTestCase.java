@@ -8,25 +8,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jbpm;
+package org.mule.module.jbpm;
 
+import org.mule.module.jbpm.Jbpm;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.util.MuleDerbyTestUtils;
 
 /**
  * Tests the jBPM wrapper with a simple process.
  */
 public class JbpmUnitTestCase extends AbstractMuleTestCase
 {
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        String dbName = MuleDerbyTestUtils.loadDatabaseName("derby.properties", "database.name");
-        System.getProperties().put("hibernate.dbURL", "jdbc:derby:" + dbName + ";sql.enforce_strict_size=true");        
-        MuleDerbyTestUtils.defaultDerbyCleanAndInit("derby.properties", "database.name");
-        super.doSetUp();
-    }
-
     public void testDeployAndRun() throws Exception 
     {
         Jbpm jbpm = new Jbpm();

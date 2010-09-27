@@ -7,8 +7,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.bpm;
+package org.mule.module.bpm;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleMessage;
 
 import java.util.Map;
@@ -18,7 +19,7 @@ import java.util.Map;
  * its own processes in order to generate Mule messages.  The generated messages will 
  * be received by the "bpm://processName" endpoint within your Mule config.
  */
-public interface MessageService {
-
-    public MuleMessage generateMessage(String endpoint, Object payloadObject, Map messageProperties, boolean synchronous) throws Exception;
+public interface MessageService 
+{
+    public MuleMessage generateMessage(String endpoint, Object payloadObject, Map messageProperties, MessageExchangePattern mep) throws Exception;
 }
