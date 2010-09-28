@@ -1,0 +1,29 @@
+#set($page="package-summary.html")
+#if ($space.getKey().startsWith("MULE3"))
+  #set($baseUrl="http://www.mulesoft.org/docs/site/current3/apidocs/org")
+#elseif ($space.getKey().startsWith("MULE2"))
+  #set($baseUrl="http://www.mulesoft.org/docs/site/current2/apidocs/org")
+#else
+  #set($baseUrl="http://www.mulesoft.org/docs/site/current/apidocs/org")
+#end
+#if($param1)
+     #set($page=$param1.trim())
+     #set($page="${page}.html")
+#end
+
+#if($param0)
+  #set($param0=$param0.replaceAll("[.]","/"))
+  #set($url = "${baseUrl}/${param0}/${page}")
+
+  #set($globalHelper=$action.getGlobalHelper())
+  #set($renderer=$globalHelper.getWikiStyleRenderer())
+  #set($context=$content.toPageContext())
+  #set($renderedBody=$renderer.convertWikiToXHtml($context, "${body}"))
+
+  #set($renderedBody = $renderedBody.replace("<p>", ""))
+  #set($renderedBody = $renderedBody.trim().replace("</p>", ""))
+
+  <a href="$url">$renderedBody</a>
+#else 
+  $body <span style="color: red">$param0: Unknown</span>
+#end
