@@ -16,8 +16,7 @@
     #set($param1=$param1.trim())
     #set($path="${path}/${param1}")
   #else
-    #set($len=$path.length())
-    #set($i=$path.indexOf("/",$len-1))
+    #set($i=$path.lastIndexOf("/"))
     #set($page=$path.substring($i))
     #if($page.toLowerCase().equals($page))
       #set($path="${path}/package-summary")
