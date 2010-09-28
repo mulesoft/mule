@@ -86,7 +86,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         {
             public MuleMessage doInTransaction() throws Exception
             {
-                return receiver.onCall(event.getMessage(), true);
+                return receiver.onCall(event.getMessage());
             }
         };
         retMessage = tt.execute(cb);
