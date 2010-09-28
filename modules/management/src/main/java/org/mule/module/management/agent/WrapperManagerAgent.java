@@ -29,10 +29,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.tanukisoftware.wrapper.jmx.WrapperManager;
-import org.tanukisoftware.wrapper.jmx.WrapperManagerMBean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -81,12 +77,11 @@ public class WrapperManagerAgent extends AbstractAgent
         super("wrapper-manager");
     }
 
-    @Override
     public void initialise() throws InitialisationException
     {
         try
         {
-            final List servers = MBeanServerFactory.findMBeanServer(null);
+            List<?> servers = MBeanServerFactory.findMBeanServer(null);
             if (servers.isEmpty())
             {
                 throw new InitialisationException(ManagementMessages.noMBeanServerAvailable(), this);
@@ -158,7 +153,7 @@ public class WrapperManagerAgent extends AbstractAgent
         }
     }
 
-    public void start() throws MuleException 
+    public void start() throws MuleException
     {
         // nothing to do
     }
@@ -286,5 +281,4 @@ public class WrapperManagerAgent extends AbstractAgent
             // not interested, really
         }
     }
-
 }
