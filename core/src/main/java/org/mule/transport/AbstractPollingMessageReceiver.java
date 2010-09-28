@@ -131,6 +131,11 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
             }
         }
     }
+    
+    public void disableNativeScheduling()
+    {
+        this.unschedule();
+    }
 
     protected PollingReceiverWorker createWork()
     {
