@@ -34,11 +34,6 @@
                                 <!-- Transports -->
                                 <artifactItem>
                                     <groupId>org.mule.transports</groupId>
-                                    <artifactId>mule-transport-bpm</artifactId>
-                                    <version>${version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.mule.transports</groupId>
                                     <artifactId>mule-transport-ejb</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
@@ -60,11 +55,6 @@
                                 <artifactItem>
                                     <groupId>org.mule.transports</groupId>
                                     <artifactId>mule-transport-http</artifactId>
-                                    <version>${version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.mule.transports</groupId>
-                                    <artifactId>mule-transport-jbpm</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
@@ -145,6 +135,11 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-bpm</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-builders</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
@@ -171,6 +166,11 @@
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-jbossts</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-jbpm</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
