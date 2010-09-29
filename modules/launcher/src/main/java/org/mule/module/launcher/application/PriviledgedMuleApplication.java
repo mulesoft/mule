@@ -49,7 +49,7 @@ public class PriviledgedMuleApplication extends DefaultMuleApplication
         }
         catch (RegistrationException e)
         {
-            final String msg = String.format("Failed to init a priviledged app[%s]", getDescriptor().getAppName());
+            final String msg = String.format("Failed to init a priviledged app: [%s]", getDescriptor().getAppName());
             throw new DeploymentInitException(MessageFactory.createStaticMessage(msg), e);
         }
     }

@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A slightly tweaked default thread factory that uses the following pattern:
- * <code>config-change-[%s]-%d-thread-%d</code>, where %s stands for application name,
+ * <code>[%s].config.change.%d.thread.%d</code>, where %s stands for application name,
  * the next number will tell one how many redeployments this app had during this container's
  * lifetime and the last digit, thread count, should always be 1. Left there for debugging
  * purposes to quickly locate any duplicate threads trying to perform a redeploy. 
@@ -35,7 +35,7 @@ public class ConfigChangeMonitorThreadFactory implements ThreadFactory
         SecurityManager s = System.getSecurityManager();
         group = (s != null) ? s.getThreadGroup() :
                 Thread.currentThread().getThreadGroup();
-        namePrefix = String.format("config-change-[%s]-%d-thread-", appName, poolNumber.getAndIncrement());
+        namePrefix = String.format("[%s].config.change.%d.thread.", appName, poolNumber.getAndIncrement());
     }
 
     public Thread newThread(Runnable r)

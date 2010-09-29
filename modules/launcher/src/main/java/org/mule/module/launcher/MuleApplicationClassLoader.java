@@ -14,13 +14,13 @@ import org.mule.api.config.MuleProperties;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class MuleApplicationClassLoader extends GoodCitizenClassLoader
 {
@@ -67,7 +67,7 @@ public class MuleApplicationClassLoader extends GoodCitizenClassLoader
                 if (!jars.isEmpty() && logger.isInfoEnabled())
                 {
                     StringBuilder sb = new StringBuilder();
-                    sb.append(String.format("[%s] Loading the following jars:", appName)).append(SystemUtils.LINE_SEPARATOR);
+                    sb.append(String.format("[%s] Loading the following jars:%n", appName));
                     sb.append("=============================").append(SystemUtils.LINE_SEPARATOR);
 
                     for (File jar : jars)
