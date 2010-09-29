@@ -8,11 +8,6 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/3.0/mule-bpm.xsd">
 
-    <bpm:connector name="bpmConnectorDefaults" bpms-ref="testBpms"/>
-
-    <bpm:connector name="bpmConnector1" bpms-ref="testBpms"
-        allowGlobalReceiver="true" processIdField="myId"/>
-
     <spring:bean id="testBpms" class="org.mule.module.bpm.test.TestBpms">
         <spring:property name="foo" value="bar"/>
     </spring:bean>
