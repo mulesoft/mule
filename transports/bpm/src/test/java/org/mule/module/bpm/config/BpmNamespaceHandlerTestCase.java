@@ -13,7 +13,6 @@ import org.mule.module.bpm.BPMS;
 import org.mule.module.bpm.ProcessComponent;
 import org.mule.module.bpm.test.TestBpms;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.bpm.ProcessConnector;
 
 
 /**
@@ -26,26 +25,6 @@ public class BpmNamespaceHandlerTestCase extends FunctionalTestCase
         return "bpm-namespace-config.xml";
     }
 
-    /**
-     * @deprecated It is recommended to configure BPM as a component rather than a transport for 3.x
-     */
-    public void testDefaultsConnector() throws Exception
-    {
-        ProcessConnector c = (ProcessConnector)muleContext.getRegistry().lookupConnector("bpmConnectorDefaults");
-        assertNotNull(c);
-        
-        assertFalse(c.isAllowGlobalReceiver());
-        assertNull(c.getProcessIdField());
-        
-        BPMS bpms = c.getBpms();
-        assertNotNull(bpms);
-        assertEquals(TestBpms.class, bpms.getClass());
-        assertEquals("bar", ((TestBpms) bpms).getFoo());
-        
-        assertTrue(c.isConnected());
-        assertTrue(c.isStarted());
-    }
-    
     public void testDefaultsComponent() throws Exception
     {
         ProcessComponent c = (ProcessComponent) muleContext.getRegistry().lookupService("Service1").getComponent();
@@ -61,26 +40,6 @@ public class BpmNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("bar", ((TestBpms) bpms).getFoo());
     }
     
-    /**
-     * @deprecated It is recommended to configure BPM as a component rather than a transport for 3.x
-     */
-    public void testConfigConnector() throws Exception
-    {
-        ProcessConnector c = (ProcessConnector)muleContext.getRegistry().lookupConnector("bpmConnector1");
-        assertNotNull(c);
-        
-        assertTrue(c.isAllowGlobalReceiver());
-        assertEquals("myId", c.getProcessIdField());
-        
-        BPMS bpms = c.getBpms();
-        assertNotNull(bpms);
-        assertEquals(TestBpms.class, bpms.getClass());
-        assertEquals("bar", ((TestBpms) bpms).getFoo());
-
-        assertTrue(c.isConnected());
-        assertTrue(c.isStarted());
-    }    
-
     public void testConfigComponent() throws Exception
     {
         ProcessComponent c = (ProcessComponent) muleContext.getRegistry().lookupService("Service2").getComponent();

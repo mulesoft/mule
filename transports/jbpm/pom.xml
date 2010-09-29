@@ -13,11 +13,6 @@
     <description>Classes which allow Mule to integrate with JBoss jBPM via the BPM Connector.</description>
 
     <dependencies>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-spring-config</artifactId>
-            <version>${version}</version>
-        </dependency>
         <!-- Generic BPM Transport -->
         <dependency>
             <groupId>org.mule.transports</groupId>
@@ -81,13 +76,19 @@
             <artifactId>javassist</artifactId>
             <version>${javassistVersion}</version>
         </dependency>
-        <!-- Needed for org.mule.transport.bpm.jbpm.actions.SendMuleEvent -->
+        <!-- Needed for MuleSendActivity -->
         <dependency>
             <groupId>commons-jxpath</groupId>
             <artifactId>commons-jxpath</artifactId>
         </dependency>
 
         <!-- Unit tests only -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>
