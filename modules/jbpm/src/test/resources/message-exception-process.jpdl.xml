@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process name="exception"
+    description="Generates a Mule message and processes its response."
+    xmlns="http://jbpm.org/4.3/jpdl">
+
+    <mule-receive name="start" var="testCase">
+        <transition to="sendAsynchronousMessageA" />
+    </mule-receive>
+
+    <mule-send name="sendAsynchronousMessageA"
+        endpoint="vm://queueC" payload="test message" exchange-pattern="one-way">
+        <transition to="callService" />
+    </mule-send>
+
+    <decision name="callService">
+        <transition to="callEchoService">
+            <condition expr="#{testCase == 'testNoException'}" />
+        </transition>
+        <transition to="callExceptionService">
+            <condition expr="#{testCase == 'testExceptionInService'}" />
+        </transition>
+        <transition to="callExceptionTransformer">
+            <condition expr="#{testCase == 'testExceptionInTransformer'}" />
+        </transition>
+    </decision>
+
+        <mule-send name="callEchoService"
+            endpoint="vm://echo" expr="Message in a bottle." exchange-pattern="request-response" var="echoResponse">
+            <transition to="sendAsynchronousMessageB" />
+        </mule-send>
+
+        <mule-send name="callExceptionService"
+            endpoint="vm://exceptionService" expr="Message in a bottle." exchange-pattern="request-response" var="echoResponse">
+            <transition to="sendAsynchronousMessageB" />
+        </mule-send>
+
+        <mule-send name="callExceptionTransformer"
+            endpoint="vm://exceptionTransformer" expr="Message in a bottle." exchange-pattern="request-response" var="echoResponse">
+            <transition to="sendAsynchronousMessageB" />
+        </mule-send>
+
+    <!-- The flow should not reach this point because an exception occurred in the previous step. -->
+    <mule-send name="sendAsynchronousMessageB"
+        endpoint="vm://queueD" payload="#{echoResponse}" exchange-pattern="one-way">
+        <transition to="end" />
+    </mule-send>
+
+    <end name="end" />
+
+</process>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<jbpm-configuration>
+
+    <import resource="jbpm.default.cfg.xml" />
+    <import resource="jbpm.jpdl.cfg.xml" />
+    <import resource="jbpm.tx.hibernate.cfg.xml" />
+
+    <process-engine-context>
+        <object class="org.mule.module.jbpm.MuleMessageService" />
+    </process-engine-context>
+
+</jbpm-configuration>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process name="fork" xmlns="http://jbpm.org/4.3/jpdl">
+
+    <start name="start">
+        <transition to="fork" />
+    </start>
+
+    <fork name="fork">
+      <transition to="sendAsynchronousMessageA" />
+      <transition to="sendSynchronousMessage" />
+      <transition to="sendAsynchronousMessageB" />
+    </fork>
+
+        <mule-send name="sendAsynchronousMessageA" endpoint="vm://queueA" payload="Message A" exchange-pattern="one-way">
+            <transition to="waitForResponseA" />
+        </mule-send>
+
+        <state name="waitForResponseA">
+            <transition to="join" />
+        </state>
+
+        <mule-send name="sendSynchronousMessage" endpoint="vm://echo" payload="Message in a bottle." exchange-pattern="request-response">
+            <transition to="join" />
+        </mule-send>
+
+        <mule-send name="sendAsynchronousMessageB" endpoint="vm://queueB" payload="Message B" exchange-pattern="one-way">
+            <transition to="waitForResponseB" />
+        </mule-send>
+
+        <state name="waitForResponseB">
+            <transition to="join" />
+        </state>
+
+    <join name="join" >
+       <transition to="end"/>
+    </join>
+   
+    <end name="end" />
+
+</process>

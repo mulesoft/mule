@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process name="variables" xmlns="http://jbpm.org/4.3/jpdl">
+
+    <mule-receive name="A" var="message">
+        <transition to="B" />
+    </mule-receive>
+
+    <script name="B" expr="#{3/4}" var="fraction">
+        <transition to="C" />
+    </script>
+
+    <mule-send name="C" endpoint="vm://queueA" payload="${message}" exchange-pattern="one-way">
+        <transition to="D" />
+    </mule-send>
+
+    <mule-receive name="D">
+        <transition to="E" />
+    </mule-receive>
+
+    <mule-send name="E" endpoint="vm://queueB" exchange-pattern="one-way">
+        <transition to="end" />
+    </mule-send>
+
+    <end name="end" />
+
+</process>

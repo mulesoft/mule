@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process name="message"
+    description="Generates a Mule message and processes its response."
+    xmlns="http://jbpm.org/4.3/jpdl">
+
+    <start name="start">
+        <transition to="sendSynchronousMessage" />
+    </start>
+
+    <mule-send name="sendSynchronousMessage"
+        endpoint="vm://echo" expr="Message in a bottle."
+        var="echoResponse" type="java.lang.String">
+        <transition to="sendAsynchronousMessage" />
+    </mule-send>
+
+    <mule-send name="sendAsynchronousMessage"
+        endpoint="test://queue" expr="#{echoResponse}" exchange-pattern="one-way">
+        <transition to="waitForResponse" />
+    </mule-send>
+
+    <mule-receive name="waitForResponse"
+        type="java.lang.String" var="asynchResponse">
+        <transition to="end" />
+    </mule-receive>
+
+    <end name="end" />
+
+</process>

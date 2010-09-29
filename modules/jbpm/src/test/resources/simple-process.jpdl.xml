@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process description="Simple process" name="simple"
+    xmlns="http://jbpm.org/4.0/jpdl">
+
+    <start name="start">
+        <transition to="dummyState" />
+    </start>
+
+    <state name="dummyState">
+        <transition to="end" />
+    </state>
+
+    <end name="end" />
+
+</process>
