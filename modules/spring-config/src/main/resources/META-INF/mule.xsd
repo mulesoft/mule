@@ -360,7 +360,7 @@
                 <xsd:attribute name="name" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Optional name that will be used to name the work managers thread pools
+                            Optional name that will be used to name the threads used by this flow.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
