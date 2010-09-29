@@ -12,6 +12,7 @@ package org.mule.config.spring.factories;
 
 import org.mule.api.MuleContext;
 import org.mule.api.NamedObject;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
@@ -19,9 +20,9 @@ import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 
-import java.util.List;
-
 import org.springframework.beans.factory.FactoryBean;
+
+import java.util.List;
 
 public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleContextAware, NamedObject
 {
@@ -50,8 +51,14 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
     public Object getObject() throws Exception
     {
         InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
-        AsyncInterceptingMessageProcessor asyncProcessor = new AsyncInterceptingMessageProcessor(
-            threadingProfile, name, muleContext.getConfiguration().getShutdownTimeout());
+        final MuleConfiguration config = muleContext.getConfiguration();
+        final boolean containerMode = config.isContainerMode();
+        final String threadPrefix = containerMode
+                                        ? String.format("[%s].%s", config.getId(), name)
+                                        : name;
+        AsyncInterceptingMessageProcessor asyncProcessor = new AsyncInterceptingMessageProcessor(threadingProfile,
+                                                                                                 threadPrefix,
+                                                                                                 config.getShutdownTimeout());
         builder.chain(asyncProcessor);
         for (Object processor : messageProcessors)
         {

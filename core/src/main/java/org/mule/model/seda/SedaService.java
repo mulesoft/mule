@@ -12,6 +12,7 @@ package org.mule.model.seda;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
@@ -122,8 +123,13 @@ public class SedaService extends AbstractService
         threadingProfile.setMaxThreadsActive(threadingProfile.getMaxThreadsActive() + 1);
         // TODO it would be nicer if the shutdown value was encapsulated in the
         // Threading profile, but it is more difficult than it seems
-        workManager = threadingProfile.createWorkManager(getName(), muleContext.getConfiguration()
-            .getShutdownTimeout());
+
+        final MuleConfiguration config = muleContext.getConfiguration();
+        final boolean containerMode = config.isContainerMode();
+        final String threadPrefix = containerMode
+                ? String.format("[%s].%s", config.getId(), getName())
+                : getName();
+        workManager = threadingProfile.createWorkManager(threadPrefix, config.getShutdownTimeout());
 
         if (queueProfile == null)
         {
