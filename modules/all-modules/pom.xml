@@ -37,6 +37,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-bpm</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>
             <version>${version}</version>
         </dependency>
@@ -63,6 +68,11 @@
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-jbossts</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-jbpm</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>

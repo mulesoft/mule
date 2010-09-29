@@ -20,6 +20,7 @@
         <module>all-modules</module>
         <module>builders</module>
         <module>boot</module>
+        <module>bpm</module>
         <module>cxf</module>
         <module>launcher</module>
         <module>client</module>
@@ -27,6 +28,7 @@
         <module>ibeans</module>
         <module>jaas</module>
         <module>jboss-transactions</module>
+        <module>jbpm</module>
         <module>jca</module>
         <module>json</module>
         <module>management</module>
