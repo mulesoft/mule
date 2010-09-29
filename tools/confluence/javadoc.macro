@@ -8,6 +8,7 @@
 
 #if($param0)
   #set($path=$param0.replaceAll("[.]","/"))
+  #set($path=$path.replaceAll("[-]","/"))
   #if(!$path.startsWith("org/") && !$path.startsWith("com/"))
     #set($path="org/${path}")
   #end
