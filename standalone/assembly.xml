@@ -275,13 +275,11 @@
         <!-- Transports -->
         <include>org.mule.transports:mule-transport-ajax</include>
         <include>org.mule.transports:mule-transport-axis</include>
-        <include>org.mule.transports:mule-transport-bpm</include>
         <include>org.mule.transports:mule-transport-ejb</include>
         <include>org.mule.transports:mule-transport-email</include>
         <include>org.mule.transports:mule-transport-file</include>
         <include>org.mule.transports:mule-transport-ftp</include>
         <include>org.mule.transports:mule-transport-http</include>
-        <include>org.mule.transports:mule-transport-jbpm</include>
         <include>org.mule.transports:mule-transport-jdbc</include>
         <include>org.mule.transports:mule-transport-jetty</include>
         <include>org.mule.transports:mule-transport-jms</include>
@@ -300,6 +298,7 @@
         <include>org.mule.modules:mule-module-acegi</include>
         <include>org.mule.modules:mule-module-annotations</include>
         <include>org.mule.modules:mule-module-atom</include>
+        <include>org.mule.modules:mule-module-bpm</include>
         <include>org.mule.modules:mule-module-builders</include>
         <include>org.mule.modules:mule-module-client</include>
         <include>org.mule.modules:mule-module-cxf</include>
@@ -307,6 +306,7 @@
         <include>org.mule.modules:mule-module-jaas</include>
         <include>org.mule.modules:mule-module-jersey</include>
         <include>org.mule.modules:mule-module-jbossts</include>
+        <include>org.mule.modules:mule-module-jbpm</include>
         <include>org.mule.modules:mule-module-json</include>
         <include>org.mule.modules:mule-module-management</include>
         <include>org.mule.modules:mule-module-ognl</include>
@@ -337,13 +337,11 @@
         <exclude>org.mule.transports:mule-transports-all</exclude>
         <exclude>org.mule.transports:mule-transport-ajax</exclude>
         <exclude>org.mule.transports:mule-transport-axis</exclude>
-        <exclude>org.mule.transports:mule-transport-bpm</exclude>
         <exclude>org.mule.transports:mule-transport-ejb</exclude>
         <exclude>org.mule.transports:mule-transport-email</exclude>
         <exclude>org.mule.transports:mule-transport-file</exclude>
         <exclude>org.mule.transports:mule-transport-ftp</exclude>
         <exclude>org.mule.transports:mule-transport-http</exclude>
-        <exclude>org.mule.transports:mule-transport-jbpm</exclude>
         <exclude>org.mule.transports:mule-transport-jdbc</exclude>
         <exclude>org.mule.transports:mule-transport-jetty</exclude>
         <exclude>org.mule.transports:mule-transport-jms</exclude>
@@ -363,6 +361,7 @@
         <exclude>org.mule.modules:mule-module-annotations</exclude>
         <exclude>org.mule.modules:mule-module-atom</exclude>
         <exclude>org.mule.modules:mule-module-boot</exclude>
+        <exclude>org.mule.modules:mule-module-bpm</exclude>
         <exclude>org.mule.modules:mule-module-builders</exclude>
         <exclude>org.mule.modules:mule-module-client</exclude>
         <exclude>org.mule.modules:mule-module-cxf</exclude>
@@ -370,6 +369,7 @@
         <exclude>org.mule.modules:mule-module-jaas</exclude>
         <exclude>org.mule.modules:mule-module-jersey</exclude>
         <exclude>org.mule.modules:mule-module-jbossts</exclude>
+        <exclude>org.mule.modules:mule-module-jbpm</exclude>
         <exclude>org.mule.modules:mule-module-jca</exclude>
         <exclude>org.mule.modules:mule-module-json</exclude>
         <exclude>org.mule.modules:mule-module-launcher</exclude>
