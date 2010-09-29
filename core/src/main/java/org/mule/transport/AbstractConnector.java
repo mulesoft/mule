@@ -74,6 +74,11 @@ import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.pool.KeyedPoolableObjectFactory;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -97,11 +102,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.pool.KeyedPoolableObjectFactory;
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 /**
  * <code>AbstractConnector</code> provides base functionality for all connectors
@@ -687,10 +687,17 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     protected void initWorkManagers() throws MuleException
     {
+        // container mode has additional thread naming requirements
+        final boolean containerMode = muleContext.getConfiguration().isContainerMode();
+        final String id = muleContext.getConfiguration().getId();
         if (receiverWorkManager.get() == null)
         {
+
+            final String threadPrefix = containerMode
+                    ? String.format("[%s].%s.receiver", id, getName())
+                    : String.format("%s.receiver", getName());
             WorkManager newWorkManager = this.getReceiverThreadingProfile().createWorkManager(
-                    getName() + ".receiver", muleContext.getConfiguration().getShutdownTimeout());
+                    threadPrefix, muleContext.getConfiguration().getShutdownTimeout());
 
             if (receiverWorkManager.compareAndSet(null, newWorkManager))
             {
@@ -704,8 +711,12 @@ public abstract class AbstractConnector implements Connector, WorkListener
             {
                 dispatcherThreadingProfile.setMuleContext(muleContext);
             }
+
+            final String threadPrefix = containerMode
+                    ? String.format("[%s].%s.dispatcher", id, getName())
+                    : String.format("%s.dispatcher", getName());
             WorkManager newWorkManager = dispatcherThreadingProfile.createWorkManager(
-                    getName() + ".dispatcher", muleContext.getConfiguration().getShutdownTimeout());
+                    threadPrefix, muleContext.getConfiguration().getShutdownTimeout());
 
             if (dispatcherWorkManager.compareAndSet(null, newWorkManager))
             {
@@ -714,8 +725,11 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
         if (requesterWorkManager.get() == null)
         {
+            final String threadPrefix = containerMode
+                    ? String.format("[%s].%s.requester", id, getName())
+                    : String.format("%s.requester", getName());
             WorkManager newWorkManager = this.getRequesterThreadingProfile().createWorkManager(
-                    getName() + ".requester", muleContext.getConfiguration().getShutdownTimeout());
+                    threadPrefix, muleContext.getConfiguration().getShutdownTimeout());
 
             if (requesterWorkManager.compareAndSet(null, newWorkManager))
             {
