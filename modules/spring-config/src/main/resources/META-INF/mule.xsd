@@ -346,7 +346,7 @@
     <xsd:element name="async" type="asyncType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Processes the nest list of message processors asychronously using a thread pool 
+                Processes the nested list of message processors asynchronously using a thread pool
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
