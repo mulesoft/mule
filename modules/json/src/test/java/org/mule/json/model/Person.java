@@ -1,5 +1,5 @@
 /*
- * $Id: Person.java 241 2009-12-03 00:54:53Z ross $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -9,9 +9,9 @@
  */
 package org.mule.json.model;
 
-import java.util.List;
-
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import java.util.List;
 
 /**
  * A Person object

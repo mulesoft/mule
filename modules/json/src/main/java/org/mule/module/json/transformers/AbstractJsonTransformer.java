@@ -7,16 +7,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.module.json.transformers;
 
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.transformer.AbstractMessageTransformer;
 
+import org.codehaus.jackson.map.ObjectMapper;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * TODO

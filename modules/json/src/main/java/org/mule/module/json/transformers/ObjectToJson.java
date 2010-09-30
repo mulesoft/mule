@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.module.json.transformers;
 
 import org.mule.api.MuleMessage;
@@ -15,6 +16,9 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.module.json.filters.IsJsonFilter;
 import org.mule.transformer.types.DataTypeFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -22,9 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Converts a java object to a JSON encoded object that can be consumed by other languages such as

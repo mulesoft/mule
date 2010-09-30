@@ -1,6 +1,6 @@
 /*
  * $Id$
- * -------------------------------------------------------------------------------------
+ * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
@@ -20,13 +20,13 @@ import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.simple.ObjectToString;
 
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
+
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * A {@link org.mule.api.registry.TransformerResolver} implementation used to discover whether the current transform

@@ -1,5 +1,5 @@
 /*
- * $Id: Item.java 244 2009-12-03 06:37:50Z ross $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

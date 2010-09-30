@@ -7,6 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.module.json.config;
 
 import org.mule.api.MuleEventContext;
@@ -18,10 +19,10 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
 import org.mule.tck.AbstractMuleTestCase;
 
-import java.util.Map;
-
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.node.ArrayNode;
+
+import java.util.Map;
 
 public class JsonPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
 {

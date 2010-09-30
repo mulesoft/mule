@@ -1,6 +1,6 @@
 /*
  * $Id$
- * -------------------------------------------------------------------------------------
+ * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
@@ -9,10 +9,10 @@
  */
 package org.mule.module.json.config;
 
-import java.util.Map;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
+
+import java.util.Map;
 
 /**
  * TODO

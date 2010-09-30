@@ -1,5 +1,5 @@
 /*
- * $Id: JsonAutoTransformerWithMixinsTestCase.java 302 2010-02-17 07:57:47Z ross $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -15,9 +15,9 @@ import org.mule.api.transformer.DataType;
 import org.mule.module.json.JsonData;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.transformer.types.DataTypeFactory;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.mule.transformer.types.DataTypeFactory;
 
 //TODO: IBEANS-141. No support for Mixin resolution yet
 public class JsonAutoTransformerWithMixinsTestCase extends AbstractMuleTestCase

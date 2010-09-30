@@ -1,6 +1,6 @@
 /*
- * $Id:  $
- * -------------------------------------------------------------------------------------
+ * $Id$
+ * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
@@ -13,13 +13,13 @@ package org.mule.module.json.transformers;
 import org.mule.api.annotations.Transformer;
 import org.mule.tck.testmodels.fruit.Apple;
 
+import org.codehaus.jackson.map.ObjectMapper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 
 import javax.annotation.PostConstruct;
-
-import org.codehaus.jackson.map.ObjectMapper;
 
 public class JsonCustomTransformerWithMixins
 {
