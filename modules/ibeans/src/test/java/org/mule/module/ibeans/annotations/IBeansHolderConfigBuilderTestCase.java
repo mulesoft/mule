@@ -34,8 +34,9 @@ public class IBeansHolderConfigBuilderTestCase extends AbstractIBeansTestCase
         //Ensure IBeanHolder is comparable
         Set<IBeanHolder> beans = new TreeSet<IBeanHolder>(col);
 
-        assertEquals(7, beans.size());
-        String[] ids = new String[7];
+        int exprectedSize = 11;
+        assertEquals(exprectedSize, beans.size());
+        String[] ids = new String[exprectedSize];
         int i = 0;
         for (Iterator<IBeanHolder> iterator = beans.iterator(); iterator.hasNext(); i++)
         {
@@ -44,11 +45,16 @@ public class IBeansHolderConfigBuilderTestCase extends AbstractIBeansTestCase
         }
 
         assertEquals("errorfilter", ids[0]);
-        assertEquals("hostip", ids[1]);
-        assertEquals("search", ids[2]);
-        assertEquals("testexception", ids[3]);
-        assertEquals("testimplicitpropertiesinfactory", ids[4]);
-        assertEquals("testparamsfactory", ids[5]);
-        assertEquals("testuri", ids[6]);
+        //these are loaded from  a jar on the classpath, part test for MULE-5108
+        assertEquals("flickr", ids[1]);
+        assertEquals("flickrauthentication", ids[2]);
+        assertEquals("flickrsearch", ids[3]);
+        assertEquals("flickrupload", ids[4]);
+        assertEquals("hostip", ids[5]);
+        assertEquals("search", ids[6]);
+        assertEquals("testexception", ids[7]);
+        assertEquals("testimplicitpropertiesinfactory", ids[8]);
+        assertEquals("testparamsfactory", ids[9]);
+        assertEquals("testuri", ids[10]);
     }
 }

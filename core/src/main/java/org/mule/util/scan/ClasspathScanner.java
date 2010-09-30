@@ -64,7 +64,8 @@ public class ClasspathScanner
     protected transient final Log logger = LogFactory.getLog(ClasspathScanner.class);
 
     private ClassLoader classLoader;
-    private String[] basepaths = new String[]{""};
+    
+    private String[] basepaths;
 
     public ClasspathScanner(String... basepaths)
     {
@@ -91,7 +92,7 @@ public class ClasspathScanner
         {
             String basepath = basepaths[i];
 
-            Enumeration<URL> urls = classLoader.getResources(basepath);
+            Enumeration<URL> urls = classLoader.getResources(basepath.trim());
             while (urls.hasMoreElements())
             {
                 URL url = urls.nextElement();
