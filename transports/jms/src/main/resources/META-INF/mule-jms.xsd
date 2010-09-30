@@ -140,7 +140,7 @@
         <xsd:attribute name="cacheJmsSessions" type="mule:substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    Whether to cache and re-use the JMS session object instead of recreating the connection each time.
+                    Whether to cache and re-use the JMS session object instead of recreating the connection each time. NOTE: meant for non-transactional use ONLY.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
