@@ -31,8 +31,6 @@ public class ValidatorTestCase extends FunctionalTestCase
         super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         muleClient = new MuleClient(muleContext);
-        // System.err.println(((SimpleService)
-        // muleContext.getRegistry().lookupObject("test-service")).getMessageSource());
     }
 
     @Override
@@ -70,10 +68,15 @@ public class ValidatorTestCase extends FunctionalTestCase
         doTestValidator("concrete-validator");
     }
 
+    public void testDispatchError() throws Exception
+    {
+        doTestValidMessageError("dispatch-error");
+    }
+
     private void doTestValidator(String serviceName) throws Exception
     {
         doTestValidMessage(serviceName);
-        doTestInvalidMessage(serviceName);
+        doTestInvalidMessageNack(serviceName);
     }
 
     private void doTestValidMessage(String serviceName) throws MuleException, Exception, InterruptedException
@@ -88,17 +91,31 @@ public class ValidatorTestCase extends FunctionalTestCase
             }
         });
 
-        final Integer payload = RandomUtils.nextInt();
-        assertEquals("GOOD:" + payload + "@" + serviceName, muleClient.send("vm://" + serviceName + ".in",
-            payload, null).getPayload());
+        final Object validPayload = doTestValidMessageAck(serviceName);
 
         latch.await(getTestTimeoutSecs(), TimeUnit.SECONDS);
         assertEquals(1, ftc.getReceivedMessagesCount());
-        assertEquals(payload, ftc.getLastReceivedMessage());
+        assertEquals(validPayload, ftc.getLastReceivedMessage());
         ftc.initialise();
     }
 
-    private void doTestInvalidMessage(String serviceName) throws MuleException
+    private Object doTestValidMessageAck(String serviceName) throws MuleException
+    {
+        final Integer payload = RandomUtils.nextInt();
+        assertEquals("GOOD:" + payload + "@" + serviceName, muleClient.send("vm://" + serviceName + ".in",
+            payload, null).getPayload());
+        return payload;
+    }
+
+    private Object doTestValidMessageError(String serviceName) throws MuleException
+    {
+        final Integer payload = RandomUtils.nextInt();
+        assertEquals("ERROR:" + payload + "@" + serviceName, muleClient.send("vm://" + serviceName + ".in",
+            payload, null).getPayload());
+        return payload;
+    }
+
+    private void doTestInvalidMessageNack(String serviceName) throws MuleException
     {
         assertEquals("BAD:abc@" + serviceName, muleClient.send("vm://" + serviceName + ".in", "abc", null)
             .getPayload());

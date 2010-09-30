@@ -15,6 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.construct.Validator;
+import org.mule.util.StringUtils;
 
 public class ValidatorBuilder extends
     AbstractFlowConstructWithSingleOutboundEndpointBuilder<ValidatorBuilder, Validator>
@@ -22,6 +23,7 @@ public class ValidatorBuilder extends
     protected Filter validationFilter;
     protected String ackExpression;
     protected String nackExpression;
+    protected String errorExpression;
 
     public ValidatorBuilder validationFilter(Filter validationFilter)
     {
@@ -41,6 +43,12 @@ public class ValidatorBuilder extends
         return this;
     }
 
+    public ValidatorBuilder errorExpression(String errorExpression)
+    {
+        this.errorExpression = errorExpression;
+        return this;
+    }
+
     @Override
     protected MessageExchangePattern getInboundMessageExchangePattern()
     {
@@ -50,13 +58,21 @@ public class ValidatorBuilder extends
     @Override
     protected MessageExchangePattern getOutboundMessageExchangePattern()
     {
-        return MessageExchangePattern.ONE_WAY;
+        return hasErrorExpression()
+                                   ? MessageExchangePattern.REQUEST_RESPONSE
+                                   : MessageExchangePattern.ONE_WAY;
     }
 
     @Override
     protected Validator buildFlowConstruct(MuleContext muleContext) throws MuleException
     {
         return new Validator(name, muleContext, getOrBuildInboundEndpoint(muleContext),
-            getOrBuildOutboundEndpoint(muleContext), validationFilter, ackExpression, nackExpression);
+            getOrBuildOutboundEndpoint(muleContext), validationFilter, ackExpression, nackExpression,
+            errorExpression);
+    }
+
+    protected boolean hasErrorExpression()
+    {
+        return StringUtils.isNotBlank(errorExpression);
     }
 }

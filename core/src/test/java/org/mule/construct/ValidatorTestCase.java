@@ -10,6 +10,8 @@
 
 package org.mule.construct;
 
+import java.util.Collections;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -48,7 +50,7 @@ public class ValidatorTestCase extends AbstractFlowConstuctTestCase
     {
         validator.initialise();
         validator.start();
-        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent(
+        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent(
             Integer.valueOf(123), muleContext));
 
         assertEquals("GOOD:123", response.getMessageAsString());
@@ -58,9 +60,41 @@ public class ValidatorTestCase extends AbstractFlowConstuctTestCase
     {
         validator.initialise();
         validator.start();
-        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent("abc",
-            muleContext));
+        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent(
+            "abc", muleContext));
 
         assertEquals("BAD:abc", response.getMessageAsString());
+    }
+
+    @SuppressWarnings("unchecked")
+    public void testErrorWithoutExpression() throws Exception
+    {
+        final OutboundEndpoint failingOutboundEndpoint = MuleTestUtils.getTestOutboundEndpoint("failing-oe",
+            muleContext, "test://AlwaysFail", Collections.EMPTY_LIST, null, Collections.EMPTY_MAP,
+            testConnector);
+
+        validator = new Validator("test-validator", muleContext, directInboundMessageSource,
+            failingOutboundEndpoint, new PayloadTypeFilter(Integer.class),
+            "#[string:GOOD:#[message:payload]]", "#[string:BAD:#[message:payload]]");
+
+        testAck();
+    }
+
+    public void testErrorWithExpression() throws Exception
+    {
+        final OutboundEndpoint failingOutboundEndpoint = MuleTestUtils.getTestOutboundEndpoint(
+            MessageExchangePattern.REQUEST_RESPONSE, muleContext, "test://AlwaysFail", testConnector);
+
+        validator = new Validator("test-validator", muleContext, directInboundMessageSource,
+            failingOutboundEndpoint, new PayloadTypeFilter(Integer.class),
+            "#[string:GOOD:#[message:payload]]", "#[string:BAD:#[message:payload]]",
+            "#[string:ERROR:#[message:payload]]");
+
+        validator.initialise();
+        validator.start();
+        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent(123,
+            muleContext));
+
+        assertEquals("ERROR:123", response.getMessageAsString());
     }
 }

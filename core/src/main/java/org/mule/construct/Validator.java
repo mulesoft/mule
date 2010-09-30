@@ -13,14 +13,17 @@ package org.mule.construct;
 import org.apache.commons.lang.Validate;
 import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
+import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
@@ -29,10 +32,12 @@ import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.expression.transformers.ExpressionTransformer;
 import org.mule.interceptor.LoggingInterceptor;
+import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.routing.ChoiceRouter;
+import org.mule.util.StringUtils;
 
 public class Validator extends AbstractFlowConstruct
 {
@@ -40,6 +45,7 @@ public class Validator extends AbstractFlowConstruct
     private final Filter validationFilter;
     private final String ackExpression;
     private final String nackExpression;
+    private final String errorExpression;
 
     public Validator(String name,
                      MuleContext muleContext,
@@ -48,6 +54,19 @@ public class Validator extends AbstractFlowConstruct
                      Filter validationFilter,
                      String ackExpression,
                      String nackExpression)
+    {
+        this(name, muleContext, messageSource, outboundEndpoint, validationFilter, ackExpression,
+            nackExpression, null);
+    }
+
+    public Validator(String name,
+                     MuleContext muleContext,
+                     MessageSource messageSource,
+                     OutboundEndpoint outboundEndpoint,
+                     Filter validationFilter,
+                     String ackExpression,
+                     String nackExpression,
+                     String errorExpression)
     {
         super(name, muleContext);
 
@@ -62,6 +81,7 @@ public class Validator extends AbstractFlowConstruct
         this.validationFilter = validationFilter;
         this.ackExpression = ackExpression;
         this.nackExpression = nackExpression;
+        this.errorExpression = errorExpression;
     }
 
     @Override
@@ -70,17 +90,27 @@ public class Validator extends AbstractFlowConstruct
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageObserver());
 
-        EventReturningMessageProcessor outboundMessageProcessor = new EventReturningMessageProcessor();
+        final ErrorAwareEventReturningMessageProcessor outboundMessageProcessor = new ErrorAwareEventReturningMessageProcessor();
         outboundMessageProcessor.setListener(outboundEndpoint);
 
-        ResponseMessageProcessorAdapter ackResponseMessageProcessor = new ResponseMessageProcessorAdapter();
+        final ResponseMessageProcessorAdapter ackResponseMessageProcessor = new ResponseMessageProcessorAdapter();
         ackResponseMessageProcessor.setListener(outboundMessageProcessor);
         ackResponseMessageProcessor.setProcessor(getExpressionTransformer(getName() + "-ack-expression",
             ackExpression));
 
+        MessageProcessor validRouteMessageProcessor = ackResponseMessageProcessor;
+
+        if (hasErrorExpression())
+        {
+            final ErrorExpressionTransformerMessageProcessor errorResponseMessageProcessor = new ErrorExpressionTransformerMessageProcessor(
+                getExpressionTransformer(getName() + "-error-expression", errorExpression));
+            errorResponseMessageProcessor.setListener(ackResponseMessageProcessor);
+            validRouteMessageProcessor = errorResponseMessageProcessor;
+        }
+
         // a simple success/failure choice router determines which response to return
         final ChoiceRouter choiceRouter = new ChoiceRouter();
-        choiceRouter.addRoute(ackResponseMessageProcessor, validationFilter);
+        choiceRouter.addRoute(validRouteMessageProcessor, validationFilter);
         choiceRouter.setDefaultRoute(getExpressionTransformer(getName() + "-nack-expression", nackExpression));
         builder.chain(choiceRouter);
     }
@@ -94,6 +124,11 @@ public class Validator extends AbstractFlowConstruct
         validateOutboundEndpoint();
         validateExpression(ackExpression);
         validateExpression(nackExpression);
+
+        if (hasErrorExpression())
+        {
+            validateExpression(errorExpression);
+        }
     }
 
     private void validateMessageSource() throws FlowConstructInvalidException
@@ -110,12 +145,18 @@ public class Validator extends AbstractFlowConstruct
 
     private void validateOutboundEndpoint() throws FlowConstructInvalidException
     {
-        if (!outboundEndpoint.getExchangePattern().equals(MessageExchangePattern.ONE_WAY))
+        if ((hasErrorExpression())
+            && (!outboundEndpoint.getExchangePattern().equals(MessageExchangePattern.REQUEST_RESPONSE)))
         {
             throw new FlowConstructInvalidException(
-                MessageFactory.createStaticMessage("Validator only works with a one-way outbound endpoint."),
+                MessageFactory.createStaticMessage("Validator with an error expression only works with a request-response outbound endpoint."),
                 this);
         }
+    }
+
+    protected boolean hasErrorExpression()
+    {
+        return StringUtils.isNotBlank(errorExpression);
     }
 
     private void validateExpression(String expression) throws FlowConstructInvalidException
@@ -129,13 +170,13 @@ public class Validator extends AbstractFlowConstruct
 
     private ExpressionTransformer getExpressionTransformer(String name, String expression)
     {
-        ExpressionConfig expressionConfig = new ExpressionConfig();
+        final ExpressionConfig expressionConfig = new ExpressionConfig();
         expressionConfig.parse(expression);
 
-        ExpressionArgument expressionArgument = new ExpressionArgument(name, expressionConfig, false);
+        final ExpressionArgument expressionArgument = new ExpressionArgument(name, expressionConfig, false);
         expressionArgument.setMuleContext(muleContext);
 
-        ExpressionTransformer expressionTransformer = new ExpressionTransformer();
+        final ExpressionTransformer expressionTransformer = new ExpressionTransformer();
         expressionTransformer.setMuleContext(muleContext);
         expressionTransformer.addArgument(expressionArgument);
 
@@ -143,7 +184,7 @@ public class Validator extends AbstractFlowConstruct
         {
             expressionTransformer.initialise();
         }
-        catch (InitialisationException ie)
+        catch (final InitialisationException ie)
         {
             throw new MuleRuntimeException(ie);
         }
@@ -151,12 +192,77 @@ public class Validator extends AbstractFlowConstruct
         return expressionTransformer;
     }
 
-    private static class EventReturningMessageProcessor extends AbstractInterceptingMessageProcessor
+    private static class ErrorExpressionTransformerMessageProcessor extends
+        AbstractInterceptingMessageProcessor
     {
+        private final ExpressionTransformer errorExpressionTransformer;
+
+        public ErrorExpressionTransformerMessageProcessor(ExpressionTransformer errorExpressionTransformer)
+        {
+            this.errorExpressionTransformer = errorExpressionTransformer;
+        }
+
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            super.processNext(event);
-            return RequestContext.cloneAndUpdateEventEndpoint(event, this);
+            final MuleEvent nextResult = super.processNext(event);
+
+            final ExceptionPayload nextResultMessageExceptionPayload = getExceptionPayload(nextResult);
+
+            if (nextResultMessageExceptionPayload != null)
+            {
+                return errorExpressionTransformer.process(event);
+            }
+
+            return nextResult;
         }
+    }
+
+    private static class ErrorAwareEventReturningMessageProcessor extends
+        AbstractInterceptingMessageProcessor
+    {
+        /*
+         * Returns the incoming event whatever the outcome of the rest of the chain
+         * maybe. Sets an exception payload on the incoming event if an error
+         * occurred downstream.
+         */
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            final MuleEvent result = RequestContext.cloneAndUpdateEventEndpoint(event, this);
+
+            try
+            {
+                final MuleEvent nextResult = super.processNext(event);
+
+                final ExceptionPayload nextResultMessageExceptionPayload = getExceptionPayload(nextResult);
+
+                if (nextResultMessageExceptionPayload != null)
+                {
+                    result.getMessage().setExceptionPayload(nextResultMessageExceptionPayload);
+                }
+            }
+            catch (final MuleException me)
+            {
+                logger.error(me);
+                result.getMessage().setExceptionPayload(new DefaultExceptionPayload(me));
+            }
+
+            return result;
+        }
+    }
+
+    private static ExceptionPayload getExceptionPayload(MuleEvent event)
+    {
+        if (event == null)
+        {
+            return null;
+        }
+
+        final MuleMessage message = event.getMessage();
+        if (message == null)
+        {
+            return null;
+        }
+
+        return message.getExceptionPayload();
     }
 }

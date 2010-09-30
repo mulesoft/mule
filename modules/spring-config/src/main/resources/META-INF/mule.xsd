@@ -1749,14 +1749,14 @@
     <xsd:element name="validator" type="validatorType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                A validator with a single request-response inbound endpoint and a single one-way outbound endpoint.
+                A validator with a single request-response inbound endpoint and a single outbound endpoint.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="validatorType">
         <xsd:annotation>
             <xsd:documentation>
-                A validator with a single request-response inbound endpoint and a single one-way outbound endpoint.
+                A validator with a single request-response inbound endpoint and a single outbound endpoint.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexContent>
@@ -1831,6 +1831,14 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             An expression used to build the content of the response in case an invalid message has been received.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="errorExpression" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An expression used to build the content of the response in case an error occurs during the outbound dispatch.
+                            The outbound endpoint's exchange pattern must be request-response if errorExpression is used. 
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

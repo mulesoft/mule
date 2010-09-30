@@ -66,6 +66,14 @@
     <payload-type-filter expectedType="java.lang.Integer"/>
   </validator>
 
+  <validator name="dispatch-error"
+             inboundAddress="vm://dispatch-error.in"
+             ackExpression="#[string:GOOD:#[message:payload]@#[context:serviceName]]"
+             nackExpression="#[string:BAD:#[message:payload]@#[context:serviceName]]"
+             errorExpression="#[string:ERROR:#[message:payload]@#[context:serviceName]]"
+             outboundAddress="http://localhost:8091/error"
+             validationFilter-ref="int-payload-filter" />
+
   <!--
         Test support
   -->
@@ -75,4 +83,8 @@
     <inbound-endpoint ref="test-service-channel" />
     <test:component />
   </flow>
+  
+  <simple-service name="error-service" address="http://localhost:8091/error">
+    <test:component throwException="true" />
+  </simple-service>
 </mule>

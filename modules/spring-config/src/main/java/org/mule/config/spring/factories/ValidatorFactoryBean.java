@@ -84,8 +84,14 @@ public class ValidatorFactoryBean extends AbstractFlowConstructFactoryBean
     {
         validatorBuilder.nackExpression(nackExpression);
     }
-    
-    public void setValidationFilter(Filter validationFilter) {
+
+    public void setErrorExpression(String errorExpression)
+    {
+        validatorBuilder.errorExpression(errorExpression);
+    }
+
+    public void setValidationFilter(Filter validationFilter)
+    {
         validatorBuilder.validationFilter(validationFilter);
     }
 }

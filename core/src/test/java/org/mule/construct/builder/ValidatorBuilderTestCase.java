@@ -17,13 +17,28 @@ import org.mule.tck.AbstractMuleTestCase;
 
 public class ValidatorBuilderTestCase extends AbstractMuleTestCase
 {
-    public void testFullConfiguration() throws Exception
+    public void testConfigurationWithoutErrorExpression() throws Exception
     {
-        Validator validator = new ValidatorBuilder().name("test-validator-full")
+        final Validator validator = new ValidatorBuilder().name("test-validator-no-error")
             .inboundAddress("test://foo.in")
             .validationFilter(new PayloadTypeFilter(Integer.class))
             .ackExpression("#[string:GOOD:#[message:payload]]")
             .nackExpression("#[string:BAD:#[message:payload]]")
+            .outboundAddress("test://foo.out")
+            .exceptionStrategy(new DefaultServiceExceptionStrategy(muleContext))
+            .build(muleContext);
+
+        assertEquals("test-validator-no-error", validator.getName());
+    }
+
+    public void testFullConfiguration() throws Exception
+    {
+        final Validator validator = new ValidatorBuilder().name("test-validator-full")
+            .inboundAddress("test://foo.in")
+            .validationFilter(new PayloadTypeFilter(Integer.class))
+            .ackExpression("#[string:GOOD:#[message:payload]]")
+            .nackExpression("#[string:BAD:#[message:payload]]")
+            .errorExpression("#[string:ERROR:#[message:payload]]")
             .outboundAddress("test://foo.out")
             .exceptionStrategy(new DefaultServiceExceptionStrategy(muleContext))
             .build(muleContext);
