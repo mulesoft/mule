@@ -15,16 +15,16 @@ import java.util.Locale;
 public class JsonBeanRoundTripNonAsciiTestCase extends JsonBeanRoundTripTestCase
 {
     private static final String ENCODING = "Windows-31J";
-	
+
     private final String jsonString;
     private final FruitCollection jsonObject;
 
     public JsonBeanRoundTripNonAsciiTestCase()
     {
-    	jsonString = "{\"apple\":{\"washed\":false,\"bitten\":true},\"orange\":{\"brand\":\""
+        jsonString = "{\"apple\":{\"washed\":false,\"bitten\":true},\"orange\":{\"brand\":\""
             +  getBrandOfOrange(Locale.JAPAN)
             + "\",\"segments\":8,\"radius\":3.45,\"listProperties\":null,\"mapProperties\":null,\"arrayProperties\":null}}";
-    	
+
         jsonObject = new FruitCollection(new Apple(true), null, new Orange(8, new Double(3.45), getBrandOfOrange(Locale.JAPAN)));
     }
    
@@ -72,7 +72,7 @@ public class JsonBeanRoundTripNonAsciiTestCase extends JsonBeanRoundTripTestCase
             return null;
         }
     }
-	
+
     private String getBrandOfOrange(Locale locale)
     {
         return LocaleMessageHandler.getString("test-data", locale, "JsonBeanRoundTripNonAsciiTestCase.getBrandOfOrange", new Object[] {});
