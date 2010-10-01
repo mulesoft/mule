@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -47,6 +48,8 @@ public class DeploymentService
     protected transient final Log logger = LogFactory.getLog(getClass());
     protected MuleDeployer deployer;
     protected ApplicationFactory appFactory;
+    // fair lock
+    private ReentrantLock lock = new ReentrantLock(true);
 
     private List<Application> applications = new ArrayList<Application>();
 
@@ -196,7 +199,9 @@ public class DeploymentService
      */
     public List<Application> getApplications()
     {
-        return Collections.unmodifiableList(applications);
+        // TODO rewrite to have api callbacks, quick hack for a demo, don't expose direct app set reference
+        return applications;
+        //return Collections.unmodifiableList(applications);
     }
 
     public MuleDeployer getDeployer()
@@ -212,6 +217,10 @@ public class DeploymentService
     public ApplicationFactory getAppFactory()
     {
         return appFactory;
+    }
+
+    public ReentrantLock getLock() {
+        return lock;
     }
 
     /**
@@ -242,74 +251,93 @@ public class DeploymentService
         //   undeploy removed apps
         //   deploy archives
         //   deploy exploded
-        public void run()
-        {
-            // list new apps
-            final String[] zips = appsDir.list(new SuffixFileFilter(".zip"));
-            String[] apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-            // we care only about removed anchors
-            String[] currentAnchors = appsDir.list(new SuffixFileFilter(APP_ANCHOR_SUFFIX));
-            @SuppressWarnings("unchecked")
-            final Collection<String> deletedAnchors = CollectionUtils.subtract(Arrays.asList(appAnchors), Arrays.asList(currentAnchors));
-            for (String deletedAnchor : deletedAnchors)
+        public void run() {
+            try
             {
-                // apps.find ( it.appName = (removedAnchor - suffix))
-                String appName = StringUtils.removeEnd(deletedAnchor, APP_ANCHOR_SUFFIX);
-                try
+                // use non-barging lock to preserve fairness, according to javadocs
+                // if there's a lock present - wait for next poll to do anything
+                if (!lock.tryLock(0, TimeUnit.SECONDS))
                 {
-                    onApplicationUndeployRequested(appName);
+                    return;
                 }
-                catch (Throwable t)
-                {
-                    logger.error("Failed to undeploy application: " + appName, t);
-                }
-            }
-            appAnchors = currentAnchors;
 
 
-            // new packed Mule apps
-            for (String zip : zips)
-            {
-                try
+                // list new apps
+                final String[] zips = appsDir.list(new SuffixFileFilter(".zip"));
+                String[] apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+                // we care only about removed anchors
+                String[] currentAnchors = appsDir.list(new SuffixFileFilter(APP_ANCHOR_SUFFIX));
+                @SuppressWarnings("unchecked")
+                final Collection<String> deletedAnchors = CollectionUtils.subtract(Arrays.asList(appAnchors), Arrays.asList(currentAnchors));
+                for (String deletedAnchor : deletedAnchors)
                 {
-                    // check if this app is running first, undeploy it then
-                    final String appName = StringUtils.removeEnd(zip, ".zip");
-                    Application app = (Application) CollectionUtils.find(applications, new BeanPropertyValueEqualsPredicate("appName", appName));
-                    if (app != null)
+                    // apps.find ( it.appName = (removedAnchor - suffix))
+                    String appName = StringUtils.removeEnd(deletedAnchor, APP_ANCHOR_SUFFIX);
+                    try
                     {
                         onApplicationUndeployRequested(appName);
                     }
-                    onNewApplicationArchive(new File(appsDir, zip));
+                    catch (Throwable t)
+                    {
+                        logger.error("Failed to undeploy application: " + appName, t);
+                    }
                 }
-                catch (Throwable t)
-                {
-                    logger.error("Failed to deploy application archive: " + zip, t);
-                }
-            }
+                appAnchors = currentAnchors;
 
-            // re-scan exploded apps and update our state, as deploying Mule app archives might have added some
-            if (zips.length > 0)
-            {
-                apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+
+                // new packed Mule apps
+                for (String zip : zips)
+                {
+                    try
+                    {
+                        // check if this app is running first, undeploy it then
+                        final String appName = StringUtils.removeEnd(zip, ".zip");
+                        Application app = (Application) CollectionUtils.find(applications, new BeanPropertyValueEqualsPredicate("appName", appName));
+                        if (app != null)
+                        {
+                            onApplicationUndeployRequested(appName);
+                        }
+                        onNewApplicationArchive(new File(appsDir, zip));
+                    }
+                    catch (Throwable t)
+                    {
+                        logger.error("Failed to deploy application archive: " + zip, t);
+                    }
+                }
+
+                // re-scan exploded apps and update our state, as deploying Mule app archives might have added some
+                if (zips.length > 0)
+                {
+                    apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+                    deployedApps = apps;
+                }
+
+                // new exploded Mule apps
+                @SuppressWarnings("unchecked")
+                final Collection<String> addedApps = CollectionUtils.subtract(Arrays.asList(apps), Arrays.asList(deployedApps));
+                for (String addedApp : addedApps)
+                {
+                    try
+                    {
+                        onNewExplodedApplication(addedApp);
+                    }
+                    catch (Throwable t)
+                    {
+                        logger.error("Failed to deploy exploded application: " + addedApp, t);
+                    }
+                }
+
                 deployedApps = apps;
             }
-
-            // new exploded Mule apps
-            @SuppressWarnings("unchecked")
-            final Collection<String> addedApps = CollectionUtils.subtract(Arrays.asList(apps), Arrays.asList(deployedApps));
-            for (String addedApp : addedApps)
+            catch (InterruptedException e)
             {
-                try
-                {
-                    onNewExplodedApplication(addedApp);
-                }
-                catch (Throwable t)
-                {
-                    logger.error("Failed to deploy exploded application: " + addedApp, t);
-                }
+                // preserve the flag for the thread
+                Thread.currentThread().interrupt();
             }
-
-            deployedApps = apps;
+            finally
+            {
+                lock.unlock();
+            }
         }
 
         protected void onApplicationUndeployRequested(String appName) throws Exception
