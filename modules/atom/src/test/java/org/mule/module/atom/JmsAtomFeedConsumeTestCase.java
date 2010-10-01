@@ -25,6 +25,12 @@ public class JmsAtomFeedConsumeTestCase extends FunctionalTestCase
         return "jms-atom-consume.xml";
     }
 
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        FeedReceiver.receivedEntries.set(0);
+    }
+
     public void testConsumeFeed() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();

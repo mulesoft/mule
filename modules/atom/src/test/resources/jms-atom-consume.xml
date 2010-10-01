@@ -3,7 +3,7 @@
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:atom="http://www.mulesoft.org/schema/mule/atom"
       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-      xmlns:test="http://www.mulesoft.org/schema/mule/test" xmlns:salesforce="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/3.0/mule-atom.xsd
