@@ -11,6 +11,7 @@
 package org.mule.transport;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
 import org.mule.ResponseOutputStream;
 import org.mule.api.MuleEvent;
@@ -192,7 +193,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
             return muleEvent;
         }
 
-        if (resultEvent != null && resultEvent.getMessage() != null && !endpoint.isDisableTransportTransformer())
+        if (endpoint.getExchangePattern()== MessageExchangePattern.REQUEST_RESPONSE && resultEvent != null && resultEvent.getMessage() != null && !endpoint.isDisableTransportTransformer())
         {
             applyResponseTransformers(resultEvent);
         }
