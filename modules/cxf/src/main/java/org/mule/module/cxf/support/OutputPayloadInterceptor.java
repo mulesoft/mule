@@ -17,21 +17,25 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
-
-import javanet.staxutils.ContentHandlerToXMLStreamWriter;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.sax.SAXResult;
 
+import javanet.staxutils.ContentHandlerToXMLStreamWriter;
 import org.apache.cxf.databinding.stax.XMLStreamWriterCallback;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.xml.sax.SAXException;
 
@@ -103,8 +107,73 @@ public class OutputPayloadInterceptor extends AbstractOutDatabindingInterceptor
                 // it's probably a null object
                 objs.add(o);
             }
-            
         }
+
+        // For the server side response, ensure that the body object is in the correct
+        // location when running in proxy mode
+        if (!isRequestor(message))
+        {
+            BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
+            if (bop != null)
+            {
+                ensurePartIndexMatchListIndex(objs, bop.getOutput().getMessageParts());
+            }
+        }
+    }
+
+    /**
+     * Ensures that each part's content is in the right place in the content list.
+     * <p/>
+     * This is required because in some scenarios there are parts that were removed from
+     * the part list. In that cases, the content list contains only the values for the
+     * remaining parts, but the part's indexes could be wrong. This method fixes that
+     * adding null values into the content list so the part's index matches the contentList
+     * index. (Related to: MULE-5113.)
+     */
+    protected void ensurePartIndexMatchListIndex(MessageContentsList contentList, List<MessagePartInfo> parts)
+    {
+
+        // In some circumstances, parts is a {@link UnmodifiableList} instance, so a new copy
+        // is required in order to sort its content.
+        List<MessagePartInfo> sortedParts = new LinkedList<MessagePartInfo>();
+        sortedParts.addAll(parts);
+        sortPartsByIndex(sortedParts);
+
+        int currentIndex = 0;
+
+        for (MessagePartInfo part : sortedParts)
+        {
+            while (part.getIndex() > currentIndex)
+            {
+                contentList.add(currentIndex++, null);
+            }
+
+            // Skips the index for the current part because now is in the right place
+            currentIndex = part.getIndex() + 1;
+        }
+    }
+
+    private void sortPartsByIndex(List<MessagePartInfo> parts)
+    {
+        Collections.sort(parts, new Comparator<MessagePartInfo>()
+        {
+
+            public int compare(MessagePartInfo o1, MessagePartInfo o2)
+            {
+                if (o1.getIndex() < o2.getIndex())
+                {
+                    return -1;
+                }
+                else if (o1.getIndex() == o2.getIndex())
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            }
+        });
     }
 
     protected Object cleanUpPayload(final Object payload)

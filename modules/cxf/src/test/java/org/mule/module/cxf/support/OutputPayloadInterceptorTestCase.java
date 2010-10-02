@@ -16,7 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.message.MessageContentsList;
+import org.apache.cxf.service.model.MessagePartInfo;
 
 public class OutputPayloadInterceptorTestCase extends AbstractMuleTestCase
 {
@@ -64,5 +67,49 @@ public class OutputPayloadInterceptorTestCase extends AbstractMuleTestCase
             MessageContentsList.REMOVED_MARKER};
         assertTrue(Arrays.equals(new Object[]{arrayOf2Objects1Null[0], arrayOf2Objects1Null[2]},
             (Object[]) interceptor.cleanUpPayload(arrayOf2Objects1Null)));
+    }
+
+    public void testAddsMissingPartContentOnHandleMessage() {
+        MessageContentsList messageContentsList = new MessageContentsList();
+        Object content1 = new Object();
+        messageContentsList.add(content1);
+
+        List<MessagePartInfo> parts = new ArrayList<MessagePartInfo>();
+
+        MessagePartInfo part1 = new MessagePartInfo(new QName("part1"), null);
+        part1.setIndex(1);
+        parts.add(part1);
+
+        interceptor.ensurePartIndexMatchListIndex(messageContentsList, parts);
+
+        assertEquals(2, messageContentsList.size());
+        assertEquals(null, messageContentsList.get(0));
+        assertEquals(content1, messageContentsList.get(1));
+    }
+
+    public void testAddsMissingPartContentWithUnsortedPartListOnHandleMessage() {
+        MessageContentsList messageContentsList = new MessageContentsList();
+        Object content1 = new Object();
+        messageContentsList.add(content1);
+        Object content2 = new Object();
+        messageContentsList.add(content2);
+
+        List<MessagePartInfo> parts = new ArrayList<MessagePartInfo>();
+
+        MessagePartInfo part2 = new MessagePartInfo(new QName("part2"), null);
+        part2.setIndex(3);
+        parts.add(part2);
+
+        MessagePartInfo part1 = new MessagePartInfo(new QName("part1"), null);
+        part1.setIndex(1);
+        parts.add(part1);
+
+        interceptor.ensurePartIndexMatchListIndex(messageContentsList, parts);
+
+        assertEquals(4, messageContentsList.size());
+        assertEquals(null, messageContentsList.get(0));
+        assertEquals(content1, messageContentsList.get(1));
+        assertEquals(null, messageContentsList.get(2));
+        assertEquals(content2, messageContentsList.get(3));
     }
 }
