@@ -1,0 +1,2 @@
+#Fails on the build server with 28 entries not 25, trying to reproduce locally
+org.mule.module.atom.JmsAtomFeedConsumeTestCase
