@@ -67,10 +67,6 @@
             <version>${cxfVersion}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-rt-transports-http</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-servlet_2.5_spec</artifactId>
                 </exclusion>

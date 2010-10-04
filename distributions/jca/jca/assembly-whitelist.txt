@@ -45,6 +45,7 @@ cxf-rt-databinding-aegis-2.2.2
 cxf-rt-databinding-jaxb-2.2.2
 cxf-rt-frontend-jaxws-2.2.2
 cxf-rt-frontend-simple-2.2.2
+cxf-rt-transports-http-2.2.2
 cxf-rt-transports-http-jetty-2.2.2
 cxf-rt-transports-local-2.2.2
 cxf-rt-ws-addr-2.2.2
