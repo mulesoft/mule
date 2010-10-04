@@ -10,6 +10,8 @@
 
 package org.mule.construct.builder;
 
+import java.util.List;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -18,8 +20,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.AbstractFlowConstruct;
-
-import java.util.List;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstructBuilder, F extends AbstractFlowConstruct>
@@ -67,8 +67,15 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
 
     public F build(MuleContext muleContext) throws MuleException
     {
-        F flowConstruct = buildFlowConstruct(muleContext);
+        final F flowConstruct = buildFlowConstruct(muleContext);
         addExceptionListener(flowConstruct);
+        return flowConstruct;
+    }
+
+    public F buildAndRegister(MuleContext muleContext) throws MuleException
+    {
+        final F flowConstruct = build(muleContext);
+        muleContext.getRegistry().registerObject(flowConstruct.getName(), flowConstruct);
         return flowConstruct;
     }
 
