@@ -10,6 +10,8 @@
 
 package org.mule.module.launcher;
 
+import org.mule.util.ClassUtils;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -90,6 +92,20 @@ public class GoodCitizenClassLoader extends URLClassLoader
             }
         }
         catch (Exception ex)
+        {
+            // ignore
+        }
+
+        try
+        {
+            // fix groovy compiler leaks http://www.mulesoft.org/jira/browse/MULE-5125
+            final Class clazz = ClassUtils.loadClass("org.codehaus.groovy.transform.ASTTransformationVisitor", getClass());
+            final Field compUnit = clazz.getDeclaredField("compUnit");
+            compUnit.setAccessible(true);
+            // static field
+            compUnit.set(null, null);
+        }
+        catch (Throwable t)
         {
             // ignore
         }
