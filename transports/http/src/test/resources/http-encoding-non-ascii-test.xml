@@ -17,49 +17,56 @@
 	<message-properties-transformer name="setResponseType">
 		<add-message-property key="Content-Type" value="text/plain;charset=EUC-JP" />			
 	</message-properties-transformer>
+    
+    <!-- 
+        this transformer is required to copy the Content-Type header that is taken from 
+        the endpoint's properties from INVOCATION to OUTBOUND scope
+     -->
+    <message-properties-transformer name="copyContentType">
+        <add-message-property key="Content-Type" value="#[header:INVOCATION:Content-Type]"/>
+    </message-properties-transformer>
 				
 	<model name="main">
 		<!-- case 1 : a string payload sent by get and return appended one. -->
 		<service name="testSendByGET">
 			<inbound>
-				<vm:inbound-endpoint path="sendByGET" />
+				<vm:inbound-endpoint path="sendByGET" exchange-pattern="request-response"/>
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<http:outbound-endpoint address="http://localhost:60198/get" exchange-pattern="request-response"
-						contentType="text/plain; charset=ISO-2022-JP" method="GET" />
+					<http:outbound-endpoint address="http://localhost:60224/get"
+						contentType="text/plain; charset=ISO-2022-JP" method="GET" transformer-refs="copyContentType"/>
 				</pass-through-router>
 			</outbound>
 		</service>
 
 		<service name="testReceiveGET">
 			<inbound>
-				<http:inbound-endpoint address="http://localhost:60198/get" exchange-pattern="request-response"
+				<http:inbound-endpoint address="http://localhost:60224/get" exchange-pattern="request-response"
 					responseTransformer-refs="setResponseType">
-    				<custom-transformer class="org.mule.transport.http.transformers.HttpRequestBodyToParamMap"/>
+                    <http:body-to-parameter-map-transformer/>
     				<custom-transformer class="org.mule.transport.http.functional.HttpEncodingNonAsciiFunctionalTestCase$ParamMapToString"/>
 				</http:inbound-endpoint>				
 			</inbound>
 			<test:component appendString=" Received" />
 		</service>
 
-		<!-- case 2 : a string payload sent by post and return appended one. -->
 		<service name="testSendByPOST">
 			<inbound>
-				<vm:inbound-endpoint path="sendByPOST" />
+				<vm:inbound-endpoint path="sendByPOST" exchange-pattern="request-response"/>
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<http:outbound-endpoint connector-ref="httpConnector" address="http://localhost:60198/post" 
-						contentType="text/plain; charset=ISO-2022-JP"  method="POST" exchange-pattern="request-response"/>						
+					<http:outbound-endpoint connector-ref="httpConnector" address="http://localhost:60224/post" 
+						contentType="text/plain; charset=ISO-2022-JP" method="POST"/>						
 				</pass-through-router>
 			</outbound>
 		</service>
 		
 		<service name="testReceivePOST">
 			<inbound>
-				<http:inbound-endpoint connector-ref="httpConnector" address="http://localhost:60198/post" 
-					responseTransformer-refs="setResponseType" exchange-pattern="request-response"/>
+				<http:inbound-endpoint connector-ref="httpConnector" address="http://localhost:60224/post" 
+					responseTransformer-refs="setResponseType" />
 			</inbound>
 			<test:component appendString=" Received" />
 		</service>

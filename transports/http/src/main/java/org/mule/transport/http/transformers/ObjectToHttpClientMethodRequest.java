@@ -90,14 +90,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
     @Override
     public Object transformMessage(MuleMessage msg, String outputEncoding) throws TransformerException
     {
-        final Object src = msg.getPayload();
-
-        String method = msg.getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, null);
-        if (method == null)
-        {
-            method = msg.getInvocationProperty(HttpConnector.HTTP_METHOD_PROPERTY, "POST");
-        }
-
+        String method = detectHttpMethod(msg);
         try
         {
             // TODO It makes testing much harder if we use the endpoint on the
@@ -119,7 +112,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             {
                 final PutMethod putMethod = new PutMethod(uri.toString());
 
-                setupEntityMethod(src, outputEncoding, msg, putMethod);
+                Object payload = msg.getPayload();
+                setupEntityMethod(payload, outputEncoding, msg, putMethod);
 
                 httpMethod = putMethod;
             }
@@ -174,6 +168,16 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         {
             throw new TransformerException(this, e);
         }
+    }
+
+    protected String detectHttpMethod(MuleMessage msg)
+    {
+        String method = msg.getOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, null);
+        if (method == null)
+        {
+            method = msg.getInvocationProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_POST);
+        }
+        return method;
     }
 
     protected HttpMethod createPostMethod(MuleMessage msg, String outputEncoding) throws Exception
@@ -370,10 +374,9 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
 
     protected void setHeaders(HttpMethod httpMethod, MuleMessage msg) throws TransformerException
     {
-        String headerValue;
         for (String headerName : msg.getOutboundPropertyNames())
         {
-            headerValue = ObjectUtils.getString(msg.getOutboundProperty(headerName), null);
+            String headerValue = ObjectUtils.getString(msg.getOutboundProperty(headerName), null);
 
             if (headerName.startsWith(MuleProperties.PROPERTY_PREFIX))
             {
