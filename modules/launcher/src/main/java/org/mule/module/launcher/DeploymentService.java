@@ -13,15 +13,19 @@ package org.mule.module.launcher;
 import org.mule.config.StartupContext;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationFactory;
+import org.mule.module.launcher.util.DebuggableReentrantLock;
+import org.mule.module.launcher.util.ElementAddedEvent;
+import org.mule.module.launcher.util.ElementRemovedEvent;
+import org.mule.module.launcher.util.ObservableList;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.CollectionUtils;
-import org.mule.util.FileUtils;
-import org.mule.util.FilenameUtils;
 import org.mule.util.StringUtils;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
+import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.logging.Log;
@@ -49,9 +54,10 @@ public class DeploymentService
     protected MuleDeployer deployer;
     protected ApplicationFactory appFactory;
     // fair lock
-    private ReentrantLock lock = new ReentrantLock(true);
+    private ReentrantLock lock = new DebuggableReentrantLock(true);
 
-    private List<Application> applications = new ArrayList<Application>();
+    // @GuardedBy #lock
+    private ObservableList<Application> applications = new ObservableList<Application>();
 
     public DeploymentService()
     {
@@ -199,12 +205,10 @@ public class DeploymentService
      */
     public List<Application> getApplications()
     {
-        // TODO rewrite to have api callbacks, quick hack for a demo, don't expose direct app set reference
-        return applications;
-        //return Collections.unmodifiableList(applications);
+        return Collections.unmodifiableList(applications);
     }
 
-    public MuleDeployer getDeployer()
+    protected MuleDeployer getDeployer()
     {
         return deployer;
     }
@@ -223,6 +227,35 @@ public class DeploymentService
         return lock;
     }
 
+    public void onApplicationInstalled(Application a)
+    {
+        applications.add(a);
+    }
+
+    protected void undeploy(Application app)
+    {
+        if (logger.isInfoEnabled())
+        {
+            logger.info("================== Request to Undeploy Application: " + app.getAppName());
+        }
+
+        deployer.undeploy(app);
+    }
+
+    public void undeploy(String appName)
+    {
+        Application app = (Application) CollectionUtils.find(applications, new BeanPropertyValueEqualsPredicate("appName", appName));
+        applications.remove(app);
+        deployer.undeploy(app);
+    }
+
+    public void deploy(URL appArchiveUrl) throws IOException
+    {
+        final Application application = deployer.installFrom(appArchiveUrl);
+        applications.add(application);
+        deployer.deploy(application);
+    }
+
     /**
      * Not thread safe. Correctness is guaranteed by a single-threaded executor.
      */
@@ -230,34 +263,50 @@ public class DeploymentService
     {
         protected File appsDir;
 
-        protected String[] deployedApps;
-
         // written on app start, will be used to cleanly undeploy the app without file locking issues
         protected String[] appAnchors = new String[0];
+        protected volatile boolean dirty;
 
-        public AppDirWatcher(File appsDir)
+        public AppDirWatcher(final File appsDir)
         {
             this.appsDir = appsDir;
-            // save the list of known apps on startup
-            this.deployedApps = new String[applications.size()];
-            for (int i = 0; i < applications.size(); i++)
+            applications.addPropertyChangeListener(new PropertyChangeListener()
             {
-                deployedApps[i] = applications.get(i).getAppName();
-
-            }
+                public void propertyChange(PropertyChangeEvent e)
+                {
+                    if (e instanceof ElementAddedEvent || e instanceof ElementRemovedEvent)
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Deployed applications set has been modified, flushing state.");
+                        }
+                        dirty = true;
+                    }
+                }
+            });
         }
 
         // Cycle is:
         //   undeploy removed apps
         //   deploy archives
         //   deploy exploded
-        public void run() {
+        public void run()
+        {
             try
             {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Checking for changes...");
+                }
                 // use non-barging lock to preserve fairness, according to javadocs
                 // if there's a lock present - wait for next poll to do anything
                 if (!lock.tryLock(0, TimeUnit.SECONDS))
                 {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Another deployment operation in progress, will skip this cycle. Owner thread: " +
+                                     ((DebuggableReentrantLock) lock).getOwner());
+                    }
                     return;
                 }
 
@@ -265,17 +314,46 @@ public class DeploymentService
                 // list new apps
                 final String[] zips = appsDir.list(new SuffixFileFilter(".zip"));
                 String[] apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+
+
                 // we care only about removed anchors
                 String[] currentAnchors = appsDir.list(new SuffixFileFilter(APP_ANCHOR_SUFFIX));
+                if (logger.isDebugEnabled())
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(String.format("Current anchors:%n"));
+                    for (String currentAnchor : currentAnchors)
+                    {
+                        sb.append(String.format("  %s%n", currentAnchor));
+                    }
+                    logger.debug(sb.toString());
+                }
                 @SuppressWarnings("unchecked")
                 final Collection<String> deletedAnchors = CollectionUtils.subtract(Arrays.asList(appAnchors), Arrays.asList(currentAnchors));
+                if (logger.isDebugEnabled())
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(String.format("Deleted anchors:%n"));
+                    for (String deletedAnchor : deletedAnchors)
+                    {
+                        sb.append(String.format("  %s%n", deletedAnchor));
+                    }
+                    logger.debug(sb.toString());
+                }
+
                 for (String deletedAnchor : deletedAnchors)
                 {
-                    // apps.find ( it.appName = (removedAnchor - suffix))
                     String appName = StringUtils.removeEnd(deletedAnchor, APP_ANCHOR_SUFFIX);
                     try
                     {
-                        onApplicationUndeployRequested(appName);
+                        if (findApplication(appName) != null)
+                        {
+                            undeploy(appName);
+                        }
+                        else if (logger.isDebugEnabled())
+                        {
+                            logger.debug(String.format("Application [%s] has already been undeployed via API", appName));
+                        }
                     }
                     catch (Throwable t)
                     {
@@ -295,9 +373,9 @@ public class DeploymentService
                         Application app = (Application) CollectionUtils.find(applications, new BeanPropertyValueEqualsPredicate("appName", appName));
                         if (app != null)
                         {
-                            onApplicationUndeployRequested(appName);
+                            undeploy(appName);
                         }
-                        onNewApplicationArchive(new File(appsDir, zip));
+                        deploy(new File(appsDir, zip).toURI().toURL());
                     }
                     catch (Throwable t)
                     {
@@ -306,15 +384,16 @@ public class DeploymentService
                 }
 
                 // re-scan exploded apps and update our state, as deploying Mule app archives might have added some
-                if (zips.length > 0)
+                if (zips.length > 0 || dirty)
                 {
                     apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-                    deployedApps = apps;
                 }
+
+                Collection deployedAppNames = CollectionUtils.collect(applications, new BeanToPropertyValueTransformer("appName"));
 
                 // new exploded Mule apps
                 @SuppressWarnings("unchecked")
-                final Collection<String> addedApps = CollectionUtils.subtract(Arrays.asList(apps), Arrays.asList(deployedApps));
+                final Collection<String> addedApps = CollectionUtils.subtract(Arrays.asList(apps), deployedAppNames);
                 for (String addedApp : addedApps)
                 {
                     try
@@ -327,7 +406,6 @@ public class DeploymentService
                     }
                 }
 
-                deployedApps = apps;
             }
             catch (InterruptedException e)
             {
@@ -337,19 +415,8 @@ public class DeploymentService
             finally
             {
                 lock.unlock();
+                dirty = false;
             }
-        }
-
-        protected void onApplicationUndeployRequested(String appName) throws Exception
-        {
-            if (logger.isInfoEnabled())
-            {
-                logger.info("================== Request to Undeploy Application: " + appName);
-            }
-
-            Application app = (Application) CollectionUtils.find(applications, new BeanPropertyValueEqualsPredicate("appName", appName));
-            applications.remove(app);
-            deployer.undeploy(app);
         }
 
         /**
@@ -364,26 +431,10 @@ public class DeploymentService
 
             Application a = appFactory.createApp(appName);
             // add to the list of known apps first to avoid deployment loop on failure
-            applications.add(a);
+            onApplicationInstalled(a);
             deployer.deploy(a);
         }
 
-        protected void onNewApplicationArchive(File file) throws Exception
-        {
-            if (logger.isInfoEnabled())
-            {
-                logger.info("================== New Application Archive: " + file);
-            }
-
-            // check if there are any broken leftovers and clean it up before exploded an updated zip
-            final String appName = FilenameUtils.getBaseName(file.getName());
-            FileUtils.deleteTree(new File(appsDir, appName));
-
-            Application app = deployer.installFrom(file.toURL());
-            // add to the list of known apps first to avoid deployment loop on failure
-            applications.add(app);
-            deployer.deploy(app);
-        }
     }
 
 }

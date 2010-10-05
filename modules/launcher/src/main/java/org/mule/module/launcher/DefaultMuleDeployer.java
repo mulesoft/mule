@@ -150,6 +150,7 @@ public class DefaultMuleDeployer implements MuleDeployer
             {
                 throw new IOException("Another deployment operation is in progress");
             }
+
             final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
 
             final String fullPath = url.toURI().toString();
