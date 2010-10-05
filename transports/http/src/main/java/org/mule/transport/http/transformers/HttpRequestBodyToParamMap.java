@@ -60,7 +60,7 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
             if (isGet)
             {
                 URI uri = new URI(message.getPayloadAsString(encoding));
-                queryString = uri.getQuery();
+                queryString = uri.getRawQuery();
             }
             else if (isPost)
             {

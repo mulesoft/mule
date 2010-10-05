@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	  xmlns:test="http://www.mulesoft.org/schema/mule/test" 
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"	
+    xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
+
+	<http:connector name="httpConnector" clientSoTimeout="300000" serverSoTimeout="300000" />
+
+	<message-properties-transformer name="setResponseType">
+		<add-message-property key="Content-Type" value="text/plain;charset=EUC-JP" />			
+	</message-properties-transformer>
+				
+	<model name="main">
+		<!-- case 1 : a string payload sent by get and return appended one. -->
+		<service name="testSendByGET">
+			<inbound>
+				<vm:inbound-endpoint path="sendByGET" />
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<http:outbound-endpoint address="http://localhost:60198/get" exchange-pattern="request-response"
+						contentType="text/plain; charset=ISO-2022-JP" method="GET" />
+				</pass-through-router>
+			</outbound>
+		</service>
+
+		<service name="testReceiveGET">
+			<inbound>
+				<http:inbound-endpoint address="http://localhost:60198/get" exchange-pattern="request-response"
+					responseTransformer-refs="setResponseType">
+    				<custom-transformer class="org.mule.transport.http.transformers.HttpRequestBodyToParamMap"/>
+    				<custom-transformer class="org.mule.transport.http.functional.HttpEncodingNonAsciiFunctionalTestCase$ParamMapToString"/>
+				</http:inbound-endpoint>				
+			</inbound>
+			<test:component appendString=" Received" />
+		</service>
+
+		<!-- case 2 : a string payload sent by post and return appended one. -->
+		<service name="testSendByPOST">
+			<inbound>
+				<vm:inbound-endpoint path="sendByPOST" />
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<http:outbound-endpoint connector-ref="httpConnector" address="http://localhost:60198/post" 
+						contentType="text/plain; charset=ISO-2022-JP"  method="POST" exchange-pattern="request-response"/>						
+				</pass-through-router>
+			</outbound>
+		</service>
+		
+		<service name="testReceivePOST">
+			<inbound>
+				<http:inbound-endpoint connector-ref="httpConnector" address="http://localhost:60198/post" 
+					responseTransformer-refs="setResponseType" exchange-pattern="request-response"/>
+			</inbound>
+			<test:component appendString=" Received" />
+		</service>
+	</model>
+</mule>
