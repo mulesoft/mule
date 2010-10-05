@@ -14,10 +14,11 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.Connector;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.soap.axis.AxisConnector;
 
-public class EndpointRetrievalMule2021TestCase extends FunctionalTestCase
+public class EndpointRetrievalMule2021TestCase extends DynamicPortTestCase
 {
 
     protected String getConfigResources()
@@ -37,7 +38,7 @@ public class EndpointRetrievalMule2021TestCase extends FunctionalTestCase
         assertNotNull(endpointBuiler);
 
         ImmutableEndpoint endpoint2 = (ImmutableEndpoint) muleContext.getRegistry().lookupObject(
-            "axis:http://localhost:18081/mule/Service?method=toString");
+            "axis:http://localhost:" + getPorts().get(0) + "/mule/Service?method=toString");
         // Null expected because lookupEndpoint does not create endpoints from uri's.
         assertNull(endpoint2);
     }
@@ -48,7 +49,7 @@ public class EndpointRetrievalMule2021TestCase extends FunctionalTestCase
             "Endpoint");
         assertEndpointOk(endpoint1);
         ImmutableEndpoint endpoint2 = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
-            "axis:http://localhost:18081/mule/Service?method=toString");
+            "axis:http://localhost:" + getPorts().get(0) + "/mule/Service?method=toString");
         assertEndpointOk(endpoint2);
     }
 
@@ -58,7 +59,7 @@ public class EndpointRetrievalMule2021TestCase extends FunctionalTestCase
             "Endpoint");
         assertEndpointOk(endpoint1);
         ImmutableEndpoint endpoint2 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "axis:http://localhost:18081/mule/Service?method=toString");
+            "axis:http://localhost:" + getPorts().get(0) + "/mule/Service?method=toString");
         assertEndpointOk(endpoint2);
     }
 
@@ -68,7 +69,7 @@ public class EndpointRetrievalMule2021TestCase extends FunctionalTestCase
             "Endpoint");
         assertEndpointOk(endpoint1);
         ImmutableEndpoint endpoint2 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
-            "axis:http://localhost:18081/mule/Service?method=toString");
+            "axis:http://localhost:" + getPorts().get(0) + "/mule/Service?method=toString");
         assertEndpointOk(endpoint2);
     }
 
@@ -77,6 +78,12 @@ public class EndpointRetrievalMule2021TestCase extends FunctionalTestCase
         assertNotNull("Endpoint is null", endpoint);
         Connector connector = endpoint.getConnector();
         assertTrue("Connector not AXIS", connector instanceof AxisConnector);
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

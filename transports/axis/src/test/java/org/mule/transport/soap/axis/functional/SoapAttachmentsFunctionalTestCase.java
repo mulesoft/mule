@@ -16,13 +16,14 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.message.ds.StringDataSource;
 import org.mule.session.DefaultMuleSession;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.soap.axis.AxisMessageDispatcher;
 
 import javax.activation.DataHandler;
 
-public class SoapAttachmentsFunctionalTestCase extends FunctionalTestCase
+public class SoapAttachmentsFunctionalTestCase extends DynamicPortTestCase
 {
     private static final int SEND_COUNT = 5;
     
@@ -57,5 +58,11 @@ public class SoapAttachmentsFunctionalTestCase extends FunctionalTestCase
             assertEquals(result.getPayloadAsString(), "Done");
             callbackCount++;
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

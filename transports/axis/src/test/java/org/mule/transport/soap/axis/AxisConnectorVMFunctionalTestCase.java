@@ -31,4 +31,11 @@ public class AxisConnectorVMFunctionalTestCase extends AbstractSoapResourceEndpo
     {
         return "axis-" + getTransportProtocol() + "-mule-config.xml";
     }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        // don't really need the ports, but the other tests which extend the same abstract class do
+        return 1;
+    }
 }

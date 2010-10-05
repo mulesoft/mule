@@ -13,7 +13,7 @@ package org.mule.transport.soap.axis;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
-public class AxisNamedParametersTestCase extends FunctionalTestCase
+public class AxisNamedParametersTestCase extends DynamicPortTestCase
 {
 
     @Override
@@ -51,8 +51,14 @@ public class AxisNamedParametersTestCase extends FunctionalTestCase
         // when making the call
         props.put(MuleProperties.MULE_SOAP_METHOD, soapMethod);
 
-        MuleMessage result = client.send("axis:http://localhost:62111/mule/mycomponent2?method=echo",
+        MuleMessage result = client.send("axis:http://localhost:" + getPorts().get(0) + "/mule/mycomponent2?method=echo",
             "Hello Named", props);
         assertEquals("Hello Named", result.getPayload());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

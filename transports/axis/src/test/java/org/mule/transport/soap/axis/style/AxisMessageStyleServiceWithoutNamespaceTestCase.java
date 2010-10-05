@@ -20,7 +20,7 @@ public class AxisMessageStyleServiceWithoutNamespaceTestCase extends AxisMessage
 
     protected String getServiceEndpoint()
     {
-        return "http://localhost:8088/ServiceEntryPoint";
+        return "http://localhost:" + getPorts().get(0) + "/ServiceEntryPoint";
     }
 
 }

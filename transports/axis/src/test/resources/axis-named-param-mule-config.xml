@@ -17,7 +17,7 @@
             <component class="org.mule.component.simple.EchoComponent"/>
             <outbound>
                 <pass-through-router>
-                    <axis:outbound-endpoint address="http://localhost:62111/mule/mycomponent2?method=echo"
+                    <axis:outbound-endpoint address="http://localhost:${port1}/mule/mycomponent2?method=echo"
                                             exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
@@ -25,7 +25,7 @@
 
         <service name="mycomponent2">
             <inbound>
-                <inbound-endpoint address="axis:http://localhost:62111/mule" exchange-pattern="request-response"/>
+                <inbound-endpoint address="axis:http://localhost:${port1}/mule" exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestServiceComponent"/>
         </service>

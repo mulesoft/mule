@@ -14,11 +14,11 @@ package org.mule.transport.soap.axis.functional;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import java.util.Properties;
 
-public class WebServiceWrapperWithAxisTestCase extends FunctionalTestCase
+public class WebServiceWrapperWithAxisTestCase extends DynamicPortTestCase
 {
     private String testString = "test";
     
@@ -34,7 +34,7 @@ public class WebServiceWrapperWithAxisTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient(muleContext);
         Properties props = new Properties();
-        props.setProperty("ws.service.url", "http://localhost:65081/services/TestUMO?method=receive");
+        props.setProperty("ws.service.url", "http://localhost:" + getPorts().get(0) + "/services/TestUMO?method=receive");
         MuleMessage result = client.send("vm://testin2", testString, props);
         assertNotNull(result.getPayload());
         assertEquals("Payload", "Received: "+ testString, result.getPayloadAsString());
@@ -53,5 +53,11 @@ public class WebServiceWrapperWithAxisTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "mule-ws-wrapper-config.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

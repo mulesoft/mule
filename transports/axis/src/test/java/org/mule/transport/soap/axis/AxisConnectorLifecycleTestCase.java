@@ -11,9 +11,10 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleException;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 
-public class AxisConnectorLifecycleTestCase extends FunctionalTestCase
+public class AxisConnectorLifecycleTestCase extends DynamicPortTestCase
 {
 
     private static String SERVICE_NAME = "mycomponent";
@@ -65,6 +66,12 @@ public class AxisConnectorLifecycleTestCase extends FunctionalTestCase
         assertTrue(muleContext.getRegistry().lookupService(SERVICE_NAME).isStarted());
         assertTrue(muleContext.getRegistry().lookupService(PROTOCOL_SERVICE_NAME).isStarted());
 
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 3;
     }
 
 }

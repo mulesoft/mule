@@ -18,8 +18,8 @@
 
     <model name="Https_Test_Model">
         <service name="TestUMO">
-            <inbound>
-                <axis:inbound-endpoint address="https://localhost:62000" exchange-pattern="request-response"/>
+            <inbound>           
+                <axis:inbound-endpoint address="https://localhost:${port1}" exchange-pattern="request-response" name="inTestUMO"/>
             </inbound>
             <component class="org.mule.component.simple.EchoComponent"/>
         </service>

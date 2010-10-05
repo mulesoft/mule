@@ -14,12 +14,12 @@
 
     <custom-connector name="testConnector" class="org.mule.tck.testmodels.mule.TestConnector"/>
 
-    <endpoint name="client" exchange-pattern="request-response" address="axis:http://localhost:60198/mule/services/testComponent?method=receiveMessageWithAttachments"/>
+    <endpoint name="client" exchange-pattern="request-response" address="axis:http://localhost:${port1}/mule/services/testComponent?method=receiveMessageWithAttachments"/>
 
     <model name="main">
         <service name="testComponent">
             <inbound>
-                <inbound-endpoint address="axis:http://localhost:60198/mule/services" 
+                <inbound-endpoint address="axis:http://localhost:${port1}/mule/services" 
                     exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.transport.soap.axis.functional.SoapAttachmentsFunctionalTestComponent"/>

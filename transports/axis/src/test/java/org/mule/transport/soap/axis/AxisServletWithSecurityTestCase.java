@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.servlet.MuleReceiverServlet;
@@ -28,9 +29,9 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 
-public class AxisServletWithSecurityTestCase extends FunctionalTestCase
+public class AxisServletWithSecurityTestCase extends DynamicPortTestCase
 {
-    public static final int HTTP_PORT = 18088;
+    public static int HTTP_PORT = -1;
 
     private Server httpServer;
 
@@ -43,6 +44,7 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
     @Override
     protected void doSetUp() throws Exception
     {
+        HTTP_PORT = getPorts().get(0);
         httpServer = new Server(HTTP_PORT);
 
         Context c = new Context(httpServer, "/", Context.SESSIONS);
@@ -86,5 +88,11 @@ public class AxisServletWithSecurityTestCase extends FunctionalTestCase
         
         assertNotNull(result);
         // assertTrue(result.getPayload() instanceof byte[]);
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

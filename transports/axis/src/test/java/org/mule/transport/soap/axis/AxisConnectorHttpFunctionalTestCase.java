@@ -71,4 +71,10 @@ public class AxisConnectorHttpFunctionalTestCase extends AbstractSoapUrlEndpoint
             assertTrue(e.getMessage(), e.getMessage().indexOf("must implement at least one interface") > -1);
         }
     }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 3;
+    }
 }

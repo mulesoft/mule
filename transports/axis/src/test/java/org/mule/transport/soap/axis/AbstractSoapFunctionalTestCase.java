@@ -13,7 +13,7 @@ package org.mule.transport.soap.axis;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.testmodels.services.Person;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractSoapFunctionalTestCase extends FunctionalTestCase
+public abstract class AbstractSoapFunctionalTestCase extends DynamicPortTestCase
 {
 
     protected abstract String getRequestResponseEndpoint();

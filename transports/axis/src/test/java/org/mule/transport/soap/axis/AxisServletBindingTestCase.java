@@ -15,7 +15,7 @@ import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
 public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
 {
-    public static final int HTTP_PORT = 62088;
+    public static int HTTP_PORT;
 
     private EmbeddedJettyServer httpServer;
 
@@ -23,6 +23,7 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
+        HTTP_PORT = getPorts().get(0);
         httpServer = new EmbeddedJettyServer(HTTP_PORT, "/", "/services/*", new MuleReceiverServlet(), muleContext);
         httpServer.start();
     }
@@ -103,5 +104,11 @@ public class AxisServletBindingTestCase extends AbstractSoapFunctionalTestCase
     protected String getWsdlEndpoint()
     {
         return "http://localhost:" + HTTP_PORT + "/services/mycomponent?wsdl";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

@@ -12,9 +12,9 @@ package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
-public class VmToAxisProxyTestCase extends FunctionalTestCase
+public class VmToAxisProxyTestCase extends DynamicPortTestCase
 {
 
     protected String getConfigResources()
@@ -32,6 +32,12 @@ public class VmToAxisProxyTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://proxy", "ibm", null);
         assertNotNull(result);
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

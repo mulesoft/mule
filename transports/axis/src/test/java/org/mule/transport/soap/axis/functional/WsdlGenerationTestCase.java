@@ -12,7 +12,7 @@ package org.mule.transport.soap.axis.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.transport.http.HttpConnector;
 
 import java.util.HashMap;
@@ -21,7 +21,7 @@ import java.util.Map;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 
-public class WsdlGenerationTestCase extends FunctionalTestCase
+public class WsdlGenerationTestCase extends DynamicPortTestCase
 {
     /**
      * The generated proxy names have increasing counter if run from the top-level m2
@@ -41,7 +41,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
         MuleClient client = new MuleClient(muleContext);
 
-        MuleMessage result = client.send("http://localhost:62081/services/EchoService1?wsdl", null, props);
+        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/EchoService1?wsdl", null, props);
         assertNotNull(result);
         String wsdl = result.getPayloadAsString();
         Document doc = DocumentHelper.parseText(wsdl);
@@ -60,7 +60,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
         assertEquals("EchoService1", doc.valueOf("/wsdl:definitions/wsdl:service/@name"));
 
         assertEquals("EchoService1", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/@name"));
-        assertEquals("http://localhost:62081/services/EchoService1",
+        assertEquals("http://localhost:" + getPorts().get(0) + "/services/EchoService1",
             doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
     }
 
@@ -70,7 +70,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
         MuleClient client = new MuleClient(muleContext);
 
-        MuleMessage result = client.send("http://localhost:62082/services/EchoService2?wsdl", null, props);
+        MuleMessage result = client.send("http://localhost:" + getPorts().get(1) + "/services/EchoService2?wsdl", null, props);
         assertNotNull(result);
         String wsdl = result.getPayloadAsString();
         Document doc = DocumentHelper.parseText(wsdl);
@@ -84,7 +84,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
             doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:output[@name='echoResponse']/wsdlsoap:body/@namespace"));
         assertEquals("muleService", doc.valueOf("/wsdl:definitions/wsdl:service/@name"));
         assertEquals("muleServicePort", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/@name"));
-        assertEquals("http://localhost:62082/services/EchoService2",
+        assertEquals("http://localhost:" + getPorts().get(1) + "/services/EchoService2",
             doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
     }
 
@@ -94,7 +94,7 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, "GET");
         MuleClient client = new MuleClient(muleContext);
 
-        MuleMessage result = client.send("http://localhost:62083/services/EchoService3?wsdl", null, props);
+        MuleMessage result = client.send("http://localhost:" + getPorts().get(2) + "/services/EchoService3?wsdl", null, props);
         assertNotNull(result);
         String wsdl = result.getPayloadAsString();
         Document doc = DocumentHelper.parseText(wsdl);
@@ -108,7 +108,14 @@ public class WsdlGenerationTestCase extends FunctionalTestCase
             doc.valueOf("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='echo']/wsdl:output[@name='echoResponse']/wsdlsoap:body/@namespace"));
         assertEquals("muleService1", doc.valueOf("/wsdl:definitions/wsdl:service/@name"));
         assertEquals("muleServicePort1", doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/@name"));
+        // this port is hardcoded in the wsdl, so not the same as the actual endpoint port
         assertEquals("http://localhost:62083/services/EchoService3",
             doc.valueOf("/wsdl:definitions/wsdl:service/wsdl:port/wsdlsoap:address/@location"));
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 3;
     }
 }

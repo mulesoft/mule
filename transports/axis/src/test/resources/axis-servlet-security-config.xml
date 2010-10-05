@@ -22,7 +22,7 @@
 
     <byte-array-to-string-transformer name="ByteArrayToString"/>
 
-    <servlet:connector name="servletConnector" servletUrl="http://localhost:18088/services" />
+    <servlet:connector name="servletConnector" servletUrl="http://localhost:${port1}/services" />
 
     <acegi:security-manager>
         <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>

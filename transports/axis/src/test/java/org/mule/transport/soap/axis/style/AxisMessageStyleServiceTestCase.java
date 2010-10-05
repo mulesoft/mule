@@ -13,7 +13,7 @@ package org.mule.transport.soap.axis.style;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.transport.soap.axis.NamedParameter;
 import org.mule.transport.soap.axis.SoapMethod;
 import org.mule.util.StringUtils;
@@ -27,7 +27,7 @@ import javax.xml.rpc.ParameterMode;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 
-public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
+public class AxisMessageStyleServiceTestCase extends DynamicPortTestCase
 {
     private static String expectedResult = "TEST RESPONSE";
 
@@ -39,7 +39,7 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
 
     protected String getServiceEndpoint()
     {
-        return "http://localhost:63080/ServiceEntryPoint";
+        return "http://localhost:" + getPorts().get(0) + "/ServiceEntryPoint";
     }
 
     public void testDocumentWithNamespace() throws Exception
@@ -141,7 +141,6 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
                                  boolean useSoapMethod,
                                  boolean useQNameMethod) throws Exception
     {
-
         if (useAxisApi)
         {
             Service service = new Service();
@@ -182,6 +181,12 @@ public class AxisMessageStyleServiceTestCase extends FunctionalTestCase
             assertNotNull(result);
             assertEquals(expectedResult, result.getPayloadAsString());
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

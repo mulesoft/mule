@@ -12,7 +12,7 @@
        http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/3.0/mule-servlet.xsd
        http://www.mulesoft.org/schema/mule/axis http://www.mulesoft.org/schema/mule/axis/3.0/mule-axis.xsd">
 
-    <servlet:connector name="servlet" servletUrl="http://localhost:62088/services"/>
+    <servlet:connector name="servlet" servletUrl="http://localhost:${port1}/services"/>
 
     <model name="test">
         <service name="mycomponent">

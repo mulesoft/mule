@@ -19,76 +19,76 @@ public abstract class AbstractSoapUrlEndpointFunctionalTestCase extends Abstract
 
     protected String getComponentWithoutInterfacesEndpoint()
     {
-        return getSoapProvider() + ":" + getTransportProtocol() + "://localhost:62111/mule/test";
+        return getSoapProvider() + ":" + getTransportProtocol() + "://localhost:" + getPorts().get(2) + "/mule/test";
     }
 
     @Override
     protected String getRequestResponseEndpoint()
     {
         return getSoapProvider() + ":" + getTransportProtocol()
-               + "://localhost:62108/mule/mycomponent?method=echo";
+               + "://localhost:" + getPorts().get(0) + "/mule/mycomponent?method=echo";
     }
 
     @Override
     protected String getReceiveEndpoint()
     {
         return getSoapProvider() + ":" + getTransportProtocol()
-               + "://localhost:62109/mule/services/mycomponent2?method=getDate";
+               + "://localhost:" + getPorts().get(1) + "/mule/services/mycomponent2?method=getDate";
     }
 
     @Override
     protected String getReceiveComplexEndpoint()
     {
         return getSoapProvider() + ":" + getTransportProtocol()
-               + "://localhost:62109/mycomponent3?method=getPerson&param=Fred";
+               + "://localhost:" + getPorts().get(1) + "/mycomponent3?method=getPerson&param=Fred";
     }
 
     @Override
     protected String getSendReceiveComplexEndpoint1()
     {
         return getSoapProvider() + ":" + getTransportProtocol()
-               + "://localhost:62109/mycomponent3?method=addPerson";
+               + "://localhost:" + getPorts().get(1) + "/mycomponent3?method=addPerson";
     }
 
     @Override
     protected String getSendReceiveComplexEndpoint2()
     {
         return getSoapProvider() + ":" + getTransportProtocol()
-               + "://localhost:62109/mycomponent3?method=getPerson&param=Dino";
+               + "://localhost:" + getPorts().get(1) + "/mycomponent3?method=getPerson&param=Dino";
     }
 
     @Override
     protected String getReceiveComplexCollectionEndpoint()
     {
         return getSoapProvider() + ":" + getTransportProtocol()
-               + "://localhost:62109/mycomponent3?method=getPeople";
+               + "://localhost:" + getPorts().get(1) + "/mycomponent3?method=getPeople";
     }
 
     @Override
     protected String getDispatchAsyncComplexEndpoint1()
     {
         return getSoapProvider() + ":" + getTransportProtocol()
-               + "://localhost:62109/mycomponent3?method=addPerson";
+               + "://localhost:" + getPorts().get(1) + "/mycomponent3?method=addPerson";
     }
 
     @Override
     protected String getDispatchAsyncComplexEndpoint2()
     {
         return getSoapProvider() + ":" + getTransportProtocol()
-               + "://localhost:62109/mycomponent3?method=getPerson&param=Betty";
+               + "://localhost:" + getPorts().get(1) + "/mycomponent3?method=getPerson&param=Betty";
     }
 
     @Override
     protected String getTestExceptionEndpoint()
     {
         return getSoapProvider() + ":" + getTransportProtocol()
-               + "://localhost:62109/mycomponent3?method=addPerson";
+               + "://localhost:" + getPorts().get(1) + "/mycomponent3?method=addPerson";
     }
 
     @Override
     protected String getWsdlEndpoint()
     {
-        return getTransportProtocol() + "://localhost:62108/mule/mycomponent?wsdl";
+        return getTransportProtocol() + "://localhost:" + getPorts().get(0) + "/mule/mycomponent?wsdl";
     }
 
 }

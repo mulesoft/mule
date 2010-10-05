@@ -11,11 +11,11 @@
     <model name="Axis_Headers_TestCase">
         <service name="component">
             <inbound>
-                <axis:inbound-endpoint address="http://localhost:62181/services"/>
+                <axis:inbound-endpoint address="http://localhost:${port1}/services"/>
             </inbound>
             <component class="org.mule.component.simple.EchoComponent"/>
             <async-reply>
-                <inbound-endpoint address="http://localhost:62182/reply"/>
+                <inbound-endpoint address="http://localhost:${port2}/reply"/>
             </async-reply>
         </service>
     </model>
