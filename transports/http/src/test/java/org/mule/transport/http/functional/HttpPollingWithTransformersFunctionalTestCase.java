@@ -13,14 +13,14 @@ package org.mule.transport.http.functional;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
-public class HttpPollingWithTransformersFunctionalTestCase extends FunctionalTestCase
+public class HttpPollingWithTransformersFunctionalTestCase extends DynamicPortTestCase
 {
     protected String getConfigResources()
     {
@@ -50,6 +50,12 @@ public class HttpPollingWithTransformersFunctionalTestCase extends FunctionalTes
         assertEquals("/foo toClient-only", result.getPayloadAsString());
         //The transform should not have been propagated to the outbound endpoint
         assertFalse(transformPropagated.get());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

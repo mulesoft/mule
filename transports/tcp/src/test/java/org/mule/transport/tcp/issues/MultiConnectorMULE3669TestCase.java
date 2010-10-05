@@ -9,9 +9,9 @@
  */
 package org.mule.transport.tcp.issues;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
-public class MultiConnectorMULE3669TestCase extends FunctionalTestCase
+public class MultiConnectorMULE3669TestCase extends DynamicPortTestCase
 {
     protected String getConfigResources()
     {
@@ -21,5 +21,11 @@ public class MultiConnectorMULE3669TestCase extends FunctionalTestCase
     public void testInitialisation() throws Exception
     {
         //Just need to ensure the test sets up connrectly
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 }

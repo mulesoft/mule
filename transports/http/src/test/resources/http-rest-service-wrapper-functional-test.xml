@@ -12,7 +12,7 @@
 
     <byte-array-to-string-transformer name="ByteArrayToString"/>
 
-    <http:endpoint name="serverEndpoint" host="localhost" port="60226" exchange-pattern="request-response">
+    <http:endpoint name="serverEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response">
     	<transformer ref="ByteArrayToString"/>
     </http:endpoint>
 
@@ -28,7 +28,7 @@
             <inbound>
                 <inbound-endpoint ref="restServiceEndpoint" exchange-pattern="request-response"/>
             </inbound>
-            <http:rest-service-component serviceUrl="http://localhost:60226" httpMethod="POST">
+            <http:rest-service-component serviceUrl="http://localhost:${port1}" httpMethod="POST">
                 <http:error-filter>
                     <regex-filter pattern="echo(.*)"/>
                 </http:error-filter>
@@ -40,7 +40,7 @@
             <inbound>
                 <inbound-endpoint ref="restServiceEndpoint2" exchange-pattern="request-response"/>
             </inbound>
-            <http:rest-service-component serviceUrl="http://localhost:60226" httpMethod="POST">
+            <http:rest-service-component serviceUrl="http://localhost:${port1}" httpMethod="POST">
                 <http:error-filter>
                     <regex-filter pattern="test(.*)"/>
                 </http:error-filter>
@@ -53,7 +53,7 @@
                 <inbound-endpoint ref="restServiceEndpoint3" exchange-pattern="request-response"/>
             </inbound>
             <!-- Test using expressions and literal values -->
-            <http:rest-service-component serviceUrl="http://localhost:60226" httpMethod="POST">
+            <http:rest-service-component serviceUrl="http://localhost:${port1}" httpMethod="POST">
                 <http:requiredParameter key="foo" value="boo"/>
                 <http:requiredParameter key="faz" value="#[header:INBOUND:baz-header]"/>
                 <http:optionalParameter key="far" value="#[header:INBOUND:bar-optional-header]"/>

@@ -21,7 +21,7 @@
         <service name="Test" >
             <inbound>
                 <inbound-endpoint name="httpEndpoint" connector-ref="PollingHttpConnector"
-                                  address="http://localhost:60206/TestServer" exchange-pattern="request-response"/>
+                                  address="http://localhost:${port1}/TestServer" exchange-pattern="request-response"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.tck.functional.FunctionalTestComponent"/>
@@ -35,7 +35,7 @@
 
         <service name="TestServer">
             <inbound>
-                <inbound-endpoint address="http://localhost:60206" connector-ref="HttpConnector" exchange-pattern="request-response"/>
+                <inbound-endpoint address="http://localhost:${port1}" connector-ref="HttpConnector" exchange-pattern="request-response"/>
             </inbound>
             <test:component>
                 <test:return-data>Here's your content.</test:return-data>

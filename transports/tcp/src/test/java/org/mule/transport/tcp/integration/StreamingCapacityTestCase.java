@@ -25,14 +25,18 @@ public class StreamingCapacityTestCase extends AbstractStreamingCapacityTestCase
 
     public StreamingCapacityTestCase()
     {
-//        super(100 * ONE_MB, "tcp://localhost:65432");
-        super(10 * ONE_GB, "tcp://localhost:65432");
-//        super(Integer.MAX_VALUE * 2L, "tcp://localhost:65432");
+    	super(10 * ONE_GB);
     }
 
     protected String getConfigResources()
     {
         return "tcp-streaming-test.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 
 }

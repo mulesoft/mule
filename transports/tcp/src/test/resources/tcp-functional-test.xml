@@ -12,10 +12,10 @@
         <tcp:direct-protocol payloadOnly="true"/>
     </tcp:connector>
 
-    <tcp:endpoint name="clientEndpoint" host="localhost" port="60198" exchange-pattern="request-response"/>
+    <tcp:endpoint name="clientEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response"/>
 
     <!-- legacy style -->
-    <endpoint name="asyncClientEndpoint" address="tcp://localhost:60199" exchange-pattern="one-way"/>
+    <endpoint name="asyncClientEndpoint" address="tcp://localhost:${port2}" exchange-pattern="one-way"/>
 
     <model name="main">
         <service name="testComponent1">

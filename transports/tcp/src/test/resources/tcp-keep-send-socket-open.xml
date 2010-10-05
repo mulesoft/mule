@@ -18,7 +18,7 @@
         <tcp:length-protocol payloadOnly="true"/>
     </tcp:connector>
 
-    <tcp:endpoint host="localhost" port="60189"
+    <tcp:endpoint host="localhost" port="${port1}"
                   connector-ref="openConnector" name="clientEndpoint" exchange-pattern="request-response"/>
 
     <model name="main">

@@ -12,13 +12,14 @@ package org.mule.transport.http.components;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
+public class RestServiceWrapperFunctionalTestCase extends DynamicPortTestCase
 {
     protected static String TEST_REQUEST = "Test Http Request";
 
@@ -68,5 +69,11 @@ public class RestServiceWrapperFunctionalTestCase extends FunctionalTestCase
         MuleMessage result = client.send("restServiceEndpoint3", null, props);
         assertEquals(NullPayload.getInstance(),result.getPayload());
         assertNotNull(result.getExceptionPayload());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

@@ -13,12 +13,13 @@ package org.mule.transport.http.functional;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.http.HttpConnector;
 
-public class HttpStemTestCase extends FunctionalTestCase
+public class HttpStemTestCase extends DynamicPortTestCase
 {
     @Override
     protected String getConfigResources()
@@ -29,10 +30,11 @@ public class HttpStemTestCase extends FunctionalTestCase
     public void testStemMatching() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        doTest(client, "http://localhost:60229/foo", "/foo", "/foo");
-        doTest(client, "http://localhost:60229/foo/baz", "/foo", "/foo/baz");
-        doTest(client, "http://localhost:60229/bar", "/bar", "/bar");
-        doTest(client, "http://localhost:60229/bar/baz", "/bar", "/bar/baz");
+        int port = getPorts().get(0);
+        doTest(client, "http://localhost:" + port + "/foo", "/foo", "/foo");
+        doTest(client, "http://localhost:" + port + "/foo/baz", "/foo", "/foo/baz");
+        doTest(client, "http://localhost:" + port + "/bar", "/bar", "/bar");
+        doTest(client, "http://localhost:" + port + "/bar/baz", "/bar", "/bar/baz");
     }
     
     protected void doTest(MuleClient client, final String url, final String contextPath, final String requestPath) throws Exception
@@ -57,5 +59,11 @@ public class HttpStemTestCase extends FunctionalTestCase
         assertEquals("Hello World Received", result.getPayloadAsString());
         final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(200, status);
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

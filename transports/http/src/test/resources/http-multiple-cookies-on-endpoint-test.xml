@@ -23,7 +23,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:34876/test" exchange-pattern="request-response" method="POST" responseTimeout="600000">
+                    <http:outbound-endpoint address="http://localhost:${port1}/test" exchange-pattern="request-response" method="POST" responseTimeout="600000">
                         <properties>
                             <spring:entry key="Content-Type" value="text/xml" />
                             <spring:entry key="cookies">
@@ -40,7 +40,7 @@
 
         <service name="HttpServer">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:34876/test" exchange-pattern="request-response"/>
+                <http:inbound-endpoint address="http://localhost:${port1}/test" exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.transport.http.functional.HttpMultipleCookiesInEndpointTestComponent"/>
         </service>

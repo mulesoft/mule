@@ -12,12 +12,13 @@ package org.mule.transport.tcp.protocols;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class MuleMessageLengthTestCase extends FunctionalTestCase 
+public class MuleMessageLengthTestCase extends DynamicPortTestCase 
 {
 
     protected static String TEST_MESSAGE = "Test TCP Request";
@@ -33,6 +34,12 @@ public class MuleMessageLengthTestCase extends FunctionalTestCase
         Map props = new HashMap();
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

@@ -13,8 +13,9 @@ package org.mule.transport.http;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
@@ -24,7 +25,7 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-public class DispatchTestCase extends FunctionalTestCase
+public class DispatchTestCase extends DynamicPortTestCase
 {
     public void testEchoService() throws Exception
     {
@@ -36,7 +37,7 @@ public class DispatchTestCase extends FunctionalTestCase
         final byte[] buf = new byte[8192];
         Arrays.fill(buf, (byte) 'a');
         
-        client.send("http://localhost:63081/services/Echo",
+        client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inEchoService")).getAddress(),
             new DefaultMuleMessage(new ByteArrayInputStream(buf), muleContext));
 
         for (int i = 0; i < THREADS; i++)
@@ -51,7 +52,7 @@ public class DispatchTestCase extends FunctionalTestCase
                     {
                         for (int i = 0; i < 20; i++) 
                         {
-                            client.dispatch("http://localhost:63081/services/Echo", 
+                            client.dispatch(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inEchoService")).getAddress(), 
                                 new DefaultMuleMessage(buf, muleContext), props);
                         }
 
@@ -85,6 +86,12 @@ public class DispatchTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "dispatch-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

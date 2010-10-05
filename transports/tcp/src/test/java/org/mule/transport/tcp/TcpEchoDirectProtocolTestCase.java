@@ -11,10 +11,11 @@
 package org.mule.transport.tcp;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
-public class TcpEchoDirectProtocolTestCase extends FunctionalTestCase 
+public class TcpEchoDirectProtocolTestCase extends DynamicPortTestCase 
 {
 
     protected static String TEST_MESSAGE = "Test TCP Request";
@@ -27,11 +28,18 @@ public class TcpEchoDirectProtocolTestCase extends FunctionalTestCase
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        String url = "tcp://localhost:61200";
         
-        MuleMessage response = client.send(url, TEST_MESSAGE, null);
+        MuleMessage response = client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inBounceTcpMMP")).getAddress(), 
+            TEST_MESSAGE, null);
+        
         assertNotNull(response);
         assertEquals(TEST_MESSAGE, response.getPayload());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

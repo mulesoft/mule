@@ -14,12 +14,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
+public class HttpFunctionalWithQueryTestCase extends DynamicPortTestCase
 {
     @Override
     protected String getConfigResources()
@@ -61,5 +61,11 @@ public class HttpFunctionalWithQueryTestCase extends FunctionalTestCase
             //expected
             assertTrue(e.getCause() instanceof RequiredValueException);
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

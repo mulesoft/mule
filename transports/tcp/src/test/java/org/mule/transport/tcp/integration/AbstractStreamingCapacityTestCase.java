@@ -12,8 +12,9 @@ package org.mule.transport.tcp.integration;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
 
@@ -25,11 +26,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * IMPORTANT - DO NOT RUN THIS TEST IN AN IDE WITH LOG LEVEL OF DEBUG.  USE INFO TO SEE
- * DIAGNOSTICS.  OTHERWISE THE CONSOLE OUTPUT WILL BE SIMILAR SIZE TO DATA TRANSFERRED,
- * CAUSING CONFUSNG AND PROBABLY FATAL MEMORY USE.
+ * IMPORTANT - DO NOT RUN THIS TEST IN AN IDE WITH LOG LEVEL OF DEBUG. USE INFO TO
+ * SEE DIAGNOSTICS. OTHERWISE THE CONSOLE OUTPUT WILL BE SIMILAR SIZE TO DATA
+ * TRANSFERRED, CAUSING CONFUSNG AND PROBABLY FATAL MEMORY USE.
  */
-public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCase
+public abstract class AbstractStreamingCapacityTestCase extends DynamicPortTestCase
 {
 
     public static final long ONE_KB = 1024;
@@ -39,12 +40,10 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
 
     protected final Log logger = LogFactory.getLog(getClass());
     private long size;
-    private String endpoint;
-
-    public AbstractStreamingCapacityTestCase(long size, String endpoint)
+   
+    public AbstractStreamingCapacityTestCase(long size)
     {
         this.size = size;
-        this.endpoint = endpoint;
     }
 
     public void testSend() throws Exception
@@ -70,7 +69,8 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
         };
 
         Object ftc = getComponent("testComponent");
-        assertTrue("FunctionalStreamingTestComponent expected", ftc instanceof FunctionalStreamingTestComponent);
+        assertTrue("FunctionalStreamingTestComponent expected",
+            ftc instanceof FunctionalStreamingTestComponent);
         assertNotNull(ftc);
         ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, size);
 
@@ -82,8 +82,11 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
 
         BigInputStream stream = new BigInputStream(size, MESSAGES);
         MuleClient client = new MuleClient(muleContext);
-        client.dispatch(endpoint, new DefaultMuleMessage(stream, muleContext));
-        
+        // dynamically get the endpoint to send to
+        client.dispatch(
+            ((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("testInbound")).getAddress(),
+            new DefaultMuleMessage(stream, muleContext));
+
         // if we assume 1MB/sec then we need at least...
         long pause = Math.max(size / ONE_MB, 60 * 10) + 10;
         logger.info("Waiting for up to " + pause + " seconds");
@@ -91,7 +94,8 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
         latch.await(pause, TimeUnit.SECONDS);
         assertEquals(stream.summary(), message.get());
 
-        // neither of these memory tests are really reliable, but if we stay with 1.4 i don't
+        // neither of these memory tests are really reliable, but if we stay with 1.4
+        // i don't
         // know of anything better.
         // if these fail in practice i guess we just remove them.
         long freeEnd = runtime.freeMemory();
@@ -99,16 +103,16 @@ public abstract class AbstractStreamingCapacityTestCase extends FunctionalTestCa
         long timeEnd = System.currentTimeMillis();
         double speed = size / (double) (timeEnd - timeStart) * 1000 / ONE_MB;
         logger.info("Transfer speed " + speed + " MB/s (" + size + " B in " + (timeEnd - timeStart) + " ms)");
-        
+
         double expectPercent = 10;
         double usePercent = 100.0 * delta / size;
         logger.info("Memory delta " + delta + " B = " + usePercent + "%");
-        
-        String assertMessage = String.format("Expected memory usage to be lower than %f%% but was %f%%", 
+
+        String assertMessage = String.format("Expected memory usage to be lower than %f%% but was %f%%",
             Double.valueOf(expectPercent), Double.valueOf(usePercent));
         assertTrue(assertMessage, usePercent < expectPercent);
 
         long maxEnd = runtime.maxMemory();
-        assertEquals("Max memory shifted", 0,  maxEnd - maxStart);
+        assertEquals("Max memory shifted", 0, maxEnd - maxStart);
     }
 }

@@ -26,14 +26,14 @@
     <model name="main">
         <service name="testComponent1">
             <inbound>
-                <inbound-endpoint address="http://localhost:34523/foo"/>
+                <inbound-endpoint address="http://localhost:${port1}/foo"/>
             </inbound>
             <test:component appendString=" Received"/>
         </service>
 
         <service name="testComponent2">
             <inbound>
-                <inbound-endpoint address="http://localhost:34524/foo"/>
+                <inbound-endpoint address="http://localhost:${port2}/foo"/>
             </inbound>
             <test:component appendString=" Received"/>
         </service>

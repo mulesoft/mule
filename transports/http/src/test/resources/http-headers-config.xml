@@ -16,15 +16,15 @@
 
     <vm:connector name="vm"/>
 
-    <http:endpoint name="clientEndpoint" host="localhost" port="60227" exchange-pattern="request-response"/>
-    <http:endpoint name="serverEndpoint" host="localhost" port="60227" exchange-pattern="request-response"/>
+    <http:endpoint name="clientEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response"/>
+    <http:endpoint name="serverEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response"/>
 
-    <http:endpoint name="clientEndpoint2" host="localhost" port="60204" contentType="application/xml"
+    <http:endpoint name="clientEndpoint2" host="localhost" port="${port2}" contentType="application/xml"
         exchange-pattern="one-way">
         <property key="Content-Disposition" value="attachment; filename=foo.zip"/>
         <property key="X-Test" value="foo"/>
     </http:endpoint>
-    <http:endpoint name="serverEndpoint2" host="localhost" port="60204" exchange-pattern="request-response"/>
+    <http:endpoint name="serverEndpoint2" host="localhost" port="${port2}" exchange-pattern="request-response"/>
 
     <model name="Test">
         <service name="ProductDataSourceRepository">

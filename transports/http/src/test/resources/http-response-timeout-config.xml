@@ -22,7 +22,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60216/DelayService" exchange-pattern="request-response" responseTimeout="1000"/>
+                    <http:outbound-endpoint address="http://localhost:${port1}/DelayService" exchange-pattern="request-response" responseTimeout="1000"/>
                 </pass-through-router>
             </outbound>
         </service>
@@ -33,14 +33,14 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60216/DelayService" exchange-pattern="request-response" responseTimeout="3000"/>
+                    <http:outbound-endpoint address="http://localhost:${port1}/DelayService" exchange-pattern="request-response" responseTimeout="3000"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="DelayService">
             <inbound>
-                <http:inbound-endpoint address="http://localhost:60216/DelayService" exchange-pattern="request-response"/>
+                <http:inbound-endpoint address="http://localhost:${port1}/DelayService" exchange-pattern="request-response" name="inDelayService"/>
             </inbound>
             <test:component waitTime="2500" appendString=" processed"/>
         </service>

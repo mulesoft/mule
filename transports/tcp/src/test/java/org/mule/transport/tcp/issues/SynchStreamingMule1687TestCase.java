@@ -12,13 +12,14 @@ package org.mule.transport.tcp.issues;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-public class SynchStreamingMule1687TestCase extends FunctionalTestCase
+public class SynchStreamingMule1687TestCase extends DynamicPortTestCase
 {
     public static final String TEST_MESSAGE = "Test TCP Request";
 
@@ -33,11 +34,17 @@ public class SynchStreamingMule1687TestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         ByteArrayInputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
         MuleMessage request = new DefaultMuleMessage(stream, muleContext);
-        MuleMessage message = client.send("tcp://localhost:65432", request);
+        MuleMessage message = client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inEcho")).getAddress(), request);
         assertNotNull(message);
 
         Object payload = message.getPayload();
         assertTrue(payload instanceof InputStream);
         assertEquals("Some value - set to make test ok", message.getPayloadAsString());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

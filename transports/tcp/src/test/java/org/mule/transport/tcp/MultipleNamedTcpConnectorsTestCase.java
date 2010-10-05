@@ -10,9 +10,10 @@
 
 package org.mule.transport.tcp;
 
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 
-public class MultipleNamedTcpConnectorsTestCase extends FunctionalTestCase
+public class MultipleNamedTcpConnectorsTestCase extends DynamicPortTestCase
 {
     protected String getConfigResources()
     {
@@ -22,6 +23,12 @@ public class MultipleNamedTcpConnectorsTestCase extends FunctionalTestCase
     public void testMultipleNamedConnectors() throws Exception
     {
         // no-op, the initialization must not fail.
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }
 

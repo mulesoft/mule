@@ -8,7 +8,7 @@
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesoft.org/schema/mule/tcp http://www.mulesoft.org/schema/mule/tcp/3.0/mule-tcp.xsd">
 
-    <tcp:endpoint name="globalEndpoint1" host="localhost" port="60198" exchange-pattern="one-way"/>
-    <tcp:endpoint name="globalEndpoint2" host="localhost" port="60197" exchange-pattern="one-way"/>
+    <tcp:endpoint name="globalEndpoint1" host="localhost" port="${port1}" exchange-pattern="one-way"/>
+    <tcp:endpoint name="globalEndpoint2" host="localhost" port="${port2}" exchange-pattern="one-way"/>
 
 </mule>

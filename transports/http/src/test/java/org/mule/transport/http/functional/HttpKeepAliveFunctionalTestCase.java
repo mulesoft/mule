@@ -10,6 +10,9 @@
 
 package org.mule.transport.http.functional;
 
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConstants;
 
@@ -24,13 +27,14 @@ import org.apache.commons.httpclient.params.HttpClientParams;
 /**
  * Tests as per http://www.io.com/~maus/HttpKeepAlive.html
  */
-public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
+public class HttpKeepAliveFunctionalTestCase extends DynamicPortTestCase
 {
-    private static final String URL_WITHOUT_EP_OVERRIDE = "http://localhost:60213/http-in";
-    private static final String URL_WITH_EP_OVERRIDE = "http://localhost:60216/http-in";
+    //private static final String URL_WITHOUT_EP_OVERRIDE = "http://localhost:60213/http-in";
+    //private static final String URL_WITH_EP_OVERRIDE = "http://localhost:60216/http-in";
     
     private HttpClient http10Client;
     private HttpClient http11Client;
+    private MuleClient client = null;
     
     @Override
     protected void doSetUp() throws Exception
@@ -39,6 +43,7 @@ public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
 
         http10Client = setupHttpClient(HttpVersion.HTTP_1_0);
         http11Client = setupHttpClient(HttpVersion.HTTP_1_1);
+        client = new MuleClient(muleContext);
     }
     
     private HttpClient setupHttpClient(HttpVersion version)
@@ -56,26 +61,26 @@ public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
     
     public void testHttp10WithoutConnectionHeader() throws Exception
     {
-        GetMethod request = new GetMethod(URL_WITHOUT_EP_OVERRIDE);
+        GetMethod request = new GetMethod(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
         request.removeRequestHeader(HttpConstants.HEADER_CONNECTION);
         runHttp10MethodAndAssertConnectionHeader(request, "close");
     }
     
     public void testHttp10WithCloseConnectionHeader() throws Exception
     {
-        GetMethod request = new GetMethod(URL_WITHOUT_EP_OVERRIDE);
+        GetMethod request = new GetMethod(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
         request.setRequestHeader(HttpConstants.HEADER_CONNECTION, "close");
         runHttp10MethodAndAssertConnectionHeader(request, "close");
     }
     
     public void testHttp10KeepAlive() throws Exception
     {
-        doTestKeepAlive(URL_WITHOUT_EP_OVERRIDE);
+        doTestKeepAlive(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
     }
     
     public void testHttp10KeepAliveWitEpOverride() throws Exception
     {
-        doTestKeepAlive(URL_WITH_EP_OVERRIDE);
+        doTestKeepAlive(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
     }
     
     private void doTestKeepAlive(String url) throws Exception
@@ -99,12 +104,12 @@ public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
     
     public void testHttp11KeepAlive() throws Exception
     {
-        doTestHttp11KeepAlive(URL_WITHOUT_EP_OVERRIDE);
+        doTestHttp11KeepAlive(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
     }
     
     public void testHttp11KeepAliveWithEpOverride() throws Exception
     {
-        doTestHttp11KeepAlive(URL_WITH_EP_OVERRIDE);
+        doTestHttp11KeepAlive(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inWithoutEndpointOverride")).getAddress());
     }
     
     public void doTestHttp11KeepAlive(String url) throws Exception
@@ -127,6 +132,12 @@ public class HttpKeepAliveFunctionalTestCase extends FunctionalTestCase
         int status = http11Client.executeMethod(request);
         assertEquals(HttpStatus.SC_OK, status);
         assertEquals("/http-in", request.getResponseBodyAsString());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 }
 

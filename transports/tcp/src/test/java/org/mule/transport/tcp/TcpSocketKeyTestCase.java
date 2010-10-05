@@ -12,10 +12,11 @@ package org.mule.transport.tcp;
 
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.tcp.TcpSocketKey;
 
-public class TcpSocketKeyTestCase extends FunctionalTestCase
+public class TcpSocketKeyTestCase extends DynamicPortTestCase
 {
 
     public void testHashAndEquals() throws MuleException
@@ -41,6 +42,12 @@ public class TcpSocketKeyTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "tcp-socket-key-test.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 
 }

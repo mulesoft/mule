@@ -12,6 +12,7 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 
@@ -22,7 +23,7 @@ import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.lang.time.StopWatch;
 
-public class HttpContinueFunctionalTestCase extends FunctionalTestCase
+public class HttpContinueFunctionalTestCase extends DynamicPortTestCase
 {
     /**
      * HttpClient has default 3 seconds wait for Expect-Continue calls.
@@ -61,5 +62,12 @@ public class HttpContinueFunctionalTestCase extends FunctionalTestCase
         {
             fail("Server did not handle Expect=100-continue header properly,");
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+
+        return 1;
     }
 }

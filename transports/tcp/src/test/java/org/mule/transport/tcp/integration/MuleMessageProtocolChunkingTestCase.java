@@ -13,12 +13,12 @@ package org.mule.transport.tcp.integration;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 /**
  * This test was set for the new changes due to Mule1199
  */
-public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
+public class MuleMessageProtocolChunkingTestCase extends DynamicPortTestCase
 {
 
     public static final long WAIT_MS = 3000L;
@@ -93,6 +93,12 @@ public class MuleMessageProtocolChunkingTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "mule-message-protocol-mule-config.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

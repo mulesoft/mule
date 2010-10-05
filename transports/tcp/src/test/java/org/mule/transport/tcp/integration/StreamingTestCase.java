@@ -11,8 +11,9 @@
 package org.mule.transport.tcp.integration;
 
 import org.mule.api.MuleEventContext;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalStreamingTestComponent;
 
@@ -26,13 +27,13 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 /**
  * This test is more about testing the streaming model than the TCP provider, really.
  */
-public class StreamingTestCase extends FunctionalTestCase
+public class StreamingTestCase extends DynamicPortTestCase
 {
 
     public static final int TIMEOUT = 300000;
     public static final String TEST_MESSAGE = "Test TCP Request";
     public static final String RESULT = "Received stream; length: 16; 'Test...uest'";
-
+    
     protected String getConfigResources()
     {
         return "tcp-streaming-test.xml";
@@ -76,11 +77,16 @@ public class StreamingTestCase extends FunctionalTestCase
 
         ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, TEST_MESSAGE.length());
 
-        client.dispatch("tcp://localhost:65432", TEST_MESSAGE, new HashMap());
+        client.dispatch(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("testInbound")).getAddress(),
+            TEST_MESSAGE, new HashMap());
 
         latch.await(10, TimeUnit.SECONDS);
         assertEquals(RESULT, message.get());
     }
 
-
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
+    }
 }

@@ -13,15 +13,15 @@ package org.mule.transport.tcp.integration;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 /**
  * This test was set for the new changes due to Mule1199
  */
-public class CustomSerializationProtocolTestCase extends FunctionalTestCase
+public class CustomSerializationProtocolTestCase extends DynamicPortTestCase
 {
     final private int messages = 1;
-
+    
     public void testCustomObject() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -48,4 +48,9 @@ public class CustomSerializationProtocolTestCase extends FunctionalTestCase
         return "custom-serialisation-mule-config.xml";
     }
 
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
+    }
 }

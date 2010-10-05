@@ -12,9 +12,9 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
-public class HttpMultipleCookiesInEndpointTestCase extends FunctionalTestCase
+public class HttpMultipleCookiesInEndpointTestCase extends DynamicPortTestCase
 {
 
     @Override
@@ -31,6 +31,12 @@ public class HttpMultipleCookiesInEndpointTestCase extends FunctionalTestCase
         assertNotNull(response);
         assertNotNull(response.getPayload());
         assertEquals("Both Cookies Found!", response.getPayloadAsString());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

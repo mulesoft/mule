@@ -21,7 +21,7 @@
     <model name="http polling test model">
         <service name="polling">
             <inbound>
-                <http:inbound-endpoint user="marie" password="marie" host="localhost" port="61205"
+                <http:inbound-endpoint user="marie" password="marie" host="localhost" port="${port1}"
                                        connector-ref="PollingHttpConnector" exchange-pattern="one-way">
                     <property key="Accept" value="application/xml"/>
                 </http:inbound-endpoint>
@@ -36,7 +36,7 @@
 
         <service name="polled">
             <inbound>
-                <inbound-endpoint address="http://localhost:61205" exchange-pattern="request-response"
+                <inbound-endpoint address="http://localhost:${port1}" exchange-pattern="request-response"
                                   connector-ref="HttpConnector"/>
             </inbound>
             <test:component>

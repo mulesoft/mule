@@ -13,11 +13,11 @@
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd">
 
     <!-- Try diffent variations of endpoint config -->
-    <endpoint name="base" address="http://localhost:60222" exchange-pattern="request-response"/>
+    <endpoint name="base" address="http://localhost:${port1}" exchange-pattern="request-response"/>
 
-    <http:endpoint name="response" address="http://localhost:60233" exchange-pattern="request-response"/>
+    <http:endpoint name="response" address="http://localhost:${port2}" exchange-pattern="request-response"/>
 
-    <http:endpoint name="both" host="localhost" port="60234" exchange-pattern="request-response"/>
+    <http:endpoint name="both" host="localhost" port="${port3}" exchange-pattern="request-response"/>
 
     <append-string-transformer name="appendString" message=" transformed"/>
     <append-string-transformer name="appendString2" message=" transformed 2"/>

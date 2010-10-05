@@ -12,14 +12,15 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transformer.DataType;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
+public class TwoEndpointsSinglePortTestCase extends DynamicPortTestCase
 {
 
     protected String getConfigResources()
@@ -30,8 +31,8 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
     public void testSendToEach() throws Exception
     {
 
-        sendWithResponse("http://localhost:60211/mycomponent1", "test", "mycomponent1", 10);
-        sendWithResponse("http://localhost:60211/mycomponent2", "test", "mycomponent2", 10);
+        sendWithResponse("inMyComponent1", "test", "mycomponent1", 10);
+        sendWithResponse("inMyComponent2", "test", "mycomponent2", 10);
     }
 
     public void testSendToEachWithBadEndpoint() throws Exception
@@ -39,21 +40,21 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
 
         MuleClient client = new MuleClient(muleContext);
 
-        sendWithResponse("http://localhost:60211/mycomponent1", "test", "mycomponent1", 5);
-        sendWithResponse("http://localhost:60211/mycomponent2", "test", "mycomponent2", 5);
+        sendWithResponse("inMyComponent1", "test", "mycomponent1", 5);
+        sendWithResponse("inMyComponent2", "test", "mycomponent2", 5);
 
-        MuleMessage result = client.send("http://localhost:60211/mycomponent-notfound", "test", null);
+        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/mycomponent-notfound", "test", null);
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
         final int status = result.getInboundProperty("http.status", 0);
         assertEquals(404, status);
 
         // Test that after the exception the endpoints still receive events
-        sendWithResponse("http://localhost:60211/mycomponent1", "test", "mycomponent1", 5);
-        sendWithResponse("http://localhost:60211/mycomponent2", "test", "mycomponent2", 5);
+        sendWithResponse("inMyComponent1", "test", "mycomponent1", 5);
+        sendWithResponse("inMyComponent2", "test", "mycomponent2", 5);
     }
 
-    protected void sendWithResponse(String endpoint, String message, String response, int noOfMessages)
+    protected void sendWithResponse(String endPointName, String message, String response, int noOfMessages)
         throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);
@@ -61,7 +62,7 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
         List results = new ArrayList();
         for (int i = 0; i < noOfMessages; i++)
         {
-            results.add(client.send(endpoint, message, null).getPayload(DataType.BYTE_ARRAY_DATA_TYPE));
+            results.add(client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject(endPointName)).getAddress(), message, null).getPayload(DataType.BYTE_ARRAY_DATA_TYPE));
         }
 
         assertEquals(noOfMessages, results.size());
@@ -69,5 +70,11 @@ public class TwoEndpointsSinglePortTestCase extends FunctionalTestCase
         {
             assertEquals(response, new String((byte[])results.get(i)));
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

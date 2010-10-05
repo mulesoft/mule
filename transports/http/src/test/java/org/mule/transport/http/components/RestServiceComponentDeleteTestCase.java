@@ -23,7 +23,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTestCase
 {
-    private static final int LISTEN_PORT = 60205;
+    //private static final int LISTEN_PORT = 60205;
     
     private CountDownLatch serverRequestCompleteLatch = new CountDownLatch(1);
     private boolean deleteRequestFound = false;
@@ -36,7 +36,7 @@ public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTe
     
     protected MockHttpServer getHttpServer(CountDownLatch serverStartLatch)
     {
-        return new SimpleHttpServer(LISTEN_PORT, serverStartLatch, serverRequestCompleteLatch);
+        return new SimpleHttpServer(getPorts().get(0), serverStartLatch, serverRequestCompleteLatch);
     }
 
     public void testRestServiceComponentDelete() throws Exception
@@ -63,5 +63,11 @@ public class RestServiceComponentDeleteTestCase extends AbstractMockHttpServerTe
             
             deleteRequestFound = httpMethod.equals(HttpConstants.METHOD_DELETE);
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

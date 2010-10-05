@@ -13,10 +13,11 @@ package org.mule.transport.http.issues;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.StringAppendTestTransformer;
 
-public class HttpTransformersMule1822TestCase extends FunctionalTestCase
+public class HttpTransformersMule1822TestCase extends DynamicPortTestCase
 {
     public static final String OUTBOUND_MESSAGE = "Test message";
 
@@ -66,5 +67,11 @@ public class HttpTransformersMule1822TestCase extends FunctionalTestCase
                     StringAppendTestTransformer.append(" transformed 2",
                         StringAppendTestTransformer.appendDefault(OUTBOUND_MESSAGE)) + " Received")),
                 sendTo("both").getPayloadAsString());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 3;
     }
 }

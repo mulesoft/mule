@@ -16,7 +16,7 @@
     <model>
         <service name="AsyncService">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="60217" exchange-pattern="one-way"/>
+                <http:inbound-endpoint host="localhost" port="${port1}" exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
             <outbound>
@@ -28,7 +28,7 @@
         
         <service name="AsyncPersistentQueueService">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="60218" exchange-pattern="one-way"/>
+                <http:inbound-endpoint host="localhost" port="${port2}" exchange-pattern="one-way"/>
             </inbound>
             <test:component/>
             <outbound>

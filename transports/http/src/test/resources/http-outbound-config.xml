@@ -21,7 +21,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60215/" method="DELETE"
+                    <http:outbound-endpoint address="http://localhost:${port1}/" method="DELETE"
                         exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
@@ -33,7 +33,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60215/" method="GET"
+                    <http:outbound-endpoint address="http://localhost:${port1}/" method="GET"
                         exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
@@ -45,7 +45,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60215/" method="HEAD"
+                    <http:outbound-endpoint address="http://localhost:${port1}/" method="HEAD"
                         exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
@@ -57,7 +57,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60215/" method="OPTIONS"
+                    <http:outbound-endpoint address="http://localhost:${port1}/" method="OPTIONS"
                         exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
@@ -69,7 +69,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60215/" method="POST"
+                    <http:outbound-endpoint address="http://localhost:${port1}/" method="POST"
                         exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
@@ -81,7 +81,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60215/" method="PUT"
+                    <http:outbound-endpoint address="http://localhost:${port1}/" method="PUT"
                         exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
@@ -93,7 +93,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60215/" method="TRACE"
+                    <http:outbound-endpoint address="http://localhost:${port1}/" method="TRACE"
                         exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>

@@ -15,18 +15,18 @@
     <model name="echoModel">
         <service name="echo">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="65432" exchange-pattern="one-way"/>
+                <tcp:inbound-endpoint host="localhost" port="${port1}" exchange-pattern="one-way"/>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <tcp:outbound-endpoint host="localhost" port="65433" exchange-pattern="one-way"/>
+                    <tcp:outbound-endpoint host="localhost" port="${port2}" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
         
         <service name="testComponent">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="65433" exchange-pattern="one-way"/>
+                <tcp:inbound-endpoint host="localhost" port="${port2}" exchange-pattern="one-way" name="testInbound"/>
             </inbound>
             <component>
                 <singleton-object class="org.mule.transport.tcp.integration.EOFStreamingTestComponent"/>

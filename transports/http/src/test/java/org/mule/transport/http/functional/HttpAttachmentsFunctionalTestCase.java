@@ -15,7 +15,7 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.config.MuleProperties;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.IOUtils;
@@ -23,7 +23,7 @@ import org.mule.util.StringDataSource;
 
 import javax.activation.DataHandler;
 
-public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase
+public class HttpAttachmentsFunctionalTestCase extends DynamicPortTestCase
 {
     protected String getConfigResources()
     {
@@ -52,6 +52,12 @@ public class HttpAttachmentsFunctionalTestCase extends FunctionalTestCase
 
         MuleMessage result = client.send("endpoint1", msg);
         assertEquals("We should have no attachments coming back", 0, result.getInboundAttachmentNames().size());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 

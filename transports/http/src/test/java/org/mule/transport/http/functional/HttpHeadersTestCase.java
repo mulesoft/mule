@@ -12,10 +12,11 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConstants;
 
-public class HttpHeadersTestCase extends FunctionalTestCase
+public class HttpHeadersTestCase extends DynamicPortTestCase
 {
 
     @Override
@@ -36,6 +37,12 @@ public class HttpHeadersTestCase extends FunctionalTestCase
         String contentDispositionProperty = result.getInboundProperty(HttpConstants.HEADER_CONTENT_DISPOSITION);
         assertNotNull(contentDispositionProperty);
         assertEquals("attachment; filename=foo.zip", contentDispositionProperty);
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 
 }

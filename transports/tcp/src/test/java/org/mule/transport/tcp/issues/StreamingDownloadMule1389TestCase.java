@@ -16,14 +16,14 @@ package org.mule.transport.tcp.issues;
 public class StreamingDownloadMule1389TestCase extends AbstractStreamingDownloadMule1389TestCase
 {
 
-    public StreamingDownloadMule1389TestCase()
-    {
-        super("tcp://localhost:65432");
-    }
-
     protected String getConfigResources()
     {
         return "streaming-download-mule-1389.xml";
     }
 
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
+    }
 }

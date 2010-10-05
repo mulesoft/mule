@@ -13,7 +13,7 @@ package org.mule.transport.http.issues;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
@@ -24,7 +24,7 @@ import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpClientParams;
 
-public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
+public class HttpMessageReceiverMule4456TestCase extends DynamicPortTestCase
 {
     private static final String MESSAGE = "test message";
 
@@ -65,7 +65,7 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
             }
         });
 
-        PostMethod request = new PostMethod("http://localhost:60217");
+        PostMethod request = new PostMethod("http://localhost:" + getPorts().get(0));
         RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain", 
             muleContext.getConfiguration().getDefaultEncoding());
         request.setRequestEntity(entity);
@@ -88,7 +88,7 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
             }
         });
 
-        PostMethod request = new PostMethod("http://localhost:60218");
+        PostMethod request = new PostMethod("http://localhost:" + getPorts().get(1));
         RequestEntity entity = new StringRequestEntity(MESSAGE, "text/plain", muleContext.getConfiguration()
             .getDefaultEncoding());
         request.setRequestEntity(entity);
@@ -97,5 +97,11 @@ public class HttpMessageReceiverMule4456TestCase extends FunctionalTestCase
         MuleMessage message = muleClient.request("vm://out", 1000);
         assertNotNull(message);
         assertEquals(MESSAGE, message.getPayloadAsString());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 }

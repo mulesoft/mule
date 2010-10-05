@@ -10,7 +10,7 @@
 
 package org.mule.transport.http.functional;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
@@ -34,23 +34,42 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
 
-public class HttpMultipleCookiesTestCase extends FunctionalTestCase
+public class HttpMultipleCookiesTestCase extends DynamicPortTestCase
 {
-    private static final int LOCAL_JETTY_SERVER_PORT = 4020;
+    //private static final int LOCAL_JETTY_SERVER_PORT = 4020;
     protected static String TEST_MESSAGE = "Test Http Request ";
     protected static final Log logger = LogFactory.getLog(HttpMultipleCookiesTestCase.class);
 
     private CountDownLatch simpleServerLatch = new CountDownLatch(1);
+    private CountDownLatch simpleServerShutdownLatch = new CountDownLatch(1);
     private static AtomicBoolean cookiesRecieved = new AtomicBoolean(false);
 
-    @Override
-    protected void suitePreSetUp() throws Exception
+    private Server server = null;
+
+    public HttpMultipleCookiesTestCase()
     {
-        super.suitePreSetUp();
+        super();
+        setStartContext(false);
+    }
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
         startServer();
         assertTrue(simpleServerLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        // TODO Auto-generated method stub
+        super.doTearDown();
+        muleContext.stop();
+        stopServer();
+        assertTrue(simpleServerShutdownLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+    }
+            
     @Override
     protected String getConfigResources()
     {
@@ -59,12 +78,14 @@ public class HttpMultipleCookiesTestCase extends FunctionalTestCase
 
     public void testSendDirectly() throws Exception
     {
-        sendMessage(LOCAL_JETTY_SERVER_PORT);
+        muleContext.start();
+        sendMessage(getPorts().get(1));
     }
 
     public void testSendviaMule() throws Exception
     {
-        sendMessage(4019);
+        muleContext.start();
+        sendMessage(getPorts().get(0));
     }
 
     protected void sendMessage(int port) throws Exception
@@ -81,6 +102,7 @@ public class HttpMultipleCookiesTestCase extends FunctionalTestCase
 
         client2.setState(state);
         PostMethod method = new PostMethod("http://localhost:" + port);
+        Thread.sleep(5000);
         client2.executeMethod(method);
         assertEquals(TEST_MESSAGE, method.getResponseBodyAsString());
         assertTrue("Cookies were not recieved", cookiesRecieved.get());
@@ -98,7 +120,7 @@ public class HttpMultipleCookiesTestCase extends FunctionalTestCase
         logger.debug("server starting");
         Server server = new Server();
         Connector connector = new SocketConnector();
-        connector.setPort(LOCAL_JETTY_SERVER_PORT);
+        connector.setPort(getPorts().get(1));
         server.setConnectors(new Connector[]{connector});
 
         ServletHandler handler = new ServletHandler();
@@ -110,7 +132,21 @@ public class HttpMultipleCookiesTestCase extends FunctionalTestCase
         // server.join();
         simpleServerLatch.countDown();
         logger.debug("Server started");
-
+    }
+    
+    protected void stopServer() throws Exception
+    {
+        logger.debug("server stopping");
+        
+        if(server != null && server.isRunning())
+        {
+            assertEquals(1, server.getConnectors());            
+            // this test only uses one connector
+            server.getConnectors()[0].stop();
+        }
+        
+        simpleServerShutdownLatch.countDown();
+        logger.debug("Server stopped");
     }
 
     public static class HelloServlet extends HttpServlet
@@ -157,5 +193,11 @@ public class HttpMultipleCookiesTestCase extends FunctionalTestCase
             doGet(request, response);
         }
 
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 }

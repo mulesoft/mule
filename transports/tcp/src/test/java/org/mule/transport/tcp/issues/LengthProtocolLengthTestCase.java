@@ -12,11 +12,11 @@ package org.mule.transport.tcp.issues;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
-public class LengthProtocolLengthTestCase extends FunctionalTestCase
+public class LengthProtocolLengthTestCase extends DynamicPortTestCase
 {
 
     protected String getConfigResources()
@@ -70,6 +70,12 @@ public class LengthProtocolLengthTestCase extends FunctionalTestCase
         {
             // expected
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 
 }

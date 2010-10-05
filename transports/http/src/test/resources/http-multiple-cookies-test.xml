@@ -16,8 +16,8 @@
 
     <http:connector name="httpConnector" enableCookies="true"/>
 
-    <http:endpoint name="clientEndpoint" address="http://localhost:4019" exchange-pattern="request-response" />
-    <http:endpoint name="serverEndpoint" address="http://localhost:4020" exchange-pattern="request-response"/>
+    <http:endpoint name="clientEndpoint" address="http://localhost:${port1}" exchange-pattern="request-response" />
+    <http:endpoint name="serverEndpoint" address="http://localhost:${port2}" exchange-pattern="request-response"/>
 
     <model name="main">
         <service name="HttpProxyService">

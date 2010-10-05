@@ -21,10 +21,10 @@
         <service name="echoService">
             <inbound>
                 <http:inbound-endpoint host="localhost"
-                                       port="63081"
+                                       port="${port1}"
                                        path="services/Echo"
                                        exchange-pattern="request-response"
-                                       keep-alive="true"/>
+                                       keep-alive="true" name="inEchoService"/>
             </inbound>
             <echo-component/>
         </service>

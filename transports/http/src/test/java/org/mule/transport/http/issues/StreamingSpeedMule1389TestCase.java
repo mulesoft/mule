@@ -15,7 +15,6 @@ import org.mule.util.SystemUtils;
 
 public class StreamingSpeedMule1389TestCase extends AbstractStreamingCapacityTestCase
 {
-
     @Override
     protected boolean isDisabledInThisEnvironment()
     {
@@ -25,12 +24,18 @@ public class StreamingSpeedMule1389TestCase extends AbstractStreamingCapacityTes
 
     public StreamingSpeedMule1389TestCase()
     {
-        super(100 * ONE_MB, "tcp://localhost:60210");
+        super(100 * ONE_MB);
     }
 
     protected String getConfigResources()
     {
         return "streaming-speed-mule-1389.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 
 }

@@ -12,12 +12,12 @@ package org.mule.transport.tcp.issues;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class AsynchMule1869TestCase extends FunctionalTestCase
+public class AsynchMule1869TestCase extends DynamicPortTestCase
 {
 
     protected static String TEST_MESSAGE = "Test TCP Request";
@@ -37,6 +37,12 @@ public class AsynchMule1869TestCase extends FunctionalTestCase
         MuleMessage result =  client.request("asyncClientEndpoint", 10000);
         assertNotNull("No message received", result);
         assertEquals(TEST_MESSAGE + " Received Async", result.getPayloadAsString());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 
 }

@@ -11,16 +11,14 @@
 package org.mule.transport.tcp;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import java.util.Arrays;
 
-public class TcpSyncTestCase extends FunctionalTestCase
+public class TcpSyncTestCase extends DynamicPortTestCase
 {
-
-    private static final String endpointUri = "tcp://localhost:45441";
-
     protected String getConfigResources()
     {
         return "tcp-sync.xml";
@@ -29,7 +27,7 @@ public class TcpSyncTestCase extends FunctionalTestCase
     protected MuleMessage send(Object payload) throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        return client.send(endpointUri, payload, null);
+        return client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inService")).getAddress(), payload, null);
     }
 
     public void testSendString() throws Exception
@@ -90,4 +88,9 @@ public class TcpSyncTestCase extends FunctionalTestCase
         return buffer;
     }
 
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
+    }
 }

@@ -15,7 +15,7 @@
             <inbound>
                 <vm:inbound-endpoint path="fromTest" exchange-pattern="one-way"/>
             </inbound>
-            <http:rest-service-component serviceUrl="http://localhost:60205" httpMethod="DELETE"/>
+            <http:rest-service-component serviceUrl="http://localhost:${port1}" httpMethod="DELETE"/>
         </service>
     </model>
 </mule>

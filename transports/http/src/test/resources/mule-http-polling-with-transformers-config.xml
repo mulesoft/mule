@@ -21,7 +21,7 @@
     <model name="http polling test model">
         <service name="pollingUMO">
             <inbound>
-                <http:inbound-endpoint host="localhost" port="61206"
+                <http:inbound-endpoint host="localhost" port="${port1}"
                                        connector-ref="PollingHttpConnector" exchange-pattern="one-way">
                     <append-string-transformer message=" toClient-only"/>
                 </http:inbound-endpoint>
@@ -36,7 +36,7 @@
 
         <service name="polledUMO">
             <inbound>
-                <inbound-endpoint address="http://localhost:61206" exchange-pattern="request-response" 
+                <inbound-endpoint address="http://localhost:${port1}" exchange-pattern="request-response" 
                     connector-ref="HttpConnector"/>
             </inbound>
             <test:component appendString="foo"/>

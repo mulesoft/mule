@@ -23,7 +23,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 {
-    private static final int LISTEN_PORT = 60212;
+    //private static final int LISTEN_PORT = 60212;
     private static final String COOKIE_HEADER = "Cookie:";
 
     private CountDownLatch latch = new CountDownLatch(1);
@@ -39,7 +39,7 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
     @Override
     protected MockHttpServer getHttpServer(CountDownLatch serverStartLatch)
     {
-        return new SimpleHttpServer(LISTEN_PORT, serverStartLatch, latch);
+        return new SimpleHttpServer(getPorts().get(0), serverStartLatch, latch);
     }
 
     public void testCookies() throws Exception
@@ -102,5 +102,11 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
                 }
             }
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

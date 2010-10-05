@@ -12,11 +12,11 @@ package org.mule.transport.tcp;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 
-public class TcpLengthFunctionalTestCase extends FunctionalTestCase
+public class TcpLengthFunctionalTestCase extends DynamicPortTestCase
 {
-
     protected static String TEST_MESSAGE = "Test TCP Request";
     private int timeout = 60 * 1000 / 20;
 
@@ -59,4 +59,9 @@ public class TcpLengthFunctionalTestCase extends FunctionalTestCase
         assertNull(result);
     }
 
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 3;
+    }
 }

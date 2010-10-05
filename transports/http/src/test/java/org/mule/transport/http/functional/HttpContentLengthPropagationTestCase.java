@@ -12,6 +12,7 @@ package org.mule.transport.http.functional;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
 import org.mule.module.xml.transformer.XsltTransformer;
 import org.mule.tck.FunctionalTestCase;
@@ -37,7 +38,8 @@ public class HttpContentLengthPropagationTestCase extends FunctionalTestCase
         byte[] fileContents = IOUtils.toByteArray(is);
 
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:8085", new DefaultMuleMessage(fileContents, muleContext));
+        MuleMessage result = client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("httpEndpoint")).getAddress(),
+            new DefaultMuleMessage(fileContents, muleContext));
 
         XsltTransformer trans = new XsltTransformer();
         trans.setMuleContext(muleContext);

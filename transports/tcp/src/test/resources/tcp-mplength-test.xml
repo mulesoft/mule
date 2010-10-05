@@ -12,7 +12,7 @@
         <tcp:length-protocol payloadOnly="false"/>
     </tcp:connector>
 
-    <tcp:endpoint host="localhost" port="60198" exchange-pattern="request-response" name="clientEndpoint"/>
+    <tcp:endpoint host="localhost" port="${port1}" exchange-pattern="request-response" name="clientEndpoint"/>
 
     <model name="main">
         <service name="testComponent">

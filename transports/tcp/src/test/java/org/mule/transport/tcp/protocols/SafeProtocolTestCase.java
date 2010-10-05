@@ -13,9 +13,9 @@ package org.mule.transport.tcp.protocols;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
-public class SafeProtocolTestCase extends FunctionalTestCase
+public class SafeProtocolTestCase extends DynamicPortTestCase
 {
 
     protected static String TEST_MESSAGE = "Test TCP Request";
@@ -28,13 +28,13 @@ public class SafeProtocolTestCase extends FunctionalTestCase
     public void testSafeToSafe() throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);
-        assertResponseOk(client.send("tcp://localhost:65432?connector=safe", TEST_MESSAGE, null));
+        assertResponseOk(client.send("tcp://localhost:" + getPorts().get(0) + "?connector=safe", TEST_MESSAGE, null));
     }
 
     public void testUnsafeToSafe() throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);
-        assertResponseBad(client.send("tcp://localhost:65432?connector=unsafe", TEST_MESSAGE, null));
+        assertResponseBad(client.send("tcp://localhost:" + getPorts().get(0) + "?connector=unsafe", TEST_MESSAGE, null));
     }
 
     private void assertResponseOk(MuleMessage message)
@@ -59,6 +59,12 @@ public class SafeProtocolTestCase extends FunctionalTestCase
         {
             // expected
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 
 }

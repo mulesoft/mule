@@ -19,7 +19,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <http:outbound-endpoint address="http://localhost:60212" method="POST" 
+                    <http:outbound-endpoint address="http://localhost:${port1}" method="POST" 
                         exchange-pattern="one-way">
                         <properties>
                             <spring:entry key="Content-Type" value="text/xml" />

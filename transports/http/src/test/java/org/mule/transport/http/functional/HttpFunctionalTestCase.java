@@ -13,6 +13,7 @@ package org.mule.transport.http.functional;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -22,9 +23,9 @@ import org.mule.transport.http.HttpConstants;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpFunctionalTestCase extends FunctionalTestCase
+public class HttpFunctionalTestCase extends DynamicPortTestCase
 {
-    protected static String TEST_MESSAGE = "Test Http Request (Rødgrød), 57 = \u06f7\u06f5 in Arabic";
+    protected static String TEST_MESSAGE = "Test Http Request (Rï¿½dgrï¿½d), 57 = \u06f7\u06f5 in Arabic";
     protected boolean checkPathProperties = true;
     
     protected String getConfigResources()
@@ -58,5 +59,11 @@ public class HttpFunctionalTestCase extends FunctionalTestCase
         props.put(HttpConstants.HEADER_CONTENT_TYPE, "text/plain;charset=UTF-8");
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

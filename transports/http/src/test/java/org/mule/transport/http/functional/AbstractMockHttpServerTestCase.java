@@ -10,12 +10,13 @@
 
 package org.mule.transport.http.functional;
 
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-public abstract class AbstractMockHttpServerTestCase extends FunctionalTestCase
+public abstract class AbstractMockHttpServerTestCase extends DynamicPortTestCase
 {
     private static final long MOCK_HTTP_SERVER_STARTUP_TIMEOUT = 30000;
     private CountDownLatch serverStartLatch = new CountDownLatch(1);

@@ -13,11 +13,11 @@ package org.mule.transport.http.functional;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
-public class HttpPollingFunctionalTestCase extends FunctionalTestCase
+public class HttpPollingFunctionalTestCase extends DynamicPortTestCase
 {
 
     public void testPollingHttpConnector() throws Exception
@@ -39,6 +39,12 @@ public class HttpPollingFunctionalTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "mule-http-polling-config.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

@@ -13,6 +13,7 @@ package org.mule.transport.http.functional;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -23,7 +24,7 @@ import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-public class HttpDynamicFunctionalTestCase extends FunctionalTestCase
+public class HttpDynamicFunctionalTestCase extends DynamicPortTestCase
 {
     protected static String TEST_MESSAGE = "Test Http Request";
 
@@ -56,18 +57,23 @@ public class HttpDynamicFunctionalTestCase extends FunctionalTestCase
 
         MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put("port", new Integer(34523));
+        props.put("port", getPorts().get(0));
         props.put("path", "foo");
         MuleMessage result = client.send("clientEndpoint", TEST_MESSAGE, props);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
 
         assertTrue(latch1.await(3000, TimeUnit.MILLISECONDS));
 
-        props.put("port", new Integer(34524));
+        props.put("port", getPorts().get(1));
         result = client.send("clientEndpoint", TEST_MESSAGE, props);
         assertEquals(TEST_MESSAGE + " Received", result.getPayloadAsString());
 
         assertTrue(latch2.await(3000, TimeUnit.MILLISECONDS));
+    }
 
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 }

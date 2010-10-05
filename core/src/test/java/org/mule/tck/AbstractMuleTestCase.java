@@ -47,6 +47,7 @@ import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -127,6 +128,13 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     // Barks if the test exceeds its time limit
     private TestCaseWatchdog watchdog;
 
+    protected int numPorts = 0;
+    
+    public ArrayList<Integer> ports = null;    
+
+    final static private int MIN_PORT = 5000;
+    final static private int MAX_PORT = 6000;    
+    
     static
     {
         String muleOpts = SystemUtils.getenv("MULE_TEST_OPTS");
@@ -409,7 +417,17 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         // start a watchdog thread
         watchdog = createWatchdog();
         watchdog.start();
+       
+        // set up the free ports
+        if(numPorts > 0)
+        {
+            //find some free ports
+            ports = findFreePorts(numPorts);
 
+            //set the port properties
+            setPortProperties();
+        }                
+        
         currentTestRunningThread = Thread.currentThread();
 
         if (verbose)
@@ -433,7 +451,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
                 // We dispose here just in case
                 disposeManager();
             }
-
+            
             muleContext = createMuleContext();
 
             // wait for Mule to fully start when requested (default)
@@ -980,4 +998,128 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return new TriggerableMessageSource();
     }
 
+    /**
+     * Define the ports as java system properties, starting with 'port1'
+     */
+    private void setPortProperties()
+    {
+        for (int i = 0; i < ports.size(); i++)
+        {
+            System.setProperty("port" + (i + 1), String.valueOf(ports.get(i)));
+        }
+    }
+    
+    /**
+     * Find a given number of available ports
+     * 
+     * @param numPorts The number of free ports to find
+     * @return an ArrayList with the number of requested ports
+     */
+    public ArrayList<Integer> findFreePorts(int numPorts)
+    {
+        ServerSocket server = null;
+        ArrayList<Integer> ports = new ArrayList<Integer>();
+        for (int port = MIN_PORT; ports.size() != numPorts && port < MAX_PORT; ++port)
+        {
+            try
+            {
+                server = new ServerSocket(port);
+                // if no exception is thrown, then add port to list
+                ports.add(port);
+            }
+            catch (IOException ex)
+            {
+                continue; // try next port
+            }
+            finally
+            {
+                if (server != null)
+                {
+                    try
+                    {
+                        server.close();
+                    }
+                    catch (IOException e)
+                    {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        if (ports.size() != numPorts)
+        {
+            logger.info("requested " + numPorts + " open ports, but returning " + ports.size());
+        }
+        return ports;
+    }
+    
+    /**
+     * Iterate through the ports and log whether each is available
+     * @param failIfTaken If true, fails the current test if the port is not available
+     */
+    public void checkPorts(boolean failIfTaken, String prefix)
+    {
+        for (int i = 0; i < ports.size(); i++)
+        {
+            if (isPortFree(ports.get(i)))
+            {
+                logger.info(prefix + " port is free : " + ports.get(i));
+            }
+            else
+            {
+                logger.info(prefix + " port is not free : " + ports.get(i));
+                if(failIfTaken)
+                {
+                    fail("failing test since port is not free : " + ports.get(i));
+                }
+            }
+        }
+    }
+    
+
+    /**
+     * Check and log is a given port is available
+     * 
+     * @param port the port number to check
+     * @return true if the port is available, false otherwise
+     */
+    public boolean isPortFree(int port)
+    {
+        ServerSocket server = null;
+        try
+        {
+            server = new ServerSocket(port);
+        }
+        catch (IOException e)
+        {
+            return false;
+        }
+        finally
+        {
+            try
+            {
+                if (server != null)
+                {
+                    server.close();
+                }
+            }
+            catch (IOException e)
+            {
+                // ignore
+            }
+            return true;
+        }
+    }
+    
+    public ArrayList<Integer> getPorts()
+    {
+        return ports;
+    }
+
+    public void setPorts(ArrayList<Integer> ports)
+    {
+        this.ports = ports;
+    }
 }

@@ -15,7 +15,7 @@
     <message-properties-transformer name="setResponseType" mimeType="text/baz" encoding="UTF-16BE">
     </message-properties-transformer>
 
-    <http:endpoint name="clientEndpoint" host="localhost" port="60198" exchange-pattern="request-response"/>
+    <http:endpoint name="clientEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response"/>
 
     <model name="main">
         <service name="testComponent">

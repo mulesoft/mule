@@ -16,10 +16,10 @@
         <tcp:length-protocol payloadOnly="true" maxMessageLength="10"/>
     </tcp:connector>
     
-    <tcp:endpoint name="safe" host="localhost" port="65432" connector-ref="safe-connector" 
+    <tcp:endpoint name="safe" host="localhost" port="${port1}" connector-ref="safe-connector" 
                   exchange-pattern="request-response"/>
                           
-    <endpoint name="length" address="tcp://localhost:65433" connector-ref="length-connector" 
+    <endpoint name="length" address="tcp://localhost:${port2}" connector-ref="length-connector" 
               exchange-pattern="request-response"/>              
 
     <model name="main">

@@ -22,9 +22,9 @@
         <service name="service">
             <inbound>
                 <!-- legacy style -->
-                <inbound-endpoint address="tcp://localhost:65432" connector-ref="safe" 
+                <inbound-endpoint address="tcp://localhost:${port1}" connector-ref="safe" 
                     exchange-pattern="request-response"/>
-                <tcp:inbound-endpoint host="localhost" port="65433" connector-ref="unsafe" 
+                <tcp:inbound-endpoint host="localhost" port="${port2}" connector-ref="unsafe" 
                     exchange-pattern="request-response"/>
             </inbound>
             <test:component appendString=" Received"/>

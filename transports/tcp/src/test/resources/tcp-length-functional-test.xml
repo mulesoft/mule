@@ -13,9 +13,9 @@
         <tcp:length-protocol payloadOnly="true"/>
     </tcp:connector>
 
-    <tcp:endpoint name="clientEndpoint" host="localhost" port="60191" exchange-pattern="request-response"/>
-    <tcp:endpoint name="asyncClientEndpoint1" host="localhost" port="60192" exchange-pattern="one-way"/>
-    <tcp:endpoint name="asyncClientEndpoint2" host="localhost" port="60193" exchange-pattern="one-way"/>
+    <tcp:endpoint name="clientEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response"/>
+    <tcp:endpoint name="asyncClientEndpoint1" host="localhost" port="${port2}" exchange-pattern="one-way"/>
+    <tcp:endpoint name="asyncClientEndpoint2" host="localhost" port="${port3}" exchange-pattern="one-way"/>
 
     <model name="main">
         <service name="testComponent1">

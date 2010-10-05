@@ -11,11 +11,13 @@
 package org.mule.transport.http.functional;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 
-public class ChunkingTestCase extends FunctionalTestCase
+public class ChunkingTestCase extends DynamicPortTestCase
 {
 
     protected String getConfigResources()
@@ -29,15 +31,23 @@ public class ChunkingTestCase extends FunctionalTestCase
         
         byte[] msg = new byte[100*1024];
         
-        MuleMessage result = client.send("http://localhost:60200/foo", msg, null);
+        MuleMessage result = client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inMain")).getAddress(), 
+            msg, null);
         assertEquals("Hello", result.getPayloadAsString());
         int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(200, status);
         
-        result = client.send("http://localhost:60200/foo", msg, null);
+        result = client.send(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("inMain")).getAddress(),
+            msg, null);
         assertEquals("Hello", result.getPayloadAsString());
         status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(200, status);
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

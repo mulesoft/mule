@@ -12,6 +12,7 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -26,10 +27,11 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 
-public class HttpPersistentQueueTestCase extends FunctionalTestCase
+public class HttpPersistentQueueTestCase extends DynamicPortTestCase
 {
     private CountDownLatch messageDidArrive = new CountDownLatch(1);
-
+    private int port = -1;
+    
     @Override
     protected String getConfigResources()
     {
@@ -44,18 +46,19 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase
         FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent("PersistentQueueAsync");
         assertNotNull(testComponent);
         testComponent.setEventCallback(new Callback(messageDidArrive));
+        port = getPorts().get(0);
     }
 
     public void testPersistentMessageDeliveryWithGet() throws Exception
     {
-        GetMethod method = new GetMethod("http://localhost:63083/services/Echo?foo=bar");
+        GetMethod method = new GetMethod("http://localhost:" + port + "/services/Echo?foo=bar");
         method.addRequestHeader(HttpConstants.HEADER_CONNECTION, "close");
         doTestPersistentMessageDelivery(method);
     }
 
     public void testPersistentMessageDeliveryWithPost() throws Exception
     {        
-        PostMethod method = new PostMethod("http://localhost:63083/services/Echo");        
+        PostMethod method = new PostMethod("http://localhost:" + port + "/services/Echo");        
         method.addRequestHeader(HttpConstants.HEADER_CONNECTION, "close");
         method.addParameter(new NameValuePair("foo", "bar"));
         doTestPersistentMessageDelivery(method);
@@ -103,5 +106,11 @@ public class HttpPersistentQueueTestCase extends FunctionalTestCase
             
             messageDidArrive.countDown();            
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     } 
 }
