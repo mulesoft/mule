@@ -33,6 +33,7 @@ import junit.framework.Assert;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 
@@ -49,7 +50,7 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends FunctionalTestCase
     public void testSendViaGET() throws Exception
     {
         Latch latch = new Latch();
-        setupAssertIncomingMessage(HttpConstants.METHOD_GET, latch, CONTENT_TYPE_HEADER);
+        setupAssertIncomingMessage(HttpConstants.METHOD_GET, latch);
         
         String testMessage = getTestMessage(Locale.JAPAN);
         String encodedPayload = URLEncoder.encode(testMessage, "ISO-2022-JP");
@@ -65,35 +66,38 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends FunctionalTestCase
         String expected = testMessage + " Received";
         String response = method.getResponseBodyAsString();
         assertEquals(expected, response);
+        
+        Header responseContentType = method.getResponseHeader(HttpConstants.HEADER_CONTENT_TYPE);
+        assertEquals("text/plain;charset=EUC-JP", responseContentType.getValue());
     }
     
-    public void testSendByPost() throws Exception
+    public void testSendViaPOST() throws Exception
     {
-        Object messagePayload = getTestMessage(Locale.JAPAN);
+        Object payload = getTestMessage(Locale.JAPAN);
+        
         Map<String, Object> messageProperties = new HashMap<String, Object>();
         messageProperties.put(MuleProperties.MULE_ENCODING_PROPERTY, "ISO-2022-JP");
-        doTestSend("POST", messagePayload, messageProperties, CONTENT_TYPE_HEADER);
+        
+        doTestSend(HttpConstants.METHOD_POST, payload, messageProperties);
     }
-
-    private void doTestSend(String method, Object messagePayload, Map<String, Object> messageProperties,
-        String expectedContentType) throws Exception
+    
+    private void doTestSend(String method, Object messagePayload, Map<String, Object> messageProperties) throws Exception
     {
         Latch latch = new Latch();
 
-        setupAssertIncomingMessage(method, latch, expectedContentType);
+        setupAssertIncomingMessage(method, latch);
 
         MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://sendBy" + method, messagePayload, messageProperties);
 
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertNotNull(reply);
-        assertEquals(expectedContentType, reply.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE));
+        assertEquals(CONTENT_TYPE_HEADER, reply.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE));
         assertEquals("EUC-JP", reply.getEncoding());
         assertEquals(getTestMessage(Locale.JAPAN) + " Received", reply.getPayloadAsString());
     }
 
-    private void setupAssertIncomingMessage(String method, final Latch latch,
-        final String expectedContentType) throws Exception
+    private void setupAssertIncomingMessage(String method, final Latch latch) throws Exception
     {
         FunctionalTestComponent ftc = getFunctionalTestComponent("testReceive" + method);
         ftc.setEventCallback(new EventCallback()
@@ -102,7 +106,7 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends FunctionalTestCase
             {
                 MuleMessage message = context.getMessage();
 
-                Assert.assertEquals(expectedContentType,
+                Assert.assertEquals(CONTENT_TYPE_HEADER,
                     message.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, null));
                 Assert.assertEquals("ISO-2022-JP", message.getEncoding());
 
@@ -110,11 +114,6 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends FunctionalTestCase
                 if (payload instanceof String)
                 {
                     assertEquals(getTestMessage(Locale.JAPAN), payload);
-                }
-                else if (payload instanceof byte[])
-                {
-                    String payloadString = new String((byte[])payload, message.getEncoding());
-                    assertEquals(getTestMessage(Locale.JAPAN), payloadString);
                 }
                 else
                 {
