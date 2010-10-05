@@ -119,7 +119,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
         }
         catch (Throwable t)
         {
-            logger.warn("Error disposing CxfConfiguration", t);
+            logger.warn("Error disposing CxfConfiguration, this may cause a memory leak", t);
         }
     }
 
