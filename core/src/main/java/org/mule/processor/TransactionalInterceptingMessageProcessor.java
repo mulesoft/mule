@@ -19,18 +19,13 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.TransactionTemplate;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Wraps the invocation of the next {@link MessageProcessor} with a transaction. If
  * the {@link TransactionConfig} is null then no transaction is used and the next
  * {@link MessageProcessor} is invoked directly.
  */
 public class TransactionalInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
-
 {
-    protected final Log logger = LogFactory.getLog(getClass());
     protected TransactionConfig transactionConfig;
 
     public TransactionalInterceptingMessageProcessor(TransactionConfig transactionConfig)
@@ -70,5 +65,4 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
             }
         }
     }
-
 }

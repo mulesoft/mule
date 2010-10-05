@@ -47,6 +47,7 @@ public class Jms102bSupport extends Jms11Support
         super(connector);
     }
 
+    @Override
     public Connection createConnection(ConnectionFactory connectionFactory, String username, String password)
             throws JMSException
     {
@@ -69,6 +70,7 @@ public class Jms102bSupport extends Jms11Support
         }
     }
 
+    @Override
     public Connection createConnection(ConnectionFactory connectionFactory) throws JMSException
     {
         if (connectionFactory == null)
@@ -90,8 +92,9 @@ public class Jms102bSupport extends Jms11Support
         }
     }
 
-    public Session createSession(Connection connection, boolean topic, boolean transacted, int ackMode, boolean noLocal)
-            throws JMSException
+    @Override
+    public Session createSession(Connection connection, boolean topic, boolean transacted,
+        int ackMode, boolean noLocal) throws JMSException
     {
         if (topic && connection instanceof TopicConnection)
         {
@@ -111,6 +114,7 @@ public class Jms102bSupport extends Jms11Support
         }
     }
 
+    @Override
     public MessageConsumer createConsumer(Session session,
                                           Destination destination,
                                           String messageSelector,
@@ -147,6 +151,7 @@ public class Jms102bSupport extends Jms11Support
         }
     }
 
+    @Override
     public MessageProducer createProducer(Session session, Destination dest, boolean topic) throws JMSException
     {
         if (topic && session instanceof TopicSession)
@@ -163,6 +168,7 @@ public class Jms102bSupport extends Jms11Support
         }
     }
 
+    @Override
     public Destination createDestination(Session session, String name, boolean topic, ImmutableEndpoint endpoint) throws JMSException
     {
         if (connector.isJndiDestinations())
@@ -189,7 +195,7 @@ public class Jms102bSupport extends Jms11Support
                 {
                     throw e;
                 }
-                else 
+                else
                 {
                     logger.warn("Unable to look up JNDI destination " + name + ": " + e.getMessage());
                 }
@@ -222,6 +228,7 @@ public class Jms102bSupport extends Jms11Support
         }
     }
 
+    @Override
     public Destination createTemporaryDestination(Session session, boolean topic) throws JMSException
     {
         if (session == null)
@@ -241,6 +248,7 @@ public class Jms102bSupport extends Jms11Support
         }
     }
 
+    @Override
     public void send(MessageProducer producer, Message message, boolean persistent, int priority, long ttl, boolean topic, ImmutableEndpoint endpoint)
             throws JMSException
     {
@@ -267,6 +275,7 @@ public class Jms102bSupport extends Jms11Support
         }
     }
 
+    @Override
     public void send(MessageProducer producer,
                      Message message,
                      Destination dest,
