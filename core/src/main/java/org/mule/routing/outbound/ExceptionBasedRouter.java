@@ -61,7 +61,7 @@ public class ExceptionBasedRouter extends ExpressionRecipientList
             }
         }        
         
-        if (recipients == null || recipients.size() == 0)
+        if (recipients.size() == 0)
         {
             throw new RoutePathNotFoundException(CoreMessages.noEndpointsForRouter(), event, null);
         }

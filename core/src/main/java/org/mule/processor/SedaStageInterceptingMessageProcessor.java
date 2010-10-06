@@ -84,25 +84,6 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
     }
 
     @Override
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        if (next == null)
-        {
-            return event;
-        }
-        else if (event.getEndpoint().getExchangePattern().hasResponse() || 
-                  event.getEndpoint().getTransactionConfig().isTransacted())
-        {
-            return processNext(event);
-        }
-        else
-        {
-            processAsync(event);
-            return null;
-        }
-    }
-
-    @Override
     protected void processAsync(MuleEvent event) throws MuleException
     {
         try

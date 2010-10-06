@@ -13,7 +13,6 @@ package org.mule.object;
 import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.InitialisationException;
 
-import java.lang.ref.SoftReference;
 import java.util.Map;
 
 /**
@@ -21,7 +20,7 @@ import java.util.Map;
  */
 public class SingletonObjectFactory extends AbstractObjectFactory
 {
-    private SoftReference instance;
+    private Object instance;
 
     /**
      * For Spring only
@@ -57,47 +56,44 @@ public class SingletonObjectFactory extends AbstractObjectFactory
     public SingletonObjectFactory(Object instance)
     {
         super(instance.getClass());
-        this.instance = new SoftReference<Object>(instance);
+        this.instance = instance;
     }
 
     @Override
     public void dispose()
     {
-        if (instance != null)
-        {
-            instance.clear();
-            instance.enqueue();
-        }
+        instance = null;
         super.dispose();
     }
 
     /**
      * Always returns the same instance of the object.
+     * 
      * @param muleContext
      */
     @Override
     public Object getInstance(MuleContext muleContext) throws Exception
     {
-        if (instance == null || instance.get() == null)
+        if (instance == null)
         {
             try
             {
-                instance = new SoftReference<Object>(super.getInstance(muleContext));
+                instance = super.getInstance(muleContext);
             }
             catch (Exception e)
             {
                 throw new InitialisationException(e, this);
             }
         }
-        return instance.get();
+        return instance;
     }
 
     @Override
     public Class<?> getObjectClass()
     {
-        if (instance != null && instance.get() != null)
+        if (instance != null)
         {
-            return instance.get().getClass();
+            return instance.getClass();
         }
         else
         {

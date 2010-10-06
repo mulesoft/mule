@@ -24,7 +24,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
-import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkListener;
 
@@ -85,36 +84,34 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         {
             return event;
         }
-        else if (event.getEndpoint().getExchangePattern().hasResponse()
-                 || event.getEndpoint().getTransactionConfig().isTransacted())
-        {
-            return processNext(event);
-        }
-        else
+        else if (isProcessAsync(event))
         {
             processAsync(event);
             return null;
         }
+        else
+        {
+            return processNext(event);
+        }
+    }
+    
+    protected boolean isProcessAsync(MuleEvent event)
+    {
+        return doThreading && !event.getEndpoint().getExchangePattern().hasResponse()
+               && !event.getEndpoint().getTransactionConfig().isTransacted();
     }
 
     protected void processAsync(MuleEvent event) throws MuleException
     {
         try
         {
-            Work work = new AsyncMessageProcessorWorker(event);
-            if (doThreading)
-            {
-                workManagerSource.getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null, this);
-            }
-            else
-            {
-                work.run();
-            }
+            workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWorker(event),
+                WorkManager.INDEFINITE, null, this);
         }
         catch (Exception e)
         {
-            new MessagingException(
-                CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation(next), event, e);
+            new MessagingException(CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation(next),
+                event, e);
         }
     }
 

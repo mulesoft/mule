@@ -37,34 +37,26 @@
 
         <choice>
             <when expression="payload.currency == 'USD'" evaluator="groovy">
-                <vm:outbound-endpoint path="groovy-script" exchange-pattern="request-response">
+                <processor-chain>
                     <transformer ref="ExtractAmount StringToNumber DollarsToCents"/>
-                </vm:outbound-endpoint>
+                    <script:component>
+                        <script:script file="greedy.groovy">
+                            <property key="currency" value="USD"/>
+                        </script:script>
+                    </script:component>
+                </processor-chain>
              </when>
              
              <when expression="payload.currency == 'GBP'" evaluator="groovy">
-                <vm:outbound-endpoint path="jython-script" exchange-pattern="request-response">
+                <processor-chain>
                     <transformer ref="ExtractAmount StringToNumber DollarsToCents"/>
-                </vm:outbound-endpoint>
+                    <script:component>
+                        <script:script file="greedy.py">
+                            <property key="currency" value="GBP"/>
+                        </script:script>
+                    </script:component>
+                </processor-chain>
              </when>
         </choice>
-    </flow>
-    
-    <flow name="GroovyScript">
-        <vm:inbound-endpoint path="groovy-script" exchange-pattern="request-response"/>
-        <script:component>
-            <script:script file="greedy.groovy">
-                <property key="currency" value="USD"/>
-            </script:script>
-        </script:component>
-    </flow>
-
-    <flow name="JythonScript">
-        <vm:inbound-endpoint path="jython-script" exchange-pattern="request-response"/>
-        <script:component>
-            <script:script file="greedy.py">
-                <property key="currency" value="GBP"/>
-            </script:script>
-        </script:component>
     </flow>
 </mule>

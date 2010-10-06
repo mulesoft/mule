@@ -123,7 +123,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
     }
 
     @Override
-    public void addRoute(MessageProcessor target) throws MuleException
+    public synchronized void addRoute(MessageProcessor target) throws MuleException
     {
         if (!useTemplates)
         {
@@ -172,7 +172,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
                 logger.debug("Uri before parsing is: " + uri);
             }
 
-            Map props = new HashMap();
+            Map<String, Object> props = new HashMap<String, Object>();
             // Also add the endpoint properties so that users can set fallback values
             // when the property is not set on the event
             props.putAll(ep.getProperties());

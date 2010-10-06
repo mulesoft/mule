@@ -10,6 +10,25 @@
 
 package org.mule.transport.http.transformers;
 
+import org.mule.RequestContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.OutputHandler;
+import org.mule.api.transport.PropertyScope;
+import org.mule.message.ds.StringDataSource;
+import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transformer.types.DataTypeFactory;
+import org.mule.transport.NullPayload;
+import org.mule.transport.http.HttpConnector;
+import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.StreamPayloadRequestEntity;
+import org.mule.transport.http.i18n.HttpMessages;
+import org.mule.util.IOUtils;
+import org.mule.util.ObjectUtils;
+import org.mule.util.StringUtils;
+
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;

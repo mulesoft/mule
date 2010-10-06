@@ -10,6 +10,9 @@
 
 package org.mule.model.seda;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
@@ -31,12 +34,10 @@ import junit.framework.AssertionFailedError;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 public class SedaServiceTestCase extends AbstractServiceTestCase
 {
     private SedaService service;
+    private Thread mainThread = Thread.currentThread();
 
     public SedaServiceTestCase()
     {
@@ -168,7 +169,6 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
     {
         final Latch latch = new Latch();
         final String serviceName = "testDoThreadingFalse";
-        final String serviceThreadName = serviceName + ".1";
 
         service.setName(serviceName);
         ChainedThreadingProfile threadingProfile = (ChainedThreadingProfile) muleContext.getDefaultServiceThreadingProfile();
@@ -176,10 +176,9 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         service.setThreadingProfile(threadingProfile);
         service.setComponent(new SimpleCallableJavaComponent(new Callable()
         {
-
             public Object onCall(MuleEventContext eventContext) throws Exception
             {
-                assertEquals(serviceThreadName, Thread.currentThread().getName());
+                assertEquals(mainThread, Thread.currentThread());
                 latch.countDown();
                 return null;
             }
@@ -202,7 +201,6 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
     {
         final Latch latch = new Latch();
         final String serviceName = "testDoThreadingFalse";
-        final String serviceThreadName = serviceName + ".1";
 
         service.setName(serviceName);
         ChainedThreadingProfile threadingProfile = (ChainedThreadingProfile) muleContext.getDefaultServiceThreadingProfile();
@@ -210,17 +208,17 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         service.setThreadingProfile(threadingProfile);
         service.setComponent(new SimpleCallableJavaComponent(new Callable()
         {
-
             public Object onCall(MuleEventContext eventContext) throws Exception
             {
-                assertFalse(serviceThreadName.equals(Thread.currentThread().getName()));
+                assertTrue(Thread.currentThread().getName().startsWith(serviceName));
                 latch.countDown();
                 return null;
             }
         }));
         muleContext.getRegistry().registerService(service);
 
-        service.dispatchEvent(MuleTestUtils.getTestInboundEvent("test", service, muleContext));
+        service.dispatchEvent(MuleTestUtils.getTestEvent("test", 
+            getTestInboundEndpoint(MessageExchangePattern.ONE_WAY), muleContext));
 
         assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
 

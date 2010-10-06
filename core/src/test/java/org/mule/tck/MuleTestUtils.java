@@ -10,10 +10,6 @@
 
 package org.mule.tck;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.mule.DefaultMuleContext;
 import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
@@ -55,6 +51,10 @@ import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
 
 import com.mockobjects.dynamic.Mock;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Utilities for creating test and Mock Mule objects
@@ -131,7 +131,7 @@ public final class MuleTestUtils
                                                          String uri,
                                                          List<Transformer> transformers,
                                                          Filter filter,
-                                                         Map properties,
+                                                         Map<Object, Object> properties,
                                                          Connector connector) throws Exception
     {
         return (InboundEndpoint) getTestEndpoint(name, uri, transformers, filter, properties, context,
@@ -149,7 +149,7 @@ public final class MuleTestUtils
                                                            String uri,
                                                            List<Transformer> transformers,
                                                            Filter filter,
-                                                           Map properties) throws Exception
+                                                           Map<Object, Object> properties) throws Exception
     {
         return (OutboundEndpoint) getTestEndpoint(name, uri, transformers, filter, properties, context,
             new EndpointSource()
@@ -166,7 +166,7 @@ public final class MuleTestUtils
                                                            String uri,
                                                            List<Transformer> transformers,
                                                            Filter filter,
-                                                           Map properties,
+                                                           Map<Object, Object> properties,
                                                            final Connector connector) throws Exception
     {
         return (OutboundEndpoint) getTestEndpoint(name, uri, transformers, filter, properties, context,
@@ -255,7 +255,7 @@ public final class MuleTestUtils
                                                      String uri,
                                                      List<Transformer> transformers,
                                                      Filter filter,
-                                                     Map properties,
+                                                     Map<Object, Object> properties,
                                                      MuleContext context,
                                                      EndpointSource source,
                                                      Connector connector) throws Exception

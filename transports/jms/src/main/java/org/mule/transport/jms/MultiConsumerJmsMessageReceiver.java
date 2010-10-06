@@ -51,7 +51,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 {
-    protected final List consumers;
+    protected final List<SubReceiver> consumers;
 
     protected final int receiversCount;
 
@@ -82,9 +82,10 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         {
             logger.debug("Creating " + receiversCount + " sub-receivers for " + endpoint.getEndpointURI());
         }
+
         consumers = new CopyOnWriteArrayList();
     }
-
+        
     @Override
     protected void doStart() throws MuleException
     {
@@ -325,8 +326,8 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 // This must be the doWork() to preserve the transactional context.
                 // We are already running in the consumer thread by this time.
-                // The JmsWorker classe is a one-off executor which is abandoned after it's done and is
-                // easily garbage-collected (confirmed with a profiler)
+                // The JmsWorker class is a one-off executor which is abandoned after it's done 
+                // and is easily garbage-collected (confirmed with a profiler)
                 getWorkManager().doWork(new JmsWorker(message, MultiConsumerJmsMessageReceiver.this, this));
             }
             catch (WorkException e)
@@ -343,7 +344,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         public JmsWorker(Message message, AbstractMessageReceiver receiver, SubReceiver subReceiver)
         {
-            super(new ArrayList(1), receiver);
+            super(new ArrayList<Object>(1), receiver);
             this.subReceiver = subReceiver;
             messages.add(message);
         }
@@ -386,6 +387,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
 
         }
 
+        @Override
         protected void bindTransaction(Transaction tx) throws TransactionException
         {
             if (tx instanceof JmsTransaction || tx instanceof TransactionCollection)

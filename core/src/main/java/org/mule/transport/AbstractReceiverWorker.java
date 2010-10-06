@@ -46,14 +46,12 @@ public abstract class AbstractReceiverWorker implements Work
         this(messages, receiver, null);
     }
 
-
     public AbstractReceiverWorker(List<Object> messages, AbstractMessageReceiver receiver, OutputStream out)
     {
         this.messages = messages;
         this.receiver = receiver;
         this.endpoint = receiver.getEndpoint();
         this.out = out;
-
     }
 
     /**

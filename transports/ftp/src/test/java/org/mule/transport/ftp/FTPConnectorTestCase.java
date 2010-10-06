@@ -19,7 +19,8 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transport.AbstractConnectorTestCase;
 
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.pool.ObjectPool;
 
@@ -70,7 +71,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
      */
     public void testPollingFrequencyEndpointOverride() throws Exception
     {
-        Properties props = new Properties();
+        Map<Object, Object> props = new HashMap<Object, Object>();
         // Endpoint wants String-typed properties
         props.put(FtpConnector.PROPERTY_POLLING_FREQUENCY, String.valueOf(POLLING_FREQUENCY_OVERRIDE));
         

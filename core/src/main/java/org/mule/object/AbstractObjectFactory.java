@@ -22,7 +22,6 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
 
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
     public static final String ATTRIBUTE_OBJECT_CLASS = "objectClass";
 
     protected String objectClassName;
-    protected SoftReference<Class<?>> objectClass = null;
+    protected Class<?> objectClass = null;
     protected Map properties = null;
     protected List<InitialisationCallback> initialisationCallbacks = new ArrayList<InitialisationCallback>();
     protected FlowConstruct flowConstruct;
@@ -76,7 +75,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
     {
         super();
         this.objectClassName = objectClass.getName();
-        this.objectClass = new SoftReference<Class<?>>(objectClass);
+        this.objectClass = objectClass;
         this.properties = properties;
     }
 
@@ -85,7 +84,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
         try
         {
             Class<?> klass = ClassUtils.getClass(objectClassName);
-            objectClass = new SoftReference<Class<?>>(klass);
+            objectClass = klass;
             return klass;
         }
         catch (ClassNotFoundException e)
@@ -130,7 +129,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
                 MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
         }
         
-        Class<?> klass = objectClass.get();
+        Class<?> klass = objectClass;
         if (klass == null)
         {
             klass = setupObjectClassFromObjectClassName();
@@ -174,7 +173,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
     {
         if (objectClass != null)
         {
-            Class<?> klass = objectClass.get();
+            Class<?> klass = objectClass;
             if (klass == null)
             {
                 klass = setupObjectClassFromObjectClassName();
@@ -188,7 +187,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
 
     public void setObjectClass(Class<?> objectClass)
     {
-        this.objectClass = new SoftReference<Class<?>>(objectClass);
+        this.objectClass = objectClass;
         this.objectClassName = objectClass.getName();
     }
 

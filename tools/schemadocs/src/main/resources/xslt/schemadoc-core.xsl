@@ -6,7 +6,7 @@
 
     <!-- the table of pages for linking -->
     <xsl:key name="item-to-page" match="link" use="item"/>
-    <xsl:variable name="items-to-pages" select="document('http://svn.codehaus.org/mule/branches/mule-3.x/tools/schemadocs/src/main/resources/links.xml')/links"/>
+    <xsl:variable name="items-to-pages" select="document('http://svn.codehaus.org/mule/branches/mule-3.0.x/tools/schemadocs/src/main/resources/links.xml')/links"/>
 
     <xsl:template match="xsd:element" mode="single-element">
         <a>
@@ -39,11 +39,6 @@
             <xsl:apply-templates select="." mode="attributes"/>
         </table>
 
-        <xsl:apply-templates select="./*[1]" mode="child-elements"/>
-
-    </xsl:template>
-
-    <xsl:template match="*" mode="child-elements">
         <h3>Child Elements</h3>
         <table class="confluenceTable">
             <tr>

@@ -120,20 +120,6 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
         }
     }
     
-    public void testSoftReferenceGetsGarbageCollected() throws Exception
-    {
-        AbstractObjectFactory factory = getUninitialisedObjectFactory();
-        factory.setObjectClass(Object.class);
-        // Will init the object
-        muleContext.getRegistry().applyProcessorsAndLifecycle(factory);
-
-        // simulate garbage collection
-        factory.objectClass.clear();
-        
-        Object borrowed = factory.getInstance(muleContext);
-        assertNotNull(borrowed);
-    }
-
     public abstract AbstractObjectFactory getUninitialisedObjectFactory();
 
     public abstract void testGetObjectClass() throws Exception;

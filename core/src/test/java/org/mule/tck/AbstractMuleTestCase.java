@@ -130,7 +130,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     protected int numPorts = 0;
     
-    public ArrayList<Integer> ports = null;    
+    public List<Integer> ports = null;    
 
     final static private int MIN_PORT = 5000;
     final static private int MAX_PORT = 6000;    
@@ -419,7 +419,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         watchdog.start();
        
         // set up the free ports
-        if(numPorts > 0)
+        if (numPorts > 0)
         {
             //find some free ports
             ports = findFreePorts(numPorts);
@@ -694,17 +694,20 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, null, transformers, null, null);
     }
 
-    public static InboundEndpoint getTestInboundEndpoint(String name, String uri, List transformers, Filter filter, Map properties, Connector connector) throws Exception
+    public static InboundEndpoint getTestInboundEndpoint(String name, String uri, 
+        List<Transformer> transformers, Filter filter, Map<Object, Object> properties, Connector connector) throws Exception
     {
         return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, transformers, filter, properties, connector);
     }
 
-    public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri, List transformers, Filter filter, Map properties) throws Exception
+    public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri, 
+        List<Transformer> transformers, Filter filter, Map<Object, Object> properties) throws Exception
     {
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties);
     }
 
-    public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri, List transformers, Filter filter, Map properties, Connector connector) throws Exception
+    public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri, 
+        List<Transformer> transformers, Filter filter, Map<Object, Object> properties, Connector connector) throws Exception
     {
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties, connector);
     }
@@ -785,12 +788,12 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestService(muleContext);
     }
 
-    public static Service getTestService(String name, Class clazz) throws Exception
+    public static Service getTestService(String name, Class<?> clazz) throws Exception
     {
         return MuleTestUtils.getTestService(name, clazz, muleContext);
     }
 
-    public static Service getTestService(String name, Class clazz, Map props) throws Exception
+    public static Service getTestService(String name, Class<?> clazz, Map<?, ?> props) throws Exception
     {
         return MuleTestUtils.getTestService(name, clazz, props, muleContext);
     }
@@ -858,12 +861,12 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             return testCount;
         }
 
-        public synchronized void incTestCount(String name)
+        public synchronized void incTestCount(String testName)
         {
-            if (!registeredTestMethod.contains(name))
+            if (!registeredTestMethod.contains(testName))
             {
                 testCount++;
-                registeredTestMethod.add(name);
+                registeredTestMethod.add(testName);
             }
         }
 
@@ -990,11 +993,13 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return new SensingNullMessageProcessor();
     }
     
-    public TriggerableMessageSource getTriggerableMessageSource(MessageProcessor listener){
+    public TriggerableMessageSource getTriggerableMessageSource(MessageProcessor listener)
+    {
         return new TriggerableMessageSource(listener);
     }
 
-    public TriggerableMessageSource getTriggerableMessageSource(){
+    public TriggerableMessageSource getTriggerableMessageSource()
+    {
         return new TriggerableMessageSource();
     }
 
@@ -1012,47 +1017,25 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     /**
      * Find a given number of available ports
      * 
-     * @param numPorts The number of free ports to find
+     * @param numberOfPorts The number of free ports to find
      * @return an ArrayList with the number of requested ports
      */
-    public ArrayList<Integer> findFreePorts(int numPorts)
+    public List<Integer> findFreePorts(int numberOfPorts)
     {
-        ServerSocket server = null;
-        ArrayList<Integer> ports = new ArrayList<Integer>();
-        for (int port = MIN_PORT; ports.size() != numPorts && port < MAX_PORT; ++port)
+        ArrayList<Integer> freePorts = new ArrayList<Integer>();
+        for (int port = MIN_PORT; freePorts.size() != numberOfPorts && port < MAX_PORT; ++port)
         {
-            try
+            if (isPortFree(port))
             {
-                server = new ServerSocket(port);
-                // if no exception is thrown, then add port to list
-                ports.add(port);
-            }
-            catch (IOException ex)
-            {
-                continue; // try next port
-            }
-            finally
-            {
-                if (server != null)
-                {
-                    try
-                    {
-                        server.close();
-                    }
-                    catch (IOException e)
-                    {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
+                freePorts.add(port);
             }
         }
 
-        if (ports.size() != numPorts)
+        if (freePorts.size() != numberOfPorts)
         {
-            logger.info("requested " + numPorts + " open ports, but returning " + ports.size());
+            logger.info("requested " + numberOfPorts + " open ports, but returning " + freePorts.size());
         }
-        return ports;
+        return freePorts;
     }
     
     /**
@@ -1070,7 +1053,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             else
             {
                 logger.info(prefix + " port is not free : " + ports.get(i));
-                if(failIfTaken)
+                if (failIfTaken)
                 {
                     fail("failing test since port is not free : " + ports.get(i));
                 }
@@ -1087,6 +1070,8 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      */
     public boolean isPortFree(int port)
     {
+        boolean portIsFree = true;
+        
         ServerSocket server = null;
         try
         {
@@ -1094,32 +1079,28 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         }
         catch (IOException e)
         {
-            return false;
+            portIsFree = false;
         }
         finally
         {
-            try
+            if (server != null)
             {
-                if (server != null)
+                try
                 {
                     server.close();
                 }
+                catch (IOException e)
+                {
+                    // ignore
+                }
             }
-            catch (IOException e)
-            {
-                // ignore
-            }
-            return true;
         }
+        
+        return portIsFree;
     }
     
-    public ArrayList<Integer> getPorts()
+    public List<Integer> getPorts()
     {
         return ports;
-    }
-
-    public void setPorts(ArrayList<Integer> ports)
-    {
-        this.ports = ports;
     }
 }
