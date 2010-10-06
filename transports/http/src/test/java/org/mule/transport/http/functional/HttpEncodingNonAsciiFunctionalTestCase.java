@@ -16,7 +16,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.LocaleMessageHandler;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transformer.AbstractTransformer;
@@ -37,7 +37,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 
-public class HttpEncodingNonAsciiFunctionalTestCase extends FunctionalTestCase
+public class HttpEncodingNonAsciiFunctionalTestCase extends DynamicPortTestCase
 {
     private static final String CONTENT_TYPE_HEADER = "text/plain; charset=ISO-2022-JP";
 
@@ -54,8 +54,8 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends FunctionalTestCase
         
         String testMessage = getTestMessage(Locale.JAPAN);
         String encodedPayload = URLEncoder.encode(testMessage, "ISO-2022-JP");
-        String url = String.format("http://localhost:60224/get?%1s=%2s",
-            HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY, encodedPayload);
+        String url = String.format("http://localhost:%1d/get?%2s=%3s",
+            getPorts().get(0), HttpConnector.DEFAULT_HTTP_GET_BODY_PARAM_PROPERTY, encodedPayload);
         
         GetMethod method = new GetMethod(url);
         method.addRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, CONTENT_TYPE_HEADER);
@@ -140,5 +140,11 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends FunctionalTestCase
     {
         return LocaleMessageHandler.getString("test-data", locale,
             "HttpEncodingNonAsciiFunctionalTestCase.getMessage", new Object[]{});
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

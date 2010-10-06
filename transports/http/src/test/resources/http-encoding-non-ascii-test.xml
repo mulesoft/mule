@@ -22,7 +22,7 @@
 		<!-- case 1 : a string payload is sent via GET and return appended one. -->
 		<service name="testReceiveGET">
 			<inbound>
-				<http:inbound-endpoint address="http://localhost:60224/get" responseTransformer-refs="setResponseType">
+				<http:inbound-endpoint address="http://localhost:${port1}/get" responseTransformer-refs="setResponseType">
                     <http:body-to-parameter-map-transformer/>
     				<custom-transformer class="org.mule.transport.http.functional.HttpEncodingNonAsciiFunctionalTestCase$ParamMapToString"/>
 				</http:inbound-endpoint>				
@@ -36,14 +36,14 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<http:outbound-endpoint connector-ref="httpConnector" address="http://localhost:60224/post" 
+					<http:outbound-endpoint connector-ref="httpConnector" address="http://localhost:${port1}/post" 
 						contentType="text/plain; charset=ISO-2022-JP" method="POST"/>						
 				</pass-through-router>
 			</outbound>
 		</service>
 		<service name="testReceivePOST">
 			<inbound>
-				<http:inbound-endpoint connector-ref="httpConnector" address="http://localhost:60224/post" 
+				<http:inbound-endpoint connector-ref="httpConnector" address="http://localhost:${port1}/post" 
 					responseTransformer-refs="setResponseType"/>
 			</inbound>
 			<test:component appendString=" Received" />
