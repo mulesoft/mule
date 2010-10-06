@@ -13,12 +13,12 @@ package org.mule.test.integration.spring.events;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
-public class MuleEventMulticasterTestCase extends FunctionalTestCase
+public class MuleEventMulticasterTestCase extends DynamicPortTestCase
 {
     final AtomicInteger eventCount = new AtomicInteger(0);
 
@@ -49,10 +49,16 @@ public class MuleEventMulticasterTestCase extends FunctionalTestCase
         orderManager.setEventCallback(callback);
 
         Order order = new Order("Sausage and Mash");
-        MuleMessage result = client.send("axis:http://localhost:44444/mule/orderManager?method=processOrder", order,
+        MuleMessage result = client.send("axis:http://localhost:" + getPorts().get(0) + "/mule/orderManager?method=processOrder", order,
             null);
 
         assertNotNull(result);
         assertEquals("Order 'Sausage and Mash' Processed", (result.getPayload()));
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

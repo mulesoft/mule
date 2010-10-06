@@ -10,9 +10,10 @@
 
 package org.mule.test.integration.transformer.response;
 
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 
-public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
+public class ResponseTransformerScenariosTestCase extends DynamicPortTestCase
 {
     public ResponseTransformerScenariosTestCase()
     {
@@ -45,5 +46,11 @@ public class ResponseTransformerScenariosTestCase extends FunctionalTestCase
      */
     public void testDummy()
     {
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 4;
     }
 }

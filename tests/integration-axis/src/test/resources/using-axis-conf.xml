@@ -15,7 +15,7 @@
         <!--Hosting the Cxf service-->
         <service name="CxfService">
             <inbound>
-                <inbound-endpoint address="cxf:http://localhost:63382/services/CxfService"
+                <inbound-endpoint address="cxf:http://localhost:${port1}/services/CxfService"
                     exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
@@ -29,7 +29,7 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint 
-                        address="axis:http://localhost:63382/services/CxfService?method=receive"
+                        address="axis:http://localhost:${port1}/services/CxfService?method=receive"
                         exchange-pattern="request-response">
                         <properties>
                             <spring:entry key="soapAction" value="#[methodNamespace]#[method]"/>

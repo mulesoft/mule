@@ -22,7 +22,7 @@
         class="org.mule.test.integration.spring.events.OrderManagerBean">
         <spring:property name="subscriptions">
             <spring:list>
-                <spring:value>axis:http://localhost:44444/mule/orderManager</spring:value>
+                <spring:value>axis:http://localhost:${port1}/mule/orderManager</spring:value>
             </spring:list>
         </spring:property>
     </spring:bean>

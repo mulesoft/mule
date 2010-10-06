@@ -12,9 +12,10 @@ package org.mule.test.usecases.axis.clientbridge;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 
-public class ClientBridgeTestCase extends FunctionalTestCase
+public class ClientBridgeTestCase extends DynamicPortTestCase
 {
 
     protected String getConfigResources()
@@ -33,5 +34,11 @@ public class ClientBridgeTestCase extends FunctionalTestCase
         assertEquals(new Integer(84), result.getSomeInteger());
         assertEquals("Foo", result.getSomeString());
 
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

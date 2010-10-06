@@ -13,12 +13,12 @@
         <client:xml-wire-format/>
     </client:remote-dispatcher-agent>
 
-    <endpoint name="remoteEndpoint" address="tcp://localhost:38100" exchange-pattern="request-response"/>
+    <endpoint name="remoteEndpoint" address="tcp://localhost:${port1}" exchange-pattern="request-response"/>
 
     <model name="test">
         <service name="mycomponent">
             <inbound>
-                <inbound-endpoint address="axis:http://localhost:38103/mule/services"
+                <inbound-endpoint address="axis:http://localhost:${port2}/mule/services" name="inMyComponent"
                     exchange-pattern="request-response"/>
             </inbound>
             <component>
@@ -28,7 +28,7 @@
 
         <service name="mycomponent2">
             <inbound>
-                <inbound-endpoint address="axis:http://localhost:38104/mule/services"
+                <inbound-endpoint address="axis:http://localhost:${port3}/mule/services" name="inMyComponent2"
                     exchange-pattern="request-response"/>
             </inbound>
             <component>
@@ -40,7 +40,7 @@
 
         <service name="mycomponent3">
             <inbound>
-                <inbound-endpoint address="axis:http://localhost:38104/mule/services"
+                <inbound-endpoint address="axis:http://localhost:${port3}/mule/services" name="inMyComponent3"
                     exchange-pattern="request-response"/>
             </inbound>
             <component>

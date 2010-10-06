@@ -12,6 +12,7 @@ package org.mule.test.usecases.axis;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.soap.axis.AxisConnector;
 
@@ -21,11 +22,11 @@ import java.util.Map;
 /**
  * TODO document
  */
-public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
+public class AxisClientWithComplexTypesTestCase extends DynamicPortTestCase
 {
     
     private Trade trade = null;
-    private String uri = "axis:http://localhost:8081/services/BackOfficeImplBindingImplUMO?method=submitTrade";
+    private String uri = null;
 
     @Override
     protected String getConfigResources()
@@ -42,6 +43,7 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
         trade.setCurrency(22);
         trade.setTradeID(22);
         trade.setTransaction(11);
+        uri = "axis:http://localhost:" + getPorts().get(0) + "/services/BackOfficeImplBindingImplUMO?method=submitTrade";
     }
 
     public void testSendComplexDOCLIT() throws Exception
@@ -75,6 +77,12 @@ public class AxisClientWithComplexTypesTestCase extends FunctionalTestCase
         assertNotNull(result);
         TradeStatus status = (TradeStatus)result.getPayload();
         assertEquals("RECEIVED", status.getStatus());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

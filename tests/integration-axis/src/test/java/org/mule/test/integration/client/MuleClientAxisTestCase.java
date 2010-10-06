@@ -11,11 +11,12 @@
 package org.mule.test.integration.client;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.testmodels.services.Person;
 
-public class MuleClientAxisTestCase extends FunctionalTestCase
+public class MuleClientAxisTestCase extends DynamicPortTestCase
 {
 
     @Override
@@ -24,11 +25,26 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
         return "org/mule/test/integration/client/axis-client-test-mule-config.xml";
     }
 
+    /**
+     * Get the Mule address for a Mule client call
+     * 
+     * @param muleClient The MuleClient instance to use
+     * @param endpointName The inbound endpoint which contains the address
+     * @return A String of the 'Mule' address, which in this case should include
+     *         'axis" + 'http://<url>'
+     */
+    private String getMuleAddress(MuleClient muleClient, String inboundEndpointName)
+    {
+        return ((InboundEndpoint) muleClient.getMuleContext().getRegistry().lookupObject(inboundEndpointName)).getProtocol()
+               + ":"
+               + ((InboundEndpoint) muleClient.getMuleContext().getRegistry().lookupObject(
+                   inboundEndpointName)).getAddress();
+    }
+    
     public void testRequestResponse() throws Throwable
     {
         MuleClient client = new MuleClient(muleContext);
-
-        MuleMessage result = client.send("axis:http://localhost:38104/mule/services/mycomponent2?method=echo",
+        MuleMessage result = client.send(getMuleAddress(client, "inMyComponent2") + "/mycomponent2?method=echo",
             "test", null);
         assertNotNull(result);
         assertEquals("test", result.getPayloadAsString());
@@ -39,7 +55,7 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
 
         MuleMessage result = client.send(
-            "axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson", "Fred", null);
+            getMuleAddress(client, "inMyComponent3") + "/mycomponent3?method=getPerson", "Fred", null);
         assertNotNull(result);
         logger.debug(result.getPayload());
         assertTrue(result.getPayload() instanceof Person);
@@ -53,14 +69,14 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
 
         String[] args = new String[]{"Betty", "Rubble"};
         MuleMessage result = client.send(
-            "axis:http://localhost:38104/mule/services/mycomponent3?method=addPerson", args, null);
+            getMuleAddress(client, "inMyComponent3") + "/mycomponent3?method=addPerson", args, null);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Betty", ((Person)result.getPayload()).getFirstName());
         assertEquals("Rubble", ((Person)result.getPayload()).getLastName());
 
         // do a receive
-        result = client.send("axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson",
+        result = client.send(getMuleAddress(client, "inMyComponent3") + "/mycomponent3?method=getPerson",
             "Betty", null);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
@@ -73,14 +89,20 @@ public class MuleClientAxisTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient(muleContext);
         Person person = new Person("Joe", "Blow");
-        String uri = "axis:http://localhost:38104/mule/services/mycomponent3?method=addPerson";
+        String uri = getMuleAddress(client, "inMyComponent3") + "/mycomponent3?method=addPerson";
         client.send(uri, person, null);
-        uri = "axis:http://localhost:38104/mule/services/mycomponent3?method=getPerson";
+        uri = getMuleAddress(client, "inMyComponent3") +  "/mycomponent3?method=getPerson";
         MuleMessage result = client.send(uri, "Joe", null);
         assertNotNull(result);
         assertTrue(result.getPayload() instanceof Person);
         assertEquals("Joe", ((Person)result.getPayload()).getFirstName());
         assertEquals("Blow", ((Person)result.getPayload()).getLastName());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 3;
     }
 
 }

@@ -21,7 +21,7 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint 
-                        address="axis:http://localhost:8002/axisService/doSomeWork?method=executeComplexity"
+                        address="axis:http://localhost:${port1}/axisService/doSomeWork?method=executeComplexity"
                         exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
@@ -29,7 +29,7 @@
 
         <service name="doSomeWork">
             <inbound>
-                <inbound-endpoint address="axis:http://localhost:8002/axisService"
+                <inbound-endpoint address="axis:http://localhost:${port1}/axisService"
                     exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.test.usecases.axis.clientbridge.DoSomeWork"/>

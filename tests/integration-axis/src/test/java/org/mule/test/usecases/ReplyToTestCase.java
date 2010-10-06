@@ -13,13 +13,14 @@ package org.mule.test.usecases;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
 /**
  * see MULE-2721
  */ 
-public class ReplyToTestCase extends FunctionalTestCase
+public class ReplyToTestCase extends DynamicPortTestCase
 {
     static final long RECEIVE_DELAY = 3000;
 
@@ -95,5 +96,11 @@ public class ReplyToTestCase extends FunctionalTestCase
         // Make sure there are no more responses
         result = client.request("ReplyTo", RECEIVE_DELAY);
         assertNull("Extra message received at replyTo destination: " + result, result);        
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 }

@@ -13,7 +13,7 @@
     <model>
         <service name="BackOfficeImplBindingImplUMO">
             <inbound>
-                <axis:inbound-endpoint address="http://localhost:8081/services" 
+                <axis:inbound-endpoint address="http://localhost:${port1}/services" 
                     exchange-pattern="request-response" style="DOCUMENT" use="LITERAL">
                     <axis:options wsdlServiceElement="BackOfficeImplService" wsdlPortType="BackOfficeImplPortType"/>
                     <axis:bean-type interface="org.mule.test.usecases.axis.Trade"/>

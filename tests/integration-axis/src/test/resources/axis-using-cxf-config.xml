@@ -14,7 +14,7 @@
         <!-- hosting the Axis Service -->
         <service name="AxisService">
             <inbound>
-                <axis:inbound-endpoint address="http://localhost:63381/services"
+                <axis:inbound-endpoint address="http://localhost:${port1}/services"
                     exchange-pattern="request-response" style="WRAPPED" use="LITERAL"/>
             </inbound>
             <component class="org.mule.tck.testmodels.services.TestComponent"/>
@@ -29,10 +29,10 @@
             <outbound>
                 <exception-based-router>
                     <outbound-endpoint 
-                        address="axis:http://localhost:63380/services/AxisService?method=receive"
+                        address="axis:http://localhost:${port2}/services/AxisService?method=receive"
                         exchange-pattern="request-response"/>
                     <outbound-endpoint 
-                        address="axis:http://localhost:63381/services/AxisService?method=receive"
+                        address="axis:http://localhost:${port1}/services/AxisService?method=receive"
                         exchange-pattern="request-response"/>
                 </exception-based-router>
             </outbound>
@@ -47,7 +47,7 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint
-                            address="wsdl-cxf:http://localhost:63381/services/AxisService?wsdl&amp;method=receive"
+                            address="wsdl-cxf:http://localhost:${port1}/services/AxisService?wsdl&amp;method=receive"
                             exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>

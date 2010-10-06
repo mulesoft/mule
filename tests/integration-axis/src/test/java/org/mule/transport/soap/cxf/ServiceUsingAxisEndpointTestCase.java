@@ -13,6 +13,7 @@ package org.mule.transport.soap.cxf;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
+public class ServiceUsingAxisEndpointTestCase extends DynamicPortTestCase
 {
 
     public void testCXF() throws Exception
@@ -41,7 +42,7 @@ public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         Map<String, String> props = new HashMap<String, String>();
         props.put("http.method", "GET");
-        MuleMessage reply = client.send("http://localhost:63382/services/CxfService?wsdl",
+        MuleMessage reply = client.send("http://localhost:" + getPorts().get(0) + "/services/CxfService?wsdl",
             "/services/CxfService?wsdl", props);
 
         assertNotNull(reply);
@@ -57,6 +58,12 @@ public class ServiceUsingAxisEndpointTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "using-axis-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }
