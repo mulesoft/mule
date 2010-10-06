@@ -24,20 +24,19 @@ import org.mule.transport.AbstractMessageRequesterFactory;
 
 public class RetrieveMessageRequesterFactory extends AbstractMessageRequesterFactory
 {
-
-    private boolean requesterPErRequest = true;
+    private boolean requesterPerRequest = true;
     /**
      * By default client connections are closed after the request.
      */
     @Override
     public boolean isCreateRequesterPerRequest()
     {
-        return requesterPErRequest;
+        return requesterPerRequest;
     }
 
+    @Override
     public MessageRequester create(InboundEndpoint endpoint) throws MuleException
     {
         return new RetrieveMessageRequester(endpoint);
     }
-
 }

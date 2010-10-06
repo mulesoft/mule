@@ -33,7 +33,6 @@ import javax.mail.internet.MimeMessage;
  * <p/>
  * This contains a reference to a mail folder (and also the endpoint and connector, via superclasses)
  */
-
 public class RetrieveMessageRequester extends AbstractMessageRequester
 {
     private Folder folder;
@@ -54,7 +53,6 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
     {
         if (folder == null || !folder.isOpen())
         {
-
             Store store = castConnector().getSessionDetails(endpoint).newStore();
 
             EndpointURI uri = endpoint.getEndpointURI();
@@ -64,38 +62,30 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
             store.connect(uri.getHost(), uri.getPort(), user, pass);
 
             folder = store.getFolder(castConnector().getMailboxFolder());
-            if (!folder.isOpen())
-            {
-                try
-                {
-                    // Depending on Server implementation it's not always
-                    // necessary to open the folder to check it
-                    // Opening folders can be exprensive!
-                    folder.open(Folder.READ_WRITE);
-                }
-                catch (MessagingException e)
-                {
-                    logger.warn("Failed to open folder: " + folder.getFullName() + " This is not an exception since some server implementations do not require the flder to be open", e);
-                }
-            }
+            ensureFolderIsOpen(folder);
 
             if (castConnector().getMoveToFolder() != null)
             {
                 moveToFolder = store.getFolder(castConnector().getMoveToFolder());
-                if (!moveToFolder.isOpen())
-                {
-                    try
-                    {
-                        // Depending on Server implementation it's not always
-                        // necessary to open the folder to check it
-                        // Opening folders can be exprensive!
-                        moveToFolder.open(Folder.READ_WRITE);
-                    }
-                    catch (MessagingException e)
-                    {
-                        logger.warn("Failed to open folder: " + moveToFolder.getFullName() + " This is not an exception since some server implementations do not require the flder to be open", e);
-                    }
-                }
+                ensureFolderIsOpen(moveToFolder);
+            }
+        }
+    }
+    
+    protected void ensureFolderIsOpen(Folder fldr)
+    {
+        if (!fldr.isOpen())
+        {
+            try
+            {
+                // Depending on Server implementation it's not always
+                // necessary to open the folder to check it
+                // Opening folders can be exprensive!
+                fldr.open(Folder.READ_WRITE);
+            }
+            catch (MessagingException e)
+            {
+                logger.warn("Failed to open folder: " + fldr.getFullName() + " This is not an exception since some server implementations do not require the folder to be open", e);
             }
         }
     }
@@ -152,7 +142,7 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
      */
     protected void doDispatch(MuleEvent event) throws Exception
     {
-        throw new UnsupportedOperationException("Cannot dispatch from a Pop3 connection");
+        throw new UnsupportedOperationException("Cannot dispatch from a POP3/IMAP connection");
     }
 
     /**
@@ -161,7 +151,7 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
      */
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
-        throw new UnsupportedOperationException("Cannot send from a Pop3 connection");
+        throw new UnsupportedOperationException("Cannot send from a POP3/IMAP connection");
     }
 
     /**
@@ -187,16 +177,16 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
 
         do
         {
-            if (hasMessages(folder))
+            if (hasMessages())
             {
-                int count = getMessageCount(folder);
+                int count = getMessageCount();
                 if (count > 0)
                 {
-                    Message message = getNextMessage(folder);
+                    Message message = getNextMessage();
                     if (message != null)
                     {
                         // so we don't get the same message again
-                        flagMessage(folder, message);
+                        flagMessage(message);
 
                         if (moveToFolder != null)
                         {
@@ -253,14 +243,11 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
     }
 
     /**
-     * There seems to be som variation on pop3 implementation so it may be
-     * preferrable to mark messages as seen here and alos overload the getMessages
+     * There seems to be some variation on pop3 implementation so it may be
+     * preferrable to mark messages as seen here and also overload the getMessages
      * method to grab only new messages
-     *
-     * @param message
-     * @throws javax.mail.MessagingException
      */
-    protected void flagMessage(Folder folder, Message message) throws MessagingException
+    protected void flagMessage(Message message) throws MessagingException
     {
         if (castConnector().isDeleteReadMessages())
         {
@@ -272,9 +259,9 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
         }
     }
 
-    protected Message getNextMessage(Folder folder) throws MessagingException
+    protected Message getNextMessage() throws MessagingException
     {
-        if (getMessageCount(folder) > 0)
+        if (getMessageCount() > 0)
         {
             Message message = folder.getMessage(1);
             if (!message.isExpunged())
@@ -285,7 +272,7 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
         return null;
     }
 
-    protected int getMessageCount(Folder folder) throws MessagingException
+    protected int getMessageCount() throws MessagingException
     {
         return folder.getMessageCount();
     }
@@ -294,13 +281,10 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
      * Optimised check to se whether to return the message count and retrieve the
      * messages. Some pop3 implementations differ so an optimised check such as
      * folder.hasNewMessages() cannot be used
-     *
-     * @param folder
-     * @throws javax.mail.MessagingException
      */
-    protected boolean hasMessages(Folder folder) throws MessagingException
+    protected boolean hasMessages() throws MessagingException
     {
-        return getMessageCount(folder) > 0;
+        return getMessageCount() > 0;
     }
 
     @Override
@@ -319,5 +303,4 @@ public class RetrieveMessageRequester extends AbstractMessageRequester
             }
         }
     }
-
 }
