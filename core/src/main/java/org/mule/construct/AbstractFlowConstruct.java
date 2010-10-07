@@ -52,7 +52,7 @@ import org.apache.commons.logging.LogFactory;
  * {@link MessageSource} and {@link MessageProcessor}s in the correct order depending
  * on the lifecycle phase. <li>Allows an {@link ExceptionListener} to be set. <br/>
  * Implementations of <code>AbstractFlowConstuct</code> should implement
- * {@link#configureMessageProcessors(ChainMessageProcessorBuilder)} and
+ * {@link #configureMessageProcessors(org.mule.processor.builder.InterceptingChainMessageProcessorBuilder)} and
  * {@link #validateConstruct()} to construct the processing chain required and
  * validate the resulting construct. Validation may include validation of the type of
  * attributes of the {@link MessageSource}.
@@ -109,6 +109,8 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
                     injectFlowConstructMuleContext(messageProcessorChain);
                     initialiseIfInitialisable(messageSource);
                     initialiseIfInitialisable(messageProcessorChain);
+
+                    statistics.setEnabled(muleContext.getStatistics().isEnabled());
 
                     doInitialise();
 
