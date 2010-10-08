@@ -25,14 +25,14 @@
 
         <service name="echoProxy">
             <inbound>
-                <inbound-endpoint address="jetty://localhost:63082/services/EchoProxy"
+                <inbound-endpoint address="jetty://localhost:${port1}/services/EchoProxy"
                                   exchange-pattern="request-response" connector-ref="jettyConnector">
                     <cxf:proxy-service />
                 </inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="http://localhost:63081/services/Echo"
+                    <outbound-endpoint address="http://localhost:${port2}/services/Echo"
                                        exchange-pattern="request-response" connector-ref="HttpConnector">
                         <cxf:proxy-client />   
                     </outbound-endpoint>
@@ -43,7 +43,7 @@
         <service name="echoService">
             <inbound>
                 <inbound-endpoint
-                        address="jetty://localhost:63081/services/Echo" exchange-pattern="request-response"
+                        address="jetty://localhost:${port2}/services/Echo" exchange-pattern="request-response"
                         connector-ref="jettyConnector">
                     <cxf:simple-service />
                 </inbound-endpoint>

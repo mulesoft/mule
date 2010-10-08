@@ -12,7 +12,7 @@ package org.mule.module.cxf.issues;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author lenhag
  */
-public class LargeProxyTestCase extends FunctionalTestCase
+public class LargeProxyTestCase extends DynamicPortTestCase
 {
     @Override
     protected String getConfigResources()
@@ -41,7 +41,6 @@ public class LargeProxyTestCase extends FunctionalTestCase
         {
             // Using a counter to make it easier to see the size
             b.append(counter).append(" ");
-//      b.append((char) (Math.random() * 26 + 'a'));
             counter++;
         }
         final String largeString = b.toString().trim();
@@ -68,7 +67,7 @@ public class LargeProxyTestCase extends FunctionalTestCase
                 {
                     try
                     {
-                        MuleMessage result = client.send("http://localhost:63082/services/EchoProxy", msg, null);
+                        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/EchoProxy", msg, null);
                         String payloadAsStr = result.getPayloadAsString();
                         assertTrue("The payload length should never be 0", payloadAsStr.length() != 0);
                         assertTrue(payloadAsStr.indexOf(largeString) != -1);
@@ -89,5 +88,11 @@ public class LargeProxyTestCase extends FunctionalTestCase
         }
 
         latch.await(50000, TimeUnit.SECONDS);
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 }
