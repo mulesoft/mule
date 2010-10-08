@@ -12,13 +12,14 @@ package org.mule.transport.ajax;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.cometd.Client;
 import org.cometd.Message;
@@ -27,9 +28,9 @@ import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
 
-public class AjaxFunctionalTestCase extends FunctionalTestCase
+public class AjaxFunctionalTestCase extends DynamicPortTestCase
 {
-    public static final int SERVER_PORT = 58381;
+    public static int SERVER_PORT = -1;
     
     private HttpClient httpClient;
     private BayeuxClient bayeuxClient;
@@ -43,6 +44,7 @@ public class AjaxFunctionalTestCase extends FunctionalTestCase
     @Override
     protected void doSetUp() throws Exception
     {
+        SERVER_PORT = getPorts().get(0);
         httpClient = new HttpClient();
         httpClient.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL);
         httpClient.start();
@@ -102,5 +104,11 @@ public class AjaxFunctionalTestCase extends FunctionalTestCase
 
         assertNotNull(msg);
         assertEquals("Ross Received", msg.getPayloadAsString());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

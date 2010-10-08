@@ -23,13 +23,20 @@ public class ResourceLoaderServletTestCase extends AbstractMuleTestCase
 {
     private Server httpServer;
 
+    public ResourceLoaderServletTestCase()
+    {
+        super();
+        // use dynamic ports outside of a FunctionalTestCase 
+        numPorts = 1;
+    }
+
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
         httpServer = new Server();
         SelectChannelConnector conn = new SelectChannelConnector();
-        conn.setPort(8881);
+        conn.setPort(getPorts().get(0));
         httpServer.addConnector(conn);
 
         ServletHandler handler = new ServletHandler();
@@ -57,7 +64,7 @@ public class ResourceLoaderServletTestCase extends AbstractMuleTestCase
         muleContext.start();
         MuleClient client = new MuleClient(muleContext);
 
-        MuleMessage m = client.request("http://localhost:8881/mule-resource/js/mule.js", 3000);
+        MuleMessage m = client.request("http://localhost:" + getPorts().get(0) + "/mule-resource/js/mule.js", 3000);
         assertFalse(m.getPayload() instanceof NullPayload);
     }
 }

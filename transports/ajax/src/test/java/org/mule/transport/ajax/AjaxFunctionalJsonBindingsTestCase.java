@@ -12,11 +12,13 @@ package org.mule.transport.ajax;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+
+import java.lang.IllegalStateException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
@@ -28,9 +30,9 @@ import org.mortbay.cometd.client.BayeuxClient;
 import org.mortbay.jetty.client.Address;
 import org.mortbay.jetty.client.HttpClient;
 
-public class AjaxFunctionalJsonBindingsTestCase extends FunctionalTestCase
+public class AjaxFunctionalJsonBindingsTestCase extends DynamicPortTestCase
 {
-    public static final int SERVER_PORT = 58080;
+    public static int SERVER_PORT = -1;
 
     private BayeuxClient client;
 
@@ -42,7 +44,8 @@ public class AjaxFunctionalJsonBindingsTestCase extends FunctionalTestCase
 
     @Override
     protected void doSetUp() throws Exception
-    {        
+    {
+        SERVER_PORT = getPorts().get(0);
         HttpClient http = new HttpClient();
         http.setConnectorType(HttpClient.CONNECTOR_SELECT_CHANNEL);
 
@@ -57,6 +60,19 @@ public class AjaxFunctionalJsonBindingsTestCase extends FunctionalTestCase
     {
         //9 times out of 10 this throws a "ava.lang.IllegalStateException: Not running" exception, it can be ignored
         //client.stop();
+        // TODO DZ: it seems like you would want to do this, maybe causing port locking issues?
+        try
+            {
+                client.stop();
+            }
+        catch (IllegalStateException e)
+        {
+            logger.info("caught an IllegalStateException during tearDown", e);
+        }
+        catch(Exception e1)
+        {
+            fail("unexpected exception during tearDown :" + e1.getMessage());
+        }
     }
 
     public void testClientSubscribeWithJsonObjectResponse() throws Exception
@@ -100,5 +116,11 @@ public class AjaxFunctionalJsonBindingsTestCase extends FunctionalTestCase
 
         assertNotNull(msg);
         assertEquals("Received: DummyJsonBean{name='Ross'}", msg.getPayloadAsString());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

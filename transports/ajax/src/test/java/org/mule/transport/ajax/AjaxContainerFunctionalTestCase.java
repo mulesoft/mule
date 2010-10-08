@@ -30,7 +30,9 @@ public class AjaxContainerFunctionalTestCase extends AjaxFunctionalTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        httpServer = new Server(SERVER_PORT);
+        // FIXME DZ: we don't use the inherited SERVER_PORT here because it's not set
+        // at this point and we can't move super.doSetUp() above this
+        httpServer = new Server(getPorts().get(0));
 
         Context c = new Context(httpServer, "/", Context.SESSIONS);
         c.addServlet(new ServletHolder(new MuleAjaxServlet()), "/ajax/*");

@@ -12,7 +12,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd">
 
-    <ajax:connector name="ajax.server" serverUrl="http://127.0.0.1:58381"/>
+    <ajax:connector name="ajax.server" serverUrl="http://127.0.0.1:${port1}"/>
     
     <ajax:endpoint name="ajax-endpoint1" channel="/test1"/>
     <ajax:endpoint name="ajax-endpoint2" channel="/test2"/>
