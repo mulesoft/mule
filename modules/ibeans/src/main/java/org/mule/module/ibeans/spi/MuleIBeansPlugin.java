@@ -30,6 +30,7 @@ import org.ibeans.api.IBeanInvoker;
 import org.ibeans.api.IBeansException;
 import org.ibeans.api.channel.CHANNEL;
 import org.ibeans.impl.DefaultIBeanInvoker;
+import org.ibeans.impl.InvokeAnnotationHandler;
 import org.ibeans.impl.TemplateAnnotationHandler;
 import org.ibeans.impl.support.util.Utils;
 import org.ibeans.spi.ErrorFilterFactory;
@@ -47,6 +48,7 @@ public class MuleIBeansPlugin implements IBeansPlugin<MuleRequestMessage, MuleRe
     private MuleExpressionParser expressionParser;
     private MuleCallAnnotationHandler callAnnotationHandler;
     private TemplateAnnotationHandler templateAnnotationHandler;
+    private InvokeAnnotationHandler invokeAnnotationHandler;
     private MuleResponseTransformInterceptor responseTransformInterceptor;
     private List<ErrorFilterFactory> errorFilterFactories;
 
@@ -57,6 +59,7 @@ public class MuleIBeansPlugin implements IBeansPlugin<MuleRequestMessage, MuleRe
         expressionParser = new MuleExpressionParser(muleContext);
         properties = new RegistryMap(muleContext.getRegistry());
         templateAnnotationHandler = new TemplateAnnotationHandler(this);
+        invokeAnnotationHandler = new InvokeAnnotationHandler(this);
         responseTransformInterceptor = new MuleResponseTransformInterceptor(muleContext, expressionParser);
 
         errorFilterFactories = new ArrayList<ErrorFilterFactory>();
@@ -68,14 +71,14 @@ public class MuleIBeansPlugin implements IBeansPlugin<MuleRequestMessage, MuleRe
         return responseTransformInterceptor;
     }
 
-    public IBeanInvoker<MuleCallAnnotationHandler, TemplateAnnotationHandler> getIBeanInvoker() throws IBeansException
+    public IBeanInvoker<MuleCallAnnotationHandler, TemplateAnnotationHandler, InvokeAnnotationHandler> getIBeanInvoker() throws IBeansException
     {
-        return new DefaultIBeanInvoker<MuleCallAnnotationHandler, TemplateAnnotationHandler>(callAnnotationHandler, templateAnnotationHandler);
+        return new DefaultIBeanInvoker<MuleCallAnnotationHandler, TemplateAnnotationHandler, InvokeAnnotationHandler>(callAnnotationHandler, templateAnnotationHandler, invokeAnnotationHandler);
     }
 
-    public IBeanInvoker<MuleMockCallAnnotationHandler, TemplateAnnotationHandler> getMockIBeanInvoker(Object mock) throws IBeansException
+    public IBeanInvoker<MuleMockCallAnnotationHandler, TemplateAnnotationHandler, InvokeAnnotationHandler> getMockIBeanInvoker(Object mock) throws IBeansException
     {
-        return new DefaultIBeanInvoker<MuleMockCallAnnotationHandler, TemplateAnnotationHandler>(new MuleMockCallAnnotationHandler(muleContext, mock, this), templateAnnotationHandler);
+        return new DefaultIBeanInvoker<MuleMockCallAnnotationHandler, TemplateAnnotationHandler, InvokeAnnotationHandler>(new MuleMockCallAnnotationHandler(muleContext, mock, this), templateAnnotationHandler, invokeAnnotationHandler);
     }
 
     public List<ErrorFilterFactory> getErrorFilterFactories()

@@ -49,6 +49,7 @@ import org.ibeans.api.IBeanInvoker;
 import org.ibeans.api.IBeansException;
 import org.ibeans.api.channel.HTTP;
 import org.ibeans.impl.IntegrationBeanInvocationHandler;
+import org.ibeans.impl.InvokeAnnotationHandler;
 import org.ibeans.impl.TemplateAnnotationHandler;
 
 /**
@@ -118,7 +119,7 @@ public class IBeanBinding implements InterfaceBinding
         Map<String, String> evals = new HashMap<String, String>();
         try
         {
-            IBeanInvoker<MuleCallAnnotationHandler, TemplateAnnotationHandler> invoker = plugin.getIBeanInvoker();
+            IBeanInvoker<MuleCallAnnotationHandler, TemplateAnnotationHandler, InvokeAnnotationHandler> invoker = plugin.getIBeanInvoker();
             invoker.getCallHandler().setFlow(flow);
 
             List<AnnotationMetaData> annos = AnnotationUtils.getAllMethodAnnotations(getInterface());
@@ -139,7 +140,7 @@ public class IBeanBinding implements InterfaceBinding
                     {
                         scheme = uri.substring(0, i);
                     }
-                    http = scheme.startsWith("http");
+                    http = scheme.contains("http");
 
                     Map metaInfo = new HashMap();
                     //By setting the connectorName we ensure that only one connector is created for each iBean
@@ -173,7 +174,7 @@ public class IBeanBinding implements InterfaceBinding
                                     break;
                                 }
                             }
-                            //TODO URGENT remove the HTTP hack above. Its required becuase HTTP request on the dispatcher
+                            //TODO remove the HTTP hack above. Its required becuase HTTP request on the dispatcher
                             //don't honour authenitcation for some reason.  Also even though there may not be any headers
                             //defined we still need to attach some headers to the HTTP method. This is very difficult when
                             //using request
