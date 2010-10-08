@@ -21,6 +21,7 @@ import org.mule.module.ibeans.i18n.IBeansMessages;
 import org.mule.transport.AbstractMessageDispatcher;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -70,6 +71,10 @@ public class IBeansMessageDispatcher extends AbstractMessageDispatcher
         if(payload.getClass().isArray())
         {
             params = (Object[])payload;
+        }
+        else if (payload instanceof ArrayList)
+        {
+            params = ((ArrayList) payload).toArray();
         }
         else
         {
