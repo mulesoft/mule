@@ -22,7 +22,7 @@ public class Pop3sConnectorTestCase extends AbstractReceivingMailConnectorTestCa
 {
     public Pop3sConnectorTestCase()
     {
-        super(ServerSetup.PROTOCOL_POP3S, 50009);
+        super(ServerSetup.PROTOCOL_POP3S);
     }
 
     public Connector createConnector() throws Exception

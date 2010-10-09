@@ -15,6 +15,7 @@ import com.icegreen.greenmail.user.UserManager;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -71,25 +72,30 @@ public abstract class AbstractGreenMailSupport
         createUserAndStoreEmail(ALICE_EMAIL, ALICE, PASSWORD, message);
     }
 
-    protected void startServers() throws Exception
+    protected void startServers(List<Integer> list) throws Exception
     {
         logger.info("Starting mail servers");
-        servers = new GreenMail(getSetups());
+        servers = new GreenMail(getSetups(list));
         servers.start();
         Thread.sleep(STARTUP_PERIOD_MS);
     }
 
     protected abstract int nextPort();
 
-    private ServerSetup[] getSetups()
+    private ServerSetup[] getSetups(List<Integer> list)
     {
+        if (list.size() != 6)
+        {
+            throw new IllegalArgumentException("must pass in an array of 6 ports for server setup");
+        }
+        
         return new ServerSetup[]{
-                newServerSetup(nextPort(), ServerSetup.PROTOCOL_SMTP),
-                newServerSetup(nextPort(), ServerSetup.PROTOCOL_SMTPS),
-                newServerSetup(nextPort(), ServerSetup.PROTOCOL_POP3),
-                newServerSetup(nextPort(), ServerSetup.PROTOCOL_POP3S),
-                newServerSetup(nextPort(), ServerSetup.PROTOCOL_IMAP),
-                newServerSetup(nextPort(), ServerSetup.PROTOCOL_IMAPS)
+                newServerSetup(list.get(0), ServerSetup.PROTOCOL_POP3),
+                newServerSetup(list.get(1), ServerSetup.PROTOCOL_SMTP),
+                newServerSetup(list.get(2), ServerSetup.PROTOCOL_SMTPS),
+                newServerSetup(list.get(3), ServerSetup.PROTOCOL_POP3S),
+                newServerSetup(list.get(4), ServerSetup.PROTOCOL_IMAP),
+                newServerSetup(list.get(5), ServerSetup.PROTOCOL_IMAPS)
         };
     }
 

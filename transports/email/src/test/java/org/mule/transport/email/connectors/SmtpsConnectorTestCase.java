@@ -19,7 +19,7 @@ public class SmtpsConnectorTestCase extends SmtpConnectorTestCase
 {
     public SmtpsConnectorTestCase()
     {
-        super(ServerSetup.PROTOCOL_SMTPS, 50008);
+        super(NO_INITIAL_EMAIL, ServerSetup.PROTOCOL_SMTPS);
         setStartContext(true);
     }
 

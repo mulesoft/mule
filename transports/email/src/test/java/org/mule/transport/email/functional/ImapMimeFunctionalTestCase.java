@@ -15,7 +15,7 @@ public class ImapMimeFunctionalTestCase extends AbstractEmailFunctionalTestCase
 
     public ImapMimeFunctionalTestCase()
     {
-        super(65443, MIME_MESSAGE, "imap", "imap-mime-functional-test.xml");
+        super(MIME_MESSAGE, "imap", "imap-mime-functional-test.xml");
     }
 
     public void testRequest() throws Exception

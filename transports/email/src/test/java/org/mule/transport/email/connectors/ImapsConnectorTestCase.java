@@ -22,7 +22,7 @@ public class ImapsConnectorTestCase extends AbstractReceivingMailConnectorTestCa
 {
     public ImapsConnectorTestCase()
     {
-        super(ServerSetup.PROTOCOL_IMAPS, 50011);
+        super(ServerSetup.PROTOCOL_IMAPS);
     }
 
     public Connector createConnector() throws Exception

@@ -20,15 +20,9 @@ import com.icegreen.greenmail.util.ServerSetup;
  */
 public class ImapConnectorTestCase extends AbstractReceivingMailConnectorTestCase
 {
-
     public ImapConnectorTestCase()
     {
-        this(50012);
-    }
-
-    public ImapConnectorTestCase(int port)
-    {
-        super(ServerSetup.PROTOCOL_IMAP, port);
+        super(ServerSetup.PROTOCOL_IMAP);
     }
 
     @Override

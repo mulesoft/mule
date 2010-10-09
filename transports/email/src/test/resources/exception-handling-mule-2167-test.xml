@@ -20,7 +20,7 @@
             <outbound>
                 <exception-based-router>
                     <!-- this doesn't exist -->
-                    <smtp:outbound-endpoint user="error" host="localhost" port="65040"/>
+                    <smtp:outbound-endpoint user="error" host="localhost" port="${port1}"/>
                     <vm:outbound-endpoint path="out-default" exchange-pattern="one-way"/>
                 </exception-based-router>
             </outbound>

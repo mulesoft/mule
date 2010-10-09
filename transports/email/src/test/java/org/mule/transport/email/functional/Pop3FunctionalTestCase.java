@@ -15,7 +15,7 @@ public class Pop3FunctionalTestCase extends AbstractEmailFunctionalTestCase
 
     public Pop3FunctionalTestCase()
     {
-        super(65435, STRING_MESSAGE, "pop3");
+        super(STRING_MESSAGE, "pop3");
     }
 
     public void testRequest() throws Exception

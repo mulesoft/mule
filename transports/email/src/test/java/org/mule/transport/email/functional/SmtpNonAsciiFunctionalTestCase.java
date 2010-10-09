@@ -17,7 +17,7 @@ public class SmtpNonAsciiFunctionalTestCase extends AbstractEmailFunctionalTestC
 
     public SmtpNonAsciiFunctionalTestCase()
     {
-        super(65437, STRING_MESSAGE, "smtp", Locale.JAPAN, "iso-2022-jp");
+        super(STRING_MESSAGE, "smtp", Locale.JAPAN, "iso-2022-jp");
     }
 
     public void testSend() throws Exception

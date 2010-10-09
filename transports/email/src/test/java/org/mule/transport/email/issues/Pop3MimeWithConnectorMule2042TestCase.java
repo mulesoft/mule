@@ -17,7 +17,7 @@ public class Pop3MimeWithConnectorMule2042TestCase extends AbstractEmailFunction
 
     public Pop3MimeWithConnectorMule2042TestCase()
     {
-        super(65445, MIME_MESSAGE, "pop3", "pop3-mime-with-connector-mule-2042-test.xml");
+        super(MIME_MESSAGE, "pop3", "pop3-mime-with-connector-mule-2042-test.xml");
     }
 
     public void testRequest() throws Exception

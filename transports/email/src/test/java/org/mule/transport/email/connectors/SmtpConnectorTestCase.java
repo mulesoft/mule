@@ -41,15 +41,15 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
 {    
     public SmtpConnectorTestCase()
     {
-        this(ServerSetup.PROTOCOL_SMTP, 50007);
+        this(NO_INITIAL_EMAIL, ServerSetup.PROTOCOL_SMTP);
         setStartContext(true);
     } 
     
-    public SmtpConnectorTestCase(String protocol, int port)
+    public SmtpConnectorTestCase(boolean initialEmail, String protocol)
     {
-        super(NO_INITIAL_EMAIL, protocol, port);
+        super(initialEmail, protocol);
     }
-
+    
     @Override
     public Connector createConnector() throws Exception
     {

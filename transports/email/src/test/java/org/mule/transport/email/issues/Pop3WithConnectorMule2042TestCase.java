@@ -17,7 +17,7 @@ public class Pop3WithConnectorMule2042TestCase extends AbstractEmailFunctionalTe
 
     public Pop3WithConnectorMule2042TestCase()
     {
-        super(65435, STRING_MESSAGE, "pop3", "pop3-with-connector-mule-2042-test.xml");
+        super(STRING_MESSAGE, "pop3", "pop3-with-connector-mule-2042-test.xml");
     }
 
     public void testRequest() throws Exception

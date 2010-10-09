@@ -17,7 +17,7 @@ public class SmtpMimeNonAsciiFunctionalTestCase extends AbstractEmailFunctionalT
 
     public SmtpMimeNonAsciiFunctionalTestCase()
     {
-        super(65438, MIME_MESSAGE, "smtp", "smtp-mime-functional-test.xml", Locale.JAPAN, "iso-2022-jp");
+        super(MIME_MESSAGE, "smtp", "smtp-mime-functional-test.xml", Locale.JAPAN, "iso-2022-jp");
     }
 
     public void testSend() throws Exception

@@ -17,7 +17,7 @@ public class Pop3NonAsciiFunctionalTestCase extends AbstractEmailFunctionalTestC
 
     public Pop3NonAsciiFunctionalTestCase()
     {
-        super(65435, STRING_MESSAGE, "pop3", Locale.JAPAN, "iso-2022-jp");
+        super(STRING_MESSAGE, "pop3", Locale.JAPAN, "iso-2022-jp");
     }
 
     public void testRequest() throws Exception

@@ -17,7 +17,7 @@ public class Pop3MimeNonAsciiFunctionalTestCase extends AbstractEmailFunctionalT
 
     public Pop3MimeNonAsciiFunctionalTestCase()
     {
-        super(65445, MIME_MESSAGE, "pop3", "pop3-mime-functional-test.xml", Locale.JAPAN, "iso-2022-jp");
+        super(MIME_MESSAGE, "pop3", "pop3-mime-functional-test.xml", Locale.JAPAN, "iso-2022-jp");
     }
 
     public void testRequest() throws Exception

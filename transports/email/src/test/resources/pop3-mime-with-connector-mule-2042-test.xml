@@ -16,7 +16,7 @@
     <model name="test">
         <service name="relay">
             <inbound>
-                <pop3:inbound-endpoint user="bob" password="password" host="localhost" port="65445" connector-ref="pop3Connector" disableTransportTransformer="true" />
+                <pop3:inbound-endpoint user="bob" password="password" host="localhost" port="${port1}" connector-ref="pop3Connector" disableTransportTransformer="true" />
             </inbound>
             <outbound>
                 <pass-through-router>

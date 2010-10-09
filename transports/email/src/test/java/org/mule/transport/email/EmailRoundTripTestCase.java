@@ -13,7 +13,7 @@ package org.mule.transport.email;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 
 import javax.mail.internet.MimeMessage;
@@ -29,10 +29,9 @@ import org.junit.Test;
  * The Mule services (defined in email-round-trip-test.xml) are started by the test framework.
  * So all we need to do here is test that the message is handled correctly.</p>
  */
-public class EmailRoundTripTestCase extends FunctionalTestCase
+public class EmailRoundTripTestCase extends DynamicPortTestCase
 {
-    // this places the SMTP server at 62000 and POP at 62002
-    private AbstractGreenMailSupport greenMailSupport = new FixedPortGreenMailSupport(62000);
+    private AbstractGreenMailSupport greenMailSupport = null;
 
     protected String getConfigResources()
     {
@@ -46,7 +45,9 @@ public class EmailRoundTripTestCase extends FunctionalTestCase
     @Override
     protected void suitePreSetUp() throws Exception
     {
-        greenMailSupport.startServers();
+        // see AbstractGreenMailSupport for all the ports this test uses and their order 
+        greenMailSupport = new FixedPortGreenMailSupport(getPorts().get(1));
+        greenMailSupport.startServers(getPorts());
         greenMailSupport.createBobAndStoreEmail(greenMailSupport.getValidMessage(AbstractGreenMailSupport.ALICE_EMAIL));
     }
 
@@ -74,5 +75,12 @@ public class EmailRoundTripTestCase extends FunctionalTestCase
         MimeMessage[] messages = greenMailSupport.getServers().getReceivedMessages();
         assertNotNull("did not receive any messages", messages);
         assertEquals("did not receive 1 mail", 1, messages.length);
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        // see AbstractGreenMailSupport for all the services this test starts
+        return 6;
     }
 }

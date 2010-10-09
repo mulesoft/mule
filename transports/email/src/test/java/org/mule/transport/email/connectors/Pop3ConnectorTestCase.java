@@ -23,7 +23,7 @@ public class Pop3ConnectorTestCase extends AbstractReceivingMailConnectorTestCas
 
     public Pop3ConnectorTestCase()
     {
-        super(ServerSetup.PROTOCOL_POP3, 50010);
+        super(ServerSetup.PROTOCOL_POP3);
     }
 
     public Connector createConnector() throws Exception

@@ -12,19 +12,19 @@ package org.mule.transport.email.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.transport.email.GreenMailUtilities;
 import org.mule.transport.email.ImapConnector;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
-public class ImapMessageRequesterTestCase extends FunctionalTestCase
+public class ImapMessageRequesterTestCase extends DynamicPortTestCase
 {
     private static final String EMAIL = "bob@example.com";
     private static final String MESSAGE = "Test email message";
     private static final String PASSWORD = "password";
-    private static final int PORT = 65434;
+    private static int PORT = -1;
     private static final String USER = "bob";
     
     private GreenMail server;
@@ -33,6 +33,7 @@ public class ImapMessageRequesterTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
+        PORT = getPorts().get(0);
         startGreenmailServer();
     }
 
@@ -68,6 +69,12 @@ public class ImapMessageRequesterTestCase extends FunctionalTestCase
         
         assertNotNull(message);
         assertEquals(MESSAGE, message.getPayload());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }
 

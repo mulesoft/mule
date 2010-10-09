@@ -51,18 +51,20 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     private String protocol;
     private int port;
 
-    protected AbstractMailConnectorFunctionalTestCase(boolean initialEmail, String protocol, int port)
+    protected AbstractMailConnectorFunctionalTestCase(boolean initialEmail, String protocol)
     {
         super();
         this.initialEmail = initialEmail;
         this.protocol = protocol;
-        this.port = port;
+        // request one port in AbstractMuleTestCase
+        numPorts = 1;
     }
     
     @Override
     protected synchronized void doSetUp() throws Exception
     {
-        super.doSetUp();
+        super.doSetUp();   
+        this.port = getPorts().get(0);
         startServers();
         muleContext.getRegistry().registerObject("noActionTransformer",new NoActionTransformer());
     }

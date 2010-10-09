@@ -22,9 +22,8 @@ public abstract class AbstractBaseBackupMule2050TestCase extends ImapConnectorTe
 
     private boolean backupEnabled;
 
-    public AbstractBaseBackupMule2050TestCase(int port, boolean backupEnabled)
+    public AbstractBaseBackupMule2050TestCase(boolean backupEnabled)
     {
-        super(port);
         this.backupEnabled = backupEnabled;
     }
 

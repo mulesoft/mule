@@ -15,7 +15,7 @@ public class Pop3MimeFunctionalTestCase extends AbstractEmailFunctionalTestCase
 
     public Pop3MimeFunctionalTestCase()
     {
-        super(65445, MIME_MESSAGE, "pop3", "pop3-mime-functional-test.xml");
+        super(MIME_MESSAGE, "pop3", "pop3-mime-functional-test.xml");
     }
 
     public void testRequest() throws Exception
