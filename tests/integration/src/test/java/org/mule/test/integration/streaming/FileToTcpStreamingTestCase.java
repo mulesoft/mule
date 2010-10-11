@@ -11,12 +11,12 @@
 package org.mule.test.integration.streaming;
 
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
 
-public class FileToTcpStreamingTestCase extends FunctionalTestCase
+public class FileToTcpStreamingTestCase extends DynamicPortTestCase
 {
     @Override
     protected void doTearDown() throws Exception
@@ -28,6 +28,12 @@ public class FileToTcpStreamingTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "org/mule/test/integration/streaming/file-to-tcp-streaming.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
     public void testStreamingFromFileToTcp() throws Exception

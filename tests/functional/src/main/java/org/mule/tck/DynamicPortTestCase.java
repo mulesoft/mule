@@ -18,18 +18,14 @@ package org.mule.tck;
  */
 public abstract class DynamicPortTestCase extends FunctionalTestCase
 {
-    //private ArrayList<Integer> ports = null;
-
     protected abstract int getNumPortsToFind();
 
     public DynamicPortTestCase()
     {
         super();
+        
         // each test class sets the number of free ports to find 
         numPorts = getNumPortsToFind();
-        //ports = findFreePorts(getNumPortsToFind());
-        // this will propagate to the mule configuration
-        //setPortProperties();
     }
 
     @Override

@@ -22,14 +22,14 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <tcp:outbound-endpoint host="localhost" port="34561" exchange-pattern="one-way"/>
+                    <tcp:outbound-endpoint host="localhost" port="${port1}" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>
 
         <service name="bridge2">
             <inbound>
-                <tcp:inbound-endpoint host="localhost" port="34561" exchange-pattern="one-way"/>
+                <tcp:inbound-endpoint host="localhost" port="${port1}" exchange-pattern="one-way"/>
             </inbound>
             <component class="org.mule.test.integration.streaming.SimpleStreamingBean"/>
             <outbound>
