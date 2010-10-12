@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 
 /**
  * <p>
@@ -57,7 +58,7 @@ public class XmlMessageProtocol extends AbstractByteProtocol
     private static final int READ_BUFFER_SIZE = 4096;
     private static final int PUSHBACK_BUFFER_SIZE = READ_BUFFER_SIZE * 2;
 
-    private ConcurrentHashMap pbMap = new ConcurrentHashMap();
+    private ConcurrentMap pbMap = new ConcurrentHashMap();
 
     public XmlMessageProtocol()
     {
