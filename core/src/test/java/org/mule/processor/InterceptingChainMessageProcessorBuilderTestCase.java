@@ -21,6 +21,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.ObjectUtils;
 
 import org.junit.Test;
@@ -114,8 +115,8 @@ public class InterceptingChainMessageProcessorBuilderTestCase extends AbstractMu
     }
 
     /**
-     * Note: Stopping the flow of a nested chain causes the nested chain to return
-     * early, but does not stop the flow of the parent chain.
+     * Note: Stopping the flow of a nested chain causes the nested chain to return early, but does not stop
+     * the flow of the parent chain.
      */
     @Test
     public void testNestedInterceptingMPChainStopFlow() throws MuleException, Exception
@@ -162,6 +163,63 @@ public class InterceptingChainMessageProcessorBuilderTestCase extends AbstractMu
         assertLifecycle(mp2);
         assertLifecycle(mpa);
         assertLifecycle(mpb);
+    }
+
+    public void testNoneIntercepting() throws Exception
+    {
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        builder.chain(new TestNonIntercepting(), new TestNonIntercepting(), new TestNonIntercepting());
+        MuleEvent restul = builder.build().process(getTestEvent(""));
+        assertEquals("MessageProcessorMessageProcessorMessageProcessor", restul.getMessageAsString());
+    }
+
+    public void testAllIntercepting() throws Exception
+    {
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        builder.chain(new TestIntercepting(), new TestIntercepting(), new TestIntercepting());
+        MuleEvent restul = builder.build().process(getTestEvent(""));
+        assertEquals("InterceptingMessageProcessorInterceptingMessageProcessorInterceptingMessageProcessor",
+            restul.getMessageAsString());
+    }
+
+    public void testMix() throws Exception
+    {
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        builder.chain(new TestIntercepting(), new TestNonIntercepting(), new TestNonIntercepting(),
+            new TestIntercepting(), new TestNonIntercepting(), new TestNonIntercepting());
+        MuleEvent restul = builder.build().process(getTestEvent(""));
+        assertEquals(
+            "InterceptingMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessor",
+            restul.getMessageAsString());
+
+    }
+
+    public void testMix2() throws Exception
+    {
+        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        builder.chain(new TestNonIntercepting(), new TestIntercepting(), new TestNonIntercepting(),
+            new TestNonIntercepting(), new TestNonIntercepting(), new TestIntercepting());
+        MuleEvent restul = builder.build().process(getTestEvent(""));
+        assertEquals(
+            "MessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessor",
+            restul.getMessageAsString());
+
+    }
+
+    static class TestNonIntercepting implements MessageProcessor
+    {
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            return new StringAppendTransformer("MessageProcessor").process(event);
+        }
+    }
+
+    static class TestIntercepting extends AbstractInterceptingMessageProcessor
+    {
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            return processNext(new StringAppendTransformer("InterceptingMessageProcessor").process(event));
+        }
     }
 
     private void assertLifecycle(AppendingMP mp)

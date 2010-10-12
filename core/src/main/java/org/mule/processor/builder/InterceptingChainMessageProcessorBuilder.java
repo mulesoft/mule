@@ -10,102 +10,73 @@
 
 package org.mule.processor.builder;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.OptimizedRequestContext;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.lifecycle.Disposable;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.construct.SimpleFlowConstruct;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.processor.NullMessageProcessor;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
  * <p>
- * Constructs a chain of {@link MessageProcessor}s and wraps the invocation of the
- * chain in a composite MessageProcessor. Both MessageProcessors and
- * InterceptingMessageProcessor's can be chained together arbitrarily in a single
- * chain. InterceptingMessageProcessors simply intercept the next MessageProcessor in
- * the chain. When other non-intercepting MessageProcessors are used an adapter is
- * used internally to chain the MessageProcessor with the next in the chain.
+ * Constructs a chain of {@link MessageProcessor}s and wraps the invocation of the chain in a composite
+ * MessageProcessor. Both MessageProcessors and InterceptingMessageProcessor's can be chained together
+ * arbitrarily in a single chain. InterceptingMessageProcessors simply intercept the next MessageProcessor in
+ * the chain. When other non-intercepting MessageProcessors are used an adapter is used internally to chain
+ * the MessageProcessor with the next in the chain.
  * </p>
  * <p>
- * The MessageProcessor instance that this builder builds can be nested in other
- * chains as required.
+ * The MessageProcessor instance that this builder builds can be nested in other chains as required.
  * </p>
  */
-public class InterceptingChainMessageProcessorBuilder implements MessageProcessorBuilder
+public class InterceptingChainMessageProcessorBuilder extends AbstractCompositeMessageProcessorBuilder
 {
-
-    protected List processors = new ArrayList();
-    protected String name;
-    protected FlowConstruct flowConstruct;
 
     public InterceptingChainMessageProcessorBuilder()
     {
         // empty
     }
-    
+
     public InterceptingChainMessageProcessorBuilder(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
     }
-    
+
     public MessageProcessor build() throws MuleException
     {
-        if (processors.isEmpty())
-        {
-            return new NullMessageProcessor();
-        }
+        LinkedList<MessageProcessor> tempList = new LinkedList<MessageProcessor>();
 
-        InterceptingMessageProcessor first = createInterceptingMessageProcessor(initializeMessageProcessor(processors.get(0)));
-        MessageProcessor composite = new InterceptingChainCompositeMessageProcessor(first, processors, name);
-        InterceptingMessageProcessor current = first;
-
-        for (int i = 1; i < processors.size(); i++)
+        // Start from last but one message processor and work backwards
+        for (int i = processors.size() - 1; i >= 0; i--)
         {
-            InterceptingMessageProcessor mp = createInterceptingMessageProcessor(initializeMessageProcessor(processors.get(i)));
-            current.setListener(mp);
-            current = mp;
+            MessageProcessor processor = initializeMessageProcessor(processors.get(i));
+            if ((processors.get(i)) instanceof InterceptingMessageProcessor)
+            {
+                if (i + 1 < processors.size())
+                {
+                    if (tempList.isEmpty())
+                    {
+                        ((InterceptingMessageProcessor) processor).setListener(initializeMessageProcessor(processors.get(i + 1)));
+                    }
+                    else
+                    {
+                        ((InterceptingMessageProcessor) processor).setListener(new IteratingListCompositeMessageProcessor(
+                            new ArrayList<MessageProcessor>(tempList)));
+                    }
+                }
+                tempList = new LinkedList<MessageProcessor>(Collections.singletonList(processor));
+            }
+            else
+            {
+                tempList.addFirst(initializeMessageProcessor(processor));
+            }
         }
-        return composite;
-    }
-
-    // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder
-    protected MessageProcessor initializeMessageProcessor(Object processor) throws MuleException
-    {
-        if (processor instanceof MessageProcessorBuilder)
-        {
-            return ((MessageProcessorBuilder) processor).build();
-        }
-        else
-        {
-            return (MessageProcessor) processor;
-        }
-    }
-    
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    private InterceptingMessageProcessor createInterceptingMessageProcessor(MessageProcessor processor)
-    {
-        if (processor instanceof InterceptingMessageProcessor)
-        {
-            return (InterceptingMessageProcessor) processor;
-        }
-        else
-        {
-            return new InterceptingMessageProcessorAdapter(processor);
-        }
+        return new InterceptingChainCompositeMessageProcessor(new IteratingListCompositeMessageProcessor(
+            new ArrayList<MessageProcessor>(tempList)), processors, "");
     }
 
     public InterceptingChainMessageProcessorBuilder chain(MessageProcessor... processors)
@@ -145,73 +116,6 @@ public class InterceptingChainMessageProcessorBuilder implements MessageProcesso
     {
         this.processors.add(0, builder);
         return this;
-    }
-    
-    @Override
-    public String toString()
-    {
-        if (name != null)
-        {
-            return "InterceptingChainMessageProcessorBuilder '" + name + "'";
-        }
-        else
-        {
-            return super.toString();
-        }
-    }
-
-    class InterceptingMessageProcessorAdapter extends AbstractInterceptingMessageProcessor implements Disposable
-    {
-        private MessageProcessor delegate;
-
-        public InterceptingMessageProcessorAdapter(MessageProcessor mp)
-        {
-            this.delegate = mp;
-        }
-
-        public MuleEvent process(MuleEvent event) throws MuleException
-        {
-            if (logger.isTraceEnabled())
-            {
-                logger.trace("Invoking adapted MessageProcessor '" + delegate.getClass().getName() + "'");
-            }
-            // If the next message processor is an outbound router then create
-            // outbound event
-            if (delegate instanceof OutboundEndpoint)
-            {
-                event = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint) delegate,
-                    event.getSession());
-            }
-            MuleEvent delegateResult = delegate.process(event);
-            if (delegateResult != null)
-            {
-                return processNext(delegateResult);
-            }
-            else if (event.getFlowConstruct() instanceof SimpleFlowConstruct)
-            {
-                return processNext(OptimizedRequestContext.criticalSetEvent(event));
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public void setNext(MessageProcessor next)
-        {
-            this.next = next;
-        }
-
-        public void dispose()
-        {
-            this.delegate = null;
-        }
-
-        @Override
-        public String toString()
-        {
-            return "InterceptingMessageProcessorAdapter [ target = '" + delegate.getClass().getName() + "' ]";
-        }
     }
 
 }
