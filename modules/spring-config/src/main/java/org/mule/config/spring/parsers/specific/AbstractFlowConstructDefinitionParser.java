@@ -19,12 +19,13 @@ import org.w3c.dom.Element;
 
 public abstract class AbstractFlowConstructDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
+    private static final String MODEL_ELEMENT = "model";
     private static final String ABSTRACT_ATTRIBUTE = "abstract";
     private static final String PARENT_ATTRIBUTE = "parent";
-    
+
     protected static final String ENDPOINT_REF_ATTRIBUTE = "endpoint-ref";
     protected static final String ADDRESS_ATTRIBUTE = "address";
-    
+
     protected static final String INBOUND_ADDRESS_ATTRIBUTE = "inboundAddress";
     protected static final String INBOUND_ENDPOINT_REF_ATTRIBUTE = "inboundEndpoint-ref";
     protected static final String INBOUND_ENDPOINT_CHILD = "inbound-endpoint";
@@ -46,6 +47,13 @@ public abstract class AbstractFlowConstructDefinitionParser extends AbstractMule
     @Override
     protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
+        if (MODEL_ELEMENT.equals(element.getParentNode().getLocalName()))
+        {
+            logger.warn("Support for pattern elements in model will be removed from Mule 3.1: move the "
+                        + element.getLocalName() + " named '" + element.getAttribute("name")
+                        + "' out of model as soon as possible!");
+        }
+
         builder.setScope(BeanDefinition.SCOPE_SINGLETON);
         handleAbstractAttribute(element, builder);
         handleParentAttribute(element, builder);
