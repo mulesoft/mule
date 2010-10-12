@@ -97,7 +97,6 @@ public class WebServiceMessageProcessorBuilder
 
     /**
      * Try to determine the target class from the Service.
-     * @param svcCls
      * @param service
      * @return
      * @throws MuleException
