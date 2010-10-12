@@ -77,6 +77,11 @@ public class WSProxyTestCase extends FunctionalTestCase
         testWsdlAndWebServiceRequests(8);
     }
 
+    public void testExpressionEndpoint() throws Exception
+    {
+        testWsdlAndWebServiceRequests(9);
+    }
+
     private void testWsdlAndWebServiceRequests(int proxyId) throws Exception
     {
         testWsdlRequest(proxyId);

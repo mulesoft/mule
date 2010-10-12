@@ -29,6 +29,7 @@ import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
+import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.processor.StopFurtherMessageProcessingMessageProcessor;
 import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
@@ -264,8 +265,13 @@ public class WSProxy extends AbstractFlowConstruct
 
     private static class DynamicWsdlProxyRequestProcessor extends AbstractProxyRequestProcessor
     {
+        private interface WsdlAddressProvider
+        {
+            String get(MuleEvent event);
+        }
+
         private static final String LOCALHOST = "localhost";
-        private final String wsdlAddress;
+        private final WsdlAddressProvider wsdlAddressProvider;
 
         /**
          * Instantiates a request processor that fetches and rewrites addresses of a
@@ -274,7 +280,7 @@ public class WSProxy extends AbstractFlowConstruct
          * @param wsdlUri the URI to fetch the WSDL from.
          * @throws FlowConstructInvalidException
          */
-        DynamicWsdlProxyRequestProcessor(URI wsdlUri) throws FlowConstructInvalidException
+        DynamicWsdlProxyRequestProcessor(final URI wsdlUri) throws FlowConstructInvalidException
         {
             if (wsdlUri == null)
             {
@@ -282,7 +288,16 @@ public class WSProxy extends AbstractFlowConstruct
                     MessageFactory.createStaticMessage("wsdlUri can't be null"));
             }
 
-            wsdlAddress = wsdlUri.toString();
+            final String wsdlAddress = wsdlUri.toString();
+
+            wsdlAddressProvider = new WsdlAddressProvider()
+            {
+                public String get(MuleEvent event)
+                {
+                    return wsdlAddress;
+                }
+            };
+
             logger.info("Using url " + wsdlAddress + " as WSDL");
         }
 
@@ -302,22 +317,48 @@ public class WSProxy extends AbstractFlowConstruct
                     MessageFactory.createStaticMessage("outboundEndpoint can't be null"));
             }
 
-            String urlWebservice = outboundEndpoint.getEndpointURI().getUri().toString();
+            final String wsAddress = outboundEndpoint.getAddress();
 
-            // remove any params from the url
-            final int paramIndex = urlWebservice.indexOf("?");
-            if (paramIndex != -1)
+            if (outboundEndpoint instanceof DynamicOutboundEndpoint)
             {
-                urlWebservice = urlWebservice.substring(0, paramIndex);
-            }
+                wsdlAddressProvider = new WsdlAddressProvider()
+                {
+                    public String get(MuleEvent event)
+                    {
+                        final String resolvedWsAddress = event.getMuleContext().getExpressionManager().parse(
+                            wsAddress, event.getMessage(), true);
 
-            wsdlAddress = urlWebservice.concat("?wsdl");
-            logger.info("Setting WSDL address to: " + wsdlAddress);
+                        return makeWsdlAddress(resolvedWsAddress);
+                    }
+                };
+
+                logger.info("Using dynamic WSDL with service address: " + wsAddress);
+            }
+            else
+            {
+                final String wsdlAddress = makeWsdlAddress(wsAddress);
+
+                wsdlAddressProvider = new WsdlAddressProvider()
+                {
+                    public String get(MuleEvent event)
+                    {
+                        return wsdlAddress;
+                    }
+                };
+
+                logger.info("Setting WSDL address to: " + wsdlAddress);
+            }
+        }
+
+        private static String makeWsdlAddress(String wsAddress)
+        {
+            return StringUtils.substringBefore(wsAddress, "?").concat("?wsdl");
         }
 
         @Override
         protected String getWsdlContents(MuleEvent event) throws Exception
         {
+            final String wsdlAddress = wsdlAddressProvider.get(event);
             String wsdlString;
 
             final MuleContext muleContext = event.getMuleContext();

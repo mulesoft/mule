@@ -70,6 +70,10 @@
             parent="weather-forecast-ws-proxy-abstract-parent">
     <http:inbound-endpoint address="http://localhost:8090/weather-forecast/8" />
   </ws:proxy>
+  
+  <ws:proxy name="weather-forecast-ws-proxy-expression"
+            inboundAddress="http://localhost:8090/weather-forecast/9"
+            outboundAddress="http://localhost:6090/#[string:weather-forecast]" />
 
   <!--
         Test support
