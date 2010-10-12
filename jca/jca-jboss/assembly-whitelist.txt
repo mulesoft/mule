@@ -7,7 +7,7 @@ abdera-spring-0.4.0-incubating
 acegi-security-1.0.7-osgi
 activation-1.1-osgi
 antlr-2.7.6
-ant-1.6.5-osgi
+ant-1.6.5
 aopalliance-1.0
 asm-3.1-osgi
 asm-commons-3.1
