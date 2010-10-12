@@ -137,14 +137,14 @@
                 
                 <mule:inbound>
                     <mule:inbound-endpoint name="Orange" address="test://orange/" exchange-pattern="one-way">
-	                    <mule:transformer ref="TestCompressionTransformer" />
-	                    <mule:response>
-		                   	<mule:transformer ref="TestCompressionTransformer"/>
-	                   	</mule:response>
-                   	</mule:inbound-endpoint>
+                        <mule:transformer ref="TestCompressionTransformer" />
+                        <mule:response>
+                           <mule:transformer ref="TestCompressionTransformer"/>
+                       </mule:response>
+                    </mule:inbound-endpoint>
                     <mule:inbound-endpoint ref="orangeEndpoint">
                         <mule:payload-type-filter expectedType="java.lang.String"/>
-                    	<mule:transformer ref="TestCompressionTransformer" />
+                        <mule:transformer ref="TestCompressionTransformer" />
                         <mule:properties>
                             <entry key="testLocal" value="value1"/>
                         </mule:properties>
@@ -170,7 +170,7 @@
                 <mule:outbound>
                     <mule:pass-through-router>
                         <mule:outbound-endpoint ref="appleInEndpoint">
-                        	<mule:transformer ref="TestCompressionTransformer"/>
+                            <mule:transformer ref="TestCompressionTransformer"/>
                         </mule:outbound-endpoint>
                     </mule:pass-through-router>
                 </mule:outbound>
@@ -209,7 +209,7 @@
                 <mule:outbound>
                     <mule:filtering-router>
                         <mule:outbound-endpoint name="TestApple-Out" address="test://appleQ2" exchange-pattern="one-way">
-	                        <mule:transformer ref="TestCompressionTransformer"/>
+                            <mule:transformer ref="TestCompressionTransformer"/>
                         </mule:outbound-endpoint>
                         <mule:payload-type-filter expectedType="java.lang.String"/>
                     </mule:filtering-router>

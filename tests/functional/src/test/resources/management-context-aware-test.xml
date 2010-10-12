@@ -13,7 +13,7 @@
         <service name="service">
             <inbound>
                 <inbound-endpoint address="test://foo">
-                	<transformer ref="bean"/>
+                    <transformer ref="bean"/>
                 </inbound-endpoint>
             </inbound>
             <component>

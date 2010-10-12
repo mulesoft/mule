@@ -32,11 +32,11 @@
         
         <service name="localEndpoints">
             <inbound>
-			    <inbound-endpoint address="test://ep3" transformer-refs="t1" responseTransformer-refs="rt1" />
+                <inbound-endpoint address="test://ep3" transformer-refs="t1" responseTransformer-refs="rt1" />
             </inbound>
             <outbound>
                 <pass-through-router>
-				    <outbound-endpoint address="test://ep4" transformer-refs="t1" responseTransformer-refs="rt1" />
+                    <outbound-endpoint address="test://ep4" transformer-refs="t1" responseTransformer-refs="rt1" />
                 </pass-through-router>
             </outbound>
         </service>

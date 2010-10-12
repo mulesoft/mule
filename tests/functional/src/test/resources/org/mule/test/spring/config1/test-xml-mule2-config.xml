@@ -148,11 +148,11 @@
         <service name="orangeComponent">
             <inbound>
                 <inbound-endpoint name="Orange" address="test://orange/" exchange-pattern="one-way">
-                	<transformer ref="TestCompressionTransformer" />
-                	<response>
-	                	<transformer ref="TestCompressionTransformer" />
-	                </response>
-	            </inbound-endpoint>
+                    <transformer ref="TestCompressionTransformer" />
+                    <response>
+                        <transformer ref="TestCompressionTransformer" />
+                    </response>
+                </inbound-endpoint>
                 <inbound-endpoint ref="orangeEndpoint" exchange-pattern="one-way">
                     <payload-type-filter expectedType="java.lang.String"/>
                     <transformer ref="TestCompressionTransformer" />
@@ -179,7 +179,7 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint ref="appleInEndpoint" exchange-pattern="one-way">
-                    	<transformer ref="TestCompressionTransformer"/>
+                        <transformer ref="TestCompressionTransformer"/>
                     </outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -224,7 +224,7 @@
             <outbound>
                 <filtering-router>
                     <outbound-endpoint address="test://appleQ2" name="TestApple-Out" exchange-pattern="one-way">
-                    	<transformer ref="TestCompressionTransformer" />
+                        <transformer ref="TestCompressionTransformer" />
                     </outbound-endpoint>
                     <payload-type-filter expectedType="java.lang.String"/>
                 </filtering-router>
