@@ -61,11 +61,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -1018,11 +1016,11 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      * Find a given number of available ports
      * 
      * @param numberOfPorts The number of free ports to find
-     * @return an ArrayList with the number of requested ports
+     * @return an List with the number of requested ports
      */
     public List<Integer> findFreePorts(int numberOfPorts)
     {
-        ArrayList<Integer> freePorts = new ArrayList<Integer>();
+        List<Integer> freePorts = new ArrayList<Integer>();
         for (int port = MIN_PORT; freePorts.size() != numberOfPorts && port < MAX_PORT; ++port)
         {
             if (isPortFree(port))
@@ -1044,18 +1042,18 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      */
     public void checkPorts(boolean failIfTaken, String prefix)
     {
-        for (int i = 0; i < ports.size(); i++)
+        for (Integer port : ports)
         {
-            if (isPortFree(ports.get(i)))
+            if (isPortFree(port))
             {
-                logger.info(prefix + " port is free : " + ports.get(i));
+                logger.info(prefix + " port is free : " + port);
             }
             else
             {
-                logger.info(prefix + " port is not free : " + ports.get(i));
+                logger.info(prefix + " port is not free : " + port);
                 if (failIfTaken)
                 {
-                    fail("failing test since port is not free : " + ports.get(i));
+                    fail("failing test since port is not free : " + port);
                 }
             }
         }
