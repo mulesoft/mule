@@ -59,7 +59,7 @@ import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
-import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.session.SerializeAndEncodeSessionHandler;
@@ -2503,7 +2503,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
     {
-        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         builder.chain(new AsyncInterceptingMessageProcessor(new WorkManagerSource()
         {
             public WorkManager getWorkManager() throws MuleException

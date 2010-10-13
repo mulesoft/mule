@@ -15,7 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.jca.i18n.JcaMessages;
-import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.service.AbstractService;
 
 /**
@@ -73,7 +73,7 @@ public class JcaService extends AbstractService
     }
 
     @Override
-    protected void addMessageProcessors(InterceptingChainMessageProcessorBuilder builder)
+    protected void addMessageProcessors(DefaultMessageProcessorChainBuilder builder)
     {
         builder.chain(component);
     }

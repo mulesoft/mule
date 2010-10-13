@@ -14,15 +14,15 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
-public class EndpointInterceptingChainMessageProcessorBuilder extends
-    InterceptingChainMessageProcessorBuilder
+public class EndpointMessageProcessorChainBuilder extends
+    DefaultMessageProcessorChainBuilder
 {
 
     protected ImmutableEndpoint endpoint;
 
-    public EndpointInterceptingChainMessageProcessorBuilder(ImmutableEndpoint endpoint,
+    public EndpointMessageProcessorChainBuilder(ImmutableEndpoint endpoint,
                                                             FlowConstruct flowConstruct)
     {
         super(flowConstruct);

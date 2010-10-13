@@ -42,7 +42,7 @@ import org.mule.lifecycle.processor.ProcessIfStartedWaitIfPausedMessageProcessor
 import org.mule.management.stats.RouterStatistics;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.service.processor.ServiceAsyncRequestReplyRequestor;
@@ -485,7 +485,7 @@ public abstract class AbstractService implements Service, MessageProcessor
 
     protected void buildServiceMessageProcessorChain() throws MuleException
     {
-        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder(this);
+        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(this);
         builder.setName("Service '" + name + "' Processor Chain");
         builder.chain(getServiceStartedAssertingMessageProcessor());
         addMessageProcessors(builder);
@@ -497,7 +497,7 @@ public abstract class AbstractService implements Service, MessageProcessor
         return new ProcessIfStartedWaitIfPausedMessageProcessor(this, lifecycleManager.getState());
     }
 
-    protected abstract void addMessageProcessors(InterceptingChainMessageProcessorBuilder builder);
+    protected abstract void addMessageProcessors(DefaultMessageProcessorChainBuilder builder);
 
     protected ServiceStatistics createStatistics()
     {

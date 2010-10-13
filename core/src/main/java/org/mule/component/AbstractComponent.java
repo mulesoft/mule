@@ -34,7 +34,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ComponentMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.management.stats.ComponentStatistics;
-import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transport.NullPayload;
 
@@ -229,7 +229,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
                 this);
         }
         
-        InterceptingChainMessageProcessorBuilder chainBuilder = new InterceptingChainMessageProcessorBuilder(flowConstruct);
+        DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder(flowConstruct);
         for (Interceptor interceptor : interceptors)
         {
             chainBuilder.chain(interceptor);

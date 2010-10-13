@@ -16,6 +16,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
@@ -95,9 +96,9 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         MessageProcessor chain = factory.createOutboundMessageProcessorChain(this, flowContruct,
             ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this));
         
-        if (chain instanceof MuleContextAware)
+        if (chain instanceof FlowConstructAware)
         {
-            ((MuleContextAware) chain).setMuleContext(getMuleContext());
+            ((FlowConstructAware) chain).setFlowConstruct(flowContruct);
         }
         if (chain instanceof Initialisable)
         {

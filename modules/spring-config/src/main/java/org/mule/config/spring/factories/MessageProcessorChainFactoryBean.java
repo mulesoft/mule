@@ -12,7 +12,7 @@ package org.mule.config.spring.factories;
 
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class MessageProcessorChainFactoryBean implements FactoryBean
 
     public Object getObject() throws Exception
     {
-        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         builder.setName(name);
         for (Object processor : processors)
         {

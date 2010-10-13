@@ -25,7 +25,7 @@ import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
 import org.mule.interceptor.LoggingInterceptor;
-import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
@@ -60,7 +60,7 @@ public class SimpleService extends AbstractFlowConstruct
 
             @Override
             public void configureComponentMessageProcessor(MuleContext muleContext,
-                                                           InterceptingChainMessageProcessorBuilder builder,
+                                                           DefaultMessageProcessorChainBuilder builder,
                                                            Component component)
             {
                 builder.chain(newJaxWsComponentMessageProcessor(muleContext, getComponentClass(component)));
@@ -87,7 +87,7 @@ public class SimpleService extends AbstractFlowConstruct
 
             @Override
             public void configureComponentMessageProcessor(MuleContext muleContext,
-                                                           InterceptingChainMessageProcessorBuilder builder,
+                                                           DefaultMessageProcessorChainBuilder builder,
                                                            Component component)
             {
                 builder.chain(newJaxRsComponentWrapper(muleContext, component));
@@ -107,7 +107,7 @@ public class SimpleService extends AbstractFlowConstruct
 
             @Override
             public void configureComponentMessageProcessor(MuleContext muleContext,
-                                                           InterceptingChainMessageProcessorBuilder builder,
+                                                           DefaultMessageProcessorChainBuilder builder,
                                                            Component component)
             {
                 builder.chain(component);
@@ -117,7 +117,7 @@ public class SimpleService extends AbstractFlowConstruct
         public abstract void validate(Component component) throws FlowConstructInvalidException;
 
         public abstract void configureComponentMessageProcessor(MuleContext muleContext,
-                                                                InterceptingChainMessageProcessorBuilder builder,
+                                                                DefaultMessageProcessorChainBuilder builder,
                                                                 Component component);
 
         public static Type fromString(String string)
@@ -167,7 +167,7 @@ public class SimpleService extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(InterceptingChainMessageProcessorBuilder builder)
+    protected void configureMessageProcessors(DefaultMessageProcessorChainBuilder builder)
     {
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageObserver());

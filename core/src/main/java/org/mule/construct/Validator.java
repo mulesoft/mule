@@ -35,7 +35,7 @@ import org.mule.interceptor.LoggingInterceptor;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.ResponseMessageProcessorAdapter;
-import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.ChoiceRouter;
 import org.mule.util.StringUtils;
 
@@ -85,7 +85,7 @@ public class Validator extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(InterceptingChainMessageProcessorBuilder builder)
+    protected void configureMessageProcessors(DefaultMessageProcessorChainBuilder builder)
     {
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageObserver());

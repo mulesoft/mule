@@ -26,7 +26,7 @@ import org.mule.api.source.MessageSource;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.StopFurtherMessageProcessingMessageProcessor;
-import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.AbstractCatchAllStrategy;
 import org.mule.routing.MessageFilter;
 import org.mule.source.StartableCompositeMessageSource;
@@ -109,7 +109,7 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
     
     protected void createMessageProcessorChain() throws MuleException
     {
-        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder(flowConstruct);
+        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flowConstruct);
         builder.chain(processors);
         builder.chain(new StopFurtherMessageProcessingMessageProcessor());
         // Stats

@@ -18,7 +18,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
-import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import org.springframework.beans.factory.FactoryBean;
 
@@ -50,7 +50,7 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
 
     public Object getObject() throws Exception
     {
-        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         final MuleConfiguration config = muleContext.getConfiguration();
         final boolean containerMode = config.isContainerMode();
         final String threadPrefix = containerMode

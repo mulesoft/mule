@@ -21,7 +21,8 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
-import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -44,7 +45,7 @@ public abstract class AbstractFlowConstructFactoryBean
         }
 
         @Override
-        protected void configureMessageProcessors(InterceptingChainMessageProcessorBuilder builder)
+        protected void configureMessageProcessors(DefaultMessageProcessorChainBuilder builder)
         {
             // NOOP
         }

@@ -14,7 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.Aggregator;
 import org.mule.management.stats.RouterStatistics;
-import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.AbstractAggregator;
 import org.mule.source.StartableCompositeMessageSource;
 
@@ -34,7 +34,7 @@ public class ServiceAsyncReplyCompositeMessageSource extends ServiceCompositeMes
 
     protected void createMessageProcessorChain() throws MuleException
     {
-        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder(flowConstruct);
+        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flowConstruct);
         builder.chain(processors);
         builder.chain(listener);
         listener = builder.build();

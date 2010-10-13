@@ -14,7 +14,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
-import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class TransactionalMessageProcessorsFactoryBean implements FactoryBean
 
     public Object getObject() throws Exception
     {
-        InterceptingChainMessageProcessorBuilder builder = new InterceptingChainMessageProcessorBuilder();
+        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         TransactionalInterceptingMessageProcessor txProcessor = 
             new TransactionalInterceptingMessageProcessor(transactionConfig);
         builder.chain(txProcessor);

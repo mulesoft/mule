@@ -20,7 +20,7 @@ import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
 import org.mule.interceptor.LoggingInterceptor;
-import org.mule.processor.builder.InterceptingChainMessageProcessorBuilder;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
 /**
  * A simple bridge between a single inbound endpoint and a single outbound endpoint.
@@ -53,7 +53,7 @@ public class Bridge extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(InterceptingChainMessageProcessorBuilder builder)
+    protected void configureMessageProcessors(DefaultMessageProcessorChainBuilder builder)
     {
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageObserver());
