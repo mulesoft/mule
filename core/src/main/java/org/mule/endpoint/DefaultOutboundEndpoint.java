@@ -95,7 +95,11 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
         EndpointMessageProcessorChainFactory factory = getMessageProcessorsFactory();
         MessageProcessor chain = factory.createOutboundMessageProcessorChain(this, flowContruct,
             ((AbstractConnector) getConnector()).createDispatcherMessageProcessor(this));
-        
+
+        if (chain instanceof MuleContextAware)
+        {
+            ((MuleContextAware) chain).setMuleContext(flowContruct.getMuleContext());
+        }
         if (chain instanceof FlowConstructAware)
         {
             ((FlowConstructAware) chain).setFlowConstruct(flowContruct);
