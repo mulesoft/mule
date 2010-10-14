@@ -12,6 +12,8 @@ package org.mule.interceptor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.interceptor.Interceptor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 
@@ -19,8 +21,12 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
  * <code>EnvelopeInterceptor</code> is an intercepter that will fire before and after
  * an event is received.
  */
-public abstract class AbstractEnvelopeInterceptor extends AbstractInterceptingMessageProcessor implements Interceptor
+public abstract class AbstractEnvelopeInterceptor extends AbstractInterceptingMessageProcessor
+                                                  implements Interceptor, FlowConstructAware
 {
+
+    protected FlowConstruct flowConstruct;
+
     /**
      * This method is invoked before the event is processed
      */
@@ -37,5 +43,10 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractInterceptingMe
         resultEvent = processNext(resultEvent);
         resultEvent = after(resultEvent);
         return resultEvent;
+    }
+
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        this.flowConstruct = flowConstruct;
     }
 }
