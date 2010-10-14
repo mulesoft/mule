@@ -50,7 +50,6 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        System.out.println(this);
         if (log.isDebugEnabled())
         {
             log.debug(String.format("Invoking %s with event %s", this, event));
