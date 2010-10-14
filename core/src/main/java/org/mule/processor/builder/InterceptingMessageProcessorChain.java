@@ -23,11 +23,11 @@ import java.util.List;
  * this chain is nested in another chain the next MessageProcessor in the parent chain is not injected into
  * the first in the nested chain.
  */
-public class InterceptingChainCompositeMessageProcessor extends AbstractMessageProcessorChain
+public class InterceptingMessageProcessorChain extends AbstractMessageProcessorChain
 {
     private MessageProcessor chain;
 
-    public InterceptingChainCompositeMessageProcessor(InterceptingMessageProcessor chain,
+    public InterceptingMessageProcessorChain(InterceptingMessageProcessor chain,
                                                       List<MessageProcessor> processors,
                                                       String name)
     {

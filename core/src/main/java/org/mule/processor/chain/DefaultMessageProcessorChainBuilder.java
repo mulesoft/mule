@@ -16,7 +16,7 @@ import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChain;
-import org.mule.processor.builder.InterceptingChainCompositeMessageProcessor;
+import org.mule.processor.builder.InterceptingMessageProcessorChain;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,7 +80,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         }
         final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(new ArrayList<MessageProcessor>(tempList));
         //chain.setFlowConstruct(flowConstruct);
-        return new InterceptingChainCompositeMessageProcessor(chain, processors, "");
+        return new InterceptingMessageProcessorChain(chain, processors, "");
     }
 
     public DefaultMessageProcessorChainBuilder chain(MessageProcessor... processors)

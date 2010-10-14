@@ -77,7 +77,7 @@ public class InterceptingChainMessageProcessorBuilder extends AbstractCompositeM
                 tempList.addFirst(initializeMessageProcessor(processor));
             }
         }
-        return new InterceptingChainCompositeMessageProcessor(new DefaultMessageProcessorChain(
+        return new InterceptingMessageProcessorChain(new DefaultMessageProcessorChain(
             new ArrayList<MessageProcessor>(tempList)), processors, "");
     }
 
