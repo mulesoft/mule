@@ -10,6 +10,7 @@
 
 package org.mule.processor.chain;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -37,7 +38,8 @@ import org.apache.commons.logging.LogFactory;
  * this chain is nested in another chain the next MessageProcessor in the parent chain is not injected into
  * the first in the nested chain.
  */
-public abstract class AbstractMessageProcessorChain extends AbstractInterceptingMessageProcessor implements MessageProcessorChain, Lifecycle, FlowConstructAware
+public abstract class AbstractMessageProcessorChain extends AbstractInterceptingMessageProcessor
+                                                    implements MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware
 {
     protected final transient Log log = LogFactory.getLog(getClass());
     protected String name;
@@ -119,9 +121,16 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
             {
                 ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
             }
+        }
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        for (MessageProcessor processor : processors)
+        {
             if (processor instanceof MuleContextAware)
             {
-                ((MuleContextAware) processor).setMuleContext(flowConstruct.getMuleContext());
+                ((MuleContextAware) processor).setMuleContext(context);
             }
         }
     }
