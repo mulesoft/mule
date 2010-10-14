@@ -49,6 +49,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
     {
         FlowConstruct flowConstruct = event.getFlowConstruct();
         MuleEvent currentEvent = event;
+        MuleEvent resultEvent;
         for (MessageProcessor processor : processors)
         {
             // If the next message processor is an outbound router then create
@@ -58,12 +59,16 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
                 currentEvent = new DefaultMuleEvent(currentEvent.getMessage(), (OutboundEndpoint) processor,
                     currentEvent.getSession());
             }
-            currentEvent = processor.process(currentEvent);
-            if (currentEvent == null)
+            resultEvent = processor.process(currentEvent);
+            if (resultEvent != null)
+            {
+                currentEvent = resultEvent;
+            }
+            else
             {
                 if (flowConstruct instanceof SimpleFlowConstruct)
                 {
-                    currentEvent = processNext(OptimizedRequestContext.criticalSetEvent(currentEvent));
+                    currentEvent = OptimizedRequestContext.criticalSetEvent(currentEvent);
                 }
                 else
                 {
