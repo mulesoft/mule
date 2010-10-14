@@ -18,4 +18,7 @@ import java.util.List;
 public interface MessageProcessorChain extends MessageProcessor
 {
     List<MessageProcessor> getMessageProcessors();
+
+    //String getName();
+
 }
