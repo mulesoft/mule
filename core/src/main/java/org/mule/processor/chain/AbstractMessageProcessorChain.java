@@ -37,9 +37,8 @@ import org.apache.commons.logging.LogFactory;
  * the first in the nested chain.
  */
 public abstract class AbstractMessageProcessorChain extends AbstractInterceptingMessageProcessor implements MessageProcessorChain
-   
 {
-    protected Log log;
+    protected final transient Log log = LogFactory.getLog(getClass());
     protected String name;
     protected List<MessageProcessor> processors;
 
@@ -47,15 +46,14 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
     {
         this.name = name;
         this.processors = processors;
-        // TODO You a custom categories?
-        log = LogFactory.getLog(getClass().getName());
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
+        System.out.println(this);
         if (log.isDebugEnabled())
         {
-            log.debug("Invoking " + this + " with event " + event);
+            log.debug(String.format("Invoking %s with event %s", this, event));
         }
         if (event == null)
         {
@@ -140,25 +138,34 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
         string.append(getClass().getSimpleName());
         if (name != null)
         {
-            string.append(" '" + name + "' ");
+            string.append(String.format(" '%s' ", name));
         }
 
         Iterator<MessageProcessor> mpIterator = processors.iterator();
+
+        final String nl = String.format("%n");
+
         if (mpIterator.hasNext())
         {
-            string.append("\n[ ");
+            string.append(String.format("%n[ "));
             while (mpIterator.hasNext())
             {
                 MessageProcessor mp = mpIterator.next();
-                string.append("\n  " + StringUtils.replace(mp.toString(), "\n", "\n  "));
+                final String indented = StringUtils.replace(mp.toString(), nl, String.format("%n  "));
+                string.append(String.format("%n  %s", indented));
                 if (mpIterator.hasNext())
                 {
                     string.append(", ");
                 }
             }
-            string.append("\n]");
+            string.append(String.format("%n]"));
         }
 
         return string.toString();
+    }
+
+    public List<MessageProcessor> getMessageProcessors()
+    {
+        return processors;
     }
 }
