@@ -63,7 +63,7 @@ public abstract class AbstractMessageDispatcher extends AbstractConnectable impl
         {
             connect();
 
-            String prop = (String) event.getMessage().getProperty(MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY);
+            String prop = event.getMessage().getOutboundProperty(MuleProperties.MULE_DISABLE_TRANSPORT_TRANSFORMER_PROPERTY);
             boolean disableTransportTransformer = (prop != null && Boolean.parseBoolean(prop)) || endpoint.isDisableTransportTransformer();
                         
             if (!disableTransportTransformer)
