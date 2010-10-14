@@ -18,11 +18,12 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.SimpleFlowConstruct;
+import org.mule.processor.chain.AbstractMessageProcessorChain;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class IteratingListCompositeMessageProcessor extends AbstractCompositeMessageProcessor
+public class IteratingListCompositeMessageProcessor extends AbstractMessageProcessorChain
 {
 
     public IteratingListCompositeMessageProcessor(List<MessageProcessor> processors)

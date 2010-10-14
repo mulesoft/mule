@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.processor.chain.AbstractMessageProcessorChain;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ import java.util.List;
  * this chain is nested in another chain the next MessageProcessor in the parent chain is not injected into
  * the first in the nested chain.
  */
-public class InterceptingChainCompositeMessageProcessor extends AbstractCompositeMessageProcessor
+public class InterceptingChainCompositeMessageProcessor extends AbstractMessageProcessorChain
 {
     private MessageProcessor chain;
 
