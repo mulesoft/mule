@@ -52,7 +52,7 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
     {
         // TODO DF: FlowConstuct should be injected here but there is an issue with spring not have reference
         // to it. For now we inject it once the MessageProcessor is built and this works, but
-        // MessageProcessorBuilders shoud have FlowConstuct available when building really.
+        // MessageProcessorBuilders should have FlowConstuct available when building really.
 
         if (processor instanceof MessageProcessorBuilder)
         {
