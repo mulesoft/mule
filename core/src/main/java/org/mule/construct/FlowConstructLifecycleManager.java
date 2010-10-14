@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowConstruct>
 {
+
     /**
      * logger used by this class
      */
@@ -56,7 +57,7 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
     @Override
     protected void notifyTransition(String currentPhase)
     {
-        if(currentPhase.equals(Resumable.PHASE_NAME))
+        if (currentPhase.equals(Resumable.PHASE_NAME))
         {
             //Revert back to start phase
             completedPhases.remove(Resumable.PHASE_NAME);
@@ -70,7 +71,10 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
     {
         checkPhase(Initialisable.PHASE_NAME);
         //TODO No pre notification
-        if(logger.isInfoEnabled()) logger.info("Initialising flow: " + getLifecycleObject().getName());
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Initialising flow: " + getLifecycleObject().getName());
+        }
         invokePhase(Initialisable.PHASE_NAME, getLifecycleObject(), callback);
         fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_INITIALISED);
     }
@@ -80,7 +84,10 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
     public void fireStartPhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
     {
         checkPhase(Startable.PHASE_NAME);
-        if(logger.isInfoEnabled()) logger.info("Starting flow: " + getLifecycleObject().getName());
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Starting flow: " + getLifecycleObject().getName());
+        }
         //TODO No pre notification
         invokePhase(Startable.PHASE_NAME, getLifecycleObject(), callback);
         fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_STARTED);
@@ -90,7 +97,10 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
     public void firePausePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
     {
         checkPhase(Pausable.PHASE_NAME);
-        if(logger.isInfoEnabled()) logger.info("Pausing flow: " + getLifecycleObject().getName());
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Pausing flow: " + getLifecycleObject().getName());
+        }
 
         //TODO No pre notification
         invokePhase(Pausable.PHASE_NAME, getLifecycleObject(), callback);
@@ -100,7 +110,10 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
     public void fireResumePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
     {
         checkPhase(Resumable.PHASE_NAME);
-        if(logger.isInfoEnabled()) logger.info("Resuming flow: " + getLifecycleObject().getName());
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Resuming flow: " + getLifecycleObject().getName());
+        }
         //TODO No pre notification
         invokePhase(Resumable.PHASE_NAME, getLifecycleObject(), callback);
         fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_RESUMED);
@@ -110,7 +123,10 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
     public void fireStopPhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
     {
         checkPhase(Stoppable.PHASE_NAME);
-        if(logger.isInfoEnabled()) logger.info("Stopping flow: " + getLifecycleObject().getName());
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Stopping flow: " + getLifecycleObject().getName());
+        }
         //TODO No pre notification
         invokePhase(Stoppable.PHASE_NAME, getLifecycleObject(), callback);
         fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_STOPPED);
@@ -120,7 +136,10 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
     public void fireDisposePhase(LifecycleCallback<FlowConstruct> callback) throws MuleException
     {
         checkPhase(Disposable.PHASE_NAME);
-        if(logger.isInfoEnabled()) logger.info("Disposing flow: " + getLifecycleObject().getName());
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Disposing flow: " + getLifecycleObject().getName());
+        }
         //TODO No pre notification
         invokePhase(Disposable.PHASE_NAME, getLifecycleObject(), callback);
         fireNotification(FlowConstructNotification.FLOW_CONSTRUCT_DISPOSED);
