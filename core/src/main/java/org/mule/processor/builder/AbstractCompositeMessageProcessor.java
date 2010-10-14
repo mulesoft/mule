@@ -1,5 +1,5 @@
 /*
- * $Id: InterceptingChainCompositeMessageProcessor.java 19207 2010-08-26 05:02:51Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -23,6 +23,7 @@ import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.util.StringUtils;
 
@@ -38,9 +39,9 @@ import org.apache.commons.logging.LogFactory;
  * the first in the nested chain.
  */
 public abstract class AbstractCompositeMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements Lifecycle, FlowConstructAware, MuleContextAware
+    implements Lifecycle, FlowConstructAware, MuleContextAware, MessageProcessorChain
 {
-    protected Log log;
+    protected Log log = LogFactory.getLog(getClass());
     protected String name;
     protected List<MessageProcessor> processors;
 
@@ -48,8 +49,6 @@ public abstract class AbstractCompositeMessageProcessor extends AbstractIntercep
     {
         this.name = name;
         this.processors = processors;
-        // TODO You a custom categories?
-        log = LogFactory.getLog(getClass().getName());
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -163,5 +162,10 @@ public abstract class AbstractCompositeMessageProcessor extends AbstractIntercep
         }
 
         return string.toString();
+    }
+
+    public List<MessageProcessor> getMessageProcessors()
+    {
+        return processors;
     }
 }

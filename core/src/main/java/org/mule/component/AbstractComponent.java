@@ -28,6 +28,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
@@ -60,7 +61,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
     protected ComponentStatistics statistics = null;
     protected ServerNotificationHandler notificationHandler;
     protected List<Interceptor> interceptors = new ArrayList<Interceptor>();
-    protected MessageProcessor interceptorChain;
+    protected MessageProcessorChain interceptorChain;
     protected MuleContext muleContext;
 
     public void setMuleContext(MuleContext context)

@@ -31,6 +31,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.RouterStatisticsRecorder;
 import org.mule.api.service.Service;
@@ -94,7 +95,7 @@ public abstract class AbstractService implements Service, MessageProcessor
     protected MessageSource messageSource = new ServiceCompositeMessageSource();
     protected ServiceAsyncReplyCompositeMessageSource asyncReplyMessageSource = new ServiceAsyncReplyCompositeMessageSource();
 
-    protected MessageProcessor messageProcessorChain;
+    protected MessageProcessorChain messageProcessorChain;
     protected MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
 
     /**
@@ -671,4 +672,8 @@ public abstract class AbstractService implements Service, MessageProcessor
         return messageProcessorChain.process(newEvent);
     }
 
+    public MessageProcessorChain getMessageProcessorChain()
+    {
+        return messageProcessorChain;
+    }
 }

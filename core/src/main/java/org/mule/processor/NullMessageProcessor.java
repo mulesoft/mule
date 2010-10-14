@@ -13,10 +13,14 @@ package org.mule.processor;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.util.ObjectUtils;
 
+import java.util.Collections;
+import java.util.List;
 
-public class NullMessageProcessor implements MessageProcessor
+
+public class NullMessageProcessor implements MessageProcessorChain
 {
     public MuleEvent process(MuleEvent event) throws MuleException
     {
@@ -27,5 +31,10 @@ public class NullMessageProcessor implements MessageProcessor
     public String toString()
     {
         return ObjectUtils.toString(this);
+    }
+
+    public List<MessageProcessor> getMessageProcessors()
+    {
+        return Collections.emptyList();
     }
 }

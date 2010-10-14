@@ -15,6 +15,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.api.processor.MessageProcessorChain;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +47,7 @@ public class InterceptingChainMessageProcessorBuilder extends AbstractCompositeM
         this.flowConstruct = flowConstruct;
     }
 
-    public MessageProcessor build() throws MuleException
+    public MessageProcessorChain build() throws MuleException
     {
         LinkedList<MessageProcessor> tempList = new LinkedList<MessageProcessor>();
 

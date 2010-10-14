@@ -24,6 +24,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.LifecycleState;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.transport.ReceiveException;
 import org.mule.exception.DefaultServiceExceptionStrategy;
@@ -242,6 +243,11 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         public MessageInfoMapping getMessageInfoMapping()
         {
             return null;
-        }        
+        }
+
+        public MessageProcessorChain getMessageProcessorChain()
+        {
+            return null;
+        }
     };
 }

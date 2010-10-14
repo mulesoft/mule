@@ -13,6 +13,7 @@ package org.mule.api.construct;
 import org.mule.api.MuleContext;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.management.stats.FlowConstructStatistics;
 
@@ -52,4 +53,6 @@ public interface FlowConstruct extends LifecycleStateEnabled
      *         Important message information is pulled from the current message.
      */
     MessageInfoMapping getMessageInfoMapping();
+
+    MessageProcessorChain getMessageProcessorChain();
 }

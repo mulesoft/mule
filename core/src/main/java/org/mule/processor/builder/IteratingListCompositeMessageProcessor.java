@@ -1,7 +1,7 @@
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
@@ -19,6 +19,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.SimpleFlowConstruct;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class IteratingListCompositeMessageProcessor extends AbstractCompositeMessageProcessor
@@ -29,9 +30,19 @@ public class IteratingListCompositeMessageProcessor extends AbstractCompositeMes
         super(null, processors);
     }
 
+    public IteratingListCompositeMessageProcessor(MessageProcessor... processors)
+    {
+        super(null, Arrays.asList(processors));
+    }
+
     public IteratingListCompositeMessageProcessor(String name, List<MessageProcessor> processors)
     {
         super(name, processors);
+    }
+
+    public IteratingListCompositeMessageProcessor(String name, MessageProcessor... processors)
+    {
+        super(name, Arrays.asList(processors));
     }
 
     protected MuleEvent doProcess(MuleEvent event) throws MuleException

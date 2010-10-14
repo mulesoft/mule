@@ -13,6 +13,7 @@ package org.mule.processor.builder;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.processor.NullMessageProcessor;
 
 import java.util.Collection;
@@ -32,7 +33,7 @@ import java.util.Collection;
 public class IteratingListMessageProcessorBuilder extends AbstractCompositeMessageProcessorBuilder
 {
 
-    public MessageProcessor build() throws MuleException
+    public MessageProcessorChain build() throws MuleException
     {
         if (processors.isEmpty())
         {

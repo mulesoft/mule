@@ -30,6 +30,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.source.MessageSource;
 import org.mule.exception.DefaultServiceExceptionStrategy;
@@ -70,7 +71,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
 
     protected String name;
     protected MessageSource messageSource;
-    protected MessageProcessor messageProcessorChain;
+    protected MessageProcessorChain messageProcessorChain;
     protected MessagingExceptionHandler exceptionListener;
     protected final FlowConstructLifecycleManager lifecycleManager;
     protected final MuleContext muleContext;
@@ -370,4 +371,8 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
         return messageProcessorChain.process(newEvent);
     }
 
+    public MessageProcessorChain getMessageProcessorChain()
+    {
+        return this.messageProcessorChain;
+    }
 }
