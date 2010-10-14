@@ -10,13 +10,13 @@
 
 package org.mule.processor.chain;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.processor.builder.InterceptingChainCompositeMessageProcessor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -121,29 +121,4 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         this.processors.add(0, builder);
         return this;
     }
-
-    // TODO haven't I seen this class before? dup?
-    class InterceptingChainCompositeMessageProcessor extends AbstractMessageProcessorChain
-    {
-        private MessageProcessor chain;
-
-        public InterceptingChainCompositeMessageProcessor(InterceptingMessageProcessor chain,
-                                                          List<MessageProcessor> processors,
-                                                          String name)
-        {
-            super(name, processors);
-            this.chain = chain;
-        }
-
-        protected MuleEvent doProcess(MuleEvent event) throws MuleException
-        {
-            return chain.process(event);
-        }
-
-        public List<MessageProcessor> getMessageProcessors()
-        {
-            return processors;
-        }
-    }
-
 }
