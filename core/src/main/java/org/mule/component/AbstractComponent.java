@@ -132,7 +132,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
         catch (Exception e)
         {
             throw new ComponentException(CoreMessages.failedToInvoke(this.toString()), event,
-                this, e);
+                                         this, e);
         }
     }
 
@@ -162,7 +162,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
         {
             event.getMessage().applyTransformers(
                     event, Collections.<Transformer>singletonList(new TransformerTemplate(
-                        new TransformerTemplate.OverwitePayloadCallback(result))));
+                    new TransformerTemplate.OverwitePayloadCallback(result))));
             return event;
         }
         else
@@ -177,7 +177,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
     public String toString()
     {
         StringBuilder buf = new StringBuilder(this.getClass().getName());
-        
+
         if (flowConstruct != null)
         {
             buf.append(" component for: ").append(flowConstruct.toString());
@@ -186,7 +186,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
         {
             buf.append(" no component");
         }
-        
+
         return buf.toString();
     }
 
@@ -226,10 +226,10 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
         if (flowConstruct == null)
         {
             throw new InitialisationException(
-                MessageFactory.createStaticMessage("Component has not been initialized properly, no service."),
-                this);
+                    MessageFactory.createStaticMessage("Component has not been initialized properly, no service."),
+                    this);
         }
-        
+
         DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder(flowConstruct);
         for (Interceptor interceptor : interceptors)
         {
@@ -242,7 +242,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
                 return invokeInternal(event);
             }
         });
-        
+
         try
         {
             interceptorChain = chainBuilder.build();
@@ -255,7 +255,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
         {
             throw new InitialisationException(e, this);
         }
-        
+
         doInitialise();
     }
 
@@ -266,11 +266,11 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
 
     public void dispose()
     {
-        if(flowConstruct.getLifecycleState().isDisposed())
+        if (flowConstruct.getLifecycleState().isDisposed())
         {
             return;
         }
-    
+
         try
         {
             // TODO is this needed, doesn't the service manage this?
@@ -301,7 +301,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
 
     public void stop() throws MuleException
     {
-        if(flowConstruct.getLifecycleState().isStopped())
+        if (flowConstruct.getLifecycleState().isStopped())
         {
             return;
         }
@@ -319,7 +319,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
 
     public void start() throws MuleException
     {
-        if(flowConstruct.getLifecycleState().isStarted())
+        if (flowConstruct.getLifecycleState().isStarted())
         {
             return;
         }
@@ -329,7 +329,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
             logger.info("Starting: " + this);
         }
         notificationHandler = new OptimisedNotificationHandler(flowConstruct.getMuleContext()
-            .getNotificationManager(), ComponentMessageNotification.class);
+                                                                       .getNotificationManager(), ComponentMessageNotification.class);
         doStart();
     }
 
