@@ -113,11 +113,11 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
         }
         if (transformer != null)
         {
-            endpointBuilder.setTransformers(Collections.singletonList(transformer));
+            endpointBuilder.setMessageProcessors(Collections.singletonList(transformer));
         }
         if (responseTransformer != null)
         {
-            endpointBuilder.setResponseTransformers(Collections.singletonList(responseTransformer));
+            endpointBuilder.setResponseMessageProcessors(Collections.singletonList(responseTransformer));
         }
         endpointBuilder.setExchangePattern(exchangePattern);
         endpointBuilder.setTransactionConfig(txConfig);
@@ -207,7 +207,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
     {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("prop1", "value1");
-        props.put("port", new Integer(12345));
+        props.put("port", 12345);
 
         Service svc = getTestService();
         if (exceptionListener != null)
