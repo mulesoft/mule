@@ -31,12 +31,13 @@ import org.apache.commons.logging.LogFactory;
  * This is a base implementation of the {@link org.mule.api.lifecycle.LifecycleManager} interface and provides
  * almost all the plumbing required to write a {@link org.mule.api.lifecycle.LifecycleManager} implementation.  This
  * class handles the tracking ofg the phases, transition validation and checking state.
- * @param <O> The object type being managed by this {@link org.mule.api.lifecycle.LifecycleManager}
  *
+ * @param <O> The object type being managed by this {@link org.mule.api.lifecycle.LifecycleManager}
  * @since 3.0
  */
 public abstract class AbstractLifecycleManager<O> implements LifecycleManager
 {
+
     /**
      * logger used by this class
      */
@@ -138,11 +139,11 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
             callback.onTransition(phase, object);
             setCurrentPhase(phase);
         }
-        catch(LifecycleException e)
+        catch (LifecycleException e)
         {
             throw e;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             throw new LifecycleException(e, object);
         }
@@ -174,11 +175,11 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
         this.currentPhase = currentPhase;
         completedPhases.add(currentPhase);
         //remove irrelevant phases
-        if(currentPhase.equals(Stoppable.PHASE_NAME))
+        if (currentPhase.equals(Stoppable.PHASE_NAME))
         {
             completedPhases.remove(Startable.PHASE_NAME);
         }
-        else if(currentPhase.equals(Disposable.PHASE_NAME))
+        else if (currentPhase.equals(Disposable.PHASE_NAME))
         {
             completedPhases.remove(Initialisable.PHASE_NAME);
         }
@@ -227,5 +228,5 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
         return state;
     }
 
-    
+
 }
