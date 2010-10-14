@@ -18,6 +18,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
@@ -36,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
  * this chain is nested in another chain the next MessageProcessor in the parent chain is not injected into
  * the first in the nested chain.
  */
-public abstract class AbstractMessageProcessorChain extends AbstractInterceptingMessageProcessor implements MessageProcessorChain
+public abstract class AbstractMessageProcessorChain extends AbstractInterceptingMessageProcessor implements MessageProcessorChain, Lifecycle, FlowConstructAware
 {
     protected final transient Log log = LogFactory.getLog(getClass());
     protected String name;

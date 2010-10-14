@@ -12,7 +12,6 @@ package org.mule.processor.chain;
 
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 
@@ -51,11 +50,6 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
     // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder
     protected MessageProcessor initializeMessageProcessor(Object processor) throws MuleException
     {
-        if (processor instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
-        }
-
         if (processor instanceof MessageProcessorBuilder)
         {
             return ((MessageProcessorBuilder) processor).build();
