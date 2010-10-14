@@ -8,13 +8,12 @@
  * LICENSE.txt file.
  */
 
-package org.mule.processor.builder;
+package org.mule.processor.chain;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.processor.chain.AbstractMessageProcessorChain;
 
 import java.util.List;
 

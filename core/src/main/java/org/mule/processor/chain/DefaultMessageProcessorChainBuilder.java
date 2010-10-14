@@ -16,7 +16,6 @@ import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChain;
-import org.mule.processor.builder.InterceptingMessageProcessorChain;
 
 import java.util.ArrayList;
 import java.util.Collections;
