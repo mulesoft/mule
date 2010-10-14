@@ -204,7 +204,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
 
         event.getMessage().setPayload(msg);
-        event.getMessage().setProperty(HttpConstants.HEADER_CONTENT_TYPE, ct);
+        event.getMessage().setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, ct);
         return event;
     }
 
@@ -412,7 +412,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
         else
         {
-            is = (InputStream) context.transformMessage(DataTypeFactory.create(InputStream.class));
+            is = context.transformMessage(DataTypeFactory.create(InputStream.class));
         }
         return is;
     }
