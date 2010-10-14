@@ -134,7 +134,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
     @Override
     public String toString()
     {
-        StringBuffer string = new StringBuffer();
+        StringBuilder string = new StringBuilder();
         string.append(getClass().getSimpleName());
         if (name != null)
         {
@@ -145,6 +145,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
 
         final String nl = String.format("%n");
 
+        // TODO have it print the nested structure with indents increasing for nested MPCs
         if (mpIterator.hasNext())
         {
             string.append(String.format("%n[ "));
