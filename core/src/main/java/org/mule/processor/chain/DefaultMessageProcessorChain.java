@@ -19,6 +19,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.SimpleFlowConstruct;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
@@ -29,9 +30,19 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
         super(null, processors);
     }
 
+    public DefaultMessageProcessorChain(MessageProcessor... processors)
+    {
+        super(null, Arrays.asList(processors));
+    }
+
     public DefaultMessageProcessorChain(String name, List<MessageProcessor> processors)
     {
         super(name, processors);
+    }
+
+    public DefaultMessageProcessorChain(String name, MessageProcessor... processors)
+    {
+        super(name, Arrays.asList(processors));
     }
 
     protected MuleEvent doProcess(MuleEvent event) throws MuleException

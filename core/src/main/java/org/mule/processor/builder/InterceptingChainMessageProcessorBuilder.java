@@ -16,6 +16,7 @@ import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.processor.chain.DefaultMessageProcessorChain;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,7 +66,7 @@ public class InterceptingChainMessageProcessorBuilder extends AbstractCompositeM
                     }
                     else
                     {
-                        ((InterceptingMessageProcessor) processor).setListener(new IteratingListCompositeMessageProcessor(
+                        ((InterceptingMessageProcessor) processor).setListener(new DefaultMessageProcessorChain(
                             new ArrayList<MessageProcessor>(tempList)));
                     }
                 }
@@ -76,7 +77,7 @@ public class InterceptingChainMessageProcessorBuilder extends AbstractCompositeM
                 tempList.addFirst(initializeMessageProcessor(processor));
             }
         }
-        return new InterceptingChainCompositeMessageProcessor(new IteratingListCompositeMessageProcessor(
+        return new InterceptingChainCompositeMessageProcessor(new DefaultMessageProcessorChain(
             new ArrayList<MessageProcessor>(tempList)), processors, "");
     }
 

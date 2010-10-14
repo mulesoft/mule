@@ -10,7 +10,7 @@
 
 package org.mule.api.processor;
 
-import org.mule.processor.builder.IteratingListCompositeMessageProcessor;
+import org.mule.processor.chain.DefaultMessageProcessorChain;
 
 /**
  * Some convenience methods for message processors.
@@ -25,7 +25,6 @@ public class MessageProcessors
 
     public static MessageProcessorChain singletonChain(MessageProcessor mp)
     {
-        // TODO just using an existing class, may not be final variant
-        return new IteratingListCompositeMessageProcessor(mp);
+        return new DefaultMessageProcessorChain(mp);
     }
 }
