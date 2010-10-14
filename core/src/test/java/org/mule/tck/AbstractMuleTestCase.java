@@ -672,6 +672,11 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestInboundEndpoint(mep, muleContext);
     }
 
+    public static InboundEndpoint getTestTransactedInboundEndpoint(MessageExchangePattern mep) throws Exception
+    {
+        return MuleTestUtils.getTestTransactedInboundEndpoint(mep, muleContext);
+    }
+
     public static InboundEndpoint getTestInboundEndpoint(String name, String uri) throws Exception
     {
         return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, null, null, null, null);

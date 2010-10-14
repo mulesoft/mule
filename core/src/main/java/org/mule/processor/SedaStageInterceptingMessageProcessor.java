@@ -45,12 +45,9 @@ import javax.resource.spi.work.WorkListener;
 
 /**
  * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to
- * schedule asynchronous processing of the next {@link MessageProcessor}. The next
- * {@link MessageProcessor} will therefore be executed in a different thread unless
- * the event is synchronous in which case the next {@link MessageProcessor} is
- * invoked directly in the same thread.
+ * schedule asynchronous processing of the next {@link MessageProcessor}. 
  */
-public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMessageProcessor
+public class SedaStageInterceptingMessageProcessor extends OptionalAsyncInterceptingMessageProcessor
     implements WorkListener, Work, Lifecycle
 {
     protected static final String QUEUE_NAME_PREFIX = "seda.queue";
@@ -69,12 +66,11 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
                                                  QueueProfile queueProfile,
                                                  int queueTimeout,
                                                  WorkManagerSource workManagerSource,
-                                                 boolean doThreading,
                                                  LifecycleState lifecycleState,
                                                  QueueStatistics queueStatistics,
                                                  MuleContext muleContext)
     {
-        super(workManagerSource, doThreading);
+        super(workManagerSource);
         this.name = name;
         this.queueProfile = queueProfile;
         this.queueTimeout = queueTimeout;
@@ -82,9 +78,24 @@ public class SedaStageInterceptingMessageProcessor extends AsyncInterceptingMess
         this.queueStatistics = queueStatistics;
         this.muleContext = muleContext;
     }
+    
+    @Deprecated
+    public SedaStageInterceptingMessageProcessor(String name,
+                                                 QueueProfile queueProfile,
+                                                 int queueTimeout,
+                                                 WorkManagerSource workManagerSource,
+                                                 boolean doThreading,
+                                                 LifecycleState lifecycleState,
+                                                 QueueStatistics queueStatistics,
+                                                 MuleContext muleContext)
+    {
+        this(name, queueProfile, queueTimeout, workManagerSource, lifecycleState, queueStatistics,
+            muleContext);
+        this.doThreading = doThreading;
+    }
 
     @Override
-    protected void processAsync(MuleEvent event) throws MuleException
+    protected void processNextAsync(MuleEvent event) throws MuleException
     {
         try
         {

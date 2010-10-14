@@ -1316,4 +1316,10 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 327);
     }
+
+    public static Message asyncDoesNotSupportTransactions()
+    {
+        return factory.createMessage(BUNDLE_PATH, 328);
+    }
+
 }

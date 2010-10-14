@@ -29,6 +29,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
+import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionFactory;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
@@ -47,6 +48,8 @@ import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.mule.TestAgent;
 import org.mule.tck.testmodels.mule.TestCompressionTransformer;
 import org.mule.tck.testmodels.mule.TestConnector;
+import org.mule.tck.testmodels.mule.TestTransactionFactory;
+import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transport.AbstractConnector;
 import org.mule.util.ClassUtils;
 
@@ -246,6 +249,23 @@ public final class MuleTestUtils
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
                 builder.setExchangePattern(mep);
+                return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+            }
+        }, null);
+    }
+    
+    public static InboundEndpoint getTestTransactedInboundEndpoint(final MessageExchangePattern mep,
+                                                         final MuleContext context) throws Exception
+    {
+        return (InboundEndpoint) getTestEndpoint(null, null, null, null, null, context, new EndpointSource()
+        {
+            public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
+            {
+                builder.setExchangePattern(mep);
+                TransactionConfig txConfig = new MuleTransactionConfig();
+                txConfig.setAction(TransactionConfig.ACTION_BEGIN_OR_JOIN);
+                txConfig.setFactory(new TestTransactionFactory());
+                builder.setTransactionConfig(txConfig);
                 return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
             }
         }, null);

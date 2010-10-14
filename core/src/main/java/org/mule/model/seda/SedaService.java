@@ -82,15 +82,17 @@ public class SedaService extends AbstractService
         builder.chain(new ServiceLoggingMessageObserver(this));
         builder.chain(new ServiceStatisticsMessageObserver(this));
         builder.chain(new ServiceSetEventRequestContextMessageObserver());
-        builder.chain(new SedaStageInterceptingMessageProcessor(getName(), queueProfile, queueTimeout,
-            new WorkManagerSource()
-            {
-                public WorkManager getWorkManager() throws MuleException
+        if (getThreadingProfile().isDoThreading())
+        {
+            builder.chain(new SedaStageInterceptingMessageProcessor(getName(), queueProfile, queueTimeout,
+                new WorkManagerSource()
                 {
-                    return workManager;
-                }
-            }, getThreadingProfile().isDoThreading(), lifecycleManager.getState(), stats,
-            muleContext));
+                    public WorkManager getWorkManager() throws MuleException
+                    {
+                        return workManager;
+                    }
+                }, lifecycleManager.getState(), stats, muleContext));
+        }
         builder.chain(new ServiceInternalMessageProcessor(this));
         if (asyncReplyMessageSource.getEndpoints().size() > 0)
         {

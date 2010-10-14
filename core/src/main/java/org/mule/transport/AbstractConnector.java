@@ -58,7 +58,7 @@ import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
 import org.mule.model.streaming.DelegatingInputStream;
-import org.mule.processor.AsyncInterceptingMessageProcessor;
+import org.mule.processor.OptionalAsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.routing.filters.WildcardFilter;
@@ -73,11 +73,6 @@ import org.mule.util.ObjectNameHelper;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.pool.KeyedPoolableObjectFactory;
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,6 +97,11 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.pool.KeyedPoolableObjectFactory;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 /**
  * <code>AbstractConnector</code> provides base functionality for all connectors
@@ -2503,16 +2503,23 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     public MessageProcessor createDispatcherMessageProcessor(OutboundEndpoint endpoint) throws MuleException
     {
-        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-        builder.chain(new AsyncInterceptingMessageProcessor(new WorkManagerSource()
+        if (endpoint.getExchangePattern().hasResponse() || !getDispatcherThreadingProfile().isDoThreading())
         {
-            public WorkManager getWorkManager() throws MuleException
+            return new DispatcherMessageProcessor();
+        }
+        else
+        {
+            DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+            builder.chain(new OptionalAsyncInterceptingMessageProcessor(new WorkManagerSource()
             {
-                return getDispatcherWorkManager();
-            }
-        }, getDispatcherThreadingProfile().isDoThreading()));
-        builder.chain(new DispatcherMessageProcessor());
-        return builder.build();
+                public WorkManager getWorkManager() throws MuleException
+                {
+                    return getDispatcherWorkManager();
+                }
+            }));
+            builder.chain(new DispatcherMessageProcessor());
+            return builder.build();
+        }
     }
     
     public MessageExchangePattern getDefaultExchangePattern()

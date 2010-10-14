@@ -31,8 +31,8 @@ import javax.resource.spi.work.WorkException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
-public class SedaStageInterceptingMessageProcessorTestCase extends AsyncInterceptingMessageProcessorTestCase
-    implements ExceptionListener
+public class SedaStageInterceptingMessageProcessorTestCase extends
+    OptionalAsyncInterceptingMessageProcessorTestCase implements ExceptionListener
 {
 
     QueueProfile queueProfile = new QueueProfile();
@@ -71,8 +71,9 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
     protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
         throws Exception
     {
-        SedaStageInterceptingMessageProcessor mp = 
-            new SedaStageInterceptingMessageProcessor(null, queueProfile, queueTimeout, new TestWorkManagerSource(), true, lifeCycleState, queueStatistics, muleContext);
+        SedaStageInterceptingMessageProcessor mp = new SedaStageInterceptingMessageProcessor(
+            null, queueProfile, queueTimeout, new TestWorkManagerSource(), true, lifeCycleState,
+            queueStatistics, muleContext);
         mp.setListener(listener);
         return mp;
     }
@@ -230,7 +231,5 @@ public class SedaStageInterceptingMessageProcessorTestCase extends AsyncIntercep
             return false;
         }
     }
-
-
 
 }

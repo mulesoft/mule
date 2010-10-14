@@ -11,12 +11,16 @@
 package org.mule.processor;
 
 import org.mule.MessageExchangePattern;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transaction.Transaction;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.testmodels.mule.TestTransaction;
+import org.mule.transaction.TransactionCoordination;
 import org.mule.util.concurrent.Latch;
 
 import java.beans.ExceptionListener;
@@ -44,18 +48,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
         messageProcessor = createAsyncInterceptingMessageProcessor(target);
     }
 
-    public void testProcessSync() throws Exception
-    {
-        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestOutboundEndpoint("",
-            "test://test?exchangePattern=request-response"));
-
-        MuleEvent result = messageProcessor.process(event);
-
-        assertSame(event, target.sensedEvent);
-        assertSame(event, result);
-    }
-
-    public void testProcessAsync() throws Exception
+    public void testProcessOneWay() throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
 
@@ -72,10 +65,88 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
         assertNull(exceptionThrown);
     }
 
+    public void testProcessRequestResponse() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
+
+        assertAsync(messageProcessor, event);
+    }
+
+    public void testProcessOneWayWithTx() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE,
+            getTestTransactedInboundEndpoint(MessageExchangePattern.ONE_WAY));
+        Transaction transaction = new TestTransaction(muleContext);
+        TransactionCoordination.getInstance().bindTransaction(transaction);
+
+        try
+        {
+            messageProcessor.process(event);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(e instanceof MessagingException);
+            assertNull(target.sensedEvent);
+        }
+        finally
+        {
+            TransactionCoordination.getInstance().unbindTransaction(transaction);
+        }
+    }
+
+    public void testProcessRequestResponseWithTx() throws Exception
+    {
+        MuleEvent event = getTestEvent(TEST_MESSAGE,
+            getTestTransactedInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE));
+        Transaction transaction = new TestTransaction(muleContext);
+        TransactionCoordination.getInstance().bindTransaction(transaction);
+
+        try
+        {
+            messageProcessor.process(event);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(e instanceof MessagingException);
+            assertNull(target.sensedEvent);
+        }
+        finally
+        {
+            TransactionCoordination.getInstance().unbindTransaction(transaction);
+        }
+    }
+
+    protected void assertSync(MessageProcessor processor, MuleEvent event) throws MuleException
+    {
+        MuleEvent result = processor.process(event);
+
+        assertSame(event, target.sensedEvent);
+        assertSame(event, result);
+    }
+
+    protected void assertAsync(MessageProcessor processor, MuleEvent event)
+        throws MuleException, InterruptedException
+    {
+        MuleEvent result = processor.process(event);
+
+        latch.await(10000, TimeUnit.MILLISECONDS);
+        assertNotNull(target.sensedEvent);
+        // Event is not the same because it gets copied in
+        // AbstractMuleEventWork#run()
+        assertNotSame(event, target.sensedEvent);
+        assertEquals(event.getMessageAsString(), target.sensedEvent.getMessageAsString());
+
+        assertNull(result);
+        assertNull(exceptionThrown);
+    }
+
     protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
         throws Exception
     {
-        AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(new TestWorkManagerSource(), true);
+        AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(
+            new TestWorkManagerSource(), true);
         mp.setListener(listener);
         return mp;
     }

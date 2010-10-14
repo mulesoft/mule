@@ -30,23 +30,29 @@ import javax.resource.spi.work.WorkListener;
 /**
  * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to
  * schedule asynchronous processing of the next {@link MessageProcessor}. The next
- * {@link MessageProcessor} will therefore be executed in a different thread unless
- * the event is synchronous in which case the next {@link MessageProcessor} is
- * invoked directly in the same thread.
+ * {@link MessageProcessor} is therefore be executed in a different thread regardless
+ * of the exchange-pattern configured on the inbound endpoint. If a transaction is
+ * present then an exception is thrown.
  */
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
     implements WorkListener, Startable, Stoppable
 {
     protected WorkManagerSource workManagerSource;
-    protected boolean doThreading;
+    protected boolean doThreading = true;
     protected WorkManager workManager;
 
+    public AsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource)
+    {
+        this.workManagerSource = workManagerSource;
+    }
+
+    @Deprecated
     public AsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource, boolean doThreading)
     {
         this.workManagerSource = workManagerSource;
         this.doThreading = doThreading;
     }
-    
+
     public AsyncInterceptingMessageProcessor(ThreadingProfile threadingProfile,
                                              String name,
                                              int shutdownTimeout)
@@ -77,7 +83,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
             workManager.dispose();
         }
     }
-    
+
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (next == null)
@@ -86,7 +92,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         }
         else if (isProcessAsync(event))
         {
-            processAsync(event);
+            processNextAsync(event);
             return null;
         }
         else
@@ -94,14 +100,18 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
             return processNext(event);
         }
     }
-    
-    protected boolean isProcessAsync(MuleEvent event)
+
+    protected boolean isProcessAsync(MuleEvent event) throws MessagingException
     {
-        return doThreading && !event.getEndpoint().getExchangePattern().hasResponse()
-               && !event.getEndpoint().getTransactionConfig().isTransacted();
+        // We do not support transactions and async
+        if (event.getEndpoint().getTransactionConfig().isTransacted())
+        {
+            throw new MessagingException(CoreMessages.asyncDoesNotSupportTransactions(), event);
+        }
+        return doThreading;
     }
 
-    protected void processAsync(MuleEvent event) throws MuleException
+    protected void processNextAsync(MuleEvent event) throws MuleException
     {
         try
         {

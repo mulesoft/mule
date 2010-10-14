@@ -138,16 +138,42 @@
         <append-string-transformer message="d" />
     </flow>
 
-    <flow name="async">
-        <vm:inbound-endpoint path="async-in" exchange-pattern="one-way" />
+    <flow name="async-oneway">
+        <vm:inbound-endpoint path="async-oneway-in" exchange-pattern="one-way" />
         <append-string-transformer message="a" />
         <async>
             <append-string-transformer message="b" />
-            <vm:outbound-endpoint path="async-async-out" exchange-pattern="one-way" />
+            <vm:outbound-endpoint path="async-async-oneway-out" exchange-pattern="one-way" />
             <threading-profile doThreading="true" maxThreadsActive="16"/>
         </async>    
         <append-string-transformer message="c" />    
-        <vm:outbound-endpoint path="async-out" exchange-pattern="one-way" />
+        <vm:outbound-endpoint path="async-oneway-out" exchange-pattern="one-way" />
+    </flow>
+
+    <flow name="async-requestresponse">
+        <vm:inbound-endpoint path="async-requestresponse-in" exchange-pattern="request-response" />
+        <append-string-transformer message="a" />
+        <async>
+            <append-string-transformer message="b" />
+            <vm:outbound-endpoint path="async-async-requestresponse-out" exchange-pattern="one-way" />
+            <threading-profile doThreading="true" maxThreadsActive="16"/>
+        </async>    
+        <append-string-transformer message="c" />    
+        <vm:outbound-endpoint path="async-requestresponse-out" exchange-pattern="one-way" />
+    </flow>
+
+    <flow name="async-tx">
+        <vm:inbound-endpoint path="async-tx-in" exchange-pattern="request-response">
+        	<vm:transaction action="ALWAYS_BEGIN"/>
+        </vm:inbound-endpoint>
+        <append-string-transformer message="a" />
+        <async>
+            <append-string-transformer message="b" />
+            <vm:outbound-endpoint path="async-async-tx-out" exchange-pattern="request-response" />
+            <threading-profile doThreading="true" maxThreadsActive="16"/>
+        </async>    
+        <append-string-transformer message="c" />    
+        <vm:outbound-endpoint path="async-tx-out" exchange-pattern="request-response" />
     </flow>
     
     <!-- 

@@ -220,32 +220,59 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertEquals("abcdefghi", result.getPayloadAsString());
     }
 
-    public void testAsync() throws MuleException, Exception
+    public void testAsyncOneWayEndpoint() throws MuleException, Exception
     {
-        muleContext.getClient().send("vm://async-in", new DefaultMuleMessage("0", muleContext));
-        final MuleMessage result = muleContext.getClient().request("vm://async-out", RECEIVE_TIMEOUT);
-        final MuleMessage asyncResult = muleContext.getClient().request("vm://async-async-out",
+        muleContext.getClient().send("vm://async-oneway-in", new DefaultMuleMessage("0", muleContext));
+        final MuleMessage result = muleContext.getClient().request("vm://async-oneway-out", RECEIVE_TIMEOUT);
+        final MuleMessage asyncResult = muleContext.getClient().request("vm://async-async-oneway-out",
             RECEIVE_TIMEOUT);
 
         assertNotNull(result);
         assertNotNull(asyncResult);
         assertEquals("0ac", result.getPayloadAsString());
         assertEquals("0ab", asyncResult.getPayloadAsString());
-
     }
 
-    public void testTransactional() throws MuleException, Exception
+    public void testAsyncRequestResponseEndpoint() throws MuleException, Exception
     {
-        muleContext.getClient().dispatch("vm://transactional-in", new DefaultMuleMessage("", muleContext));
+        muleContext.getClient().send("vm://async-requestresponse-in", new DefaultMuleMessage("0", muleContext));
+        final MuleMessage result = muleContext.getClient().request("vm://async-requestresponse-out", RECEIVE_TIMEOUT);
+        final MuleMessage asyncResult = muleContext.getClient().request("vm://async-async-requestresponse-out",
+            RECEIVE_TIMEOUT);
 
+        assertNotNull(result);
+        assertNotNull(asyncResult);
+        assertEquals("0ac", result.getPayloadAsString());
+        assertEquals("0ab", asyncResult.getPayloadAsString());
     }
 
-    public void testTransactionalRollback() throws MuleException, Exception
+    public void testAsyncTransactionalEndpoint() throws MuleException, Exception
     {
-        muleContext.getClient().dispatch("vm://transactional-rollback-in",
-            new DefaultMuleMessage("", muleContext));
+            MuleMessage response = muleContext.getClient().send("vm://async-tx-in", new DefaultMuleMessage("0", muleContext));
+            assertNotNull(response);
+            assertNotNull(response.getExceptionPayload());
 
+            final MuleMessage result = muleContext.getClient().request("vm://async-requestresponse-out", RECEIVE_TIMEOUT);
+            final MuleMessage asyncResult = muleContext.getClient().request("vm://async-async-oneway-out",
+                RECEIVE_TIMEOUT);
+
+            assertNull(result);
+            assertNull(asyncResult);
     }
+
+    
+//    public void testTransactional() throws MuleException, Exception
+//    {
+//        muleContext.getClient().dispatch("vm://transactional-in", new DefaultMuleMessage("", muleContext));
+//
+//    }
+//
+//    public void testTransactionalRollback() throws MuleException, Exception
+//    {
+//        muleContext.getClient().dispatch("vm://transactional-rollback-in",
+//            new DefaultMuleMessage("", muleContext));
+//
+//    }
 
     public void testMulticaster() throws MuleException, Exception
     {
