@@ -20,5 +20,4 @@ public interface MessageProcessorChain extends MessageProcessor
     List<MessageProcessor> getMessageProcessors();
 
     //String getName();
-
 }

@@ -21,7 +21,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.chain.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.util.StringUtils;
 

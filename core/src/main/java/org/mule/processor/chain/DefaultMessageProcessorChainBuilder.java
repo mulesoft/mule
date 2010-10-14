@@ -16,6 +16,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.api.processor.MessageProcessorChain;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +48,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         this.flowConstruct = flowConstruct;
     }
 
-    public MessageProcessor build() throws MuleException
+    public MessageProcessorChain build() throws MuleException
     {
         LinkedList<MessageProcessor> tempList = new LinkedList<MessageProcessor>();
 
@@ -118,7 +119,8 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         this.processors.add(0, builder);
         return this;
     }
-    
+
+    // TODO haven't I seen this class before? dup?
     class InterceptingChainCompositeMessageProcessor extends AbstractMessageProcessorChain
     {
         private MessageProcessor chain;
@@ -136,6 +138,10 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
             return chain.process(event);
         }
 
+        public List<MessageProcessor> getMessageProcessors()
+        {
+            return processors;
+        }
     }
 
 }
