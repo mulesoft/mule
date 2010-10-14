@@ -66,8 +66,9 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                     }
                     else
                     {
-                        ((InterceptingMessageProcessor) processor).setListener(new DefaultMessageProcessorChain(
-                            new ArrayList<MessageProcessor>(tempList)));
+                        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(new ArrayList<MessageProcessor>(tempList));
+                        chain.setFlowConstruct(flowConstruct);
+                        ((InterceptingMessageProcessor) processor).setListener(chain);
                     }
                 }
                 tempList = new LinkedList<MessageProcessor>(Collections.singletonList(processor));
@@ -77,8 +78,9 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                 tempList.addFirst(initializeMessageProcessor(processor));
             }
         }
-        return new InterceptingChainCompositeMessageProcessor(new DefaultMessageProcessorChain(
-            new ArrayList<MessageProcessor>(tempList)), processors, "");
+        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(new ArrayList<MessageProcessor>(tempList));
+        chain.setFlowConstruct(flowConstruct);
+        return new InterceptingChainCompositeMessageProcessor(chain, processors, "");
     }
 
     public DefaultMessageProcessorChainBuilder chain(MessageProcessor... processors)
