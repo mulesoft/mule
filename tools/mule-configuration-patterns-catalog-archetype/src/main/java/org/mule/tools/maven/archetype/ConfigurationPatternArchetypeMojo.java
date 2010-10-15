@@ -30,9 +30,9 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
- * Builds archetype containers.
+ * Creates a new configuration pattern.
  * 
- * @goal create
+ * @goal new-pattern
  * @description The archetype creation goal looks for an archetype with a given newGroupId, newArtifactId, and
  *              newVersion and retrieves it from the remote repository. Once the archetype is retrieve it is process
  *              against a set of user parameters to create a working Maven project. This is a modified newVersion for
