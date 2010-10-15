@@ -91,7 +91,7 @@ public class AxisMuleMessageFactory extends AbstractMuleMessageFactory
             {
                 String name = String.valueOf(x);
                 AttachmentPart attachmentPart = (AttachmentPart)i.next();
-                message.addAttachment(name, attachmentPart.getActivationDataHandler());
+                message.addOutboundAttachment(name, attachmentPart.getActivationDataHandler());
             }
         }
         catch (Exception e)
