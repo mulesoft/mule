@@ -12,10 +12,12 @@
     <name>Mule Tests for Maven Archetypes</name>
 
     <modules>
-        <module>transport-archetype</module>
-        <module>project-archetype</module>
+        <!-- enable when MULE-5141 is resolved
+        <module>configuration-pattern-archetype</module> -->
         <module>example-archetype</module>
         <module>module-archetype</module>
+        <module>project-archetype</module>
+        <module>transport-archetype</module>
     </modules>
 
     <profiles>

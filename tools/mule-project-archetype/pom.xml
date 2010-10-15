@@ -11,8 +11,7 @@
     <!-- Do not specify group here, otherwise deployment will break -->
     <artifactId>mule-project-archetype</artifactId>
     <version>3.1.0-SNAPSHOT</version>
-    <description>An architype for creating Mule applications.
-    </description>
+    <description>An architype for creating Mule applications.</description>
 
     <dependencies>
         <dependency>
