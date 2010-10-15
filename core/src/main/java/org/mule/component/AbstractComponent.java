@@ -203,12 +203,6 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
-
-        // propagate MuleContext from the enclosing service if provided
-        if (this.muleContext == null && flowConstruct.getMuleContext() != null)
-        {
-            this.muleContext = flowConstruct.getMuleContext();
-        }
         //lifecycleState = service.getLifecycleManager().getState();
     }
 
