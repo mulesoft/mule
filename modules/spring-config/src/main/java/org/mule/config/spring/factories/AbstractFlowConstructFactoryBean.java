@@ -23,15 +23,15 @@ import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
 import org.mule.construct.builder.AbstractFlowConstructWithSingleInboundEndpointBuilder;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-public abstract class 	
-    implements FactoryBean<FlowConstruct>, InitializingBean, ApplicationContextAware, MuleContextAware,
-    Initialisable
+public abstract class AbstractFlowConstructFactoryBean implements FactoryBean<FlowConstruct>, 
+    InitializingBean, ApplicationContextAware, MuleContextAware, Initialisable
 {
     private static final NullFlowConstruct NULL_FLOW_CONSTRUCT = new NullFlowConstruct("noop", null);
 
