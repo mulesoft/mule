@@ -21,16 +21,17 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
+import org.mule.construct.builder.AbstractFlowConstructWithSingleInboundEndpointBuilder;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-public abstract class AbstractFlowConstructFactoryBean
-    implements FactoryBean<FlowConstruct>, InitializingBean, ApplicationContextAware, MuleContextAware, Initialisable
+public abstract class 	
+    implements FactoryBean<FlowConstruct>, InitializingBean, ApplicationContextAware, MuleContextAware,
+    Initialisable
 {
     private static final NullFlowConstruct NULL_FLOW_CONSTRUCT = new NullFlowConstruct("noop", null);
 
@@ -79,16 +80,19 @@ public abstract class AbstractFlowConstructFactoryBean
     {
         getFlowConstructBuilder().name(name);
     }
-    
+
     public void setMessageSource(MessageSource messageSource)
     {
-        if (messageSource instanceof InboundEndpoint)
+        final AbstractFlowConstructBuilder<?, ?> flowConstructBuilder = getFlowConstructBuilder();
+
+        if ((flowConstructBuilder instanceof AbstractFlowConstructWithSingleInboundEndpointBuilder<?, ?>)
+            && (messageSource instanceof InboundEndpoint))
         {
-            getFlowConstructBuilder().inboundEndpoint((InboundEndpoint) messageSource);
+            ((AbstractFlowConstructWithSingleInboundEndpointBuilder<?, ?>) flowConstructBuilder).inboundEndpoint((InboundEndpoint) messageSource);
         }
         else
         {
-            throw new IllegalArgumentException("InboundEndpoint is the only supported message source");
+            flowConstructBuilder.messageSource(messageSource);
         }
     }
 

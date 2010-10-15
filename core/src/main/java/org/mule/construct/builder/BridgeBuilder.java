@@ -31,7 +31,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.StringUtils;
 
 public class BridgeBuilder extends
-    AbstractFlowConstructWithSingleOutboundEndpointBuilder<BridgeBuilder, Bridge>
+    AbstractFlowConstructWithSingleInboundAndOutboundEndpointBuilder<BridgeBuilder, Bridge>
 {
     protected MessageExchangePattern exchangePattern = MessageExchangePattern.REQUEST_RESPONSE;
     protected boolean transacted = false;

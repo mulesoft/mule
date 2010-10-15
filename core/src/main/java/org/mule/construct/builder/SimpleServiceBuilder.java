@@ -10,6 +10,8 @@
 
 package org.mule.construct.builder;
 
+import java.util.Arrays;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -28,12 +30,11 @@ import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
 
-import java.util.Arrays;
-
 /**
  * Fluent API for the creation of a SimpleService.
  */
-public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleServiceBuilder, SimpleService>
+public class SimpleServiceBuilder extends
+    AbstractFlowConstructWithSingleInboundEndpointBuilder<SimpleServiceBuilder, SimpleService>
 {
     protected Type type = SimpleService.Type.DIRECT;
     protected Component component;
@@ -86,7 +87,7 @@ public class SimpleServiceBuilder extends AbstractFlowConstructBuilder<SimpleSer
     {
         if (component instanceof JavaComponent)
         {
-            JavaComponent javaComponent = (JavaComponent) component;
+            final JavaComponent javaComponent = (JavaComponent) component;
 
             if (javaComponent.getEntryPointResolverSet() == null)
             {

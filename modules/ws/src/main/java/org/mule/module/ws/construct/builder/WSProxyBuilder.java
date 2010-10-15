@@ -21,12 +21,12 @@ import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.Transformer;
-import org.mule.construct.builder.AbstractFlowConstructWithSingleOutboundEndpointBuilder;
+import org.mule.construct.builder.AbstractFlowConstructWithSingleInboundAndOutboundEndpointBuilder;
 import org.mule.module.ws.construct.WSProxy;
 import org.mule.util.FileUtils;
 
 public class WSProxyBuilder extends
-    AbstractFlowConstructWithSingleOutboundEndpointBuilder<WSProxyBuilder, WSProxy>
+    AbstractFlowConstructWithSingleInboundAndOutboundEndpointBuilder<WSProxyBuilder, WSProxy>
 {
     protected URI wsldLocation;
     protected File wsdlFile;

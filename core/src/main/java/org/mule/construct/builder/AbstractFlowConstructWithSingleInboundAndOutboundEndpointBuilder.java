@@ -21,8 +21,8 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.AbstractFlowConstruct;
 
 @SuppressWarnings("unchecked")
-public abstract class AbstractFlowConstructWithSingleOutboundEndpointBuilder<T extends AbstractFlowConstructBuilder, F extends AbstractFlowConstruct>
-    extends AbstractFlowConstructBuilder<T, F>
+public abstract class AbstractFlowConstructWithSingleInboundAndOutboundEndpointBuilder<T extends AbstractFlowConstructBuilder, F extends AbstractFlowConstruct>
+    extends AbstractFlowConstructWithSingleInboundEndpointBuilder<T, F>
 {
     private OutboundEndpoint outboundEndpoint;
     private EndpointBuilder outboundEndpointBuilder;

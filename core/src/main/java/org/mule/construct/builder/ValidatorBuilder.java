@@ -18,7 +18,7 @@ import org.mule.construct.Validator;
 import org.mule.util.StringUtils;
 
 public class ValidatorBuilder extends
-    AbstractFlowConstructWithSingleOutboundEndpointBuilder<ValidatorBuilder, Validator>
+    AbstractFlowConstructWithSingleInboundAndOutboundEndpointBuilder<ValidatorBuilder, Validator>
 {
     protected Filter validationFilter;
     protected String ackExpression;
