@@ -91,8 +91,8 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
 
         if (logger.isTraceEnabled())
         {
-            logger.trace("Invoking " + this.getClass().getName() + "component for service "
-                         + flowConstruct.getName());
+            logger.trace(String.format("Invoking %s component for service %s",
+                                       this.getClass().getName(), flowConstruct.getName()));
         }
 
         if (!flowConstruct.getLifecycleState().isStarted() || flowConstruct.getLifecycleState().isStopping())

@@ -10,9 +10,6 @@
 
 package org.mule.model.seda;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
@@ -30,9 +27,11 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.queue.QueueManager;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.AssertionFailedError;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SedaServiceTestCase extends AbstractServiceTestCase
 {
@@ -71,7 +70,6 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
     {
         boolean persistent = true;
         int capacity = 345;
-        String queueName = "test.service";
 
         QueueManager queueManager = muleContext.getQueueManager();
 
@@ -107,7 +105,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         service.initialise();
 
         assertNotNull(service.getQueueTimeout());
-        assertTrue(service.getQueueTimeout().intValue() != 0);
+        assertTrue(service.getQueueTimeout() != 0);
     }
 
     /**
@@ -141,7 +139,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         threadingProfile.setThreadWaitTimeout(200);
         threadingProfile.setPoolExhaustedAction(ThreadingProfile.WHEN_EXHAUSTED_WAIT);
         service.setThreadingProfile(threadingProfile);
-        service.setComponent(new SimpleCallableJavaComponent(new Callable()
+        final SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(new Callable()
         {
 
             public Object onCall(MuleEventContext eventContext) throws Exception
@@ -149,7 +147,9 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
                 latch.countDown();
                 return null;
             }
-        }));
+        });
+        component.setMuleContext(muleContext);
+        service.setComponent(component);
         muleContext.getRegistry().registerService(service);
 
         service.dispatchEvent(MuleTestUtils.getTestInboundEvent("test", service, muleContext));
@@ -174,7 +174,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         ChainedThreadingProfile threadingProfile = (ChainedThreadingProfile) muleContext.getDefaultServiceThreadingProfile();
         threadingProfile.setDoThreading(false);
         service.setThreadingProfile(threadingProfile);
-        service.setComponent(new SimpleCallableJavaComponent(new Callable()
+        final SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(new Callable()
         {
             public Object onCall(MuleEventContext eventContext) throws Exception
             {
@@ -182,7 +182,9 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
                 latch.countDown();
                 return null;
             }
-        }));
+        });
+        component.setMuleContext(muleContext);
+        service.setComponent(component);
         muleContext.getRegistry().registerService(service);
 
         service.dispatchEvent(MuleTestUtils.getTestEvent("test", 
@@ -206,7 +208,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         ChainedThreadingProfile threadingProfile = (ChainedThreadingProfile) muleContext.getDefaultServiceThreadingProfile();
         threadingProfile.setDoThreading(true);
         service.setThreadingProfile(threadingProfile);
-        service.setComponent(new SimpleCallableJavaComponent(new Callable()
+        final SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(new Callable()
         {
             public Object onCall(MuleEventContext eventContext) throws Exception
             {
@@ -214,7 +216,9 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
                 latch.countDown();
                 return null;
             }
-        }));
+        });
+        component.setMuleContext(muleContext);
+        service.setComponent(component);
         muleContext.getRegistry().registerService(service);
 
         service.dispatchEvent(MuleTestUtils.getTestEvent("test", 
