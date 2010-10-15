@@ -623,6 +623,11 @@ public abstract class AbstractService implements Service, MessageProcessor
     {
         this.component = component;
         this.component.setFlowConstruct(this);
+        if (component instanceof MuleContextAware)
+        {
+            ((MuleContextAware) component).setMuleContext(muleContext);
+
+        }
     }
 
     public MuleContext getMuleContext()
