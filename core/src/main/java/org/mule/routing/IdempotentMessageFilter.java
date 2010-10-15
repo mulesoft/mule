@@ -31,7 +31,7 @@ import java.text.MessageFormat;
  * checking the unique ID of the incoming message. Note that the underlying endpoint must support unique
  * message IDs for this to work, otherwise a <code>UniqueIdNotSupportedException</code> is thrown.<br>
  * <p>
- * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/IdempotentReceiver.html}
+ * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/IdempotentReceiver.html">http://www.eaipatterns.com/IdempotentReceiver.html</a>
  */
 public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor implements FlowConstructAware, Initialisable
 {

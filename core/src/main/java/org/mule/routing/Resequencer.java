@@ -28,7 +28,7 @@ import java.util.Comparator;
  * parts so that another router such as the <i>CorrelationEventResequencer</i> can
  * receive the parts and reorder or merge them.
  * <p>
- * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/Resequencer.html}
+ * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Resequencer.html">http://www.eaipatterns.com/Resequencer.html<a/>
  */
 public class Resequencer extends AbstractAggregator
 {

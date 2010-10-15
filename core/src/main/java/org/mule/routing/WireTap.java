@@ -30,7 +30,7 @@ import org.mule.processor.AbstractMessageObserver;
  * error sending to the wiretap output no exception will be thrown but rather an
  * error logged.
  * <p>
- * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/WireTap.html}
+ * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/WireTap.html">http://www.eaipatterns.com/WireTap.html<a/>
  */
 public class WireTap extends AbstractMessageObserver
 

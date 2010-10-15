@@ -18,7 +18,7 @@ import org.mule.routing.correlation.EventCorrelatorCallback;
  * This allows the service itself to act upon the events rather that the user having to write a custom
  * aggregator.  This may feel more natural for some users.
  *
- * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/Aggregator.html}
+ * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Aggregator.html">http://www.eaipatterns.com/Aggregator.html</a>
  */
 public class SimpleCollectionAggregator extends AbstractAggregator
 {

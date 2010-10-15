@@ -26,7 +26,7 @@ import java.util.List;
  * Splits a message using the expression provided invoking the next message processor
  * one for each split part.
  * <p>
- * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/Sequencer.html}
+ * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http://www.eaipatterns.com/Sequencer.html</a>
  */
 public class ExpressionSplitter extends AbstractSplitter
     implements Initialisable

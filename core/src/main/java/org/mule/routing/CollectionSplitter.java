@@ -22,7 +22,7 @@ import java.util.List;
  * Splits a message that has a list payload invoking the next message processor one
  * for each item in the list in order.
  * <p>
- * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/Sequencer.html}
+ * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http://www.eaipatterns.com/Sequencer.html</a>
  */
 public class CollectionSplitter extends AbstractSplitter
 {

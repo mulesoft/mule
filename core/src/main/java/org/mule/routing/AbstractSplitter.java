@@ -30,7 +30,7 @@ import java.util.List;
  * the message is split.
  *
  * <p>
- * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html"/>http://www.eaipatterns.com/Sequencer.html</a>
+ * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http://www.eaipatterns.com/Sequencer.html</a>
  */
 
 public abstract class AbstractSplitter extends

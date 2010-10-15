@@ -25,7 +25,7 @@ import java.util.List;
  * MessageChunkingAggregator inbound router in order to rebuild the message at the
  * other end.
  * <p>
- * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/Sequencer.html}
+ * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http://www.eaipatterns.com/Sequencer.html</a>
  */
 public class MessageChunkSplitter extends AbstractSplitter
 {

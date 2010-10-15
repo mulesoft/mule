@@ -25,7 +25,7 @@ import org.mule.processor.AbstractFilteringMessageProcessor;
  * does not accept the message processor and a message processor is configured for handling unaccepted message
  * then this will be invoked, otherwise <code>null</code> will be returned.
  * <p/>
- * <b>EIP Reference:</b> {@link http://www.eaipatterns.com/Filter.html}
+ * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Filter.html">http://www.eaipatterns.com/Filter.html<a/>
  */
 public class MessageFilter extends AbstractFilteringMessageProcessor
 {
