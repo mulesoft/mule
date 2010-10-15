@@ -40,7 +40,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
     public static final String ATTRIBUTE_OBJECT_CLASS = "objectClass";
 
     protected String objectClassName;
-    protected Class<?> objectClass = null;
+    protected Class<?> objectClass;
     protected Map properties = null;
     protected List<InitialisationCallback> initialisationCallbacks = new ArrayList<InitialisationCallback>();
     protected FlowConstruct flowConstruct;
@@ -133,13 +133,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
                     MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
         }
 
-        Class<?> klass = objectClass;
-        if (klass == null)
-        {
-            klass = setupObjectClassFromObjectClassName();
-        }
-
-        Object object = ClassUtils.instanciateClass(klass);
+        Object object = ClassUtils.instanciateClass(objectClass);
 
         if (properties != null)
         {
@@ -175,18 +169,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
 
     public Class<?> getObjectClass()
     {
-        if (objectClass != null)
-        {
-            Class<?> klass = objectClass;
-            if (klass == null)
-            {
-                klass = setupObjectClassFromObjectClassName();
-            }
-            return klass;
-        }
-
-        // objectClass may be null if this factory was not yet initialized or was disposed
-        return null;
+        return objectClass;
     }
 
     public void setObjectClass(Class<?> objectClass)
