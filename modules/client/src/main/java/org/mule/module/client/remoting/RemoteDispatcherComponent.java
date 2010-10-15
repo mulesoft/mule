@@ -287,7 +287,9 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             props.put("wireFormat", wireFormat);
             props.put("encoding", encoding);
             props.put("synchronousEventTimeout", new Integer(eventTimeout));
-            service.setComponent(new SimpleCallableJavaComponent(new PrototypeObjectFactory(RemoteDispatcherComponent.class, props)));
+            final SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(new PrototypeObjectFactory(RemoteDispatcherComponent.class, props));
+            component.setMuleContext(muleContext);
+            service.setComponent(component);
 
 
             if (!(service.getMessageSource() instanceof CompositeMessageSource))

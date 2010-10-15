@@ -59,7 +59,6 @@ import java.util.Set;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -651,7 +650,9 @@ public class MuleEventMulticaster
             s.setQueueProfile(new QueueProfile());
             ((CompositeMessageSource) s.getMessageSource()).addSource(
                 muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(newEndpoint));
-            s.setComponent(new DefaultJavaComponent(new SingletonObjectFactory(listener)));
+            final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(listener));
+            component.setMuleContext(muleContext);
+            s.setComponent(component);
             muleContext.getRegistry().registerService(s);
             return true;
         }

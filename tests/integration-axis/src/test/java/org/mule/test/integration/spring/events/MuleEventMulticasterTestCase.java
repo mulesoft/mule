@@ -37,7 +37,7 @@ public class MuleEventMulticasterTestCase extends DynamicPortTestCase
     public void testReceiveAsWebService() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        OrderManagerBean orderManager = (OrderManagerBean) muleContext.getRegistry().lookupObject("orderManagerBean");
+        OrderManagerBean orderManager = muleContext.getRegistry().get("orderManagerBean");
         assertNotNull(orderManager);
         EventCallback callback = new EventCallback()
         {

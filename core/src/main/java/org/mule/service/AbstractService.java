@@ -117,9 +117,10 @@ public abstract class AbstractService implements Service, MessageProcessor
     public AbstractService(MuleContext muleContext)
     {
         this.muleContext = muleContext;
+        ((MuleContextAware) component).setMuleContext(muleContext);
         try
         {
-            lifecycleManager = new ServiceLifecycleManager(this);
+            lifecycleManager = new ServiceLifecycleManager(this, muleContext);
         }
         catch (MuleException e)
         {

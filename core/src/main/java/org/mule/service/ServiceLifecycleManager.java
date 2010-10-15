@@ -9,6 +9,7 @@
  */
 package org.mule.service;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Disposable;
@@ -35,7 +36,7 @@ public class ServiceLifecycleManager extends SimpleLifecycleManager<FlowConstruc
      */
     protected transient final Log logger = LogFactory.getLog(ServiceLifecycleManager.class);
 
-    public ServiceLifecycleManager(FlowConstruct service) throws MuleException
+    public ServiceLifecycleManager(FlowConstruct service, MuleContext muleContext) throws MuleException
     {
         super(service.getName(), service);
     }

@@ -322,8 +322,8 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
         {
             logger.info("Starting: " + this);
         }
-        notificationHandler = new OptimisedNotificationHandler(flowConstruct.getMuleContext()
-                                                                       .getNotificationManager(), ComponentMessageNotification.class);
+        notificationHandler = new OptimisedNotificationHandler(muleContext.getNotificationManager(),
+                                                               ComponentMessageNotification.class);
         doStart();
     }
 

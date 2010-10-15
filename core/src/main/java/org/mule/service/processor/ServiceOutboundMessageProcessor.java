@@ -61,7 +61,7 @@ public class ServiceOutboundMessageProcessor extends AbstractInterceptingMessage
                 {
                     // Copy of the inbound event for outbound phase
                     outboundEvent = new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage()
-                        .getPayload(), event.getMessage(), service.getMuleContext()), event);
+                        .getPayload(), event.getMessage(), event.getMuleContext()), event);
                 }
                 else
                 {
