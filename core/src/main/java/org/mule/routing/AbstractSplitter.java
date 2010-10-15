@@ -28,6 +28,9 @@ import java.util.List;
  * Splits a message invoking the next message processor one for each split part.
  * Implementations must implement {@link #splitMessage(MuleEvent)} and determine how
  * the message is split.
+ *
+ * <p>
+ * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http://www.eaipatterns.com/Sequencer.html</a>
  */
 
 public abstract class AbstractSplitter extends
