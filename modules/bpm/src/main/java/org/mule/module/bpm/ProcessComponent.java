@@ -60,7 +60,7 @@ public class ProcessComponent extends AbstractComponent
             ((Initialisable) bpms).initialise();
         }
         
-        process = new Process(bpms, name, resource, flowConstruct);
+        process = new Process(bpms, name, resource, flowConstruct, muleContext);
         process.initialise();
 
         // Inject a callback so that the BPMS may generate messages within Mule.

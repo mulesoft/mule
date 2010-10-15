@@ -42,12 +42,13 @@ public class IBeanHolder implements Comparable
         return ibean;
     }
 
-    public Object create(MuleContext context, MuleIBeansPlugin plugin) throws MuleException
+    public Object create(MuleContext muleContext, MuleIBeansPlugin plugin) throws MuleException
     {
-        IBeanFlowConstruct flow = new IBeanFlowConstruct(ibean.getSimpleName() + "." + System.identityHashCode(this), context);
-        context.getRegistry().registerObject(flow.getName(), flow, FlowConstruct.class);
+        final String name = String.format("%s.%d", ibean.getSimpleName(), System.identityHashCode(this));
+        IBeanFlowConstruct flow = new IBeanFlowConstruct(name, muleContext);
+        muleContext.getRegistry().registerObject(flow.getName(), flow, FlowConstruct.class);
 
-        IBeanBinding router = new IBeanBinding(flow, plugin);
+        IBeanBinding router = new IBeanBinding(flow, muleContext, plugin);
         router.setInterface(ibean);
         return router.createProxy(new Object());
     }

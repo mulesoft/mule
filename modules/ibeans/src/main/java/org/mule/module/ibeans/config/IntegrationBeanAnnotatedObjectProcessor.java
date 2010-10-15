@@ -90,6 +90,6 @@ public class IntegrationBeanAnnotatedObjectProcessor implements InjectProcessor,
         {
             throw new MuleRuntimeException(e);
         }
-        return new IBeanBinding(flow, plugin);
+        return new IBeanBinding(flow, muleContext, plugin);
     }
 }

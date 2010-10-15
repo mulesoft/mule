@@ -71,10 +71,10 @@ public class IBeanBinding implements InterfaceBinding
     
     protected MuleContext muleContext;
 
-    public IBeanBinding(IBeanFlowConstruct flow, MuleIBeansPlugin plugin)
+    public IBeanBinding(IBeanFlowConstruct flow, MuleContext muleContext, MuleIBeansPlugin plugin)
     {
         this.flow = flow;
-        this.muleContext = this.flow.getMuleContext();
+        this.muleContext = muleContext;
         this.plugin = plugin;
     }
 

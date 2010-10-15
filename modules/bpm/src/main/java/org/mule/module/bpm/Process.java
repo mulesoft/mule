@@ -14,6 +14,7 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -54,9 +55,11 @@ public class Process implements Initialisable, Disposable, MessageService
     /** This field will be used to correlate messages with processes. */
     protected final String processIdField;
 
+    protected MuleContext muleContext;
+
     /** Needed for exception handling. */
     private FlowConstruct flowConstruct;
-    
+
     public static final String BPM_PROPERTY_PREFIX = "BPM_";
     
     public static final String PROPERTY_ENDPOINT = 
@@ -83,18 +86,19 @@ public class Process implements Initialisable, Disposable, MessageService
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public Process(BPMS bpms, String name, String resource, FlowConstruct flowConstruct)
+    public Process(BPMS bpms, String name, String resource, FlowConstruct flowConstruct, MuleContext muleContext)
     {
-        this(bpms, name, resource, null, flowConstruct);
+        this(bpms, name, resource, null, flowConstruct, muleContext);
     }
 
-    public Process(BPMS bpms, String name, String resource, String processIdField, FlowConstruct flowConstruct)
+    public Process(BPMS bpms, String name, String resource, String processIdField, FlowConstruct flowConstruct, MuleContext muleContext)
     {
         this.bpms = bpms;
         this.name = name;
         this.resource = resource;
         this.processIdField = processIdField;
         this.flowConstruct = flowConstruct;
+        this.muleContext = muleContext;
     }
 
     public void initialise() throws InitialisationException
@@ -261,13 +265,13 @@ public class Process implements Initialisable, Disposable, MessageService
         }
         else
         {
-            message = new DefaultMuleMessage(payload, flowConstruct.getMuleContext());
+            message = new DefaultMuleMessage(payload, muleContext);
         }
         message.addProperties(messageProperties, PropertyScope.INBOUND);
         message.addProperties(messageProperties, PropertyScope.INVOCATION);
 
         //TODO should probably cache this
-        EndpointBuilder endpointBuilder = flowConstruct.getMuleContext().getRegistry().lookupEndpointFactory().getEndpointBuilder(endpoint);
+        EndpointBuilder endpointBuilder = muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(endpoint);
         endpointBuilder.setExchangePattern(exchangePattern);
         OutboundEndpoint ep = endpointBuilder.buildOutboundEndpoint();
        
