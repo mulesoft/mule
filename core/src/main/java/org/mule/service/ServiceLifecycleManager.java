@@ -35,10 +35,12 @@ public class ServiceLifecycleManager extends SimpleLifecycleManager<FlowConstruc
      * logger used by this class
      */
     protected transient final Log logger = LogFactory.getLog(ServiceLifecycleManager.class);
+    protected MuleContext muleContext;
 
     public ServiceLifecycleManager(FlowConstruct service, MuleContext muleContext) throws MuleException
     {
         super(service.getName(), service);
+        this.muleContext = muleContext;
     }
 
     @Override
@@ -127,10 +129,10 @@ public class ServiceLifecycleManager extends SimpleLifecycleManager<FlowConstruc
     protected void fireNotification(int action)
     {
         // double broadcast for backwards compatibility
-        getLifecycleObject().getMuleContext().fireNotification(new FlowConstructNotification(getLifecycleObject(), action));
+        muleContext.fireNotification(new FlowConstructNotification(getLifecycleObject(), action));
         if(getLifecycleObject() instanceof Service)
         {
-            getLifecycleObject().getMuleContext().fireNotification(new ServiceNotification((Service)getLifecycleObject(), action));
+            muleContext.fireNotification(new ServiceNotification((Service)getLifecycleObject(), action));
         }
     }
 }
