@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstructAware
 {
+
     public static final String ATTRIBUTE_OBJECT_CLASS_NAME = "objectClassName";
     public static final String ATTRIBUTE_OBJECT_CLASS = "objectClass";
 
@@ -47,7 +48,9 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    /** For Spring only */
+    /**
+     * For Spring only
+     */
     public AbstractObjectFactory()
     {
         // nop
@@ -103,22 +106,23 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
         if ((objectClassName == null) || (objectClass == null))
         {
             throw new InitialisationException(
-                MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
+                    MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
         }
-        disposed=false;
+        disposed = false;
     }
-    
+
     public void dispose()
     {
-        disposed=true;
+        disposed = true;
         //Don't reset the component config state i.e. objectClass since service objects can be recycled
     }
 
     /**
      * Creates an initialized object instance based on the class and sets any properties.
      * This method handles all injection of properties for the resulting object
+     *
      * @param muleContext the current {@link org.mule.api.MuleContext} instance. This can be used for performing registry lookups
-     * applying processors to newly created objects or even firing custom notifications
+     *                    applying processors to newly created objects or even firing custom notifications
      * @throws Exception Can throw any type of exception while creating a new object
      */
     public Object getInstance(MuleContext muleContext) throws Exception
@@ -126,9 +130,9 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
         if (objectClass == null || disposed)
         {
             throw new InitialisationException(
-                MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
+                    MessageFactory.createStaticMessage("Object factory has not been initialized."), this);
         }
-        
+
         Class<?> klass = objectClass;
         if (klass == null)
         {
@@ -142,22 +146,22 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
             BeanUtils.populateWithoutFail(object, properties, true);
         }
 
-        if(object instanceof FlowConstructAware)
+        if (object instanceof FlowConstructAware)
         {
-            ((FlowConstructAware)object).setFlowConstruct(flowConstruct);
-        }
-        
-        if(object instanceof ServiceAware && flowConstruct instanceof Service)
-        {
-            ((ServiceAware)object).setService((Service) flowConstruct);
+            ((FlowConstructAware) object).setFlowConstruct(flowConstruct);
         }
 
-        if(isAutoWireObject())
+        if (object instanceof ServiceAware && flowConstruct instanceof Service)
+        {
+            ((ServiceAware) object).setService((Service) flowConstruct);
+        }
+
+        if (isAutoWireObject())
         {
             muleContext.getRegistry().applyProcessors(object);
         }
         fireInitialisationCallbacks(object);
-        
+
         return object;
     }
 
@@ -211,12 +215,12 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
     {
         this.properties = properties;
     }
-    
+
     public void addObjectInitialisationCallback(InitialisationCallback callback)
     {
         initialisationCallbacks.add(callback);
     }
-    
+
     public boolean isSingleton()
     {
         return false;
