@@ -10,7 +10,6 @@
 
 package org.mule.api.construct;
 
-import org.mule.api.MuleContext;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
 import org.mule.api.processor.MessageProcessorChain;
@@ -45,8 +44,6 @@ public interface FlowConstruct extends LifecycleStateEnabled
      *         activity.
      */
     FlowConstructStatistics getStatistics();
-
-    MuleContext getMuleContext();
 
     /**
      * @return This implementation of {@link MessageInfoMapping} used to control how

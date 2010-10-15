@@ -275,7 +275,7 @@ public class Process implements Initialisable, Disposable, MessageService
         endpointBuilder.setExchangePattern(exchangePattern);
         OutboundEndpoint ep = endpointBuilder.buildOutboundEndpoint();
        
-        DefaultMuleEvent event = new DefaultMuleEvent(message, ep, new DefaultMuleSession(flowConstruct, flowConstruct.getMuleContext()));
+        DefaultMuleEvent event = new DefaultMuleEvent(message, ep, new DefaultMuleSession(flowConstruct, muleContext));
 
         // Set correlation properties in SESSION scope so that they get propagated to response messages.
         RequestContext.setEvent(event);
