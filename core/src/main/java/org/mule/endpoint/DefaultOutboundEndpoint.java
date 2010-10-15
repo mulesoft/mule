@@ -98,7 +98,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
 
         if (chain instanceof MuleContextAware)
         {
-            ((MuleContextAware) chain).setMuleContext(flowContruct.getMuleContext());
+            ((MuleContextAware) chain).setMuleContext(getMuleContext());
         }
         if (chain instanceof FlowConstructAware)
         {
