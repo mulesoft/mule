@@ -31,7 +31,7 @@ public class MuleClientRemotingAxisTestCase extends DynamicPortTestCase
      * Get the Mule address for a Mule client call
      * 
      * @param muleClient The MuleClient instance to use
-     * @param endpointName The inbound endpoint which contains the address
+     * @param inboundEndpointName The inbound endpoint which contains the address
      * @return A String of the 'Mule' address, which in this case should include
      *         'axis" + 'http://<url>'
      */
