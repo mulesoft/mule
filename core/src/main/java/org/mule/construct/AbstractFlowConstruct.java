@@ -82,7 +82,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     {
         this.muleContext = muleContext;
         this.name = name;
-        this.lifecycleManager = new FlowConstructLifecycleManager(this);
+        this.lifecycleManager = new FlowConstructLifecycleManager(this, muleContext);
         this.statistics = new FlowConstructStatistics(name);
         this.exceptionListener = new DefaultServiceExceptionStrategy(muleContext);
     }

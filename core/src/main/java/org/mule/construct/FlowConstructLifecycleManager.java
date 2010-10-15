@@ -9,6 +9,7 @@
  */
 package org.mule.construct;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.lifecycle.Disposable;
@@ -35,11 +36,13 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
      * logger used by this class
      */
     protected transient final Log logger = LogFactory.getLog(FlowConstructLifecycleManager.class);
+    protected MuleContext muleContext;
 
 
-    public FlowConstructLifecycleManager(FlowConstruct flowConstruct)
+    public FlowConstructLifecycleManager(FlowConstruct flowConstruct, MuleContext muleContext)
     {
         super(flowConstruct.getName(), flowConstruct);
+        this.muleContext = muleContext;
     }
 
     @Override
@@ -147,6 +150,6 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
 
     protected void fireNotification(int action)
     {
-        getLifecycleObject().getMuleContext().fireNotification(new FlowConstructNotification(getLifecycleObject(), action));
+        muleContext.fireNotification(new FlowConstructNotification(getLifecycleObject(), action));
     }
 }
