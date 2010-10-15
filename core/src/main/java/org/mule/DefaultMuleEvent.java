@@ -652,7 +652,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     public MuleContext getMuleContext()
     {
-        return endpoint.getMuleContext();
+        return message.getMuleContext();
     }
 
     public ThreadSafeAccess newThreadCopy()
