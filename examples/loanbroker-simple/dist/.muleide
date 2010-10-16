@@ -1,0 +1,5 @@
+#
+# This is the configuration file for Mule IDE. Do not delete it
+# if you want to create new projects from this example in Mule IDE.
+#
+ConfigFile=src/main/app/mule-config.xml
