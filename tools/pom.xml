@@ -19,7 +19,7 @@
         <module>mule-project-archetype</module>
         <module>mule-module-archetype</module>
         <module>mule-example-archetype</module>
-        <module>mule-configuration-patterns-catalog-archetype</module>
+        <module>mule-catalog-archetype</module>
   </modules>
 
     <profiles>
