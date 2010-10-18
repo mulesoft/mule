@@ -7,12 +7,11 @@
   <parent>
     <artifactId>mule-tools</artifactId>
     <groupId>org.mule.tools</groupId>
-    <version>3.0.1-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
   </parent>
 
   <packaging>maven-plugin</packaging>
   <artifactId>mule-catalog-archetype</artifactId>
-  <version>3.0.1-SNAPSHOT</version>
   <name>Mule Configuration Patterns Catalog Artifact</name>
   
   <dependencies>
