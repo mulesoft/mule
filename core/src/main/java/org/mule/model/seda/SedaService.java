@@ -133,11 +133,11 @@ public class SedaService extends AbstractService
                 : getName();
         workManager = threadingProfile.createWorkManager(threadPrefix, config.getShutdownTimeout());
 
-        if (queueProfile == null)
+        if (queueProfile == null && model != null)
         {
             queueProfile = ((SedaModel) model).getQueueProfile();
         }
-        if (queueTimeout == null)
+        if (queueTimeout == null && model != null)
         {
             setQueueTimeout(((SedaModel) model).getQueueTimeout());
         }

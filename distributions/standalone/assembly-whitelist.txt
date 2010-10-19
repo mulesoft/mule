@@ -81,7 +81,7 @@ jbpm-pvm-4.2
 jbossts-common-4.2.3-SP5-osgi
 jbossts-jta-4.2.3-SP5-patched-osgi
 jbossts-jta-integration-4.2.3-SP5-osgi
-jcl104-over-slf4j-1.5.0
+jcl-over-slf4j-1.6.1
 jdom-1.0-osgi
 jersey-core-1.3
 jersey-json-1.3
@@ -167,8 +167,8 @@ saxon-dom-8.9.0.4-osgi
 saxon-xqj-8.9.0.4
 scribe-1.0.3
 servlet-api-2.5-20081211
-slf4j-api-1.5.0
-slf4j-log4j12-1.5.0
+slf4j-api-1.6.1
+slf4j-log4j12-1.6.1
 smack-3.1.0
 smackx-3.1.0
 spring-aop-3.0.3.RELEASE

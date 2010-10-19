@@ -17,7 +17,7 @@ public class ScanLicenseHeaders
      * These files are known to have invalid license headers and are the usual exception to the rule
      */
     static List ignoredFiles = [ "BndMojo.java", "BobberArchetype.java", "BobberArchetypeMojo.java",
-        "DummySSLServerSocketFactory.java", "ExampleArchetypeMojo.java", "ModuleArchetypeMojo.java",
+        "ConfigurationPatternArchetypeMojo.java", "DummySSLServerSocketFactory.java", "ExampleArchetypeMojo.java", "ModuleArchetypeMojo.java",
         "MultipartConfiguration.java", "Part.java", "ProjectArchetypeMojo.java",
         "TransportArchetypeMojo.java", "XMLStreamReaderToContentHandler.java" ];
 
