@@ -1301,6 +1301,11 @@
                     <artifactId>gmaven-plugin</artifactId>
                     <version>1.2</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>1.5</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 

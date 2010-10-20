@@ -1,114 +1,107 @@
 <?xml version="1.0"?>
-<project
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-  xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-
-  <parent>
-    <artifactId>mule-tools</artifactId>
-    <groupId>org.mule.tools</groupId>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>mule-tools</artifactId>
+        <groupId>org.mule.tools</groupId>
+        <version>3.1.0-SNAPSHOT</version>
+    </parent>
+    <packaging>maven-plugin</packaging>
+    <artifactId>mule-catalog-archetype</artifactId>
     <version>3.1.0-SNAPSHOT</version>
-  </parent>
+    <name>Mule Configuration Patterns Catalog Artifact</name>
 
-  <packaging>maven-plugin</packaging>
-  <artifactId>mule-catalog-archetype</artifactId>
-  <name>Mule Configuration Patterns Catalog Artifact</name>
-  
-  <dependencies>
-    <dependency>
-      <groupId>org.mule</groupId>
-      <artifactId>mule-core</artifactId>
-      <version>${version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.mule.tools</groupId>
-      <artifactId>bobberplus</artifactId>
-      <version>${version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.mule.tools</groupId>
-      <artifactId>mule-module-archetype</artifactId>
-      <version>${version}</version>
-    </dependency>
-    
-    <!--
-      Due to the Maven 2.0.4 prerequisites. By default,
-      maven-plugin-test-plugin uses 2.0.1
-    -->
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-embedder</artifactId>
-      <version>2.0.4</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-core</artifactId>
-      <version>2.0.7</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>add-source</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${project.build.directory}/src-other</source>
-              </sources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>add-resource</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>add-resource</goal>
-            </goals>
-            <configuration>
-              <resources>
-                <resource>
-                  <directory>${project.build.directory}/src-other</directory>
-                  <targetPath>${project.build.directory}/classes</targetPath>
-                  <excludes>
-                    <exclude>org/**</exclude>
-                  </excludes>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>src-dependencies</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>unpack-dependencies</goal>
-            </goals>
-            <configuration>
-              <classifier>sources</classifier>
-              <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
-              <outputDirectory>${project.build.directory}/src-other</outputDirectory>
-              <includeGroupIds>${groupId}</includeGroupIds>
-              <includeArtifactIds>mule-module-archetype</includeArtifactIds>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-  
+    <dependencies>
+        <dependency>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tools</groupId>
+            <artifactId>bobberplus</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tools</groupId>
+            <artifactId>mule-module-archetype</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <!-- Due to the Maven 2.0.4 prerequisites. By default, maven-plugin-test-plugin uses 2.0.1 -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-embedder</artifactId>
+            <version>2.0.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-core</artifactId>
+            <version>2.0.7</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/src-other</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-resource</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/src-other</directory>
+                                    <targetPath>${project.build.directory}/classes</targetPath>
+                                    <excludes>
+                                        <exclude>org/**</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>src-dependencies</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>sources</classifier>
+                            <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
+                            <outputDirectory>${project.build.directory}/src-other</outputDirectory>
+                            <includeGroupIds>${groupId}</includeGroupIds>
+                            <includeArtifactIds>mule-module-archetype</includeArtifactIds>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
