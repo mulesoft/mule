@@ -47,6 +47,82 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="entry-last-updated-filter" type="entryLastUpdateFilterType"
+                 substitutionGroup="mule:abstract-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                Will filter RSS entry objects based on their last update date. This is useful for filtering older
+                entries from the feed. This filter works only on RSS SyndEntry objects not SyndFeed objects.
+                Typically it is better to set the lastUpdated attribute on an inbound ATOM endpoint rather than use this filter, however, this filter can be used elsewhere in a flow.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="entryLastUpdateFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractFilterType">
+                <xsd:attribute name="lastUpdate" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The date from which to filter events from.  Any entries that were last updated before this date will not be accepted. The date format is
+                            The format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25 13:00:00.
+                            If only the date is important you can omit the time part.
+                            You can set the value to 'now' to set the date and time that the server is started.
+
+                            Do not set this attribute if you want to receive all available entries then any new entries going forward.
+                            This is the default behaviour and suitable for many scenarios.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="acceptWithoutUpdateDate" type="mule:substitutableBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether an entry should be accepted if it doesn't have a Last Update date set.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="feed-last-updated-filter" type="feedLastUpdateFilterType"
+                 substitutionGroup="mule:abstract-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                Will filter the whole RSS Feed based on its last update date. This is useful for processing a feed that has not been updated since a specific date.
+                This filter works only on RSS SyndFeed objects.
+                Typically it is better to set the lastUpdated attribute on an inbound ATOM endpoint with splitFeed=false rather than use this filter, however, this filter can be used elsewhere in a flow.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="feedLastUpdateFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractFilterType">
+                <xsd:attribute name="lastUpdate" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The date from which to filter events from.  Any entries that were last updated before this date will not be accepted. The date format is
+                            The format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25 13:00:00.
+                            If only the date is important you can omit the time part.
+                            You can set the value to 'now' to set the date and time that the server is started.
+
+                            Do not set this attribute if you want to receive all available entries then any new entries going forward.
+                            This is the default behaviour and suitable for many scenarios.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="acceptWithoutUpdateDate" type="mule:substitutableBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether a Feed should be accepted if it doesn't have a Last Update date set.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>

@@ -9,15 +9,19 @@
  */
 package org.mule.module.rss;
 
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
+import org.mule.construct.SimpleFlowConstruct;
 import org.mule.module.rss.endpoint.RssInboundEndpoint;
+import org.mule.module.rss.routing.EntryLastUpdatedFilter;
+import org.mule.module.rss.routing.FeedLastUpdatedFilter;
 import org.mule.module.rss.routing.FeedSplitter;
+import org.mule.routing.MessageFilter;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.FunctionalTestCase;
 
 import java.text.SimpleDateFormat;
-
-import junit.framework.Assert;
 
 public class NamespaceTestCase extends FunctionalTestCase
 {
@@ -33,10 +37,37 @@ public class NamespaceTestCase extends FunctionalTestCase
         assertTrue(((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0) instanceof RssInboundEndpoint);
         RssInboundEndpoint ep = (RssInboundEndpoint) ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
         assertEquals(FeedSplitter.class, ep.getMessageProcessors().get(0).getClass());
-
         assertNotNull(ep.getLastUpdate());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        Assert.assertEquals(sdf.parse("2009-10-01"), ep.getLastUpdate());
+        assertEquals(sdf.parse("2009-10-01"), ep.getLastUpdate());
+    }
+
+    public void testFlowConfig() throws Exception
+    {
+        SimpleFlowConstruct flowConstruct = muleContext.getRegistry().lookupObject("flowTest");
+        assertNotNull(flowConstruct);
+        assertTrue(flowConstruct.getMessageSource() instanceof InboundEndpoint);
+        InboundEndpoint ep = ((InboundEndpoint)flowConstruct.getMessageSource());
+        assertEquals(2, ep.getMessageProcessors().size());
+        MessageProcessor mp = ep.getMessageProcessors().get(0);
+        assertTrue(mp instanceof FeedSplitter);
+        mp = ep.getMessageProcessors().get(1);
+        assertTrue(mp instanceof MessageFilter);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        assertEquals(sdf.parse("2009-10-01"), ((EntryLastUpdatedFilter)((MessageFilter)mp).getFilter()).getLastUpdate());
+    }
+
+    public void testGlobalFilterConfig() throws Exception {
+        FeedLastUpdatedFilter filter = muleContext.getRegistry().lookupObject("feedFilter");
+        assertNotNull(filter);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+        assertEquals(sdf.parse("2009-10-01 13:00:00"), filter.getLastUpdate());
+        assertFalse(filter.isAcceptWithoutUpdateDate());
+
     }
 }
