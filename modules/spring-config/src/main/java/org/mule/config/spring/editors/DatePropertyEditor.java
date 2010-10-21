@@ -79,13 +79,17 @@ public class DatePropertyEditor extends PropertyEditorSupport
 			// Treat empty String as null value.
 			setValue(null);
 		}
-		else if (text != null && this.exactDateLength >= 0 && text.length() != this.exactDateLength) {
+        else if(text.equals("now"))
+        {
+            setValue(new Date());
+        }
+		else if (this.exactDateLength >= 0 && text.length() != this.exactDateLength) {
 			throw new IllegalArgumentException(
 					"Could not parse date: it is not exactly" + this.exactDateLength + "characters long");
 		}
 		else {
 			try {
-                if(shortDateFormat!=null && text!=null && text.length() <=10) {
+                if(shortDateFormat!=null && text.length() <=10) {
 				    setValue(this.shortDateFormat.parse(text));
                 } else {
                     setValue(this.dateFormat.parse(text));

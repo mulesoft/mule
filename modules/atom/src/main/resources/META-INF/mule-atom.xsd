@@ -38,6 +38,9 @@
         <xsd:annotation>
             <xsd:documentation>
                 Allows ATOM requests to be filtered by request path and HTTP verb.
+                The route attribute defines a type of URI Template loosely based on Ruby on Rails style Routes. For example:
+                "feed" or ":feed/:entry".
+                For reference, see the Ruby On Rails routing http://guides.rubyonrails.org/routing.html
             </xsd:documentation>
         </xsd:annotation>
                  </xsd:element>
@@ -48,6 +51,9 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The URI request path made for an ATOM request.  This matches against the path of the request URL.
+                            The route attribute defines a type of URI Template loosely based on Ruby on Rails style Routes. For example:
+                            "feed" or ":feed/:entry".
+                            For reference, see the Ruby On Rails routing http://guides.rubyonrails.org/routing.html
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -77,12 +83,16 @@
     <xsd:complexType name="entryLastUpdateFilterType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractFilterType">
-                <xsd:attribute name="lastUpdate" type="xsd:string" use="required">
+                <xsd:attribute name="lastUpdate" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             The date from which to filter events from.  Any entries that were last updated before this date will not be accepted. The date format is
                             The format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25 13:00:00.
                             If only the date is important you can omit the time part.
+                            You can set the value to 'now' to set the date and time that the server is started.
+
+                            Do not set this attribute if you want to receive all available entries then any new entries going forward.
+                            This is the default behaviour and suitable for many scenarios.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -111,12 +121,16 @@
     <xsd:complexType name="feedLastUpdateFilterType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractFilterType">
-                <xsd:attribute name="lastUpdate" type="xsd:string" use="required">
+                <xsd:attribute name="lastUpdate" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             The date from which to filter events from.  Any entries that were last updated before this date will not be accepted. The date format is
                             The format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25 13:00:00.
                             If only the date is important you can omit the time part.
+                            You can set the value to 'now' to set the date and time that the server is started.
+
+                            Do not set this attribute if you want to receive all available entries then any new entries going forward.
+                            This is the default behaviour and suitable for many scenarios.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -131,8 +145,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="component" type="atomComponentType"
-                 substitutionGroup="mule:abstract-component">
+    <xsd:element name="component" type="atomComponentType" substitutionGroup="mule:abstract-component">
         <xsd:annotation>
             <xsd:documentation>
                 Represents an Abdera component.
@@ -155,7 +168,7 @@
 
     <xsd:complexType name="atomComponentType">
         <xsd:complexContent>
-            <xsd:extension base="mule:abstractComponentType">
+            <xsd:extension base="mule:defaultJavaComponentType">
                 <xsd:attributeGroup ref="componentAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -242,6 +255,10 @@
                             used if the feed is split.
                             The format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25
                             13:00:00. If only the date is important you can omit the time part
+                            You can set the value to 'now' to set the date and time that the server is started
+
+                            Do not set this attribute if you want to receive all available entries then any new entries going forward.
+                            This is the default behaviour and suitable for many scenarios.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
