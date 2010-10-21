@@ -9,19 +9,18 @@
  */
 package org.mule.module.rss;
 
-import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
-public class FeedConsumeAndSplitExplicitNonHttpTestCase extends FunctionalTestCase
+public class HttpOnlyFeedConsumeAndSplitTestCase extends FunctionalTestCase
 {
     private final CounterCallback counter = new CounterCallback();
 
     @Override
     protected String getConfigResources()
     {
-        return "vm-rss-consume-and-explicit-split.xml";
+        return "http-only-consume-and-split.xml";
     }
 
     @Override
@@ -31,13 +30,14 @@ public class FeedConsumeAndSplitExplicitNonHttpTestCase extends FunctionalTestCa
         comp.setEventCallback(counter);
     }
 
-    public void testConsume() throws Exception
-    {
-        LocalMuleClient client = muleContext.getClient();
-        String feed = loadResourceAsString("sample-feed.rss");
-        client.dispatch("vm://feed.in", feed, null);
-        Thread.sleep(2000);
+    public void testConsume() throws Exception {
+
+        Thread.sleep(4000);
         int count = counter.getCallbackCount();
-        assertEquals(25, count);
+        assertTrue(count > 0);
+        Thread.sleep(3000);
+        //We should only receive entries once
+        assertEquals(count, counter.getCallbackCount());
+
     }
 }

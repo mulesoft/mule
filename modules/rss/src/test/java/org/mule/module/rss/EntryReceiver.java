@@ -9,17 +9,18 @@
  */
 package org.mule.module.rss;
 
+import org.mule.api.annotations.param.Payload;
+
 import com.sun.syndication.feed.synd.SyndEntry;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RssEntryCounterComponent
+public class EntryReceiver
 {
     private AtomicInteger count = new AtomicInteger(0);
 
-    public void readFeed(SyndEntry entry) throws Exception
+    public void readEntry(@Payload SyndEntry entry) throws Exception
     {
-        System.out.println(entry.getTitle());
         count.getAndIncrement();
     }
 

@@ -28,11 +28,11 @@ public class RssFunctionalTestCase extends FunctionalTestCase
         }
 
         //lets wait to read the feed
-        Thread.sleep(10000);
-        RssEntryCounterComponent component = (RssEntryCounterComponent) this.getComponent("rssTester");
+        Thread.sleep(RECEIVE_TIMEOUT);
+        EntryReceiver component = (EntryReceiver) getComponent("rssTester");
         assertTrue(component.getCount() > 2);
 
-        RssEntryCounterComponent component2 = (RssEntryCounterComponent) this.getComponent("rssTester2");
+        EntryReceiver component2 = (EntryReceiver) getComponent("rssTester2");
         assertTrue(component2.getCount() > 2);
 
         assertTrue(component.getCount() >= component2.getCount());

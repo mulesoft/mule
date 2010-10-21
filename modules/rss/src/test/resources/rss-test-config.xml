@@ -16,7 +16,7 @@
                 </rss:inbound-endpoint>
             </inbound>
             <component>
-                <singleton-object class="org.mule.module.rss.RssEntryCounterComponent"/>
+                <singleton-object class="org.mule.module.rss.EntryReceiver"/>
             </component>
         </service>
 
@@ -28,7 +28,7 @@
                 </rss:inbound-endpoint>
             </inbound>
             <component>
-                <singleton-object class="org.mule.module.rss.RssEntryCounterComponent"/>
+                <singleton-object class="org.mule.module.rss.EntryReceiver"/>
             </component>
         </service>
     </model>

@@ -15,6 +15,7 @@ import com.sun.syndication.feed.synd.SyndEntryImpl;
 import java.util.ArrayList;
 import java.util.List;
 
+//Currently not used
 public class RssEntryCreatorComponent
 {
 

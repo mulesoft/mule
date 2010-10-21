@@ -1,589 +1,864 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet href="http://feeds.sfgate.com/~d/styles/rss2full.xsl" type="text/xsl" media="screen"?><?xml-stylesheet href="http://feeds.sfgate.com/~d/styles/itemcontent.css" type="text/css" media="screen"?>
-<rss xmlns:feedburner="http://rssnamespace.org/feedburner/ext/1.0" version="2.0">
-    <channel>
-        <title>SFGate: Business &amp; Technology</title>
-        <link>http://www.sfgate.com/business/</link>
-        <description>Business and technology news. From SFGate.com: the Bay Area's home page, online home of the San
-            Francisco Chronicle and much more.
-        </description>
-        <language>en-us</language>
-        <copyright>Copyright 2007 Hearst Communications, Inc.</copyright>
-        <managingEditor>ed@sfgate.com (SFGate Editorial staff)</managingEditor>
-        <webMaster>support@sfgate.com (SFGate technical support)</webMaster>
-        <lastBuildDate>Fri, 27 Jul 2007 13:20:18 PDT</lastBuildDate>
-        <category>News</category>
-        <category>Newspapers</category>
-        <category>San Francisco</category>
-        <category>San Francisco Bay Area</category>
-        <docs>http://blogs.law.harvard.edu/tech/rss</docs>
-        <image>
-            <url>http://www.sfgate.com/templates/types/syndication/pages/rss/graphics/sfgate_logo.png</url>
-            <title>SFGate: Business &amp; Technology</title>
-            <link>http://www.sfgate.com/business/</link>
-        </image>
-        <atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="self"
-                     href="http://www.sfgate.com/rss/feeds/business.xml" type="application/rss+xml"/>
-        <feedburner:browserFriendly>This is an RSS feed, but with the headlines made visible. Choose one of the buttons
-            to add this feed to your favorite RSS reader.
-        </feedburner:browserFriendly>
-        <item>
-            <title><![CDATA[Stocks Continue Slide Despite GDP Report]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/138021646/article.cgi</link>
-            <description>Wall Street extended its steep decline Friday, propelling the Dow Jones industrials down more
-                than 500 points over two days after investors gave in to mounting concerns that borrowing costs would
-                climb for both companies and homeowners. It was the Dow's worst...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=XzzhyT"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=XzzhyT" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=ZLbdza60"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=ZLbdza60" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=DEA2YWMh"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=DEA2YWMh" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=DdaNZICz"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=DdaNZICz" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=5R6o4zSu"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=5R6o4zSu" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/138021646" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[By TIM PARADIS, AP Business Writer]]></author>
-            <pubDate>Fri, 27 Jul 2007 13:18:10 PDT</pubDate>
-            <guid isPermaLink="false">/n/a/2007/07/27/financial/f085913D39.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/n/a/2007/07/27/financial/f085913D39.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[Ex-Qwest Boss Gets Six Years in Prison]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/138052334/article.cgi</link>
-            <description>Former Qwest Communications chief executive Joe Nacchio got six years in prison and was ordered
-                to give up all his ill-gotten gains on Friday for hiding his company's problems from investors even as
-                he dumped shares at a huge profit. U.S. District...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=uIsLur"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=uIsLur" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=N7unkhh5"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=N7unkhh5" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=5BC5q5wq"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=5BC5q5wq" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=ktII2dMX"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=ktII2dMX" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=Q2b4HpR7"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=Q2b4HpR7" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/138052334" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[By SANDY SHORE, AP Business Writer]]></author>
-            <pubDate>Fri, 27 Jul 2007 11:39:01 PDT</pubDate>
-            <guid isPermaLink="false">/n/a/2007/07/27/financial/f110809D69.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/n/a/2007/07/27/financial/f110809D69.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[Chevron's 2Q Profit Soars 24 Percent]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/137982678/article.cgi</link>
-            <description>Chevron Corp.'s profits surged to a new high during the second quarter as the nation's second
-                largest oil company cashed in on higher gasoline prices and cashed out of a major investment. The San
-                Ramon-based company said Friday that it earned $5.38...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=UIKs0E"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=UIKs0E" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=LZzqeMwd"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=LZzqeMwd" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=XR5HFotF"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=XR5HFotF" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=OVP7gDcc"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=OVP7gDcc" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=zrRBKKHX"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=zrRBKKHX" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/137982678" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[By MICHAEL LIEDTKE, AP Business Writer]]></author>
-            <pubDate>Fri, 27 Jul 2007 07:54:20 PDT</pubDate>
-            <guid isPermaLink="false">/n/a/2007/07/27/financial/f070750D30.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/n/a/2007/07/27/financial/f070750D30.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[EU charges Intel with monopoly abuse]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/137982682/article.cgi</link>
-            <description>EU regulators said Friday they have charged Intel Corp. with monopoly abuse for customer
-                rebates and below-cost pricing that undercut rival computer chipmaker Advanced Micro Devices Inc. Intel
-                immediately said its conduct had been lawful, good for...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=lZ4j6s"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=lZ4j6s" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=zVFzrqQQ"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=zVFzrqQQ" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=FZqwzYC5"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=FZqwzYC5" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=8CTLDA5u"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=8CTLDA5u" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=oidIWUzD"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=oidIWUzD" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/137982682" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[By AOIFE WHITE, AP Business Writer]]></author>
-            <pubDate>Fri, 27 Jul 2007 06:30:03 PDT</pubDate>
-            <guid isPermaLink="false">/n/a/2007/07/27/financial/f003516D65.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/n/a/2007/07/27/financial/f003516D65.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[DAILY DIGEST]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/137913379/article.cgi</link>
-            <description>Chain consolidates newsroom operations The Oakland Tribune, Contra Costa Times and several
-                other East Bay newspapers plan to combine their news operations, according to an e-mail sent to
-                employees by John Armstrong, publisher of the Contra Costa Times.&lt;...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=4ChAvP"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=4ChAvP" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=ZyhxOHJx"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=ZyhxOHJx" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=UIqlnoG2"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=UIqlnoG2" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=6vSHPlui"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=6vSHPlui" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=JxpkX0yg"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=JxpkX0yg" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/137913379" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[Verne Kopytoff]]></author>
-            <pubDate>Fri, 27 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/27/BUE5R7P183.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/27/BUE5R7P183.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[TECH CHRONICLES]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/137913380/article.cgi</link>
-            <description>Socialization of personalization Dan Cohen has worked on the personal home pages at two of the
-                biggest Internet firms, helping build MyYahoo and iGoogle. Now he's running a San Francisco startup,
-                Pageflakes, that is taking that concept into the social-...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=GRSe9v"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=GRSe9v" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=0ak948ev"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=0ak948ev" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=8PD99CZN"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=8PD99CZN" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=tV9HjnLy"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=tV9HjnLy" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=Es4HHdb2"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=Es4HHdb2" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/137913380" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[Dan Fost, Ellen Lee]]></author>
-            <pubDate>Fri, 27 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/27/BUB8R7P0K3.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/27/BUB8R7P0K3.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[Where is the media watchdog?]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/137913381/article.cgi</link>
-            <description>This is my last column for The Chronicle. And, no, I haven't been fired. More on that in a
-                moment. First, I want to take this opportunity to look at the state of consumer advocacy in the United
-                States. And who better to turn to than Ralph Nader, the...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=6WkhxO"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=6WkhxO" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=O6cMxAWq"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=O6cMxAWq" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=mG99LQPA"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=mG99LQPA" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=JD6jTM0e"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=JD6jTM0e" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=yyXVabQs"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=yyXVabQs" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/137913381" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[David Lazarus]]></author>
-            <pubDate>Fri, 27 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/27/BUB8R7P0H2.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/27/BUB8R7P0H2.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[Record $3 million fine for Kaiser]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/137913382/article.cgi</link>
-            <description>Kaiser Permanente must pay a record $3 million fine after state investigators found that the
-                health maintenance organization, the country's largest, did not adequately track patient complaints
-                about treatment. The penalty, announced Thursday, marks the...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=ELfya4"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=ELfya4" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=xSlqgS1d"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=xSlqgS1d" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=Akm2kZAd"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=Akm2kZAd" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=yVuaB9Bz"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=yVuaB9Bz" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=91zRJrfv"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=91zRJrfv" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/137913382" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[David R. Baker]]></author>
-            <pubDate>Fri, 27 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/27/BUB8R7P0G2.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/27/BUB8R7P0G2.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[Assistance for foreign speakers]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/137913383/article.cgi</link>
-            <description>State utilities regulators voted Thursday to require telecom carriers that market in a foreign
-                language to also provide support to customers in that language. The Public Utilities Commission is the
-                first state regulatory body to require such rules,...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=QDgztn"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=QDgztn" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=NDWr4DHj"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=NDWr4DHj" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=o25XeLY9"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=o25XeLY9" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=yyMaztHM"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=yyMaztHM" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=17TjazmX"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=17TjazmX" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/137913383" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[Ryan Kim]]></author>
-            <pubDate>Fri, 27 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/27/BUB8R7P0L2.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/27/BUB8R7P0L2.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[Chevron reports largest quarterly profit ever of $5.38 billion]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/138056108/article.cgi</link>
-            <description>Chevron Corp. on Friday reported its largest quarterly profit ever, $5.38 billion, the result
-                of high oil and gas prices this spring. That's 24 percent more money than Chevron made in the same
-                quarter last year and easily beats the company's previous...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=ltJlqr"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=ltJlqr" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=UstZoFye"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=UstZoFye" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=1qXZU9bs"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=1qXZU9bs" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=Sz8k3y2Z"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=Sz8k3y2Z" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=0c84vQ65"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=0c84vQ65" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/138056108" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[David R. Baker]]></author>
-            <pubDate>Fri, 27 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/27/BUGBPR8CHE6.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/27/BUGBPR8CHE6.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title>
-                <![CDATA[Real estate portals squabble over content / Trulia boots upstart Terabitz out of its space]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/137548907/article.cgi</link>
-            <description>A new real estate portal founded by a Silicon Valley veteran and his teenage son has had to
-                decouple its site from another Bay Area Web firm over concerns about how home listing information was
-                being used. The scuffle between the two Web firms - in the...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=zerl1l"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=zerl1l" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=jWac6pfI"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=jWac6pfI" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=0eZcFc7C"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=0eZcFc7C" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=17zMSrFn"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=17zMSrFn" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=7ryxqagu"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=7ryxqagu" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/137548907" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[Kelly Zito]]></author>
-            <pubDate>Thu, 26 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/26/BUQMR752K2.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/26/BUQMR752K2.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[Facebook founder under fire]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/137548913/article.cgi</link>
-            <description>Facebook, one of the hottest social-networking sites on the Internet, landed in a Boston
-                courthouse Wednesday facing charges that its founder stole the idea for the company from a competing
-                site. ConnectU, a much smaller social network in Connecticut,...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=ZJDsG8"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=ZJDsG8" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=mMBdDGaj"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=mMBdDGaj" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=HRU7aHHE"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=HRU7aHHE" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=fkbbMEZY"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=fkbbMEZY" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=sX8vIkZC"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=sX8vIkZC" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/137548913" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[Dan Fost]]></author>
-            <pubDate>Thu, 26 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/26/BUQMR757V2.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/26/BUQMR757V2.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[FDA eyes nanotech standards]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/137548909/article.cgi</link>
-            <description>The Food and Drug Administration needs to beef up its expertise in the field of nanotechnology
-                to ensure the safety of the coming wave of products it will have to regulate, an agency task force said
-                in a report issued Wednesday. Cosmetics, food,...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=pyXjI6"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=pyXjI6" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=TU6Iwna2"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=TU6Iwna2" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=5t6nYlbg"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=5t6nYlbg" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=SgGVwEPK"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=SgGVwEPK" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=tuAQycak"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=tuAQycak" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/137548909" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[Bernadette Tansey]]></author>
-            <pubDate>Thu, 26 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/26/BUQMR75812.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/26/BUQMR75812.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title>
-                <![CDATA[Circuit breakers wipe out the Web / PG&Es faulty equipment reveals the Internets vulnerability to a disruption of its power source]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/137548911/article.cgi</link>
-            <description>All it took to wipe out some of the Internet's biggest sites Tuesday was some faulty PG&amp;E
-                electrical breakers that caused a blackout in downtown San Francisco. Some of the Web's hottest
-                destinations - Craigslist, Yelp, Second Life - were suddenly...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=Szb1of"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=Szb1of" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=Q0LVcZQQ"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=Q0LVcZQQ" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=kUw6XiXw"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=kUw6XiXw" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=2ISnagms"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=2ISnagms" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=Vdj5suQC"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=Vdj5suQC" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/137548911" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[Verne Kopytoff]]></author>
-            <pubDate>Thu, 26 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/26/BUQMR757R2.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/26/BUQMR757R2.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[APPLE POLISHES ITS QUARTERLY PROFIT / Jobs: 1 million iPhones sold by September]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/137548912/article.cgi</link>
-            <description>Despite early indications that Apple's iPhone had a disappointing introduction, the company's
-                latest financial figures reveal a solid release and a promising future. In the two days the iPhone was
-                on the shelves before the quarter ended - June 29 and...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=oVbcjC"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=oVbcjC" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=5FUtMQMQ"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=5FUtMQMQ" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=wpfjhGj6"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=wpfjhGj6" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=FCd2Ku1z"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=FCd2Ku1z" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=M6iA9fOe"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=M6iA9fOe" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/137548912" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[Ellen Lee]]></author>
-            <pubDate>Thu, 26 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/26/BUQMR757T2.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/26/BUQMR757T2.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title/>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/137181232/article.cgi</link>
-            <description>Offering the first glimpse at whether the iPhone lived up to its hype, AT&amp;T said Tuesday
-                that it activated 146,000 iPhones during the first two days of its premiere, far less than some of the
-                loftier sales estimates. The news sent shares of Apple Inc.,...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=1BoE7N"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=1BoE7N" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=wrU7yODt"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=wrU7yODt" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=Fs5B8oEk"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=Fs5B8oEk" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=ZLuldU6H"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=ZLuldU6H" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=Cb9ESZSO"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=Cb9ESZSO" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/137181232" height="1"
-                width="1"/&gt;</description>
-            <author/>
-            <pubDate>Wed, 25 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/25/BU44R6ES72.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/25/BU44R6ES72.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[TiVo gearing up for HD fight]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/136810782/article.cgi</link>
-            <description>It's no secret that TiVo, the groundbreaking digital video company that caught many people's
-                hearts and eyeballs since its inception in 1997, has struggled to maintain market share in recent years
-                due to increased competition from cable and satellite...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=ay8btC"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=ay8btC" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=htOkkwmn"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=htOkkwmn" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=2y2pJaVC"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=2y2pJaVC" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=uTCMaYWV"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=uTCMaYWV" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=YSLgiPz0"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=YSLgiPz0" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/136810782" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[Ellen Lee]]></author>
-            <pubDate>Tue, 24 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/24/BUIOR5O864.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/24/BUIOR5O864.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[Microsoft and Ask.com pushing for more privacy]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/136810785/article.cgi</link>
-            <description>Microsoft Corp. and Ask.com called on the technology industry to craft safeguards to better
-                protect consumer privacy, answering a growing chorus of criticism about the amount of data Internet
-                companies collect about their users. The project, proposed...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=oFz5zv"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=oFz5zv" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=OQhvWK9H"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=OQhvWK9H" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=zXy7WupD"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=zXy7WupD" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=pVkYDupT"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=pVkYDupT" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=La4uvpk7"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=La4uvpk7" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/136810785" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[Verne Kopytoff]]></author>
-            <pubDate>Tue, 24 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/24/BUIOR5O822.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/24/BUIOR5O822.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[Andreessen strikes gold again with Opsware sale]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/136810783/article.cgi</link>
-            <description>Marc Andreessen has done it again. Many credit the Internet wunderkind with launching the go-go
-                years in Silicon Valley when his software company, Netscape Communications, had a stratospheric public
-                stock offering in 1995. Now 36, the second company...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=n33aCw"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=n33aCw" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=r2DkBY4n"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=r2DkBY4n" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=hDdsR9NT"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=hDdsR9NT" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=NwiJ7xcN"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=NwiJ7xcN" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=E9oTNYL3"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=E9oTNYL3" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/136810783" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[Dan Fost]]></author>
-            <pubDate>Tue, 24 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/24/BUIOR5O872.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/24/BUIOR5O872.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title><![CDATA[HDTV via antenna won't get all channels]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/136448530/article.cgi</link>
-            <description>Q: I'm thinking of getting a high-definition television. I have cable, but I'm not keen on
-                paying extra for HDTV programming. I've heard that it's possible to receive HDTV signals over the air
-                using an antenna. Is this true? A: It is, but read...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=dHYdC3"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=dHYdC3" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=Ghw1XTmJ"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=Ghw1XTmJ" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=nOjwAopp"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=nOjwAopp" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=qwsUwY4l"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=qwsUwY4l" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=u42PGVFf"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=u42PGVFf" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/136448530" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[David Einstein]]></author>
-            <pubDate>Mon, 23 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/23/BUG3IR47661.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/23/BUG3IR47661.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title>
-                <![CDATA[Teen's social-networking site a hit with high schoolers / MyYearbook battles it out with Facebook, MySpace to be the online place to meet]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/136448532/article.cgi</link>
-            <description>Not many teenagers raise $4.1 million in funding at the same time they're learning how to
-                drive. Or attend a business meeting the morning before their senior prom. Or appear on CNBC and then
-                return to school to take a calculus test. This is the life...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=Uvd8Ix"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=Uvd8Ix" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=6U8AyT5p"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=6U8AyT5p" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=JYVd2gWC"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=JYVd2gWC" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=5zM1tbS2"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=5zM1tbS2" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=aX8kFuAU"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=aX8kFuAU" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/136448532" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[Ellen Lee]]></author>
-            <pubDate>Mon, 23 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/23/BUGU1R465P39.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/23/BUGU1R465P39.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title>
-                <![CDATA[ANALYSIS / Credibility called into question / Will SunRocket's failure jeopardize Net phone firms?]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/136448529/article.cgi</link>
-            <description>Internet telephone provider SunRocket's sudden closure last week not only surprised and
-                disappointed subscribers, it also cast a shadow on the future of similar, low-cost Internet phone
-                services. SunRocket, with more than 200,000 subscribers, was the...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=2xXYXp"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=2xXYXp" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=rW89auTA"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=rW89auTA" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=HZF3UHEn"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=HZF3UHEn" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=UDfC8xTE"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=UDfC8xTE" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=BojMxpS5"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=BojMxpS5" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/136448529" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[Ryan Kim]]></author>
-            <pubDate>Mon, 23 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/23/BUGN3R489P19.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/23/BUGN3R489P19.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-        <item>
-            <title>
-                <![CDATA[PLUG-IN HYBRIDS / Making green cars greener costs a bundle / With $24,000 add-on, plug-in Toyota Prius is mostly for rich]]></title>
-            <link>http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~3/135967111/article.cgi</link>
-            <description>Want to be the first on your block with a $50,000 Toyota Prius? Head to Hybrids Plus in
-                Boulder, Colo., and leave your Prius with their technicians. Go skiing or something, come back in three
-                or four days with a check for $24,000 and you will have one...
-                &lt;p&gt;&lt;a href="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?a=dpZl1H"&gt;&lt;img
-                src="http://feeds.sfgate.com/~a/sfgate/rss/feeds/business?i=dpZl1H" border="0"&gt;&lt;/img&gt;&lt;/a&gt;&lt;/p&gt;&lt;div
-                class="feedflare"&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=DmP5mnq0"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=DmP5mnq0" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=ahzexxCP"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=ahzexxCP" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=Ovid2Ww2"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=Ovid2Ww2" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;a href="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?a=Xn9pyUjb"&gt;&lt;img
-                src="http://feeds.sfgate.com/~f/sfgate/rss/feeds/business?i=Xn9pyUjb" border="0"&gt;&lt;/img&gt;&lt;/a&gt;
-                &lt;/div&gt;&lt;img src="http://feeds.sfgate.com/~r/sfgate/rss/feeds/business/~4/135967111" height="1"
-                width="1"/&gt;</description>
-            <author><![CDATA[Michael Taylor]]></author>
-            <pubDate>Sat, 21 Jul 2007 00:00:00 PDT</pubDate>
-            <guid isPermaLink="false">/c/a/2007/07/21/BAG08R4M7E1.DTL</guid>
-            <feedburner:origLink>http://www.sfgate.com/cgi-bin/article.cgi?f=/c/a/2007/07/21/BAG08R4M7E1.DTL&amp;feed=rss.business</feedburner:origLink>
-        </item>
-
-    </channel>
-</rss>
+<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet href="http://www.blogger.com/styles/atom.css" type="text/css"?>
+<feed xmlns='http://www.w3.org/2005/Atom' xmlns:openSearch='http://a9.com/-/spec/opensearchrss/1.0/'
+      xmlns:georss='http://www.georss.org/georss' xmlns:thr='http://purl.org/syndication/thread/1.0'>
+    <id>tag:blogger.com,1999:blog-1425601518852438157</id>
+    <updated>2010-09-29T16:22:21.738-07:00</updated>
+    <title type='text'>Notes from a (very) small Island</title>
+    <subtitle type='html'></subtitle>
+    <link rel='http://schemas.google.com/g/2005#feed' type='application/atom+xml'
+          href='http://rossmason.blogspot.com/feeds/posts/default'/>
+    <link rel='self' type='application/atom+xml' href='http://www.blogger.com/feeds/1425601518852438157/posts/default'/>
+    <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/'/>
+    <link rel='hub' href='http://pubsubhubbub.appspot.com/'/>
+    <link rel='next' type='application/atom+xml'
+          href='http://www.blogger.com/feeds/1425601518852438157/posts/default?start-index=26&amp;max-results=25'/>
+    <author>
+        <name>Ross Mason</name>
+        <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+        <email>noreply@blogger.com</email>
+    </author>
+    <generator version='7.00' uri='http://www.blogger.com'>Blogger</generator>
+    <openSearch:totalResults>97</openSearch:totalResults>
+    <openSearch:startIndex>1</openSearch:startIndex>
+    <openSearch:itemsPerPage>25</openSearch:itemsPerPage>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-4273899232700727333</id>
+        <published>2010-03-16T11:10:00.000-07:00</published>
+        <updated>2010-03-16T12:18:10.740-07:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='rest'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='SOA'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='esb'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='Architecture'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='web services'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='Mashups'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='Web 2.0'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='messaging'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='ibeans'/>
+        <title type='text'>Mashups and ESBs at Qcon</title>
+        <summary type='text'>I had a great time at Qcon London last week, it really is one of the more forward thinking
+            conferences out there for the enterprise. I gave two talks on ESBs and Enterprise Mashups so I figured I'd
+            share the slides.ESB or not to ESBThe ESB has become synonymous with integration. While the ESB grew from
+            the needs of enterprise integration, the landscape has changed and not every project that
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/4273899232700727333/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=4273899232700727333'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/4273899232700727333'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/4273899232700727333'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2010/03/mashups-and-esbs-at-qcon.html'
+              title='Mashups and ESBs at Qcon'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-232035011836938188</id>
+        <published>2009-12-04T09:40:00.000-08:00</published>
+        <updated>2009-12-04T09:49:21.385-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='atom'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='jackson'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='flickr'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='release'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='s3'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='json'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='jaxb'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='twitter'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='ibeans'/>
+        <title type='text'>What's new in iBeans?</title>
+        <summary type='text'>Before I get into the new stuff, here is a quick introduction. iBeans is a project I've
+            been working on that aims to make integration for web applications much easier than it is today. It does
+            this by focusing on simplicity and task-based integration and avoids technical jargon and new concepts
+            wherever possible. In a nutshell iBeans offers –Easy to use integration for doing things like -
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/232035011836938188/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=232035011836938188'
+              title='1 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/232035011836938188'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/232035011836938188'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/12/whats-new-in-ibeans.html'
+              title='What&apos;s new in iBeans?'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>1</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-5448685382217594444</id>
+        <published>2009-10-29T03:48:00.000-07:00</published>
+        <updated>2009-10-29T04:01:30.151-07:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='integration'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='mulesoft'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='tcat'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='ibeans'/>
+        <title type='text'>New iBeans Release; Simple Web Integration</title>
+        <summary type='text'>I have been busy the last few months with the MuleSoft team working on a new project called
+            iBeans that aims to greatly simplify integration for applications on the web. Today we're pleased to
+            announce the 1.0-beta-8 release of iBeans. What is iBeans?iBeans is a service that simplifies integration
+            for web applications. iBeans exposes its API as a small collection of Annotations which can be used
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/5448685382217594444/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=5448685382217594444'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/5448685382217594444'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/5448685382217594444'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/10/new-ibeans-release-simple-web.html'
+              title='New iBeans Release; Simple Web Integration'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <media:thumbnail xmlns:media='http://search.yahoo.com/mrss/'
+                         url='http://4.bp.blogspot.com/_1J_NEXtTKV0/Sul105wp6TI/AAAAAAAAALE/m7XQ0navxAM/s72-c/ibeans-diag.png'
+                         height='72' width='72'/>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-5764869749122314835</id>
+        <published>2009-07-03T06:48:00.000-07:00</published>
+        <updated>2009-07-04T05:49:44.668-07:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='esb'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='mule'/>
+        <title type='text'>To ESB or not to ESB</title>
+        <summary type='text'>Many of us have had to ponder this question. Technology selection is notoriously difficult
+            in the enterprise space since the criteria and complexity of the problem is often not fully understood until
+            later in the development process.There is an interesting post from ThoughtWorker Erik Dörnenburg with the
+            unfortunate title “Making the ESB pain Visible”. Erik provides a real-world example of when
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/5764869749122314835/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=5764869749122314835'
+              title='6 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/5764869749122314835'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/5764869749122314835'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/07/to-esb-or-not-to-esb.html'
+              title='To ESB or not to ESB'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <media:thumbnail xmlns:media='http://search.yahoo.com/mrss/'
+                         url='http://1.bp.blogspot.com/_-uGpx0_gPO8/RtCrI7tb_VI/AAAAAAAAAG8/D7rLdrgDmbs/s72-c/HamletSkullHCSealous.jpg'
+                         height='72' width='72'/>
+        <thr:total>6</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-8270993961347010273</id>
+        <published>2009-06-01T07:38:00.001-07:00</published>
+        <updated>2009-06-01T08:04:38.043-07:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='miscellaneous'/>
+        <title type='text'>Fatherhood is fantastic, but not for blogging</title>
+        <summary type='text'>My wife and I became parents for the first time a couple of months ago. It’s been an
+            amazing experience so far and has changed our lives beyond recognition - mostly in a good way. Part of me
+            wants to pour all over this, but I’ll leave that to the blogging dads that have the emotional maturity to
+            describe their feelings above and beyond “a kinda fuzzy, cuddly sensation”. Instead I thought I’d
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/8270993961347010273/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=8270993961347010273'
+              title='2 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8270993961347010273'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8270993961347010273'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/06/fatherhood-is-fantastic-but-not-for.html'
+              title='Fatherhood is fantastic, but not for blogging'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <media:thumbnail xmlns:media='http://search.yahoo.com/mrss/'
+                         url='http://3.bp.blogspot.com/_1J_NEXtTKV0/SiPoB_G2_NI/AAAAAAAAAKs/rXexAWLiyqo/s72-c/Day3.jpg'
+                         height='72' width='72'/>
+        <thr:total>2</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-8625725720679301661</id>
+        <published>2009-03-09T10:20:00.000-07:00</published>
+        <updated>2009-04-13T06:41:46.937-07:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='best practices'/>
+        <title type='text'>Ten Tips for Technical Presentations</title>
+        <summary type='text'>Today I attended the morning session of Sun’s open source day in Malta. I was pretty
+            disappointed by the quality of the sessions. These sorts of events cost time and money, doing them badly can
+            do more harm than good. I don’t think Sun did themselves any favours today.I thought I’d share some tips
+            that I have picked up over the years that would have made today a better experience for the
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/8625725720679301661/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=8625725720679301661'
+              title='2 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8625725720679301661'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8625725720679301661'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/03/ten-tips-for-technical-presentations.html'
+              title='Ten Tips for Technical Presentations'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>2</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-9158453442325432471</id>
+        <published>2009-02-26T14:18:00.000-08:00</published>
+        <updated>2009-02-26T14:44:22.806-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='cloud'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='gmail'/>
+        <title type='text'>Gmail Fails, Cloud Computing Fails</title>
+        <summary type='text'>While I don't go to the MotleyFool for my tech news, they ran an article this week about
+            the Gmail Fail (or #gfail on Twitter). The Fool was in praise of Gmail because even though the service was
+            down for a few hours some interfaces such as IMAP for the iPhone kept working (though this wasn't true for
+            me). To me the fact that Gmail went down and affected people in Europe and the US was a big blow
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/9158453442325432471/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=9158453442325432471'
+              title='5 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/9158453442325432471'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/9158453442325432471'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/02/gmail-fails-cloud-computing-fails.html'
+              title='Gmail Fails, Cloud Computing Fails'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>5</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-8505372469367405117</id>
+        <published>2009-02-25T10:15:00.000-08:00</published>
+        <updated>2009-02-25T11:20:04.100-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='SOA'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='cloud'/>
+        <title type='text'>How SOA paved the way for Cloud</title>
+        <summary type='text'>Though some think SOA failed and others see it only as a partial success, this has been
+            because of the approach to SOA not its underlying principles. SOA (or what I’d rather call Service
+            Orientation, but that doesn’t fit our obsession with TLAs) is responsible for beginning a new evolution in
+            the way we build software. This change is as fundamental as the shift to OO programming but essentially a
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/8505372469367405117/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=8505372469367405117'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8505372469367405117'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8505372469367405117'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/02/how-soa-paved-way-for-cloud.html'
+              title='How SOA paved the way for Cloud'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-6119224543389184661</id>
+        <published>2009-02-24T01:38:00.000-08:00</published>
+        <updated>2009-02-24T02:21:19.487-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='crowd'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='twitter'/>
+        <title type='text'>Twitter is Changing Community Dynamics</title>
+        <summary type='text'>It seems the mirco-blogging platform is being used for a lot more than just posting links
+            and banal commentary on the days events. I am an avid user of TripIt for organizing my frequent travel
+            schedules. TripIt works by allowing users to forward their travel arrangement emails to TripIt, which will
+            then parse the emails and create a travel schedule for you. Genius. A couple of weeks ago I booked
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/6119224543389184661/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=6119224543389184661'
+              title='3 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/6119224543389184661'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/6119224543389184661'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/02/twitter-is-changing-community-dynamics.html'
+              title='Twitter is Changing Community Dynamics'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>3</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-9177142550122469311</id>
+        <published>2009-02-23T16:22:00.000-08:00</published>
+        <updated>2009-02-23T16:38:01.926-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='mulesource'/>
+        <title type='text'>A New Chapter for MuleSource</title>
+        <summary type='text'>It’s been an exciting couple of months for MuleSource. We began the year with 2 blowout
+            quarters behind us. Last week we announced that Mark Burton, the former executive vice president of Sales
+            from MySQL has joined the MuleSource board of directors. Mark brings a wealth of sales operating experience
+            from one of the most successful open source companies to date. Mark has an excellent
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/9177142550122469311/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=9177142550122469311'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/9177142550122469311'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/9177142550122469311'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/02/new-chapter-for-mulesource.html'
+              title='A New Chapter for MuleSource'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-3258820940080178228</id>
+        <published>2009-02-20T09:47:00.000-08:00</published>
+        <updated>2009-02-20T10:10:51.208-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='govenance'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='SOA'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='mule galaxy'/>
+        <title type='text'>Pragmatic SOA Governance</title>
+        <summary type='text'>I recently wrote an article that appeared in eBizQ on the topic of SOA governance. In this
+            article, I argue that the primary reason that many pundits have declared “SOA is dead” is that the
+            traditional “top-down” approach to SOA and governance have failed. Vendors have for too long evangelized a
+            “big bang” re-architecture of development processes, using their tools to enforce new behaviors from
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/3258820940080178228/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=3258820940080178228'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/3258820940080178228'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/3258820940080178228'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/02/pragmatic-soa-governance.html'
+              title='Pragmatic SOA Governance'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-284775976148135926</id>
+        <published>2009-02-09T21:37:00.000-08:00</published>
+        <updated>2009-02-10T05:34:22.629-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='iphone'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='android'/>
+        <title type='text'>Android Predictions</title>
+        <summary type='text'>Android is getting momentum with more phone vendors gearing up to release Android phones
+            this year. While I don’t think Android is at par with the iPhone yet, it is a much more compelling platform
+            for innovation. The openness of Android is a blessing and a curse. The community around Android will
+            flourish since developers and startups will be more comfortable investing in an open platform.
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/284775976148135926/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=284775976148135926'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/284775976148135926'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/284775976148135926'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/02/android-predictions.html'
+              title='Android Predictions'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-5240907584529602819</id>
+        <published>2009-02-06T02:39:00.000-08:00</published>
+        <updated>2009-02-06T06:37:05.274-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='cloud'/>
+        <title type='text'>Cloud: Defining the Undefinable</title>
+        <summary type='text'>Given that the definition of cloud is still somewhat fuzzy and the terminology is already
+            spiraling (yes we have Private clouds, federated clouds and heavenly cloud cakes), I decided (for my own
+            understanding), to map out where IaaS, PaaS and SaaS sit. The bit I was struggling with was that PaaS has
+            multiple layers. Big thanks to Alexis for helping to organize my thoughts on this.The cloud
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/5240907584529602819/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=5240907584529602819'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/5240907584529602819'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/5240907584529602819'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/02/cloud-defining-indefinable.html'
+              title='Cloud: Defining the Undefinable'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <media:thumbnail xmlns:media='http://search.yahoo.com/mrss/'
+                         url='http://4.bp.blogspot.com/_1J_NEXtTKV0/SYwU4_eCCDI/AAAAAAAAAKY/eon-v2E_q0s/s72-c/the-cloud-1.2.png'
+                         height='72' width='72'/>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-8420506891645524820</id>
+        <published>2009-02-06T02:01:00.000-08:00</published>
+        <updated>2009-02-06T02:17:56.900-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='cloud'/>
+        <title type='text'>Making The Same Mistakes With Cloud</title>
+        <summary type='text'>I’m watching the rise of the cloud with some disappointment. It was inevitable but still I
+            hoped that we would take a more pragmatic approach to defining the cloud. The term cloud is being bounded
+            around by almost all vendors, analysts and many technologists, but following the forums and blogs it’s clear
+            we have very different views what the cloud means. I do find it amazing that so many
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/8420506891645524820/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=8420506891645524820'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8420506891645524820'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8420506891645524820'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/02/making-same-mistakes-with-cloud.html'
+              title='Making The Same Mistakes With Cloud'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-1414450822697878955</id>
+        <published>2009-01-26T02:55:00.000-08:00</published>
+        <updated>2009-01-26T03:18:59.229-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='twitter'/>
+        <title type='text'>Stephen Fry on Twitter</title>
+        <summary type='text'>I just posted about Twitter and then just found a link from @Scobleizer on Twitter showing
+            and interview with Stephen Fry about why he uses Twitter.Stephen Fry is not the only celebrity on Twitter,
+            many others including Barack Obama was on twitter (until his account got hacked). Check out CelebTwitter for
+            a full list folks you might know. I am currently following Johnathan Ross (@wossy), William
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/1414450822697878955/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=1414450822697878955'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1414450822697878955'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1414450822697878955'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/01/stephen-fry-on-twitter.html'
+              title='Stephen Fry on Twitter'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-8943519628099182404</id>
+        <published>2009-01-26T02:19:00.000-08:00</published>
+        <updated>2009-01-26T02:53:16.870-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='twitter'/>
+        <title type='text'>Why Twitter?</title>
+        <summary type='text'>I started using Twitter around the middle of last year as an experiment to see what the
+            fuss was about. The idea of micro-blogging seemed banal to me, I couldn't understand the popularity of
+            Twitter so decided to give it a go. Needless to say I have been sucked in by it for the same reason most
+            other people. It provides a platform for effortless communication. I can ask things and get real
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/8943519628099182404/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=8943519628099182404'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8943519628099182404'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/8943519628099182404'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/01/why-twitter.html'
+              title='Why Twitter?'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-7866099042278871238</id>
+        <published>2009-01-23T03:36:00.000-08:00</published>
+        <updated>2009-01-23T03:53:30.341-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='miscellaneous'/>
+        <title type='text'>Friday Fun: Beer</title>
+        <summary type='text'>Heineken does it again!What goes through your mind when someone says "lets go for a
+            drink?"
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/7866099042278871238/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=7866099042278871238'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/7866099042278871238'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/7866099042278871238'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/01/friday-fun-beer.html'
+              title='Friday Fun: Beer'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-265892759168864204</id>
+        <published>2009-01-21T06:07:00.000-08:00</published>
+        <updated>2009-01-21T06:29:37.085-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='iphone'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='android'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='G1'/>
+        <title type='text'>iPhone is from Mars, G1 is from Venus</title>
+        <summary type='text'>I recently got my hands on a shiny new G1 phone. Despite being a little jaded by all the
+            promises made by phone providers in the past, I was excited about getting this phone. I am a fan of the
+            iPhone for the most part and I had high hopes because the iPhone has been out for a while now giving vendors
+            time to replicate and improve. However, the G1 is a completely different experience. The G1 has a
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/265892759168864204/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=265892759168864204'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/265892759168864204'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/265892759168864204'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/01/iphone-is-from-mars-g1-is-from-venus.html'
+              title='iPhone is from Mars, G1 is from Venus'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-1388056601995479567</id>
+        <published>2009-01-20T00:55:00.000-08:00</published>
+        <updated>2009-01-20T04:50:50.814-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='sun'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='marketing'/>
+        <title type='text'>The Server Formerly Known as Prince</title>
+        <summary type='text'>I was in the pub the other night discussing Sun’s innate ability to confuse its customers.
+            Sun has just announced that they are releasing a version of the Sun Java System Web Server version 7 as open
+            source software under a BSD license, which is a shining example of a confusing product strategy. For those
+            who aren’t watching carefully, or just don’t care this server has had more name changes
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/1388056601995479567/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=1388056601995479567'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1388056601995479567'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1388056601995479567'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/01/server-formerly-known-as-prince.html'
+              title='The Server Formerly Known as Prince'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-1106493661534528664</id>
+        <published>2009-01-12T00:59:00.001-08:00</published>
+        <updated>2009-01-12T01:43:14.190-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='SOA'/>
+        <title type='text'>How to Define Services</title>
+        <summary type='text'>Defining what constitutes a service when building service-orientated applications seems to
+            be a common problem for developers and architects who are new to building services. The main issue seems to
+            be the scope, i.e. what is the granularity of the service. This is actually quite difficult since the
+            granularity of a service can vary depending on the application. The trick with any fuzzy problem
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/1106493661534528664/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=1106493661534528664'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1106493661534528664'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1106493661534528664'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/01/how-to-define-services.html'
+              title='How to Define Services'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <media:thumbnail xmlns:media='http://search.yahoo.com/mrss/'
+                         url='http://2.bp.blogspot.com/_1J_NEXtTKV0/SWsHAYeX0TI/AAAAAAAAAJA/DrYgQ-w2EKU/s72-c/service-layers.png'
+                         height='72' width='72'/>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-1814301625685212562</id>
+        <published>2009-01-11T10:16:00.001-08:00</published>
+        <updated>2009-01-11T12:41:27.683-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='miscellaneous'/>
+        <title type='text'>Got the kites, now where's the wind?</title>
+        <summary type='text'>I finally got my kiteboarding stuff yesterday after a TNT mix-up between New Zealand and
+            here. I'm proud owner of 2 Slingshot Rev 2 kites and and an Underground FLX 35 board. What I need now is a
+            App for the iPhone and/or Android for tracking the wind. Everyone I know uses WindFinder. They have good
+            mobile browser support and there is a great OS X Dashboard widget, but alas I haven't found any
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/1814301625685212562/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=1814301625685212562'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1814301625685212562'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/1814301625685212562'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2009/01/got-kites-now-wheres-wind.html'
+              title='Got the kites, now where&apos;s the wind?'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <media:thumbnail xmlns:media='http://search.yahoo.com/mrss/'
+                         url='http://1.bp.blogspot.com/_1J_NEXtTKV0/SWo3oMEwIEI/AAAAAAAAAIw/7seMsrnPRhg/s72-c/kiteboard.jpg'
+                         height='72' width='72'/>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-2694346899545448946</id>
+        <published>2009-01-08T07:58:00.000-08:00</published>
+        <updated>2009-01-08T12:10:50.449-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='SOA'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='marketing'/>
+        <category scheme='http://www.blogger.com/atom/ns#' term='industry'/>
+        <title type='text'>Did SOA Just Die?</title>
+        <summary type='text'>There is an interesting post by Anne Thomas Maines from Burton Group exclaiming that SOA
+            has gone the way of the Dodo: Once thought to be the savior of IT, SOA instead turned into a great failed
+            experiment—at least for most organizations. SOA was supposed to reduce costs and increase agility on a
+            massive scale. Except in rare situations, SOA has failed to deliver its promised benefits. After
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/2694346899545448946/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=2694346899545448946'
+              title='2 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/2694346899545448946'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/2694346899545448946'/>
+        <link rel='alternate' type='text/html' href='http://rossmason.blogspot.com/2009/01/did-soa-just-die.html'
+              title='Did SOA Just Die?'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>2</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-4280936985993771717</id>
+        <published>2008-12-16T06:13:00.000-08:00</published>
+        <updated>2008-12-16T06:34:26.532-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='twitter'/>
+        <title type='text'>Make $1 million using Twitter</title>
+        <summary type='text'>Thought it couldn't be done? Apparently, Dell have had some success with their Twitter feed
+            and report they made one million dollars through Twitter. That's not a huge amount of cash for Dell, but its
+            a glimmer of hope that there some viable business models for Twitter and, more importantly, the consumer
+            market might be ready for them. Looking at the followers on Twitter for Dell tweets, there
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/4280936985993771717/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=4280936985993771717'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/4280936985993771717'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/4280936985993771717'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2008/12/make-1-million-using-twitter.html'
+              title='Make $1 million using Twitter'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-718825877461588842</id>
+        <published>2008-12-16T02:38:00.000-08:00</published>
+        <updated>2008-12-16T03:42:48.710-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='java'/>
+        <title type='text'>Is Java Dying a Slow Death?</title>
+        <summary type='text'>There have been numerous reports of the demise of Java ever since the language gained
+            popularity. However with SUN's market cap at $3 billion there have been renewed speculations that because
+            SUN is in trouble Java is too. First off, Java is a lot bigger than SUN, its out in the ethyr. Nobody
+            controls Java (except the Java community) is its own entity. This is obviously a good thing for companies
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/718825877461588842/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=718825877461588842'
+              title='5 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/718825877461588842'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/718825877461588842'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2008/12/is-java-dying-slow-death.html'
+              title='Is Java Dying a Slow Death?'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>5</thr:total>
+    </entry>
+    <entry>
+        <id>tag:blogger.com,1999:blog-1425601518852438157.post-6101490854635104494</id>
+        <published>2008-12-12T05:22:00.000-08:00</published>
+        <updated>2008-12-12T05:42:33.933-08:00</updated>
+        <category scheme='http://www.blogger.com/atom/ns#' term='mulesource'/>
+        <title type='text'>Strategy is Something You Can Only Learn</title>
+        <summary type='text'>There is a great post by Mike Cannon-Brookes of Altassian, which talks about how they came
+            up with the stellar business strategy that has that has driven the iconic company from strength to strength.
+            Mike raises some interesting points, which are relevant to any tech start-up or indeed any industry that
+            deals with progressive change, which are almost all industries. I believe open source
+        </summary>
+        <link rel='replies' type='application/atom+xml'
+              href='http://rossmason.blogspot.com/feeds/6101490854635104494/comments/default' title='Post Comments'/>
+        <link rel='replies' type='text/html'
+              href='https://www.blogger.com/comment.g?blogID=1425601518852438157&amp;postID=6101490854635104494'
+              title='0 Comments'/>
+        <link rel='edit' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/6101490854635104494'/>
+        <link rel='self' type='application/atom+xml'
+              href='http://www.blogger.com/feeds/1425601518852438157/posts/default/6101490854635104494'/>
+        <link rel='alternate' type='text/html'
+              href='http://rossmason.blogspot.com/2008/12/strategy-is-something-you-can-only.html'
+              title='Strategy is Something You Can &lt;i&gt;Only&lt;/i&gt; Learn'/>
+        <author>
+            <name>Ross Mason</name>
+            <uri>http://www.blogger.com/profile/16687524504324116768</uri>
+            <email>noreply@blogger.com</email>
+            <gd:extendedProperty xmlns:gd='http://schemas.google.com/g/2005' name='OpenSocialUserId'
+                                 value='02119424404330733719'/>
+        </author>
+        <thr:total>0</thr:total>
+    </entry>
+</feed>
