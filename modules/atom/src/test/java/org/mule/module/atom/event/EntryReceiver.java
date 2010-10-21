@@ -20,10 +20,15 @@ import org.apache.abdera.model.Feed;
 public class EntryReceiver
 {
 
-    public static AtomicInteger receivedEntries = new AtomicInteger(0);
+    private AtomicInteger receivedEntries = new AtomicInteger(0);
 
     public void processEntry(@Payload Entry entry, @Expr("#[header:invocation:feed.object]") Feed feed) throws Exception
     {
         System.out.println("Received " + receivedEntries.incrementAndGet() + " of " + feed.getEntries().size() + " entries");
+    }
+
+    public int getCount()
+    {
+        return receivedEntries.get();
     }
 }

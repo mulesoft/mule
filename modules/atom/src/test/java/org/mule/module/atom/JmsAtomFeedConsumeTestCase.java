@@ -13,22 +13,13 @@ import org.mule.api.client.LocalMuleClient;
 import org.mule.module.atom.event.EntryReceiver;
 import org.mule.module.atom.event.FeedReceiver;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.functional.CounterCallback;
 
 public class JmsAtomFeedConsumeTestCase extends FunctionalTestCase
 {
-    private final CounterCallback counter = new CounterCallback();
-
     @Override
     protected String getConfigResources()
     {
         return "jms-atom-consume.xml";
-    }
-
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        FeedReceiver.receivedEntries.set(0);
     }
 
     public void testConsumeFeed() throws Exception
@@ -37,7 +28,8 @@ public class JmsAtomFeedConsumeTestCase extends FunctionalTestCase
         String feed = loadResourceAsString("sample-feed.atom");
         client.dispatch("jms://feed.in", feed, null);
         Thread.sleep(2000);
-        assertEquals(25, FeedReceiver.receivedEntries.get());
+        FeedReceiver component = (FeedReceiver)getComponent("feedConsumer");
+        assertEquals(25, component.getCount());
     }
 
     public void testConsumeSplitFeed() throws Exception
@@ -45,7 +37,8 @@ public class JmsAtomFeedConsumeTestCase extends FunctionalTestCase
         LocalMuleClient client = muleContext.getClient();
         String feed = loadResourceAsString("sample-feed.atom");
         client.dispatch("jms://feed.split.in", feed, null);
-        Thread.sleep(2000);                
-        assertEquals(25, EntryReceiver.receivedEntries.get());
+        Thread.sleep(2000);
+        EntryReceiver component = (EntryReceiver)getComponent("feedSplitterConsumer");
+        assertEquals(25, component.getCount());
     }
 }

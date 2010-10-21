@@ -2,32 +2,27 @@
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:atom="http://www.mulesoft.org/schema/mule/atom"
-      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
                http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
                http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/3.0/mule-atom.xsd
-               http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd
+               http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.0/mule-file.xsd
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd">
 
-    <jms:activemq-connector name="test"/>
-
-    <flow name="feedConsumer">
-        <jms:inbound-endpoint queue="feed.in"/>
-
-        <component>
-            <singleton-object class="org.mule.module.atom.event.FeedReceiver"/>
-        </component>
-    </flow>
 
     <flow name="feedSplitterConsumer">
-        <jms:inbound-endpoint queue="feed.split.in">
+        <file:inbound-endpoint  path="${mule.working.dir}" pollingFrequency="1000" >
+            <file:filename-wildcard-filter pattern="*.atom"/>
             <atom:feed-splitter/>
-        </jms:inbound-endpoint>
+        </file:inbound-endpoint>
 
         <component>
             <singleton-object class="org.mule.module.atom.event.EntryReceiver"/>
         </component>
     </flow>
+
+
+
 
 </mule>

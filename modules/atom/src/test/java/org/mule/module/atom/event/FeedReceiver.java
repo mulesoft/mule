@@ -18,11 +18,16 @@ import org.apache.abdera.model.Feed;
 public class FeedReceiver
 {
 
-    public static AtomicInteger receivedEntries = new AtomicInteger(0);
+    private final AtomicInteger receivedEntries = new AtomicInteger(0);
 
     public void processFeed(@Payload Feed feed) throws Exception
     {
-        System.out.println("Received " + feed.getEntries().size() + " events");
         receivedEntries.set(feed.getEntries().size());
     }
+
+    public int getCount()
+    {
+        return receivedEntries.get();
+    }
+
 }

@@ -46,7 +46,9 @@
 
     <flow name="eventConsumer">
         <atom:inbound-endpoint address="http://localhost:9002/events" connector-ref="PollingHttpConnector"/>
-        <component class="org.mule.module.atom.event.EntryReceiver"/>
+        <component>
+            <singleton-object class="org.mule.module.atom.event.EntryReceiver"/>
+        </component>
     </flow>
 
 </mule>

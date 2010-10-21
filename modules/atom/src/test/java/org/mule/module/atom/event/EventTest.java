@@ -47,8 +47,9 @@ public class EventTest extends FunctionalTestCase
         Feed feed = doc.getRoot();
 
         assertTrue( feed.getEntries().size() >= 1);
+        EntryReceiver component = (EntryReceiver)getComponent("eventConsumer");
 
-        assertTrue(EntryReceiver.receivedEntries.get() > 0);
+        assertTrue(component.getCount() > 0);
     }
 
     @Override
