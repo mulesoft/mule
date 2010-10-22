@@ -66,8 +66,7 @@ public class FtpConnectionFactory implements PoolableObjectFactory
         FTPClient client = (FTPClient) obj;
         try
         {
-            client.sendNoOp();
-            return true;
+            return client.sendNoOp();
         }
         catch (IOException e)
         {
