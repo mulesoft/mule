@@ -18,13 +18,18 @@ import org.mule.transport.http.HttpConstants;
 
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.collections.EnumerationUtils;
+
 public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
 {
+    private static final String REMOTE_ADDRESS_HEADER = "remoteAddress";
+
     public ServletMuleMessageFactory(MuleContext context)
     {
         super(context);
@@ -68,7 +73,7 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
          * 3. The content type is application/x-www-form-urlencoded.
          * 4. The servlet has made an initial call of any of the getParameter family of meth-
          *    ods on the request object.
-         *
+         * 
          * If the conditions are not met and the post form data is not included in the
          * parameter set, the post data must still be available to the servlet via the request
          * object's input stream. If the conditions are met, post form data will no longer be
@@ -109,6 +114,7 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
         setupUniqueId(request, message);
         setupContentType(request, message);
         setupCharacterEncoding(request, message);
+        setupRemoteAddress(request, message);
         setupMessageProperties(request, message);
     }
 
@@ -195,8 +201,13 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
      
         message.addInboundProperties(properties);
     }
+    
+    protected void setupRemoteAddress(HttpServletRequest request, DefaultMuleMessage message)
+    {
+        message.setInboundProperty(REMOTE_ADDRESS_HEADER, request.getRemoteAddr());
+    }
 
-    private void setupMessageProperties(HttpServletRequest request, DefaultMuleMessage message)
+    protected void setupMessageProperties(HttpServletRequest request, DefaultMuleMessage message)
     {
         Map<String, Object> messageProperties = new HashMap<String, Object>();
         
@@ -208,7 +219,7 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     protected void copyParameters(HttpServletRequest request, Map<String, Object> messageProperties)
-    {        
+    {
         Map<?, ?> parameterMap = request.getParameterMap();
         if (parameterMap != null && parameterMap.size() > 0)
         {
@@ -230,7 +241,7 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
     }
 
     protected void copyAttributes(HttpServletRequest request, Map<String, Object> messageProperties)
-    {        
+    {
         for (Enumeration<?> e = request.getAttributeNames(); e.hasMoreElements();)
         {
             String key = (String) e.nextElement();
@@ -238,8 +249,8 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
         }
     }
     
-    private void copyHeaders(HttpServletRequest request, Map<String, Object> messageProperties)
-    {                
+    protected void copyHeaders(HttpServletRequest request, Map<String, Object> messageProperties)
+    {
         for (Enumeration<?> e = request.getHeaderNames(); e.hasMoreElements();)
         {
             String key = (String)e.nextElement();
@@ -252,18 +263,31 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
 
             // Workaround for containers that strip the port from the Host header.
             // This is needed so Mule components can figure out what port they're on.
-            String value = request.getHeader(key);
-            if (HttpConstants.HEADER_HOST.equalsIgnoreCase(key)) 
+            if (HttpConstants.HEADER_HOST.equalsIgnoreCase(key))
             {
                 realKey = HttpConstants.HEADER_HOST;
+
+                String value = request.getHeader(key);
                 int port = request.getLocalPort();
                 if (!value.contains(":") && port != 80 && port != 443)
                 {
                     value = value + ":" + port;
                 }
+                messageProperties.put(realKey, value);
             }
-            
-            messageProperties.put(realKey, value);
+            else
+            {
+                Enumeration<?> valueEnum = request.getHeaders(key);
+                List<?> values = EnumerationUtils.toList(valueEnum);
+                if (values.size() > 1)
+                {
+                    messageProperties.put(realKey, values.toArray());
+                }
+                else
+                {
+                    messageProperties.put(realKey, values.get(0));
+                }
+            }
         }
     }
 }

@@ -21,8 +21,10 @@ import com.mockobjects.dynamic.Mock;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpSession;
@@ -164,6 +166,9 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertInboundScopedProperty("foo-value", message, "foo-header");
         assertInboundScopedProperty("MULE_HEADER_VALUE", message, "MULE_HEADER");
         assertInboundScopedProperty("localhost:8080", message, HttpConstants.HEADER_HOST);
+        
+        Object[] expected = new Object[] { "value-one", "value-two" };
+        assertTrue(Arrays.equals(expected, (Object[]) message.getInboundProperty("multi-value")));
     }
         
     private void assertInboundScopedProperty(Object expected, MuleMessage message, String key)
@@ -180,7 +185,6 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertEquals(expected, value);
     }
 
-    @SuppressWarnings("unchecked")
     private Map<String, Object> retrieveMapProperty(MuleMessage message, String key)
     {
         return message.getInboundProperty(key);
@@ -225,6 +229,12 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         builder.headers.put("foo-header", "foo-value");
         builder.headers.put("X-MULE_HEADER", "MULE_HEADER_VALUE");
         builder.headers.put(HttpConstants.HEADER_HOST, "localhost");
+        
+        Vector<String> multiValue = new Vector<String>();
+        multiValue.add("value-one");
+        multiValue.add("value-two");
+        builder.headers.put("multi-value", multiValue.elements());
+        
         return builder.buildRequest();
     }
 

@@ -41,7 +41,8 @@ public class MockHttpServletRequestBuilder
     public HttpSession session = null;
     public String characterEncoding = null;
     public Map<String, String> attributes = new HashMap<String, String>();
-    public Map<String, String> headers = new HashMap<String, String>();
+    public Map<String, Object> headers = new HashMap<String, Object>();
+    public String host = "localhost";
     public int localPort = 8080;
     
     public HttpServletRequest buildRequest()
@@ -63,9 +64,12 @@ public class MockHttpServletRequestBuilder
         mockRequest.expectAndReturn("getContentType", contentType);
         mockRequest.expectAndReturn("getContentType", contentType);
 
+        mockRequest.expectAndReturn("getRemoteAddr", host);
+        
         addParameterExpectations(mockRequest);
         addAttributeExpectations(mockRequest);
         addHeaderExpectations(mockRequest);
+        mockRequest.expectAndReturn("getHeader", C.eq(HttpConstants.HEADER_HOST), host);
         
         return (HttpServletRequest) mockRequest.proxy();
     }
@@ -98,7 +102,14 @@ public class MockHttpServletRequestBuilder
         if (attributes != null)
         {
             nameEnum = keyEnumeration(attributes);
-            addMapExpectations(mockRequest, "getAttribute", attributes);
+            
+            for (Map.Entry<String, String> entry : attributes.entrySet())
+            {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                
+                mockRequest.expectAndReturn("getAttribute", C.eq(key), value);
+            }
         }
         
         mockRequest.expectAndReturn("getAttributeNames", nameEnum);
@@ -110,25 +121,52 @@ public class MockHttpServletRequestBuilder
         if (headers != null)
         {
             nameEnum = keyEnumeration(headers);
-            addMapExpectations(mockRequest, "getHeader", headers);
+            
+            for (Map.Entry<String, Object> entry : headers.entrySet())
+            {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if ((value instanceof Enumeration<?>) == false)
+                {
+                    value = new SingleElementEnumeration(value);
+                }
+                
+                mockRequest.expectAndReturn("getHeaders", C.eq(key), value);
+            }
         }
         
         mockRequest.expectAndReturn("getHeaderNames", nameEnum);
     }
-    
-    private void addMapExpectations(Mock mockRequest, String methodName, Map<String, String> map)
+        
+    private Enumeration<?> keyEnumeration(Map<?, ?> map)
     {
-        for (Map.Entry<String, String> entry : map.entrySet())
-        {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            mockRequest.expectAndReturn(methodName, C.eq(key), value);
-        }
+        Set<?> keys = map.keySet();
+        return new IteratorEnumeration(keys.iterator());
     }
     
-    private Enumeration<?> keyEnumeration(Map<String, String> map)
+    private static class SingleElementEnumeration implements Enumeration<Object>
     {
-        Set<String> keys = map.keySet();
-        return new IteratorEnumeration(keys.iterator());
+        private Object element;
+
+        public SingleElementEnumeration(Object singleElement)
+        {
+            super();
+            element = singleElement;
+        }
+
+        public boolean hasMoreElements()
+        {
+            return (element != null);
+        }
+
+        public Object nextElement()
+        {
+            Object retValue = element;
+            if (element != null)
+            {
+                element = null;
+            }
+            return retValue;
+        }
     }
 }
