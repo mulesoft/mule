@@ -50,11 +50,10 @@ import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
 
 /**
- * The CxfOutboundMessageProcessor performs outbound CXF processing, sending an event through
- * the CXF client, then on to the next MessageProcessor. 
+ * The CxfOutboundMessageProcessor performs outbound CXF processing, sending an event
+ * through the CXF client, then on to the next MessageProcessor.
  */
-public class CxfOutboundMessageProcessor 
-    extends AbstractInterceptingMessageProcessor
+public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProcessor
 {
 
     private static final String URI_REGEX = "cxf:\\[(.+?)\\]:(.+?)/\\[(.+?)\\]:(.+?)";
@@ -66,7 +65,7 @@ public class CxfOutboundMessageProcessor
     private boolean proxy;
     private String operation;
     private BindingProvider clientProxy;
-    
+
     public CxfOutboundMessageProcessor(Client client)
     {
         this.client = client;
@@ -74,7 +73,8 @@ public class CxfOutboundMessageProcessor
 
     protected void cleanup()
     {
-        // MULE-4899: cleans up client's request and response context to avoid a memory leak.
+        // MULE-4899: cleans up client's request and response context to avoid a
+        // memory leak.
         Map<String, Object> requestContext = client.getRequestContext();
         requestContext.clear();
         Map<String, Object> responseContext = client.getResponseContext();
@@ -84,14 +84,14 @@ public class CxfOutboundMessageProcessor
     protected Object[] getArgs(MuleEvent event) throws TransformerException
     {
         Object payload;
-        
+
         payload = event.getMessage().getPayload();
-        
+
         if (proxy)
         {
-            return new Object[] { event.getMessage() };
+            return new Object[]{ event.getMessage() };
         }
-        
+
         Object[] args = payloadToArguments.payloadToArrayOfArguments(payload);
 
         MuleMessage message = event.getMessage();
@@ -101,7 +101,7 @@ public class CxfOutboundMessageProcessor
             List<DataHandler> attachments = new ArrayList<DataHandler>();
             for (Object attachmentName : attachmentNames)
             {
-                attachments.add(message.getInboundAttachment((String) attachmentName));
+                attachments.add(message.getInboundAttachment((String)attachmentName));
             }
             List<Object> temp = new ArrayList<Object>(Arrays.asList(args));
             temp.add(attachments.toArray(new DataHandler[attachments.size()]));
@@ -115,10 +115,10 @@ public class CxfOutboundMessageProcessor
         return args;
     }
 
-    
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        try {
+        try
+        {
             MuleEvent res;
             if (!isClientProxyAvailable())
             {
@@ -129,9 +129,13 @@ public class CxfOutboundMessageProcessor
                 res = doSendWithProxy(event);
             }
             return res;
-        } catch (MuleException e) {
+        }
+        catch (MuleException e)
+        {
             throw e;
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             throw new DefaultMuleException(e);
         }
     }
@@ -150,9 +154,9 @@ public class CxfOutboundMessageProcessor
         Method method = getMethod(event);
 
         Map<String, Object> props = getInovcationProperties(event);
-        
+
         Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
-        props.put("holder", responseHolder); 
+        props.put("holder", responseHolder);
         // Set custom soap action if set on the event or endpoint
         String soapAction = event.getMessage().getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
         if (soapAction != null)
@@ -160,9 +164,9 @@ public class CxfOutboundMessageProcessor
             soapAction = parseSoapAction(soapAction, new QName(method.getName()), event);
             props.put(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION, soapAction);
         }
-        
+
         clientProxy.getRequestContext().putAll(props);
-        
+
         Object response;
         try
         {
@@ -181,23 +185,23 @@ public class CxfOutboundMessageProcessor
             {
                 throw e;
             }
-        }        
-        
+        }
+
         // TODO: handle holders
         MuleEvent muleRes = responseHolder.value;
-        return buildResponseMessage(event, muleRes, new Object[] { response });
+        return buildResponseMessage(event, muleRes, new Object[]{ response });
     }
 
     protected MuleEvent doSendWithClient(MuleEvent event) throws Exception
     {
         BindingOperationInfo bop = getOperation(event);
-        
+
         Map<String, Object> props = getInovcationProperties(event);
-        
+
         // Holds the response from the transport
         Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
-        props.put("holder", responseHolder); 
-        
+        props.put("holder", responseHolder);
+
         // Set custom soap action if set on the event or endpoint
         String soapAction = event.getMessage().getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
         if (soapAction != null)
@@ -206,36 +210,36 @@ public class CxfOutboundMessageProcessor
             props.put(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION, soapAction);
             event.getMessage().setProperty(SoapConstants.SOAP_ACTION_PROPERTY, soapAction);
         }
-        
+
         Map<String, Object> ctx = new HashMap<String, Object>();
-        ctx.put(Client.REQUEST_CONTEXT, props); 
-        ctx.put(Client.RESPONSE_CONTEXT, props); 
-        
+        ctx.put(Client.REQUEST_CONTEXT, props);
+        ctx.put(Client.RESPONSE_CONTEXT, props);
+
         // Set Custom Headers on the client
         Object[] arr = event.getMessage().getPropertyNames().toArray();
         String head;
 
         for (int i = 0; i < arr.length; i++)
         {
-            head = (String) arr[i];
+            head = (String)arr[i];
             if ((head != null) && (!head.startsWith("MULE")))
             {
-                props.put((String) arr[i], event.getMessage().getProperty((String) arr[i]));
+                props.put((String)arr[i], event.getMessage().getProperty((String)arr[i]));
             }
         }
-        
+
         Object[] response = client.invoke(bop, getArgs(event), ctx);
 
         return buildResponseMessage(event, responseHolder.value, response);
     }
-    
+
     public Method getMethod(MuleEvent event) throws Exception
     {
         Method method = null;
         if (method == null)
         {
-            String opName = (String) event.getMessage().getProperty(CxfConstants.OPERATION);
-            if (opName != null) 
+            String opName = (String)event.getMessage().getProperty(CxfConstants.OPERATION);
+            if (opName != null)
             {
                 method = getMethodFromOperation(opName);
             }
@@ -243,7 +247,7 @@ public class CxfOutboundMessageProcessor
             if (method == null)
             {
                 opName = operation;
-                if (opName != null) 
+                if (opName != null)
                 {
                     method = getMethodFromOperation(opName);
                 }
@@ -256,7 +260,6 @@ public class CxfOutboundMessageProcessor
         }
         return method;
     }
-
 
     protected BindingOperationInfo getOperation(final String opName) throws Exception
     {
@@ -312,19 +315,19 @@ public class CxfOutboundMessageProcessor
     private Method getMethodFromOperation(String op) throws Exception
     {
         BindingOperationInfo bop = getOperation(op);
-        MethodDispatcher md = (MethodDispatcher) client.getEndpoint().getService().get(
-            MethodDispatcher.class.getName());
+        MethodDispatcher md = (MethodDispatcher)client.getEndpoint()
+            .getService()
+            .get(MethodDispatcher.class.getName());
         return md.getMethod(bop);
     }
-
 
     protected String getMethodOrOperationName(MuleEvent event) throws DispatchException
     {
         // People can specify a CXF operation, which may in fact be different
-        // than the method name. If that's not found, we'll default back to the 
-        // mule method property. 
+        // than the method name. If that's not found, we'll default back to the
+        // mule method property.
         String method = event.getMessage().getInvocationProperty(CxfConstants.OPERATION);
-        
+
         if (method == null)
         {
             method = event.getMessage().getInvocationProperty(MuleProperties.MULE_METHOD_PROPERTY);
@@ -334,7 +337,7 @@ public class CxfOutboundMessageProcessor
         {
             method = operation;
         }
-        
+
         if (method == null && proxy)
         {
             return "invoke";
@@ -358,22 +361,23 @@ public class CxfOutboundMessageProcessor
     private Map<String, Object> getInovcationProperties(MuleEvent event)
     {
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(MuleProperties.MULE_EVENT_PROPERTY, event); 
+        props.put(MuleProperties.MULE_EVENT_PROPERTY, event);
         props.put(CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR, this);
         return props;
     }
-    
-    protected MuleEvent buildResponseMessage(MuleEvent request, MuleEvent transportResponse, Object[] response) 
+
+    protected MuleEvent buildResponseMessage(MuleEvent request, MuleEvent transportResponse, Object[] response)
     {
         // One way dispatches over an async transport result in this
-        if (transportResponse == null) 
+        if (transportResponse == null)
         {
             return null;
         }
-        
+
         // Otherwise we may have a response!
         Object payload;
-        if (response == null || response.length == 0) {
+        if (response == null || response.length == 0)
+        {
             payload = null;
         }
         else if (response.length == 1)
@@ -384,7 +388,7 @@ public class CxfOutboundMessageProcessor
         {
             payload = response;
         }
-        
+
         MuleMessage message = transportResponse.getMessage();
         String statusCode = message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY);
         if (statusCode != null && Integer.parseInt(statusCode) != HttpConstants.SC_OK)
@@ -399,15 +403,15 @@ public class CxfOutboundMessageProcessor
                 exPayload = "Invalid status code: " + statusCode;
             }
             message.setExceptionPayload(new DefaultExceptionPayload(new HttpException(exPayload)));
-        } 
-        else 
+        }
+        else
         {
             message.setPayload(payload);
         }
 
         return transportResponse;
     }
-    
+
     public String parseSoapAction(String soapAction, QName method, MuleEvent event)
     {
         EndpointURI endpointURI = event.getEndpoint().getEndpointURI();
@@ -431,11 +435,9 @@ public class CxfOutboundMessageProcessor
         properties.put("host", endpointURI.getHost());
         properties.put("port", String.valueOf(endpointURI.getPort()));
         properties.put("path", endpointURI.getPath());
-        properties.put("hostInfo", endpointURI.getScheme()
-                                   + "://"
-                                   + endpointURI.getHost()
-                                   + (endpointURI.getPort() > -1
-                                                   ? ":" + String.valueOf(endpointURI.getPort()) : ""));
+        properties.put("hostInfo",
+            endpointURI.getScheme() + "://" + endpointURI.getHost()
+                            + (endpointURI.getPort() > -1 ? ":" + String.valueOf(endpointURI.getPort()) : ""));
         if (event.getFlowConstruct() != null)
         {
             properties.put("serviceName", event.getFlowConstruct().getName());
@@ -460,6 +462,7 @@ public class CxfOutboundMessageProcessor
     {
         return clientProxy != null;
     }
+
     public boolean isProxy()
     {
         return proxy;
@@ -494,7 +497,5 @@ public class CxfOutboundMessageProcessor
     {
         return client;
     }
-    
+
 }
-
-

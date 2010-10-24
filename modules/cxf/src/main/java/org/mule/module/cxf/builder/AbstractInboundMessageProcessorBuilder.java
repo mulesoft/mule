@@ -44,9 +44,10 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
+import org.apache.cxf.service.invoker.Invoker;
 
 /**
- * An abstract builder for CXF services. It handles all common operations such 
+ * An abstract builder for CXF services. It handles all common operations such
  * as interceptor configuration, mule header enabling, etc. Subclasses can extend
  * this and control how the Server is created and how the {@link CxfInboundMessageProcessor}
  * is configured.
@@ -72,7 +73,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     
     public CxfInboundMessageProcessor build() throws MuleException
     {
-        if (muleContext == null) 
+        if (muleContext == null)
         {
             throw new IllegalStateException("MuleContext must be supplied.");
         }
@@ -82,17 +83,17 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
             configuration = CxfConfiguration.getConfiguration(muleContext);
         }
         
-        if (configuration == null) 
+        if (configuration == null)
         {
             throw new IllegalStateException("A CxfConfiguration object must be supplied.");
         }
 
         ServerFactoryBean sfb;
-        try 
+        try
         {
             sfb = createServerFactory();
-        } 
-        catch (Exception e) 
+        }
+        catch (Exception e)
         {
             throw new DefaultMuleException(e);
         }
@@ -103,7 +104,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
             sfb.setBindingId(bindingId);
         }
         
-        if (features != null) 
+        if (features != null)
         {
             sfb.getFeatures().addAll(features);
         }
@@ -175,7 +176,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         }
         
         sfb.setProperties(properties);
-        sfb.setInvoker(new MuleInvoker(processor, getServiceClass()));
+        sfb.setInvoker(createInvoker(processor));
         
         server = sfb.create();
         
@@ -186,6 +187,11 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         processor.setServer(server);
         processor.setProxy(isProxy());
         return processor;
+    }
+    
+    protected Invoker createInvoker(CxfInboundMessageProcessor processor)
+    {
+        return new MuleInvoker(processor, getServiceClass());
     }
 
     protected void configureServer(Server server2)

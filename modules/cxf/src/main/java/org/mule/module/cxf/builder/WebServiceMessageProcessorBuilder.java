@@ -22,6 +22,8 @@ import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.module.cxf.CxfConstants;
+import org.mule.module.cxf.CxfInboundMessageProcessor;
+import org.mule.module.cxf.MuleJAXWSInvoker;
 import org.mule.module.cxf.i18n.CxfMessages;
 import org.mule.service.ServiceCompositeMessageSource;
 
@@ -33,18 +35,19 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.service.invoker.Invoker;
 
 /**
- * Builds a CXF web service MessageProcessor using either the JAX-WS or 
+ * Builds a CXF web service MessageProcessor using either the JAX-WS or
  * simple frontends.  It must be configured in the following way:
  * <ul>
- * <li>If the builder is part of a {@link Service}, then it will try to 
+ * <li>If the builder is part of a {@link Service}, then it will try to
  * detect the serviceClass from the component.</li>
  * <li>If it is not part of a {@link Service}, then the serviceClass
  * attribute must be supplied.</li>
  * <li>The builder will use the JAX-WS frontend by default.</li>
  */
-public class WebServiceMessageProcessorBuilder 
+public class WebServiceMessageProcessorBuilder
     extends AbstractInboundMessageProcessorBuilder implements FlowConstructAware
 {
     protected transient Log logger = LogFactory.getLog(getClass());
@@ -53,7 +56,7 @@ public class WebServiceMessageProcessorBuilder
     private String frontend = CxfConstants.JAX_WS_FRONTEND;
     private FlowConstruct flowConstruct;
     private Service muleService;
-    private Class serviceClass;
+    private Class<?> serviceClass;
 
     @Override
     protected ServerFactoryBean createServerFactory() throws Exception
@@ -94,6 +97,17 @@ public class WebServiceMessageProcessorBuilder
         }
         return sfb;
     }
+    
+    @Override
+    protected Invoker createInvoker(CxfInboundMessageProcessor processor)
+    {
+        Invoker invoker = super.createInvoker(processor);
+        if (CxfConstants.JAX_WS_FRONTEND.equals(frontend))
+        {
+            invoker = new MuleJAXWSInvoker(invoker);
+        }
+        return invoker;
+    }
 
     /**
      * Try to determine the target class from the Service.
@@ -110,7 +124,7 @@ public class WebServiceMessageProcessorBuilder
         }
         
         Component component = service.getComponent();
-        if (!(component instanceof JavaComponent)) 
+        if (!(component instanceof JavaComponent))
         {
             throw new DefaultMuleException(CxfMessages.serviceClassRequiredWithPassThrough());
         }
@@ -168,12 +182,12 @@ public class WebServiceMessageProcessorBuilder
     }
 
     @Override
-    public Class getServiceClass()
+    public Class<?> getServiceClass()
     {
         return serviceClass;
     }
 
-    public void setServiceClass(Class serviceClass)
+    public void setServiceClass(Class<?> serviceClass)
     {
         this.serviceClass = serviceClass;
     }
@@ -194,7 +208,7 @@ public class WebServiceMessageProcessorBuilder
 
     /**
      * Whether to use the simple frontend or JAX-WS frontend. Valid values
-     * are "simple" or "jaxws". 
+     * are "simple" or "jaxws".
      * @param frontend
      */
     public void setFrontend(String frontend)

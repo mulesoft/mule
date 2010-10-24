@@ -23,17 +23,19 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
 {
     public void testEchoService() throws Exception
     {
+        String url = "cxf:http://localhost:63081/services/Echo?method=echo";
+
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("cxf:http://localhost:63081/services/Echo?method=echo", "Hello!",
-            null);
+        MuleMessage result = client.send(url, "Hello!", null);
         assertEquals("Hello!", result.getPayload());
     }
 
     public void testOneWay() throws Exception
     {
+        String url = "cxf:http://localhost:63081/services/async?method=send";
+
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("cxf:http://localhost:63081/services/async?method=send", "Hello!",
-            null);
+        MuleMessage result = client.send(url, "Hello!", null);
         assertEquals(NullPayload.getInstance(), result.getPayload());
     }
 
@@ -53,11 +55,20 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
         assertEquals(
                 "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
                     "<soap:Body>" +
-                        "<ns2:echoResponse xmlns:ns2=\"http://testmodels.cxf.module.mule.org/\">" +                        
+                        "<ns2:echoResponse xmlns:ns2=\"http://testmodels.cxf.module.mule.org/\">" +
                             "<text>hello</text>" +
                         "</ns2:echoResponse>" +
                     "</soap:Body>" +
                 "</soap:Envelope>", httpMethod.getResponseBodyAsString());
+    }
+
+    public void testWebServiceContext() throws Exception
+    {
+        String url = "cxf:http://localhost:63081/services/Echo?method=ensureWebSerivceContextIsSet";
+
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage result = client.send(url, TEST_MESSAGE, null);
+        assertEquals(TEST_MESSAGE, result.getPayload());
     }
 
     @Override
