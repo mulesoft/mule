@@ -34,6 +34,11 @@
                                 <!-- Transports -->
                                 <artifactItem>
                                     <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-activiti</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
                                     <artifactId>mule-transport-axis</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
