@@ -36,17 +36,17 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-jbpm</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jms</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-jbpm</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>

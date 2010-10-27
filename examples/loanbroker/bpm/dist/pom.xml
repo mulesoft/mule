@@ -24,11 +24,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-jbpm</artifactId>
-            <version>${muleVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-jms</artifactId>
             <version>${muleVersion}</version>
         </dependency>
@@ -37,7 +32,12 @@
             <artifactId>mule-transport-vm</artifactId>
             <version>${muleVersion}</version>
         </dependency>
-        
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-jbpm</artifactId>
+            <version>${version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
