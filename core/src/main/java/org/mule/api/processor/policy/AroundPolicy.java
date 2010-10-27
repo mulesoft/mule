@@ -8,22 +8,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.processor;
+package org.mule.api.processor.policy;
 
-import org.mule.api.processor.policy.AroundPolicy;
-
-import java.util.List;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 
 /**
  *
  */
-public interface MessageProcessorChain extends MessageProcessor
+public interface AroundPolicy
 {
-    List<MessageProcessor> getMessageProcessors();
+    String getName();
 
-    //String getName();
-
-    void add(AroundPolicy policy);
-
-    AroundPolicy removePolicy(String policyName);
+    MuleEvent invoke(PolicyInvocation invocation) throws MuleException;
 }

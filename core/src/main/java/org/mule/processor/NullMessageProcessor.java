@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.policy.AroundPolicy;
 import org.mule.util.ObjectUtils;
 
 import java.util.Collections;
@@ -36,5 +37,14 @@ public class NullMessageProcessor implements MessageProcessorChain
     public List<MessageProcessor> getMessageProcessors()
     {
         return Collections.emptyList();
+    }
+
+    public void add(AroundPolicy policy)
+    {
+    }
+
+    public AroundPolicy removePolicy(String policyName)
+    {
+        return null;
     }
 }

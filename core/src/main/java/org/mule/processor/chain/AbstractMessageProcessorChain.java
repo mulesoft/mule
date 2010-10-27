@@ -24,12 +24,17 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.policy.AroundPolicy;
+import org.mule.api.processor.policy.PolicyInvocation;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.util.CollectionUtils;
 import org.mule.util.StringUtils;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,6 +49,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
     protected final transient Log log = LogFactory.getLog(getClass());
     protected String name;
     protected List<MessageProcessor> processors;
+    private LinkedList<AroundPolicy> policies = new LinkedList<AroundPolicy>();
 
     public AbstractMessageProcessorChain(String name, List<MessageProcessor> processors)
     {
@@ -62,7 +68,26 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
             return null;
         }
 
-        return processNext(doProcess(event));
+        final AroundPolicy policy = getPolicies().iterator().next();
+        MuleEvent result;
+        if (policy != null)
+        {
+            // if there's a policy, adapt, so it can call through to the doProcess() method
+            PolicyInvocation invocation = new PolicyInvocation(event, new MessageProcessor()
+            {
+                public MuleEvent process(MuleEvent event) throws MuleException
+                {
+                    return doProcess(event);
+                }
+            });
+            result = policy.invoke(invocation);
+        }
+        else
+        {
+            // direct invocation
+            result = doProcess(event);
+        }
+        return processNext(result);
     }
 
     protected abstract MuleEvent doProcess(MuleEvent event) throws MuleException;
@@ -154,6 +179,11 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
 
         final String nl = String.format("%n");
 
+        for (AroundPolicy policy : policies)
+        {
+            string.append(String.format("%n  -- policy [%s]: %s", policy.getName(), policy));
+        }
+
         // TODO have it print the nested structure with indents increasing for nested MPCs
         if (mpIterator.hasNext())
         {
@@ -177,5 +207,32 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
     public List<MessageProcessor> getMessageProcessors()
     {
         return processors;
+    }
+
+    public void add(AroundPolicy policy)
+    {
+        // TODO concurrency
+        this.policies.add(policy);
+    }
+
+    public AroundPolicy removePolicy(String policyName)
+    {
+        // TODO concurrency
+        // find { policy.name == policyName }
+        final AroundPolicy policy = (AroundPolicy) CollectionUtils.find(this.policies,
+                                                                        new BeanPropertyValueEqualsPredicate("name", policyName));
+        if (policy == null)
+        {
+            return null;
+        }
+        this.policies.remove(policy);
+
+        return policy;
+    }
+
+    public List<AroundPolicy> getPolicies()
+    {
+        // TODO concurrency
+        return this.policies;
     }
 }
