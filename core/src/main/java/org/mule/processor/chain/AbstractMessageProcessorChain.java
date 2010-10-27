@@ -69,7 +69,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
         }
 
         // TODO handle more than 1 policy
-        final AroundPolicy policy = getPolicies().iterator().next();
+        final AroundPolicy policy = getPolicies().isEmpty() ? null : getPolicies().iterator().next();
         MuleEvent result;
         if (policy != null)
         {
