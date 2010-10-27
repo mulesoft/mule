@@ -68,11 +68,15 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
             return null;
         }
 
+        // TODO handle more than 1 policy
         final AroundPolicy policy = getPolicies().iterator().next();
         MuleEvent result;
         if (policy != null)
         {
             // if there's a policy, adapt, so it can call through to the doProcess() method
+            // TODO I hate to do this, and there are no method delegates in java.
+            // This doProcess() must be abstracted into some chain processor which has the logic,
+            // and have the chain handle the plumbing only
             PolicyInvocation invocation = new PolicyInvocation(event, new MessageProcessor()
             {
                 public MuleEvent process(MuleEvent event) throws MuleException

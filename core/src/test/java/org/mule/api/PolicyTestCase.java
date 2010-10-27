@@ -19,7 +19,7 @@ import org.mule.transformer.simple.StringAppendTransformer;
 /**
  *
  */
-public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
+public class PolicyTestCase extends AbstractMuleTestCase
 {
 
     public void testPolicy() throws Exception
@@ -30,6 +30,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             {
                 new StringAppendTransformer(" {before} ").process(invocation.getEvent());
                 final MuleEvent result = invocation.proceed();
+                //throw new DefaultMuleException("test");
                 new StringAppendTransformer(" {after}").process(invocation.getEvent());
                 return result;
             }
