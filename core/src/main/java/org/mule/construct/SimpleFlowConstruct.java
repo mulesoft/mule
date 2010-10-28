@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
 import java.util.Collections;
@@ -48,7 +49,7 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(DefaultMessageProcessorChainBuilder builder)
+    protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
     {
         for (Object processor : messageProcessors)
         {

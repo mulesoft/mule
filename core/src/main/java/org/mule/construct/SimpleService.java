@@ -21,11 +21,11 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
 import org.mule.interceptor.LoggingInterceptor;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
@@ -60,7 +60,7 @@ public class SimpleService extends AbstractFlowConstruct
 
             @Override
             public void configureComponentMessageProcessor(MuleContext muleContext,
-                                                           DefaultMessageProcessorChainBuilder builder,
+                                                           MessageProcessorChainBuilder builder,
                                                            Component component)
             {
                 builder.chain(newJaxWsComponentMessageProcessor(muleContext, getComponentClass(component)));
@@ -87,7 +87,7 @@ public class SimpleService extends AbstractFlowConstruct
 
             @Override
             public void configureComponentMessageProcessor(MuleContext muleContext,
-                                                           DefaultMessageProcessorChainBuilder builder,
+                                                           MessageProcessorChainBuilder builder,
                                                            Component component)
             {
                 builder.chain(newJaxRsComponentWrapper(muleContext, component));
@@ -107,7 +107,7 @@ public class SimpleService extends AbstractFlowConstruct
 
             @Override
             public void configureComponentMessageProcessor(MuleContext muleContext,
-                                                           DefaultMessageProcessorChainBuilder builder,
+                                                           MessageProcessorChainBuilder builder,
                                                            Component component)
             {
                 builder.chain(component);
@@ -117,7 +117,7 @@ public class SimpleService extends AbstractFlowConstruct
         public abstract void validate(Component component) throws FlowConstructInvalidException;
 
         public abstract void configureComponentMessageProcessor(MuleContext muleContext,
-                                                                DefaultMessageProcessorChainBuilder builder,
+                                                                MessageProcessorChainBuilder builder,
                                                                 Component component);
 
         public static Type fromString(String string)
@@ -167,7 +167,7 @@ public class SimpleService extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(DefaultMessageProcessorChainBuilder builder)
+    protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
     {
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageObserver());
@@ -211,12 +211,12 @@ public class SimpleService extends AbstractFlowConstruct
             Method setServiceClassMethod = ClassUtils.getMethod(wsmpb.getClass(), "setServiceClass",
                 new Class<?>[]{Class.class});
 
-            setServiceClassMethod.invoke(wsmpb, new Object[]{componentClass});
+            setServiceClassMethod.invoke(wsmpb, componentClass);
 
             Method setFrontendMethod = ClassUtils.getMethod(wsmpb.getClass(), "setFrontend",
                 new Class<?>[]{String.class});
 
-            setFrontendMethod.invoke(wsmpb, new Object[]{"jaxws"});
+            setFrontendMethod.invoke(wsmpb, "jaxws");
 
             ((MuleContextAware) wsmpb).setMuleContext(muleContext);
 
@@ -239,7 +239,7 @@ public class SimpleService extends AbstractFlowConstruct
             Method setComponentsMethod = ClassUtils.getMethod(jrc.getClass(), "setComponents",
                 new Class<?>[]{List.class});
 
-            setComponentsMethod.invoke(jrc, new Object[]{Collections.singletonList(component)});
+            setComponentsMethod.invoke(jrc, Collections.singletonList(component));
 
             ((MuleContextAware) jrc).setMuleContext(muleContext);
 

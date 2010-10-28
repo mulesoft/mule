@@ -10,17 +10,18 @@
 
 package org.mule.construct;
 
-import org.apache.commons.lang.Validate;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
 import org.mule.interceptor.LoggingInterceptor;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+
+import org.apache.commons.lang.Validate;
 
 /**
  * A simple bridge between a single inbound endpoint and a single outbound endpoint.
@@ -53,7 +54,7 @@ public class Bridge extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(DefaultMessageProcessorChainBuilder builder)
+    protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
     {
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageObserver());

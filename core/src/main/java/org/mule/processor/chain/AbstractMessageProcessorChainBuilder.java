@@ -14,6 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.api.processor.MessageProcessorChainBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ import java.util.List;
  * The MessageProcessor instance that this builder builds can be nested in other chains as required.
  * </p>
  */
-public abstract class AbstractMessageProcessorChainBuilder implements MessageProcessorBuilder
+public abstract class AbstractMessageProcessorChainBuilder implements MessageProcessorChainBuilder
 {
 
     protected List processors = new ArrayList();

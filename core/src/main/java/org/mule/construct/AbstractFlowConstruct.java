@@ -31,6 +31,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.source.MessageSource;
 import org.mule.exception.DefaultServiceExceptionStrategy;
@@ -56,7 +57,7 @@ import org.apache.commons.logging.LogFactory;
  *  <li>Allows an {@link ExceptionListener} to be set.
  * </ul>
  * Implementations of <code>AbstractFlowConstuct</code> should implement
- * {@link #configureMessageProcessors(org.mule.processor.chain.DefaultMessageProcessorChainBuilder)} and
+ * {@link #configureMessageProcessors(org.mule.api.processor.MessageProcessorChainBuilder)} and
  * {@link #validateConstruct()} to construct the processing chain required and
  * validate the resulting construct. Validation may include validation of the type of
  * attributes of the {@link MessageSource}.
@@ -206,7 +207,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
      * The default implementation of this methods uses a
      * {@link DefaultMessageProcessorChainBuilder} and allows a chain of
      * {@link MessageProcessor}s to be configured using the
-     * {@link #configureMessageProcessors(DefaultMessageProcessorChainBuilder)}
+     * {@link #configureMessageProcessors(org.mule.api.processor.MessageProcessorChainBuilder)}
      * method but if you wish to use another {@link MessageProcessorBuilder} or just
      * a single {@link MessageProcessor} then this method can be overridden and
      * return a single {@link MessageProcessor} instead.
@@ -228,10 +229,13 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
      * {@link MessageProcessor} manually override {@link #createMessageProcessor()}
      * instead.
      * 
-     * @param builder instance of {@link DefaultMessageProcessorChainBuilder}
-     * @throws MuleException 
+     *
+     *
+     *
+     * @param builder instance of {@link org.mule.processor.chain.DefaultMessageProcessorChainBuilder}
+     * @throws MuleException
      */
-    protected abstract void configureMessageProcessors(DefaultMessageProcessorChainBuilder builder) throws MuleException;
+    protected abstract void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException;
 
     public String getName()
     {

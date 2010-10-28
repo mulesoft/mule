@@ -10,7 +10,6 @@
 
 package org.mule.construct;
 
-import org.apache.commons.lang.Validate;
 import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
@@ -24,6 +23,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
@@ -35,9 +35,10 @@ import org.mule.interceptor.LoggingInterceptor;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.ResponseMessageProcessorAdapter;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.ChoiceRouter;
 import org.mule.util.StringUtils;
+
+import org.apache.commons.lang.Validate;
 
 public class Validator extends AbstractFlowConstruct
 {
@@ -85,7 +86,7 @@ public class Validator extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(DefaultMessageProcessorChainBuilder builder)
+    protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
     {
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageObserver());

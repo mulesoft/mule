@@ -10,11 +10,6 @@
 
 package org.mule.module.ws.construct;
 
-import java.net.InetAddress;
-import java.net.URI;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -25,6 +20,7 @@ import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.AbstractFlowConstruct;
@@ -32,11 +28,16 @@ import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
 import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.processor.StopFurtherMessageProcessingMessageProcessor;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transformer.TransformerTemplate.TransformerCallback;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
+
+import java.net.InetAddress;
+import java.net.URI;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class is implemented to act as a Proxy for a Web Service. It listens for
@@ -117,7 +118,7 @@ public class WSProxy extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(DefaultMessageProcessorChainBuilder builder)
+    protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
     {
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageObserver());
