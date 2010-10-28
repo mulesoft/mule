@@ -28,6 +28,11 @@ public class PolicyInvocation
         this.messageProcessor = messageProcessor;
     }
 
+    /**
+     * Proceed using the current event.
+     *
+     * @see #setEvent(org.mule.api.MuleEvent)
+     */
     public MuleEvent proceed() throws MuleException
     {
         return messageProcessor.process(event);
@@ -38,8 +43,28 @@ public class PolicyInvocation
         return event;
     }
 
+    /**
+     * Replace the event object completely. Note that most of the time it's enough to simply
+     * modify the event without any rewriting.
+     *
+     * @see #getEvent()
+     */
+    public void setEvent(MuleEvent event)
+    {
+        this.event = event;
+    }
+
     public MessageProcessor getMessageProcessor()
     {
         return messageProcessor;
+    }
+
+    /**
+     * Set the message processor to be invoked on {@link #proceed()}. This may potentially disrupt the
+     * execution chain, use wisely.
+     */
+    public void setMessageProcessor(MessageProcessor messageProcessor)
+    {
+        this.messageProcessor = messageProcessor;
     }
 }
