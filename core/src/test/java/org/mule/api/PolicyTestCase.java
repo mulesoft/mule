@@ -28,6 +28,7 @@ public class PolicyTestCase extends AbstractMuleTestCase
         {
             public MuleEvent invoke(PolicyInvocation invocation) throws MuleException
             {
+                // mutates the event directly, thus we can safely ignore the return object
                 new StringAppendTransformer(" {before} ").process(invocation.getEvent());
                 final MuleEvent result = invocation.proceed();
                 //throw new DefaultMuleException("test");
