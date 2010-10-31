@@ -55,8 +55,6 @@ import org.mortbay.xml.XmlConfiguration;
  */
 public class JettyHttpConnector extends AbstractConnector
 {
-    public static final String RESOURCE_BASE_PROPERTY = "resourceBase";
-
     public static final String ROOT = "/";
 
     public static final String JETTY = "jetty";
@@ -68,6 +66,9 @@ public class JettyHttpConnector extends AbstractConnector
     private JettyReceiverServlet receiverServlet;
 
     private boolean useContinuations = false;
+
+    private String resourceBase;
+
 
     protected HashMap<String, ConnectorHolder> holders = new HashMap<String, ConnectorHolder>();
 
@@ -366,7 +367,6 @@ public class JettyHttpConnector extends AbstractConnector
         context.setConnectorNames(new String[]{connector.getName()});
         context.addEventListener(new MuleServletContextListener(muleContext, getName()));
 
-        String resourceBase = (String)endpoint.getProperty(RESOURCE_BASE_PROPERTY);
         if(resourceBase!=null)
         {
 
@@ -439,5 +439,15 @@ public class JettyHttpConnector extends AbstractConnector
                 servlet.removeReceiver(receiver);
             }
         }
+    }
+
+    public String getResourceBase()
+    {
+        return resourceBase;
+    }
+
+    public void setResourceBase(String resourceBase)
+    {
+        this.resourceBase = resourceBase;
     }
 }

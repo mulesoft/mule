@@ -132,8 +132,6 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
 
     private ContinuationCometdServlet servlet;
 
-    private String resourceBase;
-
     public AjaxConnector(MuleContext context)
     {
         super(context);
@@ -305,15 +303,6 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
         return receiver;
     }
 
-    public String getResourceBase()
-    {
-        return resourceBase;
-    }
-
-    public void setResourceBase(String resourceBase)
-    {
-        this.resourceBase = resourceBase;
-    }
 
     public int getInterval()
     {
