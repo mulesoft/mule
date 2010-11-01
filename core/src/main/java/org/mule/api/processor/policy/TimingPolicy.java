@@ -37,9 +37,12 @@ public class TimingPolicy implements AroundPolicy
         final MuleEvent result = invocation.proceed();
 
         long executionTime = System.currentTimeMillis() - startTime;
-        logger.info(String.format("%s took %dms to process event [%s]",
-                                      invocationEvent.getFlowConstruct().getName(),
-                                      executionTime, invocationEvent.getId()));
+        if (logger.isInfoEnabled())
+        {
+            logger.info(String.format("%s took %dms to process event [%s]",
+                                          invocationEvent.getFlowConstruct().getName(),
+                                          executionTime, invocationEvent.getId()));
+        }
 
         return result;
     }
