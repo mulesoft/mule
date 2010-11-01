@@ -25,5 +25,16 @@ public interface MessageProcessorChain extends MessageProcessor
 
     void add(AroundPolicy policy);
 
+    /**
+     *
+     * @return null if not found, otherwise the first found and removed policy instance
+     */
     AroundPolicy removePolicy(String policyName);
+
+    /**
+     * @return a read-only list of currently applied policies
+     */
+    List<AroundPolicy> getActivePolicies();
+
+    void clearPolicies();
 }

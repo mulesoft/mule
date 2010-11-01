@@ -30,6 +30,7 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.util.CollectionUtils;
 import org.mule.util.StringUtils;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -238,5 +239,15 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
     {
         // TODO concurrency
         return this.policies;
+    }
+
+    public List<AroundPolicy> getActivePolicies()
+    {
+        return Collections.unmodifiableList(this.policies);
+    }
+
+    public void clearPolicies()
+    {
+        this.clearPolicies();
     }
 }

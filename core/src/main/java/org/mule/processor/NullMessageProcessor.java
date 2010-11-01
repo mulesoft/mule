@@ -47,4 +47,13 @@ public class NullMessageProcessor implements MessageProcessorChain
     {
         return null;
     }
+
+    public List<AroundPolicy> getActivePolicies()
+    {
+        return Collections.unmodifiableList(Collections.<AroundPolicy>emptyList());
+    }
+
+    public void clearPolicies()
+    {
+    }
 }
