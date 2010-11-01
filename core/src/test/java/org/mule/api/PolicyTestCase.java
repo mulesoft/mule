@@ -49,9 +49,9 @@ public class PolicyTestCase extends AbstractMuleTestCase
         initialiseObject(chain);
 
         // test registration
-        assertEquals("No policies should have been registered.", 0, chain.getPolicies().size());
+        assertEquals("No policies should have been registered.", 0, chain.getActivePolicies().size());
         chain.add(ap);
-        assertSame("Policy has not been registered.", ap, chain.getPolicies().iterator().next());
+        assertSame("Policy has not been registered.", ap, chain.getActivePolicies().iterator().next());
 
         System.out.println(chain);
 
@@ -65,6 +65,6 @@ public class PolicyTestCase extends AbstractMuleTestCase
         // test cleanup
         final AroundPolicy policy = chain.removePolicy(ap.getName());
         assertSame("Wrong policy returned?", ap, policy);
-        assertEquals("No policies should have been registered.", 0, chain.getPolicies().size());
+        assertEquals("No policies should have been registered.", 0, chain.getActivePolicies().size());
     }
 }

@@ -70,7 +70,8 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
         }
 
         // TODO handle more than 1 policy
-        final AroundPolicy policy = getPolicies().isEmpty() ? null : getPolicies().iterator().next();
+        final List<AroundPolicy> activePolicies = getActivePolicies();
+        final AroundPolicy policy = activePolicies.isEmpty() ? null : activePolicies.iterator().next();
         MuleEvent result;
         if (policy != null)
         {
@@ -235,14 +236,9 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
         return policy;
     }
 
-    public List<AroundPolicy> getPolicies()
-    {
-        // TODO concurrency
-        return this.policies;
-    }
-
     public List<AroundPolicy> getActivePolicies()
     {
+        // TODO concurrency
         return Collections.unmodifiableList(this.policies);
     }
 
