@@ -79,7 +79,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
             // TODO I hate to do this, and there are no method delegates in java.
             // This doProcess() must be abstracted into some chain processor which has the logic,
             // and have the chain handle the plumbing only
-            PolicyInvocation invocation = new PolicyInvocation(event, new MessageProcessor()
+            PolicyInvocation invocation = new PolicyInvocation(event, policies, new MessageProcessor()
             {
                 public MuleEvent process(MuleEvent event) throws MuleException
                 {
@@ -176,7 +176,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
     {
         StringBuilder string = new StringBuilder();
         string.append(getClass().getSimpleName());
-        if (name != null)
+        if (StringUtils.isNotBlank(name))
         {
             string.append(String.format(" '%s' ", name));
         }
@@ -218,15 +218,19 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
     public void add(AroundPolicy policy)
     {
         // TODO concurrency
+        if (findPolicy(policy.getName()) != null)
+        {
+            final String msg = String.format("There's already a policy registered under name [%s] for chain [%s]:%s",
+                                             policy.getName(), getName(), this);
+            throw new IllegalArgumentException(msg);
+        }
         this.policies.add(policy);
     }
 
     public AroundPolicy removePolicy(String policyName)
     {
         // TODO concurrency
-        // find { policy.name == policyName }
-        final AroundPolicy policy = (AroundPolicy) CollectionUtils.find(this.policies,
-                                                                        new BeanPropertyValueEqualsPredicate("name", policyName));
+        final AroundPolicy policy = findPolicy(policyName);
         if (policy == null)
         {
             return null;
@@ -245,5 +249,16 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
     public void clearPolicies()
     {
         this.clearPolicies();
+    }
+
+    /**
+     *
+     * @return policy with that name or null if not found
+     */
+    protected AroundPolicy findPolicy(String policyName)
+    {
+        // find { policy.name == policyName }
+        return (AroundPolicy) CollectionUtils.find(this.policies,
+                                                   new BeanPropertyValueEqualsPredicate("name", policyName));
     }
 }

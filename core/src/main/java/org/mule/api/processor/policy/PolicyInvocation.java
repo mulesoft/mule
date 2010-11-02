@@ -14,18 +14,24 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  *
  */
 public class PolicyInvocation
 {
     private MuleEvent event;
+    private List<AroundPolicy> policies = new LinkedList<AroundPolicy>();
+    private volatile int currentPolicyIndex = 0;
     private MessageProcessor messageProcessor;
 
-    public PolicyInvocation(MuleEvent event, MessageProcessor messageProcessor)
+    public PolicyInvocation(MuleEvent event, List<AroundPolicy> policies, MessageProcessor processor)
     {
         this.event = event;
-        this.messageProcessor = messageProcessor;
+        this.policies = policies;
+        this.messageProcessor = processor;
     }
 
     /**
@@ -35,7 +41,16 @@ public class PolicyInvocation
      */
     public MuleEvent proceed() throws MuleException
     {
-        return messageProcessor.process(event);
+        currentPolicyIndex++;
+        if (currentPolicyIndex == policies.size())
+        {
+            // end of chain
+            return messageProcessor.process(event);
+        }
+        final AroundPolicy currentPolicy = getCurrentPolicy();
+        final MuleEvent result = currentPolicy.invoke(this);
+        setEvent(result);
+        return event;
     }
 
     public MuleEvent getEvent()
@@ -54,17 +69,21 @@ public class PolicyInvocation
         this.event = event;
     }
 
+    /**
+     * @return policy at the current index in the list
+     */
+    public AroundPolicy getCurrentPolicy()
+    {
+        return policies.get(currentPolicyIndex);
+    }
+
     public MessageProcessor getMessageProcessor()
     {
         return messageProcessor;
     }
 
-    /**
-     * Set the message processor to be invoked on {@link #proceed()}. This may potentially disrupt the
-     * execution chain, use wisely.
-     */
-    public void setMessageProcessor(MessageProcessor messageProcessor)
+    public List<AroundPolicy> getPolicies()
     {
-        this.messageProcessor = messageProcessor;
+        return policies;
     }
 }

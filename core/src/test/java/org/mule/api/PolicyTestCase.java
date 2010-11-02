@@ -22,25 +22,9 @@ import org.mule.transformer.simple.StringAppendTransformer;
 public class PolicyTestCase extends AbstractMuleTestCase
 {
 
-    public void testPolicy() throws Exception
+    public void testSinglePolicy() throws Exception
     {
-        AroundPolicy ap = new AroundPolicy()
-        {
-            public MuleEvent invoke(PolicyInvocation invocation) throws MuleException
-            {
-                // mutates the event directly, thus we can safely ignore the return object
-                new StringAppendTransformer(" {before} ").process(invocation.getEvent());
-                final MuleEvent result = invocation.proceed();
-                //throw new DefaultMuleException("test");
-                new StringAppendTransformer(" {after}").process(invocation.getEvent());
-                return result;
-            }
-
-            public String getName()
-            {
-                return "test around policy";
-            }
-        };
+        AroundPolicy ap = new TestPolicy("test around policy");
 
         // this is our regular chain that should get a policy applied
         DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(
@@ -56,15 +40,91 @@ public class PolicyTestCase extends AbstractMuleTestCase
         System.out.println(chain);
 
         // invoke
-        final MuleEvent result = chain.process(getTestEvent("main"));
+        final MuleEvent result = chain.process(getTestEvent("payload "));
         assertNotNull(result);
         final MuleMessage message = result.getMessage();
         assertNotNull(message);
-        assertEquals("main {before} first second {after}", message.getPayload());
+        assertEquals("payload {before} first second {after}", message.getPayload());
 
         // test cleanup
         final AroundPolicy policy = chain.removePolicy(ap.getName());
         assertSame("Wrong policy returned?", ap, policy);
         assertEquals("No policies should have been registered.", 0, chain.getActivePolicies().size());
+    }
+
+    public void testMultiplePolicies() throws Exception
+    {
+
+        // this is our regular chain that should get a policy applied
+        DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(
+                                                             new StringAppendTransformer("first"),
+                                                             new StringAppendTransformer(" second"));
+        initialiseObject(chain);
+
+        // test registration
+        assertEquals("No policies should have been registered.", 0, chain.getActivePolicies().size());
+        AroundPolicy policy1 = new TestPolicy("test around policy 1");
+        chain.add(policy1);
+        // add another policy
+        final TestPolicy policy2 = new TestPolicy("test around policy 2");
+        chain.add(policy2);
+        assertEquals("Wrong policies count.", 2, chain.getActivePolicies().size());
+
+        System.out.println(chain);
+
+        // invoke
+        final MuleEvent result = chain.process(getTestEvent("payload "));
+        assertNotNull(result);
+        final MuleMessage message = result.getMessage();
+        assertNotNull(message);
+        assertEquals("payload {before} {before} first second {after} {after}", message.getPayload());
+
+        // test cleanup
+        final AroundPolicy policy = chain.removePolicy(policy1.getName());
+        assertSame("Wrong policy returned?", policy1, policy);
+        chain.removePolicy(policy2.getName());
+        assertEquals("No policies should have been registered.", 0, chain.getActivePolicies().size());
+    }
+
+    public void testDuplicateName() throws Exception
+    {
+        DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain();
+        chain.add(new TestPolicy("test"));
+        try
+        {
+            chain.add(new TestPolicy("test"));
+            fail("Should've thrown an exception, no duplicates allowed");
+        }
+        catch (IllegalArgumentException e)
+        {
+            System.out.println(e);
+            // expected
+        }
+    }
+
+    private static class TestPolicy implements AroundPolicy
+    {
+
+        private String name;
+
+        public TestPolicy(final String name)
+        {
+            this.name = name;
+        }
+
+        public MuleEvent invoke(PolicyInvocation invocation) throws MuleException
+        {
+            // mutates the event directly, thus we can safely ignore the return object
+            new StringAppendTransformer("{before} ").process(invocation.getEvent());
+            final MuleEvent result = invocation.proceed();
+            //throw new DefaultMuleException("test");
+            new StringAppendTransformer(" {after}").process(invocation.getEvent());
+            return result;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
     }
 }
