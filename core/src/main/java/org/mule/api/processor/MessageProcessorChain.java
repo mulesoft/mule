@@ -10,7 +10,7 @@
 
 package org.mule.api.processor;
 
-import org.mule.api.processor.policy.AroundPolicy;
+import org.mule.api.processor.policy.Policies;
 
 import java.util.List;
 
@@ -21,20 +21,8 @@ public interface MessageProcessorChain extends MessageProcessor
 {
     List<MessageProcessor> getMessageProcessors();
 
-    //String getName();
+    String getName();
 
-    void add(AroundPolicy policy);
+    Policies getPolicies();
 
-    /**
-     *
-     * @return null if not found, otherwise the first found and removed policy instance
-     */
-    AroundPolicy removePolicy(String policyName);
-
-    /**
-     * @return a read-only list of currently applied policies
-     */
-    List<AroundPolicy> getActivePolicies();
-
-    void clearPolicies();
 }

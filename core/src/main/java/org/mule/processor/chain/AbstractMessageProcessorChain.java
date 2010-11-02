@@ -25,17 +25,14 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.policy.AroundPolicy;
+import org.mule.api.processor.policy.Policies;
 import org.mule.api.processor.policy.PolicyInvocation;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.util.CollectionUtils;
 import org.mule.util.StringUtils;
 
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanPropertyValueEqualsPredicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -50,7 +47,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
     protected final transient Log log = LogFactory.getLog(getClass());
     protected String name;
     protected List<MessageProcessor> processors;
-    private LinkedList<AroundPolicy> policies = new LinkedList<AroundPolicy>();
+    private final Policies policies = new Policies(this);
 
     public AbstractMessageProcessorChain(String name, List<MessageProcessor> processors)
     {
@@ -70,7 +67,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
         }
 
         // TODO handle more than 1 policy
-        final List<AroundPolicy> activePolicies = getActivePolicies();
+        final List<AroundPolicy> activePolicies = policies.listActive();
         final AroundPolicy policy = activePolicies.isEmpty() ? null : activePolicies.iterator().next();
         MuleEvent result;
         if (policy != null)
@@ -79,7 +76,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
             // TODO I hate to do this, and there are no method delegates in java.
             // This doProcess() must be abstracted into some chain processor which has the logic,
             // and have the chain handle the plumbing only
-            PolicyInvocation invocation = new PolicyInvocation(event, policies, new MessageProcessor()
+            PolicyInvocation invocation = new PolicyInvocation(event, policies.listActive(), new MessageProcessor()
             {
                 public MuleEvent process(MuleEvent event) throws MuleException
                 {
@@ -185,7 +182,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
 
         final String nl = String.format("%n");
 
-        for (AroundPolicy policy : policies)
+        for (AroundPolicy policy : policies.listActive())
         {
             string.append(String.format("%n  -- policy [%s]: %s", policy.getName(), policy));
         }
@@ -215,50 +212,8 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
         return processors;
     }
 
-    public void add(AroundPolicy policy)
+    public Policies getPolicies()
     {
-        // TODO concurrency
-        if (findPolicy(policy.getName()) != null)
-        {
-            final String msg = String.format("There's already a policy registered under name [%s] for chain [%s]:%s",
-                                             policy.getName(), getName(), this);
-            throw new IllegalArgumentException(msg);
-        }
-        this.policies.add(policy);
-    }
-
-    public AroundPolicy removePolicy(String policyName)
-    {
-        // TODO concurrency
-        final AroundPolicy policy = findPolicy(policyName);
-        if (policy == null)
-        {
-            return null;
-        }
-        this.policies.remove(policy);
-
-        return policy;
-    }
-
-    public List<AroundPolicy> getActivePolicies()
-    {
-        // TODO concurrency
-        return Collections.unmodifiableList(this.policies);
-    }
-
-    public void clearPolicies()
-    {
-        this.clearPolicies();
-    }
-
-    /**
-     *
-     * @return policy with that name or null if not found
-     */
-    protected AroundPolicy findPolicy(String policyName)
-    {
-        // find { policy.name == policyName }
-        return (AroundPolicy) CollectionUtils.find(this.policies,
-                                                   new BeanPropertyValueEqualsPredicate("name", policyName));
+        return policies;
     }
 }
