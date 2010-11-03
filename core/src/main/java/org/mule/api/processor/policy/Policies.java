@@ -33,7 +33,7 @@ public class Policies
     public void add(AroundPolicy policy)
     {
         // TODO concurrency
-        if (findPolicy(policy.getName()) != null)
+        if (find(policy.getName()) != null)
         {
             final String msg = String.format("There's already a policy registered under name [%s] for chain [%s]:%s",
                                              policy.getName(), messageProcessorChain.getName(), messageProcessorChain);
@@ -42,10 +42,10 @@ public class Policies
         this.policies.add(policy);
     }
 
-    public AroundPolicy removePolicy(String policyName)
+    public AroundPolicy remove(String policyName)
     {
         // TODO concurrency
-        final AroundPolicy policy = findPolicy(policyName);
+        final AroundPolicy policy = find(policyName);
         if (policy == null)
         {
             return null;
@@ -55,13 +55,13 @@ public class Policies
         return policy;
     }
 
-    public List<AroundPolicy> listActive()
+    public List<AroundPolicy> list()
     {
         // TODO concurrency
         return Collections.unmodifiableList(this.policies);
     }
 
-    public void clearPolicies()
+    public void clear()
     {
         // TODO concurrency
         this.policies.clear();
@@ -70,7 +70,7 @@ public class Policies
     /**
      * @return policy with that name or null if not found
      */
-    public AroundPolicy findPolicy(String policyName)
+    public AroundPolicy find(String policyName)
     {
         // TODO concurrency
         // find { policy.name == policyName }

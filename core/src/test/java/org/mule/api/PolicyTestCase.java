@@ -33,9 +33,9 @@ public class PolicyTestCase extends AbstractMuleTestCase
         initialiseObject(chain);
 
         // test registration
-        assertEquals("No policies should have been registered.", 0, chain.getPolicies().listActive().size());
+        assertEquals("No policies should have been registered.", 0, chain.getPolicies().list().size());
         chain.getPolicies().add(ap);
-        assertSame("Policy has not been registered.", ap, chain.getPolicies().listActive().iterator().next());
+        assertSame("Policy has not been registered.", ap, chain.getPolicies().list().iterator().next());
 
         System.out.println(chain);
 
@@ -47,9 +47,9 @@ public class PolicyTestCase extends AbstractMuleTestCase
         assertEquals("payload {before} first second {after}", message.getPayload());
 
         // test cleanup
-        final AroundPolicy policy = chain.getPolicies().removePolicy(ap.getName());
+        final AroundPolicy policy = chain.getPolicies().remove(ap.getName());
         assertSame("Wrong policy returned?", ap, policy);
-        assertEquals("No policies should have been registered.", 0, chain.getPolicies().listActive().size());
+        assertEquals("No policies should have been registered.", 0, chain.getPolicies().list().size());
     }
 
     public void testMultiplePolicies() throws Exception
@@ -62,13 +62,13 @@ public class PolicyTestCase extends AbstractMuleTestCase
         initialiseObject(chain);
 
         // test registration
-        assertEquals("No policies should have been registered.", 0, chain.getPolicies().listActive().size());
+        assertEquals("No policies should have been registered.", 0, chain.getPolicies().list().size());
         AroundPolicy policy1 = new TestPolicy("test around policy 1");
         chain.getPolicies().add(policy1);
         // add another policy
         final TestPolicy policy2 = new TestPolicy("test around policy 2");
         chain.getPolicies().add(policy2);
-        assertEquals("Wrong policies count.", 2, chain.getPolicies().listActive().size());
+        assertEquals("Wrong policies count.", 2, chain.getPolicies().list().size());
 
         System.out.println(chain);
 
@@ -80,10 +80,10 @@ public class PolicyTestCase extends AbstractMuleTestCase
         assertEquals("payload {before} {before} first second {after} {after}", message.getPayload());
 
         // test cleanup
-        final AroundPolicy policy = chain.getPolicies().removePolicy(policy1.getName());
+        final AroundPolicy policy = chain.getPolicies().remove(policy1.getName());
         assertSame("Wrong policy returned?", policy1, policy);
-        chain.getPolicies().removePolicy(policy2.getName());
-        assertEquals("No policies should have been registered.", 0, chain.getPolicies().listActive().size());
+        chain.getPolicies().remove(policy2.getName());
+        assertEquals("No policies should have been registered.", 0, chain.getPolicies().list().size());
     }
 
     public void testDuplicateName() throws Exception
