@@ -42,8 +42,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
     public static final String[] DEFAULT_STACKTRACE_FILTER = (
             "org.mule.processor.AbstractInterceptingMessageProcessor," +
-            "org.mule.processor.chain.AbstractMessageProcessorChainBuilder," +
-            "org.mule.processor.chain.DefaultMessageProcessorChainBuilder,")
+            "org.mule.processor.chain")
             .split(",");
 
     /**

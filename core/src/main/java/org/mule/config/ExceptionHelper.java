@@ -349,11 +349,15 @@ public final class ExceptionHelper
      */
     public static Throwable sanitize(Throwable t)
     {
+        if (t == null)
+        {
+            return null;
+        }
         StackTraceElement[] trace = t.getStackTrace();
         List<StackTraceElement> newTrace = new ArrayList<StackTraceElement>();
         for (StackTraceElement stackTraceElement : trace)
         {
-            if (isMuleInternalClass(stackTraceElement.getClassName()))
+            if (!isMuleInternalClass(stackTraceElement.getClassName()))
             {
                 newTrace.add(stackTraceElement);
             }
@@ -394,10 +398,10 @@ public final class ExceptionHelper
         {
             if (className.startsWith(mulePackage))
             {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     public static Throwable getRootParentException(Throwable t)
@@ -431,7 +435,15 @@ public final class ExceptionHelper
             {
                 exception = (MuleException) cause;
             }
-            cause = getExceptionReader(cause).getCause(cause);
+            final Throwable tempCause = getExceptionReader(cause).getCause(cause);
+            if (DefaultMuleConfiguration.fullStackTraces)
+            {
+                cause = tempCause;
+            }
+            else
+            {
+                cause = ExceptionHelper.sanitize(tempCause);
+            }
             // address some misbehaving exceptions, avoid endless loop
             if (t == cause)
             {
