@@ -32,6 +32,7 @@ import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.model.Model;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.RouterStatisticsRecorder;
 import org.mule.api.service.Service;
@@ -499,7 +500,7 @@ public abstract class AbstractService implements Service, MessageProcessor
         return new ProcessIfStartedWaitIfPausedMessageProcessor(this, lifecycleManager.getState());
     }
 
-    protected abstract void addMessageProcessors(DefaultMessageProcessorChainBuilder builder);
+    protected abstract void addMessageProcessors(MessageProcessorChainBuilder builder);
 
     protected ServiceStatistics createStatistics()
     {

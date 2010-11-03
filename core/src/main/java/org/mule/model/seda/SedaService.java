@@ -19,6 +19,7 @@ import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.CoreMessages;
@@ -26,7 +27,6 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.processor.ProcessIfStartedWaitIfSyncPausedMessageProcessor;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.processor.SedaStageInterceptingMessageProcessor;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.service.AbstractService;
 import org.mule.service.processor.ServiceInternalMessageProcessor;
 import org.mule.service.processor.ServiceLoggingMessageObserver;
@@ -77,7 +77,7 @@ public class SedaService extends AbstractService
         return new ProcessIfStartedWaitIfSyncPausedMessageProcessor(this, lifecycleManager.getState());
     }
 
-    protected void addMessageProcessors(DefaultMessageProcessorChainBuilder builder)
+    protected void addMessageProcessors(MessageProcessorChainBuilder builder)
     {
         builder.chain(new ServiceLoggingMessageObserver(this));
         builder.chain(new ServiceStatisticsMessageObserver(this));
