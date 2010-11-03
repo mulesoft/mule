@@ -70,8 +70,9 @@ public class Policies
     /**
      * @return policy with that name or null if not found
      */
-    protected AroundPolicy findPolicy(String policyName)
+    public AroundPolicy findPolicy(String policyName)
     {
+        // TODO concurrency
         // find { policy.name == policyName }
         return (AroundPolicy) CollectionUtils.find(this.policies,
                                                    new BeanPropertyValueEqualsPredicate("name", policyName));
