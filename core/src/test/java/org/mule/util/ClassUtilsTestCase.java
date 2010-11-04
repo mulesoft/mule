@@ -70,7 +70,19 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         }
 
     }
-
+    
+    public void testLoadPrimitiveClass() throws Exception
+    {
+        assertSame(ClassUtils.loadClass("boolean", getClass()), Boolean.TYPE);
+        assertSame(ClassUtils.loadClass("byte", getClass()), Byte.TYPE);
+        assertSame(ClassUtils.loadClass("char", getClass()), Character.TYPE);
+        assertSame(ClassUtils.loadClass("double", getClass()), Double.TYPE);
+        assertSame(ClassUtils.loadClass("float", getClass()), Float.TYPE);
+        assertSame(ClassUtils.loadClass("int", getClass()), Integer.TYPE);
+        assertSame(ClassUtils.loadClass("long", getClass()), Long.TYPE);
+        assertSame(ClassUtils.loadClass("short", getClass()), Short.TYPE);
+    }
+    
     public void testLoadClassOfType() throws Exception
     {
 

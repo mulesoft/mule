@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
     public static final Class<?>[] NO_ARGS_TYPE = new Class<?>[]{};
 
     private static final Map<Class<?>, Class<?>> wrapperToPrimitiveMap = new HashMap<Class<?>, Class<?>>();
+    private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<String, Class<?>>(32);
 
     static
     {
@@ -61,6 +63,13 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
         wrapperToPrimitiveMap.put(Double.class, Double.TYPE);
         wrapperToPrimitiveMap.put(Float.class, Float.TYPE);
         wrapperToPrimitiveMap.put(Void.TYPE, Void.TYPE);
+
+        Set<Class<?>> primitiveTypes = new HashSet<Class<?>>(32);
+        primitiveTypes.addAll(wrapperToPrimitiveMap.values());
+        for (Class<?> primitiveType : primitiveTypes)
+        {
+            primitiveTypeNameMap.put(primitiveType.getName(), primitiveType);
+        }
     }
 
     public static boolean isConcrete(Class<?> clazz)
@@ -222,6 +231,15 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      */
     public static <T extends Class> T loadClass(final String className, final Class<?> callingClass, T type) throws ClassNotFoundException
     {
+        if (className.length() <= 8)
+        {
+            // Could be a primitive - likely.
+            if (primitiveTypeNameMap.containsKey(className))
+            {
+                return (T) primitiveTypeNameMap.get(className);
+            }
+        }
+        
         Class<?> clazz = AccessController.doPrivileged(new PrivilegedAction<Class<?>>()
         {
             public Class<?> run()
