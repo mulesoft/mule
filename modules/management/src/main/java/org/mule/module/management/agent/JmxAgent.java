@@ -258,29 +258,32 @@ public class JmxAgent extends AbstractAgent
     {
         try
         {
+            // TODO cleanup rmi registry creation too
             initRMI();
-            logger.info("Creating and starting JMX agent connector Server");
-            if (connectorServerUrl != null)
+            if (connectorServerUrl == null)
             {
-                JMXServiceURL url = new JMXServiceURL(connectorServerUrl);
-                if (connectorServerProperties == null)
-                {
-                    connectorServerProperties = new HashMap<String, Object>(DEFAULT_CONNECTOR_SERVER_PROPERTIES);
-                }
-                // TODO custom authenticator may have its own security config,
-                // refactor
-                if (!credentials.isEmpty())
-                {
-                    JMXAuthenticator jmxAuthenticator = (JMXAuthenticator) ClassUtils.instanciateClass(DEFAULT_JMX_AUTHENTICATOR);
-                    // TODO support for custom authenticators
-                    ((SimplePasswordJmxAuthenticator) jmxAuthenticator).setCredentials(credentials);
-                    connectorServerProperties.put(JMXConnectorServer.AUTHENTICATOR, jmxAuthenticator);
-                }
-                connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url,
-                        connectorServerProperties,
-                        mBeanServer);
-                connectorServer.start();
+                return;
             }
+
+            logger.info("Creating and starting JMX agent connector Server");
+            JMXServiceURL url = new JMXServiceURL(connectorServerUrl);
+            if (connectorServerProperties == null)
+            {
+                connectorServerProperties = new HashMap<String, Object>(DEFAULT_CONNECTOR_SERVER_PROPERTIES);
+            }
+            // TODO custom authenticator may have its own security config,
+            // refactor
+            if (!credentials.isEmpty())
+            {
+                JMXAuthenticator jmxAuthenticator = (JMXAuthenticator) ClassUtils.instanciateClass(DEFAULT_JMX_AUTHENTICATOR);
+                // TODO support for custom authenticators
+                ((SimplePasswordJmxAuthenticator) jmxAuthenticator).setCredentials(credentials);
+                connectorServerProperties.put(JMXConnectorServer.AUTHENTICATOR, jmxAuthenticator);
+            }
+            connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url,
+                                                                              connectorServerProperties,
+                                                                              mBeanServer);
+            connectorServer.start();
         }
         catch (ExportException e)
         {
