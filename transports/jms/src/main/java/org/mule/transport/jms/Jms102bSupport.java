@@ -96,6 +96,10 @@ public class Jms102bSupport extends Jms11Support
     public Session createSession(Connection connection, boolean topic, boolean transacted,
         int ackMode, boolean noLocal) throws JMSException
     {
+        if (connection == null)
+        {
+            throw new IllegalArgumentException("Connection is null");
+        }
         if (topic && connection instanceof TopicConnection)
         {
             return ((TopicConnection) connection).createTopicSession(noLocal, ackMode);
@@ -110,7 +114,7 @@ public class Jms102bSupport extends Jms11Support
         }
         else
         {
-            throw new IllegalArgumentException("Connection and domain type do not match");
+            throw new IllegalArgumentException("Connection and domain type do not match, connection is of type " + connection.getClass().getName());
         }
     }
 
