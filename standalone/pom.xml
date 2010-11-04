@@ -286,7 +286,7 @@
         <dependency>
             <groupId>ant</groupId>
             <artifactId>ant</artifactId>
-            <version>${antVersion}-osgi</version>
+            <version>${antVersion}</version>
         </dependency>
         <dependency>
             <groupId>xalan</groupId>
