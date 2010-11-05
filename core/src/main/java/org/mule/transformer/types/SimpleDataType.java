@@ -15,6 +15,8 @@ import org.mule.api.transformer.DataType;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 
+import org.apache.commons.beanutils.MethodUtils;
+
 /**
  * A data type that simply wraps a Java type.  This type also allows a mime type to be associated
  * with the Java type.
@@ -111,12 +113,26 @@ public class SimpleDataType<T> implements DataType<T>, Cloneable
             return false;
         }
 
-        if (!this.getType().isAssignableFrom(that.getType()))
+        if (!fromPrimitive(this.getType()).isAssignableFrom(fromPrimitive(that.getType())))
         {
             return false;
         }
 
         return true;
+    }
+    
+    
+    private Class<?> fromPrimitive(Class<?> type)
+    {
+        Class<?> primitiveWrapper = MethodUtils.getPrimitiveWrapper(type);
+        if (primitiveWrapper != null)
+        {
+            return primitiveWrapper;
+        }
+        else
+        {
+            return type;
+        }
     }
 
     @Override
