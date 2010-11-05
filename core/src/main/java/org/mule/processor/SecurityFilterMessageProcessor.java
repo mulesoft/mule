@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.security.SecurityException;
+import org.mule.config.ExceptionHelper;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.endpoint.EndpointAware;
 import org.mule.message.DefaultExceptionPayload;
@@ -59,14 +60,15 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
             }
             catch (SecurityException e)
             {
+                e = (SecurityException) ExceptionHelper.sanitizeIfNeeded(e);
                 logger.warn("Outbound Request was made but was not authenticated: " + e.getMessage(), e);
-                
+
                 AbstractConnector connector = (AbstractConnector) event.getEndpoint().getConnector();
                 connector.fireNotification(new SecurityNotification(e,
-                    SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
-                
+                                                                    SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
+
                 event.getFlowConstruct().getExceptionListener().handleException(e, event);
-                
+
                 event.getMessage().setPayload(e.getLocalizedMessage());
                 event.getMessage().setExceptionPayload(new DefaultExceptionPayload(e));
                 return event;

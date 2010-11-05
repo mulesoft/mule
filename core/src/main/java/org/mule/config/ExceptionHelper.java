@@ -343,6 +343,11 @@ public final class ExceptionHelper
         return DefaultMuleConfiguration.fullStackTraces ? root : sanitize(root);
     }
 
+    public static Throwable sanitizeIfNeeded(Throwable t)
+    {
+        return DefaultMuleConfiguration.fullStackTraces ? t : sanitize(t);
+    }
+
     /**
      * Removes some internal Mule entries from the stacktrace. Modifies the
      * passed-in throwable stacktrace.
@@ -366,6 +371,14 @@ public final class ExceptionHelper
         StackTraceElement[] clean = new StackTraceElement[newTrace.size()];
         newTrace.toArray(clean);
         t.setStackTrace(clean);
+
+        Throwable cause = t.getCause();
+        while (cause != null)
+        {
+            sanitize(cause);
+            cause = cause.getCause();
+        }
+
         return t;
     }
 
