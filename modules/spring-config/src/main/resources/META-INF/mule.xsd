@@ -359,13 +359,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="methodName" type="xsd:string">
+                <xsd:attribute name="method" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="methodParameters" type="xsd:string">
+                <xsd:attribute name="methodArguments" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                         </xsd:documentation>

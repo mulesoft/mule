@@ -286,7 +286,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("message-filter", new MessageFilterDefinitionParser());
         registerMuleBeanDefinitionParser("invoke",
             new ChildDefinitionParser("messageProcessor", InvokerMessageProcessor.class)).addAlias("method",
-            "methodName").addAlias("methodParameters", "argumentExpressionsString");
+            "methodName").addAlias("methodArguments", "argumentExpressionsString");
         
         registerBeanDefinitionParser("async", new ChildDefinitionParser("messageProcessor",
             AsyncMessageProcessorsFactoryBean.class));

@@ -256,12 +256,12 @@
 
     <flow name="invoke">
         <vm:inbound-endpoint path="invoke-in" exchange-pattern="request-response"/>
-        <invoke object-ref="appender" methodName="transform" methodParameters="#[payload]"/>
+        <invoke object-ref="appender" method="transform" methodArguments="#[payload]"/>
     </flow>
 
     <flow name="invoke2">
         <vm:inbound-endpoint path="invoke2-in" exchange-pattern="request-response"/>
-        <invoke object-ref="appender" methodName="transform" methodParameters="#[header:INBOUND:one]"/>
+        <invoke object-ref="appender" method="transform" methodArguments="#[header:INBOUND:one]"/>
     </flow>
     
     <spring:bean name="appender" class="org.mule.transformer.simple.StringAppendTransformer">
