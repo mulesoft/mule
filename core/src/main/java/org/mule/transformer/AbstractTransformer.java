@@ -254,9 +254,10 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
     @Deprecated
     public void setReturnClass(Class<?> newClass)
     {
-        returnType = new SimpleDataType<Object>(newClass);
-        returnType.setMimeType(mimeType);
-        returnType.setEncoding(encoding);
+        DataType<?> tempReturnType = new SimpleDataType<Object>(newClass);
+        tempReturnType.setMimeType(mimeType);
+        tempReturnType.setEncoding(encoding);
+        setReturnDataType(tempReturnType);
     }
 
     public void setMimeType(String mimeType) throws MimeTypeParseException

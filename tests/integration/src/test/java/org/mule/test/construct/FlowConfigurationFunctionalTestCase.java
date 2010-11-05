@@ -337,5 +337,20 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
             new DefaultMuleMessage("0", muleContext)).getPayloadAsString());
 
     }
+
+    public void testInvoke() throws MuleException, Exception
+    {
+        assertEquals("0recieved", muleContext.getClient().send("vm://invoke-in",
+            new DefaultMuleMessage("0", muleContext)).getPayloadAsString());
+    }
+
+    public void testInvoke2() throws MuleException, Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("0", muleContext);
+        message.setOutboundProperty("one", "header1val");
+        assertEquals("header1valrecieved", muleContext.getClient().send("vm://invoke2-in",
+            message).getPayloadAsString());
+
+    }
     
 }

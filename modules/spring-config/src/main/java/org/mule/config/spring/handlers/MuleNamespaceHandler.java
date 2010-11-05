@@ -107,6 +107,7 @@ import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
+import org.mule.processor.InvokerMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
 import org.mule.routing.CollectionSplitter;
 import org.mule.routing.ExpressionMessageInfoMapping;
@@ -283,6 +284,10 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("processor-chain", new MessageProcessorChainDefinitionParser());        
         registerBeanDefinitionParser("response", new ResponseDefinitionParser());
         registerMuleBeanDefinitionParser("message-filter", new MessageFilterDefinitionParser());
+        registerMuleBeanDefinitionParser("invoke",
+            new ChildDefinitionParser("messageProcessor", InvokerMessageProcessor.class)).addAlias("method",
+            "methodName").addAlias("methodParameters", "argumentExpressionsString");
+        
         registerBeanDefinitionParser("async", new ChildDefinitionParser("messageProcessor",
             AsyncMessageProcessorsFactoryBean.class));
         registerBeanDefinitionParser("transactional", new ChildDefinitionParser("messageProcessor",
