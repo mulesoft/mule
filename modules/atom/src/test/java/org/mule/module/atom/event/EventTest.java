@@ -53,6 +53,14 @@ public class EventTest extends FunctionalTestCase
     }
 
     @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        EntryReceiver component = (EntryReceiver)getComponent("eventConsumer");
+        component.getReceivedEntries().set(0);
+    }
+
+    @Override
     protected void doTearDown() throws Exception
     {
         clearJcrRepository();

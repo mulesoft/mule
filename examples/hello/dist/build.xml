@@ -70,7 +70,7 @@
 
         <zip destfile="mule-example-hello.zip">
             <zipfileset file="${dir.build}/${app.name}.jar" fullpath="lib/mule-example-hello.jar"/>
-            <zipfileset file="src/main/app/mule-config.xml" fullpath="mule-config.xml"/>
+            <zipfileset dir="src/main/app" includes="docroot/**,jetty/**,mule-config.xml"/>            
         </zip>
     </target>
 

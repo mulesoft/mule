@@ -11,13 +11,13 @@ package org.mule.transport.ajax;
 
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.transport.ajax.container.AjaxServletConnector;
 import org.mule.transport.ajax.embedded.AjaxConnector;
 
 import java.net.URL;
 
-public class AjaxNamespaceHandlerTestCase extends FunctionalTestCase
+public class AjaxNamespaceHandlerTestCase extends DynamicPortTestCase
 {
     protected String getConfigResources()
     {
@@ -38,7 +38,7 @@ public class AjaxNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(3000, connector.getMultiFrameInterval());
         assertEquals(4000, connector.getRefsThreshold());
         assertEquals(50000, connector.getTimeout());
-        assertEquals(new URL("http://0.0.0.0:58080/service"), connector.getServerUrl());
+        assertEquals(new URL("http://0.0.0.0:" + getPorts().get(0) + "/service"), connector.getServerUrl());
         assertEquals("/foo/bar", connector.getResourceBase());
     }
 
@@ -56,7 +56,7 @@ public class AjaxNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(3000, connector.getMultiFrameInterval());
         assertEquals(4000, connector.getRefsThreshold());
         assertEquals(50000, connector.getTimeout());
-        assertEquals(new URL("https://0.0.0.0:58081/service"), connector.getServerUrl());
+        assertEquals(new URL("https://0.0.0.0:" + getPorts().get(1) + "/service"), connector.getServerUrl());
         assertEquals("/foo/bar", connector.getResourceBase());
 
         //The full path gets resolved, we're just checkng that the property got set
@@ -94,5 +94,11 @@ public class AjaxNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(b);
         InboundEndpoint ep = b.buildInboundEndpoint();
         assertEquals("/response", ep.getEndpointURI().getPath());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 }

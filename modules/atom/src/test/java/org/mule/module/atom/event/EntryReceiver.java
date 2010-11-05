@@ -31,4 +31,9 @@ public class EntryReceiver
     {
         return receivedEntries.get();
     }
+
+    public AtomicInteger getReceivedEntries()
+    {
+        return receivedEntries;
+    }
 }

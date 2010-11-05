@@ -167,6 +167,10 @@
                             <groupId>org.mule.transports</groupId>
                             <artifactId>mule-transport-servlet</artifactId>
                         </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-jetty</artifactId>
+                        </exclusion>
                     </exclusions>
                 </configuration>
             </plugin>

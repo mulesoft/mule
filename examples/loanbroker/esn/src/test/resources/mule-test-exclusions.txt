@@ -4,4 +4,5 @@
 # Intermittent failures. See: MULE-4972
 org.mule.example.loanbroker.esn.VMLoanBrokerSynchronousFunctionalTestCase
 org.mule.example.loanbroker.esn.VMLoanBrokerAsynchronousFunctionalTestCase
-
+# EE-1911 : intermittent failure
+org.mule.example.loanbroker.esn.CxfLoanBrokerAsynchronousFunctionalTestCase

@@ -1,5 +1,5 @@
 /*
- * $Id:  $
+ * $Id$
  * -------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -30,7 +30,7 @@ public class FileAtomFeedConsumeTestCase extends FunctionalTestCase
         fos.write(feed.getBytes());
 
         //allow the file connector to poll a couple of times to ensure we only get the same 25 entries
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         EntryReceiver component = (EntryReceiver)getComponent("feedSplitterConsumer");
         assertEquals(25, component.getCount());
     }
