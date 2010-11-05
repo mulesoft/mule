@@ -111,7 +111,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
                     // Throws TransformerException if no suitable transformer is
                     // found
                     Transformer t = event.getMuleContext().getRegistry().lookupTransformer(source, target);
-                    arg = t.transform(args[i]);
+                    arg = t.transform(arg);
                 }
                 args[i] = arg;
             }
