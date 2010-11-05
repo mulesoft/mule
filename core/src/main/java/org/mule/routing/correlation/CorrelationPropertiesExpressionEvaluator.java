@@ -27,7 +27,7 @@ public class CorrelationPropertiesExpressionEvaluator extends MessageHeaderExpre
     @Override
     public final Object evaluate(String name, MuleMessage message)
     {
-        Object result = null;
+        Object result;
         if (message != null)
         {
             if (MuleProperties.MULE_CORRELATION_ID_PROPERTY.equals(name))

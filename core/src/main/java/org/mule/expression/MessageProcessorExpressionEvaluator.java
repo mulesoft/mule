@@ -45,7 +45,7 @@ import org.apache.commons.logging.LogFactory;
  * @see ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessageProcessorExpressionEvaluator implements ExpressionEvaluator, ExpressionConstants
+public class MessageProcessorExpressionEvaluator implements ExpressionEvaluator
 {
     protected transient Log logger = LogFactory.getLog(MessageProcessorExpressionEvaluator.class);
 

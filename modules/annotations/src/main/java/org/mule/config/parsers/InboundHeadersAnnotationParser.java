@@ -13,7 +13,6 @@ import org.mule.api.annotations.meta.Evaluator;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.expression.ExpressionConfig;
-import org.mule.expression.ExpressionConstants;
 import org.mule.expression.MessageHeaderExpressionEvaluator;
 import org.mule.expression.MessageHeadersExpressionEvaluator;
 import org.mule.expression.MessageHeadersListExpressionEvaluator;
@@ -22,6 +21,8 @@ import org.mule.expression.transformers.ExpressionArgument;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
+
+import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
 
 /**
  * Responsible for parsing the {@link org.mule.api.annotations.param.InboundHeaders} annotation.  This is an iBeans
@@ -47,7 +48,7 @@ public class InboundHeadersAnnotationParser implements ExpressionAnnotationParse
             {
                 eval = MessageHeadersListExpressionEvaluator.NAME;
             }
-            else if(expr.endsWith(ExpressionConstants.OPTIONAL_ARGUMENT))
+            else if (expr.endsWith(OPTIONAL_ARGUMENT))
             {
                 //We only set optional if we're dealing with a single header, List and Maps of headers can contain
                 //optional names but we will always return a Map or List even if it is empty

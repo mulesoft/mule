@@ -12,8 +12,14 @@ package org.mule.expression;
 /**
  * Constnts for Headers and Attachment processing shared by a number of the Expression evaluators
  */
-public interface ExpressionConstants
+public class ExpressionConstants
 {
+
+    private ExpressionConstants()
+    {
+        // do not instantiate
+    }
+
     public static final String DELIM = ",";
     public static final String ALL_ARGUMENT = "*";
     public static final String OPTIONAL_ARGUMENT = "?";

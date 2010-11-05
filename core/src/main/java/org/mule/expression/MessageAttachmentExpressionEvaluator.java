@@ -17,6 +17,8 @@ import org.mule.config.i18n.CoreMessages;
 
 import javax.activation.DataHandler;
 
+import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
+
 /**
  * Looks up an attachment with the given name.
  *
@@ -25,7 +27,7 @@ import javax.activation.DataHandler;
  * @see org.mule.api.expression.ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator, ExpressionConstants
+public class MessageAttachmentExpressionEvaluator implements ExpressionEvaluator
 {
     public static final String NAME = "attachment";
 

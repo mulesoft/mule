@@ -22,7 +22,7 @@ import org.mule.api.expression.ExpressionEvaluator;
  * @see ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator, ExpressionConstants
+public class MessageHeaderExpressionEvaluator implements ExpressionEvaluator
 {
     public static final String NAME = "header";
 

@@ -23,7 +23,7 @@ import java.util.List;
  * @see org.mule.api.expression.ExpressionEvaluator
  * @see DefaultExpressionManager
  */
-public class MessageHeadersListExpressionEvaluator implements ExpressionEvaluator, ExpressionConstants
+public class MessageHeadersListExpressionEvaluator implements ExpressionEvaluator
 {
     public static final String NAME = "headers-list";
 
