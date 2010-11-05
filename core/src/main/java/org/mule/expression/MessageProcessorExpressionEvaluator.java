@@ -1,5 +1,5 @@
 /*
- * $Id: MessageHeaderExpressionEvaluator.java 19191 2010-08-25 21:05:23Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -20,6 +20,7 @@ import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,7 +59,7 @@ public class MessageProcessorExpressionEvaluator implements ExpressionEvaluator,
         String processorArgExpression = null;
         MuleMessage messageToProcess = message;
 
-        if (expression == null || expression.isEmpty())
+        if (StringUtils.isBlank(expression))
         {
             return message;
         }
