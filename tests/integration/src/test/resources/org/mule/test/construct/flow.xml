@@ -264,6 +264,13 @@
         <invoke object-ref="appender" method="transform" methodArguments="#[header:INBOUND:one]"/>
     </flow>
     
+    <flow name="invoke3">
+        <vm:inbound-endpoint path="invoke3-in" exchange-pattern="request-response"/>
+        <processor ref="invokeme"/>
+    </flow>
+
+    <invoke name="invokeme" object-ref="appender" method="transform" methodArguments="#[payload]"/>
+
     <spring:bean name="appender" class="org.mule.transformer.simple.StringAppendTransformer">
         <spring:constructor-arg value="recieved"/>
     </spring:bean>

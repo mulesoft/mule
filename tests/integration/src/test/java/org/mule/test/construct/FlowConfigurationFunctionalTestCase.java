@@ -353,4 +353,11 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
     }
     
+    public void testInvoke3() throws MuleException, Exception
+    {
+        assertEquals("0recieved", muleContext.getClient().send("vm://invoke3-in",
+            new DefaultMuleMessage("0", muleContext)).getPayloadAsString());
+    }
+    
+    
 }
