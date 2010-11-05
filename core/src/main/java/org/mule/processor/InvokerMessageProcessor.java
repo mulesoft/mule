@@ -12,6 +12,7 @@ package org.mule.processor;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -19,8 +20,12 @@ import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
+import org.mule.api.transformer.TransformerException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.TransformerTemplate;
+import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
 import java.lang.reflect.Method;
@@ -28,6 +33,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * <code>InvokerMessageProcessor</code> invokes a specified method of an object. An
+ * array of argument expressions can be provided to map the message to the method
+ * arguments. The method used is determined by the method name along with the number
+ * of argument expressions provided. The results of the expression evaluations will
+ * automatically be transformed where possible to the method argument type. Multiple
+ * methods with the same name and same number of arguments are not supported
+ * currently.
+ */
 public class InvokerMessageProcessor implements MessageProcessor, Initialisable
 {
     private Object object;
@@ -49,28 +63,17 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
         {
             method = matchingMethods.get(0);
         }
-        else if (matchingMethods.size() == 0)
+        else
         {
-            throw new RuntimeException("No method with name " + methodName + " and "
-                                       + argumentExpressions.length + " parameters found in class '"
-                                       + object.getClass().getName() + "'.");
+            throw new InitialisationException(CoreMessages.methodWithNumParamsNotFoundOnObject(methodName,
+                argumentExpressions.length, object), this);
         }
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleEvent resultEvent = event;
-        ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
-        Object[] args = new Object[argumentExpressions.length];
-        for (int i = 0; i < args.length; i++)
-        {
-            args[i] = expressionManager.evaluate(argumentExpressions[i], event.getMessage());
-            if (!(method.getParameterTypes()[i].isAssignableFrom(args[i].getClass())))
-            {
-                args[i] = event.getMuleContext().getRegistry().lookupTransformer(args[i].getClass(),
-                    method.getParameterTypes()[i]).transform(args[i]);
-            }
-        }
+        Object[] args = evaluateArguments(event, argumentExpressions);
 
         try
         {
@@ -82,10 +85,35 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
         }
         catch (Exception e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new MessagingException(CoreMessages.failedToInvoke(object.toString()), event, e);
         }
         return resultEvent;
+    }
+
+    protected Object[] evaluateArguments(MuleEvent event, String[] expressions) throws MessagingException
+    {
+        ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
+        Object[] args = new Object[expressions.length];
+        try
+        {
+            for (int i = 0; i < args.length; i++)
+            {
+                args[i] = expressionManager.evaluate(expressions[i], event.getMessage());
+                if (!(method.getParameterTypes()[i].isAssignableFrom(args[i].getClass())))
+                {
+                    DataType<?> source = DataTypeFactory.create(args[i].getClass());
+                    DataType<?> target = DataTypeFactory.create(method.getParameterTypes()[i]);
+                    // Throws TransformerException if no suitable transformer is found
+                    Transformer t = event.getMuleContext().getRegistry().lookupTransformer(source, target);
+                    args[i] = t.transform(args[i]);
+                }
+            }
+            return args;
+        }
+        catch (TransformerException e)
+        {
+            throw new MessagingException(event, e);
+        }
     }
 
     public void setObject(Object object)

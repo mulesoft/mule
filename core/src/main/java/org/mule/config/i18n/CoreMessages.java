@@ -1321,5 +1321,11 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 328);
     }
+    
+    public static Message methodWithNumParamsNotFoundOnObject(String method, int numArgments, Object object)
+    {
+        return factory.createMessage(BUNDLE_PATH, 329, method, numArgments,
+            StringMessageUtils.toString(object));
+    }
 
 }
