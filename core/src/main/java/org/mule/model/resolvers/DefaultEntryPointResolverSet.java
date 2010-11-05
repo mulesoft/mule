@@ -17,8 +17,7 @@ import org.mule.util.CollectionUtils;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,10 +33,8 @@ public class DefaultEntryPointResolverSet implements EntryPointResolverSet
 {
     protected final Log logger = LogFactory.getLog(getClass());
 
-    private final Set<EntryPointResolver> entryPointResolvers = new LinkedHashSet<EntryPointResolver>(4);
-    
-    @SuppressWarnings("unchecked")
-    private Set<String> exceptions = new CopyOnWriteArraySet/*<String>*/();
+    private final Set<EntryPointResolver> entryPointResolvers = new LinkedHashSet<EntryPointResolver>(4);    
+    private final Set<String> exceptions = new CopyOnWriteArraySet<String>();
 
     public Object invoke(Object component, MuleEventContext context) throws Exception
     {

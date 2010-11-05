@@ -178,7 +178,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     /**
      * Timeout used for the test watchdog
      */
-    private int testTimeoutSecs = DEFAULT_MULE_TEST_TIMEOUT_SECS;
+    protected int testTimeoutSecs = DEFAULT_MULE_TEST_TIMEOUT_SECS;
 
     /**
      * When a test case depends on a 3rd-party resource such as a public web service,
