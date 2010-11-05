@@ -98,15 +98,22 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
         {
             for (int i = 0; i < args.length; i++)
             {
-                args[i] = expressionManager.evaluate(expressions[i], event.getMessage());
-                if (!(method.getParameterTypes()[i].isAssignableFrom(args[i].getClass())))
+                Object arg = expressionManager.evaluate(expressions[i], event.getMessage());
+                // If expression evaluates to a MuleMessage then use it's payload
+                if (arg instanceof MuleMessage)
                 {
-                    DataType<?> source = DataTypeFactory.create(args[i].getClass());
-                    DataType<?> target = DataTypeFactory.create(method.getParameterTypes()[i]);
-                    // Throws TransformerException if no suitable transformer is found
-                    Transformer t = event.getMuleContext().getRegistry().lookupTransformer(source, target);
-                    args[i] = t.transform(args[i]);
+                    arg = ((MuleMessage) arg).getPayload();
                 }
+                if (!(method.getParameterTypes()[i].isAssignableFrom(arg.getClass())))
+                {
+                    DataType<?> source = DataTypeFactory.create(arg.getClass());
+                    DataType<?> target = DataTypeFactory.create(method.getParameterTypes()[i]);
+                    // Throws TransformerException if no suitable transformer is
+                    // found
+                    Transformer t = event.getMuleContext().getRegistry().lookupTransformer(source, target);
+                    arg = t.transform(args[i]);
+                }
+                args[i] = arg;
             }
             return args;
         }
