@@ -11,9 +11,7 @@
 package org.mule.transformer.simple;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.transport.PropertyScope;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.transformer.AbstractMessageTransformer;
@@ -30,17 +28,20 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * <p>
  * A configurable message transformer that allows users to add, overwrite, rename and delete
- * properties on the current message. Users can set a {@link List} of
- * 'deleteProperties' regular expressions to remove the matching properties
- * from the message and can also set a {@link Map} of 'addProperties' that
- * will be added to the message and possibly overwrite existing properties
- * with the same name. <p/> If {@link #overwrite} is set to
- * <code>false</code>, and a property exists on the message (even if the value is
- * <code>null</code>, it will be left intact. The transformer then acts as a more
- * gentle 'enricher'. The default setting is <code>true</code>.
+ * properties on the current message. Users can set a {@link List} of 'deleteProperties' regular 
+ * expressions to remove the matching properties from the message and can also set a {@link Map} 
+ * of 'addProperties' that will be added to the message and possibly overwrite existing properties
+ * with the same name.
+ * <p/> 
+ * <p>
+ * If {@link #overwrite} is set to <code>false</code>, and a property 
+ * exists on the message (even if the value is <code>null</code>, it will be left intact. The 
+ * transformer then acts as a more gentle 'enricher'. The default setting is <code>true</code>.
+ * </p>
  */
-public class MessagePropertiesTransformer extends AbstractMessageTransformer implements MuleContextAware
+public class MessagePropertiesTransformer extends AbstractMessageTransformer
 {
     private List<String> deleteProperties = null;
     private Map<String, Object> addProperties = null;
@@ -50,8 +51,6 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer imp
     private boolean overwrite = true;
     // outbound is the default scope
     private PropertyScope scope = PropertyScope.OUTBOUND;
-
-    private MuleContext muleContext;
 
     public MessagePropertiesTransformer()
     {
@@ -82,12 +81,6 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer imp
     }
 
     @Override
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
-
-    @Override
     public Object transformMessage(MuleMessage message, String outputEncoding)
     {
         if (deleteProperties != null && deleteProperties.size() > 0)
@@ -97,56 +90,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer imp
 
         if (addProperties != null && addProperties.size() > 0)
         {
-            for (Map.Entry<String, Object> entry : addProperties.entrySet())
-            {
-                if (entry.getKey() == null)
-                {
-                    logger.error("Setting Null property keys is not supported, this entry is being ignored");
-                }
-                else
-                {
-                    final String key = entry.getKey();
-
-                    Object value= entry.getValue();
-                    Object realValue = value;
-
-                    //Enable expression support for property values
-                    if (muleContext.getExpressionManager().isExpression(value.toString()))
-                    {
-                        realValue = muleContext.getExpressionManager().evaluate(value.toString(), message);
-                    }
-
-                    if (realValue != null)
-                    {
-                        if (message.getProperty(key, scope) != null)
-                        {
-                            if (overwrite)
-                            {
-                                logger.debug("Overwriting message property " + key);
-                                message.setProperty(key, realValue, scope);
-                            }
-                            else if(logger.isDebugEnabled())
-                            {
-                                logger.debug(MessageFormat.format(
-                                    "Message already contains the property and overwrite is false, skipping: key={0}, value={1}, scope={2}",
-                                    key, realValue, scope));
-                            }
-                        }
-                        //If value is null an exception will not be thrown if the key was marked as optional (with a '?'). If not
-                        //optional the expression evaluator will throw an exception
-                        else
-                        {
-                            message.setProperty(key, realValue, scope);
-                        }
-                    }
-                    else if(logger.isInfoEnabled())
-                        {
-                            logger.info(MessageFormat.format(
-                                    "Property with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this property",
-                                    key, value));
-                        }
-                }
-            }
+            addProperties(message);
         }
 
         /* perform renaming transformation */
@@ -171,14 +115,138 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer imp
         return message;
     }
 
-    protected void renameInScope(String oldKey, String newKey, PropertyScope scope, MuleMessage message)
+    protected void deleteProperties(MuleMessage message)
     {
-        Object propValue = message.getProperty(oldKey, scope);
-        message.removeProperty(oldKey, scope);
-        message.setProperty(newKey, propValue, scope);
+        final Set<String> propertyNames = new HashSet<String>(message.getPropertyNames(scope));
+        
+        for (String expression : deleteProperties)
+        {
+            for (String key : propertyNames)
+            {
+                if (key.matches(expression))
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug(String.format("Removing property: '%s' from scope: '%s'", key, scope.getScopeName()));
+                    }
+                    message.removeProperty(key, scope);
+                }
+                else
+                {
+                    // fallback to the plain wildcard for simplicity
+                    WildcardFilter filter = new WildcardFilter(expression);
+                    if (filter.accept(key))
+                    {
+                        message.removeProperty(key, scope);
+                    }
+                }
+            }
+        }
     }
 
-    public List getDeleteProperties()
+    protected void addProperties(MuleMessage message)
+    {
+        for (Map.Entry<String, Object> entry : addProperties.entrySet())
+        {
+            if (entry.getKey() == null)
+            {
+                logger.error("Setting Null property keys is not supported, this entry is being ignored");
+            }
+            else
+            {
+                final String key = entry.getKey();
+
+                Object value= entry.getValue();
+                Object realValue = value;
+
+                //Enable expression support for property values
+                if (muleContext.getExpressionManager().isExpression(value.toString()))
+                {
+                    realValue = muleContext.getExpressionManager().evaluate(value.toString(), message);
+                }
+
+                if (realValue != null)
+                {
+                    if (message.getProperty(key, scope) != null)
+                    {
+                        if (overwrite)
+                        {
+                            logger.debug("Overwriting message property " + key);
+                            message.setProperty(key, realValue, scope);
+                        }
+                        else if(logger.isDebugEnabled())
+                        {
+                            logger.debug(MessageFormat.format(
+                                "Message already contains the property and overwrite is false, skipping: key={0}, value={1}, scope={2}",
+                                key, realValue, scope));
+                        }
+                    }
+                    //If value is null an exception will not be thrown if the key was marked as optional (with a '?'). If not
+                    //optional the expression evaluator will throw an exception
+                    else
+                    {
+                        message.setProperty(key, realValue, scope);
+                    }
+                }
+                else if (logger.isInfoEnabled())
+                {
+                    logger.info(MessageFormat.format(
+                        "Property with key '{0}', not found on message using '{1}'. Since the value was marked optional, nothing was set on the message for this property",
+                        key, value));
+                }
+            }
+        }
+    }
+
+    protected void renameProperties(MuleMessage message)
+    {
+        for (Map.Entry<String, String> entry : this.renameProperties.entrySet())
+        {
+            if (entry.getKey() == null)
+            {
+                logger.error("Setting Null property keys is not supported, this entry is being ignored");
+            }
+            else
+            {
+                final String key = entry.getKey();
+                String value = entry.getValue();
+
+                if (value == null)
+                {
+                    logger.error("Setting Null property values for renameProperties is not supported, this entry is being ignored");
+                }
+                else
+                {
+                    //Enable expression support for property values
+                    if (muleContext.getExpressionManager().isValidExpression(value))
+                    {
+                        Object temp = muleContext.getExpressionManager().evaluate(value, message);
+                        if (temp != null)
+                        {
+                            value = temp.toString();
+                        }
+                    }
+
+                    /* log transformation */
+                    if (logger.isDebugEnabled() && message.getProperty(key, scope) == null)
+                    {
+                        logger.debug(String.format("renaming message property '%s' to '%s'", key, value));
+                    }
+
+                    renameInScope(key, value, scope, message);
+                }
+            }
+        }
+    }
+
+    protected void renameInScope(String oldKey, String newKey, PropertyScope propertyScope, MuleMessage message)
+    {
+        Object propValue = message.getProperty(oldKey, propertyScope);
+        message.removeProperty(oldKey, propertyScope);
+        message.setProperty(newKey, propValue, propertyScope);
+    }
+
+    public List<String> getDeleteProperties()
     {
         return deleteProperties;
     }
@@ -196,7 +264,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer imp
         this.deleteProperties = Arrays.asList(deleteProperties);
     }
 
-    public Map getAddProperties()
+    public Map<String, Object> getAddProperties()
     {
         return addProperties;
     }
@@ -209,7 +277,7 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer imp
     /**
      * @return the renameProperties
      */
-    public Map getRenameProperties()
+    public Map<String, String> getRenameProperties()
     {
         return this.renameProperties;
     }
@@ -269,74 +337,5 @@ public class MessagePropertiesTransformer extends AbstractMessageTransformer imp
     public void setScopeName(String scopeName)
     {
         this.scope = PropertyScope.get(scopeName);
-    }
-
-    protected void deleteProperties(MuleMessage message)
-    {
-        final Set<String> props = new HashSet<String>(message.getPropertyNames(scope));
-        for (String expression : deleteProperties)
-        {
-            for (String name : props)
-            {
-                if (name.matches(expression))
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug(String.format("Removing property: '%s' from scope: '%s'", name, scope.getScopeName()));
-                    }
-                    message.removeProperty(name, scope);
-                }
-                else
-                {
-                    // fallback to the plain wildcard for simplicity
-                    WildcardFilter filter = new WildcardFilter(expression);
-                    if (filter.accept(name))
-                    {
-                        message.removeProperty(name, scope);
-                    }
-                }
-            }
-        }
-    }
-
-    protected void renameProperties(MuleMessage message)
-    {
-        for (Map.Entry<String, String> entry : this.renameProperties.entrySet())
-        {
-            if (entry.getKey() == null)
-            {
-                logger.error("Setting Null property keys is not supported, this entry is being ignored");
-            }
-            else
-            {
-                final String key = entry.getKey();
-                String value = entry.getValue();
-
-                if (value == null)
-                {
-                    logger.error("Setting Null property values for renameProperties is not supported, this entry is being ignored");
-                }
-                else
-                {
-                    //Enable expression support for property values
-                    if (muleContext.getExpressionManager().isValidExpression(value))
-                    {
-                        Object temp = muleContext.getExpressionManager().evaluate(value, message);
-                        if (temp != null)
-                        {
-                            value = temp.toString();
-                        }
-                    }
-
-                    /* log transformation */
-                    if (logger.isDebugEnabled() && message.getProperty(key, scope) == null)
-                    {
-                        logger.debug(String.format("renaming message property '%s' to '%s'", key, value));
-                    }
-
-                    renameInScope(key, value, scope, message);
-                }
-            }
-        }
     }
 }
