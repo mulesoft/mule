@@ -8,7 +8,7 @@
     </parent>
     <artifactId>mule-module-cxf</artifactId>
     <packaging>jar</packaging>
-    <name>CXF</name>
+    <name>CXF Module</name>
     <description>A Mule module for web service connectivity using CXF.</description>
 
     <build>

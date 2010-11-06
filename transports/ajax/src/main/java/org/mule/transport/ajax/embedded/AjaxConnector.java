@@ -45,8 +45,8 @@ import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.jetty.servlet.ServletHolder;
 
 /**
- * Creates an 'embedded' Ajax server using Jetty and allows Mule to receiver and send events 
- * to browsers. The browser will need to use the <pre>mule.js</pre> class to publish and 
+ * Creates an 'embedded' Ajax server using Jetty and allows Mule to receiver and send events
+ * to browsers. The browser will need to use the <pre>mule.js</pre> class to publish and
  * subscribe events.
  *
  * Note that a {@link @RESOURCE_BASE_PROPERTY} can be set on the ajax endpoint that provides the location of any web application resources such
@@ -217,7 +217,7 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
     @Override
     public Servlet createServlet(Connector connector, ImmutableEndpoint endpoint)
     {
-        ContinuationCometdServlet servlet = new MuleAjaxServlet();
+        ContinuationCometdServlet ajaxServlet = new MuleAjaxServlet();
 
         String path = endpoint.getEndpointURI().getPath();
         if (StringUtils.isBlank(path))
@@ -235,14 +235,15 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
             Context resourceContext = new Context(handlerCollection, path, Context.NO_SECURITY);
             populateContext(resourceContext);
 
-        } else
+        }
+        else
         {
             populateContext(root);
         }
 
         //Add ajax to root
         ServletHolder holder = new ServletHolder();
-        holder.setServlet(servlet);
+        holder.setServlet(ajaxServlet);
         root.addServlet(holder, AJAX_PATH_SPEC);
 
         if (getInterval() != INT_VALUE_NOT_SET) holder.setInitParameter("interval", Integer.toString(getInterval()));
@@ -256,7 +257,7 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
 
 
         this.getHttpServer().addHandler(handlerCollection);
-        return servlet;
+        return ajaxServlet;
     }
 
     protected void populateContext(Context context)

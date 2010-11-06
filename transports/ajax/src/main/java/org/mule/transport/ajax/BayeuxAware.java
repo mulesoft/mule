@@ -1,5 +1,5 @@
 /*
- * $Id:  $
+ * $Id$
  * -------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -9,8 +9,9 @@
  */
 package org.mule.transport.ajax;
 
-import org.mortbay.cometd.AbstractBayeux;
 import org.mule.api.MuleException;
+
+import org.mortbay.cometd.AbstractBayeux;
 
 /**
  * Set on objects that have or need access to the Bayeux CometD object
