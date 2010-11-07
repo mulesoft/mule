@@ -13,11 +13,11 @@
     <description>
     This configuration uses an HTTP endpoint to receive requests.
     </description>
-    
+
     <!--
     To invoke the Hello service over HTTP, hit the following URL in your browser:
 
-        http://localhost:8888?name=Ross 
+        http://localhost:8888?name=Ross
 
     To invoke the Hello service via a Servlet, submit a web form such as:
 
@@ -42,26 +42,26 @@
     <custom-transformer name="HttpRequestToParameter" class="org.mule.transport.servlet.transformers.HttpRequestToParameter"/>
     <custom-transformer name="ObjectToString" class="org.mule.transformer.simple.ObjectToString"/>
 
-    <flow name="Hello World"> 
+    <flow name="Hello World">
         <composite-source>
             <!-- Incoming HTTP requests -->
             <inbound-endpoint address="http://localhost:8888" transformer-refs="HttpRequestToNameString" exchange-pattern="request-response">
                 <not-filter>
-                    <wildcard-filter pattern="/favicon.ico"/>   
+                    <wildcard-filter pattern="/favicon.ico"/>
                 </not-filter>
             </inbound-endpoint>
 
             <!-- Incoming Servlet requests -->
             <inbound-endpoint address="servlet://name" transformer-refs="HttpRequestToNameString" exchange-pattern="request-response">
                 <not-filter>
-                    <wildcard-filter pattern="/favicon.ico"/>   
+                    <wildcard-filter pattern="/favicon.ico"/>
                 </not-filter>
             </inbound-endpoint>
 
             <!-- Incoming VM requests -->
             <vm:inbound-endpoint path="greeter" transformer-refs="StringToNameString" exchange-pattern="request-response"/>
         </composite-source>
-        
+
         <component class="org.mule.example.hello.Greeter"/>
 
         <choice>
@@ -72,7 +72,7 @@
                 <vm:outbound-endpoint path="userErrorHandler" exchange-pattern="request-response"/>
             </when>
         </choice>
-    
+
         <!-- Route unexpected errors to separate error handler -->
         <default-service-exception-strategy>
             <vm:outbound-endpoint path="systemErrorHandler" exchange-pattern="one-way"/>
@@ -86,13 +86,13 @@
             </inbound>
         </service>
     </model>
-    
+
     <flow name="ChitChat">
-        <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString" 
+        <vm:inbound-endpoint path="chitchatter" transformer-refs="NameStringToChatString"
             responseTransformer-refs="ChatStringToString" exchange-pattern="request-response"/>
         <component class="org.mule.example.hello.ChitChatter"/>
     </flow>
-    
+
     <!-- Handle any unexpected errors. Errors could also be routed elsewhere,
         e.g. into an error file, send via email to a list, stored in a database, etc. -->
     <flow name="SystemErrorHandler">
