@@ -54,8 +54,8 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
         final MuleConfiguration config = muleContext.getConfiguration();
         final boolean containerMode = config.isContainerMode();
         final String threadPrefix = containerMode
-                                        ? String.format("[%s].%s", config.getId(), name)
-                                        : name;
+                                        ? String.format("[%s].%s.processor.async", config.getId(), name)
+                                        : String.format("%s.processor.async", name);
         AsyncInterceptingMessageProcessor asyncProcessor = new AsyncInterceptingMessageProcessor(threadingProfile,
                                                                                                  threadPrefix,
                                                                                                  config.getShutdownTimeout());
