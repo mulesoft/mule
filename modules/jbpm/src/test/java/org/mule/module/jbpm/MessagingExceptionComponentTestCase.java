@@ -11,8 +11,8 @@
 package org.mule.module.jbpm;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerException;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.util.ExceptionUtils;
@@ -26,7 +26,7 @@ public class MessagingExceptionComponentTestCase extends FunctionalTestCase
 
     public void testNoException() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.send("vm://exception", "testNoException", null);                                  
 
         // Both messages should have been sent.
@@ -36,7 +36,7 @@ public class MessagingExceptionComponentTestCase extends FunctionalTestCase
 
     public void testExceptionInService() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         
         MuleMessage response = client.send("vm://exception", "testExceptionInService", null);                      
         assertNotNull("Should have thrown an exception", response.getExceptionPayload());
@@ -49,7 +49,7 @@ public class MessagingExceptionComponentTestCase extends FunctionalTestCase
 
     public void testExceptionInTransformer() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         
         MuleMessage response = client.send("vm://exception", "testExceptionInTransformer", null);                      
         assertNotNull("Should have thrown an exception", response.getExceptionPayload());

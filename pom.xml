@@ -119,7 +119,7 @@
         <javaXmlWsVersion>2.1-1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
         <jbossTsVersion>4.2.3-SP5</jbossTsVersion>
-        <jbpmVersion>4.2</jbpmVersion>
+        <jbpmVersion>4.4</jbpmVersion>
         <jcrVersion>1.0</jcrVersion>
         <jdomVersion>1.0</jdomVersion>
         <jettyVersion>6.1.22</jettyVersion>

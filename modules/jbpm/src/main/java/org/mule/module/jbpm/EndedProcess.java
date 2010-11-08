@@ -99,6 +99,11 @@ public class EndedProcess implements ProcessInstance
         return null;
     }
 
+    public Execution getSubProcessInstance()
+    {
+        return null;
+    }
+    
     public String getState()
     {
         return ProcessInstance.STATE_ENDED;

@@ -19,6 +19,7 @@ import org.mule.util.ClassUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.jbpm.api.JbpmException;
 import org.jbpm.api.activity.ActivityExecution;
@@ -39,9 +40,9 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
     private String endpoint;
 
     /**
-     * Exchange pattern (REQUEST-RESPONSE, ONE-WAY, etc.)
+     * Exchange pattern (REQUEST-RESPONSE, ONE-WAY, etc.).  Default is REQUEST-RESPONSE.
      */
-    private MessageExchangePattern mep;
+    private MessageExchangePattern mep = MessageExchangePattern.REQUEST_RESPONSE;
     
     /** 
      * Expected response type in the case of a synchronous call; if the response payload is not assignable to this class, an exception will be thrown.
@@ -114,7 +115,7 @@ public class MuleSendActivity extends JpdlActivity implements EventListener
         log.debug("process state: " + state);        
 
         // Set process vars as properties on outgoing Mule messages.
-        for (Map.Entry<String, Object> var : execution.getVariables().entrySet())
+        for (Entry<String, ?> var : execution.getVariables().entrySet())
         {
             if (!var.getKey().startsWith(MuleProperties.PROPERTY_PREFIX))
             {

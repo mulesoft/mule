@@ -100,9 +100,10 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
      * Creates the Mule wrapper for jBPM
      * @param The already-initialized jBPM ProcessEngine.  This is useful if you use Spring to configure your jBPM instance.
      */
-    public Jbpm(ProcessEngine processEngine)
+    public Jbpm(ProcessEngine processEngine, Properties processDefinitions)
     {
         this.processEngine = processEngine;
+        this.processDefinitions = processDefinitions;
     }
 
     public void initialise()

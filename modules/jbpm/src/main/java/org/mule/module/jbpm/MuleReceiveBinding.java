@@ -40,10 +40,14 @@ public class MuleReceiveBinding extends JpdlBinding
             activity = new MuleReceiveActivity(false);
         }
 
-        // Note: The last method argument is the default value.
-        activity.setVariableName(XmlUtil.attribute(element, "var", false, parse, null));
-        activity.setEndpoint(XmlUtil.attribute(element, "endpoint", false, parse, null));
-        activity.setPayloadClass(XmlUtil.attribute(element, "type", false, parse, null));
+        if (element.hasAttribute("var"))
+            activity.setVariableName(XmlUtil.attribute(element, "var", parse));
+        
+        if (element.hasAttribute("endpoint"))
+            activity.setEndpoint(XmlUtil.attribute(element, "endpoint", parse));
+        
+        if (element.hasAttribute("type"))
+            activity.setPayloadClass(XmlUtil.attribute(element, "type", parse));
 
         return activity;
     }

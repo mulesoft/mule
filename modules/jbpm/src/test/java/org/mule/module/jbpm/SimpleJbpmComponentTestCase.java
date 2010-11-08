@@ -11,9 +11,9 @@
 package org.mule.module.jbpm;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.module.bpm.BPMS;
 import org.mule.module.bpm.Process;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.HashMap;
@@ -31,33 +31,26 @@ public class SimpleJbpmComponentTestCase extends FunctionalTestCase
 
     public void testSimpleProcess() throws Exception 
     {
+        MuleClient client = muleContext.getClient();
         BPMS bpms = muleContext.getRegistry().lookupObject(BPMS.class);
         assertNotNull(bpms);
 
-        MuleClient client = new MuleClient(muleContext);
-        try
-        {
-            // Create a new process.
-            MuleMessage response = client.send("vm://simple", "data", null);
-            Object process = response.getPayload();
+        // Create a new process.
+        MuleMessage response = client.send("vm://simple", "data", null);
+        Object process = response.getPayload();
 
-            String processId = (String)bpms.getId(process);
-            // The process should be started and in a wait state.
-            assertFalse(processId == null);
-            assertEquals("dummyState", bpms.getState(process));
+        String processId = (String)bpms.getId(process);
+        // The process should be started and in a wait state.
+        assertFalse(processId == null);
+        assertEquals("dummyState", bpms.getState(process));
 
-            // Advance the process one step.
-            Map props = new HashMap();
-            props.put(Process.PROPERTY_PROCESS_ID, processId);
-            response = client.send("vm://simple", null, props);
-            process = response.getPayload();
+        // Advance the process one step.
+        Map props = new HashMap();
+        props.put(Process.PROPERTY_PROCESS_ID, processId);
+        response = client.send("vm://simple", null, props);
+        process = response.getPayload();
 
-            // The process should have ended.
-            assertTrue(bpms.hasEnded(process));
-        }
-        finally
-        {
-            client.dispose();
-        }
+        // The process should have ended.
+        assertTrue(bpms.hasEnded(process));
     }
 }

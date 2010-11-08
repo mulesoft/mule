@@ -23,16 +23,32 @@ public class MuleSendBinding extends JpdlBinding
         super("mule-send");
     }
 
+    @Override
     public Object parseJpdl(Element element, Parse parse, JpdlParser parser)
     {
         MuleSendActivity activity = new MuleSendActivity();
 
-        // Note: The last method argument is the default value.
-        activity.setMessageExchangePattern((XmlUtil.attribute(element, "exchange-pattern", false, parse, "request-response")));
-        activity.setEndpoint(XmlUtil.attribute(element, "endpoint", true, parse));
-        activity.setPayloadExpression(XmlUtil.attribute(element, "expr", false, parse, null));
-        activity.setResponseVariableName(XmlUtil.attribute(element, "var", false, parse, null));
-        activity.setResponsePayloadClass(XmlUtil.attribute(element, "type", false, parse, null));
+        activity.setEndpoint(XmlUtil.attribute(element, "endpoint", parse));
+
+        if (element.hasAttribute("exchange-pattern"))
+        {
+            activity.setMessageExchangePattern((XmlUtil.attribute(element, "exchange-pattern", parse)));
+        }
+        
+        if (element.hasAttribute("expr"))
+        {
+        	activity.setPayloadExpression(XmlUtil.attribute(element, "expr", parse));
+        }
+        
+        if (element.hasAttribute("var"))
+        {
+        	activity.setResponseVariableName(XmlUtil.attribute(element, "var", parse));
+        }
+        
+        if (element.hasAttribute("type"))
+        {
+        	activity.setResponsePayloadClass(XmlUtil.attribute(element, "type", parse));
+        }
 
         return activity;
     }

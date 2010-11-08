@@ -11,9 +11,9 @@
 package org.mule.module.jbpm;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.module.bpm.BPMS;
 import org.mule.module.bpm.Process;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.Date;
@@ -30,41 +30,34 @@ public class VariablesComponentTestCase extends FunctionalTestCase
 
     public void testVariables() throws Exception
     {
+        MuleClient client = muleContext.getClient();
         BPMS bpms = muleContext.getRegistry().lookupObject(BPMS.class);
         assertNotNull(bpms);
 
-        MuleClient client = new MuleClient(muleContext);
-        try
-        {
-            Map<String, Object> props = new HashMap<String, Object>();
-            props.put("foo", "bar");
-            MuleMessage response = client.send("vm://variables", "data", props);
-            String processId = (String)bpms.getId(response.getPayload());
-            assertNotNull(processId);
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("foo", "bar");
+        MuleMessage response = client.send("vm://variables", "data", props);
+        String processId = (String)bpms.getId(response.getPayload());
+        assertNotNull(processId);
 
-            response = client.request("vm://queueA", 3000);
-            assertNotNull(response);
-            assertEquals("bar", response.getInboundProperty("foo"));
-            assertEquals(0.75, response.getInboundProperty("fraction"));
+        response = client.request("vm://queueA", 3000);
+        assertNotNull(response);
+        assertEquals("bar", response.getInboundProperty("foo"));
+        assertEquals(0.75, response.getInboundProperty("fraction"));
 
-            // Advance the process
-            props = new HashMap<String, Object>();
-            props.put(Process.PROPERTY_PROCESS_ID, processId);
-            props.put("straw", "berry");
-            props.put("time", new Date());
-            response = client.send("vm://variables", "data", props);
-            
-            response = client.request("vm://queueB", 3000);
-            assertNotNull(response);
-            assertEquals("bar", response.getInboundProperty("foo"));
-            assertEquals(0.75, response.getInboundProperty("fraction"));
-            assertEquals("berry", response.getInboundProperty("straw"));
-            final Object o = response.getInboundProperty("time");
-            assertTrue(o instanceof Date);
-        }
-        finally
-        {
-            client.dispose();
-        }
+        // Advance the process
+        props = new HashMap<String, Object>();
+        props.put(Process.PROPERTY_PROCESS_ID, processId);
+        props.put("straw", "berry");
+        props.put("time", new Date());
+        response = client.send("vm://variables", "data", props);
+        
+        response = client.request("vm://queueB", 3000);
+        assertNotNull(response);
+        assertEquals("bar", response.getInboundProperty("foo"));
+        assertEquals(0.75, response.getInboundProperty("fraction"));
+        assertEquals("berry", response.getInboundProperty("straw"));
+        final Object o = response.getInboundProperty("time");
+        assertTrue(o instanceof Date);
     }
 }

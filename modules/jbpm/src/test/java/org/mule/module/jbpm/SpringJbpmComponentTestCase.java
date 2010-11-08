@@ -20,36 +20,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Tests the connector against jBPM with a process which generates 
- * a Mule message and processes its response. jBPM is instantiated by Spring. 
+ * Tests jBPM component with a simple process.  The ProcessEngine is built by Spring and injected into the Mule wrapper.
  */
-public class MessagingJbpmComponentTestCase extends FunctionalTestCase
+public class SpringJbpmComponentTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
-        return "jbpm-component-functional-test.xml";
+        return "spring-jbpm-component.xml";
     }
 
-    public void testSendMessageProcess() throws Exception
+    public void testSimpleProcess() throws Exception 
     {
         MuleClient client = muleContext.getClient();
         BPMS bpms = muleContext.getRegistry().lookupObject(BPMS.class);
         assertNotNull(bpms);
 
         // Create a new process.
-        MuleMessage response = client.send("vm://message", "data", null);
+        MuleMessage response = client.send("vm://simple", "data", null);
         Object process = response.getPayload();
-        assertTrue(bpms.isProcess(process)); 
 
         String processId = (String)bpms.getId(process);
-        // The process should have sent a synchronous message, followed by an asynchronous message and now be in a wait state.
+        // The process should be started and in a wait state.
         assertFalse(processId == null);
-        assertEquals("waitForResponse", bpms.getState(process));
+        assertEquals("dummyState", bpms.getState(process));
 
         // Advance the process one step.
-        Map props = new HashMap<String, Object>();
+        Map props = new HashMap();
         props.put(Process.PROPERTY_PROCESS_ID, processId);
-        response = client.send("vm://message", "data", props);
+        response = client.send("vm://simple", null, props);
         process = response.getPayload();
 
         // The process should have ended.

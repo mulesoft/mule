@@ -3,10 +3,10 @@
 
 <!--
 NOTE: This file is essentially the same as the default one that comes 
-with jbpm 4.2. However, because hibernate defaults derby blob columns to be 
+with jbpm. However, because hibernate defaults derby blob columns to be 
 only 255 bytes, jbpm tests fail because the column is too short. 
 
-The only difference is on line 209 - 
+The only difference is the following: 
 
     Original version:
     <property name="blob" type="blob"><column name="BLOB_VALUE_"/></property>
@@ -14,7 +14,6 @@ The only difference is on line 209 -
     New version:
     <property name="blob" type="blob"><column name="BLOB_VALUE_" length="10000000"/></property>
 -->
-
 
 <hibernate-mapping package="org.jbpm.pvm.internal.model" default-access="field">
 
@@ -35,7 +34,7 @@ The only difference is on line 209 -
 
   <!-- ### EXECUTION ############################################# -->
   <class name="ExecutionImpl" 
-         table="JBPM_EXECUTION"
+         table="JBPM4_EXECUTION"
          discriminator-value="pvm">
     <id name="dbid" column="DBID_">
       <generator class="assigned" />
@@ -121,7 +120,7 @@ The only difference is on line 209 -
   </class>
 
   <!-- ### VARIABLE ####################################################### -->
-  <class name="org.jbpm.pvm.internal.type.Variable" abstract="true" discriminator-value=" " table="JBPM_VARIABLE">
+  <class name="org.jbpm.pvm.internal.type.Variable" abstract="true" discriminator-value=" " table="JBPM4_VARIABLE">
     <!-- discriminator values:
     date   : org.jbpm.pvm.internal.type.variable.DateVariable
     double : org.jbpm.pvm.internal.type.variable.DoubleVariable
@@ -201,7 +200,7 @@ The only difference is on line 209 -
   </subclass>
   
   <!-- ### LOB ############################################################ -->
-  <class name="org.jbpm.pvm.internal.lob.Lob" table="JBPM_LOB">
+  <class name="org.jbpm.pvm.internal.lob.Lob" table="JBPM4_LOB">
     <id name="dbid" column="DBID_">
       <generator class="assigned" />
     </id>
@@ -215,14 +214,14 @@ The only difference is on line 209 -
     -->
   </class>
   
-  <class name="org.jbpm.pvm.internal.job.JobImpl" table="JBPM_JOB" discriminator-value="Job">
+  <class name="org.jbpm.pvm.internal.job.JobImpl" table="JBPM4_JOB" discriminator-value="Job">
     <id name="dbid" column="DBID_">
       <generator class="assigned" />
     </id>
     <discriminator column="CLASS_" />
     <version name="dbversion" column="DBVERSION_" />
 
-    <property name="duedate" column="DUEDATE_" type="timestamp" index="IDX_JOBDUEDATE"  />
+    <property name="dueDate" column="DUEDATE_" type="timestamp" index="IDX_JOBDUEDATE"  />
     <property name="state" column="STATE_" />
     <property name="isExclusive" column="ISEXCLUSIVE_" />
     <property name="lockOwner" column="LOCKOWNER_" />
@@ -262,8 +261,11 @@ The only difference is on line 209 -
       <property name="signalName" column="SIGNAL_" />
       <property name="eventName" column="EVENT_" />
       <property name="repeat" column="REPEAT_" />
+      
+      <subclass name="org.jbpm.pvm.internal.job.StartProcessTimer" discriminator-value="PeriodicStartProcess" />
+    
     </subclass>
-     
+    
   </class>
 
   <!-- ### HibernatePvmDbSession QUERIES ################################## -->
@@ -272,7 +274,7 @@ The only difference is on line 209 -
     <![CDATA[
      select t
      from org.jbpm.pvm.internal.job.TimerImpl as t
-     order by duedate asc
+     order by dueDate asc
     ]]>
   </query>
 
@@ -288,7 +290,7 @@ The only difference is on line 209 -
      select job
      from org.jbpm.pvm.internal.job.JobImpl as job
      where job.retries = 0 
-     order by duedate asc
+     order by dueDate asc
     ]]>
   </query>
 
@@ -297,19 +299,11 @@ The only difference is on line 209 -
     <![CDATA[
      select job
      from org.jbpm.pvm.internal.job.JobImpl as job
-     where ( ( (job.lockExpirationTime is null)
-               or (job.lockExpirationTime <= :now) 
-             )
-             and 
-             ( (job.duedate is null)
-               or (job.duedate <= :now) 
-             ) 
-             and 
-             ( job.retries > 0 ) 
-             and 
-             ( job.state != 'suspended' ) 
-           )
-     order by job.duedate asc
+     where (job.lockExpirationTime is null or job.lockExpirationTime <= :now)
+       and (job.dueDate is null or job.dueDate <= :now) 
+       and job.retries > 0 
+       and job.state != 'suspended' 
+     order by job.dueDate asc
     ]]>
   </query>
 
@@ -322,10 +316,8 @@ The only difference is on line 209 -
        and job.isExclusive = true 
        and job.retries > 0 
        and job.state != 'suspended'
-       and ( (job.duedate is null)
-             or (job.duedate <= :now) 
-           )
-     order by job.duedate asc
+       and (job.dueDate is null or job.dueDate <= :now)
+     order by job.dueDate asc
     ]]>
   </query>
   
@@ -336,7 +328,7 @@ The only difference is on line 209 -
      where job.lockOwner is null
        and job.retries > 0 
        and job.state != 'suspended'
-     order by job.duedate asc
+     order by job.dueDate asc
     ]]>
   </query>
   
@@ -368,4 +360,12 @@ The only difference is on line 209 -
     ]]>
   </query>
 
+  <query name="findProcessInstanceIds">
+    <![CDATA[
+     select processInstance.id
+     from org.jbpm.pvm.internal.model.ExecutionImpl as processInstance
+     where processInstance.processDefinitionId = :processDefinitionId
+       and processInstance.parent is null
+    ]]>
+  </query>
 </hibernate-mapping>
