@@ -119,57 +119,6 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
             throw new DefaultMuleException(e);
         }
     }
-    
-    protected MuleMessage createMessageCopy(MuleMessage message, boolean reinitialize) throws Exception
-    {
-        //Copy message, but put all outbound properties and attachments on inbound
-        //We ignore inbound and invocation scopes since the VM receiver needs to behave the
-        //same way as any other receiver in Mule and would only receive inbound headers and attachments
-        Map<String, DataHandler> attachments = new HashMap<String, DataHandler>(3);
-        for (String name : message.getOutboundAttachmentNames())
-        {
-            attachments.put(name, message.getOutboundAttachment(name));
-        }
-
-        Map<String, Object> properties = new HashMap<String, Object>(3);
-        for (String name : message.getOutboundPropertyNames())
-        {
-            properties.put(name, message.getOutboundProperty(name));
-        }
-
-        DefaultMuleMessage newMessage =  new DefaultMuleMessage(message.getPayload(), message, connector.getMuleContext());
-        if (reinitialize)
-        {
-            newMessage.clearProperties(PropertyScope.INBOUND);
-            newMessage.clearProperties(PropertyScope.INVOCATION);
-            newMessage.clearProperties(PropertyScope.OUTBOUND);
-        }
-
-        for (String s : properties.keySet())
-        {
-            newMessage.setInboundProperty(s, properties.get(s));
-        }
-
-        if (reinitialize)
-        {
-            for (String s : newMessage.getOutboundAttachmentNames())
-            {
-                newMessage.removeOutboundAttachment(s);
-            }
-        }
-
-        for (String s : attachments.keySet())
-        {
-            newMessage.addInboundAttachment(s, attachments.get(s));
-        }
-
-        newMessage.setCorrelationId(message.getCorrelationId());
-        newMessage.setCorrelationGroupSize(message.getCorrelationGroupSize());
-        newMessage.setCorrelationSequence(message.getCorrelationSequence());
-        newMessage.setReplyTo(message.getReplyTo());
-        newMessage.setEncoding(message.getEncoding());
-        return newMessage;
-    }
 
     /**
      * It's impossible to process all messages in the receive transaction

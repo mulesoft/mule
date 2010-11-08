@@ -10,6 +10,7 @@
 
 package org.mule.module.cxf.support;
 
+import org.apache.cxf.message.Exchange;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.module.cxf.CxfConstants;
@@ -45,7 +46,7 @@ public class MuleProtocolHeadersOutInterceptor
         {
             return;
         }
-        extractAndSet(message, muleMsg, Message.CONTENT_TYPE, HttpConstants.HEADER_CONTENT_TYPE);
+        extractAndSetContentType(message, muleMsg);
         extractAndSet(message, muleMsg, Message.RESPONSE_CODE, HttpConnector.HTTP_STATUS_PROPERTY);
 
         String method = (String) message.get(Message.HTTP_REQUEST_METHOD);
@@ -81,6 +82,36 @@ public class MuleProtocolHeadersOutInterceptor
         {
             muleMsg.setOutboundProperty(muleHeader, val);
         }
+    }
+
+    private void extractAndSetContentType(Message message, MuleMessage muleMsg)
+    {
+        String ct = (String) message.get(Message.CONTENT_TYPE);
+        if (ct != null)
+        {
+            String encoding = getEncoding(message);
+            if (ct.indexOf("charset") == -1)
+            {
+                ct = ct + "; charset=" + encoding;
+            }
+            muleMsg.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, ct);
+        }
+    }
+
+    private String getEncoding(Message message)
+    {
+        Exchange ex = message.getExchange();
+        String encoding = (String)message.get(Message.ENCODING);
+        if (encoding == null && ex.getInMessage() != null) {
+            encoding = (String) ex.getInMessage().get(Message.ENCODING);
+            message.put(Message.ENCODING, encoding);
+        }
+
+        if (encoding == null) {
+            encoding = "UTF-8";
+            message.put(Message.ENCODING, encoding);
+        }
+        return encoding;
     }
 
     private String format(List<String> value)

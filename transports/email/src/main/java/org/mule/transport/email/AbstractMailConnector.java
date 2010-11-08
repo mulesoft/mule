@@ -111,8 +111,16 @@ public abstract class AbstractMailConnector extends AbstractConnector
         }
 
         EndpointURI uri = endpoint.getEndpointURI();
-        String user = URLDecoder.decode((uri.getUser()==null ? StringUtils.EMPTY : uri.getUser()), endpoint.getEncoding());
-        String pass = URLDecoder.decode((uri.getPassword()==null ? StringUtils.EMPTY : uri.getPassword()), endpoint.getEncoding());
+        String user = uri.getUser();
+        if (user != null)
+        {
+            user = URLDecoder.decode(user, endpoint.getEncoding());
+        }
+        String pass = uri.getPassword();
+        if (pass != null)
+        {
+            pass = URLDecoder.decode(pass, endpoint.getEncoding());
+        }
 
         return new URLName(uri.getScheme(), uri.getHost(), uri.getPort(), inbox, user, pass);
     }

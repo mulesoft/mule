@@ -9,6 +9,7 @@
  */
 package org.mule.module.json.transformers;
 
+import org.mule.api.annotations.ContainsTransformerMethods;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.Payload;
@@ -27,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+@ContainsTransformerMethods
 public class JsonCustomTransformer
 {
     //This is used to test other source types and injecting an ObjectMapper instance

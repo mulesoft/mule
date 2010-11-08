@@ -37,22 +37,43 @@ import org.apache.commons.logging.LogFactory;
 public class ObjectToMimeMessage extends StringToEmailMessage
 {
     private Log logger = LogFactory.getLog(getClass());
-    
+    private boolean useInboundAttachments = true;
+    private boolean useOutboundAttachments = true;
+
     @Override
     protected void setContent(Object payload, Message msg, String contentType, MuleMessage message)
         throws Exception
     {
-        if (message.getInboundAttachmentNames().size() > 0)
+        boolean transformInboundAttachments = useInboundAttachments && message.getInboundAttachmentNames().size() > 0;
+        boolean transformOutboundAttachments = useOutboundAttachments && message.getOutboundAttachmentNames().size() > 0;
+        if (transformInboundAttachments || transformOutboundAttachments)
         {
             // The content type must be multipart/mixed
             MimeMultipart multipart = new MimeMultipart("mixed");
             multipart.addBodyPart(getPayloadBodyPart(message.getPayload(), contentType));
-            for (String name : message.getInboundAttachmentNames())
+            if (transformInboundAttachments)
             {
-                BodyPart part = getBodyPartForAttachment(message.getInboundAttachment(name), name);
-                // Check message props for extra headers
-                addBodyPartHeaders(part, name, message);
-                multipart.addBodyPart(part);
+                for (String name : message.getInboundAttachmentNames())
+                {
+                    // Let outbound attachments override inbound ones
+                    if (!transformOutboundAttachments || message.getOutboundAttachment(name) == null)
+                    {
+                        BodyPart part = getBodyPartForAttachment(message.getInboundAttachment(name), name);
+                        // Check message props for extra headers
+                        addBodyPartHeaders(part, name, message);
+                        multipart.addBodyPart(part);
+                    }
+                }
+            }
+            if (transformOutboundAttachments)
+            {
+                for (String name : message.getOutboundAttachmentNames())
+                {
+                    BodyPart part = getBodyPartForAttachment(message.getOutboundAttachment(name), name);
+                    // Check message props for extra headers
+                    addBodyPartHeaders(part, name, message);
+                    multipart.addBodyPart(part);
+                }
             }
             // the payload must be set to the constructed MimeMultipart message
             payload = multipart;
@@ -121,5 +142,21 @@ public class ObjectToMimeMessage extends StringToEmailMessage
         part.setDataHandler(handler);
         part.setDescription("Payload");
         return part;
+    }
+
+    /**
+     * Set whether inbound attachments should be transformed into MIME parts
+     */
+    public void setUseInboundAttachments(boolean useInboundAttachments)
+    {
+        this.useInboundAttachments = useInboundAttachments;
+    }
+
+    /**
+     * Set whether outbound attachments should be transformed into MIME parts
+     */
+    public void setUseOutboundAttachments(boolean useOutboundAttachments)
+    {
+        this.useOutboundAttachments = useOutboundAttachments;
     }
 }

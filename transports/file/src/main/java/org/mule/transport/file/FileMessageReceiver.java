@@ -102,12 +102,12 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         {
             connectorIsAutoDelete = ((FileConnector) connector).isAutoDelete();
         }
-        boolean endpointHasResponse = endpoint.getExchangePattern().hasResponse();
+
         boolean messageFactoryConsumes = (createMuleMessageFactory() instanceof FileContentsMuleMessageFactory);
         
-        if (connectorIsAutoDelete && !endpointHasResponse && !messageFactoryConsumes)
+        if (connectorIsAutoDelete && !messageFactoryConsumes)
         {
-            logger.warn(FileMessages.connectorAutodeletesWithOneWayEndpoint(connector, endpoint).getMessage());
+            logger.warn(FileMessages.connectorAutodeletesWithoutConsuming(connector).getMessage());
         }
     }
 

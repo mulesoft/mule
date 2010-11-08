@@ -11,13 +11,16 @@
 package org.mule.module.cxf;
 
 import org.mule.api.MuleMessage;
+import org.mule.config.i18n.LocaleMessageHandler;
 import org.mule.module.client.MuleClient;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.http.HttpConstants;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -52,6 +55,20 @@ public class CxfBasicTestCase extends FunctionalTestCase
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         MuleMessage result = client.send("http://localhost:63081/services/Echo", xml, props);
         assertTrue(result.getPayloadAsString().contains("Hello!"));
+        String ct = result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "");
+        assertEquals("text/xml; charset=UTF-8", ct);
+    }
+
+    public void testEchoServiceEncoding() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        String message = LocaleMessageHandler.getString("test-data",
+            Locale.JAPAN, "CxfBasicTestCase.testEchoServiceEncoding", new Object[]{});
+        MuleMessage result = client.send("cxf:http://localhost:63081/services/Echo?method=echo", message, null);
+        String ct = result.getStringProperty(HttpConstants.HEADER_CONTENT_TYPE, "");
+
+        assertEquals(message, result.getPayload());
+        assertEquals("text/xml; charset=UTF-8", ct);
     }
 
     public void testEchoWsdl() throws Exception

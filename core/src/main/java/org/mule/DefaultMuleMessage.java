@@ -1686,10 +1686,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             newMessage.setInboundProperty(s, properties.get(s));
         }
 
-        for (String s : newMessage.getOutboundAttachmentNames())
-        {
-            newMessage.removeOutboundAttachment(s);
-        }
+        newMessage.inboundAttachments.clear();
+        newMessage.outboundAttachments.clear();
 
         for (String s : attachments.keySet())
         {

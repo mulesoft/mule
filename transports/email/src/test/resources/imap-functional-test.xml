@@ -10,7 +10,7 @@
        http://www.mulesoft.org/schema/mule/imap http://www.mulesoft.org/schema/mule/imap/3.0/mule-imap.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd">
 
-    <imap:connector name="imapConnector"/>
+    <imap:connector name="imapConnector" />
     <vm:connector name="vmConnector"/>
 
     <model name="test">

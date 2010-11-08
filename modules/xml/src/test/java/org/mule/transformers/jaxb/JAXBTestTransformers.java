@@ -9,6 +9,7 @@
  */
 package org.mule.transformers.jaxb;
 
+import org.mule.api.annotations.ContainsTransformerMethods;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.Payload;
@@ -33,6 +34,7 @@ import org.w3c.dom.Node;
 /**
  * Explicit JAXB transformers used to test that JAXB transforms can be intercepted
  */
+@ContainsTransformerMethods
 public class JAXBTestTransformers
 {
 

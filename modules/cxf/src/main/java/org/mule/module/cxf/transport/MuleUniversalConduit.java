@@ -291,9 +291,14 @@ public class MuleUniversalConduit extends AbstractConduit
             {
                 Message inMessage = new MessageImpl();
 
+                String encoding = result.getEncoding();
+                inMessage.put(Message.ENCODING, encoding);
                 String contentType = result.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+                if (encoding != null && contentType.indexOf("charset") < 0)
+                {
+                    contentType += "; charset=" + result.getEncoding();
+                }
                 inMessage.put(Message.CONTENT_TYPE, contentType);
-                inMessage.put(Message.ENCODING, result.getEncoding());
                 inMessage.put(CxfConstants.MULE_EVENT, resEvent);
                 inMessage.setContent(InputStream.class, is);
                 inMessage.setExchange(m.getExchange());

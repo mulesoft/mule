@@ -132,7 +132,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         String sessionId = UUID.getUUID();
         Object payload = buildGetRequestWithSession(sessionId);
         MuleMessage message = factory.create(payload, encoding);
-        assertEquals(sessionId, message.getUniqueId());
+        assertEquals(sessionId, message.<Object>getInboundProperty(ServletConnector.SESSION_ID_PROPERTY_KEY));
     }
     
     public void testCharacterEncodingFromHttpRequest() throws Exception

@@ -105,7 +105,27 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:element name="object-to-mime-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
+    <xsd:complexType name="transformMessageWithAttachmentsType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractTransformerType">
+            <xsd:attribute name="useInboundAttachments" type="mule:substitutableBoolean" default="true">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        Whether to transform inbound attachment in the input message into MIME parts.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+                <xsd:attribute name="useOutboundAttachments" type="mule:substitutableBoolean" default="true">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether to transform outbound attachment in the input message into MIME parts.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:element name="object-to-mime-transformer" type="transformMessageWithAttachmentsType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
                 Converts an object to MIME format.

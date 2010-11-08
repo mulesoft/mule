@@ -40,6 +40,12 @@ public class ServletConnector extends AbstractConnector
     public static final String SERVLET = "servlet";
 
     /**
+     * This property name is used to store the session id {@link HttpServletRequest} to
+     * the {@link MuleMessage}
+     */
+    public static final String SESSION_ID_PROPERTY_KEY = MuleProperties.PROPERTY_PREFIX + "SESSION_ID";
+
+    /**
      * This property name is used to store the character encoding of the {@link HttpServletRequest} to
      * the {@link MuleMessage}
      */

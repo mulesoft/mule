@@ -17,7 +17,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to mark a method on a class as a Mule Transformer, which means it will be made available in the Mule container.
+ * Used to mark a that a class contains methods which are Mule Transformer, which means it will be made available in the Mule container.
  * Transformers are used to convert one object type to another.  Mule uses them to provide automatic conversion of Java types
  * and now support Mime type conversion too.
  *
@@ -27,6 +27,7 @@ import java.lang.annotation.Target;
  *
  * There are some rules to follow when writing a transformer method -
  * <ol>
+ * <li>The method's declaring class must be annotated with ContainsTransformerMethods</li>
  * <li>The annotation must appear on a concrete method, not on an abstract or interface method</li>
  * <li>The method must be public</li>
  * <li>The method must have a non-void return type</li>

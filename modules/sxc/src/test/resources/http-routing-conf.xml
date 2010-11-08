@@ -16,16 +16,16 @@
     
         <service name="proxy">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/proxy" exchange-pattern="request-response"/>
+                <inbound-endpoint address="http://localhost:${port1}/proxy" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <sxc:filtering-router>
-                    <outbound-endpoint address="http://localhost:63081/echo" exchange-pattern="request-response"/>
+                    <outbound-endpoint address="http://localhost:${port1}/echo" exchange-pattern="request-response"/>
                     <sxc:filter pattern="//invalid"/>
                     <sxc:namespace prefix="test" uri="http://foo"/>
                 </sxc:filtering-router>
                 <sxc:filtering-router>
-                    <outbound-endpoint address="http://localhost:63081/echo" exchange-pattern="request-response">
+                    <outbound-endpoint address="http://localhost:${port1}/echo" exchange-pattern="request-response">
                         <custom-transformer class="org.mule.module.xml.transformer.XmlToOutputHandler"/>
                     </outbound-endpoint>
                     <sxc:filter pattern="//test:purchaseOrder[@country]"/>
@@ -33,7 +33,7 @@
                 </sxc:filtering-router>
                 
                 <sxc:filtering-router>
-                    <outbound-endpoint address="http://localhost:63081/echo" exchange-pattern="request-response">
+                    <outbound-endpoint address="http://localhost:${port1}/echo" exchange-pattern="request-response">
                         <custom-transformer class="org.mule.module.xml.transformer.XmlToOutputHandler"/>
                     </outbound-endpoint>
                     <sxc:filter pattern="//purchaseOrder[@country]"/>
@@ -43,7 +43,7 @@
         
         <service name="echo">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/echo" exchange-pattern="request-response"/>
+                <inbound-endpoint address="http://localhost:${port1}/echo" exchange-pattern="request-response"/>
             </inbound>
             <echo-component/>
         </service>

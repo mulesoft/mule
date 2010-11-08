@@ -50,6 +50,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         super.doSetUp();
         session = MuleTestUtils.getMockSession();
         router = new ChainingRouter();
+        router.setMuleContext(muleContext);
 
         DefaultOutboundRouterCollection messageRouter = new DefaultOutboundRouterCollection();
         messageRouter.setCatchAllStrategy(new LoggingCatchAllStrategy());

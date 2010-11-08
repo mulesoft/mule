@@ -11,6 +11,7 @@ package org.mule.config.transformer;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.annotations.ContainsTransformerMethods;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.registry.PreInitProcessor;
@@ -48,7 +49,12 @@ public class AnnotatedTransformerObjectProcessor implements PreInitProcessor, Mu
 
     public Object process(Object object)
     {
-        List<AnnotationMetaData> annos = AnnotationUtils.getMethodAnnotations(object.getClass(), Transformer.class);
+        Class<? extends Object> clazz = object.getClass();
+        if (clazz.getAnnotation(ContainsTransformerMethods.class) == null)
+        {
+            return object;
+        }
+        List<AnnotationMetaData> annos = AnnotationUtils.getMethodAnnotations(clazz, Transformer.class);
 
         if (annos.size() == 0)
         {

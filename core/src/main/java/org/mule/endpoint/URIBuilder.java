@@ -208,7 +208,7 @@ public class URIBuilder
         {
             try
             {
-                EndpointURI endpointUri = new MuleEndpointURI(getConstructor(), muleContext);
+                EndpointURI endpointUri = new MuleEndpointURI(getConstructor(), getEncodedConstructor(), muleContext);
                 cache.compareAndSet(null, endpointUri);
             }
             catch (EndpointException e)
@@ -224,12 +224,17 @@ public class URIBuilder
      */
     protected String getConstructor()
     {
+        return URLDecoder.decode(getEncodedConstructor());
+    }
+
+    protected String getEncodedConstructor()
+    {
         StringBuffer buffer = new StringBuffer();
         appendMeta(buffer);
         OrderedQueryParameters uriQueries = appendAddress(buffer);
         uriQueries.override(queryMap);
         buffer.append(uriQueries.toString());
-        return URLDecoder.decode(buffer.toString());
+        return buffer.toString();
     }
 
     private void appendMeta(StringBuffer buffer)

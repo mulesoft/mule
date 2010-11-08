@@ -16,7 +16,6 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class PropertiesTestCase extends FunctionalTestCase
@@ -35,19 +34,22 @@ public class PropertiesTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
 
         Map<String, FunctionalTestComponent> components = muleContext.getRegistry().lookupByType(FunctionalTestComponent.class);
-        Map properties = new HashMap();
-        properties.put("outbound1", "yes");
-        properties.put("outbound2", "no");
-        MuleMessage response = client.send("vm://in", "OK", properties);
+        MuleMessage msg1 = createOutboundMessage();
+        MuleMessage response = client.send("vm://in", msg1);
         assertEquals(response.getPayloadAsString(), "OK(success)");
         assertNull(response.getInboundProperty("outbound1"));
         assertNull(response.getInboundProperty("outbound2"));
         assertNull(response.getOutboundProperty("outbound1"));
         assertNull(response.getOutboundProperty("outbound2"));
+        assertNull(response.<Object>getInvocationProperty("invocation1"));
+        assertNull(response.<Object>getInvocationProperty("invocation2"));
         assertEquals("123", response.getInboundProperty("outbound3"));
         assertEquals("456", response.getInboundProperty("outbound4"));
+        assertNull(response.<Object>getInvocationProperty("invocation3"));
+        assertNull(response.<Object>getInvocationProperty("invocation4"));
 
-        client.dispatch("vm://inQueue", "OK", properties);
+        MuleMessage msg2 = createOutboundMessage();
+        client.dispatch("vm://inQueue", msg2);
         Thread.sleep(1000);
         response = client.request("vm://outQueue", 0);
         assertEquals(response.getPayloadAsString(), "OK");
@@ -55,19 +57,34 @@ public class PropertiesTestCase extends FunctionalTestCase
         assertEquals("no", response.getInboundProperty("outbound2"));
         assertNull(response.getOutboundProperty("outbound1"));
         assertNull(response.getOutboundProperty("outbound2"));
+        assertNull(response.<Object>getInvocationProperty("invocation1"));
+        assertNull(response.<Object>getInvocationProperty("invocation2"));
+
+    }
+
+    private MuleMessage createOutboundMessage()
+    {
+        MuleMessage msg = new DefaultMuleMessage("OK", muleContext);
+        msg.setOutboundProperty("outbound1", "yes");
+        msg.setOutboundProperty("outbound2", "no");
+        msg.setInvocationProperty("invocation1", "ja");
+        msg.setInvocationProperty("invocation2", "nein");
+        return msg;
     }
 
     public static class Component
     {
         /**
-         * Create a message with outbound properties.  These should have been moved to the inbound scope
-         * by the time the message is received
+         * Create a message with outbound and invocation properties.  These should have been moved to the inbound scope
+         * by the time the message is received.  Invocation properties should have been removed
          */
         public MuleMessage process(Object payload)
         {
             MuleMessage msg = new DefaultMuleMessage(payload + "(success)", muleContext);
             msg.setOutboundProperty("outbound3", "123");
             msg.setOutboundProperty("outbound4", "456");
+            msg.setInvocationProperty("invocation3", "UVW");
+            msg.setInvocationProperty("invocation4", "XYZ");
             return msg;
         }
     }

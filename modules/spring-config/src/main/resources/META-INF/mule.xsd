@@ -4352,7 +4352,35 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
+    <xsd:complexType name="processorWithAtLeastOneTargetType" >
+        <xsd:complexContent>
+            <xsd:extension base="abstractRoutingMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="first-successful" substitutionGroup="abstract-routing-message-processor"
+                 type="processorWithAtLeastOneTargetType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Sends a message to a list of message processors until one processes it successfully
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="round-robin" substitutionGroup="abstract-routing-message-processor"
+                 type="processorWithAtLeastOneTargetType">
+        <xsd:annotation>
+            <xsd:documentation>
+                Send each message received to the next message processor in the circular list of targets
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:element name="recipient-list" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>

@@ -122,6 +122,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
         }
     }
 
+    @ContainsTransformerMethods
     public class Transformers
     {
         @Transformer

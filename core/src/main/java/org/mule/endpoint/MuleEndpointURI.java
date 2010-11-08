@@ -70,6 +70,7 @@ public class MuleEndpointURI implements EndpointURI
     private String userInfo;
     private String schemeMetaInfo;
     private String resourceInfo;
+    private boolean dynamic;
     private transient MuleContext muleContext;
 
     MuleEndpointURI(String address,
@@ -123,39 +124,89 @@ public class MuleEndpointURI implements EndpointURI
         this.filterAddress = filterAddress;
     }
 
+    public MuleEndpointURI(String uri, MuleContext muleContext) throws EndpointException
+    {
+        this(uri, null, muleContext);       
+    }
+
     /**
      * Creates but does not initialize the endpoint URI.  It is up to the caller
      * to call initialise() at some point.
      */
-    public MuleEndpointURI(String uri, MuleContext muleContext) throws EndpointException
+    public MuleEndpointURI(String uri, String encodedUri, MuleContext muleContext) throws EndpointException
+    {
+        this.muleContext = muleContext;
+        uri = preprocessUri(uri);
+        String startUri = uri;
+        uri = convertExpressionDelimiters(uri, "#");
+        uri = convertExpressionDelimiters(uri, "$");
+
+        if (uri.indexOf("#[") >= 0)
+        {
+            address = uri;
+            dynamic = true;
+        }
+        else
+        {
+            try
+            {
+                this.uri = new URI((encodedUri != null && uri.equals(startUri)) ? preprocessUri(encodedUri) : uri);
+            }
+            catch (URISyntaxException e)
+            {
+                throw new MalformedEndpointException(uri, e);
+            }
+            this.userInfo = this.uri.getRawUserInfo();
+        }
+    }
+
+    private String convertExpressionDelimiters(String uri, String startChar)
+    {
+        //Allow Expressions to be embedded
+        int uriLength = uri.length();
+        for (int index = 0; index < uriLength; )
+        {
+            index = uri.indexOf(startChar + "{", index);
+            if (index < 0)
+            {
+                break;
+            }
+            int braceCount = 1;
+            for (int seek = index + 2; seek < uriLength; seek++)
+            {
+                char c = uri.charAt(seek);
+                if (c == '{')
+                {
+                    braceCount++;
+                }
+                else if (c == '}')
+                {
+                    if (--braceCount == 0)
+                    {
+                        uri = uri.substring(0, index) + startChar + "[" + uri.substring(index + 2, seek) + "]" + uri.substring(seek+1);
+                        break;
+                    }
+                }
+            }
+            index += 2;
+        }
+        return uri;
+    }
+
+    protected String preprocessUri(String uri) throws MalformedEndpointException
     {
         uri = uri.trim().replaceAll(" ", "%20");
-        //Allow Expressions to be embedded
-        uri = uri.replaceAll("\\{", "\\[");
-        uri = uri.replaceAll("\\}", "\\]");
-
         if (!validateUrl(uri))
         {
             throw new MalformedEndpointException(uri);
         }
-        this.muleContext = muleContext;
-
-        try
+        schemeMetaInfo = retrieveSchemeMetaInfo(uri);
+        if (schemeMetaInfo != null)
         {
-            schemeMetaInfo = retrieveSchemeMetaInfo(uri);
-            if (schemeMetaInfo != null)
-            {
-                uri = uri.replaceFirst(schemeMetaInfo + ":", "");
-            }
-            this.uri = new URI(uri);
-            this.userInfo = this.uri.getRawUserInfo();
+            uri = uri.replaceFirst(schemeMetaInfo + ":", "");
         }
-        catch (URISyntaxException e)
-        {
-            throw new MalformedEndpointException(uri, e);
-        }
+        return uri;
     }
-
 
     public void initialise() throws InitialisationException
     {
@@ -279,7 +330,17 @@ public class MuleEndpointURI implements EndpointURI
 
     public String getFullScheme()
     {
-        return (schemeMetaInfo == null ? uri.getScheme() : schemeMetaInfo + ':' + uri.getScheme());
+        String scheme;
+        if (dynamic)
+        {
+            int colon = address.indexOf(':');
+            scheme = address.substring(0, colon);
+        }
+        else
+        {
+            scheme = uri.getScheme();
+        }
+        return (schemeMetaInfo == null ? scheme : schemeMetaInfo + ':' + scheme);
     }
 
     public boolean isAbsolute()
@@ -442,6 +503,11 @@ public class MuleEndpointURI implements EndpointURI
     public MuleContext getMuleContext()
     {
         return muleContext;
+    }
+
+    public boolean isDynamic()
+    {
+        return dynamic;
     }
 
     @Override

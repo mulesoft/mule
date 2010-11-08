@@ -12,13 +12,14 @@ package org.mule.module.sxc;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 
 import java.io.ByteArrayOutputStream;
 
 import org.apache.commons.io.IOUtils;
 
-public class HttpRoutingTestCase extends FunctionalTestCase
+public class HttpRoutingTestCase extends DynamicPortTestCase 
 {
     int finished = 0;
 
@@ -29,7 +30,8 @@ public class HttpRoutingTestCase extends FunctionalTestCase
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         IOUtils.copy(getClass().getResourceAsStream("/purchase-order.xml"), out);
 
-        MuleMessage res = client.send("http://localhost:63081/proxy", out.toByteArray(), null);
+        String address = "http://localhost:" + getPorts().get(0) + "/proxy";
+        MuleMessage res = client.send(address, out.toByteArray(), null);
         System.out.println(res.getPayloadAsString());
         assertTrue(res.getPayloadAsString().contains("purchaseOrder"));
         assertTrue(res.getPayloadAsString().contains("Alice"));
@@ -37,7 +39,7 @@ public class HttpRoutingTestCase extends FunctionalTestCase
         out = new ByteArrayOutputStream();
         IOUtils.copy(getClass().getResourceAsStream("/namespace-purchase-order.xml"), out);
         
-        res = client.send("http://localhost:63081/proxy", out.toByteArray(), null);
+        res = client.send(address, out.toByteArray(), null);
         System.out.println(res.getPayloadAsString());
         assertTrue(res.getPayloadAsString().contains("purchaseOrder"));
         assertTrue(res.getPayloadAsString().contains("Alice"));
@@ -47,6 +49,11 @@ public class HttpRoutingTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "http-routing-conf.xml";
+    }
+
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

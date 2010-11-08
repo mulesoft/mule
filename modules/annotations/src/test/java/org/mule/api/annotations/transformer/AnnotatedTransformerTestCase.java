@@ -9,6 +9,7 @@
  */
 package org.mule.api.annotations.transformer;
 
+import org.mule.api.annotations.ContainsTransformerMethods;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.transformer.DataType;
 import org.mule.config.transformer.AnnotatedTransformerProxy;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import org.junit.Test;
 
 
+@ContainsTransformerMethods
 public class AnnotatedTransformerTestCase extends AbstractMuleTestCase
 {
     @Override

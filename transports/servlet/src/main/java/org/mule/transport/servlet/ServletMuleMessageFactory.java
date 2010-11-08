@@ -111,7 +111,7 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
 
         setupRequestParameters(request, message);
         setupEncoding(request, message);
-        setupUniqueId(request, message);
+        setupSessionId(request, message);
         setupContentType(request, message);
         setupCharacterEncoding(request, message);
         setupRemoteAddress(request, message);
@@ -165,20 +165,20 @@ public class ServletMuleMessageFactory extends AbstractMuleMessageFactory
         }
     }
 
-    protected void setupUniqueId(HttpServletRequest request, MuleMessage message)
+    protected void setupSessionId(HttpServletRequest request, MuleMessage message)
     {
         try
         {
-            // We wrap this call as on some App Servers (Websfear) it can cause an NPE
+            // We wrap this call as on some App Servers (Websphere) it can cause an NPE
             HttpSession session = request.getSession(false);
             if (session != null)
             {
-                ((DefaultMuleMessage) message).setUniqueId(session.getId());
+                ((DefaultMuleMessage) message).setInboundProperty(ServletConnector.SESSION_ID_PROPERTY_KEY, session.getId());
             }
         }
         catch (Exception e)
         {
-            // MuleMessage's default is good enough in this case
+            // C'est la vie
         }
     }
 

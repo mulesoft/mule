@@ -64,7 +64,11 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
             attachments.put("baz", new DataHandler(new StringDataSource("bazValue")));
         }
         MuleMessage message;
-        message = new DefaultMuleMessage("test",null, attachments, muleContext);
+        message = new DefaultMuleMessage("test", muleContext);
+        for (Map.Entry<String, DataHandler> attachment : attachments.entrySet())
+        {
+            message.addOutboundAttachment(attachment.getKey(), attachment.getValue());
+        }
         for (String s : headers.keySet())
         {
             message.setOutboundProperty(s, headers.get(s));

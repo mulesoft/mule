@@ -125,6 +125,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         assertNotNull(endpoint1);
 
         FilteringOutboundRouter router = new FilteringOutboundRouter();
+        router.setMuleContext(muleContext);
         PayloadTypeFilter filter = new PayloadTypeFilter(String.class);
         router.setFilter(filter);
         List<OutboundEndpoint> endpoints = new ArrayList<OutboundEndpoint>();

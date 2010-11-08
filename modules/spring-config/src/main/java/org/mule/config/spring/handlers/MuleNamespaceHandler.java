@@ -112,6 +112,7 @@ import org.mule.processor.NullMessageProcessor;
 import org.mule.routing.CollectionSplitter;
 import org.mule.routing.ExpressionMessageInfoMapping;
 import org.mule.routing.ExpressionSplitter;
+import org.mule.routing.FirstSuccessful;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.IdempotentMessageFilter;
 import org.mule.routing.IdempotentSecureHashMessageFilter;
@@ -120,6 +121,7 @@ import org.mule.routing.MessageChunkAggregator;
 import org.mule.routing.MessageChunkSplitter;
 import org.mule.routing.MessageFilter;
 import org.mule.routing.Resequencer;
+import org.mule.routing.RoundRobin;
 import org.mule.routing.SimpleCollectionAggregator;
 import org.mule.routing.WireTap;
 import org.mule.routing.filters.EqualsFilter;
@@ -421,7 +423,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("recipient-list", new ChildDefinitionParser("messageProcessor", ExpressionRecipientList.class));
 
         registerBeanDefinitionParser("request-reply", new ChildDefinitionParser("messageProcessor", SimpleAsyncRequestReplyRequester.class));
-
+        registerBeanDefinitionParser("first-successful", new ChildDefinitionParser("messageProcessor", FirstSuccessful.class));
+        registerBeanDefinitionParser("round-robin", new ChildDefinitionParser("messageProcessor", RoundRobin.class));
         
         //Message Info Mappings
         registerBeanDefinitionParser("expression-message-info-mapping", new ChildDefinitionParser("messageInfoMapping", ExpressionMessageInfoMapping.class));

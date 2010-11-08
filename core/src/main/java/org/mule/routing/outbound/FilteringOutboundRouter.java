@@ -144,7 +144,7 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
      * on the Endpoint URI if necessary
      * 
      * @param index the index of the endpoint to get
-     * @param message the current message. This is required if template matching is
+     * @param event the current event. This is required if template matching is
      *            being used
      * @return the endpoint at the index, with any template tags resolved
      * @throws CouldNotRouteOutboundMessageException if the template causs the
@@ -211,10 +211,16 @@ public class FilteringOutboundRouter extends AbstractOutboundRouter implements T
                             CoreMessages.schemeCannotChangeForRouter(ep.getEndpointURI().getScheme(),
                                 newUri.getScheme()), event, ep);
                     }
+                    newUri.initialise();
 
                     return new DynamicURIOutboundEndpoint(ep, newUri);
                 }
                 catch (EndpointException e)
+                {
+                    throw new CouldNotRouteOutboundMessageException(
+                        CoreMessages.templateCausedMalformedEndpoint(uri, newUriString), event, ep, e);
+                }
+                catch (InitialisationException e)
                 {
                     throw new CouldNotRouteOutboundMessageException(
                         CoreMessages.templateCausedMalformedEndpoint(uri, newUriString), event, ep, e);

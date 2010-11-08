@@ -64,11 +64,9 @@ public class FileMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 8, filter.getClass().getName());
     }
 
-    public static Message connectorAutodeletesWithOneWayEndpoint(Connector connector,
-        ImmutableEndpoint endpoint)
+    public static Message connectorAutodeletesWithoutConsuming(Connector connector)
     {
-        return factory.createMessage(BUNDLE_PATH, 9, connector.getName(), 
-            endpoint.getEndpointURI().toString());
+        return factory.createMessage(BUNDLE_PATH, 9, connector.getName());
     }
 }
 

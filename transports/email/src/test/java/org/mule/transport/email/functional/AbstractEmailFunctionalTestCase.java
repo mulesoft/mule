@@ -10,6 +10,7 @@
 
 package org.mule.transport.email.functional;
 
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.config.i18n.LocaleMessageHandler;
 import org.mule.module.client.MuleClient;
@@ -30,10 +31,12 @@ import java.util.Map;
 
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
+import javax.activation.DataHandler;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCase
 {
@@ -58,6 +61,7 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
     private String message;
     private String password;
     private String charset;
+    private boolean addAttachments;
 
     protected AbstractEmailFunctionalTestCase(boolean isMimeMessage, String protocol)
     {
@@ -147,7 +151,16 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
             props = new HashMap<String, Object>();
             props.put(MailProperties.CONTENT_TYPE_PROPERTY, "text/plain; charset=" + charset);
         }
-        client.dispatch("vm://send", msg, props);
+        if (addAttachments)
+        {
+            MuleMessage message = new DefaultMuleMessage(msg, props, muleContext);
+            createOutboundAttachments(message);
+            client.dispatch("vm://send", message);
+        }
+        else
+        {
+            client.dispatch("vm://send", msg, props);
+        }
 
         server.waitForIncomingEmail(DELIVERY_DELAY_MS, 1);
 
@@ -157,16 +170,30 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
         verifyMessage(messages[0]);
     }
 
-    protected void verifyMessage(MimeMessage received) throws IOException, MessagingException
+    protected void verifyMessage(MimeMessage received) throws Exception
     {
-        assertTrue("Did not receive a message with String contents",
-            received.getContent() instanceof String);
-        verifyMessage((String) received.getContent());
-        
+        if (addAttachments)
+        {
+            assertTrue("Did not receive a multipart message",
+                received.getContent() instanceof MimeMultipart);
+            verifyMessage((MimeMultipart) received.getContent());
+        }
+        else
+        {
+            assertTrue("Did not receive a message with String contents",
+                received.getContent() instanceof String);
+            verifyMessage((String) received.getContent());
+        }
+
         Address[] recipients = received.getRecipients(Message.RecipientType.TO);
         assertNotNull(recipients);
         assertEquals("number of recipients", 1, recipients.length);
         assertEquals("recipient", email, recipients[0].toString());
+    }
+
+    protected void verifyMessage(MimeMultipart mimeMultipart) throws Exception
+    {
+        fail("multipart message was not expected");
     }
 
     protected void verifyMessage(String receivedText)
@@ -225,5 +252,16 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
     protected int getNumPortsToFind()
     {
         return 1;
-    }    
+    }
+
+    public void setAddAttachments(boolean addAttachments)
+    {
+        this.addAttachments = addAttachments;
+    }
+
+    private void createOutboundAttachments(MuleMessage msg) throws Exception
+    {
+        msg.addOutboundAttachment("hello", "hello", "text/plain");
+        msg.addOutboundAttachment("goodbye", "<a/>", "text/xml");
+    }
 }

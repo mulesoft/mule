@@ -10,6 +10,7 @@
 
 package org.mule.api.annotations.param;
 
+import org.mule.api.annotations.ContainsTransformerMethods;
 import org.mule.api.annotations.Transformer;
 
 import java.io.IOException;
@@ -19,6 +20,7 @@ import javax.activation.DataHandler;
 /**
  * TODO
  */
+@ContainsTransformerMethods
 public class DataHandlerTransformer
 {
     @Transformer

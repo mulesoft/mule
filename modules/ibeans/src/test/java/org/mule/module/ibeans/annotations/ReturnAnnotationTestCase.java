@@ -9,6 +9,7 @@
  */
 package org.mule.module.ibeans.annotations;
 
+import org.mule.api.annotations.ContainsTransformerMethods;
 import org.mule.api.annotations.Transformer;
 
 import java.net.MalformedURLException;
@@ -17,6 +18,7 @@ import java.net.URL;
 import org.ibeans.annotation.IntegrationBean;
 import org.junit.Test;
 
+@ContainsTransformerMethods
 public class ReturnAnnotationTestCase extends AbstractIBeansTestCase
 {
     @SuppressWarnings("unused")

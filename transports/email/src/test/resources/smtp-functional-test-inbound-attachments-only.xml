@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+       xmlns:email="http://www.mulesoft.org/schema/mule/email"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/3.0/mule-smtp.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/3.0/mule-email.xsd">
+
+    <smtp:connector name="smtpConnector"/>
+
+    <model name="test">
+        <service name="relay">
+            <inbound>
+                <vm:inbound-endpoint path="send" exchange-pattern="one-way">
+                    <message-properties-transformer scope="outbound">
+                        <add-message-property key="contentType" value="#[header:INBOUND:contentType?]"/>
+                    </message-properties-transformer>
+                </vm:inbound-endpoint>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <smtp:outbound-endpoint host="localhost" port="${port1}" to="bob@example.com">
+                        <custom-transformer
+                                class="org.mule.transport.email.transformers.SmtpAttachmentsFunctionalTestCase$AddOutboundAttachments"/>
+                        <email:object-to-mime-transformer useOutboundAttachments="false"/>
+                    </smtp:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
+</mule>
