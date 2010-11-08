@@ -47,6 +47,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
     private Object object;
     private String methodName;
     private String[] argumentExpressions;
+    private String name;
 
     private Method method;
 
@@ -162,6 +163,16 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
             return new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(),
                 event.getMuleContext()), event);
         }
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
 }
