@@ -11,10 +11,12 @@
 package org.mule.processor;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ThreadingProfile;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.Startable;
@@ -35,11 +37,12 @@ import javax.resource.spi.work.WorkListener;
  * present then an exception is thrown.
  */
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements WorkListener, Startable, Stoppable
+    implements WorkListener, Startable, Stoppable, MuleContextAware
 {
     protected WorkManagerSource workManagerSource;
     protected boolean doThreading = true;
     protected WorkManager workManager;
+    protected MuleContext muleContext;
 
     public AsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource)
     {
@@ -58,7 +61,13 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
                                              int shutdownTimeout)
     {
         this.doThreading = threadingProfile.isDoThreading();
-        workManager = threadingProfile.createWorkManager(name, shutdownTimeout);
+        // container mode has additional thread naming requirements
+        final boolean containerMode = muleContext.getConfiguration().isContainerMode();
+        final String id = muleContext.getConfiguration().getId();
+        final String threadPrefix = containerMode
+                                    ? String.format("[%s].%s.processor.async", id, name)
+                                    : String.format("%s.receiver", name);
+        workManager = threadingProfile.createWorkManager(threadPrefix, shutdownTimeout);
         workManagerSource = new WorkManagerSource()
         {
             public WorkManager getWorkManager() throws MuleException
@@ -143,6 +152,11 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     public void workCompleted(WorkEvent event)
     {
         this.handleWorkException(event, "workCompleted");
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 
     protected void handleWorkException(WorkEvent event, String type)
