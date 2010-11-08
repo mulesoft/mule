@@ -66,7 +66,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         final String id = muleContext.getConfiguration().getId();
         final String threadPrefix = containerMode
                                     ? String.format("[%s].%s.processor.async", id, name)
-                                    : String.format("%s.receiver", name);
+                                    : String.format("%s.processor.async", name);
         workManager = threadingProfile.createWorkManager(threadPrefix, shutdownTimeout);
         workManagerSource = new WorkManagerSource()
         {
