@@ -74,10 +74,10 @@ jaxb-impl-2.1.9-osgi
 jaxb-xjc-2.1.9-osgi
 jaxen-1.1.1-osgi
 jaxws-api-2.1-1-osgi
-jbpm-api-4.2
-jbpm-jpdl-4.2
-jbpm-log-4.2
-jbpm-pvm-4.2
+jbpm-api-4.4
+jbpm-jpdl-4.4
+jbpm-log-4.4
+jbpm-pvm-4.4
 jbossts-common-4.2.3-SP5-osgi
 jbossts-jta-4.2.3-SP5-patched-osgi
 jbossts-jta-integration-4.2.3-SP5-osgi
@@ -92,9 +92,9 @@ jetty-util5-6.1.22
 joda-time-1.6
 jsr250-api-1.0
 jsr311-api-1.1.1
-juel-2.1.0
+juel-api-2.2.1
 juel-engine-2.1.0
-juel-impl-2.1.0
+juel-impl-2.2.1
 jug-2.0.0-osgi-asl
 junit-4.8.1
 livetribe-jsr223-2.0.5
