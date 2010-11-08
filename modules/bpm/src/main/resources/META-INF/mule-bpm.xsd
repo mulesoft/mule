@@ -112,7 +112,7 @@
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="abstractBpmConnectorType">
-                <xsd:attribute name="bpms-ref" type="xsd:IDREF" use="required">
+                <xsd:attribute name="bpms-ref" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             A reference to the underlying BPMS, which must implement the {javadoc:mule/transport/bpm|BPMS}org.mule.transport.bpm.BPMS{javadoc} interface to exchange messages through Mule using the BPM transport. 
@@ -151,7 +151,7 @@
 		                 </xsd:documentation>
 		             </xsd:annotation>
 		         </xsd:attribute>
-		         <xsd:attribute name="processEngine-ref" type="xsd:IDREF">
+		         <xsd:attribute name="processEngine-ref" type="xsd:string">
 		             <xsd:annotation>
 		                 <xsd:documentation>
 		                     A reference to the already-initialized jBPM ProcessEngine.  This is useful if you use Spring to configure your jBPM instance.  Note that the "configurationResource" attribute will be ignored.
@@ -194,7 +194,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="processEngine-ref" type="xsd:IDREF">
+                <xsd:attribute name="processEngine-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
                             A reference to the already-initialized jBPM ProcessEngine.  This is useful if you use Spring to configure your jBPM instance.  Note that the "configurationResource" attribute will be ignored.
