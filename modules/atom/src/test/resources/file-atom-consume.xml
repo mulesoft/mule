@@ -5,10 +5,10 @@
       xmlns:file="http://www.mulesoft.org/schema/mule/file"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
-               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
-               http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/3.0/mule-atom.xsd
-               http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.0/mule-file.xsd
-               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.0/mule-test.xsd">
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+               http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/3.1/mule-atom.xsd
+               http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.1/mule-file.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.1/mule-test.xsd">
 
 
     <flow name="feedSplitterConsumer">

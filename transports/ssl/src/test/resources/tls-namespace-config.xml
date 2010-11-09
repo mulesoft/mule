@@ -5,8 +5,8 @@
        xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/3.0/mule-tls.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+       http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/3.1/mule-tls.xsd">
 
 
     <tls:connector name="sslConnector" sendBufferSize="1024" receiveBufferSize="2048" keepAlive="true">

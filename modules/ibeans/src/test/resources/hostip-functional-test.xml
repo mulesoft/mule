@@ -4,8 +4,8 @@
       xmlns:ibeans="http://www.mulesoft.org/schema/mule/ibeans"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
-       http://www.mulesoft.org/schema/mule/ibeans http://www.mulesoft.org/schema/mule/ibeans/3.0/mule-ibeans.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+       http://www.mulesoft.org/schema/mule/ibeans http://www.mulesoft.org/schema/mule/ibeans/3.1/mule-ibeans.xsd">
 
     <ibeans:connector name="foo">
         <!--<ibeans:state-parameters>-->

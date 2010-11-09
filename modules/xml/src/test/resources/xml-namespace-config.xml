@@ -5,8 +5,8 @@
       xmlns:spring="http://www.springframework.org/schema/beans"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.0/mule-xml.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
+       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.1/mule-xml.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd">
 
     <mulexml:namespace-manager includeConfigNamespaces="true">
         <mulexml:namespace prefix="foo" uri="http://foo.com"/>
