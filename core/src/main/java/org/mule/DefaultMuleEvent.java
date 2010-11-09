@@ -323,9 +323,9 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     }
 
     /**
-     * Returns the message contents as a string
+     * Returns the message contents for logging
      *
-     * @param encoding the encoding to use when converting the message to string
+     * @param encoding the encoding to use when converting bytes to a string, if necessary
      * @return the message contents as a string
      * @throws org.mule.api.MuleException if the message cannot be converted into a
      *                                    string
@@ -334,7 +334,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     {
         try
         {
-            return message.getPayloadAsString(encoding);
+            return message.getPayloadForLogging(encoding);
         }
         catch (Exception e)
         {
@@ -652,7 +652,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     public MuleContext getMuleContext()
     {
-        return message.getMuleContext();
+        return endpoint.getMuleContext();
     }
 
     public ThreadSafeAccess newThreadCopy()

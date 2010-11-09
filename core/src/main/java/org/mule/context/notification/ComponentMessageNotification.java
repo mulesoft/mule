@@ -47,14 +47,7 @@ public class ComponentMessageNotification extends ServerNotification
     @Override
     protected String getPayloadToString()
     {
-        try
-        {
-            return ((MuleMessage) source).getPayloadAsString();
-        }
-        catch (Exception e)
-        {
-            return source.toString();
-        }
+       return ((MuleMessage) source).getPayloadForLogging();
     }
 
     /**

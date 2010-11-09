@@ -148,7 +148,7 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
             try
             {
                 logger.trace("Request payload: \n"
-                             + StringMessageUtils.truncate(message.getPayloadAsString(), 100, false));
+                             + StringMessageUtils.truncate(message.getPayloadForLogging(), 100, false));
                 if (route instanceof OutboundEndpoint)
                 {
                     logger.trace("outbound transformer is: " + ((OutboundEndpoint) route).getTransformers());
@@ -196,7 +196,7 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
                     try
                     {
                         logger.trace("Response payload: \n"
-                                     + StringMessageUtils.truncate(resultMessage.getPayloadAsString(), 100,
+                                     + StringMessageUtils.truncate(resultMessage.getPayloadForLogging(), 100,
                                          false));
                     }
                     catch (Exception e)

@@ -180,6 +180,25 @@ public class DefaultMessageCollection extends DefaultMuleMessage implements Mule
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPayloadForLogging(String encoding)
+    {
+       return "[This is a message collection]";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getPayloadForLogging()
+    {
+       return "[This is a message collection]";
+    }
+
+    
+    /**
      * We need to overload this if we find we want to make this class available to users, but the copy will be expensive;
      */
     public ThreadSafeAccess newThreadCopy()

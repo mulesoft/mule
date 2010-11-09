@@ -708,7 +708,24 @@ public interface MuleMessage extends Serializable
      * @return the original payload used to create this message
      */
     Object getOriginalPayload();
+    
+    /**
+     * Get the message payload for logging without throwing exception
+     * Converts the message implementation into a String representation. 
+     * 
+     * @return message payload as object
+     */
+    String getPayloadForLogging();      
 
+    /**
+     * Get the message payload for logging without throwing exception
+     * Converts the message implementation into a String representation. If encoding
+     * is required it will use the encoding set on the message
+     * 
+     * @return message payload as object
+     */
+    String getPayloadForLogging(String encoding);      
+    
     MuleContext getMuleContext();
 
     /**
