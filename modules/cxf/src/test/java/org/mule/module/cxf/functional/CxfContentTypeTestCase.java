@@ -19,8 +19,6 @@ import java.util.Map;
 
 public class CxfContentTypeTestCase extends DynamicPortTestCase
 {
-    private static final int TIMEOUT_IN_MILLISECONDS = 500;
-
     private static final String requestPayload =
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"\n" +
             "           xmlns:hi=\"http://example.org/\">\n" +

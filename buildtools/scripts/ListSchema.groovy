@@ -18,11 +18,11 @@
 
   Example schema and their locations:
     transports/file/src/main/resources/META-INF/mule-file.xsd
-     -> http://www.mulesoft.org/schema/mule/file/3.0/mule-file.xsd
+     -> http://www.mulesoft.org/schema/mule/file/3.1/mule-file.xsd
     modules/acegi/src/main/resources/META-INF/mule-acegi.xsd
-     -> http://www.mulesoft.org/schema/mule/acegi/3.0/mule-acegi.xsd
+     -> http://www.mulesoft.org/schema/mule/acegi/3.1/mule-acegi.xsd
     core/src/main/resources/META-INF/mule.xsd
-     -> http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+     -> http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
 
   This script and the generated script have only been verified to 
   work on Linux.
