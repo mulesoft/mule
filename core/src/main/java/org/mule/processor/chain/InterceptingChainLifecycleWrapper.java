@@ -24,14 +24,15 @@ import java.util.List;
  * MessageProcessor in the parent chain is not injected into the first in the nested
  * chain.
  */
-public class InterceptingChainLifecycleWrapper implements MessageProcessorChain
+public class InterceptingChainLifecycleWrapper extends AbstractMessageProcessorChain
 {
-    protected List<MessageProcessor> processors;
     private MessageProcessorChain chain;
 
-    public InterceptingChainLifecycleWrapper(MessageProcessorChain chain, List<MessageProcessor> processors)
+    public InterceptingChainLifecycleWrapper(MessageProcessorChain chain,
+                                             List<MessageProcessor> processors,
+                                             String name)
     {
-        this.processors = processors;
+        super(name, processors);
         this.chain = chain;
     }
 
@@ -50,15 +51,10 @@ public class InterceptingChainLifecycleWrapper implements MessageProcessorChain
         return chain.getPolicies();
     }
 
-    public MuleEvent process(MuleEvent event) throws MuleException
+    @Override
+    protected MuleEvent doProcess(MuleEvent event) throws MuleException
     {
         return chain.process(event);
-    }
-
-    @Override
-    public String toString()
-    {
-        return chain.toString();
     }
 
 }
