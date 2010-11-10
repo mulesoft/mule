@@ -27,7 +27,8 @@ public class FileAtomFeedConsumeTestCase extends FunctionalTestCase
     {
         FileOutputStream fos = new FileOutputStream(new File(muleContext.getConfiguration().getWorkingDirectory(), "sample-feed.atom"));
         String feed = loadResourceAsString("sample-feed.atom");
-        fos.write(feed.getBytes());
+        fos.write(feed.getBytes("UTF-8"));
+        fos.close();
 
         //allow the file connector to poll a couple of times to ensure we only get the same 25 entries
         Thread.sleep(5000);

@@ -27,6 +27,7 @@ public class FileRssFeedConsumeTestCase extends FunctionalTestCase
         FileOutputStream fos = new FileOutputStream(new File(muleContext.getConfiguration().getWorkingDirectory(), "sample-feed.rss"));
         String feed = loadResourceAsString("sample-feed.rss");
         fos.write(feed.getBytes());
+        fos.close();
 
         Thread.sleep(3000);
         EntryReceiver component = (EntryReceiver) getComponent("feedSplitterConsumer");
