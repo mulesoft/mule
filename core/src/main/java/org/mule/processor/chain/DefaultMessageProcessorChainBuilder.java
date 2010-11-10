@@ -79,7 +79,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         }
         final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(new ArrayList<MessageProcessor>(tempList));
         //chain.setFlowConstruct(flowConstruct);
-        return new InterceptingChainLifecycleWrapper(chain, processors, "");
+        return new InterceptingChainLifecycleWrapper(chain, processors);
     }
 
     public DefaultMessageProcessorChainBuilder chain(MessageProcessor... processors)
