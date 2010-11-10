@@ -35,7 +35,7 @@ import net.sf.cglib.proxy.Enhancer;
 
 /**
  * A Mule {@link org.mule.api.model.EntryPointResolver} implementation that will resolve methods on a service class
- * that have Mule expression annotations such as {@link org.mule.api.annotations.param.Payload}, {@link org.mule.api.annotations.param.InboundHeaders} or {@link org.mule.api.annotations.expressions.XPath}.
+ * that have Mule expression annotations such as {@link org.mule.api.annotations.param.Payload}, {@link org.mule.api.annotations.param.InboundHeaders}
  * It will transform the received message to match the annotated method arguments. For example -
  * <code>
  * public Object doSomething(
@@ -63,8 +63,6 @@ import net.sf.cglib.proxy.Enhancer;
  * @see org.mule.api.annotations.param.InboundAttachments
  * @see org.mule.api.annotations.param.OutboundHeaders
  * @see org.mule.api.annotations.param.OutboundAttachments
- * @see org.mule.api.annotations.expressions.XPath
- * @see org.mule.api.annotations.expressions.Groovy
  * @see org.mule.api.annotations.expressions.Mule
  *
  * @since 3.0
@@ -73,25 +71,23 @@ import net.sf.cglib.proxy.Enhancer;
 public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
 {
 
-    private AtomicBoolean firstTime = new AtomicBoolean(true);
+    private AtomicBoolean cacheBuilt = new AtomicBoolean(false);
+
 
     @SuppressWarnings("unchecked")
     private Map<Method, Transformer> transformerCache = new ConcurrentHashMap();
 
     public InvocationResult invoke(Object component, MuleEventContext context) throws Exception
     {
-        if (firstTime.getAndSet(false))
+        try
         {
-            try
-            {
-                initCache(component, context);
-            }
-            catch (Exception e)
-            {
-                InvocationResult result = new InvocationResult(this, InvocationResult.State.NOT_SUPPORTED);
-                result.setErrorMessage(e.toString());
-                return result;
-            }
+            initCache(component, context);
+        }
+        catch (Exception e)
+        {
+            InvocationResult result = new InvocationResult(this, InvocationResult.State.NOT_SUPPORTED);
+            result.setErrorMessage(e.toString());
+            return result;
         }
 
         if(methodCache.size()==0)
@@ -206,14 +202,31 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
         return sb.toString();
     }
 
-    protected synchronized void initCache(Object component, MuleEventContext context)
+
+    protected void initCache(Object component, MuleEventContext context)
     {
-        for (int i = 0; i < component.getClass().getMethods().length; i++)
+        if (!cacheBuilt.get())
         {
-            Method method = component.getClass().getMethods()[i];
-            if (AnnotationUtils.getParamAnnotationsWithMeta(method, Evaluator.class).size() > 0)
+            synchronized (this)
             {
-                this.addMethodByName(method, context);
+                try
+                {
+                    if (!cacheBuilt.get())
+                    {
+                        for (int i = 0; i < component.getClass().getMethods().length; i++)
+                        {
+                            Method method = component.getClass().getMethods()[i];
+                            if (AnnotationUtils.getParamAnnotationsWithMeta(method, Evaluator.class).size() > 0)
+                            {
+                                this.addMethodByName(method, context);
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    cacheBuilt.set(true);
+                }
             }
         }
     }
