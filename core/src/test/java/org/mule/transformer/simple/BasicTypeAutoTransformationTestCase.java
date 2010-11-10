@@ -14,6 +14,8 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
 
+import java.math.BigDecimal;
+
 public class BasicTypeAutoTransformationTestCase extends AbstractMuleTestCase
 {
 
@@ -24,6 +26,7 @@ public class BasicTypeAutoTransformationTestCase extends AbstractMuleTestCase
         testType("1", Short.class, Short.TYPE, Short.valueOf((short) 1));
         testType("1.1", Double.class, Double.TYPE, Double.valueOf(1.1));
         testType("1.1", Float.class, Float.TYPE, Float.valueOf((float) 1.1));
+        testType("1.1", BigDecimal.class, null, BigDecimal.valueOf(1.1));
         testType("true", Boolean.class, Boolean.TYPE, Boolean.TRUE);
 
     }
