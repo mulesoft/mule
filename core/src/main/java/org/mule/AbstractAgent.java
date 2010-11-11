@@ -14,7 +14,7 @@ import org.mule.api.agent.Agent;
 import org.mule.api.context.MuleContextAware;
 
 /**
- * Implements common methods for all Agents. Importantly, the Management context is made available to Agents that
+ * Implements common methods for all Agents. Importantly, the MuleContext is made available to Agents that
  * extend this.
  */
 public abstract class AbstractAgent implements Agent, MuleContextAware

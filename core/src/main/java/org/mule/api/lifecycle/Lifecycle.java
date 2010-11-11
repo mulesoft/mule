@@ -16,12 +16,5 @@ package org.mule.api.lifecycle;
  */
 public interface Lifecycle extends Initialisable, Startable, Stoppable, Disposable
 {
-    //MULE-3969
-//    boolean isInitialised();
-//
-//    boolean isStarted();
-//
-//    boolean isStopped();
-//
-//    boolean isDisposed();
+    // empty
 }
