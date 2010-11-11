@@ -90,6 +90,7 @@ public class DeploymentService
         {
             // explode any app zips first
             final String[] zips = appsDir.list(new SuffixFileFilter(".zip"));
+            Arrays.sort(zips);
             for (String zip : zips)
             {
                 try
@@ -107,6 +108,7 @@ public class DeploymentService
             // TODO this is a place to put a FQN of the custom sorter (use AND filter)
             // Add string shortcuts for bundled ones
             apps = appsDir.list(DirectoryFileFilter.DIRECTORY);
+            Arrays.sort(apps);
         }
         else
         {
