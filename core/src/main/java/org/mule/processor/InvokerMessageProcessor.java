@@ -136,7 +136,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
 
     public void setArgumentExpressionsString(String arguments)
     {
-        this.argumentExpressions = arguments.split(",");
+        this.argumentExpressions = arguments.split("\\s*,\\s*");
     }
 
     public void setArgumentExpressions(String[] argumentExpressions)
