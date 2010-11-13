@@ -32,11 +32,7 @@ existingProjectDir.mkdirs()
 // we need to use the same local repository on the forked Maven invocation
 localRepoArgument = "-Dmaven.repo.local=${settings.localRepository}"
 
-//
-// run Maven archetype
-//
-def cmdline = "-o ${localRepoArgument} "
-
+// get Maven archetype name
 if (project.properties.archetype == null)
 {
     fail("Specify the archetype to be invoked via a property named 'archetype' in the config section of the groovy-maven-plugin that invokes this script")
@@ -46,31 +42,45 @@ if (archetype.endsWith(":") == false)
 {
     archetype += ":"
 }
-cmdline += archetype + project.version + ":create "
 
-if (project.properties.archetypeParams != null)
-{
-    cmdline += project.properties.archetypeParams
-}
-cmdline += " -DmuleVersion=" + project.version
-cmdline += " -Dinteractive=false"
+// run archetype on build dir
+def cmdline = buildArchetypeCommand(archetype, 'create', project.properties.archetypeParams)
 runMaven(cmdline, buildDir)
 
+// if a pre-compilation archetype call has been configured, run it in the generated project
+def preCompileArchetypeGoal = project.properties.preCompileArchetypeGoal
+if (preCompileArchetypeGoal != null)
+{
+  cmdline = buildArchetypeCommand(archetype, preCompileArchetypeGoal, project.properties.preCompileArchetypeParams)
+  runMaven(cmdline, existingProjectDir)
+}
+
 // now that the source is generated, compile it using Maven
-// Do not run "mvn test" here since the generated source is not testable as is
+// do not run "mvn test" here since the generated source is not testable as is
 cmdline = "${localRepoArgument} test-compile"
 runMaven(cmdline, existingProjectDir)
 
+def buildArchetypeCommand(String archetype, String goal, String archetypeParams)
+{
+  def cmdline = "-o ${localRepoArgument} "
+  cmdline += archetype + project.version + ":${goal} "
+  
+  if (archetypeParams != null)
+  {
+      cmdline += archetypeParams
+  }
+  cmdline += ' -DmuleVersion=' + project.version
+  cmdline += ' -Dinteractive=false'
+}
+
 def runMaven(String commandline, File directory)
 {
-    def maven = "mvn"
-    if (SystemUtils.IS_OS_WINDOWS)
-    {
-        maven = "mvn.bat"
-    }
+    def maven = SystemUtils.IS_OS_WINDOWS ? "mvn.bat" : "mvn"
+    
     commandline = maven + " " + commandline
 
-    log.info("***** commandline: '" + commandline + "'")
+    log.info("***** directory: '${directory}'")
+    log.info("***** commandline: '${commandline}'")
 
     // null means inherit parent's env ...
     def process = commandline.execute(null, directory)

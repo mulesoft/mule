@@ -7,24 +7,27 @@
         <version>3.1.0-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.tests.archetypes</groupId>
-    <artifactId>example-archetype</artifactId>
+    <artifactId>configuration-pattern-archetype</artifactId>
     <packaging>jar</packaging>
-    <name>Test for Mule Example Archetype</name>
+    <name>Test for Mule Catalog Archetype</name>
 
     <!-- the following properties are needed by the groovy script that we inherit from our parent pom -->
     <properties>
-        <!-- this is the name of the directory that's crated by the archetype -->
+        <!-- this is the name of the directory that's created by the archetype -->
         <outputDir>foo</outputDir>
         <!-- this is the groupId:artifactId of the archetype that we want to invoke -->
-        <archetype>org.mule.tools:mule-configuration-pattern-archetype</archetype>
-        <!-- this string will be appended to the archetype's commandline -->
-        <archetypeParams>-DartifactId=foo -DpatternTagName=foo-pattern -DpatternFQCN=org.mule.test.FooPattern -DpatternType=mp</archetypeParams>
+        <archetype>org.mule.tools:mule-catalog-archetype</archetype>
+        <!-- this string will be appended to the archetype's commandline when testing archetypeGoal -->
+        <archetypeParams>-DartifactId=foo -DhasCustomSchema=y</archetypeParams>
+        <!-- the following defines an optional goal and related params to run in the generated project dir before calling compile -->
+        <preCompileArchetypeGoal>new-pattern</preCompileArchetypeGoal>
+        <preCompileArchetypeParams>-DpatternTagName=foo-pattern -DpatternFQCN=org.mule.test.FooPattern -DpatternType=siso</preCompileArchetypeParams>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.mule.tools</groupId>
-            <artifactId>mule-configuration-pattern-archetype</artifactId>
+            <artifactId>mule-catalog-archetype</artifactId>
             <version>${version}</version>
         </dependency>
     </dependencies>

@@ -1,5 +1,5 @@
 <archetype>
-  <id>mule-configuration-pattern-archetype</id>
+  <id>mule-catalog-archetype</id>
   <!--
     allows us to update an existing project if the archetype is run from
     the project directory

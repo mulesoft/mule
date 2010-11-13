@@ -53,7 +53,7 @@ public class ConfigurationPatternArchetypeMojo extends AbstractMojo
     private String archetypeGroupId;
 
     /**
-     * @parameter expression="${archetypeArtifactId}" default-value="mule-configuration-pattern-archetype"
+     * @parameter expression="${archetypeArtifactId}" default-value="mule-catalog-archetype"
      * @required
      */
     private String archetypeArtifactId;
