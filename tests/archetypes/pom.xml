@@ -12,11 +12,11 @@
     <name>Mule Tests for Maven Archetypes</name>
 
     <modules>
+        <module>catalog-archetype</module>
         <module>example-archetype</module>
         <module>module-archetype</module>
         <module>project-archetype</module>
         <module>transport-archetype</module>
-        <module>catalog-archetype</module>
     </modules>
 
     <profiles>
