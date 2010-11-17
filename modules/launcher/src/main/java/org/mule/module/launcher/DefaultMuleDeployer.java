@@ -63,7 +63,10 @@ public class DefaultMuleDeployer implements MuleDeployer
         }
         finally
         {
-            lock.unlock();
+            if (lock.isHeldByCurrentThread())
+            {
+                lock.unlock();
+            }
         }
     }
 
@@ -98,7 +101,10 @@ public class DefaultMuleDeployer implements MuleDeployer
         }
         finally
         {
-            lock.unlock();
+            if (lock.isHeldByCurrentThread())
+            {
+                lock.unlock();
+            }
         }
     }
 
@@ -129,7 +135,10 @@ public class DefaultMuleDeployer implements MuleDeployer
         }
         finally
         {
-            lock.unlock();
+            if (lock.isHeldByCurrentThread())
+            {
+                lock.unlock();
+            }
         }
     }
 
@@ -184,7 +193,10 @@ public class DefaultMuleDeployer implements MuleDeployer
         }
         finally
         {
-            lock.unlock();
+            if (lock.isHeldByCurrentThread())
+            {
+                lock.unlock();
+            }
         }
 
         // appname is never null by now

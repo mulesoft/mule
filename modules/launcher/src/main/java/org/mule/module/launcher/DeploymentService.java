@@ -416,7 +416,10 @@ public class DeploymentService
             }
             finally
             {
-                lock.unlock();
+                if (lock.isHeldByCurrentThread())
+                {
+                    lock.unlock();
+                }
                 dirty = false;
             }
         }
