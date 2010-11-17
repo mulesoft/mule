@@ -10,7 +10,7 @@ to run it:
 
 You can change 'Ross' to any string you want.
 
-For more information, refer to http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples
+For more information, refer to http://www.mulesoft.org/documentation/display/MULE3INTRO/Hello+World+Example
 
 +----------------------+
 | Building the example |

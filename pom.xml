@@ -1695,6 +1695,7 @@
             <id>bamboo</id>
             <distributionManagement>
                 <site>
+                    <id>mule-site</id> 
                     <url>file:///var/www/html/docs/site/${version}</url>
                 </site>
             </distributionManagement>

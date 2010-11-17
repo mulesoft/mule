@@ -23,8 +23,8 @@ public abstract class DynamicPortTestCase extends FunctionalTestCase
     public DynamicPortTestCase()
     {
         super();
-        
-        // each test class sets the number of free ports to find 
+
+        // each test class sets the number of free ports to find
         numPorts = getNumPortsToFind();
     }
 
@@ -32,8 +32,6 @@ public abstract class DynamicPortTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        // see if the ports are available, tests should fail if they are not
-        //checkPorts(false, "SETUP");
     }
 
     @Override
@@ -43,10 +41,5 @@ public abstract class DynamicPortTestCase extends FunctionalTestCase
         // make sure that the ports have been freed. It's not a fatal error, but we
         // want to track down why it's not being released
         checkPorts(false, "TEARDOWN");
-        
-        //find a new set of ports so the next test does not fail, regardless of the current ports not being available
-        //ports = findFreePorts(getNumPortsToFind());
-        // this will propagate to the mule configuration
-        //setPortProperties();        
     }
 }

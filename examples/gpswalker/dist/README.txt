@@ -1,7 +1,9 @@
 +--------------------+
 | GPS Walker Example |
 +--------------------+
-Simulates plotting GPS coordinates
+This example demonstrates how to use AJAX to communicate from a Mule Service to the browser. This example uses other new features in Mule 3 including automatic JSON bindings, the @Schedule annotation and Flow.
+
+For more information, refer to http://www.mulesoft.org/documentation/display/MULE3INTRO/GPS+Walker+Example
 
 +---------------------+
 | Running the example |
