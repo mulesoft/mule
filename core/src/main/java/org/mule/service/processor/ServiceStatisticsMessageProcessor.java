@@ -15,11 +15,11 @@ import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 
-public class ServiceStatisticsMessageObserver implements MessageProcessor
+public class ServiceStatisticsMessageProcessor implements MessageProcessor
 {
     protected Service service;
 
-    public ServiceStatisticsMessageObserver(Service service)
+    public ServiceStatisticsMessageProcessor(Service service)
     {
         this.service = service;
     }

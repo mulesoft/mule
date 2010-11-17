@@ -18,12 +18,12 @@ import org.mule.api.service.Service;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ServiceLoggingMessageObserver implements MessageProcessor
+public class ServiceLoggingMessageProcessor implements MessageProcessor
 {
     protected final transient Log logger = LogFactory.getLog(getClass());
     protected Service service;
 
-    public ServiceLoggingMessageObserver(Service service)
+    public ServiceLoggingMessageProcessor(Service service)
     {
         this.service = service;
     }

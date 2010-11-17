@@ -29,11 +29,11 @@ import org.mule.management.stats.ServiceStatistics;
 import org.mule.processor.SedaStageInterceptingMessageProcessor;
 import org.mule.service.AbstractService;
 import org.mule.service.processor.ServiceInternalMessageProcessor;
-import org.mule.service.processor.ServiceLoggingMessageObserver;
+import org.mule.service.processor.ServiceLoggingMessageProcessor;
 import org.mule.service.processor.ServiceOutboundMessageProcessor;
-import org.mule.service.processor.ServiceOutboundStatisticsObserver;
-import org.mule.service.processor.ServiceSetEventRequestContextMessageObserver;
-import org.mule.service.processor.ServiceStatisticsMessageObserver;
+import org.mule.service.processor.ServiceOutboundStatisticsMessageProcessor;
+import org.mule.service.processor.ServiceSetEventRequestContextMessageProcessor;
+import org.mule.service.processor.ServiceStatisticsMessageProcessor;
 
 /**
  * A Seda service runs inside a Seda Model and is responsible for managing a Seda
@@ -79,9 +79,9 @@ public class SedaService extends AbstractService
 
     protected void addMessageProcessors(MessageProcessorChainBuilder builder)
     {
-        builder.chain(new ServiceLoggingMessageObserver(this));
-        builder.chain(new ServiceStatisticsMessageObserver(this));
-        builder.chain(new ServiceSetEventRequestContextMessageObserver());
+        builder.chain(new ServiceLoggingMessageProcessor(this));
+        builder.chain(new ServiceStatisticsMessageProcessor(this));
+        builder.chain(new ServiceSetEventRequestContextMessageProcessor());
         if (getThreadingProfile().isDoThreading())
         {
             builder.chain(new SedaStageInterceptingMessageProcessor(getName(), queueProfile, queueTimeout,
@@ -99,7 +99,7 @@ public class SedaService extends AbstractService
             builder.chain(createAsyncReplyProcessor());
         }
         builder.chain(new ServiceOutboundMessageProcessor(this));
-        builder.chain(new ServiceOutboundStatisticsObserver(this));
+        builder.chain(new ServiceOutboundStatisticsMessageProcessor(this));
         builder.chain(outboundRouter);
     }
 

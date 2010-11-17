@@ -15,7 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 
-public class ServiceSetEventRequestContextMessageObserver implements MessageProcessor
+public class ServiceSetEventRequestContextMessageProcessor implements MessageProcessor
 {
 
     public MuleEvent process(MuleEvent event) throws MuleException

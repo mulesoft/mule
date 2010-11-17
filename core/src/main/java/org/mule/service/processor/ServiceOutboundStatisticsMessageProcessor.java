@@ -17,12 +17,12 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.management.stats.ServiceStatistics;
 
-public class ServiceOutboundStatisticsObserver implements MessageProcessor
+public class ServiceOutboundStatisticsMessageProcessor implements MessageProcessor
 {
 
     protected Service service;
 
-    public ServiceOutboundStatisticsObserver(Service service)
+    public ServiceOutboundStatisticsMessageProcessor(Service service)
     {
         this.service = service;
     }
