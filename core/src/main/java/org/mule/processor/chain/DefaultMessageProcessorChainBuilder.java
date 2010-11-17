@@ -47,6 +47,17 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         this.flowConstruct = flowConstruct;
     }
 
+    /**
+     * This builder supports the chaining together of message processors that intercept and also those that
+     * don't. While one can iterate over message processor intercepting message processors need to be chained
+     * together. One solution is make all message processors intercepting (via adaption) and chain them all
+     * together, this results in huge stack traces and recursive calls with adaptor. The alternative is to
+     * build the chain in such a way that we iterate when we can and chain where we need to. <br>
+     * We iterate over the list of message processor to be chained together in reverse order collecting up
+     * those that can be iterated over in a temporary list, as soon as we have an intercepting message
+     * processor we create a DefaultMessageProcessorChain using the temporary list and set it as a listener of
+     * the intercepting message processor and then we continue with the algorithm
+     */
     public MessageProcessorChain build() throws MuleException
     {
         LinkedList<MessageProcessor> tempList = new LinkedList<MessageProcessor>();
@@ -57,28 +68,41 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
             MessageProcessor processor = initializeMessageProcessor(processors.get(i));
             if ((processors.get(i)) instanceof InterceptingMessageProcessor)
             {
+                // Processor is intercepting so we can't simply iterate
                 if (i + 1 < processors.size())
                 {
+                    // The current processor is not the last in the list
                     if (tempList.isEmpty())
                     {
                         ((InterceptingMessageProcessor) processor).setListener(initializeMessageProcessor(processors.get(i + 1)));
                     }
                     else
                     {
-                        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(new ArrayList<MessageProcessor>(tempList));
-                        //chain.setFlowConstruct(flowConstruct);
+                        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(
+                            new ArrayList<MessageProcessor>(tempList));
                         ((InterceptingMessageProcessor) processor).setListener(chain);
                     }
                 }
-                tempList = new LinkedList<MessageProcessor>(Collections.singletonList(processor));
+                else
+                {
+                    // The current processor is the last in the list
+                    tempList = new LinkedList<MessageProcessor>(Collections.singletonList(processor));
+                }
             }
             else
             {
+                // Processor is not intercepting so we can invoke it using iteration (add to temp list)
                 tempList.addFirst(initializeMessageProcessor(processor));
             }
         }
-        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(new ArrayList<MessageProcessor>(tempList));
-        //chain.setFlowConstruct(flowConstruct);
+        // Create the final chain using the current tempList after reserve iteration is complete. This temp
+        // list contains the first n processors in the chain that are not intercepting.. with processor n+1
+        // having been injected as the listener of processor n
+        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(
+            new ArrayList<MessageProcessor>(tempList));
+
+        // Wrap with something that can apply lifecycle to all processors which are otherwise not visable from
+        // DefaultMessageProcessorChain
         return new InterceptingChainLifecycleWrapper(chain, processors, "");
     }
 
