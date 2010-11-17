@@ -5,6 +5,7 @@
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
       xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+      xmlns:smtps="http://www.mulesoft.org/schema/mule/smtps"
       xmlns:email="http://www.mulesoft.org/schema/mule/email"
       xmlns:servlet="http://www.mulesoft.org/schema/mule/servlet"
       xsi:schemaLocation="
@@ -86,11 +87,11 @@
                </inbound>
                <outbound>
                     <pass-through-router>
-                         <smtp:outbound-endpoint user="${user}" password="${password}" host="${host}" 
+                         <smtps:outbound-endpoint user="${user}" password="${password}" host="${host}" 
                              from="${from}" subject="Your order has been placed!">
                                 <custom-transformer class="org.mule.example.bookstore.transformers.OrderToEmailTransformer" />
                                 <email:string-to-email-transformer />
-                         </smtp:outbound-endpoint>
+                         </smtps:outbound-endpoint>
                     </pass-through-router>
                </outbound>
           </service>
