@@ -12,9 +12,9 @@ package org.mule.transport.http;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.transport.http.i18n.HttpMessages;
 
@@ -34,10 +34,10 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 public class HttpsMessageReceiver extends HttpMessageReceiver
 {
 
-    public HttpsMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
+    public HttpsMessageReceiver(Connector connector, FlowConstruct flow, InboundEndpoint endpoint)
             throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flow, endpoint);
     }
 
     @Override
@@ -74,10 +74,10 @@ public class HttpsMessageReceiver extends HttpMessageReceiver
             {
                 throw new MessagingException(HttpMessages.sslHandshakeDidNotComplete(),
                     message, e);
-            }                   
+            }
 
             super.preRouteMessage(message);
-            
+
             if (peerCertificateChain != null)
             {
                 message.setOutboundProperty(HttpsConnector.PEER_CERTIFICATES, peerCertificateChain);
