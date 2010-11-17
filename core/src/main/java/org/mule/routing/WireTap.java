@@ -43,6 +43,16 @@ public class WireTap implements MessageProcessor
 
     protected MessageProcessor filteredTap = new WireTapFilter();
 
+    public WireTap()
+    {
+        // empty on purpose
+    }
+
+    public WireTap(MessageProcessor tap)
+    {
+        this.tap = tap;
+    }
+
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (tap == null)

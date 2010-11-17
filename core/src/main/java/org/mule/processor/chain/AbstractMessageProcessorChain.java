@@ -28,10 +28,14 @@ import org.mule.api.processor.policy.AroundPolicy;
 import org.mule.api.processor.policy.Policies;
 import org.mule.api.processor.policy.PolicyInvocation;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.routing.WireTap;
 import org.mule.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,6 +52,7 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
     protected String name;
     protected List<MessageProcessor> processors;
     private final Policies policies = new Policies(this);
+    private final ConcurrentMap<MessageProcessor, WireTap> callbackMap = new ConcurrentHashMap<MessageProcessor, WireTap>();
 
     public AbstractMessageProcessorChain(String name, List<MessageProcessor> processors)
     {
@@ -214,5 +219,10 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
     public Policies getPolicies()
     {
         return policies;
+    }
+
+    public Map<MessageProcessor, WireTap> getCallbackMap()
+    {
+        return callbackMap;
     }
 }

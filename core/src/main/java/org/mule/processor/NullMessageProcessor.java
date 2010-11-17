@@ -15,10 +15,12 @@ import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.policy.Policies;
+import org.mule.routing.WireTap;
 import org.mule.util.ObjectUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 
 public class NullMessageProcessor implements MessageProcessorChain
@@ -47,5 +49,10 @@ public class NullMessageProcessor implements MessageProcessorChain
     public Policies getPolicies()
     {
         return new Policies(this);
+    }
+
+    public Map<MessageProcessor, WireTap> getCallbackMap()
+    {
+        return null;
     }
 }

@@ -18,6 +18,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.SimpleFlowConstruct;
+import org.mule.routing.WireTap;
 
 import java.util.Arrays;
 import java.util.List;
@@ -52,6 +53,11 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
         MuleEvent resultEvent;
         for (MessageProcessor processor : processors)
         {
+            final WireTap wireTap = getCallbackMap().get(processor);
+            if (wireTap != null)
+            {
+                event = wireTap.process(event);
+            }
             // If the next message processor is an outbound router then create
             // outbound event
             if (processor instanceof OutboundEndpoint)
