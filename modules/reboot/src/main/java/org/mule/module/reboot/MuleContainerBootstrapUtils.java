@@ -101,7 +101,7 @@ public final class MuleContainerBootstrapUtils
     /**
      * @see org.mule.util.ClassUtils#getResource
      */
-    public static URL getResource(final String resourceName, final Class callingClass)
+    public static URL getResource(final String resourceName, final Class<?> callingClass)
     {
         URL url = AccessController.doPrivileged(new PrivilegedAction<URL>()
         {
@@ -209,10 +209,10 @@ public final class MuleContainerBootstrapUtils
     /**
      * @see org.mule.util.IOUtils#copy
      */
-    public static int copy(InputStream input, OutputStream output) throws IOException 
+    public static int copy(InputStream input, OutputStream output) throws IOException
     {
         long count = copyLarge(input, output);
-        if (count > Integer.MAX_VALUE) 
+        if (count > Integer.MAX_VALUE)
         {
             return -1;
         }
@@ -227,7 +227,7 @@ public final class MuleContainerBootstrapUtils
         byte[] buffer = new byte[1024 * 4];
         long count = 0;
         int n = 0;
-        while (-1 != (n = input.read(buffer))) 
+        while (-1 != (n = input.read(buffer)))
         {
             output.write(buffer, 0, n);
             count += n;

@@ -22,20 +22,22 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleContainerSystemClassLoader extends URLClassLoader
 {
-
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public MuleContainerSystemClassLoader()
+    public MuleContainerSystemClassLoader(DefaultMuleClassPathConfig classPath)
     {
         super(new URL[0]);
+
         try
         {
-            DefaultMuleClassPathConfig classPath = new DefaultMuleClassPathConfig(MuleContainerBootstrap.lookupMuleHome(),
-                                                                                  MuleContainerBootstrap.lookupMuleBase());
-            @SuppressWarnings("unchecked")
             final List<URL> urlsList = classPath.getURLs();
             for (URL url : urlsList)
             {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("adding URL " + url);
+                }
+
                 addURL(url);
             }
         }
