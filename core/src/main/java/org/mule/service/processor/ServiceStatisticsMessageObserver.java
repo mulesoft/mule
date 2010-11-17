@@ -11,10 +11,11 @@
 package org.mule.service.processor;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
-import org.mule.processor.AbstractMessageObserver;
 
-public class ServiceStatisticsMessageObserver extends AbstractMessageObserver
+public class ServiceStatisticsMessageObserver implements MessageProcessor
 {
     protected Service service;
 
@@ -23,8 +24,7 @@ public class ServiceStatisticsMessageObserver extends AbstractMessageObserver
         this.service = service;
     }
 
-    @Override
-    public void observe(MuleEvent event)
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (service.getStatistics().isEnabled())
         {
@@ -37,5 +37,7 @@ public class ServiceStatisticsMessageObserver extends AbstractMessageObserver
                 service.getStatistics().incReceivedEventASync();
             }
         }
+
+        return event;
     }
 }

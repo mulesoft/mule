@@ -11,12 +11,13 @@
 package org.mule.service.processor;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.management.stats.ServiceStatistics;
-import org.mule.processor.AbstractMessageObserver;
 
-public class ServiceOutboundStatisticsObserver extends AbstractMessageObserver
+public class ServiceOutboundStatisticsObserver implements MessageProcessor
 {
 
     protected Service service;
@@ -26,8 +27,7 @@ public class ServiceOutboundStatisticsObserver extends AbstractMessageObserver
         this.service = service;
     }
 
-    @Override
-    public void observe(MuleEvent event)
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
         ServiceStatistics stats = service.getStatistics();
         if (stats.isEnabled())
@@ -45,5 +45,7 @@ public class ServiceOutboundStatisticsObserver extends AbstractMessageObserver
                 }
             }
         }
+
+        return event;
     }
 }

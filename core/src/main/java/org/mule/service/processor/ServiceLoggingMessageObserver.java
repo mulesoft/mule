@@ -11,11 +11,16 @@
 package org.mule.service.processor;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
-import org.mule.processor.AbstractMessageObserver;
 
-public class ServiceLoggingMessageObserver extends AbstractMessageObserver
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+public class ServiceLoggingMessageObserver implements MessageProcessor
 {
+    protected final transient Log logger = LogFactory.getLog(getClass());
     protected Service service;
 
     public ServiceLoggingMessageObserver(Service service)
@@ -23,8 +28,7 @@ public class ServiceLoggingMessageObserver extends AbstractMessageObserver
         this.service = service;
     }
 
-    @Override
-    public void observe(MuleEvent event)
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (event.getEndpoint().getExchangePattern().hasResponse())
         {
@@ -42,5 +46,7 @@ public class ServiceLoggingMessageObserver extends AbstractMessageObserver
                              + event.getEndpoint().getEndpointURI());
             }
         }
+
+        return event;
     }
 }

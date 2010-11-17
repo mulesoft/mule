@@ -16,7 +16,9 @@ import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.processor.AbstractFilteringMessageProcessor;
-import org.mule.processor.AbstractMessageObserver;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The <code>WireTap</code> MessageProcessor allows inspection of messages in a flow.
@@ -32,20 +34,19 @@ import org.mule.processor.AbstractMessageObserver;
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/WireTap.html">http://www.eaipatterns.com/WireTap.html<a/>
  */
-public class WireTap extends AbstractMessageObserver
-
+public class WireTap implements MessageProcessor
 {
+    protected final transient Log logger = LogFactory.getLog(getClass());
     protected volatile MessageProcessor tap;
     protected volatile Filter filter;
 
     protected MessageProcessor filteredTap = new WireTapFilter();
 
-    @Override
-    public void observe(MuleEvent event)
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (tap == null)
         {
-            return;
+            return event;
         }
 
         try
@@ -58,6 +59,8 @@ public class WireTap extends AbstractMessageObserver
         {
             logger.error("Exception sending to wiretap output " + tap, e);
         }
+
+        return event;
     }
 
     public MessageProcessor getTap()
