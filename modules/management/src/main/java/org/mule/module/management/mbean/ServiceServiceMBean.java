@@ -21,24 +21,9 @@ import javax.management.ObjectName;
  * <code>ServiceServiceMBean</code> defines the management interface for a mule
  * managed service.
  */
-public interface ServiceServiceMBean extends Stoppable, Startable, ServiceStatsMBean
+public interface ServiceServiceMBean extends Stoppable, Startable, AbstractFlowConstructServiceMBean, ServiceStatsMBean
 {
     String DEFAULT_JMX_NAME_PREFIX = "type=Service,name=";
-
-    /**
-     * The statistics for this service
-     * 
-     * @return statistics for this service
-     * @see ServiceStats
-     */
-    ObjectName getStatistics();
-
-    /**
-     * The name of this service
-     * 
-     * @return The name of this service
-     */
-    String getName();
 
     /**
      * The number of queued events for this service
@@ -47,23 +32,23 @@ public interface ServiceServiceMBean extends Stoppable, Startable, ServiceStatsM
      */
     int getQueueSize();
 
-    /**
+        /**
      * Pauses event processing for theComponent. Unlike stop(), a paused service
      * will still consume messages from the underlying transport, but those messages
      * will be queued until the service is resumed. In order to persist these
      * queued messages you can set the 'recoverableMode' property on the
      * Muleconfiguration to true. this causes all internal queues to store their
      * state.
-     * 
-     * @throws MuleException if the service failed to pause.
-     * @see MuleConfiguration
+     *
+     * @throws org.mule.api.MuleException if the service failed to pause.
+     * @see org.mule.api.config.MuleConfiguration
      */
     void pause() throws MuleException;
 
     /**
      * Resumes the Service that has been paused. If the service is not paused
      * nothing is executed.
-     * 
+     *
      * @throws MuleException if the service failed to resume
      */
     void resume() throws MuleException;
@@ -80,4 +65,5 @@ public interface ServiceServiceMBean extends Stoppable, Startable, ServiceStatsM
     void forceStop() throws MuleException;
 
     boolean isStopping();
+
 }

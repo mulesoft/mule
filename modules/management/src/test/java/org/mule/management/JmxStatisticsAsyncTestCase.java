@@ -11,9 +11,13 @@
 package org.mule.management;
 
 import org.mule.api.MuleMessage;
+import org.mule.management.stats.AbstractFlowConstructStatistics;
+import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+
+import java.util.Iterator;
 
 public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
 {
@@ -33,6 +37,10 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
         MuleMessage response = muleClient.request("vm://out", RECEIVE_TIMEOUT * 2);
         assertNotNull(response);
         assertEquals("data", response.getPayloadAsString());
+        muleClient.dispatch("vm://inflow", "Flow data", null);
+        response = muleClient.request("vm://outflow", RECEIVE_TIMEOUT * 2);
+        assertNotNull(response);
+        assertEquals("Flow data", response.getPayloadAsString());
     }
 
     @Override
@@ -52,6 +60,8 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
     {
         ServiceStatistics stats = getServiceStatistics();
         assertEquals(1, stats.getAsyncEventsReceived());
+        FlowConstructStatistics fstats = getFlowConstructStatistics();
+        assertEquals(1, fstats.getAsyncEventsReceived());
     }
 
     public void testCorrectMaxQueueSize() throws Exception
@@ -76,10 +86,35 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
     {
         ServiceStatistics stats = getServiceStatistics();
         assertEquals(1, stats.getTotalEventsReceived());
+        FlowConstructStatistics fstats = getFlowConstructStatistics();
+        assertEquals(1, fstats.getTotalEventsReceived());
     }
 
     private ServiceStatistics getServiceStatistics()
     {
-        return muleContext.getStatistics().getServiceStatistics().iterator().next();
+        Iterator<AbstractFlowConstructStatistics> iterator = muleContext.getStatistics().getServiceStatistics().iterator();
+        AbstractFlowConstructStatistics stat1 = iterator.next();
+        if (stat1 instanceof ServiceStatistics)
+        {
+            return (ServiceStatistics)stat1;
+        }
+        else
+        {
+            return (ServiceStatistics)iterator.next();
+        }
+    }
+
+    private FlowConstructStatistics getFlowConstructStatistics()
+    {
+        Iterator<AbstractFlowConstructStatistics> iterator = muleContext.getStatistics().getServiceStatistics().iterator();
+        AbstractFlowConstructStatistics stat1 = iterator.next();
+        if (stat1 instanceof FlowConstructStatistics)
+        {
+            return (FlowConstructStatistics)stat1;
+        }
+        else
+        {
+            return (FlowConstructStatistics)iterator.next();
+        }
     }
 }

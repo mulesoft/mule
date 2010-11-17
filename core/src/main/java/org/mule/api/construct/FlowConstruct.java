@@ -14,6 +14,7 @@ import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.MessageInfoMapping;
+import org.mule.management.stats.AbstractFlowConstructStatistics;
 import org.mule.management.stats.FlowConstructStatistics;
 
 /**
@@ -43,7 +44,7 @@ public interface FlowConstruct extends LifecycleStateEnabled
      * @return The statistics holder used by this flow construct to keep track of its
      *         activity.
      */
-    FlowConstructStatistics getStatistics();
+    AbstractFlowConstructStatistics getStatistics();
 
     /**
      * @return This implementation of {@link MessageInfoMapping} used to control how

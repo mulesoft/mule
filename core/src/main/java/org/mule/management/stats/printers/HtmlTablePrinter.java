@@ -99,7 +99,7 @@ public class HtmlTablePrinter extends AbstractTablePrinter
 
     protected String getProviderStatsHtml(String stats)
     {
-        if (StringUtils.isBlank(stats))
+        if (StringUtils.isBlank(stats) || "-".equals(stats))
         {
             return "";
         }

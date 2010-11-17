@@ -266,4 +266,10 @@ public class Validator extends AbstractFlowConstruct
 
         return message.getExceptionPayload();
     }
+
+    @Override
+    public String getConstructType()
+    {
+        return "Validator";
+    }
 }

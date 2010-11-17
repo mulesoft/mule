@@ -10,6 +10,8 @@
 
 package org.mule.management.stats.printers;
 
+import org.mule.management.stats.AbstractFlowConstructStatistics;
+import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.management.stats.SedaServiceStatistics;
@@ -18,6 +20,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +31,6 @@ import java.util.Map;
  */
 public class AbstractTablePrinter extends PrintWriter
 {
-
     public AbstractTablePrinter(Writer out)
     {
         super(out, true);
@@ -42,7 +44,7 @@ public class AbstractTablePrinter extends PrintWriter
     public String[] getHeaders()
     {
         String[] column = new String[36];
-        column[0] = "Service Name";
+        column[0] = "Name";
         column[1] = "Service Pool Max Size";
         column[2] = "Service Pool Size";
         column[3] = "Thread Pool Size";
@@ -81,13 +83,15 @@ public class AbstractTablePrinter extends PrintWriter
         return column;
     }
 
-    protected void getColumn(ServiceStatistics stats, String[] col)
+    protected void getColumn(AbstractFlowConstructStatistics stats, String[] col)
     {
         if (stats == null)
         {
             return;
         }
-
+        ServiceStatistics serviceStats = (stats instanceof ServiceStatistics) ? (ServiceStatistics) stats : null;
+        FlowConstructStatistics flowStats = (stats instanceof FlowConstructStatistics) ? (FlowConstructStatistics) stats : null;
+        Arrays.fill(col, "-");
 
         col[0] = stats.getName();
 
@@ -103,28 +107,51 @@ public class AbstractTablePrinter extends PrintWriter
             col[1] = "-";
             col[2] = "-";
         }
-        col[3] = String.valueOf(stats.getThreadPoolSize());
-        col[4] = String.valueOf(stats.getQueuedEvents());
-        col[5] = String.valueOf(stats.getMaxQueueSize());
-        col[6] = String.valueOf(stats.getAverageQueueSize());
+        if (serviceStats != null)
+        {
+            col[3] = String.valueOf(serviceStats.getThreadPoolSize());
+            col[4] = String.valueOf(serviceStats.getQueuedEvents());
+            col[5] = String.valueOf(serviceStats.getMaxQueueSize());
+            col[6] = String.valueOf(serviceStats.getAverageQueueSize());
+        }
         col[7] = String.valueOf(stats.getSyncEventsReceived());
         col[8] = String.valueOf(stats.getAsyncEventsReceived());
         col[9] = String.valueOf(stats.getTotalEventsReceived());
-        col[10] = String.valueOf(stats.getSyncEventsSent());
-        col[11] = String.valueOf(stats.getAsyncEventsSent());
-        col[12] = String.valueOf(stats.getReplyToEventsSent());
-        col[13] = String.valueOf(stats.getTotalEventsSent());
-        col[14] = String.valueOf(stats.getExecutedEvents());
-        col[15] = String.valueOf(stats.getExecutionErrors());
-        col[16] = String.valueOf(stats.getFatalErrors());
-        col[17] = String.valueOf(stats.getMinExecutionTime());
-        col[18] = String.valueOf(stats.getMaxExecutionTime());
-        col[19] = String.valueOf(stats.getAverageExecutionTime());
-        col[20] = String.valueOf(stats.getTotalExecutionTime());
+        if (serviceStats != null)
+        {
+            col[10] = String.valueOf(serviceStats.getSyncEventsSent());
+            col[11] = String.valueOf(serviceStats.getAsyncEventsSent());
+            col[12] = String.valueOf(serviceStats.getReplyToEventsSent());
+            col[13] = String.valueOf(serviceStats.getTotalEventsSent());
+        }
 
-        int i = getRouterInfo(stats.getInboundRouterStat(), col, 21);
-        i = getRouterInfo(stats.getOutboundRouterStat(), col, i);
-        col[i] = String.valueOf(stats.getSamplePeriod());
+        if (serviceStats != null)
+        {
+            col[14] = String.valueOf(serviceStats.getExecutedEvents());
+            col[15] = String.valueOf(serviceStats.getExecutionErrors());
+            col[16] = String.valueOf(serviceStats.getFatalErrors());
+            col[17] = String.valueOf(serviceStats.getMinExecutionTime());
+            col[18] = String.valueOf(serviceStats.getMaxExecutionTime());
+            col[19] = String.valueOf(serviceStats.getAverageExecutionTime());
+            col[20] = String.valueOf(serviceStats.getTotalExecutionTime());
+        }
+        else if (flowStats != null)
+        {
+            col[14] = String.valueOf(flowStats.getProcessedEvents());
+            col[17] = String.valueOf(flowStats.getMinProcessingTime());
+            col[18] = String.valueOf(flowStats.getMaxProcessingTime());
+            col[19] = String.valueOf(flowStats.getAverageProcessingTime());
+            col[20] = String.valueOf(flowStats.getTotalProcessingTime());
+        }
+
+
+        if (serviceStats != null)
+        {
+            int i = getRouterInfo(serviceStats.getInboundRouterStat(), col, 21);
+            i = getRouterInfo(serviceStats.getOutboundRouterStat(), col, i);
+        }
+
+        col[35] = String.valueOf(stats.getSamplePeriod());
     }
 
     protected int getRouterInfo(RouterStatistics stats, String[] col, int index)
@@ -182,7 +209,7 @@ public class AbstractTablePrinter extends PrintWriter
         int i = 1;
         for (Iterator iterator = stats.iterator(); iterator.hasNext(); i++)
         {
-            getColumn((ServiceStatistics) iterator.next(), table[i]);
+            getColumn((AbstractFlowConstructStatistics) iterator.next(), table[i]);
         }
 
         return table;

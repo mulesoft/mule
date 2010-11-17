@@ -33,15 +33,31 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractInterceptingMe
     public abstract MuleEvent before(MuleEvent event) throws MuleException;
 
     /**
-     * This method is invoked after the event has been processed
+     * This method is invoked after the event has been processed, unless an exception was thrown
      */
     public abstract MuleEvent after(MuleEvent event) throws MuleException;
 
+    /**
+     *  This method is always invoked after the event has been processed,
+     */
+    public abstract MuleEvent last(MuleEvent event, long startTime, boolean exceptionWasThrown) throws MuleException;
+
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleEvent resultEvent = before(event);
-        resultEvent = processNext(resultEvent);
-        resultEvent = after(resultEvent);
+        boolean exceptionWasThrown = true;
+        long startTime = System.currentTimeMillis();
+        MuleEvent resultEvent = event;
+        try
+        {
+            resultEvent = before(event);
+            resultEvent = processNext(resultEvent);
+            resultEvent = after(resultEvent);
+            exceptionWasThrown = false;
+        }
+        finally
+        {
+            resultEvent = last(resultEvent, startTime, exceptionWasThrown);
+        }
         return resultEvent;
     }
 

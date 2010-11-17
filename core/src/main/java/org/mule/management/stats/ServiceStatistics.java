@@ -16,7 +16,7 @@ import org.mule.management.stats.printers.SimplePrinter;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
-public class ServiceStatistics extends FlowConstructStatistics implements QueueStatistics
+public class ServiceStatistics extends AbstractFlowConstructStatistics implements QueueStatistics
 {
     private static final long serialVersionUID = -2086999226732861675L;
 
@@ -34,7 +34,6 @@ public class ServiceStatistics extends FlowConstructStatistics implements QueueS
     private long totalQueuedEvent = 0;
 
     private int threadPoolSize = 0;
-    private long samplePeriod = 0;
 
     private RouterStatistics inboundRouterStat = null;
     private ComponentStatistics componentStat = null;
@@ -47,8 +46,7 @@ public class ServiceStatistics extends FlowConstructStatistics implements QueueS
 
     public ServiceStatistics(String name, int threadPoolSize)
     {
-        super(name);
-
+        super("Service", name);
         this.threadPoolSize = threadPoolSize;
         clear();
     }
@@ -188,11 +186,6 @@ public class ServiceStatistics extends FlowConstructStatistics implements QueueS
         return getSyncEventsSent() + getAsyncEventsSent();
     }
 
-    public long getTotalEventsReceived()
-    {
-        return getSyncEventsReceived() + getAsyncEventsReceived();
-    }
-
     public long getExecutedEvents()
     {
         return componentStat.getExecutedEvents();
@@ -237,8 +230,6 @@ public class ServiceStatistics extends FlowConstructStatistics implements QueueS
         {
             getOutboundRouterStat().clear();
         }
-
-        samplePeriod = System.currentTimeMillis();
     }
 
     public RouterStatistics getInboundRouterStat()
@@ -277,10 +268,5 @@ public class ServiceStatistics extends FlowConstructStatistics implements QueueS
     public int getThreadPoolSize()
     {
         return threadPoolSize;
-    }
-
-    public long getSamplePeriod()
-    {
-        return System.currentTimeMillis() - samplePeriod;
     }
 }

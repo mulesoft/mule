@@ -26,7 +26,7 @@ public class AllStatistics
     private boolean isStatisticsEnabled;
     private long startTime;
 
-    private Map<String, ServiceStatistics> serviceStats = new HashMap<String, ServiceStatistics>();
+    private Map<String, AbstractFlowConstructStatistics> flowConstructStats = new HashMap<String, AbstractFlowConstructStatistics>();
 
     /**
      * 
@@ -46,13 +46,13 @@ public class AllStatistics
 
         if (printer instanceof AbstractTablePrinter)
         {
-            printer.print(serviceStats.values());
+            printer.print(flowConstructStats.values());
         }
         else
         {
-            for (ServiceStatistics serviceStatistics : serviceStats.values())
+            for (AbstractFlowConstructStatistics statistics : flowConstructStats.values())
             {
-                printer.print(serviceStatistics);
+                printer.print(statistics);
             }
         }
         // printer.println("-----------------------------");
@@ -62,9 +62,9 @@ public class AllStatistics
 
     public synchronized void clear()
     {
-        for (ServiceStatistics serviceStatistics : getServiceStatistics())
+        for (AbstractFlowConstructStatistics statistics : getServiceStatistics())
         {
-            (serviceStatistics).clear();
+            (statistics).clear();
         }
         startTime = System.currentTimeMillis();
     }
@@ -84,9 +84,9 @@ public class AllStatistics
     {
         isStatisticsEnabled = b;
 
-        for (ServiceStatistics serviceStatistics : serviceStats.values())
+        for (AbstractFlowConstructStatistics statistics : flowConstructStats.values())
         {
-            (serviceStatistics).setEnabled(b);
+            (statistics).setEnabled(b);
         }
     }
 
@@ -100,19 +100,19 @@ public class AllStatistics
         this.startTime = startTime;
     }
 
-    public synchronized void add(ServiceStatistics stat)
+    public synchronized void add(AbstractFlowConstructStatistics stat)
     {
         if (stat != null)
         {
-            serviceStats.put(stat.getName(), stat);
+            flowConstructStats.put(stat.getName(), stat);
         }
     }
 
-    public synchronized void remove(ServiceStatistics stat)
+    public synchronized void remove(AbstractFlowConstructStatistics stat)
     {
         if (stat != null)
         {
-            serviceStats.remove(stat.getName());
+            flowConstructStats.remove(stat.getName());
         }
     }
 
@@ -120,13 +120,13 @@ public class AllStatistics
      * @deprecated use #getServiceStatistics
      */
     @Deprecated
-    public synchronized Collection<ServiceStatistics> getComponentStatistics()
+    public synchronized Collection<AbstractFlowConstructStatistics> getComponentStatistics()
     {
-        return serviceStats.values();
+        return flowConstructStats.values();
     }
 
-    public synchronized Collection<ServiceStatistics> getServiceStatistics()
+    public synchronized Collection<AbstractFlowConstructStatistics> getServiceStatistics()
     {
-        return serviceStats.values();
+        return flowConstructStats.values();
     }
 }

@@ -878,7 +878,6 @@
             <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
             <xsd:group ref="entryPointResolvers"/>
             <xsd:element ref="abstract-service" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element ref="abstract-flow-construct" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="name" type="nonBlankString">
             <xsd:annotation>

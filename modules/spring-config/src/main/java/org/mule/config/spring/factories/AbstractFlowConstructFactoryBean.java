@@ -50,6 +50,12 @@ public abstract class AbstractFlowConstructFactoryBean implements FactoryBean<Fl
         {
             // NOOP
         }
+
+        @Override
+        public String getConstructType()
+        {
+            return "NULL";
+        }
     }
 
     protected ApplicationContext applicationContext;

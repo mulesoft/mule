@@ -132,4 +132,10 @@ public class Bridge extends AbstractFlowConstruct
                 this);
         }
     }
+
+    @Override
+    public String getConstructType()
+    {
+        return "Bridge";
+    }
 }

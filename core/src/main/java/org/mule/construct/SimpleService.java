@@ -252,4 +252,10 @@ public class SimpleService extends AbstractFlowConstruct
                 e);
         }
     }
+
+    @Override
+    public String getConstructType()
+    {
+        return "Simple-Service";
+    }
 }

@@ -14,18 +14,17 @@ import org.mule.api.management.stats.Statistics;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
-public class FlowConstructStatistics implements Statistics
+public class FlowConstructStatistics extends AbstractFlowConstructStatistics
 {
     private static final long serialVersionUID = 5337576392583767442L;
 
-    protected String name;
-    protected boolean enabled = false;
-    protected final AtomicLong receivedEventSync = new AtomicLong(0);
-    protected final AtomicLong receivedEventASync = new AtomicLong(0);
+    protected final ComponentStatistics flowStatistics = new ComponentStatistics();
 
-    public FlowConstructStatistics(String name)
+    public FlowConstructStatistics(String flowConstructType, String name)
     {
-        this.name = name;
+        super(flowConstructType, name);
+        flowStatistics.setEnabled(enabled);
+        clear();
     }
 
     /**
@@ -41,43 +40,46 @@ public class FlowConstructStatistics implements Statistics
      */
     public synchronized void setEnabled(boolean b)
     {
-        enabled = b;
-    }
-
-    public synchronized String getName()
-    {
-        return name;
-    }
-
-    public synchronized void setName(String name)
-    {
-        this.name = name;
+        super.setEnabled(b);
+        flowStatistics.setEnabled(enabled);
     }
 
     public synchronized void clear()
     {
-        receivedEventSync.set(0);
-        receivedEventASync.set(0);
+        super.clear();
+        if (flowStatistics != null)
+        {
+            flowStatistics.clear();
+        }
     }
 
-    public void incReceivedEventSync()
+    public void addFlowExecutionTime(long time)
     {
-        receivedEventSync.addAndGet(1);
+        flowStatistics.addExecutionTime(time);
     }
 
-    public void incReceivedEventASync()
+    public long getAverageProcessingTime()
     {
-        receivedEventASync.addAndGet(1);
+        return flowStatistics.getAverageExecutionTime();
     }
 
-    public long getAsyncEventsReceived()
+    public long getProcessedEvents()
     {
-        return receivedEventASync.get();
+        return flowStatistics.getExecutedEvents();
     }
 
-    public long getSyncEventsReceived()
+    public long getMaxProcessingTime()
     {
-        return receivedEventSync.get();
+        return flowStatistics.getMaxExecutionTime();
     }
 
+    public long getMinProcessingTime()
+    {
+        return flowStatistics.getMinExecutionTime();
+    }
+
+    public long getTotalProcessingTime()
+    {
+        return flowStatistics.getTotalExecutionTime();
+    }
 }

@@ -37,22 +37,22 @@
             <test:component throwException="true"/>
         </service>
 
-
-        <simple-service name="testSS1"
-                        address="vm://inss1">
-            <test:component throwException="true" />
-            <default-service-exception-strategy>
-                <vm:outbound-endpoint path="ss1out" exchange-pattern="one-way"
-                                      connector-ref="vmConnector"/>
-            </default-service-exception-strategy>
-        </simple-service>
-
-        <simple-service name="testSS2"
-                        address="vm://inss2">
-            <test:component throwException="true" />
-        </simple-service>
-
     </model>
+
+
+    <simple-service name="testSS1"
+                    address="vm://inss1">
+        <test:component throwException="true" />
+        <default-service-exception-strategy>
+            <vm:outbound-endpoint path="ss1out" exchange-pattern="one-way"
+                                  connector-ref="vmConnector"/>
+        </default-service-exception-strategy>
+    </simple-service>
+
+    <simple-service name="testSS2"
+                    address="vm://inss2">
+        <test:component throwException="true" />
+    </simple-service>
 
     <flow name="testflow1">
         <vm:inbound-endpoint path="inflow1" exchange-pattern="one-way"/>

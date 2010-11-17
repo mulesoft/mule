@@ -33,4 +33,10 @@ public class IBeanFlowConstruct extends SimpleFlowConstruct
         final List<MessageProcessor> messageProcessors = Collections.emptyList();
         setMessageProcessors(messageProcessors);
     }
+
+    @Override
+    public String getConstructType()
+    {
+        return "Ibeans-Flow";
+    }
 }

@@ -83,4 +83,11 @@ public class ${patternClassName} extends AbstractFlowConstruct
         builder.chain(outboundEndpoint);
 #end
     }
+
+    @Override
+    public String getConstructType()
+    {
+        return "${patternClassName}";
+    }
+    
 }

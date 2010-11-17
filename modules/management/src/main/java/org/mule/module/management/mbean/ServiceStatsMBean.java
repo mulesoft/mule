@@ -13,10 +13,8 @@ package org.mule.module.management.mbean;
 /**
  * <code>ServiceStatsMBean</code> TODO
  */
-public interface ServiceStatsMBean
+public interface ServiceStatsMBean extends AbstractFlowConstructStatsMBean
 {
-
-    void clearStatistics();
 
     long getAverageExecutionTime();
 
@@ -34,10 +32,6 @@ public interface ServiceStatsMBean
 
     long getQueuedEvents();
 
-    long getAsyncEventsReceived();
-
-    long getSyncEventsReceived();
-
     long getReplyToEventsSent();
 
     long getSyncEventsSent();
@@ -45,8 +39,6 @@ public interface ServiceStatsMBean
     long getAsyncEventsSent();
 
     long getTotalEventsSent();
-
-    long getTotalEventsReceived();
 
     long getExecutedEvents();
 

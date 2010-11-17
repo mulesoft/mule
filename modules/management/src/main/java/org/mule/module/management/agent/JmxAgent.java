@@ -19,6 +19,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.construct.AbstractFlowConstruct;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.module.management.i18n.ManagementMessages;
@@ -26,6 +27,8 @@ import org.mule.module.management.mbean.ConnectorService;
 import org.mule.module.management.mbean.ConnectorServiceMBean;
 import org.mule.module.management.mbean.EndpointService;
 import org.mule.module.management.mbean.EndpointServiceMBean;
+import org.mule.module.management.mbean.FlowConstructService;
+import org.mule.module.management.mbean.FlowConstructServiceMBean;
 import org.mule.module.management.mbean.ModelService;
 import org.mule.module.management.mbean.ModelServiceMBean;
 import org.mule.module.management.mbean.MuleConfigurationService;
@@ -409,6 +412,22 @@ public class JmxAgent extends AbstractAgent
         }
     }
 
+    protected void registerFlowConstructServices() throws NotCompliantMBeanException, MBeanRegistrationException,
+        InstanceAlreadyExistsException, MalformedObjectNameException
+    {
+        for (AbstractFlowConstruct flowConstruct : muleContext.getRegistry().lookupObjects(AbstractFlowConstruct.class))
+        {
+            final String rawName = flowConstruct.getName();
+            final String name = jmxSupport.escape(rawName);
+            final String jmxName = String.format("%s:type=%s,name=%s", jmxSupport.getDomainName(muleContext, !containerMode), flowConstruct.getConstructType(), name);
+            ObjectName on = jmxSupport.getObjectName(jmxName);
+            FlowConstructServiceMBean fcMBean = new FlowConstructService(flowConstruct.getConstructType(), rawName, muleContext, flowConstruct.getStatistics());
+            ClassloaderSwitchingMBeanWrapper wrapper = new ClassloaderSwitchingMBeanWrapper(fcMBean, FlowConstructServiceMBean.class, muleContext.getExecutionClassLoader());
+            logger.debug("Registering service with name: " + on);
+            mBeanServer.registerMBean(wrapper, on);
+        }
+    }
+
     protected void registerEndpointServices() throws NotCompliantMBeanException, MBeanRegistrationException,
         InstanceAlreadyExistsException, MalformedObjectNameException
     {
@@ -660,6 +679,7 @@ public class JmxAgent extends AbstractAgent
                     registerConfigurationService();
                     registerModelServices();
                     registerServiceServices();
+                    registerFlowConstructServices();
                     registerEndpointServices();
                     registerConnectorServices();
                 }

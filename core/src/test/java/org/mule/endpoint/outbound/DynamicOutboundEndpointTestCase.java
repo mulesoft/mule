@@ -73,26 +73,26 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
     }
 
-    //TODO MULE-4982 - fails intermittently
-//    public void testDefaultFlowOneWay() throws Exception
-//    {
-//        OutboundEndpoint endpoint = createOutboundEndpoint( null, null, null,
-//                null, MessageExchangePattern.ONE_WAY, null);
-//
-//        testOutboundEvent = createTestOutboundEvent(endpoint);
-//        //First Request creates the real endpoint
-//        endpoint.process(testOutboundEvent);
-//
-//        setUpFakeDispatcher(endpoint);
-//
-//        assertTrue(endpoint instanceof DynamicOutboundEndpoint);
-//
-//        MuleEvent result = endpoint.process(testOutboundEvent);
-//
-//        dispacher.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
-//        assertMessageSentSame(false);
-//        assertNull(result);
-//    }
+    public void testDefaultFlowOneWay() throws Exception
+    {
+        OutboundEndpoint endpoint = createOutboundEndpoint( null, null, null,
+            null, MessageExchangePattern.ONE_WAY, null);
+
+        testOutboundEvent = createTestOutboundEvent(endpoint);
+        //First Request creates the real endpoint
+        endpoint.process(testOutboundEvent);
+        Thread.sleep(1000);
+
+        setUpFakeDispatcher(endpoint);
+
+        assertTrue(endpoint instanceof DynamicOutboundEndpoint);
+
+        MuleEvent result = endpoint.process(testOutboundEvent);
+
+        dispacher.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
+        assertMessageSentSame(false);
+        assertNull(result);
+    }
 
     public void testSecurityFilterAccept() throws Exception
     {

@@ -84,7 +84,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
         this.muleContext = muleContext;
         this.name = name;
         this.lifecycleManager = new FlowConstructLifecycleManager(this, muleContext);
-        this.statistics = new FlowConstructStatistics(name);
+        this.statistics = new FlowConstructStatistics(getConstructType(), name);
         this.exceptionListener = new DefaultServiceExceptionStrategy(muleContext);
     }
 
@@ -289,7 +289,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
 
     protected void doInitialise() throws InitialisationException
     {
-        // Empty template method
+        muleContext.getStatistics().add(statistics);
     }
 
     protected void doStart() throws MuleException
@@ -304,7 +304,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
 
     protected void doDispose()
     {
-        // Empty template method
+        muleContext.getStatistics().remove(statistics);
     }
 
     /**
@@ -379,4 +379,10 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     {
         return this.messageProcessorChain;
     }
+
+    /**
+     *
+     * @return the type of construct being created, e.g. "Flow"
+     */
+    public abstract String getConstructType();
 }

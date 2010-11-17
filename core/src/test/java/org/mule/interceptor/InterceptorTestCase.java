@@ -11,6 +11,7 @@
 package org.mule.interceptor;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.service.Service;
 import org.mule.component.AbstractComponent;
 import org.mule.model.seda.SedaService;
@@ -172,6 +173,12 @@ public class InterceptorTestCase extends AbstractMuleTestCase
                 e.printStackTrace();
                 fail(e.getMessage());
             }
+            return event;
+        }
+
+        @Override
+        public MuleEvent last(MuleEvent event, long startTime, boolean exceptionWasThrown) throws MuleException
+        {
             return event;
         }
     }

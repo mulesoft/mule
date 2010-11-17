@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>ServiceStats</code> TODO
  */
-public class ServiceStats implements ServiceStatsMBean, MBeanRegistration
+public class ServiceStats extends AbstractFlowConstructStats implements ServiceStatsMBean, MBeanRegistration
 {
 
     /**
@@ -31,28 +31,17 @@ public class ServiceStats implements ServiceStatsMBean, MBeanRegistration
      */
     private static Log LOGGER = LogFactory.getLog(ServiceStats.class);
 
-    private MBeanServer server;
-
-    private ObjectName name;
     private ObjectName inboundName;
     private ObjectName outboundName;
 
-    private ServiceStatistics statistics;
+    private final ServiceStatistics statistics;
 
     public ServiceStats(ServiceStatistics statistics)
     {
+        super(statistics);
         this.statistics = statistics;
     }
 
-    public void clearStatistics()
-    {
-        statistics.clear();
-    }
-
-    public long getAsyncEventsReceived()
-    {
-        return statistics.getAsyncEventsReceived();
-    }
 
     public long getAsyncEventsSent()
     {
@@ -114,19 +103,9 @@ public class ServiceStats implements ServiceStatsMBean, MBeanRegistration
         return statistics.getReplyToEventsSent();
     }
 
-    public long getSyncEventsReceived()
-    {
-        return statistics.getSyncEventsReceived();
-    }
-
     public long getSyncEventsSent()
     {
         return statistics.getSyncEventsSent();
-    }
-
-    public long getTotalEventsReceived()
-    {
-        return statistics.getTotalEventsReceived();
     }
 
     public long getTotalEventsSent()
@@ -141,14 +120,12 @@ public class ServiceStats implements ServiceStatsMBean, MBeanRegistration
 
     public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception
     {
-        this.server = server;
-        this.name = name;
-        return name;
+        return super.preRegister(server, name);
     }
 
     public void postRegister(Boolean registrationDone)
     {
-
+        super.postRegister(registrationDone);
         try
         {
             RouterStatistics is = this.statistics.getInboundRouterStat();
@@ -184,11 +161,12 @@ public class ServiceStats implements ServiceStatsMBean, MBeanRegistration
 
     public void preDeregister() throws Exception
     {
-        // nothing to do
+        super.preDeregister();
     }
 
     public void postDeregister()
     {
+        super.postDeregister();
         try
         {
             if (this.server.isRegistered(inboundName))

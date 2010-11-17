@@ -399,4 +399,10 @@ public class WSProxy extends AbstractFlowConstruct
     {
         return ObjectUtils.toString(this);
     }
+
+    @Override
+    public String getConstructType()
+    {
+        return "Web-Service-Proxy";
+    }
 }

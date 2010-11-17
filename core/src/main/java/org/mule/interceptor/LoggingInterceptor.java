@@ -13,6 +13,9 @@ package org.mule.interceptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.management.stats.AbstractFlowConstructStatistics;
+import org.mule.management.stats.FlowConstructStatistics;
 
 /**
  * <code>LoggingInterceptor</code> is a simple interceptor that logs a message before
@@ -49,4 +52,17 @@ public class LoggingInterceptor extends AbstractEnvelopeInterceptor
         return event;
     }
 
+    @Override
+    public MuleEvent last(MuleEvent event, long startTime, boolean exceptionWasThrown) throws MuleException
+    {
+        if (flowConstruct != null && flowConstruct.getStatistics().isEnabled())
+        {
+            AbstractFlowConstructStatistics stats = flowConstruct.getStatistics();
+            if (stats instanceof FlowConstructStatistics)
+            {
+                ((FlowConstructStatistics)stats).addFlowExecutionTime(System.currentTimeMillis() - startTime);
+            }
+        }
+        return event;
+    }
 }

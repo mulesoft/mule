@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>ServiceService</code> exposes service information about a Mule Managed
  * service.
  */
-public class ServiceService implements ServiceServiceMBean, MBeanRegistration, ServiceStatsMBean
+public class ServiceService extends AbstractFlowConstructService implements ServiceServiceMBean, MBeanRegistration, ServiceStatsMBean
 {
 
     /**
@@ -37,24 +37,12 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
      */
     private static Log LOGGER = LogFactory.getLog(ServiceService.class);
 
-    private MBeanServer server;
-
-    private String name;
-
-    private ObjectName statsName;
-
-    private ObjectName objectName;
-
-    private ServiceStatistics statistics;
-
-    private MuleContext muleContext;
+    private ServiceStatistics  statistics;
 
     public ServiceService(String name, MuleContext muleContext)
     {
-        this.muleContext = muleContext;        
-        this.name = name;
+        super("Service", name, muleContext);
         this.statistics = getComponent().getStatistics();
-
     }
 
     public int getQueueSize()
@@ -139,9 +127,7 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
 
     public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception
     {
-        this.server = server;
-        this.objectName = name;
-        return name;
+        return super.preRegister(server, name);
     }
 
     public void postRegister(Boolean registrationDone)
@@ -169,22 +155,12 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
 
     public void preDeregister() throws Exception
     {
-        try
-        {
-            if (this.server.isRegistered(statsName))
-            {
-                this.server.unregisterMBean(statsName);
-            }
-        }
-        catch (Exception ex)
-        {
-            LOGGER.error("Error unregistering ServiceService child " + statsName.getCanonicalName(), ex);
-        }
+        super.preDeregister();
     }
 
     public void postDeregister()
     {
-        // nothing to do
+        super.postDeregister();
     }
 
     private AbstractService getComponent()
@@ -193,7 +169,6 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
     }
 
     // ///// Service stats impl /////////
-
     public void clearStatistics()
     {
         statistics.clear();
@@ -202,6 +177,16 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
     public long getAsyncEventsReceived()
     {
         return statistics.getAsyncEventsReceived();
+    }
+
+    public long getSyncEventsReceived()
+    {
+        return statistics.getSyncEventsReceived();
+    }
+
+    public long getTotalEventsReceived()
+    {
+        return statistics.getTotalEventsReceived();
     }
 
     public long getAsyncEventsSent()
@@ -249,11 +234,6 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
         return statistics.getMinExecutionTime();
     }
 
-    public String getName()
-    {
-        return name;
-    }
-
     public long getQueuedEvents()
     {
         return statistics.getQueuedEvents();
@@ -264,19 +244,9 @@ public class ServiceService implements ServiceServiceMBean, MBeanRegistration, S
         return statistics.getReplyToEventsSent();
     }
 
-    public long getSyncEventsReceived()
-    {
-        return statistics.getSyncEventsReceived();
-    }
-
     public long getSyncEventsSent()
     {
         return statistics.getSyncEventsSent();
-    }
-
-    public long getTotalEventsReceived()
-    {
-        return statistics.getTotalEventsReceived();
     }
 
     public long getTotalEventsSent()

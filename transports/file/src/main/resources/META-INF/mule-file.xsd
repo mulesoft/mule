@@ -89,7 +89,7 @@
                 <xsd:attribute name="streaming" type="mule:substitutableBoolean" default="true">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether a FileInputStream should be sent as the message payload (if true) or a file (if false). The default is true.
+                            Whether a FileInputStream should be sent as the message payload (if true) or a byte array. (if false). The default is true.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
