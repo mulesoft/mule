@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.util.ObjectUtils;
 import org.mule.util.StringMessageUtils;
 
 import org.apache.commons.logging.Log;
@@ -53,5 +54,11 @@ public class InboundLoggingMessageProcessor implements MessageProcessor
         }
 
         return event;
+    }
+
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
     }
 }

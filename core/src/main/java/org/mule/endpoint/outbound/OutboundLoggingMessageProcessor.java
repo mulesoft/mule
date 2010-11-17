@@ -13,6 +13,7 @@ package org.mule.endpoint.outbound;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.util.ObjectUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,4 +32,9 @@ public class OutboundLoggingMessageProcessor implements MessageProcessor
         return event;
     }
 
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
+    }
 }

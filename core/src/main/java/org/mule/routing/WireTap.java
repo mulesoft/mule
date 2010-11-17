@@ -16,6 +16,7 @@ import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.processor.AbstractFilteringMessageProcessor;
+import org.mule.util.ObjectUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -113,6 +114,18 @@ public class WireTap implements MessageProcessor
             }
             return null;
         }
+
+        @Override
+        public String toString()
+        {
+            return ObjectUtils.toString(this);
+        }
+    }
+
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
     }
 
 }

@@ -16,6 +16,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.transport.AbstractConnector;
+import org.mule.util.ObjectUtils;
 
 /**
  * Publishes a {@link EndpointMessageNotification}'s when a message is received.
@@ -39,5 +40,11 @@ public class InboundNotificationMessageProcessor implements MessageProcessor
         }
 
         return event;
+    }
+
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
     }
 }

@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.util.ObjectUtils;
 
 public class FlowConstructStatisticsMessageProcessor implements MessageProcessor, FlowConstructAware
 {
@@ -40,5 +41,11 @@ public class FlowConstructStatisticsMessageProcessor implements MessageProcessor
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
+    }
+
+    @Override
+    public String toString()
+    {
+        return ObjectUtils.toString(this);
     }
 }
