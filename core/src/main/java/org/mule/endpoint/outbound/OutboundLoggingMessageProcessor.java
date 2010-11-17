@@ -11,18 +11,24 @@
 package org.mule.endpoint.outbound;
 
 import org.mule.api.MuleEvent;
-import org.mule.processor.AbstractMessageObserver;
+import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
 
-public class OutboundLoggingMessageProcessor extends AbstractMessageObserver
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+public class OutboundLoggingMessageProcessor implements MessageProcessor
 {
+    protected final transient Log logger = LogFactory.getLog(getClass());
 
-    @Override
-    public void observe(MuleEvent event)
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (logger.isDebugEnabled())
         {
             logger.debug("sending event: " + event);
         }
+
+        return event;
     }
 
 }
