@@ -230,11 +230,23 @@ fi
 
 PROC_ARCH=`uname $UNAME_PROC_OPTION | tr [:upper:] [:lower:] | tr -d [:blank:]`
 
+# The previous approach was this:
+# If a 32-bit wrapper binary exists then it will work on 32 or 64 bit
+# platforms, if the 64-bit binary exists then the distribution most
+# likely wants to use long names.
+DIST_BITS="32"
+
 while :
 do
     case "$PROC_ARCH" in
-        'amd64' | 'athlon' | 'i386' | 'i486' | 'i586' | 'i686' | 'x86_64' | 'i86pc')
+        'amd64' | 'athlon' | 'i386' | 'i486' | 'i586' | 'i686' | 'i86pc')
             DIST_ARCH="x86"
+            break;;
+        'x86_64')
+            DIST_ARCH="x86"
+            # on 64 bit Linuxes the 32 bit subsystem may not be installed so
+            # let's use the 64 bit wrapper
+            DIST_BITS="64"
             break;;
         'ia32' | 'ia64')
              DIST_ARCH="ia"
@@ -272,12 +284,7 @@ outputFile() {
     fi
 }
 
-# Decide on the wrapper binary to use.
-# If a 32-bit wrapper binary exists then it will work on 32 or 64 bit
-#  platforms, if the 64-bit binary exists then the distribution most
-#  likely wants to use long names.  Otherwise, look for the default.
-# For macosx, we also want to look for universal binaries.
-WRAPPER_TEST_CMD="$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-32"
+WRAPPER_TEST_CMD="$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-$DIST_BITS"
 if [ -x "$WRAPPER_TEST_CMD" ]
 then
     WRAPPER_CMD="$WRAPPER_TEST_CMD"
@@ -313,19 +320,13 @@ else
             fi
         fi
     else
-        WRAPPER_TEST_CMD="$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-64"
-        if [ -x "$WRAPPER_TEST_CMD" ]
+        if [ ! -x "$WRAPPER_CMD" ]
         then
-            WRAPPER_CMD="$WRAPPER_TEST_CMD"
-        else
-            if [ ! -x "$WRAPPER_CMD" ]
-            then
-                echo "Unable to locate any of the following binaries:"
-                outputFile "$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-32"
-                outputFile "$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-64"
-                outputFile "$WRAPPER_CMD"
-                exit 1
-            fi
+            echo "Unable to locate any of the following binaries:"
+            outputFile "$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-32"
+            outputFile "$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-64"
+            outputFile "$WRAPPER_CMD"
+            exit 1
         fi
     fi
 fi
