@@ -11,9 +11,10 @@
 package org.mule.endpoint.outbound;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.context.notification.EndpointMessageNotification;
-import org.mule.processor.AbstractMessageObserver;
 import org.mule.transport.AbstractConnector;
 
 /**
@@ -21,7 +22,7 @@ import org.mule.transport.AbstractConnector;
  * dispatched.
  */
 
-public class OutboundNotificationMessageProcessor extends AbstractMessageObserver
+public class OutboundNotificationMessageProcessor implements MessageProcessor
 {
 
     private OutboundEndpoint endpoint;
@@ -31,8 +32,7 @@ public class OutboundNotificationMessageProcessor extends AbstractMessageObserve
         this.endpoint = endpoint;
     }
 
-    @Override
-    public void observe(MuleEvent event)
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
         AbstractConnector connector = (AbstractConnector) endpoint.getConnector();
         if (connector.isEnableMessageEvents())
@@ -55,5 +55,7 @@ public class OutboundNotificationMessageProcessor extends AbstractMessageObserve
             connector.fireNotification(new EndpointMessageNotification(event.getMessage(),
                 event.getEndpoint(), component, notificationAction));
         }
+
+        return event;
     }
 }
