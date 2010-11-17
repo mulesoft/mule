@@ -11,14 +11,18 @@
 package org.mule.endpoint.inbound;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.processor.AbstractMessageObserver;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.util.StringMessageUtils;
 
-public class InboundLoggingMessageProcessor extends AbstractMessageObserver
-{
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+public class InboundLoggingMessageProcessor implements MessageProcessor
+{
+    protected final transient Log logger = LogFactory.getLog(getClass());
     protected InboundEndpoint endpoint;
 
     public InboundLoggingMessageProcessor(InboundEndpoint endpoint)
@@ -26,8 +30,7 @@ public class InboundLoggingMessageProcessor extends AbstractMessageObserver
         this.endpoint = endpoint;
     }
 
-    @Override
-    public void observe(MuleEvent event)
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleMessage message = event.getMessage();
         if (logger.isDebugEnabled())
@@ -48,5 +51,7 @@ public class InboundLoggingMessageProcessor extends AbstractMessageObserver
                 // ignore
             }
         }
+
+        return event;
     }
 }
