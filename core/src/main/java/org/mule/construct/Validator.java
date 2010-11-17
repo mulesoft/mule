@@ -27,7 +27,7 @@ import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
+import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.expression.transformers.ExpressionTransformer;
@@ -89,7 +89,7 @@ public class Validator extends AbstractFlowConstruct
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
     {
         builder.chain(new LoggingInterceptor());
-        builder.chain(new FlowConstructStatisticsMessageObserver());
+        builder.chain(new FlowConstructStatisticsMessageProcessor());
 
         final ErrorAwareEventReturningMessageProcessor outboundMessageProcessor = new ErrorAwareEventReturningMessageProcessor();
         outboundMessageProcessor.setListener(outboundEndpoint);

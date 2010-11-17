@@ -16,7 +16,7 @@ import org.mule.config.i18n.MessageFactory;
 #end
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.construct.AbstractFlowConstruct;
-import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
+import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.LoggingInterceptor;
 
 public class ${patternClassName} extends AbstractFlowConstruct
@@ -75,7 +75,7 @@ public class ${patternClassName} extends AbstractFlowConstruct
         throws MuleException
     {
         builder.chain(new LoggingInterceptor());
-        builder.chain(new FlowConstructStatisticsMessageObserver());
+        builder.chain(new FlowConstructStatisticsMessageProcessor());
 
         // TODO add specific message processors to reify the expected pattern behavior
 #if($patternType == "siso")

@@ -24,7 +24,7 @@ import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
+import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.util.ClassUtils;
 
@@ -170,7 +170,7 @@ public class SimpleService extends AbstractFlowConstruct
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
     {
         builder.chain(new LoggingInterceptor());
-        builder.chain(new FlowConstructStatisticsMessageObserver());
+        builder.chain(new FlowConstructStatisticsMessageProcessor());
         type.configureComponentMessageProcessor(muleContext, builder, component);
     }
 

@@ -18,7 +18,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
+import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.LoggingInterceptor;
 
 import org.apache.commons.lang.Validate;
@@ -57,7 +57,7 @@ public class Bridge extends AbstractFlowConstruct
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
     {
         builder.chain(new LoggingInterceptor());
-        builder.chain(new FlowConstructStatisticsMessageObserver());
+        builder.chain(new FlowConstructStatisticsMessageProcessor());
         builder.chain(outboundEndpoint);
     }
 

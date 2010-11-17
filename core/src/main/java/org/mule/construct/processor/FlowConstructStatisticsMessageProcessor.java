@@ -11,17 +11,16 @@
 package org.mule.construct.processor;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
-import org.mule.processor.AbstractMessageObserver;
+import org.mule.api.processor.MessageProcessor;
 
-public class FlowConstructStatisticsMessageObserver extends AbstractMessageObserver
-    implements FlowConstructAware
+public class FlowConstructStatisticsMessageProcessor implements MessageProcessor, FlowConstructAware
 {
     protected FlowConstruct flowConstruct;
 
-    @Override
-    public void observe(MuleEvent event)
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (flowConstruct.getStatistics().isEnabled())
         {
@@ -34,6 +33,8 @@ public class FlowConstructStatisticsMessageObserver extends AbstractMessageObser
                 flowConstruct.getStatistics().incReceivedEventASync();
             }
         }
+
+        return event;
     }
 
     public void setFlowConstruct(FlowConstruct flowConstruct)

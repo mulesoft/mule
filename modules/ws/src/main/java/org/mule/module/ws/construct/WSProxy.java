@@ -24,7 +24,7 @@ import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.AbstractFlowConstruct;
-import org.mule.construct.processor.FlowConstructStatisticsMessageObserver;
+import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.processor.StopFurtherMessageProcessingMessageProcessor;
@@ -121,7 +121,7 @@ public class WSProxy extends AbstractFlowConstruct
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
     {
         builder.chain(new LoggingInterceptor());
-        builder.chain(new FlowConstructStatisticsMessageObserver());
+        builder.chain(new FlowConstructStatisticsMessageProcessor());
         builder.chain(proxyMessageProcessor);
         builder.chain(new StopFurtherMessageProcessingMessageProcessor());
         builder.chain(new TransformerTemplate(new CopyInboundToOutboundPropertiesTransformerCallback()));
