@@ -92,6 +92,8 @@
             <exclude>**/*.iml</exclude>
             <exclude>**/*.ipr</exclude>
             <exclude>**/*.iws</exclude>
+            <!-- Legacy LoanBroker example -->
+            <exclude>loanbroker/**</exclude>
         </excludes>
     </fileSet>
 
@@ -147,57 +149,22 @@
 
     <!--
     ===============================
-        Mule Examples: Loan Broker
+        Mule Examples: Loan Broker Simple
     ===============================
     -->
     <fileSet>
-        <directory>../../examples/loanbroker/dist</directory>
-        <outputDirectory>examples/loanbroker</outputDirectory>
-    </fileSet>
-    <fileSet>
-        <directory>../../examples/loanbroker/dist</directory>
-        <outputDirectory>examples/loanbroker</outputDirectory>
-        <fileMode>755</fileMode>
-        <includes>
-            <include>loanbroker-client</include>
-            <include>loanbroker-server</include>
-            <include>loanbroker-client.bat</include>
-            <include>loanbroker-server.bat</include>
-        </includes>
-    </fileSet>
-    <!-- Common classes -->
-    <fileSet>
-        <directory>../../examples/loanbroker/common/dist</directory>
-        <outputDirectory>examples/loanbroker/common</outputDirectory>
-    </fileSet>
-    <fileSet>
-        <directory>../../examples/loanbroker/common-tests/dist</directory>
-        <outputDirectory>examples/loanbroker/common-tests</outputDirectory>
-    </fileSet>
-    <!-- Credit Agency EJB -->
-    <fileSet>
-        <directory>../../examples/loanbroker/credit-agency/dist</directory>
-        <outputDirectory>examples/loanbroker/credit-agency</outputDirectory>
-    </fileSet>
-    <!-- LoanBroker ESB -->
-    <fileSet>
-        <directory>../../examples/loanbroker/esb/dist</directory>
-        <outputDirectory>examples/loanbroker/esb</outputDirectory>
-    </fileSet>
-    <!-- LoanBroker ESN -->
-    <fileSet>
-        <directory>../../examples/loanbroker/esn/dist</directory>
-        <outputDirectory>examples/loanbroker/esn</outputDirectory>
-    </fileSet>
-    <!-- LoanBroker BPM -->
-    <fileSet>
-        <directory>../../examples/loanbroker/bpm/dist</directory>
-        <outputDirectory>examples/loanbroker/bpm</outputDirectory>
-    </fileSet>
-    <!-- LoanBroker simple -->
-    <fileSet>
         <directory>../../examples/loanbroker-simple/dist</directory>
         <outputDirectory>examples/loanbroker-simple</outputDirectory>
+    </fileSet>
+
+    <!--
+    ===============================
+        Mule Examples: Loan Broker BPM
+    ===============================
+    -->
+    <fileSet>
+        <directory>../../examples/loanbroker-bpm/dist</directory>
+        <outputDirectory>examples/loanbroker-bpm</outputDirectory>
     </fileSet>
 
     <!--
@@ -478,6 +445,12 @@
       <outputDirectory>examples/errorhandler</outputDirectory>
       <includes>
         <include>org.mule.examples:mule-example-errorhandler</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>examples/loanbroker-bpm</outputDirectory>
+      <includes>
+        <include>org.mule.examples:mule-example-loanbroker-bpm</include>
       </includes>
     </dependencySet>
     <dependencySet>
