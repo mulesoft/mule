@@ -15,10 +15,8 @@ import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.policy.Policies;
-import org.mule.routing.WireTap;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the
@@ -38,29 +36,19 @@ public class InterceptingChainLifecycleWrapper extends AbstractMessageProcessorC
         this.chain = chain;
     }
 
-    @Override
+    public List<MessageProcessor> getMessageProcessors()
+    {
+        return chain.getMessageProcessors();
+    }
+
     public String getName()
     {
         return chain.getName();
     }
 
-    @Override
     public Policies getPolicies()
     {
         return chain.getPolicies();
-    }
-
-    @Override
-    public Map<MessageProcessor, WireTap> getCallbackMap()
-    {
-        return chain.getCallbackMap();
-    }
-
-    @Override
-    public List<MessageProcessor> getMessageProcessors()
-    {
-        // TODO something odd here, 'this' MP set is different from the delegate's set
-        return chain.getMessageProcessors();
     }
 
     @Override
