@@ -62,7 +62,9 @@ geronimo-jta_1.0.1B_spec-1.1-osgi
 geronimo-stax-api_1.0_spec-1.0.1
 geronimo-ws-metadata_2.0_spec-1.1.2
 groovy-all-1.6.7
-hibernate-core-3.3.2.GA
+hibernate-commons-annotations-3.2.0.Final
+hibernate-core-3.6.0.Final
+hibernate-jpa-2.0-api-1.0.0.Final
 ibeans-support-1.0-SNAPSHOT
 ibeans-annotation-api-0.9.2-SNAPSHOT
 jackson-core-asl-1.3.1
