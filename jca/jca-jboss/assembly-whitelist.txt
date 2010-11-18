@@ -7,6 +7,11 @@ asm-3.1-osgi
 aspectjrt-1.5.4
 axis-1.4-osgi
 backport-util-concurrent-3.1-osgi
+bcmail-jdk15-1.45
+bcpg-jdk15-1.45
+bcprov-ext-jdk15-1.45
+bcprov-jdk15-1.45
+bctsp-jdk15-1.45
 cglib-nodep-2.1_3-osgi
 commons-beanutils-1.7.0-osgi
 commons-cli-1.0-osgi
@@ -20,11 +25,6 @@ commons-jxpath-1.3-osgi
 commons-lang-2.4-osgi
 commons-net-2.0
 commons-pool-1.4
-cryptix-jce-api-20050328-osgi
-cryptix-jce-provider-20050328-osgi
-cryptix-message-api-20050405-osgi
-cryptix-openpgp-provider-20050405-osgi
-cryptix-pki-api-20050405-osgi
 cxf-api-2.1.10
 cxf-common-schemas-2.1.10
 cxf-common-utilities-2.1.10
