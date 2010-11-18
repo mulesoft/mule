@@ -83,11 +83,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                         ((InterceptingMessageProcessor) processor).setListener(chain);
                     }
                 }
-                else
-                {
-                    // The current processor is the last in the list
-                    tempList = new LinkedList<MessageProcessor>(Collections.singletonList(processor));
-                }
+                tempList = new LinkedList<MessageProcessor>(Collections.singletonList(processor));
             }
             else
             {
