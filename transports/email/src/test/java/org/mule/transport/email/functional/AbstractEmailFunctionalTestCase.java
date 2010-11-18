@@ -24,17 +24,14 @@ import org.mule.util.SystemUtils;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
-import javax.activation.DataHandler;
 import javax.mail.Address;
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
@@ -153,9 +150,9 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
         }
         if (addAttachments)
         {
-            MuleMessage message = new DefaultMuleMessage(msg, props, muleContext);
-            createOutboundAttachments(message);
-            client.dispatch("vm://send", message);
+            MuleMessage muleMessage = new DefaultMuleMessage(msg, props, muleContext);
+            createOutboundAttachments(muleMessage);
+            client.dispatch("vm://send", muleMessage);
         }
         else
         {
@@ -209,7 +206,7 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
 
         MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.request("vm://receive", RECEIVE_TIMEOUT);
-        
+
         assertNotNull(reply);
         Object payload = reply.getPayload();
         if (isMimeMessage)

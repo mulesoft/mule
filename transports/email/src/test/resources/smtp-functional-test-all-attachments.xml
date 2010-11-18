@@ -27,7 +27,7 @@
                 <pass-through-router>
                     <smtp:outbound-endpoint host="localhost" port="${port1}" to="bob@example.com">
                         <custom-transformer
-                           class="org.mule.transport.email.transformers.SmtpAttachmentsFunctionalTestCase$AddOutboundAttachments"/>
+                           class="org.mule.transport.email.transformers.AddOutboundAttachments"/>
                         <email:object-to-mime-transformer/>
                     </smtp:outbound-endpoint>
                 </pass-through-router>
