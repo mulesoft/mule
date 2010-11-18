@@ -17,13 +17,13 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.codec.net.URLCodec;
 
 public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
 {
@@ -81,7 +81,7 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
     }
 
     protected void addQueryStringToParameterMap(String queryString, Map<String, Object> paramMap,
-        String outputEncoding) throws UnsupportedEncodingException
+        String outputEncoding) throws Exception
     {
         String[] pairs = queryString.split("&");
         for (String pair : pairs)
@@ -89,8 +89,9 @@ public class HttpRequestBodyToParamMap extends AbstractMessageTransformer
             String[] nameValue = pair.split("=");
             if (nameValue.length == 2)
             {
-                String key = URLDecoder.decode(nameValue[0], outputEncoding);
-                String value = URLDecoder.decode(nameValue[1], outputEncoding);
+                URLCodec codec = new URLCodec(outputEncoding);
+                String key = codec.decode(nameValue[0]);
+                String value = codec.decode(nameValue[1]);
                 addToParameterMap(paramMap, key, value);
             }
         }
