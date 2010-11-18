@@ -11,11 +11,11 @@
 package org.mule.example.loanbroker.bpm;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.example.loanbroker.messages.Customer;
 import org.mule.example.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.example.loanbroker.messages.LoanQuote;
 import org.mule.example.loanbroker.tests.AbstractAsynchronousLoanBrokerTestCase;
-import org.mule.module.client.MuleClient;
 import org.mule.transport.NullPayload;
 
 
@@ -30,7 +30,7 @@ public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCa
     @Override
     protected String getConfigResources()
     {
-        return "loan-broker-bpm-mule-config.xml";
+        return "mule-config.xml";
     }
 
     @Override
@@ -48,7 +48,7 @@ public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCa
     @Override
     public void testLotsOfLoanRequests() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        final MuleClient client = muleContext.getClient();
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest request = new CustomerQuoteRequest(c, 100000, 48);
 

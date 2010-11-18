@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:spring="http://www.springframework.org/schema/beans"
-    xmlns:context="http://www.springframework.org/schema/context"
     xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
     xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
-    xmlns:client="http://www.mulesoft.org/schema/mule/client"
+    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
     xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
-       http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/3.1/mule-bpm.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/client http://www.mulesoft.org/schema/mule/client/3.1/mule-client.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.1/mule-jms.xsd">
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd
+       http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/3.0/mule-bpm.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.0/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.0/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.0/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.0/mule-scripting.xsd">
 
     <bpm:jbpm name="jbpm" />
 
@@ -34,6 +32,21 @@
     <vm:endpoint name="SmallBank" path="small.bank" exchange-pattern="request-response" />
 
     <model name="loan-broker">
+
+        <!-- ***************************************************
+            HTTP Front End
+            *************************************************** -->
+
+        <service name="HttpService">
+            <inbound>
+                <inbound-endpoint ref="HttpUrlCustomerRequests" />
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <outbound-endpoint ref="CustomerRequests" />
+                </pass-through-router>
+            </outbound>
+        </service>
 
         <!-- ***************************************************
             Process Engine
@@ -87,4 +100,35 @@
             <component class="org.mule.example.loanbroker.bank.Bank" />
         </service>
     </model>
+    
+    <http:endpoint name="HttpUrlCustomerRequests" address="http://0.0.0.0:11081"
+                   exchange-pattern="request-response">
+        <!-- Translate request params into properties map -->
+        <http:body-to-parameter-map-transformer name="HttpRequestToMap"/>
+        <!-- Create java objects for the LoanBroker requests-->
+        <script:transformer>
+            <script:script engine="groovy">
+                import org.mule.example.loanbroker.messages.*
+                import org.mule.example.loanbroker.bank.*
+                import org.mule.example.loanbroker.credit.*
+
+                //println "\n\n\n\n$payload"
+
+                // remember 'payload' is a Map/String,String/ from the previous transformer
+                def customerName = payload.name ?: "Muley" // fallback to defaults if no value provided in url
+                def ssn = (payload.ssn ?: 1234) as Integer
+                def amount = (payload.amount ?: 20000) as Integer
+                def term = (payload.term ?: 48) as Integer
+
+                def c = new Customer(customerName,  ssn)
+                result = new CustomerQuoteRequest(c, amount, term)
+            </script:script>
+        </script:transformer>
+        <response>
+            <expression-transformer>
+                <return-argument evaluator="string" expression="Your loan request has been submitted."/>
+            </expression-transformer>
+        </response>
+    </http:endpoint>
+
 </mule>

@@ -11,7 +11,7 @@ public class ScanLicenseHeaders
     /**
      * Files in the following packages are known do have invalid license headers
      */
-    static List ignoredPackages = [ "net/webservicex",  ]
+    static List ignoredPackages = [ "net/webservicex", "org/hibernate"  ]
 
     /**
      * These files are known to have invalid license headers and are the usual exception to the rule

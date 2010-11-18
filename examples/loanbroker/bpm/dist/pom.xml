@@ -1,30 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.mule.examples</groupId>
-        <artifactId>mule-example-loanbroker-parent</artifactId>
-        <version>1.0</version>
-    </parent>
+    <groupId>org.mule.examples</groupId>
     <artifactId>mule-example-loanbroker-bpm</artifactId>
-    <packaging>jar</packaging>
-    <name>Loan Broker BPM Example</name>
+    <version>1.0</version>
+    <packaging>mule</packaging>
+    <name>Loanbroker BPM Example</name>
+
+    <properties>
+        <muleVersion>3.1.0-SNAPSHOT</muleVersion>
+    </properties>
+
+    <build>
+        <defaultGoal>install</defaultGoal>
+        <finalName>${project.artifactId}</finalName>
+
+         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.0-beta-1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireProperty>
+                                    <property>env.MULE_HOME</property>
+                                    <message>You must set MULE_HOME before building the example.</message>
+                                </requireProperty>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <encoding>ISO-8859-1</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.mule.tools</groupId>
+                <artifactId>maven-mule-plugin</artifactId>
+                <version>1.3</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-jbpm</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-vm</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-jms</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.transports</groupId>
+                            <artifactId>mule-transport-http</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-scripting</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.mule.modules</groupId>
+                            <artifactId>mule-module-spring-config</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>package-example</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy file="${project.build.directory}/${project.artifactId}.zip"
+                                    todir="${env.MULE_HOME}/apps" overwrite="true"/>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-loanbroker-common</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-example-loanbroker-common-tests</artifactId>
-            <version>1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-jms</artifactId>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-cxf</artifactId>
             <version>${muleVersion}</version>
         </dependency>
         <dependency>
@@ -34,102 +116,27 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-jbpm</artifactId>
-            <version>${version}</version>
+            <artifactId>mule-module-client</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-scripting</artifactId>
+            <version>${muleVersion}</version>
         </dependency>
 
+        <!-- test dependencies -->
         <dependency>
-            <groupId>org.apache.derby</groupId>
-            <artifactId>derby</artifactId>
-            <version>10.6.1.0</version>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${muleVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
-            <version>4.1.2</version>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-http</artifactId>
+            <version>${muleVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>    
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy tofile="${MULE_HOME}/apps/loanbroker-bpm/mule-config.xml" file="${basedir}/target/classes/loan-broker-bpm-mule-config.xml"/>
-                                <copy todir="${MULE_HOME}/apps/loanbroker-bpm" file="${basedir}/target/classes/mule-deploy.properties"/>                             
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>        
-            <!-- "mvn install" will copy the target jar to the $MULE_HOME/lib/user directory,
-                overwriting the previous one. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-artifact</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${MULE_HOME}/apps/loanbroker-bpm/lib</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${groupId}</groupId>
-                                    <artifactId>${artifactId}</artifactId>
-                                    <version>${version}</version>
-                                    <destFileName>${artifactId}.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-artifact2</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${MULE_HOME}/lib/user</outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <artifactItems>                            
-                                <artifactItem>
-                                    <groupId>org.apache.derby</groupId>
-                                    <artifactId>derby</artifactId>
-                                    <version>10.6.1.0</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>bsh</groupId>
-                                    <artifactId>bsh</artifactId>
-                                    <version>1.3.0</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.apache.activemq</groupId>
-                                    <artifactId>activemq-core</artifactId>
-                                    <version>4.1.2</version>
-                                </artifactItem>                              
-                            </artifactItems>
-                        </configuration>
-                    </execution>                    
-                </executions>
-            </plugin>
-        </plugins>
-    </build>    
 </project>
