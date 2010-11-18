@@ -235,7 +235,7 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
             for (LifecycleObject lo : phase.getOrderedLifecycleObjects())
             {
                 // TODO Collection -> List API refactoring
-                Collection<?> targetsObj = getLifecycleObject().lookupObjects(lo.getType());
+                Collection<?> targetsObj = getLifecycleObject().lookupObjectsForLifecycle(lo.getType());
                 List<Object> targets = new LinkedList<Object>(targetsObj);
                 if (targets.size() == 0)
                 {

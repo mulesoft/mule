@@ -168,13 +168,24 @@ public class SpringRegistry extends AbstractRegistry
     {
         return lookupByType(type).values();
     }
+    
+    public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
+    {
+        return internalLookupByType(type, false, false).values();
+    }
 
     @SuppressWarnings("unchecked")
     public <T> Map<String, T> lookupByType(Class<T> type)
     {
+        return internalLookupByType(type, true, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T> Map<String, T> internalLookupByType(Class<T> type, boolean nonSingletons, boolean eagerInit)
+    {
         try
         {
-            return applicationContext.getBeansOfType(type);
+            return applicationContext.getBeansOfType(type, nonSingletons, eagerInit);
         }
         catch (FatalBeanException fbex)
         {
@@ -187,9 +198,9 @@ public class SpringRegistry extends AbstractRegistry
             logger.debug(e);
             return Collections.emptyMap();
         }
-
     }
-
+    
+    
     ////////////////////////////////////////////////////////////////////////////////////
     // Registry is read-only
     ////////////////////////////////////////////////////////////////////////////////////

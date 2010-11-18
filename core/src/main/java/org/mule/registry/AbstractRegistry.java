@@ -167,6 +167,12 @@ public abstract class AbstractRegistry implements Registry
             return null;
         }
     }
+    
+    public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
+    {
+        return lookupObjects(type);
+    }
+
 
     // /////////////////////////////////////////////////////////////////////////
     // Registry Metadata

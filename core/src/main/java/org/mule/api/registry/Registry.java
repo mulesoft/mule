@@ -42,6 +42,13 @@ public interface Registry extends Initialisable, Disposable
     <T> Collection<T> lookupObjects(Class<T> type);
 
     /**
+     * Look up all objects of a given type that lifecycle should be applied to
+     *
+     * @return collection of objects or empty collection if none found
+     */
+    <T> Collection<T> lookupObjectsForLifecycle(Class<T> type);
+    
+    /**
      * Look up a single object by type.
      *
      * @return object or null if not found
