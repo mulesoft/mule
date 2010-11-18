@@ -92,8 +92,8 @@
             <exclude>**/*.iml</exclude>
             <exclude>**/*.ipr</exclude>
             <exclude>**/*.iws</exclude>
-            <!-- Legacy LoanBroker example -->
-            <exclude>loanbroker/**</exclude>
+            <!-- Legacy LoanBroker example, used for testing only -->
+            <exclude>loanbroker-legacy/**</exclude>
         </excludes>
     </fileSet>
 

@@ -22,21 +22,9 @@
         <module>hello</module>
         <module>loanbroker-bpm</module>
         <module>loanbroker-simple</module>
-        <module>loanbroker</module>
         <module>notifications</module>
         <module>scripting</module>
         <module>stockquote</module>
+        <module>loanbroker-legacy</module>
     </modules>
-
-    <build>
-        <!-- Allow config files to be in the "conf" directory to make it easier for users to find them. -->
-        <resources>
-            <resource>
-                <directory>conf</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-    </build>
 </project>
