@@ -609,6 +609,14 @@ public class MuleRegistryHelper implements MuleRegistry
         return registry.lookupObjects(type);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
+    {
+        return registry.lookupObjectsForLifecycle(type);
+    }
+    
     @SuppressWarnings("unchecked")
     public <T> T get(String key)
     {

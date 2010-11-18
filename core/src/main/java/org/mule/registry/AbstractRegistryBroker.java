@@ -138,7 +138,19 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
 
         return results;
     }
+    
+    public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
+    {
+        Collection<T> objects = new ArrayList<T>();
 
+        Iterator it = getRegistries().iterator();
+        while (it.hasNext())
+        {
+            objects.addAll(((Registry) it.next()).lookupObjectsForLifecycle(type));
+        }
+        return objects;
+    }
+    
     public void registerObject(String key, Object value) throws RegistrationException
     {
         registerObject(key, value, null);
