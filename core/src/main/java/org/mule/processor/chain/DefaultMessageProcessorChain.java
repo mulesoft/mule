@@ -18,28 +18,46 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.SimpleFlowConstruct;
-import org.mule.util.StringUtils;
+import org.mule.routing.WireTap;
 
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 
-public class IteratingCompositeMessageProcessor implements MessageProcessor
+public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
 {
 
-    protected List<MessageProcessor> processors;
-
-    public IteratingCompositeMessageProcessor(List<MessageProcessor> processors)
+    public DefaultMessageProcessorChain(List<MessageProcessor> processors)
     {
-        this.processors = processors;
+        super(null, processors);
     }
 
-    public MuleEvent process(MuleEvent event) throws MuleException
+    public DefaultMessageProcessorChain(MessageProcessor... processors)
+    {
+        super(null, Arrays.asList(processors));
+    }
+
+    public DefaultMessageProcessorChain(String name, List<MessageProcessor> processors)
+    {
+        super(name, processors);
+    }
+
+    public DefaultMessageProcessorChain(String name, MessageProcessor... processors)
+    {
+        super(name, Arrays.asList(processors));
+    }
+
+    protected MuleEvent doProcess(MuleEvent event) throws MuleException
     {
         FlowConstruct flowConstruct = event.getFlowConstruct();
         MuleEvent currentEvent = event;
         MuleEvent resultEvent;
         for (MessageProcessor processor : processors)
         {
+            final WireTap wireTap = getCallbackMap().get(processor);
+            if (wireTap != null)
+            {
+                event = wireTap.process(event);
+            }
             // If the next message processor is an outbound router then create
             // outbound event
             if (processor instanceof OutboundEndpoint)
@@ -67,33 +85,4 @@ public class IteratingCompositeMessageProcessor implements MessageProcessor
         return currentEvent;
     }
 
-    @Override
-    public String toString()
-    {
-        StringBuilder string = new StringBuilder();
-        string.append(getClass().getSimpleName());
-
-        Iterator<MessageProcessor> mpIterator = processors.iterator();
-
-        final String nl = String.format("%n");
-
-        // TODO have it print the nested structure with indents increasing for nested MPCs
-        if (mpIterator.hasNext())
-        {
-            string.append(String.format("%n[ "));
-            while (mpIterator.hasNext())
-            {
-                MessageProcessor mp = mpIterator.next();
-                final String indented = StringUtils.replace(mp.toString(), nl, String.format("%n  "));
-                string.append(String.format("%n  %s", indented));
-                if (mpIterator.hasNext())
-                {
-                    string.append(", ");
-                }
-            }
-            string.append(String.format("%n]"));
-        }
-
-        return string.toString();
-    }
 }
