@@ -60,7 +60,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>3.6.0.Final</version>
+            <version>${hibernateVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.transaction</groupId>
