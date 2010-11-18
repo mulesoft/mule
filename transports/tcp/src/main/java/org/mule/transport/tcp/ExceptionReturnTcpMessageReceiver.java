@@ -12,9 +12,9 @@ package org.mule.transport.tcp;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.AbstractMessageReceiver;
@@ -36,12 +36,14 @@ import javax.resource.spi.work.Work;
 public class ExceptionReturnTcpMessageReceiver extends TcpMessageReceiver
 {
 
-    public ExceptionReturnTcpMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
+    public ExceptionReturnTcpMessageReceiver(Connector connector, FlowConstruct flowConstruct,
+         InboundEndpoint endpoint)
             throws CreateException
     {
-        super(connector, service, endpoint);
+        super(connector, flowConstruct, endpoint);
     }
 
+    @Override
     protected Work createWork(Socket socket) throws IOException
     {
         return new TcpWorker(socket, this);
@@ -55,6 +57,7 @@ public class ExceptionReturnTcpMessageReceiver extends TcpMessageReceiver
             super(socket, receiver);
         }
 
+        @Override
         protected Object getNextMessage(Object resource) throws Exception
         {
             try

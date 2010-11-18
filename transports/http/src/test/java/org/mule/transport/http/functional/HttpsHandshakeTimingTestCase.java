@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
@@ -40,8 +41,8 @@ import javax.resource.spi.work.Work;
 import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
- * Test for SSL handshake timeouts. Unfortunately, there is no easy way to blackbox-test this 
- * as it would require a SSLSocket implementation that could actually add arbitrary delays to 
+ * Test for SSL handshake timeouts. Unfortunately, there is no easy way to blackbox-test this
+ * as it would require a SSLSocket implementation that could actually add arbitrary delays to
  * the SSL handshake.
  * <p/>
  * The approach chosen here is based on reflection and massive subclassing/stubbing to make things
@@ -53,11 +54,11 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleTestCase
     public void testHttpsHandshakeExceedsTimeout() throws Exception
     {
         MockHttpsMessageReceiver messageReceiver = setupMockHttpsMessageReceiver();
-        
+
         MockSslSocket socket = new MockSslSocket();
         Work work = messageReceiver.createWork(socket);
         assertNotNull(work);
-        
+
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         try
         {
@@ -72,11 +73,11 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleTestCase
             assertTrue(ite.getCause().getMessage().contains("handshake"));
         }
     }
-        
+
     public void testHttpsHandshakeCompletesBeforeProcessingMessage() throws Exception
     {
         MockHttpsMessageReceiver messageReceiver = setupMockHttpsMessageReceiver();
-        
+
         MockSslSocket socket = new MockSslSocket();
         Work work = messageReceiver.createWork(socket);
         assertNotNull(work);
@@ -109,31 +110,31 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleTestCase
     {
         HttpsConnector httpsConnector = new HttpsConnector(muleContext);
         httpsConnector.setSslHandshakeTimeout(1000);
-        
+
         Map properties = Collections.emptyMap();
-        
+
         Mock mockEndpoint = new Mock(InboundEndpoint.class);
         mockEndpoint.expectAndReturn("getConnector", httpsConnector);
         mockEndpoint.expectAndReturn("getEncoding", new DefaultMuleConfiguration().getDefaultEncoding());
         mockEndpoint.expectAndReturn("getProperties", properties);
         mockEndpoint.expectAndReturn("getProperties", properties);
         InboundEndpoint inboundEndpoint = (InboundEndpoint) mockEndpoint.proxy();
-        
+
         Mock mockService = new Mock(Service.class);
         mockService.expectAndReturn("getResponseRouter", null);
         mockService.expectAndReturn("getInboundRouter", new ServiceCompositeMessageSource());
         Service service = (Service) mockService.proxy();
-        
+
         MockHttpsMessageReceiver messageReceiver = new MockHttpsMessageReceiver(httpsConnector, service, inboundEndpoint);
         return messageReceiver;
     }
 
     private static class MockHttpsMessageReceiver extends HttpsMessageReceiver
     {
-        public MockHttpsMessageReceiver(Connector connector, Service service, InboundEndpoint endpoint)
-            throws CreateException
+        public MockHttpsMessageReceiver(Connector connector, FlowConstruct flowConstruct,
+            InboundEndpoint endpoint) throws CreateException
         {
-            super(connector, service, endpoint);
+            super(connector, flowConstruct, endpoint);
         }
 
         /**
