@@ -1562,6 +1562,7 @@
                 </xsd:element>
             </xsd:choice>
             <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+            <xsd:element ref="threading-profile" minOccurs="0"/>                    
         </xsd:sequence>
         <xsd:attribute name="name" type="nonBlankString" use="required">
             <xsd:annotation>

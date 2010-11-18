@@ -276,4 +276,10 @@
     </spring:bean>
 
 
+	<flow name="flow-threading-profile">
+        <vm:inbound-endpoint path="flow-threading-profile-in" exchange-pattern="request-response"/>
+        <append-string-transformer message=" Hello foo" />
+		<threading-profile doThreading="true" maxThreadsActive="2" maxThreadsIdle="1" poolExhaustedAction="RUN"/>
+    </flow>
+
 </mule>

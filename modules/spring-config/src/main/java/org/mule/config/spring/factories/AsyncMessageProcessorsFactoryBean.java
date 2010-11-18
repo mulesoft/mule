@@ -20,9 +20,9 @@ import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
-import org.springframework.beans.factory.FactoryBean;
-
 import java.util.List;
+
+import org.springframework.beans.factory.FactoryBean;
 
 public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleContextAware, NamedObject
 {
@@ -30,7 +30,7 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
     protected MuleContext muleContext;
 
     protected List messageProcessors;
-    protected ThreadingProfile threadingProfile = ThreadingProfile.DEFAULT_THREADING_PROFILE;
+    protected ThreadingProfile threadingProfile;
     protected String name;
 
     public Class getObjectType()
@@ -50,6 +50,11 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
 
     public Object getObject() throws Exception
     {
+        if (threadingProfile == null)
+        {
+            threadingProfile = muleContext.getDefaultThreadingProfile();
+        }
+
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         final MuleConfiguration config = muleContext.getConfiguration();
         final boolean containerMode = config.isContainerMode();

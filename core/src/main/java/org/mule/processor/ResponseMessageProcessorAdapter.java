@@ -19,6 +19,17 @@ public class ResponseMessageProcessorAdapter extends AbstractResponseMessageProc
 
     protected MessageProcessor responseProcessor;
 
+    public ResponseMessageProcessorAdapter()
+    {
+        super();
+    }
+
+    public ResponseMessageProcessorAdapter(MessageProcessor responseProcessor)
+    {
+        super();
+        this.responseProcessor = responseProcessor;
+    }
+
     public void setProcessor(MessageProcessor processor)
     {
         this.responseProcessor = processor;

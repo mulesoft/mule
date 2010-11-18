@@ -18,6 +18,7 @@
             <add-message-property key="foo" value="#[header:INBOUND:foo]"/>
         </message-properties-transformer>
         <echo-component/>
+        <threading-profile doThreading="false"/>
     </flow>
 
     <model>
