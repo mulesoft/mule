@@ -13,8 +13,6 @@ package org.mule.processor.chain;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.processor.policy.Policies;
 
 import java.util.List;
 
@@ -24,37 +22,39 @@ import java.util.List;
  * MessageProcessor in the parent chain is not injected into the first in the nested
  * chain.
  */
-public class InterceptingChainLifecycleWrapper extends AbstractMessageProcessorChain
+public class InterceptingMessageProcessorChain extends AbstractMessageProcessorChain
 {
-    private MessageProcessorChain chain;
-
-    public InterceptingChainLifecycleWrapper(MessageProcessorChain chain,
+    private MessageProcessor firstInChain;
+ 
+    public InterceptingMessageProcessorChain(MessageProcessor firstInChain,
                                              List<MessageProcessor> processors,
                                              String name)
     {
         super(name, processors);
-        this.chain = chain;
+        this.firstInChain = firstInChain;
     }
 
+    public void setFirstInChain(MessageProcessor chain)
+    {
+        this.firstInChain = chain;
+    }
+
+    @Override
     public List<MessageProcessor> getMessageProcessors()
     {
-        return chain.getMessageProcessors();
-    }
-
-    public String getName()
-    {
-        return chain.getName();
-    }
-
-    public Policies getPolicies()
-    {
-        return chain.getPolicies();
+        return processors;
     }
 
     @Override
     protected MuleEvent doProcess(MuleEvent event) throws MuleException
     {
-        return chain.process(event);
+        return firstInChain.process(event);
+    }
+
+    public void setMessageProcessors(List processors)
+    {
+        this.processors = processors;
+        
     }
 
 }

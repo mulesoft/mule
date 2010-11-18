@@ -10,12 +10,15 @@
 
 package org.mule.processor.chain;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.processor.AbstractInterceptingMessageProcessor;
+import org.mule.routing.WireTap;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,12 +63,15 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
      */
     public MessageProcessorChain build() throws MuleException
     {
+        InterceptingMessageProcessorChain finalChain = new InterceptingMessageProcessorChain(null, null, "");
+
         LinkedList<MessageProcessor> tempList = new LinkedList<MessageProcessor>();
 
         // Start from last but one message processor and work backwards
         for (int i = processors.size() - 1; i >= 0; i--)
         {
-            MessageProcessor processor = initializeMessageProcessor(processors.get(i));
+            MessageProcessor processor = decorateMessageProcessorForCallbacks(
+                initializeMessageProcessor(processors.get(i)), finalChain);
             if ((processors.get(i)) instanceof InterceptingMessageProcessor)
             {
                 // Processor is intercepting so we can't simply iterate
@@ -74,11 +80,12 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                     // The current processor is not the last in the list
                     if (tempList.isEmpty())
                     {
-                        ((InterceptingMessageProcessor) processor).setListener(initializeMessageProcessor(processors.get(i + 1)));
+                        ((InterceptingMessageProcessor) processor).setListener(decorateMessageProcessorForCallbacks(
+                            initializeMessageProcessor(processors.get(i + 1)), finalChain));
                     }
                     else
                     {
-                        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(
+                        final IteratingCompositeMessageProcessor chain = new IteratingCompositeMessageProcessor(
                             new ArrayList<MessageProcessor>(tempList));
                         ((InterceptingMessageProcessor) processor).setListener(chain);
                     }
@@ -88,18 +95,33 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
             else
             {
                 // Processor is not intercepting so we can invoke it using iteration (add to temp list)
-                tempList.addFirst(initializeMessageProcessor(processor));
+                tempList.addFirst(processor);
             }
         }
         // Create the final chain using the current tempList after reserve iteration is complete. This temp
         // list contains the first n processors in the chain that are not intercepting.. with processor n+1
         // having been injected as the listener of processor n
-        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(
+        final IteratingCompositeMessageProcessor chain = new IteratingCompositeMessageProcessor(
             new ArrayList<MessageProcessor>(tempList));
 
         // Wrap with something that can apply lifecycle to all processors which are otherwise not visable from
         // DefaultMessageProcessorChain
-        return new InterceptingChainLifecycleWrapper(chain, processors, "");
+        finalChain.setFirstInChain(chain);
+        finalChain.setMessageProcessors(processors);
+        return finalChain;
+    }
+
+    protected MessageProcessor decorateMessageProcessorForCallbacks(final MessageProcessor processor,
+                                                                    final MessageProcessorChain chain)
+    {
+        if (processor instanceof InterceptingMessageProcessor)
+        {
+            return new InterceptingMessageProcessorDecorator((InterceptingMessageProcessor) processor, chain);
+        }
+        else
+        {
+            return new MessageProcessorDecorator(processor, chain);
+        }
     }
 
     public DefaultMessageProcessorChainBuilder chain(MessageProcessor... processors)
@@ -139,5 +161,70 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
     {
         this.processors.add(0, builder);
         return this;
+    }
+    
+    class InterceptingMessageProcessorDecorator extends AbstractInterceptingMessageProcessor{
+        
+        
+        private MessageProcessor target;
+        private MessageProcessorChain chain;
+        
+        public InterceptingMessageProcessorDecorator(InterceptingMessageProcessor target, MessageProcessorChain chain)
+        {
+            this.target = target;
+            this.chain = chain;
+        }
+        
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            final WireTap wireTap = chain.getCallbackMap().get(target);
+            if (wireTap != null)
+            {
+                event = wireTap.process(event);
+            }
+            return target.process(event);
+        }
+
+        @Override
+        public void setListener(MessageProcessor next)
+        {
+            ((InterceptingMessageProcessor) target).setListener(next);
+        }
+
+        @Override
+        public String toString()
+        {
+            return target.toString();
+        }
+    }
+    
+    class MessageProcessorDecorator implements MessageProcessor{
+        
+        
+        private MessageProcessor target;
+        private MessageProcessorChain chain;
+        
+        public MessageProcessorDecorator(MessageProcessor target, MessageProcessorChain chain)
+        {
+            this.target = target;
+            this.chain = chain;
+        }
+        
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            final WireTap wireTap = chain.getCallbackMap().get(target);
+            if (wireTap != null)
+            {
+                event = wireTap.process(event);
+            }
+            return target.process(event);
+        }
+        
+        @Override
+        public String toString()
+        {
+            return target.toString();
+        }
+
     }
 }

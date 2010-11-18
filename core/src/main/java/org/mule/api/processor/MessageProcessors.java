@@ -10,7 +10,9 @@
 
 package org.mule.api.processor;
 
-import org.mule.processor.chain.DefaultMessageProcessorChain;
+import org.mule.processor.chain.InterceptingMessageProcessorChain;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * Some convenience methods for message processors.
@@ -25,6 +27,6 @@ public class MessageProcessors
 
     public static MessageProcessorChain singletonChain(MessageProcessor mp)
     {
-        return new DefaultMessageProcessorChain(mp);
+        return new InterceptingMessageProcessorChain(mp, Collections.singletonList(mp), "");
     }
 }

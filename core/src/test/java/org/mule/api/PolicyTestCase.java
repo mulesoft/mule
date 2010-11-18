@@ -10,9 +10,10 @@
 
 package org.mule.api;
 
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.policy.AroundPolicy;
 import org.mule.api.processor.policy.PolicyInvocation;
-import org.mule.processor.chain.DefaultMessageProcessorChain;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
@@ -26,10 +27,12 @@ public class PolicyTestCase extends AbstractMuleTestCase
     {
         AroundPolicy ap = new TestPolicy("test around policy");
 
+        
+        
         // this is our regular chain that should get a policy applied
-        DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(
-                                                             new StringAppendTransformer("first"),
-                                                             new StringAppendTransformer(" second"));
+        MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder().chain(
+            new StringAppendTransformer("first"), new StringAppendTransformer(" second")).build();
+
         initialiseObject(chain);
 
         // test registration
@@ -56,9 +59,9 @@ public class PolicyTestCase extends AbstractMuleTestCase
     {
 
         // this is our regular chain that should get a policy applied
-        DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(
-                                                             new StringAppendTransformer("first"),
-                                                             new StringAppendTransformer(" second"));
+        MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder().chain(
+            new StringAppendTransformer("first"), new StringAppendTransformer(" second")).build();
+
         initialiseObject(chain);
 
         // test registration
@@ -88,7 +91,8 @@ public class PolicyTestCase extends AbstractMuleTestCase
 
     public void testDuplicateName() throws Exception
     {
-        DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain();
+        MessageProcessorChain chain = new DefaultMessageProcessorChainBuilder().build();
+
         chain.getPolicies().add(new TestPolicy("test"));
         try
         {
