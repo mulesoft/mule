@@ -1,5 +1,5 @@
 /*
- * $Id: ExpressionEvaluatorProcessor.java 19191 2010-08-25 21:05:23Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -14,7 +14,7 @@ import org.mule.api.expression.ExpressionEnricher;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.registry.PreInitProcessor;
 
-/** 
+/**
  * Registers ExpressionEvaluators with the {@link org.mule.expression.DefaultExpressionManager} so that they will
  * be resolved at run-time.
  * {@link org.mule.api.expression.ExpressionEvaluator} objects are used to execute property expressions (usually on the

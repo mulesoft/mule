@@ -207,7 +207,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("default-service-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultServiceExceptionStrategy.class));
         registerBeanDefinitionParser("commit-transaction", new ExceptionTXFilterDefinitionParser("commitTxFilter"));
         registerBeanDefinitionParser("rollback-transaction", new ExceptionTXFilterDefinitionParser("rollbackTxFilter"));
-        registerBeanDefinitionParser("custom-agent", new DefaultNameMuleOrphanDefinitionParser());        
+        registerBeanDefinitionParser("custom-agent", new DefaultNameMuleOrphanDefinitionParser());
 
         registerBeanDefinitionParser("routeable-exception-strategy", new ChildDefinitionParser("exceptionListener", RouteableExceptionStrategy.class));
         registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
@@ -235,7 +235,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("return-argument", new ChildDefinitionParser("argument", ExpressionArgument.class));
 
         registerBeanDefinitionParser("bean-builder-transformer", new MessageProcessorDefinitionParser(BeanBuilderTransformer.class));
-        
+
         final ChildDefinitionParser beanPropertyParser = new ChildDefinitionParser("argument", ExpressionArgument.class);
         beanPropertyParser.addAlias("property-name", "name");
         registerBeanDefinitionParser("bean-property", beanPropertyParser);
@@ -280,11 +280,11 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("outbound-endpoint", new ChildEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("custom-transaction", new TransactionDefinitionParser());
         registerBeanDefinitionParser("xa-transaction", new TransactionDefinitionParser(XaTransactionFactory.class));
-        
+
         // Message Processors
         registerBeanDefinitionParser("processor", new MessageProcessorRefDefinitionParser());
-        registerMuleBeanDefinitionParser("custom-processor", new MessageProcessorDefinitionParser()).addIgnored("name");        
-        registerBeanDefinitionParser("processor-chain", new MessageProcessorChainDefinitionParser());        
+        registerMuleBeanDefinitionParser("custom-processor", new MessageProcessorDefinitionParser()).addIgnored("name");
+        registerBeanDefinitionParser("processor-chain", new MessageProcessorChainDefinitionParser());
         registerBeanDefinitionParser("response", new ResponseDefinitionParser());
         registerMuleBeanDefinitionParser("message-filter", new MessageFilterDefinitionParser());
         registerMuleBeanDefinitionParser("invoke",
@@ -292,15 +292,15 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
             "methodName").addAlias("methodArguments", "argumentExpressionsString").addAlias("methodArgumentTypes", "ArgumentTypes");
         registerMuleBeanDefinitionParser("message-enricher", new MessageProcessorDefinitionParser(MessageEnricher.class)).addAlias("with",
             "evaluatorExpression").addAlias("enrich", "enricherExpression");
-        
+
         registerBeanDefinitionParser("async", new ChildDefinitionParser("messageProcessor",
             AsyncMessageProcessorsFactoryBean.class));
         registerBeanDefinitionParser("transactional", new ChildDefinitionParser("messageProcessor",
             TransactionalMessageProcessorsFactoryBean.class));
         // Message Sources
         // TODO MULE-4987
-        // registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));        
-        registerBeanDefinitionParser("composite-source", new ChildDefinitionParser("messageSource", CompositeMessageSourceFactoryBean.class));        
+        // registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));
+        registerBeanDefinitionParser("composite-source", new ChildDefinitionParser("messageSource", CompositeMessageSourceFactoryBean.class));
 
         // Models
         registerBeanDefinitionParser("model", new ModelDefinitionParser());
@@ -325,7 +325,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("seda-service", new ServiceDefinitionParser(SedaService.class));
         registerBeanDefinitionParser("service", new ServiceDefinitionParser(SedaService.class));
         registerBeanDefinitionParser("custom-service", new ServiceDefinitionParser());
-        
+
         // Flow Constructs
         registerBeanDefinitionParser("flow", new FlowDefinitionParser());
         registerBeanDefinitionParser("simple-service", new SimpleServiceDefinitionParser());
@@ -333,7 +333,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("validator", new ValidatorDefinitionParser());
 
         registerBeanDefinitionParser("flow-ref", new FlowRefDefinitionParser());
-        
+
         // Components
         registerBeanDefinitionParser("component", new ComponentDelegatingDefinitionParser(DefaultJavaComponent.class));
         registerBeanDefinitionParser("pooled-component", new ComponentDelegatingDefinitionParser(PooledJavaComponent.class));
@@ -344,7 +344,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("pass-through-component", new ComponentDefinitionParser(PassThroughComponent.class));
         registerBeanDefinitionParser("log-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, LogComponent.class));
         registerBeanDefinitionParser("null-component", new SimpleComponentDefinitionParser(SimpleCallableJavaComponent.class, NullComponent.class));
-        registerBeanDefinitionParser("static-component", new StaticComponentDefinitionParser());        
+        registerBeanDefinitionParser("static-component", new StaticComponentDefinitionParser());
         registerIgnoredElement("return-data"); // Handled by StaticComponentDefinitionParser
 
         // We need to use DefaultJavaComponent for the echo component because some tests invoke EchoComponent with method name and therefore we need an entry point resolver
@@ -415,7 +415,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("custom-splitter", new SplitterDefinitionParser());
 
         // Routing: Routing Message Processors
-        
+
         // Routing: Conditional Routers
         registerBeanDefinitionParser("choice", new ChildDefinitionParser("messageProcessor", ChoiceRouterFactoryBean.class));
         registerBeanDefinitionParser("when", (ChildDefinitionParser)new ChildDefinitionParser("route", MessageProcessorFilterPairFactoryBean.class).registerPreProcessor(new CheckExclusiveAttributesAndChildren(new String[]{
@@ -428,7 +428,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("request-reply", new ChildDefinitionParser("messageProcessor", SimpleAsyncRequestReplyRequester.class));
         registerBeanDefinitionParser("first-successful", new ChildDefinitionParser("messageProcessor", FirstSuccessful.class));
         registerBeanDefinitionParser("round-robin", new ChildDefinitionParser("messageProcessor", RoundRobin.class));
-        
+
         //Message Info Mappings
         registerBeanDefinitionParser("expression-message-info-mapping", new ChildDefinitionParser("messageInfoMapping", ExpressionMessageInfoMapping.class));
         registerBeanDefinitionParser("custom-message-info-mapping", new ChildDefinitionParser("messageInfoMapping"));
