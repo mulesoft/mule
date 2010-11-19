@@ -21,7 +21,7 @@ import org.mule.transformer.simple.StringAppendTransformer;
 public class MessageEnricherTestCase extends AbstractMuleTestCase
 {
 
-    public void testEnrichHeaderWithPayload() throws MuleException, Exception
+    public void testEnrichHeaderWithPayload() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
         enricher.setEnricherExpression("header:myHeader");
@@ -38,7 +38,7 @@ public class MessageEnricherTestCase extends AbstractMuleTestCase
         assertEquals("test", enricher.process(getTestEvent("")).getMessage().getProperty("myHeader"));
     }
 
-    public void testEnrichHeaderWithHeader() throws MuleException, Exception
+    public void testEnrichHeaderWithHeader() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
         enricher.setEnricherExpression("header:myHeader");
@@ -56,7 +56,7 @@ public class MessageEnricherTestCase extends AbstractMuleTestCase
         assertEquals("test", enricher.process(getTestEvent("")).getMessage().getProperty("myHeader"));
     }
 
-    public void testEnrichHeaderNestedEvaluator() throws MuleException, Exception
+    public void testEnrichHeaderNestedEvaluator() throws Exception
     {
         muleContext.getRegistry().registerObject("appender", new StringAppendTransformer(" append"));
 
