@@ -35,10 +35,3 @@ Depending on the build tool you are using (Ant or Maven), you can build the
 example by simply running "ant" or "mvn".  This will compile the example 
 classes and produce a zip file that will be copied into the application folder 
 ($MULE_HOME/apps).
-
-(If you are unable to download the libraries it may be because you are behind a 
-firewall and have not configured your build tool to use your HTTP proxy.  Please 
-refer to the following information.)
-    Ant users:     http://ant.apache.org/manual-beta/proxy.html
-    Maven users:   http://maven.apache.org/guides/mini/guide-proxies.html
-

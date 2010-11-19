@@ -92,6 +92,8 @@
             <exclude>**/*.iml</exclude>
             <exclude>**/*.ipr</exclude>
             <exclude>**/*.iws</exclude>
+			<!-- Exclude this example until someone gets it working -->
+			<exclude>geomail/**</exclude>
             <!-- Legacy LoanBroker example, used for testing only -->
             <exclude>loanbroker-legacy/**</exclude>
         </excludes>
@@ -121,11 +123,11 @@
     ============================
         Mule Examples: Geomail
     ============================
-    -->
     <fileSet>
         <directory>../../examples/geomail/dist</directory>
         <outputDirectory>examples/geomail</outputDirectory>
     </fileSet>
+    -->
 
     <!--
     ============================
