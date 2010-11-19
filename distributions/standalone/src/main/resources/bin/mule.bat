@@ -12,25 +12,20 @@ goto :eof
 
 :nt
 
-rem Configure remote Java debugging options here
-rem Setting suspend=y will wait for you to connect before proceeding
-set JPDA_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
-
 rem
 rem Find the application home.
 rem
 rem %~dp0 is location of current script under NT
 set _REALPATH=%~dp0
 
-rem Decide on the wrapper binary.
 rem ###############################################################
 rem Customized for Mule
 rem ###############################################################
 
 rem MULE_HOME must be set
 if "%MULE_HOME%" == "" (
-   echo You must set the MULE_HOME environment variable before starting Mule
-   goto :eof
+   set MULE_HOME="%_REALPATH%.."
+   echo "MULE_HOME is set to %MULE_HOME%" 
 )
 
 rem If MULE_BASE is not set, set it to MULE_HOME
@@ -38,17 +33,20 @@ if "%MULE_BASE%" == "" SET MULE_BASE=%MULE_HOME%
 
 if "%MULE_APP%" == "" (
     set MULE_APP=mule
+)
+if "%MULE_APP_LONG%" == "" (
     set MULE_APP_LONG=Mule
-) else (
-    if "%MULE_APP_LONG%" == "" (
-        set MULE_APP_LONG=%MULE_APP%
-    )
 )
 
 set PATH=%PATH%;%MULE_HOME%\lib\native\profiler
 set _WRAPPER_BASE=%MULE_HOME%\lib\boot\exec\wrapper
 
+rem Configure remote Java debugging options here
+rem Setting suspend=y will wait for you to connect before proceeding
+set JPDA_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
+
 rem ###############################################################
+rem Decide on the wrapper binary.
 set _WRAPPER_EXE=%_WRAPPER_BASE%-windows-x86-32.exe
 if exist "%_WRAPPER_EXE%" goto validate
 set _WRAPPER_EXE=%_WRAPPER_BASE%-windows-x86-64.exe
