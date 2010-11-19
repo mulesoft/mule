@@ -170,6 +170,9 @@ public abstract class AbstractRegistry implements Registry
     
     public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
     {
+        // By default use the normal lookup. If a registry implementation needs a
+        // different lookup implementation for lifecycle it should override this
+        // method
         return lookupObjects(type);
     }
 

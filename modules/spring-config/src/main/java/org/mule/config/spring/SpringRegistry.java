@@ -169,6 +169,10 @@ public class SpringRegistry extends AbstractRegistry
         return lookupByType(type).values();
     }
     
+    /**
+     * For lifecycle we only want spring to return singleton objects from it's application context
+     */
+    @Override
     public <T> Collection<T> lookupObjectsForLifecycle(Class<T> type)
     {
         return internalLookupByType(type, false, false).values();
