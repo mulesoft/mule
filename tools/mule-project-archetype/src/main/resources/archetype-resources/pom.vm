@@ -4,13 +4,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-   <modelVersion>4.0.0</modelVersion>
-   <groupId>${groupId}</groupId>
-   <artifactId>${artifactId}</artifactId>
-   <packaging>mule</packaging>
-   <name>Mule ${ModuleName} ${ModuleType}</name>
-   <version>${version}</version>
-   <description>${description}</description>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}</artifactId>
+    <packaging>mule</packaging>
+    <name>Mule ${ModuleName} ${ModuleType}</name>
+    <version>${version}</version>
+    <description>${description}</description>
 
     <properties>
         <mule.version>${MuleVersion}</mule.version>
@@ -69,9 +69,55 @@
                     <jdkName>${D}{jdk.version}</jdkName>
                 </configuration>
             </plugin>
+            <!--
+                make sure that MULE_HOME is set when building (required below when copying the
+                artifact to Mule's apps directory
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.0-beta-1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireProperty>
+                                    <property>env.MULE_HOME</property>
+                                    <message>You must set MULE_HOME before building the example.</message>
+                                </requireProperty>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
+                automatically deploy the artifact after it has been built
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>package-example</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy file="${project.build.directory}/${build.finalName}.zip"
+                                    todir="${env.MULE_HOME}/apps" overwrite="true"/>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
-
 
     <!-- plugins for creating site reports -->
     <reporting>
