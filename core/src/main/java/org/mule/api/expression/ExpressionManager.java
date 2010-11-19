@@ -39,6 +39,24 @@ public interface ExpressionManager
      * @return the evaluator that was removed. This will be null if the evaluator was not registered
      */
     public ExpressionEvaluator unregisterEvaluator(String name);
+    
+    public void registerEnricher(ExpressionEnricher enricher);
+
+    /**
+     * Checks whether an enricher is registered with the manager
+     *
+     * @param name the name of the expression enricher
+     * @return true if the enricher is registered with the manager, false otherwise
+     */
+    public boolean isEnricherRegistered(String name);
+
+    /**
+     * Removes the enricher with the given name
+     *
+     * @param name the name of the enricher to remove
+     * @return the enricher that was removed. This will be null if the enricher was not registered
+     */
+    public ExpressionEnricher unregisterEnricher(String name);
 
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
@@ -87,6 +105,9 @@ public interface ExpressionManager
      */
     public Object evaluate(String expression, String evaluator, MuleMessage message, boolean failIfNull) throws ExpressionRuntimeException;
 
+    
+    public void enrich(String expression, MuleMessage message, Object object);
+
 
     /**
      * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If
@@ -119,6 +140,11 @@ public interface ExpressionManager
      * Clears all registered evaluators from the manager.
      */
     public void clearEvaluators();
+    
+    /**
+     * Clears all registered enrichers from the manager.
+     */
+    public void clearEnrichers();
 
     /**
      * Determines if the expression is valid or not.  This method will validate a single expression or

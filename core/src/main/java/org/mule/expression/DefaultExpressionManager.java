@@ -12,6 +12,7 @@ package org.mule.expression;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.expression.ExpressionEnricher;
 import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.expression.ExpressionRuntimeException;
@@ -27,6 +28,7 @@ import java.util.Iterator;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,6 +50,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     private TemplateParser parser = TemplateParser.createMuleStyleParser();
 
     private ConcurrentMap evaluators = new ConcurrentHashMap(8);
+    private ConcurrentMap enrichers = new ConcurrentHashMap(8);
 
     private MuleContext muleContext;
 
@@ -72,6 +75,22 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         evaluators.put(evaluator.getName(), evaluator);
     }
 
+    public void registerEnricher(ExpressionEnricher enricher)
+    {
+        if (enricher == null)
+        {
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("enricher").getMessage());
+        }
+
+        final String name = enricher.getName();
+        // TODO MULE-3809 Eliminate duplicate evaluators registration
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Enrichers already contain an object named '" + name + "'.  The previous object will be overwritten.");
+        }
+        enrichers.put(enricher.getName(), enricher);
+    }
+
     /**
      * Checks whether an evaluator is registered with the manager
      *
@@ -82,7 +101,18 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     {
         return evaluators.containsKey(name);
     }
-
+    
+    /**
+     * Checks whether an enricher is registered with the manager
+     *
+     * @param name the name of the expression enricher
+     * @return true if the enricher is registered with the manager, false otherwise
+     */
+    public boolean isEnricherRegistered(String name)
+    {
+        return enrichers.containsKey(name);
+    }
+    
     /**
      * Removes the evaluator with the given name
      *
@@ -101,6 +131,26 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
             ((Disposable) evaluator).dispose();
         }
         return evaluator;
+    }
+    
+    /**
+     * Removes the evaluator with the given name
+     *
+     * @param name the name of the evaluator to remove
+     */
+    public ExpressionEnricher unregisterEnricher(String name)
+    {
+        if (name == null)
+        {
+            return null;
+        }
+
+        ExpressionEnricher enricher = (ExpressionEnricher) enrichers.remove(name);
+        if (enricher instanceof Disposable)
+        {
+            ((Disposable) enricher).dispose();
+        }
+        return enricher;
     }
 
     /**
@@ -160,6 +210,40 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         return evaluate(expression, name, message, failIfNull);
     }
 
+
+    public void enrich(String expression, MuleMessage message, Object object)
+        throws ExpressionRuntimeException
+    {
+        String enricherName;
+
+        if (expression == null)
+        {
+            throw new IllegalArgumentException(CoreMessages.objectIsNull("expression").getMessage());
+        }
+        if (expression.startsWith(DEFAULT_EXPRESSION_PREFIX))
+        {
+            expression = expression.substring(2, expression.length() - 1);
+        }
+        int i = expression.indexOf(":");
+        if (i > -1)
+        {
+            enricherName = expression.substring(0, i);
+            expression = expression.substring(i + DEFAULT_EXPRESSION_POSTFIX.length());
+        }
+        else
+        {
+            enricherName = expression;
+            expression = null;
+        }
+        ExpressionEnricher enricher = (ExpressionEnricher) enrichers.get(enricherName);
+        if (enricher == null)
+        {
+            throw new IllegalArgumentException(CoreMessages.expressionEnricherNotRegistered(enricherName)
+                .getMessage());
+        }
+        enricher.enrich(expression, message, object);
+    }
+    
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
      * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
@@ -249,6 +333,19 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         }
         evaluators.clear();
     }
+    
+    public void clearEnrichers()
+    {
+        for (Iterator iterator = enrichers.values().iterator(); iterator.hasNext();)
+        {
+            ExpressionEnricher enricher = (ExpressionEnricher) iterator.next();
+            if (enricher instanceof Disposable)
+            {
+                ((Disposable) enricher).dispose();
+            }
+        }
+        enrichers.clear();
+    }
 
     public boolean isExpression(String string)
     {
@@ -323,4 +420,5 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
             throw new InvalidExpressionException(expression, "Expression string is not an expression.  Use isExpression(String) to validate first");
         }
     }
+
 }

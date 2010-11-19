@@ -385,6 +385,56 @@
         </xsd:complexContent>
     </xsd:complexType>
     
+
+    <xsd:element name="message-enricher" type="messageEnricherType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Enriches the current message, using expressins to define how, with the result of processing an enrichment message processor that is specified.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="messageEnricherType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
+                    <!-- <xsd:element name="mapping" type="extractEnrichPairType" minOccurs="0" maxOccurs="unbounded"/> -->
+                </xsd:sequence>
+                <xsd:attribute name="with" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An optional evaluator expression used to extract a value from the result of the enrichment message processor.  By default the messge payload is used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="enrich" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The enricher expression used to enrich the current message with the result the processing of the enrichement message processor specificed.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="extractEnrichPairType">
+        <xsd:attribute name="with" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The evaluator expression used to extract a value from the nested message processor result rather
+                    than  enriching the current message with the whole payload.    
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="enrich" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The expression used to enrich the current payload with the result of calling the nested message processor
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
     <xsd:element name="async" type="asyncType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>

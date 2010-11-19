@@ -46,7 +46,6 @@ import org.mule.config.spring.parsers.specific.BindingDefinitionParser;
 import org.mule.config.spring.parsers.specific.BridgeDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDelegatingDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorChainDefinitionParser;
 import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
@@ -61,6 +60,7 @@ import org.mule.config.spring.parsers.specific.InboundRouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.InterceptorDefinitionParser;
 import org.mule.config.spring.parsers.specific.InterceptorStackDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageFilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageProcessorChainDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessagePropertiesTransformerDefinitionParser;
@@ -88,6 +88,7 @@ import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDe
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.context.notification.ListenerSubscriptionPair;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.enricher.MessageEnricher;
 import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.BeanBuilderTransformer;
@@ -289,6 +290,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("invoke",
             new MessageProcessorDefinitionParser(InvokerMessageProcessor.class)).addAlias("method",
             "methodName").addAlias("methodArguments", "argumentExpressionsString");
+        registerMuleBeanDefinitionParser("message-enricher", new MessageProcessorDefinitionParser(MessageEnricher.class)).addAlias("with",
+            "evaluatorExpression").addAlias("enrich", "enricherExpression");
         
         registerBeanDefinitionParser("async", new ChildDefinitionParser("messageProcessor",
             AsyncMessageProcessorsFactoryBean.class));

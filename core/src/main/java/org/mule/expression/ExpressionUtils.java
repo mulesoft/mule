@@ -10,6 +10,10 @@
 
 package org.mule.expression;
 
+import static org.mule.expression.ExpressionConstants.ALL_ARGUMENT;
+import static org.mule.expression.ExpressionConstants.DELIM;
+import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
+
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.transport.PropertyScope;
@@ -21,10 +25,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.mule.expression.ExpressionConstants.ALL_ARGUMENT;
-import static org.mule.expression.ExpressionConstants.DELIM;
-import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
 
 /**
  * Used by the different header expression evaluators to read message properties, honuouring scope and return type
@@ -208,7 +208,7 @@ public final class ExpressionUtils
         return l;
     }
 
-    private static PropertyScope getScope(String expression)
+    protected static PropertyScope getScope(String expression)
     {
         // see if scope has been specified explicitly
         final String[] tokens = expression.split(":", 2); // note we split only once, not on every separator

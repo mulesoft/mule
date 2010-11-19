@@ -16,6 +16,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.transport.PropertyScope;
 import org.mule.construct.SimpleFlowConstruct;
 import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.source.StartableCompositeMessageSource;
@@ -236,10 +237,12 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
     public void testAsyncRequestResponseEndpoint() throws MuleException, Exception
     {
-        muleContext.getClient().send("vm://async-requestresponse-in", new DefaultMuleMessage("0", muleContext));
-        final MuleMessage result = muleContext.getClient().request("vm://async-requestresponse-out", RECEIVE_TIMEOUT);
-        final MuleMessage asyncResult = muleContext.getClient().request("vm://async-async-requestresponse-out",
+        muleContext.getClient().send("vm://async-requestresponse-in",
+            new DefaultMuleMessage("0", muleContext));
+        final MuleMessage result = muleContext.getClient().request("vm://async-requestresponse-out",
             RECEIVE_TIMEOUT);
+        final MuleMessage asyncResult = muleContext.getClient().request(
+            "vm://async-async-requestresponse-out", RECEIVE_TIMEOUT);
 
         assertNotNull(result);
         assertNotNull(asyncResult);
@@ -249,31 +252,33 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
     public void testAsyncTransactionalEndpoint() throws MuleException, Exception
     {
-            MuleMessage response = muleContext.getClient().send("vm://async-tx-in", new DefaultMuleMessage("0", muleContext));
-            assertNotNull(response);
-            assertNotNull(response.getExceptionPayload());
+        MuleMessage response = muleContext.getClient().send("vm://async-tx-in",
+            new DefaultMuleMessage("0", muleContext));
+        assertNotNull(response);
+        assertNotNull(response.getExceptionPayload());
 
-            final MuleMessage result = muleContext.getClient().request("vm://async-requestresponse-out", RECEIVE_TIMEOUT);
-            final MuleMessage asyncResult = muleContext.getClient().request("vm://async-async-oneway-out",
-                RECEIVE_TIMEOUT);
+        final MuleMessage result = muleContext.getClient().request("vm://async-requestresponse-out",
+            RECEIVE_TIMEOUT);
+        final MuleMessage asyncResult = muleContext.getClient().request("vm://async-async-oneway-out",
+            RECEIVE_TIMEOUT);
 
-            assertNull(result);
-            assertNull(asyncResult);
+        assertNull(result);
+        assertNull(asyncResult);
     }
 
-    
-//    public void testTransactional() throws MuleException, Exception
-//    {
-//        muleContext.getClient().dispatch("vm://transactional-in", new DefaultMuleMessage("", muleContext));
-//
-//    }
-//
-//    public void testTransactionalRollback() throws MuleException, Exception
-//    {
-//        muleContext.getClient().dispatch("vm://transactional-rollback-in",
-//            new DefaultMuleMessage("", muleContext));
-//
-//    }
+    // public void testTransactional() throws MuleException, Exception
+    // {
+    // muleContext.getClient().dispatch("vm://transactional-in", new
+    // DefaultMuleMessage("", muleContext));
+    //
+    // }
+    //
+    // public void testTransactionalRollback() throws MuleException, Exception
+    // {
+    // muleContext.getClient().dispatch("vm://transactional-rollback-in",
+    // new DefaultMuleMessage("", muleContext));
+    //
+    // }
 
     public void testMulticaster() throws MuleException, Exception
     {
@@ -321,14 +326,14 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertEquals(TEST_MESSAGE, result3.getPayload());
 
     }
-    
+
     public void testChoiceWithoutOutboundEndpoints() throws MuleException, Exception
     {
-        assertEquals("foo Hello foo",muleContext.getClient().send("vm://choice2-in",
+        assertEquals("foo Hello foo", muleContext.getClient().send("vm://choice2-in",
             new DefaultMuleMessage("foo", muleContext)).getPayloadAsString());
-        assertEquals("bar Hello bar",muleContext.getClient().send("vm://choice2-in",
+        assertEquals("bar Hello bar", muleContext.getClient().send("vm://choice2-in",
             new DefaultMuleMessage("bar", muleContext)).getPayloadAsString());
-        assertEquals("egh Hello ?",muleContext.getClient().send("vm://choice2-in",
+        assertEquals("egh Hello ?", muleContext.getClient().send("vm://choice2-in",
             new DefaultMuleMessage("egh", muleContext)).getPayloadAsString());
     }
 
@@ -349,18 +354,34 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     {
         MuleMessage message = new DefaultMuleMessage("0", muleContext);
         message.setOutboundProperty("one", "header1val");
-        assertEquals("header1valrecieved", muleContext.getClient().send("vm://invoke2-in",
-            message).getPayloadAsString());
+        assertEquals("header1valrecieved", muleContext.getClient()
+            .send("vm://invoke2-in", message)
+            .getPayloadAsString());
 
     }
-    
+
     public void testInvoke3() throws MuleException, Exception
     {
-        assertEquals("0recieved", muleContext.getClient().send("vm://invoke3-in",
-            new DefaultMuleMessage("0", muleContext)).getPayloadAsString());
+        // ensure multiple arguments work
+        muleContext.getClient().send("vm://invoke3-in", new DefaultMuleMessage("0", muleContext));
     }
     
-    
+    public void testEnrich() throws MuleException, Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("0", muleContext);
+        assertEquals("0Hello", muleContext.getClient().send("vm://enrich-in", message).getProperty(
+            "helloHeader", PropertyScope.INBOUND));
+    }
+
+    static class Pojo
+    {
+
+        public void method(Object arg1, Object arg2)
+        {
+
+        }
+    }
+
     public void testFlowThreadingProfile() throws MuleException, Exception
     {
         SimpleFlowConstruct flow = muleContext.getRegistry().lookupObject("flow-threading-profile");

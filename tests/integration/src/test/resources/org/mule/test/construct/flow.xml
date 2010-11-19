@@ -268,8 +268,17 @@
         <vm:inbound-endpoint path="invoke3-in" exchange-pattern="request-response"/>
         <processor ref="invokeme"/>
     </flow>
+    
+    <flow name="enrich">
+        <vm:inbound-endpoint path="enrich-in" exchange-pattern="request-response"/>
+        <message-enricher enrich="header:OUTBOUND:helloHeader" with="#[payload]">
+                <append-string-transformer message="Hello" />
+        </message-enricher>
+    </flow>
 
-    <invoke name="invokeme" object-ref="appender" method="transform" methodArguments="#[payload]"/>
+    <invoke name="invokeme" object-ref="pojo" method="method" methodArguments="#[string:Account] ,    #[groovy:message.payload]"/>
+
+    <spring:bean name="pojo" class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$Pojo"/>
 
     <spring:bean name="appender" class="org.mule.transformer.simple.StringAppendTransformer">
         <spring:constructor-arg value="recieved"/>

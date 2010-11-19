@@ -65,6 +65,7 @@ public class TransientRegistry extends AbstractRegistry
             registry.put("_muleContextProcessor", new MuleContextProcessor(muleContext));
             //registry.put("_muleNotificationProcessor", new NotificationListenersProcessor(muleContext));
             registry.put("_muleExpressionEvaluatorProcessor", new ExpressionEvaluatorProcessor(muleContext));
+            registry.put("_muleExpressionEnricherProcessor", new ExpressionEnricherProcessor(muleContext));
             registry.put("_muleLifecycleStateInjectorProcessor", new LifecycleStateInjectorProcessor(getLifecycleManager().getState()));
             registry.put("_muleLifecycleManager", getLifecycleManager());
         }

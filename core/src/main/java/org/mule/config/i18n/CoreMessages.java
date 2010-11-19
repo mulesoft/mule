@@ -1033,7 +1033,7 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 251, key);
     }
-
+    
     public static Message objectAlreadyExists(String key)
     {
         return factory.createMessage(BUNDLE_PATH, 252, key);
@@ -1326,6 +1326,11 @@ public class CoreMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 329, method, numArgments,
             StringMessageUtils.toString(object));
+    }
+    
+    public static Message expressionEnricherNotRegistered(String key)
+    {
+        return factory.createMessage(BUNDLE_PATH, 330, key);
     }
 
 }
