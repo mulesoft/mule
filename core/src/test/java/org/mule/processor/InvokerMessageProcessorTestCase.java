@@ -68,6 +68,16 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         }
     }
 
+    public void testMethodWithArgTypes() throws MuleException, Exception
+    {
+        invoker.setMethodName("testDuplicateNameMethod");
+        invoker.setArgumentExpressionsString("#[string:1], #[string:2]");
+        invoker.setArgumentTypes(new Class[]{String.class, Integer.TYPE});
+        invoker.initialise();
+        assertEquals("12(string and int)", invoker.process(getTestEvent("")).getMessageAsString());
+
+    }
+
     public void testCantTransform() throws MuleException, Exception
     {
         invoker.setMethodName("testMethod2");
@@ -118,6 +128,16 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         public String testMethod3(String text)
         {
             return text + " echo";
+        }
+
+        public String testDuplicateNameMethod(String text, String text2)
+        {
+            return text + text2 + " (two strings)";
+        }
+
+        public String testDuplicateNameMethod(String text, int i)
+        {
+            return text + i + "(string and int)";
         }
 
     }

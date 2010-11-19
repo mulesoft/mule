@@ -289,7 +289,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("message-filter", new MessageFilterDefinitionParser());
         registerMuleBeanDefinitionParser("invoke",
             new MessageProcessorDefinitionParser(InvokerMessageProcessor.class)).addAlias("method",
-            "methodName").addAlias("methodArguments", "argumentExpressionsString");
+            "methodName").addAlias("methodArguments", "argumentExpressionsString").addAlias("methodArgumentTypes", "ArgumentTypes");
         registerMuleBeanDefinitionParser("message-enricher", new MessageProcessorDefinitionParser(MessageEnricher.class)).addAlias("with",
             "evaluatorExpression").addAlias("enrich", "enricherExpression");
         

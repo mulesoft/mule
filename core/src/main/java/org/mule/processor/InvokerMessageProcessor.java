@@ -27,6 +27,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
+import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -47,27 +48,41 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
     private Object object;
     private String methodName;
     private String[] argumentExpressions;
+    private Class<?>[] argumentTypes;
     private String name;
 
     private Method method;
 
     public void initialise() throws InitialisationException
     {
-        List<Method> matchingMethods = new ArrayList<Method>();
-        for (Method methodCandidate : object.getClass().getMethods())
+        if (argumentTypes != null)
         {
-            if (methodCandidate.getName().equals(methodName)
-                && methodCandidate.getParameterTypes().length == argumentExpressions.length)
-                matchingMethods.add(methodCandidate);
-        }
-        if (matchingMethods.size() == 1)
-        {
-            method = matchingMethods.get(0);
+            method = ClassUtils.getMethod(object.getClass(), methodName, argumentTypes);
+            if (method == null)
+            {
+                throw new InitialisationException(CoreMessages.methodWithParamsNotFoundOnObject(methodName,
+                    argumentTypes, object.getClass()), this);
+            }
         }
         else
         {
-            throw new InitialisationException(CoreMessages.methodWithNumParamsNotFoundOnObject(methodName,
-                argumentExpressions.length, object), this);
+            List<Method> matchingMethods = new ArrayList<Method>();
+            for (Method methodCandidate : object.getClass().getMethods())
+            {
+                if (methodCandidate.getName().equals(methodName)
+                    && methodCandidate.getParameterTypes().length == argumentExpressions.length)
+                    matchingMethods.add(methodCandidate);
+            }
+            if (matchingMethods.size() == 1)
+            {
+                method = matchingMethods.get(0);
+                argumentTypes = method.getParameterTypes();
+            }
+            else
+            {
+                throw new InitialisationException(CoreMessages.methodWithNumParamsNotFoundOnObject(
+                    methodName, argumentExpressions.length, object), this);
+            }
         }
     }
 
@@ -105,10 +120,10 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
                 {
                     arg = ((MuleMessage) arg).getPayload();
                 }
-                if (!(method.getParameterTypes()[i].isAssignableFrom(arg.getClass())))
+                if (!(argumentTypes[i].isAssignableFrom(arg.getClass())))
                 {
                     DataType<?> source = DataTypeFactory.create(arg.getClass());
-                    DataType<?> target = DataTypeFactory.create(method.getParameterTypes()[i]);
+                    DataType<?> target = DataTypeFactory.create(argumentTypes[i]);
                     // Throws TransformerException if no suitable transformer is
                     // found
                     Transformer t = event.getMuleContext().getRegistry().lookupTransformer(source, target);
@@ -173,6 +188,11 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public void setArgumentTypes(Class[] argumentTypes)
+    {
+        this.argumentTypes = argumentTypes;
     }
 
 }

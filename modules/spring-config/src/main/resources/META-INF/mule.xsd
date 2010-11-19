@@ -374,6 +374,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="methodArgumentTypes" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Comma-seperated list of mule expression that when evaluated are the arguments for the method invocation 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="name" type="substitutableName" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>

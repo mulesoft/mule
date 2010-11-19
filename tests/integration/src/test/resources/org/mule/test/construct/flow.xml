@@ -276,7 +276,7 @@
         </message-enricher>
     </flow>
 
-    <invoke name="invokeme" object-ref="pojo" method="method" methodArguments="#[string:Account] ,    #[groovy:message.payload]"/>
+    <invoke name="invokeme" object-ref="pojo" method="method" methodArguments="#[string:Account] ,    #[groovy:message.payload]" methodArgumentTypes="java.lang.String, java.lang.String"/>
 
     <spring:bean name="pojo" class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$Pojo"/>
 
