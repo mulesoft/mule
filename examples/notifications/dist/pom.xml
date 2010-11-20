@@ -16,7 +16,7 @@
     <build>
         <defaultGoal>install</defaultGoal>
         <finalName>${project.artifactId}</finalName>
-        
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -37,7 +37,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>        
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -51,28 +51,8 @@
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>maven-mule-plugin</artifactId>
-                <version>1.3</version>
+                <version>1.4</version>
                 <extensions>true</extensions>
-                <configuration>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-builders</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-management</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-json</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.transports</groupId>
-                            <artifactId>mule-transport-ajax</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

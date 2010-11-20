@@ -49,36 +49,8 @@
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>maven-mule-plugin</artifactId>
-                <version>1.3</version>
+                <version>1.4</version>
                 <extensions>true</extensions>
-                <configuration>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-jbpm</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.transports</groupId>
-                            <artifactId>mule-transport-vm</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.transports</groupId>
-                            <artifactId>mule-transport-jms</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.transports</groupId>
-                            <artifactId>mule-transport-http</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-scripting</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-spring-config</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -16,19 +16,16 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-scripting</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <!-- This is the engine for JSR-223 compliance, not the actual implementation -->
@@ -41,7 +38,7 @@
             <groupId>org.python</groupId>
             <artifactId>jython</artifactId>
         </dependency>
-        
+
         <!-- Unit tests only -->
         <dependency>
             <groupId>org.mule.tests</groupId>
