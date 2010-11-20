@@ -72,13 +72,14 @@
             <!--
                 make sure that MULE_HOME is set when building (required below when copying the
                 artifact to Mule's apps directory
-
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <version>1.0-beta-1</version>
                 <executions>
                     <execution>
+                        <phase>install</phase>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
@@ -86,17 +87,16 @@
                             <rules>
                                 <requireProperty>
                                     <property>env.MULE_HOME</property>
-                                    <message>You must set MULE_HOME before building the example.</message>
+                                    <message>You must set MULE_HOME before installing the example.</message>
                                 </requireProperty>
                             </rules>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-            -->
             <!--
                 automatically deploy the artifact after it has been built
-
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -117,7 +117,6 @@
                     </execution>
                 </executions>
             </plugin>
-            -->
         </plugins>
     </build>
 
