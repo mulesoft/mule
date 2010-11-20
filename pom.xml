@@ -1430,7 +1430,7 @@
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>maven-mule-plugin</artifactId>
-                <version>1.3</version>
+                <version>1.4</version>
                 <extensions>true</extensions>
             </plugin>
         </plugins>

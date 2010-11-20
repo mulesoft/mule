@@ -11,7 +11,7 @@
     <name>Echo Example</name>
     <description>Is a simple component example that demonstrates how to expose a component over multiple transports (soap and stream).</description>
 
-    <build>    
+    <build>
          <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -32,19 +32,16 @@
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- test dependencies -->

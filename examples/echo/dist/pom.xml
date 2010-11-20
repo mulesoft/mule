@@ -135,32 +135,8 @@
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>maven-mule-plugin</artifactId>
-                <version>1.3</version>
+                <version>1.4</version>
                 <extensions>true</extensions>
-                <configuration>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.mule</groupId>
-                            <artifactId>mule-core</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-spring-config</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.transports</groupId>
-                            <artifactId>mule-transport-vm</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-cxf</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.mule.modules</groupId>
-                            <artifactId>mule-module-client</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
