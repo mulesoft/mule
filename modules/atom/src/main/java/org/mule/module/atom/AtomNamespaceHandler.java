@@ -32,7 +32,6 @@ public class AtomNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser("atom", true, AtomInboundEndpointFactoryBean.class, new String[]{"lastUpdate", "splitFeed", "acceptedMimeTypes", "pollingFrequency"}, new String[][]{}, new String[][]{}));
 
         FilterDefinitionParser routeFilter = new FilterDefinitionParser(URIRouteFilter.class);
-        routeFilter.addAlias("verbs", "verbsString");
         registerBeanDefinitionParser("route-filter", routeFilter);
         registerBeanDefinitionParser("entry-last-updated-filter", new FilterDefinitionParser(EntryLastUpdatedFilter.class));
         registerBeanDefinitionParser("feed-last-updated-filter", new FilterDefinitionParser(FeedLastUpdatedFilter.class));
