@@ -35,7 +35,7 @@ public class URIRouteFilter implements Filter
         route = new Route("", routePattern);
     }
 
-    public void setVerbsString(String verbString)
+    public void setVerbs(String verbString)
     {
         if (verbString.equals("*"))
         {
@@ -47,15 +47,6 @@ public class URIRouteFilter implements Filter
         for (String s : split)
         {
             verbs.add(s.toUpperCase());
-        }
-    }
-
-    public void setVerbs(Set<String> verbs)
-    {
-        this.verbs = new HashSet<String>(verbs.size());
-        for (String verb : verbs)
-        {
-            this.verbs.add(verb.toUpperCase());
         }
     }
 
