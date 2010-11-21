@@ -48,6 +48,8 @@ cxf-rt-frontend-simple-2.2.2
 cxf-rt-transports-http-2.2.2
 cxf-rt-transports-http-jetty-2.2.2
 cxf-rt-transports-local-2.2.2
+cxf-rt-transports-http-2.2.2
+cxf-rt-transports-http-jetty-2.2.2
 cxf-rt-ws-addr-2.2.2
 cxf-rt-ws-security-2.2.2
 cxf-tools-common-2.2.2
