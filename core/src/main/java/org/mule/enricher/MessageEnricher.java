@@ -10,46 +10,64 @@
 
 package org.mule.enricher;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MessageEnricher implements MessageProcessor
 {
 
-    private String evaluatorExpression;
-    private String enricherExpression;
+    private List<EnrichExpressionPair> enrichExpressionPairs = new ArrayList<EnrichExpressionPair>();
 
     private MessageProcessor enrichmentProcessor;
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleContext muleContext = event.getMuleContext();
-        ExpressionManager expressionManager = muleContext.getExpressionManager();
-
-        Object enrichmentObject = null;
+        ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
         MuleMessage enrichmentMessage = enrichmentProcessor.process(event).getMessage();
 
         if (enrichmentMessage != null)
         {
-            if (evaluatorExpression != null)
+            for (EnrichExpressionPair pair : enrichExpressionPairs)
             {
-                enrichmentObject = expressionManager.evaluate(evaluatorExpression, enrichmentMessage);
-                if (enrichmentObject instanceof MuleMessage)
-                {
-                    enrichmentObject = ((MuleMessage) enrichmentObject).getPayload();
-                }
+                enrich(event.getMessage(), enrichmentMessage, pair.getSource(), pair.getTarget(),
+                    expressionManager);
             }
-            else
-            {
-                enrichmentObject = enrichmentMessage.getPayload();
-            }
-            expressionManager.enrich(enricherExpression, event.getMessage(), enrichmentObject);
         }
         return event;
+    }
+
+    protected void enrich(MuleMessage currentMessage,
+                          MuleMessage enrichmentMessage,
+                          String sourceExpressionArg,
+                          String targetExpressionArg,
+                          ExpressionManager expressionManager)
+    {
+        if (StringUtils.isEmpty(sourceExpressionArg))
+        {
+            sourceExpressionArg = "#[payload]";
+        }
+
+        Object enrichmentObject = expressionManager.evaluate(sourceExpressionArg, enrichmentMessage);
+        if (enrichmentObject instanceof MuleMessage)
+        {
+            enrichmentObject = ((MuleMessage) enrichmentObject).getPayload();
+        }
+
+        if (!StringUtils.isEmpty(targetExpressionArg))
+        {
+            expressionManager.enrich(targetExpressionArg, currentMessage, enrichmentObject);
+        }
+        else
+        {
+            currentMessage.setPayload(enrichmentObject);
+        }
     }
 
     public void setEnrichmentMessageProcessor(MessageProcessor enrichmentProcessor)
@@ -65,14 +83,57 @@ public class MessageEnricher implements MessageProcessor
         this.enrichmentProcessor = enrichmentProcessor;
     }
 
-    public void setEvaluatorExpression(String evaluatorExpression)
+    public void setEnrichExpressionPairs(List<EnrichExpressionPair> enrichExpressionPairs)
     {
-        this.evaluatorExpression = evaluatorExpression;
+        this.enrichExpressionPairs = enrichExpressionPairs;
     }
 
-    public void setEnricherExpression(String enricherExpression)
+    public void addEnrichExpressionPair(EnrichExpressionPair pair)
     {
-        this.enricherExpression = enricherExpression;
+        this.enrichExpressionPairs.add(pair);
+    }
+
+    public static class EnrichExpressionPair
+    {
+
+        private String source;
+        private String target;
+
+        public EnrichExpressionPair()
+        {
+            // for spring
+        }
+
+        public EnrichExpressionPair(String target)
+        {
+            this.target = target;
+        }
+
+        public EnrichExpressionPair(String source, String target)
+        {
+            this.source = source;
+            this.target = target;
+        }
+
+        public String getSource()
+        {
+            return source;
+        }
+
+        public void setSource(String source)
+        {
+            this.source = source;
+        }
+
+        public String getTarget()
+        {
+            return target;
+        }
+
+        public void setTarget(String target)
+        {
+            this.target = target;
+        }
     }
 
 }

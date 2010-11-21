@@ -373,6 +373,15 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
             "helloHeader", PropertyScope.INBOUND));
     }
 
+    public void testEnrich2() throws MuleException, Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("0", muleContext);
+        MuleMessage result = muleContext.getClient().send("vm://enrich2-in", message);
+
+        assertEquals("0Hello", result.getProperty("helloHeader", PropertyScope.INBOUND));
+        assertEquals("0Hello", result.getProperty("helloHeader2", PropertyScope.INBOUND));
+    }
+
     static class Pojo
     {
 

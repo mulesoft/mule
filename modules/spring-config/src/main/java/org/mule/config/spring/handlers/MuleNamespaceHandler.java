@@ -59,6 +59,7 @@ import org.mule.config.spring.parsers.specific.IgnoreObjectMethodsDefinitionPars
 import org.mule.config.spring.parsers.specific.InboundRouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.InterceptorDefinitionParser;
 import org.mule.config.spring.parsers.specific.InterceptorStackDefinitionParser;
+import org.mule.config.spring.parsers.specific.MessageEnricherDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorChainDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
@@ -89,6 +90,7 @@ import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.context.notification.ListenerSubscriptionPair;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.enricher.MessageEnricher;
+import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
 import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.BeanBuilderTransformer;
@@ -289,10 +291,20 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("message-filter", new MessageFilterDefinitionParser());
         registerMuleBeanDefinitionParser("invoke",
             new MessageProcessorDefinitionParser(InvokerMessageProcessor.class)).addAlias("method",
-            "methodName").addAlias("methodArguments", "argumentExpressionsString").addAlias("methodArgumentTypes", "ArgumentTypes");
-        registerMuleBeanDefinitionParser("message-enricher", new MessageProcessorDefinitionParser(MessageEnricher.class)).addAlias("with",
-            "evaluatorExpression").addAlias("enrich", "enricherExpression");
+            "methodName").addAlias("methodArguments", "argumentExpressionsString").addAlias(
+            "methodArgumentTypes", "ArgumentTypes");
+        registerMuleBeanDefinitionParser("message-enricher",
+            new MessageEnricherDefinitionParser("messageProcessor", MessageEnricher.class)).addIgnored(
+            "source")
+            .addIgnored("target")
+            .registerPreProcessor(
+                new CheckExclusiveAttributesAndChildren(new String[]{"source", "target"},
+                    new String[]{"enrich"}))
+            .addCollection("enrichExpressionPairs");
+        registerMuleBeanDefinitionParser("enrich", new ChildDefinitionParser("enrichExpressionPair",
+            EnrichExpressionPair.class));
 
+        
         registerBeanDefinitionParser("async", new ChildDefinitionParser("messageProcessor",
             AsyncMessageProcessorsFactoryBean.class));
         registerBeanDefinitionParser("transactional", new ChildDefinitionParser("messageProcessor",
