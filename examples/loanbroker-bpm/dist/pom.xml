@@ -18,26 +18,6 @@
          <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.0-beta-1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireProperty>
-                                    <property>env.MULE_HOME</property>
-                                    <message>You must set MULE_HOME before building the example.</message>
-                                </requireProperty>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
@@ -65,8 +45,8 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${project.build.directory}/${project.artifactId}.zip"
-                                    todir="${env.MULE_HOME}/apps" overwrite="true"/>
+                                <copy file="${project.build.directory}/${build.finalName}.zip"
+                                    todir="../../apps" overwrite="true"/>
                             </tasks>
                         </configuration>
                     </execution>

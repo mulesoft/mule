@@ -7,11 +7,11 @@
     <packaging>war</packaging>
     <name>GeoMail Example</name>
     <version>1.0</version>
-    
+
     <properties>
         <muleVersion>3.1.0-SNAPSHOT</muleVersion>
     </properties>
-    
+
     <description>A web based example that plots incoming emails on a world map.  This example demonstrates how to use Ajax events with Mule.</description>
 
     <build>
@@ -30,6 +30,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
@@ -129,8 +130,8 @@
             <version>3.2.1</version>
         </dependency>
     </dependencies>
-    
-    <repositories>        
+
+    <repositories>
         <repository>
             <id>mule-deps</id>
             <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
