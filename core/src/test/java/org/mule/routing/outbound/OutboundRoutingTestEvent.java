@@ -21,6 +21,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
+import org.mule.management.stats.ProcessingTime;
 import org.mule.tck.MuleTestUtils;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.UUID;
@@ -206,5 +207,10 @@ public class OutboundRoutingTestEvent implements MuleEvent
         {
             throw new RuntimeException(e);
         }
+    }
+
+    public ProcessingTime getProcessingTime()
+    {
+        return null;
     }
 }

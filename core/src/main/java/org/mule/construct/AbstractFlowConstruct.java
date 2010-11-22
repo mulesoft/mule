@@ -15,6 +15,7 @@ import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.config.ThreadingProfile;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.construct.FlowConstructInvalidException;
@@ -76,15 +77,15 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     protected MessagingExceptionHandler exceptionListener;
     protected final FlowConstructLifecycleManager lifecycleManager;
     protected final MuleContext muleContext;
-    protected final FlowConstructStatistics statistics;
+    protected FlowConstructStatistics statistics;
     protected MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
+    protected ThreadingProfile threadingProfile;
 
     public AbstractFlowConstruct(String name, MuleContext muleContext)
     {
         this.muleContext = muleContext;
         this.name = name;
         this.lifecycleManager = new FlowConstructLifecycleManager(this, muleContext);
-        this.statistics = new FlowConstructStatistics(getConstructType(), name);
         this.exceptionListener = new DefaultServiceExceptionStrategy(muleContext);
     }
 
@@ -114,8 +115,6 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
                     injectFlowConstructMuleContext(messageProcessorChain);
                     initialiseIfInitialisable(messageSource);
                     initialiseIfInitialisable(messageProcessorChain);
-
-                    statistics.setEnabled(muleContext.getStatistics().isEnabled());
 
                     doInitialise();
 
@@ -183,6 +182,11 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
         {
             logger.error("Failed to stop service: " + name, e);
         }
+    }
+
+    public ThreadingProfile getThreadingProfile()
+    {
+        return threadingProfile;
     }
 
     public boolean isStarted()
@@ -289,6 +293,9 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
 
     protected void doInitialise() throws InitialisationException
     {
+        int threadPoolSize = threadingProfile == null ? 0 : threadingProfile.getMaxThreadsActive();
+        statistics = new FlowConstructStatistics(getConstructType(), name, threadPoolSize);
+        statistics.setEnabled(muleContext.getStatistics().isEnabled());
         muleContext.getStatistics().add(statistics);
     }
 
@@ -370,9 +377,18 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event.getEndpoint(), this, event);
+        FlowConstruct flowConstruct = event.getFlowConstruct();
+        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event.getEndpoint(), this, event, true);
         RequestContext.setEvent(newEvent);
-        return messageProcessorChain.process(newEvent);
+        try
+        {
+            return messageProcessorChain.process(newEvent);
+        }
+        finally
+        {
+            event.getSession().setFlowConstruct(flowConstruct);
+            RequestContext.setEvent(event);
+        }
     }
 
     public MessageProcessorChain getMessageProcessorChain()

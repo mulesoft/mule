@@ -80,6 +80,7 @@ public class ComponentStatistics implements Statistics
         maxExecutionTime = 0;
         executedEvent = 0;
         totalExecTime = 0;
+        averageExecutionTime = 0;
     }
 
     public boolean isEnabled()
@@ -125,6 +126,48 @@ public class ComponentStatistics implements Statistics
         return executedEvent;
     }
 
+    /**
+     * Add a new execution-time measurement for one branch of processing an event
+     * @param first true if this is the first branch for this event
+     * @param branch the time to execute this branch
+     * @param total the total time (so far) for  processing this event
+     */
+    public synchronized void addExecutionBranchTime(boolean first, long branch, long total)
+    {
+        if (statIntervalTimeEnabled)
+        {
+            long currentTime = System.currentTimeMillis();
+            if (currentIntervalStartTime == 0)
+            {
+                currentIntervalStartTime = currentTime;
+            }
+
+            if ((currentTime - currentIntervalStartTime) > intervalTime)
+            {
+                clear();
+                currentIntervalStartTime = currentTime;
+            }
+        }
+
+        if (first)
+        {
+            executedEvent++;
+        }
+
+        totalExecTime += ProcessingTime.getEffectiveTime(branch);
+        long effectiveTotal = ProcessingTime.getEffectiveTime(total);
+        if (maxExecutionTime == 0 || effectiveTotal > maxExecutionTime)
+        {
+            maxExecutionTime = effectiveTotal;
+        }
+        averageExecutionTime = Math.round(totalExecTime / executedEvent);
+    }
+
+    /**
+     * Add a new execution-time measurement for processing an event.
+     *
+     * @param time
+     */
     public synchronized void addExecutionTime(long time)
     {
         if (statIntervalTimeEnabled)
@@ -144,13 +187,14 @@ public class ComponentStatistics implements Statistics
 
         executedEvent++;
 
-        totalExecTime += (time == 0 ? 1 : time);
+        long effectiveTime = ProcessingTime.getEffectiveTime(time);
+        totalExecTime += effectiveTime;
 
-        if (minExecutionTime == 0 || time < minExecutionTime)
+        if (minExecutionTime == 0 || effectiveTime < minExecutionTime)
         {
             minExecutionTime = time;
         }
-        if (maxExecutionTime == 0 || time > maxExecutionTime)
+        if (maxExecutionTime == 0 || effectiveTime > maxExecutionTime)
         {
             maxExecutionTime = time;
         }

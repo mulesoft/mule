@@ -24,6 +24,7 @@ import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.interceptor.ProcessingTimerInterceptor;
 import org.mule.lifecycle.processor.ProcessIfStartedWaitIfSyncPausedMessageProcessor;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.processor.SedaStageInterceptingMessageProcessor;
@@ -79,6 +80,7 @@ public class SedaService extends AbstractService
 
     protected void addMessageProcessors(MessageProcessorChainBuilder builder)
     {
+        builder.chain(new ProcessingTimerInterceptor(null, this));
         builder.chain(new ServiceLoggingMessageProcessor(this));
         builder.chain(new ServiceStatisticsMessageProcessor(this));
         builder.chain(new ServiceSetEventRequestContextMessageProcessor());

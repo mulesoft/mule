@@ -10,6 +10,7 @@
 
 package org.mule.processor;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -17,10 +18,12 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.interceptor.ProcessingTimerInterceptor;
 import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
@@ -98,6 +101,34 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         else
         {
             return processNext(event);
+        }
+    }
+
+    protected MuleEvent processNextTimed(MuleEvent event) throws MuleException
+    {
+        if (next == null)
+        {
+            return event;
+        }
+        else
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("Invoking next MessageProcessor: '" + next.getClass().getName() + "' ");
+            }
+            // If the next message processor is an outbound router then create outbound event
+            if (next instanceof OutboundEndpoint)
+            {
+                event = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint) next, event.getSession());
+            }
+            if (event.getFlowConstruct() != null)
+            {
+                return new ProcessingTimerInterceptor(next, event.getFlowConstruct()).process(event);
+            }
+            else
+            {
+                return next.process(event);
+            }
         }
     }
 
@@ -181,7 +212,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         {
             try
             {
-                processNext(event);
+                processNextTimed(event);
             }
             catch (MuleException e)
             {

@@ -18,6 +18,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ExceptionHelper;
+import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.util.CollectionUtils;
 
@@ -48,7 +49,7 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
     @Override
     protected void defaultHandler(Throwable t)
     {
-        ServiceStatistics statistics = getServiceStatistics();
+        FlowConstructStatistics statistics = getFlowConstructStatistics();
 
         if (statistics != null)
         {
@@ -61,7 +62,7 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
     @Override
     protected void logFatal(MuleMessage message, Throwable t)
     {
-        ServiceStatistics statistics = getServiceStatistics();
+        FlowConstructStatistics statistics = getFlowConstructStatistics();
         if (statistics != null)
         {
             statistics.incFatalError();
@@ -75,7 +76,7 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
     {
         super.routeException(message, target, t);
         List<MessageProcessor> processors = getMessageProcessors(t);
-        if (CollectionUtils.isNotEmpty(processors) && getServiceStatistics() != null)
+        if (CollectionUtils.isNotEmpty(processors) && getFlowConstructStatistics() instanceof ServiceStatistics)
         {
             ServiceStatistics statistics = getServiceStatistics();
             for (MessageProcessor endpoint : processors)
@@ -85,7 +86,7 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
         }
     }
 
-    protected ServiceStatistics getServiceStatistics()
+    protected FlowConstructStatistics getFlowConstructStatistics()
     {
         MuleEvent event = RequestContext.getEvent();
         if (event == null)
@@ -95,15 +96,27 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
             //logger.fatal("The error is: " + t.getMessage(), t);
             return null;
         }
-        else if(event.getFlowConstruct()!=null && event.getFlowConstruct() instanceof Service)
+        else if(event.getFlowConstruct()!=null )
         {
-            return ((Service) event.getFlowConstruct()).getStatistics();
+            return event.getFlowConstruct().getStatistics();
         }
         else
         {
             //this will ever happen, but JIC
+            logger.fatal("The Default Service Exception Strategy has been invoked but there is no current flow construct on the context. Please report this to dev@mule.codehaus.org");
+            return null;
+        }
+    }
+
+    protected ServiceStatistics getServiceStatistics()
+    {
+        FlowConstructStatistics stats = getFlowConstructStatistics();
+        if (!(stats instanceof ServiceStatistics))
+        {
+            //this should never happen, but JIC
             logger.fatal("The Default Service Exception Strategy has been invoked but there is no current service on the context. Please report this to dev@mule.codehaus.org");            
             return null;
         }
+        return (ServiceStatistics) stats;
     }
 }

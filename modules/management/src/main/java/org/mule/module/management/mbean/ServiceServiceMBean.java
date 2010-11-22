@@ -21,7 +21,7 @@ import javax.management.ObjectName;
  * <code>ServiceServiceMBean</code> defines the management interface for a mule
  * managed service.
  */
-public interface ServiceServiceMBean extends Stoppable, Startable, AbstractFlowConstructServiceMBean, ServiceStatsMBean
+public interface ServiceServiceMBean extends Stoppable, Startable, FlowConstructServiceMBean, ServiceStatsMBean
 {
     String DEFAULT_JMX_NAME_PREFIX = "type=Service,name=";
 

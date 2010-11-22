@@ -26,18 +26,47 @@ import javax.management.ObjectName;
  * <code>FlowConstructService</code> exposes service information about a Mule Managed
  * flow construct.
  */
-public class FlowConstructService extends AbstractFlowConstructService implements FlowConstructServiceMBean, MBeanRegistration, FlowConstructStatsMBean
+public class FlowConstructService implements FlowConstructServiceMBean, MBeanRegistration, FlowConstructStatsMBean
 {
     private static Log LOGGER = LogFactory.getLog(FlowConstructService.class);
 
     protected FlowConstructStatistics statistics;
 
+    protected MBeanServer server;
+
+    protected String name;
+
+    protected String type;
+
+    protected ObjectName statsName;
+
+    protected ObjectName objectName;
+
     protected MuleContext muleContext;
 
     public FlowConstructService(String type, String name, MuleContext muleContext, FlowConstructStatistics statistics)
     {
-        super(type, name, muleContext);
+        this.muleContext = muleContext;
+        this.type = type;
+        this.name = name;
         this.statistics = statistics;
+    }
+
+    protected FlowConstructService(String type, String name, MuleContext muleContext)
+    {
+        this.muleContext = muleContext;
+        this.type = type;
+        this.name = name;
+    }
+    
+    public String getName()
+    {
+        return name;
+    }
+
+    public String getType()
+    {
+        return type;
     }
 
     public ObjectName getStatistics()
@@ -90,27 +119,64 @@ public class FlowConstructService extends AbstractFlowConstructService implement
         return statistics.getTotalProcessingTime();
     }
 
-    @Override
+    public long getExecutionErrors()
+    {
+        return statistics.getExecutionErrors();
+    }
+
+    public long getFatalErrors()
+    {
+        return statistics.getFatalErrors();
+    }
+
     public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception
     {
-        return super.preRegister(server, name);
+        this.server = server;
+        this.objectName = name;
+        return name;
     }
 
-    @Override
     public void postRegister(Boolean registrationDone)
     {
-        super.postRegister(registrationDone);
+        AbstractFlowConstruct flow = muleContext.getRegistry().lookupObject(getName());
+        try
+        {
+            if (flow.getStatistics() != null)
+            {
+                statsName = new ObjectName(objectName.getDomain() + ":type=org.mule.Statistics," +
+                    flow.getConstructType() + "=" + getName());
+                // unregister old version if exists
+                if (this.server.isRegistered(statsName))
+                {
+                    this.server.unregisterMBean(statsName);
+                }
+
+                this.server.registerMBean(new FlowConstructStats(flow.getStatistics()), this.statsName);
+            }
+        }
+        catch (Exception e)
+        {
+            LOGGER.error("Error post-registering the MBean", e);
+        }
     }
 
-    @Override
     public void preDeregister() throws Exception
     {
-        super.preDeregister();
+        try
+        {
+            if (this.server.isRegistered(statsName))
+            {
+                this.server.unregisterMBean(statsName);
+            }
+        }
+        catch (Exception ex)
+        {
+            LOGGER.error("Error unregistering ServiceService child " + statsName.getCanonicalName(), ex);
+        }
     }
 
-    @Override
     public void postDeregister()
     {
-        super.postDeregister();
+        // nothing to do
     }
 }

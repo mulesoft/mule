@@ -31,6 +31,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.endpoint.MuleEndpointURI;
+import org.mule.management.stats.ProcessingTime;
 import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.types.DataTypeFactory;
@@ -104,6 +105,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     private transient Map<String, Object> serializedData = null;
 
+    private ProcessingTime processingTime = new ProcessingTime();
     /**
      * Properties cache that only reads properties once from the inbound message and
      * merges them with any properties on the endpoint. The message properties take
@@ -119,9 +121,18 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                             FlowConstruct service,
                             MuleEvent previousEvent)
     {
+       this(message, endpoint, service, previousEvent, false);
+    }
+
+    public DefaultMuleEvent(MuleMessage message,
+                            ImmutableEndpoint endpoint,
+                            FlowConstruct service,
+                            MuleEvent previousEvent,
+                            boolean preserveEventId)
+    {
         super(message.getPayload());
         this.message = message;
-        this.id = generateEventId();
+        this.id = preserveEventId ? previousEvent.getId() : generateEventId();
         this.session = previousEvent.getSession();
         ((DefaultMuleSession) session).setFlowConstruct(service);
         this.endpoint = endpoint;
@@ -171,6 +182,10 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         if (rewriteEvent instanceof DefaultMuleEvent)
         {
             this.transformedMessage = ((DefaultMuleEvent) rewriteEvent).getCachedMessage();
+        }
+        if (rewriteEvent instanceof DefaultMuleEvent)
+        {
+            this.processingTime = ((DefaultMuleEvent)rewriteEvent).processingTime;
         }
         fillProperties(rewriteEvent);
     }
@@ -691,4 +706,10 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         logger.warn("Deprecation warning: MUleEvent.transformMessage does nothing in Mule 3.0.  The message is already transformed before the event reaches a component");
         return message.getPayload();
     }
+
+    public ProcessingTime getProcessingTime()
+    {
+        return processingTime;
+    }
+
 }

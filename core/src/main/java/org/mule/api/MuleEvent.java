@@ -15,6 +15,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
+import org.mule.management.stats.ProcessingTime;
 
 import java.io.OutputStream;
 
@@ -253,4 +254,9 @@ public interface MuleEvent
      * @return the muleContext for the Mule node that this event was received in
      */
     MuleContext getMuleContext();
+
+    /**
+     * Returns the times spent processing this event (so far)
+     */
+    ProcessingTime getProcessingTime();
 }

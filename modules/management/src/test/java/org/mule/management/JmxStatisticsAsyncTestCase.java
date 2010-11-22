@@ -92,7 +92,7 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
 
     private ServiceStatistics getServiceStatistics()
     {
-        Iterator<AbstractFlowConstructStatistics> iterator = muleContext.getStatistics().getServiceStatistics().iterator();
+        Iterator<FlowConstructStatistics> iterator = muleContext.getStatistics().getServiceStatistics().iterator();
         AbstractFlowConstructStatistics stat1 = iterator.next();
         if (stat1 instanceof ServiceStatistics)
         {
@@ -106,7 +106,7 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
 
     private FlowConstructStatistics getFlowConstructStatistics()
     {
-        Iterator<AbstractFlowConstructStatistics> iterator = muleContext.getStatistics().getServiceStatistics().iterator();
+        Iterator<FlowConstructStatistics> iterator = muleContext.getStatistics().getServiceStatistics().iterator();
         AbstractFlowConstructStatistics stat1 = iterator.next();
         if (stat1 instanceof FlowConstructStatistics)
         {

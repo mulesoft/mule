@@ -32,6 +32,7 @@ import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.expression.transformers.ExpressionTransformer;
 import org.mule.interceptor.LoggingInterceptor;
+import org.mule.interceptor.ProcessingTimerInterceptor;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.ResponseMessageProcessorAdapter;
@@ -88,6 +89,7 @@ public class Validator extends AbstractFlowConstruct
     @Override
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
     {
+        builder.chain(new ProcessingTimerInterceptor());
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageProcessor());
 

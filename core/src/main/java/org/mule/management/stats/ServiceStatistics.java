@@ -16,15 +16,13 @@ import org.mule.management.stats.printers.SimplePrinter;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
-public class ServiceStatistics extends AbstractFlowConstructStatistics implements QueueStatistics
+public class ServiceStatistics extends FlowConstructStatistics implements QueueStatistics
 {
     private static final long serialVersionUID = -2086999226732861675L;
 
     private final AtomicLong sentEventSync = new AtomicLong(0);
     private final AtomicLong sentReplyToEvent = new AtomicLong(0);
     private final AtomicLong sentEventASync = new AtomicLong(0);
-    private final AtomicLong executionError = new AtomicLong(0);
-    private final AtomicLong fatalError = new AtomicLong(0);
 
     // these can't sensibly converted to AtomicLong as they are processed together
     // in incQueuedEvent
@@ -32,8 +30,6 @@ public class ServiceStatistics extends AbstractFlowConstructStatistics implement
     private long maxQueuedEvent = 0;
     private long averageQueueSize = 0;
     private long totalQueuedEvent = 0;
-
-    private int threadPoolSize = 0;
 
     private RouterStatistics inboundRouterStat = null;
     private ComponentStatistics componentStat = null;
@@ -46,8 +42,7 @@ public class ServiceStatistics extends AbstractFlowConstructStatistics implement
 
     public ServiceStatistics(String name, int threadPoolSize)
     {
-        super("Service", name);
-        this.threadPoolSize = threadPoolSize;
+        super("Service", name, threadPoolSize);
         clear();
     }
 
@@ -71,16 +66,6 @@ public class ServiceStatistics extends AbstractFlowConstructStatistics implement
         {
             outboundRouterStat.setEnabled(b);
         }
-    }
-
-    public void incExecutionError()
-    {
-        executionError.addAndGet(1);
-    }
-
-    public void incFatalError()
-    {
-        fatalError.addAndGet(1);
     }
 
     public void incSentEventSync()
@@ -138,11 +123,6 @@ public class ServiceStatistics extends AbstractFlowConstructStatistics implement
         return componentStat.getMaxExecutionTime();
     }
 
-    public long getFatalErrors()
-    {
-        return fatalError.get();
-    }
-
     /**
      * @deprecated
      */
@@ -191,11 +171,6 @@ public class ServiceStatistics extends AbstractFlowConstructStatistics implement
         return componentStat.getExecutedEvents();
     }
 
-    public long getExecutionErrors()
-    {
-        return executionError.get();
-    }
-
     public void logSummary()
     {
         logSummary(new SimplePrinter(System.out));
@@ -219,9 +194,10 @@ public class ServiceStatistics extends AbstractFlowConstructStatistics implement
         sentEventASync.set(0);
         sentReplyToEvent.set(0);
 
-        executionError.set(0);
-        fatalError.set(0);
-
+        if (getComponentStat() != null)
+        {
+            getComponentStat().clear();
+        }
         if (getInboundRouterStat() != null)
         {
             getInboundRouterStat().clear();
@@ -263,10 +239,5 @@ public class ServiceStatistics extends AbstractFlowConstructStatistics implement
     {
         this.componentStat = componentStat;
         this.componentStat.setEnabled(enabled);
-    }
-
-    public int getThreadPoolSize()
-    {
-        return threadPoolSize;
     }
 }

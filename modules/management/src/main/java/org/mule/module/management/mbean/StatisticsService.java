@@ -11,8 +11,8 @@
 package org.mule.module.management.mbean;
 
 import org.mule.api.MuleContext;
-import org.mule.management.stats.AbstractFlowConstructStatistics;
 import org.mule.management.stats.AllStatistics;
+import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.management.stats.printers.CSVPrinter;
 import org.mule.management.stats.printers.HtmlTablePrinter;
 import org.mule.management.stats.printers.XMLPrinter;
@@ -89,7 +89,7 @@ public class StatisticsService implements StatisticsServiceMBean
         return stats.getServiceStatistics();
     }
 
-    public Collection<AbstractFlowConstructStatistics> getServiceStatistics()
+    public Collection<FlowConstructStatistics> getServiceStatistics()
     {
         return stats.getServiceStatistics();
     }

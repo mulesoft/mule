@@ -13,7 +13,7 @@ package org.mule.module.management.mbean;
 /**
  * <code>ServiceStatsMBean</code> TODO
  */
-public interface ServiceStatsMBean extends AbstractFlowConstructStatsMBean
+public interface ServiceStatsMBean extends FlowConstructStatsMBean
 {
 
     long getAverageExecutionTime();
@@ -23,8 +23,6 @@ public interface ServiceStatsMBean extends AbstractFlowConstructStatsMBean
     long getMaxQueueSize();
 
     long getMaxExecutionTime();
-
-    long getFatalErrors();
 
     long getMinExecutionTime();
 
@@ -42,5 +40,4 @@ public interface ServiceStatsMBean extends AbstractFlowConstructStatsMBean
 
     long getExecutedEvents();
 
-    long getExecutionErrors();
 }

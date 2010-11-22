@@ -26,7 +26,7 @@ public class AllStatistics
     private boolean isStatisticsEnabled;
     private long startTime;
 
-    private Map<String, AbstractFlowConstructStatistics> flowConstructStats = new HashMap<String, AbstractFlowConstructStatistics>();
+    private Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<String, FlowConstructStatistics>();
 
     /**
      * 
@@ -50,7 +50,7 @@ public class AllStatistics
         }
         else
         {
-            for (AbstractFlowConstructStatistics statistics : flowConstructStats.values())
+            for (FlowConstructStatistics statistics : flowConstructStats.values())
             {
                 printer.print(statistics);
             }
@@ -62,9 +62,9 @@ public class AllStatistics
 
     public synchronized void clear()
     {
-        for (AbstractFlowConstructStatistics statistics : getServiceStatistics())
+        for (FlowConstructStatistics statistics : getServiceStatistics())
         {
-            (statistics).clear();
+            statistics.clear();
         }
         startTime = System.currentTimeMillis();
     }
@@ -84,9 +84,9 @@ public class AllStatistics
     {
         isStatisticsEnabled = b;
 
-        for (AbstractFlowConstructStatistics statistics : flowConstructStats.values())
+        for (FlowConstructStatistics statistics : flowConstructStats.values())
         {
-            (statistics).setEnabled(b);
+            statistics.setEnabled(b);
         }
     }
 
@@ -100,7 +100,7 @@ public class AllStatistics
         this.startTime = startTime;
     }
 
-    public synchronized void add(AbstractFlowConstructStatistics stat)
+    public synchronized void add(FlowConstructStatistics stat)
     {
         if (stat != null)
         {
@@ -108,7 +108,7 @@ public class AllStatistics
         }
     }
 
-    public synchronized void remove(AbstractFlowConstructStatistics stat)
+    public synchronized void remove(FlowConstructStatistics stat)
     {
         if (stat != null)
         {
@@ -120,12 +120,12 @@ public class AllStatistics
      * @deprecated use #getServiceStatistics
      */
     @Deprecated
-    public synchronized Collection<AbstractFlowConstructStatistics> getComponentStatistics()
+    public synchronized Collection<FlowConstructStatistics> getComponentStatistics()
     {
         return flowConstructStats.values();
     }
 
-    public synchronized Collection<AbstractFlowConstructStatistics> getServiceStatistics()
+    public synchronized Collection<FlowConstructStatistics> getServiceStatistics()
     {
         return flowConstructStats.values();
     }

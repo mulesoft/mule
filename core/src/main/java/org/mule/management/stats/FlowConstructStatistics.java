@@ -10,21 +10,25 @@
 
 package org.mule.management.stats;
 
-import org.mule.api.management.stats.Statistics;
-
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
 public class FlowConstructStatistics extends AbstractFlowConstructStatistics
 {
     private static final long serialVersionUID = 5337576392583767442L;
-
+    private final AtomicLong executionError = new AtomicLong(0);
+    private final AtomicLong fatalError = new AtomicLong(0);
+    private int threadPoolSize = 0;
     protected final ComponentStatistics flowStatistics = new ComponentStatistics();
 
-    public FlowConstructStatistics(String flowConstructType, String name)
+    public FlowConstructStatistics(String flowConstructType, String name, int threadPoolSize)
     {
         super(flowConstructType, name);
+        this.threadPoolSize = threadPoolSize;
         flowStatistics.setEnabled(enabled);
-        clear();
+        if (this.getClass() == FlowConstructStatistics.class)
+        {
+            clear();
+        }
     }
 
     /**
@@ -33,6 +37,16 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics
     public boolean isEnabled()
     {
         return enabled;
+    }
+
+    public void incExecutionError()
+    {
+        executionError.addAndGet(1);
+    }
+
+    public void incFatalError()
+    {
+        fatalError.addAndGet(1);
     }
 
     /**
@@ -47,15 +61,20 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics
     public synchronized void clear()
     {
         super.clear();
+
+        executionError.set(0);
+        fatalError.set(0);        
         if (flowStatistics != null)
         {
             flowStatistics.clear();
         }
     }
 
-    public void addFlowExecutionTime(long time)
+    public void addFlowExecutionBranchTime(ProcessingTime pt, long time)
     {
-        flowStatistics.addExecutionTime(time);
+        long effectiveTime = pt.getEffectiveTime(time);
+        long total = pt.recordExecutionBranchTime(effectiveTime);
+        flowStatistics.addExecutionBranchTime(effectiveTime == total, effectiveTime, total);
     }
 
     public long getAverageProcessingTime()
@@ -82,4 +101,20 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics
     {
         return flowStatistics.getTotalExecutionTime();
     }
+
+    public long getExecutionErrors()
+    {
+        return executionError.get();
+    }
+
+    public long getFatalErrors()
+    {
+        return fatalError.get();
+    }
+
+    public int getThreadPoolSize()
+    {
+        return threadPoolSize;
+    }
+
 }

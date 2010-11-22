@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.interceptor.Interceptor;
+import org.mule.management.stats.ProcessingTime;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 
 /**
@@ -40,12 +41,13 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractInterceptingMe
     /**
      *  This method is always invoked after the event has been processed,
      */
-    public abstract MuleEvent last(MuleEvent event, long startTime, boolean exceptionWasThrown) throws MuleException;
+    public abstract MuleEvent last(MuleEvent event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException;
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         boolean exceptionWasThrown = true;
         long startTime = System.currentTimeMillis();
+        ProcessingTime time = event.getProcessingTime();
         MuleEvent resultEvent = event;
         try
         {
@@ -56,7 +58,7 @@ public abstract class AbstractEnvelopeInterceptor extends AbstractInterceptingMe
         }
         finally
         {
-            resultEvent = last(resultEvent, startTime, exceptionWasThrown);
+            resultEvent = last(resultEvent, time, startTime, exceptionWasThrown);
         }
         return resultEvent;
     }

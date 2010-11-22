@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>ServiceStats</code> TODO
  */
-public class ServiceStats extends AbstractFlowConstructStats implements ServiceStatsMBean, MBeanRegistration
+public class ServiceStats extends FlowConstructStats implements ServiceStatsMBean, MBeanRegistration
 {
 
     /**
@@ -63,15 +63,6 @@ public class ServiceStats extends AbstractFlowConstructStats implements ServiceS
         return statistics.getExecutedEvents();
     }
 
-    public long getExecutionErrors()
-    {
-        return statistics.getExecutionErrors();
-    }
-
-    public long getFatalErrors()
-    {
-        return statistics.getFatalErrors();
-    }
 
     public long getMaxExecutionTime()
     {

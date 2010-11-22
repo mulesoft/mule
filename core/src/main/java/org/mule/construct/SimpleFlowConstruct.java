@@ -15,12 +15,15 @@ import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.LoggingInterceptor;
+import org.mule.interceptor.ProcessingTimerInterceptor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
+import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.OptionalAsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
@@ -39,8 +42,6 @@ import java.util.List;
 public class SimpleFlowConstruct extends AbstractFlowConstruct
 {
     protected List<MessageProcessor> messageProcessors = Collections.emptyList();
-
-    protected ThreadingProfile threadingProfile;
 
     protected WorkManager workManager;
 
@@ -64,11 +65,14 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct
                                                  : String.format("flow.%s", getName());
 
         builder.chain(new ProcessIfStartedMessageProcessor(this, getLifecycleState()));
+        builder.chain(new ProcessingTimerInterceptor());
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageProcessor());
-        builder.chain(new OptionalAsyncInterceptingMessageProcessor(threadingProfile, threadPrefix,
-            muleContext.getConfiguration().getShutdownTimeout()));
-
+        if (messageSource != null)
+        {
+            builder.chain(new OptionalAsyncInterceptingMessageProcessor(threadingProfile, threadPrefix,
+                muleContext.getConfiguration().getShutdownTimeout()));
+        }
         for (Object processor : messageProcessors)
         {
             if (processor instanceof MessageProcessor)
@@ -85,11 +89,6 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct
                     "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
             }
         }
-    }
-
-    public ThreadingProfile getThreadingProfile()
-    {
-        return threadingProfile;
     }
 
     public void setThreadingProfile(ThreadingProfile threadingProfile)

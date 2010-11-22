@@ -10,7 +10,6 @@
 
 package org.mule.management.stats.printers;
 
-import org.mule.management.stats.AbstractFlowConstructStatistics;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.management.stats.RouterStatistics;
@@ -43,7 +42,7 @@ public class AbstractTablePrinter extends PrintWriter
 
     public String[] getHeaders()
     {
-        String[] column = new String[36];
+        String[] column = new String[41];
         column[0] = "Name";
         column[1] = "Service Pool Max Size";
         column[2] = "Service Pool Size";
@@ -65,32 +64,37 @@ public class AbstractTablePrinter extends PrintWriter
         column[18] = "Max Execution Time";
         column[19] = "Avg Execution Time";
         column[20] = "Total Execution Time";
-        column[21] = "In Router Statistics";
-        column[22] = "Total Received";
-        column[23] = "Total Routed";
-        column[24] = "Not Routed";
-        column[25] = "Caught Events";
-        column[26] = "By Provider";
-        column[27] = "";
-        column[28] = "Out Router Statistics";
-        column[29] = "Total Received";
-        column[30] = "Total Routed";
-        column[31] = "Not Routed";
-        column[32] = "Caught Events";
-        column[33] = "By Provider";
-        column[34] = "";
-        column[35] = "Sample Period";
+        column[21] = "Processed Events";
+        column[22] = "Min Processing Time";
+        column[23] = "Max Processing Time";
+        column[24] = "Avg Processing Time";
+        column[25] = "Total Processing Time";
+        column[26] = "In Router Statistics";
+        column[27] = "Total Received";
+        column[28] = "Total Routed";
+        column[29] = "Not Routed";
+        column[30] = "Caught Events";
+        column[31] = "By Provider";
+        column[32] = "";
+        column[33] = "Out Router Statistics";
+        column[34] = "Total Received";
+        column[35] = "Total Routed";
+        column[36] = "Not Routed";
+        column[37] = "Caught Events";
+        column[38] = "By Provider";
+        column[39] = "";
+        column[40] = "Sample Period";
         return column;
     }
 
-    protected void getColumn(AbstractFlowConstructStatistics stats, String[] col)
+    protected void getColumn(FlowConstructStatistics stats, String[] col)
     {
         if (stats == null)
         {
             return;
         }
         ServiceStatistics serviceStats = (stats instanceof ServiceStatistics) ? (ServiceStatistics) stats : null;
-        FlowConstructStatistics flowStats = (stats instanceof FlowConstructStatistics) ? (FlowConstructStatistics) stats : null;
+
         Arrays.fill(col, "-");
 
         col[0] = stats.getName();
@@ -107,9 +111,9 @@ public class AbstractTablePrinter extends PrintWriter
             col[1] = "-";
             col[2] = "-";
         }
+        col[3] = String.valueOf(stats.getThreadPoolSize());
         if (serviceStats != null)
         {
-            col[3] = String.valueOf(serviceStats.getThreadPoolSize());
             col[4] = String.valueOf(serviceStats.getQueuedEvents());
             col[5] = String.valueOf(serviceStats.getMaxQueueSize());
             col[6] = String.valueOf(serviceStats.getAverageQueueSize());
@@ -128,30 +132,30 @@ public class AbstractTablePrinter extends PrintWriter
         if (serviceStats != null)
         {
             col[14] = String.valueOf(serviceStats.getExecutedEvents());
-            col[15] = String.valueOf(serviceStats.getExecutionErrors());
-            col[16] = String.valueOf(serviceStats.getFatalErrors());
+        }
+        col[15] = String.valueOf(stats.getExecutionErrors());
+        col[16] = String.valueOf(stats.getFatalErrors());
+        if (serviceStats != null)
+        {
             col[17] = String.valueOf(serviceStats.getMinExecutionTime());
             col[18] = String.valueOf(serviceStats.getMaxExecutionTime());
             col[19] = String.valueOf(serviceStats.getAverageExecutionTime());
             col[20] = String.valueOf(serviceStats.getTotalExecutionTime());
         }
-        else if (flowStats != null)
-        {
-            col[14] = String.valueOf(flowStats.getProcessedEvents());
-            col[17] = String.valueOf(flowStats.getMinProcessingTime());
-            col[18] = String.valueOf(flowStats.getMaxProcessingTime());
-            col[19] = String.valueOf(flowStats.getAverageProcessingTime());
-            col[20] = String.valueOf(flowStats.getTotalProcessingTime());
-        }
 
+        col[21] = String.valueOf(stats.getProcessedEvents());
+        col[22] = String.valueOf(stats.getMinProcessingTime());
+        col[23] = String.valueOf(stats.getMaxProcessingTime());
+        col[24] = String.valueOf(stats.getAverageProcessingTime());
+        col[25] = String.valueOf(stats.getTotalProcessingTime());
 
         if (serviceStats != null)
         {
-            int i = getRouterInfo(serviceStats.getInboundRouterStat(), col, 21);
+            int i = getRouterInfo(serviceStats.getInboundRouterStat(), col, 26);
             i = getRouterInfo(serviceStats.getOutboundRouterStat(), col, i);
         }
 
-        col[35] = String.valueOf(stats.getSamplePeriod());
+        col[40] = String.valueOf(stats.getSamplePeriod());
     }
 
     protected int getRouterInfo(RouterStatistics stats, String[] col, int index)
@@ -209,7 +213,7 @@ public class AbstractTablePrinter extends PrintWriter
         int i = 1;
         for (Iterator iterator = stats.iterator(); iterator.hasNext(); i++)
         {
-            getColumn((AbstractFlowConstructStatistics) iterator.next(), table[i]);
+            getColumn((FlowConstructStatistics) iterator.next(), table[i]);
         }
 
         return table;

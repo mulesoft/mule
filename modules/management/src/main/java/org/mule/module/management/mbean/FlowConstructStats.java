@@ -13,15 +13,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.management.stats.FlowConstructStatistics;
 
+import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 /**
  * A concrete class that holds management information for a Mule managed flow.
  */
-public class FlowConstructStats extends AbstractFlowConstructStats
+public class FlowConstructStats implements FlowConstructStatsMBean, MBeanRegistration
 {
     private final FlowConstructStatistics statistics;
+
+
+    protected MBeanServer server;
+
+    protected ObjectName name;
 
     /**
      * logger used by this class
@@ -30,7 +36,6 @@ public class FlowConstructStats extends AbstractFlowConstructStats
 
     public FlowConstructStats(FlowConstructStatistics statistics)
     {
-        super(statistics);
         this.statistics = statistics;
     }
 
@@ -59,24 +64,55 @@ public class FlowConstructStats extends AbstractFlowConstructStats
         return statistics.getTotalProcessingTime();
     }
 
+    public void clearStatistics()
+    {
+        statistics.clear();
+    }
+
+    public long getAsyncEventsReceived()
+    {
+        return statistics.getAsyncEventsReceived();
+    }
+
+    public long getSyncEventsReceived()
+    {
+        return statistics.getSyncEventsReceived();
+    }
+
+    public long getTotalEventsReceived()
+    {
+        return statistics.getTotalEventsReceived();
+    }
+
+    public long getExecutionErrors()
+    {
+        return statistics.getExecutionErrors();
+    }
+
+    public long getFatalErrors()
+    {
+        return statistics.getFatalErrors();
+    }
+
     public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception
     {
-        return super.preRegister(server, name);
+        this.server = server;
+        this.name = name;
+        return name;
     }
 
     public void postRegister(Boolean registrationDone)
     {
-        super.postRegister(registrationDone);
+        // nothing to do
     }
 
     public void preDeregister() throws Exception
     {
-        super.preDeregister();
+        // nothing to do
     }
 
     public void postDeregister()
     {
-        super.postDeregister();
+        // nothing to do
     }
-
 }

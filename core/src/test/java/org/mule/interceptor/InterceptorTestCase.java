@@ -14,6 +14,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.service.Service;
 import org.mule.component.AbstractComponent;
+import org.mule.management.stats.ProcessingTime;
 import org.mule.model.seda.SedaService;
 import org.mule.tck.AbstractMuleTestCase;
 
@@ -177,7 +178,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
         }
 
         @Override
-        public MuleEvent last(MuleEvent event, long startTime, boolean exceptionWasThrown) throws MuleException
+        public MuleEvent last(MuleEvent event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException
         {
             return event;
         }

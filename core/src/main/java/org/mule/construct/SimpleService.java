@@ -26,6 +26,7 @@ import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.LoggingInterceptor;
+import org.mule.interceptor.ProcessingTimerInterceptor;
 import org.mule.util.ClassUtils;
 
 import java.lang.reflect.Method;
@@ -169,6 +170,7 @@ public class SimpleService extends AbstractFlowConstruct
     @Override
     protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
     {
+        builder.chain(new ProcessingTimerInterceptor());
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageProcessor());
         type.configureComponentMessageProcessor(muleContext, builder, component);

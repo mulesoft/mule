@@ -15,7 +15,25 @@ import javax.management.ObjectName;
  * <code>FlowConstructServiceMBean</code> defines the management interface for a mule
  * managed flow construct.
  */
-public interface FlowConstructServiceMBean  extends AbstractFlowConstructServiceMBean, FlowConstructStatsMBean
+public interface FlowConstructServiceMBean  extends FlowConstructStatsMBean
 {
+    /**
+     * The statistics for this flow construct
+     *
+     * @return statistics for this flow construct
+     * @see org.mule.module.management.mbean.FlowConstructStats
+     */
+    ObjectName getStatistics();
 
+    /**
+     * The name of this service
+     *
+     * @return The name of this service
+     */
+    String getName();
+
+    /**
+     * The type of flow construct
+     */
+    String getType();
 }

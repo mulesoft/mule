@@ -167,7 +167,7 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
         {
             try
             {
-                processNext(event);
+                processNextTimed(event);
             }
             catch (Exception e)
             {

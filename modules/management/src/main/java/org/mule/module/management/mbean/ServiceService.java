@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>ServiceService</code> exposes service information about a Mule Managed
  * service.
  */
-public class ServiceService extends AbstractFlowConstructService implements ServiceServiceMBean, MBeanRegistration, ServiceStatsMBean
+public class ServiceService extends FlowConstructService implements ServiceServiceMBean, MBeanRegistration, ServiceStatsMBean
 {
 
     /**
@@ -43,6 +43,7 @@ public class ServiceService extends AbstractFlowConstructService implements Serv
     {
         super("Service", name, muleContext);
         this.statistics = getComponent().getStatistics();
+        super.statistics = statistics;
     }
 
     public int getQueueSize()
@@ -207,16 +208,6 @@ public class ServiceService extends AbstractFlowConstructService implements Serv
     public long getExecutedEvents()
     {
         return statistics.getExecutedEvents();
-    }
-
-    public long getExecutionErrors()
-    {
-        return statistics.getExecutionErrors();
-    }
-
-    public long getFatalErrors()
-    {
-        return statistics.getFatalErrors();
     }
 
     public long getMaxExecutionTime()
