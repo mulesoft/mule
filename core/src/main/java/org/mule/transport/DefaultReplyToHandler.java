@@ -21,6 +21,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReplyToHandler;
@@ -95,7 +96,10 @@ public class DefaultReplyToHandler implements ReplyToHandler
         // dispatch the event
         try
         {
-            ((AbstractService) event.getFlowConstruct()).getStatistics().incSentReplyToEvent();
+            if (event.getFlowConstruct() instanceof Service)
+            {
+                ((Service)event.getFlowConstruct()).getStatistics().incSentReplyToEvent();
+            }
             endpoint.process(replyToEvent);
             if (logger.isInfoEnabled())
             {

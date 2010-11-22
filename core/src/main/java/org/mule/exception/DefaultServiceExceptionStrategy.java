@@ -96,7 +96,7 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
             //logger.fatal("The error is: " + t.getMessage(), t);
             return null;
         }
-        else if(event.getFlowConstruct()!=null )
+        else if(event.getFlowConstruct()!= null )
         {
             return event.getFlowConstruct().getStatistics();
         }
