@@ -11,11 +11,8 @@
 package org.mule.module.management.mbean;
 
 import org.mule.api.MuleException;
-import org.mule.api.config.MuleConfiguration;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
-
-import javax.management.ObjectName;
 
 /**
  * <code>ServiceServiceMBean</code> defines the management interface for a mule

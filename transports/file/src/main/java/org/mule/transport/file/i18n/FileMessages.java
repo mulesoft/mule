@@ -11,7 +11,6 @@
 package org.mule.transport.file.i18n;
 
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;

@@ -15,7 +15,6 @@ import org.mule.tck.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractRegistryTestCase extends AbstractMuleTestCase

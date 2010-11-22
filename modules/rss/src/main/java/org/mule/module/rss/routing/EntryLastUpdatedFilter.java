@@ -14,6 +14,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transformer.types.DataTypeFactory;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 
@@ -21,7 +22,6 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.transformer.types.DataTypeFactory;
 
 /**
  * Will filter a feed who's update date has changed since the last time it was read.  Some feeds to no update
@@ -52,7 +52,7 @@ public class EntryLastUpdatedFilter implements Filter
         SyndEntry feed;
         try
         {
-            feed = (SyndEntry) message.getPayload(DataTypeFactory.create(SyndEntry.class));
+            feed = message.getPayload(DataTypeFactory.create(SyndEntry.class));
         }
         catch (TransformerException e)
         {

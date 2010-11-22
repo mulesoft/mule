@@ -9,8 +9,6 @@
  */
 package org.mule.api.lifecycle;
 
-import org.mule.api.MuleException;
-import org.mule.api.registry.Registry;
 import org.mule.lifecycle.LifecycleObject;
 
 import java.util.Set;

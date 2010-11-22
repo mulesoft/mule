@@ -15,7 +15,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.transport.PropertyScope;
 import org.mule.module.rss.transformers.ObjectToRssFeed;
 import org.mule.routing.AbstractSplitter;
 
@@ -89,7 +88,7 @@ public class FeedSplitter extends AbstractSplitter
                 {
                     continue;
                 }
-                m.setProperty(FEED_PROPERTY, feed, PropertyScope.INVOCATION);
+                m.setInvocationProperty(FEED_PROPERTY, feed);
                 messages.add(m);
             }
             return messages;

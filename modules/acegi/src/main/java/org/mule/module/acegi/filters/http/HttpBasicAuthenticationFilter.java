@@ -28,7 +28,6 @@ import org.mule.security.AbstractEndpointSecurityFilter;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-import org.acegisecurity.AuthenticationException;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;

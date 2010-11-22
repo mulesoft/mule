@@ -11,7 +11,6 @@
 package org.mule.transport.http.functional;
 
 import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;

@@ -15,7 +15,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.servlet.MuleReceiverServlet;
 

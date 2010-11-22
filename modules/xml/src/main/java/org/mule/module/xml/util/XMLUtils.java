@@ -10,10 +10,8 @@
 
 package org.mule.module.xml.util;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
 import org.mule.api.transport.OutputHandler;
 import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.StaxSource;
@@ -34,8 +32,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;

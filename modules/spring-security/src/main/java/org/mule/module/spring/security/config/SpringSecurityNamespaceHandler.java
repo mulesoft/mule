@@ -12,7 +12,6 @@ package org.mule.module.spring.security.config;
 import org.mule.api.config.MuleProperties;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.DescendentDefinitionParser;
 import org.mule.config.spring.parsers.generic.NamedDefinitionParser;
 import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.module.spring.security.SpringProviderAdapter;

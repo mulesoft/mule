@@ -13,7 +13,6 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleEventContext;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.InvocationResult;

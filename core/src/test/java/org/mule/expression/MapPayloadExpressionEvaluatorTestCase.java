@@ -15,11 +15,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.tck.AbstractMuleTestCase;
 
-import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.activation.DataHandler;
 
 public class MapPayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {

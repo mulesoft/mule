@@ -10,7 +10,6 @@
 package org.mule.module.atom;
 
 import org.mule.api.client.LocalMuleClient;
-import org.mule.module.atom.event.EntryReceiver;
 import org.mule.module.atom.event.FeedReceiver;
 import org.mule.tck.FunctionalTestCase;
 

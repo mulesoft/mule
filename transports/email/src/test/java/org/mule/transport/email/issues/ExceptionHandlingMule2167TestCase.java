@@ -13,7 +13,6 @@ package org.mule.transport.email.issues;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
 
 public class ExceptionHandlingMule2167TestCase extends DynamicPortTestCase
 {

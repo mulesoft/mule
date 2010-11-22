@@ -10,7 +10,6 @@
 
 package org.mule.api;
 
-import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;

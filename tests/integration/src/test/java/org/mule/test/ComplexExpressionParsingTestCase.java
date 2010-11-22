@@ -10,14 +10,11 @@
 
 package org.mule.test;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
 import org.mule.module.scripting.expression.GroovyExpressionEvaluator;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.jdbc.JdbcConnector;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ComplexExpressionParsingTestCase extends AbstractMuleTestCase

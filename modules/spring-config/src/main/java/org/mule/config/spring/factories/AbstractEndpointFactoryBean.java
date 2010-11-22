@@ -13,7 +13,6 @@ package org.mule.config.spring.factories;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 
 import org.apache.commons.logging.Log;

@@ -16,9 +16,6 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
-import java.util.HashMap;
-import java.util.Map;
-
 // START SNIPPET: full-class
 public class InOptionalOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase
 {

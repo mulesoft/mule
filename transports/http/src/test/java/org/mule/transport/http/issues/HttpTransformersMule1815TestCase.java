@@ -14,7 +14,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.StringAppendTestTransformer;
 
 public class HttpTransformersMule1815TestCase extends DynamicPortTestCase

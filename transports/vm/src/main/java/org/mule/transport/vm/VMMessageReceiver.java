@@ -19,19 +19,14 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transport.PollingReceiverWorker;
 import org.mule.transport.TransactedPollingMessageReceiver;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import javax.activation.DataHandler;
 
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
 

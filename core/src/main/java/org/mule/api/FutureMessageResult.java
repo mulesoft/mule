@@ -11,7 +11,6 @@
 package org.mule.api;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.api.transformer.TransformerException;
 import org.mule.util.concurrent.DaemonThreadFactory;
 
 import java.util.List;

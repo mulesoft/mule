@@ -15,7 +15,6 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.Connector;
 import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.soap.axis.AxisConnector;
 
 public class EndpointRetrievalMule2021TestCase extends DynamicPortTestCase

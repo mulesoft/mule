@@ -16,7 +16,6 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageRequester;
 import org.mule.api.transport.ReceiveException;
 import org.mule.context.notification.EndpointMessageNotification;

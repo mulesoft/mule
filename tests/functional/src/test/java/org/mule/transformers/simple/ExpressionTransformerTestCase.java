@@ -13,7 +13,6 @@ package org.mule.transformers.simple;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
-import org.mule.api.transformer.TransformerException;
 import org.mule.expression.transformers.BeanBuilderTransformer;
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.expression.transformers.ExpressionTransformer;

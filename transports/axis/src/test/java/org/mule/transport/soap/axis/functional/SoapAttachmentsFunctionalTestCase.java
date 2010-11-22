@@ -17,7 +17,6 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.message.ds.StringDataSource;
 import org.mule.session.DefaultMuleSession;
 import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.soap.axis.AxisMessageDispatcher;
 

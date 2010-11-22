@@ -15,7 +15,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.service.Service;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ExceptionHelper;
 import org.mule.management.stats.FlowConstructStatistics;

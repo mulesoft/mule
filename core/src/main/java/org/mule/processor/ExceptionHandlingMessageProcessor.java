@@ -12,7 +12,6 @@ package org.mule.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ExceptionHelper;
 
 public class ExceptionHandlingMessageProcessor extends AbstractInterceptingMessageProcessor

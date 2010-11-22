@@ -12,7 +12,6 @@ package org.mule.module.cxf.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
-import org.mule.config.spring.parsers.generic.GrandchildDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.processors.AddAttribute;

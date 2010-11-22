@@ -10,12 +10,12 @@
 
 package org.mule.interceptor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.management.stats.ProcessingTime;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>LoggingInterceptor</code> is a simple interceptor that logs a message before

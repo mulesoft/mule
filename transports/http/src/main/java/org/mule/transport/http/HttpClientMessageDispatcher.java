@@ -31,10 +31,7 @@ import org.mule.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HostConfiguration;

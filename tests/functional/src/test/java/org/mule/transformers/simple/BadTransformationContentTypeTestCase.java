@@ -10,13 +10,8 @@
 
 package org.mule.transformers.simple;
 
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
 import org.mule.tck.FunctionalTestCase;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class BadTransformationContentTypeTestCase extends FunctionalTestCase
 {

@@ -11,7 +11,6 @@
 package org.mule.transport.tcp;
 
 import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
 
 public class MultipleNamedTcpConnectorsTestCase extends DynamicPortTestCase
 {

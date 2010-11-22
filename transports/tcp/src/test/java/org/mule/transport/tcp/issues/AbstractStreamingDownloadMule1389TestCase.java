@@ -14,7 +14,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.tcp.integration.AbstractStreamingCapacityTestCase;
 
 public abstract class AbstractStreamingDownloadMule1389TestCase extends DynamicPortTestCase

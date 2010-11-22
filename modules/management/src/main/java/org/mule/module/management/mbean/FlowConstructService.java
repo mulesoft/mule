@@ -9,18 +9,16 @@
  */
 package org.mule.module.management.mbean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.management.stats.FlowConstructStatistics;
 
-import javax.management.InstanceAlreadyExistsException;
 import javax.management.MBeanRegistration;
-import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
-import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>FlowConstructService</code> exposes service information about a Mule Managed

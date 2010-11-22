@@ -13,7 +13,6 @@ package org.mule.module.sxc;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
 
 import java.io.ByteArrayOutputStream;
 

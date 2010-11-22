@@ -9,12 +9,9 @@
  */
 package org.mule.registry;
 
-import org.mule.api.MuleContext;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.LifecycleStateAware;
 import org.mule.api.registry.InjectProcessor;
-import org.mule.api.registry.RegistrationException;
 
 /**
  * Injects the MuleContext object for objects stored in the {@link org.mule.registry.TransientRegistry} where the object registered

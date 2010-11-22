@@ -13,7 +13,6 @@ package org.mule.transport.http.functional;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
