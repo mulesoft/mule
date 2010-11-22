@@ -7,11 +7,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.management.stats;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
-
 import java.io.Serializable;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Accumulates the processing time for all branches of a flow

@@ -11,7 +11,6 @@
 package org.mule.management;
 
 import org.mule.api.MuleMessage;
-import org.mule.management.stats.AbstractFlowConstructStatistics;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.module.client.MuleClient;
@@ -93,7 +92,7 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
     private ServiceStatistics getServiceStatistics()
     {
         Iterator<FlowConstructStatistics> iterator = muleContext.getStatistics().getServiceStatistics().iterator();
-        AbstractFlowConstructStatistics stat1 = iterator.next();
+        FlowConstructStatistics stat1 = iterator.next();
         if (stat1 instanceof ServiceStatistics)
         {
             return (ServiceStatistics)stat1;
@@ -107,7 +106,7 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
     private FlowConstructStatistics getFlowConstructStatistics()
     {
         Iterator<FlowConstructStatistics> iterator = muleContext.getStatistics().getServiceStatistics().iterator();
-        AbstractFlowConstructStatistics stat1 = iterator.next();
+        FlowConstructStatistics stat1 = iterator.next();
         if (stat1 instanceof FlowConstructStatistics)
         {
             return (FlowConstructStatistics)stat1;
