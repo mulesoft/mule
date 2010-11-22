@@ -10,12 +10,12 @@
 
 package org.mule.config.spring.parsers.specific;
 
-public class PojoTest
+public class TestPojo
 {
     private String config1;
     private String config2;
 
-    public PojoTest()
+    public TestPojo()
     {
     }
 

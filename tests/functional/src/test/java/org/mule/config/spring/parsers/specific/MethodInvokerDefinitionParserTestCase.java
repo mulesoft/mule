@@ -16,7 +16,7 @@ import org.mule.tck.FunctionalTestCase;
 public class MethodInvokerDefinitionParserTestCase extends FunctionalTestCase
 {
 
-    public void testDefaultJavaComponentShortcut() throws Exception
+    public void testPojoFlow() throws Exception
     {
         SimpleFlowConstruct flow = muleContext.getRegistry().lookupObject("pojoFlow");
         SimpleFlowConstruct flow2 = muleContext.getRegistry().lookupObject("pojoFlow2");
