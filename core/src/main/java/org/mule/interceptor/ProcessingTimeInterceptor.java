@@ -20,13 +20,13 @@ import org.mule.management.stats.ProcessingTime;
 /**
  * Calculate and record the processing time for a message processing chain
  */
-public class ProcessingTimerInterceptor extends AbstractEnvelopeInterceptor
+public class ProcessingTimeInterceptor extends AbstractEnvelopeInterceptor
 {
-    public ProcessingTimerInterceptor()
+    public ProcessingTimeInterceptor()
     {
     }
 
-    public ProcessingTimerInterceptor(MessageProcessor next, FlowConstruct fc)
+    public ProcessingTimeInterceptor(MessageProcessor next, FlowConstruct fc)
     {
         setListener(next);
         setFlowConstruct(fc);

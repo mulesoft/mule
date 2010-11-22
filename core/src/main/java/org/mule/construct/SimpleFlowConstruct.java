@@ -20,7 +20,7 @@ import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.LoggingInterceptor;
-import org.mule.interceptor.ProcessingTimerInterceptor;
+import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.OptionalAsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -63,7 +63,7 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct
                                                  : String.format("flow.%s", getName());
 
         builder.chain(new ProcessIfStartedMessageProcessor(this, getLifecycleState()));
-        builder.chain(new ProcessingTimerInterceptor());
+        builder.chain(new ProcessingTimeInterceptor());
         builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageProcessor());
         if (messageSource != null)

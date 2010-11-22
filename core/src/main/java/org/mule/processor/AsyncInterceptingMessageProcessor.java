@@ -23,7 +23,7 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.interceptor.ProcessingTimerInterceptor;
+import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
@@ -123,7 +123,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
             }
             if (event.getFlowConstruct() != null)
             {
-                return new ProcessingTimerInterceptor(next, event.getFlowConstruct()).process(event);
+                return new ProcessingTimeInterceptor(next, event.getFlowConstruct()).process(event);
             }
             else
             {
