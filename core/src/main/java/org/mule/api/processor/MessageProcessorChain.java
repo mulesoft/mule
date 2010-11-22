@@ -11,10 +11,8 @@
 package org.mule.api.processor;
 
 import org.mule.api.processor.policy.Policies;
-import org.mule.routing.WireTap;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -27,5 +25,4 @@ public interface MessageProcessorChain extends MessageProcessor
 
     Policies getPolicies();
 
-    Map<MessageProcessor, WireTap> getCallbackMap();
 }
