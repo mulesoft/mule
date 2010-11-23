@@ -8,10 +8,6 @@
  * LICENSE.txt file.
  */
 
-/**
- * FirstSuccessful is a message processor that has a list of target MPs.  Each reveiced event is routed to each
- * target, in order,  until one succeeds by not throwing an exception.
- */
 package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
@@ -24,13 +20,12 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 
-
 /**
- *  FirstSuccessful routes an event to the first target route that can accept it without throwing or returning an 
- * exception.  If no such route can be found, an exception is thrown. Note that this works more reliable with
- * synchronous targets, but no such restriction is imposed.
+ * FirstSuccessful routes an event to the first target route that can accept it without throwing or 
+ * returning an  exception. If no such route can be found, an exception is thrown. Note that this 
+ * works more reliable with synchronous targets, but no such restriction is imposed.
  */
-public class FirstSuccessful extends AbstractOutboundRouter implements MessageProcessor
+public class FirstSuccessful extends AbstractOutboundRouter
 {
     /**
      * Route the given event to one of our targets
@@ -38,7 +33,7 @@ public class FirstSuccessful extends AbstractOutboundRouter implements MessagePr
     @Override
     public MuleEvent route(MuleEvent event) throws MessagingException
     {
-        MuleEvent retval = null;
+        MuleEvent returnEvent = null;
 
         boolean failed = true;
         for (MessageProcessor mp : routes)
@@ -50,15 +45,17 @@ public class FirstSuccessful extends AbstractOutboundRouter implements MessagePr
                 {
                     toProcess = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint)mp, event.getSession());
                 }
-                retval = mp.process(toProcess);
-                if (retval == null)
+                
+                returnEvent = mp.process(toProcess);
+                
+                if (returnEvent == null)
                 {
                     failed = false;
                 }
                 else
                 {
-                    MuleMessage msg = retval.getMessage();
-                    failed = msg != null && msg.getExceptionPayload() != null;
+                    MuleMessage msg = returnEvent.getMessage();
+                    failed = (msg != null) && (msg.getExceptionPayload() != null);
                 }
             }
             catch (Exception ex)
@@ -66,7 +63,9 @@ public class FirstSuccessful extends AbstractOutboundRouter implements MessagePr
                 failed = true;
             }
             if (!failed)
+            {
                 break;
+            }
         }
 
         if (failed)
@@ -74,7 +73,7 @@ public class FirstSuccessful extends AbstractOutboundRouter implements MessagePr
             throw new CouldNotRouteOutboundMessageException(event, this);
         }
 
-        return retval;
+        return returnEvent;
     }
 
     public boolean isMatch(MuleMessage message) throws MuleException
