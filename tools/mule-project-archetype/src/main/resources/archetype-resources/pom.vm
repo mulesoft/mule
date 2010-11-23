@@ -111,8 +111,8 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${project.build.directory}/${build.finalName}.zip"
-                                    todir="${env.MULE_HOME}/apps" overwrite="true"/>
+                                <copy file="${D}{project.build.directory}/${D}{build.finalName}.zip"
+                                    todir="${D}{env.MULE_HOME}/apps" overwrite="true"/>
                             </tasks>
                         </configuration>
                     </execution>
