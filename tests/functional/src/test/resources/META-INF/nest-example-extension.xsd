@@ -7,7 +7,7 @@
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/nest-example-base"
-                schemaLocation="http://www.mulesoft.org/schema/mule/nest-example-base/3.0/nest-example-base.xsd"/>
+                schemaLocation="http://www.mulesoft.org/schema/mule/nest-example-base/3.1/nest-example-base.xsd"/>
 
     <xsd:element name="subclass" type="subclassType" substitutionGroup="base:abstract"/>
 
