@@ -393,11 +393,12 @@
     </xsd:complexType>
 
 
-    <xsd:element name="message-enricher" type="messageEnricherType" substitutionGroup="abstract-message-processor">
+    <xsd:element name="enricher" type="messageEnricherType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 Enriches the current message, using expressins to define source and target,
-                with the result of processing a nested message processor.
+                with the result of processing a nested message processor.  Use the target and optionally sourcre attributes 
+                for 1-1 enrichment.  If you require n-m enrichment than use the child 'enrich' elements instead.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -409,7 +410,24 @@
                     <xsd:element name="enrich" type="extractEnrichPairType" minOccurs="0"
                         maxOccurs="unbounded" />
                 </xsd:sequence>
-                <xsd:attributeGroup ref="enricherSourceTargetAttributes" />
+                <xsd:attribute name="source" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An evaluator expression used to extract a value from the result of the
+                            enrichment message processor. If an
+                            expression is not specificed then the payload of the
+                            message is used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="target" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The enricher expression used to enrich the current message with the result
+                            the processing of the enrichement message processor specificed. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -428,16 +446,14 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="target" type="xsd:string">
-        <xsd:annotation>
-            <xsd:documentation>
-                The enricher expression used to enrich the current message with the result
-                the processing of the enrichement message processor specificed. If an expresion is not
-                specified then the payload of the
-                current message will be replaced.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:attribute>
+        <xsd:attribute name="target" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The enricher expression used to enrich the current message with the result
+                    the processing of the enrichement message processor specificed.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:element name="async" type="asyncType" substitutionGroup="abstract-message-processor">

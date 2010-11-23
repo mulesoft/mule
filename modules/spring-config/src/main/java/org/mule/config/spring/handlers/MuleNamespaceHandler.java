@@ -41,6 +41,7 @@ import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributesAndChildren;
+import org.mule.config.spring.parsers.processors.CheckRequiredAttributesWhenNoChildren;
 import org.mule.config.spring.parsers.specific.AggregatorDefinitionParser;
 import org.mule.config.spring.parsers.specific.BindingDefinitionParser;
 import org.mule.config.spring.parsers.specific.BridgeDefinitionParser;
@@ -293,17 +294,18 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
             new MessageProcessorDefinitionParser(InvokerMessageProcessor.class)).addAlias("method",
             "methodName").addAlias("methodArguments", "argumentExpressionsString").addAlias(
             "methodArgumentTypes", "ArgumentTypes");
-        registerMuleBeanDefinitionParser("message-enricher",
+        registerMuleBeanDefinitionParser("enricher",
             new MessageEnricherDefinitionParser("messageProcessor", MessageEnricher.class)).addIgnored(
             "source")
             .addIgnored("target")
             .registerPreProcessor(
                 new CheckExclusiveAttributesAndChildren(new String[]{"source", "target"},
                     new String[]{"enrich"}))
+            .registerPreProcessor(
+                new CheckRequiredAttributesWhenNoChildren(new String[][]{new String[]{"target"}}, "enrich"))
             .addCollection("enrichExpressionPairs");
         registerMuleBeanDefinitionParser("enrich", new ChildDefinitionParser("enrichExpressionPair",
             EnrichExpressionPair.class));
-
         
         registerBeanDefinitionParser("async", new ChildDefinitionParser("messageProcessor",
             AsyncMessageProcessorsFactoryBean.class));

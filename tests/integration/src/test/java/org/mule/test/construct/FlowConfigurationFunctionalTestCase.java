@@ -366,14 +366,14 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         muleContext.getClient().send("vm://invoke3-in", new DefaultMuleMessage("0", muleContext));
     }
     
-    public void testEnrich() throws MuleException, Exception
+    public void testEnrichWithAttributes() throws MuleException, Exception
     {
         MuleMessage message = new DefaultMuleMessage("0", muleContext);
         assertEquals("0Hello", muleContext.getClient().send("vm://enrich-in", message).getProperty(
             "helloHeader", PropertyScope.INBOUND));
     }
 
-    public void testEnrich2() throws MuleException, Exception
+    public void testEnrichWithElements() throws MuleException, Exception
     {
         MuleMessage message = new DefaultMuleMessage("0", muleContext);
         MuleMessage result = muleContext.getClient().send("vm://enrich2-in", message);

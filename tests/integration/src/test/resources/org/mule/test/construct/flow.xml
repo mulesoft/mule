@@ -269,22 +269,21 @@
         <processor ref="invokeme"/>
     </flow>
 
-    <flow name="enrich">
+    <flow name="enrichWithAttributes">
         <vm:inbound-endpoint path="enrich-in" exchange-pattern="request-response" />
-        <message-enricher target="#[header:OUTBOUND:helloHeader]" source="#[payload]">
+        <enricher target="#[header:OUTBOUND:helloHeader]" source="#[payload]">
             <append-string-transformer message="Hello" />
-        </message-enricher>
+        </enricher>
     </flow>
 
-    <flow name="enrich2">
+    <flow name="enrichWithElements">
         <vm:inbound-endpoint path="enrich2-in" exchange-pattern="request-response" />
-        <message-enricher>
+        <enricher>
             <append-string-transformer message="Hello" />
             <enrich target="#[header:OUTBOUND:helloHeader]" />
             <enrich target="#[header:OUTBOUND:helloHeader2]" source="#[payload]" />
-        </message-enricher>
+        </enricher>
     </flow>
-
 
     <invoke name="invokeme" object-ref="pojo" method="method" methodArguments="#[string:Account] ,    #[groovy:message.payload]" methodArgumentTypes="java.lang.String, java.lang.String"/>
 
