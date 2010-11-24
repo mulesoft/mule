@@ -16,7 +16,6 @@
 
     <properties>
         <bouncycastle.jdk>jdk15</bouncycastle.jdk>
-        <bouncycastle.version>1.45</bouncycastle.version>
     </properties>
     
     <dependencies>
@@ -37,22 +36,18 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpg-${bouncycastle.jdk}</artifactId>
-            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-ext-${bouncycastle.jdk}</artifactId>
-            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-${bouncycastle.jdk}</artifactId>
-            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bctsp-${bouncycastle.jdk}</artifactId>
-            <version>${bouncycastle.version}</version>
         </dependency>
 
         <!-- Unit tests -->

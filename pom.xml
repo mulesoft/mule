@@ -83,6 +83,7 @@
         <asmVersion>3.1</asmVersion>
         <backportUtilConcurrentVersion>3.1</backportUtilConcurrentVersion>
         <bshVersion>2.0b4</bshVersion>
+        <bouncycastleVersion>1.45</bouncycastleVersion>
         <cglibVersion>2.2</cglibVersion>
         <commonsBeanUtilsVersion>1.8.0</commonsBeanUtilsVersion>
         <commonsCliVersion>1.2</commonsCliVersion>
@@ -1046,6 +1047,29 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <!-- BouncyCastle deps -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpg-jdk15</artifactId>
+                <version>${bouncycastleVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-ext-jdk15</artifactId>
+                <version>${bouncycastleVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15</artifactId>
+                <version>${bouncycastleVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bctsp-jdk15</artifactId>
+                <version>${bouncycastleVersion}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
