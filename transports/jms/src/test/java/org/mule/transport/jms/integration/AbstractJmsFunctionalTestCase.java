@@ -118,6 +118,8 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     protected Scenario scenarioRollback;
     protected Scenario scenarioNotReceive;
     protected Scenario scenarioReceive;
+    protected boolean purgeQueuesOnPreSetUp = true;
+    protected boolean purgeQueuesOnTearDown = true;
 
     private MuleClient client = null;
 
@@ -222,9 +224,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
     {
         super.suitePreSetUp();
 
-        purge(getInboundQueueName());
-        purge(getOutboundQueueName());
-        // TODO DZ: get all of the queue/topic names from the Mule config and just purge those 
+        if (purgeQueuesOnPreSetUp)
+        {
+            purge(getInboundQueueName());
+            purge(getOutboundQueueName());
+            // TODO DZ: get all of the queue/topic names from the Mule config and just purge those
+        }
     }
 
     /**
@@ -527,9 +532,12 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected void doTearDown() throws Exception
     {
-        purge(getInboundQueueName());
-        purge(getOutboundQueueName());
-        purgeTopics();
+        if (purgeQueuesOnTearDown)
+        {
+            purge(getInboundQueueName());
+            purge(getOutboundQueueName());
+            purgeTopics();
+        }
 
         super.doTearDown();
         if (client != null)
