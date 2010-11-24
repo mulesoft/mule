@@ -7,7 +7,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.atom;
+package org.mule.module.atom.config;
 
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
@@ -16,6 +16,7 @@ import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.expression.transformers.ExpressionArgument;
+import org.mule.module.atom.AbderaServiceComponent;
 import org.mule.module.atom.endpoint.AtomInboundEndpointFactoryBean;
 import org.mule.module.atom.routing.EntryLastUpdatedFilter;
 import org.mule.module.atom.routing.FeedLastUpdatedFilter;
