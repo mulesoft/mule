@@ -41,7 +41,16 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
 {
     private final XAConnection xaConnection;
     private Connection connection;
-    private volatile boolean enlisted = false;
+
+    /**
+     * This is the lock object that guards access to {@link #enlistedXAResource}.
+     */
+    private final Object enlistedXAResourceLock = new Object();
+    /**
+     * @GuardedBy {@link #enlistedXAResourceLock}
+     */
+    private XAResource enlistedXAResource;
+
     protected static final transient Log logger = LogFactory.getLog(ConnectionWrapper.class);
     private volatile boolean reuseObject = false;
 
@@ -69,6 +78,16 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
     public void close() throws SQLException
     {
         connection.close();
+        try
+        {
+            xaConnection.close();
+        }
+        catch (SQLException e)
+        {
+            logger.info(
+                "Exception while explicitely closing the xaConnection (some providers require this). "
+                                + "The exception will be ignored and only logged: " + e.getMessage(), e);
+        }
     }
 
     public void commit() throws SQLException
@@ -294,22 +313,33 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
         {
             throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(transaction));
         }
-        if (!isEnlisted())
+
+        synchronized (enlistedXAResourceLock)
         {
-            final XAResource xaResource;
-            try
+            if (!isEnlisted())
             {
-                xaResource = xaConnection.getXAResource();
+                final XAResource xaResource = getXAResourceFromXATransaction();
+                boolean wasAbleToEnlist = ((XaTransaction) transaction).enlistResource(xaResource);
+                if (wasAbleToEnlist)
+                {
+                    enlistedXAResource = xaResource;
+                }
             }
-            catch (SQLException e)
-            {
-                throw new TransactionException(e);
-            }
-            
-            enlisted = ((XaTransaction) transaction).enlistResource(xaResource);
         }
         
-        return enlisted;
+        return isEnlisted();
+    }
+
+    protected XAResource getXAResourceFromXATransaction() throws TransactionException
+    {
+        try
+        {
+            return xaConnection.getXAResource();
+        }
+        catch (SQLException e)
+        {
+            throw new TransactionException(e);
+        }
     }
 
     public boolean delist() throws Exception
@@ -332,22 +362,29 @@ public class ConnectionWrapper implements Connection, XaTransaction.MuleXaObject
         {
             throw new IllegalTransactionStateException(CoreMessages.notMuleXaTransaction(transaction));
         }
-        if (isEnlisted())
+
+        synchronized (enlistedXAResourceLock)
         {
-            enlisted = !((XaTransaction) transaction).delistResource(xaConnection.getXAResource(), XAResource.TMSUCCESS);
+            if (isEnlisted())
+            {
+                boolean wasAbleToDelist = ((XaTransaction) transaction).delistResource(enlistedXAResource,
+                    XAResource.TMSUCCESS);
+                if (wasAbleToDelist)
+                {
+                    enlistedXAResource = null;
+                }
+            }
+            return !isEnlisted();
         }
-        return !isEnlisted();
     }
 
 
     public boolean isEnlisted()
     {
-        return enlisted;
-    }
-
-    public void setEnlisted(boolean enlisted)
-    {
-        this.enlisted = enlisted;
+        synchronized (enlistedXAResourceLock)
+        {
+            return enlistedXAResource != null;
+        }
     }
 
     public boolean isReuseObject()
