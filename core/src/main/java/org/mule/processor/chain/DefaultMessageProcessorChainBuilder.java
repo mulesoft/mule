@@ -78,7 +78,7 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                     }
                     else
                     {
-                        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(
+                        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(name,
                             new ArrayList<MessageProcessor>(tempList));
                         ((InterceptingMessageProcessor) processor).setListener(chain);
                     }
@@ -94,12 +94,12 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         // Create the final chain using the current tempList after reserve iteration is complete. This temp
         // list contains the first n processors in the chain that are not intercepting.. with processor n+1
         // having been injected as the listener of processor n
-        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(
+        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(name,
             new ArrayList<MessageProcessor>(tempList));
 
         // Wrap with something that can apply lifecycle to all processors which are otherwise not visable from
         // DefaultMessageProcessorChain
-        return new InterceptingChainLifecycleWrapper(chain, processors, "");
+        return new InterceptingChainLifecycleWrapper(chain, processors, "wrapper for " + name);
     }
 
     public DefaultMessageProcessorChainBuilder chain(MessageProcessor... processors)

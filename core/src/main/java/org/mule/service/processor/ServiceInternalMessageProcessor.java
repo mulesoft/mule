@@ -45,7 +45,7 @@ public class ServiceInternalMessageProcessor extends AbstractInterceptingMessage
      */
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        MuleEvent resultEvent = null;
+        MuleEvent resultEvent;
         try
         {
             Object replyTo = event.getMessage().getReplyTo();
