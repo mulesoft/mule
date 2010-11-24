@@ -12,6 +12,7 @@ package org.mule.context.notification;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.NamedObject;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
@@ -43,6 +44,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
 
         this.processor = processor;
 
+        // can't extract it to a method and still kepp the field final, have to leave it inline
         try
         {
             // TODO would love to see MP.getName() in the API. Avoid BeanUtils.getProperty() overhead here
@@ -50,12 +52,12 @@ public class MessageProcessorNotification extends ServerNotification implements 
             if (method == null)
             {
                 // no such method, fallback to MP class name + NamedObject
-                messageProcessorName = ObjectUtils.toString(processor);
+                messageProcessorName = toString(processor);
             }
             else
             {
                 // invoke existing getName(), but provide same fallback if it returned nothing
-                messageProcessorName = ObjectUtils.toString(method.invoke(processor), ObjectUtils.toString(processor));
+                messageProcessorName = ObjectUtils.toString(method.invoke(processor), toString(processor));
             }
         }
         catch (Exception e)
@@ -78,5 +80,24 @@ public class MessageProcessorNotification extends ServerNotification implements 
     public String getFriendlyProcessorName()
     {
         return messageProcessorName;
+    }
+
+    protected String toString(Object obj)
+    {
+        if (obj == null)
+        {
+            return "";
+        }
+
+        String name;
+        if (obj instanceof NamedObject)
+        {
+            name = String.format("%s '%s'", obj.getClass().getName(), ((NamedObject) obj).getName());
+        }
+        else
+        {
+            name = ObjectUtils.identityToString(obj);
+        }
+        return name;
     }
 }
