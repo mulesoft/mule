@@ -19,9 +19,6 @@ import org.mule.util.ObjectUtils;
 
 import java.lang.reflect.Method;
 
-/**
- *
- */
 public class MessageProcessorNotification extends ServerNotification implements BlockingServerEvent
 {
 
@@ -30,7 +27,8 @@ public class MessageProcessorNotification extends ServerNotification implements 
     public static final int MESSAGE_PROCESSOR_PRE_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 1;
     public static final int MESSAGE_PROCESSOR_POST_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 2;
 
-    private transient MessageProcessor processor;
+    private final transient MessageProcessor processor;
+    private final String messageProcessorName;
 
     static
     {
@@ -43,24 +41,22 @@ public class MessageProcessorNotification extends ServerNotification implements 
     {
         super(event, action, event.getFlowConstruct() != null ? event.getFlowConstruct().getName() : null);
 
+        this.processor = processor;
+
         try
         {
-            String mpName;
             // TODO would love to see MP.getName() in the API. Avoid BeanUtils.getProperty() overhead here
             final Method method = processor.getClass().getMethod("getName");
             if (method == null)
-        {
-            // no such method, fallback to MP class name + NamedObject
-            mpName = ObjectUtils.toString(processor);
-        }
-        else
-        {
-            // invoke existing getName(), but provide same fallback if it returned nothing
-            mpName = ObjectUtils.toString(method.invoke(processor), ObjectUtils.toString(processor));
-        }
-
-
-            System.out.printf("++ %s > %s%n", event.getFlowConstruct().getName(), mpName);
+            {
+                // no such method, fallback to MP class name + NamedObject
+                messageProcessorName = ObjectUtils.toString(processor);
+            }
+            else
+            {
+                // invoke existing getName(), but provide same fallback if it returned nothing
+                messageProcessorName = ObjectUtils.toString(method.invoke(processor), ObjectUtils.toString(processor));
+            }
         }
         catch (Exception e)
         {
@@ -77,5 +73,10 @@ public class MessageProcessorNotification extends ServerNotification implements 
     public MessageProcessor getProcessor()
     {
         return processor;
+    }
+
+    public String getFriendlyProcessorName()
+    {
+        return messageProcessorName;
     }
 }
