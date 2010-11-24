@@ -26,7 +26,6 @@
                              expression="'urn:uuid:' + java.util.UUID.randomUUID().toString()"/>
     </atom:entry-builder-transformer>
 
-
     <flow name="EventPublisher">
         <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
 
@@ -34,6 +33,13 @@
                            mimeType="application/atom+xml;type=entry">
             <transformer ref="defaultEntryBuilder"/>
         </outbound-endpoint>
+    </flow>
+
+    <flow name="EventTransformer">
+        <vm:inbound-endpoint path="fromTest"/>
+        <vm:outbound-endpoint path="toTest">
+            <transformer ref="defaultEntryBuilder"/>
+        </vm:outbound-endpoint>
     </flow>
 
     <flow name="atomPubEventStore">

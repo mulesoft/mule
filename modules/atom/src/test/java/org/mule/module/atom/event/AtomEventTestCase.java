@@ -9,6 +9,8 @@
  */
 package org.mule.module.atom.event;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
@@ -28,7 +30,7 @@ import org.apache.abdera.model.Feed;
 import org.apache.abdera.protocol.client.AbderaClient;
 import org.apache.abdera.protocol.client.ClientResponse;
 
-public class AtomEventTest extends FunctionalTestCase
+public class AtomEventTestCase extends FunctionalTestCase
 {
     private Repository repository;
 
@@ -38,16 +40,19 @@ public class AtomEventTest extends FunctionalTestCase
         return "atom-builder-conf.xml";
     }
 
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        clearJcrRepository();
+        super.doTearDown();
+    }
+
     public void testCustomerProvider() throws Exception
     {
         repository = (Repository) muleContext.getRegistry().lookupObject("jcrRepository");
 
         MuleClient client = new MuleClient(muleContext);
-
-        Map props = new HashMap();
-        props.put("title", "Foo Bar");
-
-        client.send("vm://in", "Mmm feeding", props);
+        client.send("vm://in", createOutboundMessage());
 
         Thread.sleep(1000);
 
@@ -62,17 +67,26 @@ public class AtomEventTest extends FunctionalTestCase
 
         assertEquals("Mmm feeding", e.getContent());
         assertEquals("Foo Bar", e.getTitle());
-        //TODO author not getting saved See: MULE-4905
-        //assertEquals("Ross Mason", e.getAuthor().getName());
-
     }
 
-    @Override
-    protected void doTearDown() throws Exception
+    public void testMessageTransformation() throws Exception
     {
-        clearJcrRepository();
+        MuleClient client = new MuleClient(muleContext);
+        client.dispatch("vm://fromTest", createOutboundMessage());
 
-        super.doTearDown();
+        MuleMessage response = client.request("vm://toTest", RECEIVE_TIMEOUT);
+        assertNotNull(response);
+
+        String payload = response.getPayloadAsString();
+        assertTrue(payload.contains("<author><name>Ross Mason</name></author>"));
+    }
+
+    private MuleMessage createOutboundMessage()
+    {
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("title", "Foo Bar");
+
+        return new DefaultMuleMessage("Mmm feeding", props, muleContext);
     }
 
     private void clearJcrRepository()
@@ -100,11 +114,11 @@ public class AtomEventTest extends FunctionalTestCase
         }
         catch (PathNotFoundException t)
         {
+            // ignore, we're shutting down anyway
         }
         catch (Throwable t)
         {
             t.printStackTrace();
         }
     }
-
 }
