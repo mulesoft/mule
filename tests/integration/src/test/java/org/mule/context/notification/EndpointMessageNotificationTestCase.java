@@ -45,7 +45,7 @@ public class EndpointMessageNotificationTestCase extends AbstractNotificationTes
                     SERVICE_1_ID))
             .parallel(
                 new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_RESPONSE,
-                    CLIENT_ID))
+                    SERVICE_1_ID))
             .parallel(
                 new Node(EndpointMessageNotification.class, EndpointMessageNotification.MESSAGE_DISPATCHED,
                     CLIENT_ID))

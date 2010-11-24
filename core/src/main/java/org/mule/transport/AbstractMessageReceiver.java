@@ -199,7 +199,7 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
             applyResponseTransformers(resultEvent);
         }
         
-        if (connector.isEnableMessageEvents() && endpoint.getExchangePattern() == MessageExchangePattern.REQUEST_RESPONSE)
+        if (connector.isEnableMessageEvents() && endpoint.getExchangePattern().hasResponse())
         {
 			connector.fireNotification(new EndpointMessageNotification(
 					resultEvent.getMessage(), endpoint, resultEvent
