@@ -71,4 +71,10 @@ public class ComponentMessageNotification extends ServerNotification
     {
         return "trace"; 
     }
+
+    @Override
+    public MuleMessage getSource()
+    {
+        return (MuleMessage) super.getSource();
+    }
 }

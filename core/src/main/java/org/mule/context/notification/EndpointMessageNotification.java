@@ -91,4 +91,10 @@ public class EndpointMessageNotification extends ServerNotification
         return TYPE_TRACE;
     }
 
+    @Override
+    public MuleMessage getSource()
+    {
+        return (MuleMessage) super.getSource();
+    }
+
 }
