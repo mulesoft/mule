@@ -313,7 +313,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("transactional", new ChildDefinitionParser("messageProcessor",
             TransactionalMessageProcessorsFactoryBean.class));
         registerMuleBeanDefinitionParser("logger", new ChildDefinitionParser("messageProcessor",
-            LoggerMessageProcessor.class)).addAlias("level", "levelString");
+            LoggerMessageProcessor.class));
         
         // Message Sources
         // TODO MULE-4987

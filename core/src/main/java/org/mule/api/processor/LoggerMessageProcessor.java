@@ -36,8 +36,7 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
 
     protected String expression;
     protected String category;
-    protected String levelString;
-    protected Level level;
+    protected String level = "DEBUG";
 
     protected MuleContext muleContext;
     protected ExpressionManager expressionManager;
@@ -52,7 +51,6 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
         {
             logger = LogFactory.getLog(LoggerMessageProcessor.class);
         }
-        level = Level.toLevel(levelString);
 
         expressionManager = muleContext.getExpressionManager();
 
@@ -76,22 +74,37 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
         }
     }
 
-    protected void logWithLevel(Object object, Level level)
+    protected void logWithLevel(Object object, String level)
     {
-        switch (level.toInt())
+        if ("ERROR".equals(level))
         {
-            case Level.ERROR_INT :
-                logger.error(object);
-            case Level.WARN_INT :
-                logger.warn(object);
-            case Level.INFO_INT :
-                logger.info(object);
-            case Level.DEBUG_INT :
-                logger.debug(object);
-            case Level.TRACE_INT :
-                logger.trace(object);
+            logger.error(object);
         }
-
+        else if ("WARN".equals(level))
+        {
+            logger.warn(object);
+        }
+        else if ("INFO".equals(level))
+        {
+            if (logger.isInfoEnabled())
+            {
+                logger.info(object);
+            }
+        }
+        else if ("DEBUG".equals(level))
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(object);
+            }
+        }
+        else if ("TRACE".equals(level))
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace(object);
+            }
+        }
     }
 
     public void setMuleContext(MuleContext muleContext)
@@ -109,9 +122,9 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
         this.category = category;
     }
 
-    public void setLevelString(String levelString)
+    public void setLevel(String level)
     {
-        this.levelString = levelString;
+        this.level = level.toUpperCase();
     }
 
 }
