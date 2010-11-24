@@ -972,6 +972,7 @@
             <xsd:enumeration value="ENDPOINT-MESSAGE"/>
             <xsd:enumeration value="COMPONENT-MESSAGE"/>
             <xsd:enumeration value="MANAGEMENT"/>
+            <xsd:enumeration value="MESSAGE-PROCESSOR"/>
             <xsd:enumeration value="CONNECTION"/>
             <xsd:enumeration value="REGISTRY"/>
             <xsd:enumeration value="CUSTOM"/>
