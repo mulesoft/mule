@@ -1,5 +1,5 @@
 /*
- * $Id: AuthComponentAsynchFunctionalTestCase.java 10662 2008-02-01 13:10:14Z romikk $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

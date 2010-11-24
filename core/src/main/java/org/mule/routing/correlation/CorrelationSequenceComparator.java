@@ -1,5 +1,5 @@
 /*
- * $Id: CorrelationSequenceComparator.java 18181 2010-07-13 13:46:53Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

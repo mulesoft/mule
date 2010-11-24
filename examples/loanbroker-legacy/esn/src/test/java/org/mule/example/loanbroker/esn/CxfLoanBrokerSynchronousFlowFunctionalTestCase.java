@@ -1,5 +1,5 @@
 /*
- * $Id: CxfLoanBrokerSynchronousFunctionalTestCase.java 11445 2008-03-20 11:03:00Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

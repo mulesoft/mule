@@ -1,5 +1,5 @@
 /*
- * $Id: HtmlTemplate.java 13541 2008-12-04 13:03:02Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: ExpressionTransformerTestCase.java 18265 2010-07-19 09:42:45Z rossmason $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

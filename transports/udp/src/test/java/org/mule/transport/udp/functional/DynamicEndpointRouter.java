@@ -1,5 +1,5 @@
 /*
- * $Id: TemplateEndpointRouter.java 10961 2008-02-22 19:01:02Z dfeist $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

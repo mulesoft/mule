@@ -1,5 +1,5 @@
 /*
- * $Id: JmxSupportTestCase.java 11343 2008-03-13 10:58:26Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: CxfBasicTestCase.java 11405 2008-03-18 00:13:00Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

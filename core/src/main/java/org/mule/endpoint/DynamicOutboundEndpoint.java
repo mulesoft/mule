@@ -1,5 +1,5 @@
 /*
- * $Id: DynamicOutboundEndpoint.java 173 2009-11-07 19:41:52Z ross $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

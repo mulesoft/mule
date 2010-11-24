@@ -1,5 +1,5 @@
 /*
- * $Id: ComponentException.java 14179 2009-02-27 18:46:19Z aperepel $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

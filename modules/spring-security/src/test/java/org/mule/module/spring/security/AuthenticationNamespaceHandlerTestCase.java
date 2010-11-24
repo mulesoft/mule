@@ -1,5 +1,5 @@
 /*
- * $Id: AcegiAuthenticationNamespaceHandlerTestCase.java 12673 2008-09-18 13:31:29Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

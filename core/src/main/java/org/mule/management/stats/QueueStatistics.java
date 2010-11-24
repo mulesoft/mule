@@ -1,5 +1,5 @@
 /*
- * $Id: ServiceStatistics.java 15632 2009-09-03 17:51:31Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

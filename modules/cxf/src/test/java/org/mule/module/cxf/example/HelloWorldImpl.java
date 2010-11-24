@@ -1,5 +1,5 @@
 /*
- * $Id: DefaultOutboundRouterCollection.java 19640 2010-09-13 22:00:05Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

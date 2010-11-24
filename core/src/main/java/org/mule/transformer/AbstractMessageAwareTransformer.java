@@ -1,5 +1,5 @@
 /*
- * $Id: AbstractMessageAwareTransformer.java 18823 2010-08-05 11:48:28Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

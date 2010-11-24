@@ -1,5 +1,5 @@
 /*
- * $Id: AuthenticationAgainstMultipleProvidersTestCase.java 12539 2008-08-20 19:40:19Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

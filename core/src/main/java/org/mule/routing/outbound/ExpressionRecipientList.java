@@ -1,5 +1,5 @@
 /*
- * $Id: StaticRecipientList.java 10489 2008-01-23 17:53:38Z dfeist $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

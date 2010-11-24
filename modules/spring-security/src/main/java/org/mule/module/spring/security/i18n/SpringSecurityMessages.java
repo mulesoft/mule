@@ -1,5 +1,5 @@
 /*
- * $Id: AcegiMessages.java 11456 2008-03-20 17:52:27Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

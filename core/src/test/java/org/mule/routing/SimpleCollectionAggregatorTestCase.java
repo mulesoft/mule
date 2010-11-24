@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleCollectionAggregatingMessageProcessorTestCase.java 17987 2010-07-09 12:22:32Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

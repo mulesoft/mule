@@ -1,5 +1,5 @@
 /*
- * $Id: DefaultMuleContext.java 11517 2008-03-31 21:34:19Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: MessageReceiverTestCase.java 17283 2010-05-15 19:52:19Z dfeist $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: JettyNamespaceHandler.java 12297 2008-07-11 17:54:29Z dandiep $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

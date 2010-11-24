@@ -1,5 +1,5 @@
 /*
- * $Id: WebServiceWrapperComponent.java 12228 2008-07-03 00:26:59Z aguenther $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

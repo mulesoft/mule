@@ -1,5 +1,5 @@
 /*
- * $Id: AbstractAnnotationConfigurationBuilder.java 19026 2010-08-16 07:30:47Z dirk.olmes $
+ * $Id$
  * -------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

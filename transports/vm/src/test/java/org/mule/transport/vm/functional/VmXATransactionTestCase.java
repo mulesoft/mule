@@ -1,5 +1,5 @@
 /*
- * $Id: VmXATransactionTestCase.java 10490 2008-01-23 17:54:20Z akuzmin $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

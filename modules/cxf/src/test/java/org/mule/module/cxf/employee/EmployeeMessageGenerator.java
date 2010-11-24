@@ -1,5 +1,5 @@
 /*
- * $Id: MtomClientTestCase.java 11678 2008-05-02 12:03:07Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

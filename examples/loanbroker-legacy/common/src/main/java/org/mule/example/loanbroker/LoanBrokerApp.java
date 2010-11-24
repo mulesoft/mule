@@ -1,5 +1,5 @@
 /*
- * $Id: LoanBrokerApp.java 17762 2010-06-30 23:19:36Z dzapata $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

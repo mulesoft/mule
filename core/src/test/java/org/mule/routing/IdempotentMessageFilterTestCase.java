@@ -1,5 +1,5 @@
 /*
- * $Id: IdempotentMessageProcessorTestCase.java 17050 2010-04-20 02:52:45Z dfeist $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

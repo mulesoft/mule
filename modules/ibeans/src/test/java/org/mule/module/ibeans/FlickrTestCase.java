@@ -1,5 +1,5 @@
 /*
- * $Id: FlickrTestCase.java 148 2010-02-17 07:59:42Z ross $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

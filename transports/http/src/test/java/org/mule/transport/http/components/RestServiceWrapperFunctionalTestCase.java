@@ -1,5 +1,5 @@
 /*
- * $Id: RestServiceWrapperFunctionalTestCase.java 10538 2008-01-25 14:43:19Z marie.rizzo $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

@@ -1,5 +1,5 @@
 /*
- * $Id: WebsphereEmbeddedJmsConnectorTestCase.java 11968 2008-06-06 04:06:18Z dfeist $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

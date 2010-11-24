@@ -1,5 +1,5 @@
 /*
- * $Id: ServiceDefinitionParser.java 13129 2008-10-24 15:31:16Z aperepel $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

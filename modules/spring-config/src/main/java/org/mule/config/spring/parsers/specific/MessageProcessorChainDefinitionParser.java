@@ -1,5 +1,5 @@
 /*
- * $Id: MessageProcessorDefinitionParser.java 17725 2010-06-25 20:12:28Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

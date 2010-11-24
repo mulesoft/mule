@@ -1,5 +1,5 @@
 /*
- * $Id: InterceptingChainCompositeMessageProcessor.java 19207 2010-08-26 05:02:51Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

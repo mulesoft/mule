@@ -1,5 +1,5 @@
 /*
- * $Id: FilterDefinitionParser.java 18701 2010-08-01 03:28:53Z dfeist $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
