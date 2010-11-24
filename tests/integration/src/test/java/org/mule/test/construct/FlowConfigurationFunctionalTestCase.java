@@ -381,6 +381,19 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertEquals("0Hello", result.getProperty("helloHeader", PropertyScope.INBOUND));
         assertEquals("0Hello", result.getProperty("helloHeader2", PropertyScope.INBOUND));
     }
+    
+    public void testLoggerMessage() throws MuleException, Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("0", muleContext);
+        muleContext.getClient().send("vm://loggermessage-in", message);
+    }
+    
+    public void testLoggerHeader() throws MuleException, Exception
+    {
+        MuleMessage message = new DefaultMuleMessage("0", muleContext);
+        message.setOutboundProperty("toLog", "valueToLog");
+        muleContext.getClient().send("vm://loggerheader-in", message);
+    }
 
     static class Pojo
     {

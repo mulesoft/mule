@@ -299,5 +299,17 @@
         <append-string-transformer message=" Hello foo" />
 		<threading-profile doThreading="true" maxThreadsActive="2" maxThreadsIdle="1" poolExhaustedAction="RUN"/>
     </flow>
+    
+    <flow name="loggerMessage">
+        <vm:inbound-endpoint path="loggermessage-in" exchange-pattern="request-response"/>
+        <append-string-transformer message=" Hello foo" />
+        <logger level="ERROR" category="mycategory"/>
+    </flow>
+
+    <flow name="loggerHeader">
+        <vm:inbound-endpoint path="loggerheader-in" exchange-pattern="request-response"/>
+        <logger expression="#[header:INBOUND:toLog]" level="ERROR" category="mycategory"/>
+    </flow>
+
 
 </mule>

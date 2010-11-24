@@ -12,6 +12,7 @@ package org.mule.config.spring.handlers;
 
 import org.mule.RouteableExceptionStrategy;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.processor.LoggerMessageProcessor;
 import org.mule.component.DefaultInterfaceBinding;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.PooledJavaComponent;
@@ -311,6 +312,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
             AsyncMessageProcessorsFactoryBean.class));
         registerBeanDefinitionParser("transactional", new ChildDefinitionParser("messageProcessor",
             TransactionalMessageProcessorsFactoryBean.class));
+        registerMuleBeanDefinitionParser("logger", new ChildDefinitionParser("messageProcessor",
+            LoggerMessageProcessor.class)).addAlias("level", "levelString");
+        
         // Message Sources
         // TODO MULE-4987
         // registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));
