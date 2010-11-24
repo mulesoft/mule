@@ -164,6 +164,18 @@ public class ComponentStatistics implements Statistics
     }
 
     /**
+     * Add the complete execution time for a flow that also reports branhc execution times
+     */
+    public synchronized void addCompleteExecutionTime(long time)
+    {
+        long effectiveTime = ProcessingTime.getEffectiveTime(time);
+        if (minExecutionTime == 0 || effectiveTime < minExecutionTime)
+        {
+            minExecutionTime = effectiveTime;
+        }
+    }
+
+    /**
      * Add a new execution-time measurement for processing an event.
      *
      * @param time

@@ -454,7 +454,7 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
         ImmutableEndpoint endpoint = (route instanceof ImmutableEndpoint)
                                                                          ? (ImmutableEndpoint) route
                                                                          : routedEvent.getEndpoint();
-        MuleEvent event = new DefaultMuleEvent(message, endpoint, routedEvent.getSession());
+        MuleEvent event = new DefaultMuleEvent(message, endpoint, routedEvent.getSession(), routedEvent.getProcessingTime());
 
         if (awaitResponse)
         {

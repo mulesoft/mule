@@ -64,7 +64,7 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
             // endpoint down the line
             event = new DefaultMuleEvent(event.getMessage(), endpoint, event.getFlowConstruct(), event);
             MuleEvent result = endpoint.process(event);
-            if (statistics != null)
+            if (statistics != null && statistics.isEnabled())
             {
                 statistics.incrementRoutedMessage(getEndpoint());
             }

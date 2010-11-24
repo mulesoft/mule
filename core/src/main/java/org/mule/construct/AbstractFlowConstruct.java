@@ -15,6 +15,7 @@ import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleSession;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
@@ -40,6 +41,7 @@ import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
+import org.mule.session.DefaultMuleSession;
 import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
@@ -378,7 +380,8 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         FlowConstruct flowConstruct = event.getFlowConstruct();
-        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event.getEndpoint(), this, event, true);
+        MuleSession calledSession = new DefaultMuleSession(event.getSession(), this);
+        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event.getEndpoint(), event, calledSession);
         RequestContext.setEvent(newEvent);
         try
         {
@@ -386,7 +389,6 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
         }
         finally
         {
-            event.getSession().setFlowConstruct(flowConstruct);
             RequestContext.setEvent(event);
         }
     }

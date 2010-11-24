@@ -1421,7 +1421,8 @@
                         <index>false</index>
                         <!-- List dependencies in the MANIFEST.MF -->
                         <manifest>
-                            <addClasspath>true</addClasspath>
+                            <!-- Note that we do not generate a classpath into the manifest, since doing so
+                                 significnatly slows down compilations that use the jar -->
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>

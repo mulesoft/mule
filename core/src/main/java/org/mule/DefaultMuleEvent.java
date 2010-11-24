@@ -105,7 +105,8 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     private transient Map<String, Object> serializedData = null;
 
-    private ProcessingTime processingTime = new ProcessingTime();
+    private final ProcessingTime processingTime;
+
     /**
      * Properties cache that only reads properties once from the inbound message and
      * merges them with any properties on the endpoint. The message properties take
@@ -121,23 +122,31 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                             FlowConstruct service,
                             MuleEvent previousEvent)
     {
-       this(message, endpoint, service, previousEvent, false);
+        super(message.getPayload());
+        this.message = message;
+        this.id = generateEventId();
+        this.session = previousEvent.getSession();
+        session.setFlowConstruct(service);
+        this.endpoint = endpoint;
+        this.timeout = previousEvent.getTimeout();
+        this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
+        this.processingTime = new ProcessingTime(this.session);
+        fillProperties(previousEvent);
     }
 
     public DefaultMuleEvent(MuleMessage message,
                             ImmutableEndpoint endpoint,
-                            FlowConstruct service,
                             MuleEvent previousEvent,
-                            boolean preserveEventId)
+                            MuleSession session)
     {
         super(message.getPayload());
         this.message = message;
-        this.id = preserveEventId ? previousEvent.getId() : generateEventId();
-        this.session = previousEvent.getSession();
-        ((DefaultMuleSession) session).setFlowConstruct(service);
+        this.id = previousEvent.getId();
+        this.session = session;
         this.endpoint = endpoint;
         this.timeout = previousEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
+        this.processingTime = new ProcessingTime(this.session);
         fillProperties(previousEvent);
     }
 
@@ -145,13 +154,30 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                             ImmutableEndpoint endpoint,
                             MuleSession session)
     {
-        this(message, endpoint, session, null);
+        this(message, endpoint, session, null, null);
+    }
+
+    public DefaultMuleEvent(MuleMessage message,
+                            ImmutableEndpoint endpoint,
+                            MuleSession session,
+                            ProcessingTime time)
+    {
+        this(message, endpoint, session, null, time);
     }
 
     public DefaultMuleEvent(MuleMessage message,
                             ImmutableEndpoint endpoint,
                             MuleSession session,
                             ResponseOutputStream outputStream)
+    {
+        this(message, endpoint, session, outputStream, null);
+    }
+
+    public DefaultMuleEvent(MuleMessage message,
+                            ImmutableEndpoint endpoint,
+                            MuleSession session,
+                            ResponseOutputStream outputStream,
+                            ProcessingTime time)
     {
         super(message.getPayload());
         this.message = message;
@@ -160,8 +186,8 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.id = generateEventId();
         this.outputStream = outputStream;
         fillProperties(null);
+        this.processingTime = time != null ? time : new ProcessingTime(this.session);
     }
-
     
     /**
      * A helper constructor used to rewrite an event payload
@@ -182,10 +208,11 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         if (rewriteEvent instanceof DefaultMuleEvent)
         {
             this.transformedMessage = ((DefaultMuleEvent) rewriteEvent).getCachedMessage();
-        }
-        if (rewriteEvent instanceof DefaultMuleEvent)
-        {
             this.processingTime = ((DefaultMuleEvent)rewriteEvent).processingTime;
+        }
+        else
+        {
+            this.processingTime = new ProcessingTime(this.session);
         }
         fillProperties(rewriteEvent);
     }

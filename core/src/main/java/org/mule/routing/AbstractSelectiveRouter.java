@@ -187,7 +187,7 @@ public abstract class AbstractSelectiveRouter
             return routeWithProcessor(defaultProcessor, event);
         }
 
-        if (getRouterStatistics() != null)
+        if (getRouterStatistics() != null  && getRouterStatistics().isEnabled())
         {
             getRouterStatistics().incrementNoRoutedMessage();
         }
@@ -294,7 +294,7 @@ public abstract class AbstractSelectiveRouter
 
         results.add(processor.process(processedEvent));
 
-        if (getRouterStatistics() != null)
+        if (getRouterStatistics() != null && getRouterStatistics().isEnabled())
         {
             getRouterStatistics().incrementRoutedMessage(event.getEndpoint());
         }

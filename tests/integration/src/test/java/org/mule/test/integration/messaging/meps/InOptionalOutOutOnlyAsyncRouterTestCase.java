@@ -12,6 +12,7 @@ package org.mule.test.integration.messaging.meps;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.service.Service;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
@@ -40,6 +41,12 @@ public class InOptionalOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase
         result = client.send("inboundEndpoint", msg);
         assertNotNull(result);
         assertEquals("got it!", result.getPayloadAsString());
+
+        Service async = muleContext.getRegistry().lookupService("In-Out_Out-Only-Async-Service");
+        Service external = muleContext.getRegistry().lookupService("ExternalApp");
+
+        assertEquals(2, async.getStatistics().getProcessedEvents());
+        assertEquals(1, external.getStatistics().getProcessedEvents());
     }
 }
 // END SNIPPET: full-class

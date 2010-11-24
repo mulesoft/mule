@@ -70,6 +70,11 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics
         }
     }
 
+    public void addCompleteFlowExecutionTime(long time)
+    {
+        flowStatistics.addCompleteExecutionTime(time);
+    }
+
     public void addFlowExecutionBranchTime(ProcessingTime pt, long time)
     {
         long effectiveTime = pt.getEffectiveTime(time);

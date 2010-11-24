@@ -51,7 +51,7 @@ public class ProcessingTimeInterceptor extends AbstractEnvelopeInterceptor
         if (flowConstruct != null)
         {
             FlowConstructStatistics stats = flowConstruct.getStatistics();
-            if (stats != null)
+            if (stats != null && stats.isEnabled())
             {
                 stats.addFlowExecutionBranchTime(time, System.currentTimeMillis() - startTime);
             }

@@ -92,7 +92,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     public DefaultMuleSession(FlowConstruct flowConstruct, MuleContext muleContext)
     {
         this.muleContext = muleContext;
-        properties = new CaseInsensitiveHashMap/*<String, Object>*/();
+        properties = Collections.synchronizedMap(new CaseInsensitiveHashMap/*<String, Object>*/());
         id = UUID.getUUID();
         this.flowConstruct = flowConstruct;
     }
@@ -165,6 +165,21 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         {
             this.properties.put(key, session.getProperty(key));
         }
+    }
+
+    /**
+     * Copy the session, changing only the flow construct.  This can be used for
+     * synchronous calls from one flow construct to another.
+     */
+    public DefaultMuleSession(MuleSession source, FlowConstruct flowConstruct)
+    {
+        this.flowConstruct = flowConstruct;
+        DefaultMuleSession session = (DefaultMuleSession) source;
+        this.id = session.id;
+        this.muleContext = session.muleContext;
+        this.properties = session.properties;
+        this.securityContext = session.securityContext;
+        this.valid = session.valid;
     }
 
     public String getId()

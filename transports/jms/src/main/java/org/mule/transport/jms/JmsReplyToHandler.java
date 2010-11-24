@@ -17,6 +17,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
+import org.mule.management.stats.ServiceStatistics;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.DefaultReplyToHandler;
 import org.mule.transport.jms.i18n.JmsMessages;
@@ -132,7 +133,11 @@ public class JmsReplyToHandler extends DefaultReplyToHandler
 
             if (event.getFlowConstruct() instanceof Service)
             {
-                ((Service) event.getFlowConstruct()).getStatistics().incSentReplyToEvent();
+                ServiceStatistics stats = ((Service) event.getFlowConstruct()).getStatistics();
+                if (stats.isEnabled())
+                {
+                    stats.incSentReplyToEvent();
+                }
             }
 
             final ImmutableEndpoint endpoint = event.getEndpoint();

@@ -50,7 +50,7 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
     {
         FlowConstructStatistics statistics = getFlowConstructStatistics();
 
-        if (statistics != null)
+        if (statistics != null && statistics.isEnabled())
         {
             statistics.incExecutionError();
         }
@@ -62,7 +62,7 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
     protected void logFatal(MuleMessage message, Throwable t)
     {
         FlowConstructStatistics statistics = getFlowConstructStatistics();
-        if (statistics != null)
+        if (statistics != null && statistics.isEnabled())
         {
             statistics.incFatalError();
         }
@@ -78,9 +78,12 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
         if (CollectionUtils.isNotEmpty(processors) && getFlowConstructStatistics() instanceof ServiceStatistics)
         {
             ServiceStatistics statistics = getServiceStatistics();
-            for (MessageProcessor endpoint : processors)
+            if (statistics.isEnabled())
             {
-                statistics.getOutboundRouterStat().incrementRoutedMessage(endpoint);
+                for (MessageProcessor endpoint : processors)
+                {
+                    statistics.getOutboundRouterStat().incrementRoutedMessage(endpoint);
+                }
             }
         }
     }

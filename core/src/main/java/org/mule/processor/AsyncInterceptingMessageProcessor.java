@@ -100,7 +100,8 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         }
         else
         {
-            return processNext(event);
+            MuleEvent response = processNext(event);
+            return response;
         }
     }
 
@@ -121,14 +122,17 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
             {
                 event = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint) next, event.getSession());
             }
+
+            MuleEvent response;
             if (event.getFlowConstruct() != null)
             {
-                return new ProcessingTimeInterceptor(next, event.getFlowConstruct()).process(event);
+                response = new ProcessingTimeInterceptor(next, event.getFlowConstruct()).process(event);
             }
             else
             {
-                return next.process(event);
+                response = next.process(event);
             }
+            return response;
         }
     }
 

@@ -67,9 +67,10 @@ public abstract class AbstractCatchAllStrategy implements OutboundRouterCatchAll
      */
     public final MuleEvent process(MuleEvent event) throws RoutingException
     {
-        if(getRouterStatistics()!=null)
+        RouterStatistics stats = getRouterStatistics();
+        if(stats !=null && stats.isEnabled())
         {
-            getRouterStatistics().incrementCaughtMessage();
+            stats.incrementCaughtMessage();
         }
         else
         {

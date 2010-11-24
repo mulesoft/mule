@@ -26,6 +26,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.management.stats.ServiceStatistics;
 import org.mule.service.AbstractService;
 
 import java.util.HashMap;
@@ -80,7 +81,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         returnMessage = new DefaultMuleMessage(returnMessage.getPayload(), returnMessage, muleContext);
 
         // Create the replyTo event asynchronous
-        MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, endpoint, event.getSession());
+        MuleEvent replyToEvent = new DefaultMuleEvent(returnMessage, endpoint, event.getSession(), event.getProcessingTime());
 
         // carry over properties
         List<String> responseProperties = endpoint.getResponseProperties();
@@ -98,7 +99,11 @@ public class DefaultReplyToHandler implements ReplyToHandler
         {
             if (event.getFlowConstruct() instanceof Service)
             {
-                ((Service)event.getFlowConstruct()).getStatistics().incSentReplyToEvent();
+                ServiceStatistics stats = ((Service) event.getFlowConstruct()).getStatistics();
+                if (stats.isEnabled())
+                {
+                    stats.incSentReplyToEvent();
+                }
             }
             endpoint.process(replyToEvent);
             if (logger.isInfoEnabled())
