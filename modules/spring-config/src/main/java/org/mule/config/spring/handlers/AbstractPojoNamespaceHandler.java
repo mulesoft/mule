@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
  */
 public abstract class AbstractPojoNamespaceHandler extends AbstractMuleNamespaceHandler
 {
-    public void registerPojo(String configElementName, String schemaName, Class<?> cls)
+    public void registerPojo(String configElementName, Class<?> cls)
     {
         // register a generic configuration element
         OrphanDefinitionParser parser = new OrphanDefinitionParser(cls, true);

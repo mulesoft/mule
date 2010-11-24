@@ -17,7 +17,7 @@ public class PojoTestNamesapceHandler extends AbstractPojoNamespaceHandler
 
     public void init()
     {
-        registerPojo("config", "", TestPojo.class);
+        registerPojo("config", TestPojo.class);
 
     }
 
