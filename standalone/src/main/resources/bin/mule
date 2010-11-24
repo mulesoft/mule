@@ -72,22 +72,25 @@ fi
 # valid path for WRAPPER_CMD below which is used when running the stop
 # command
 MULE_HOME=`echo ${MULE_HOME} | sed -e 's/\/$//'`
+export MULE_HOME
 
 # If MULE_BASE is not set, set it to MULE_HOME
 if [ -z "$MULE_BASE" ] ; then
     MULE_BASE=$MULE_HOME
-    export MULE_BASE
 fi
+export MULE_BASE
 
 # Application
 if [ "$MULE_APP" = "" ]
 then
     MULE_APP="mule"
 fi
+export MULE_APP
 if [ "$MULE_APP_LONG" = "" ]
 then
     MULE_APP_LONG="Mule"
 fi
+export MULE_APP_LONG
 APP_NAME=${MULE_APP}
 APP_LONG_NAME=${MULE_APP_LONG}
 
@@ -618,20 +621,6 @@ dump() {
 checkAdditionalJvmParams() {
     $MULE_HOME/bin/launcher $MULE_HOME/bin/additional.groovy $WRAPPER_CONF "$JPDA_OPTS" "$MULE_ENDORSED" $@
 }
-
-######################################################################
-# Customized for Mule
-######################################################################
-# Export variables to be used in wrapper.conf
-
-# The location of this script.
-MULE_EXE="$REALDIR"
-export MULE_EXE
-
-# The name of the Mule application (defaults to "mule").
-export MULE_APP
-export MULE_APP_LONG
-######################################################################
 
 case "$1" in
 
