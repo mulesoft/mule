@@ -15,17 +15,18 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.IOUtils;
 
-import cryptix.pki.ExtendedKeyStore;
-import cryptix.pki.KeyBundle;
-
 import java.io.InputStream;
-import java.security.Principal;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
+import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
+import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 
 public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 {
@@ -33,19 +34,62 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 
     private String publicKeyRingFileName;
 
-    private HashMap principalsKeyBundleMap;
+    private HashMap<String, PGPPublicKey> principalsKeyBundleMap;
 
     private String secretKeyRingFileName;
 
     private String secretAliasId;
 
-    private KeyBundle secretKeyBundle;
+    private PGPSecretKey secretKey;
 
     private String secretPassphrase;
 
-    public PGPKeyRingImpl()
+    public void initialise() throws InitialisationException
     {
-        super();
+        try
+        {
+            java.security.Security.addProvider(new BouncyCastleProvider());
+
+            principalsKeyBundleMap = new HashMap<String, PGPPublicKey>();
+
+            readPublicKeyRing();
+            readPrivateKeyBundle();
+        }
+        catch (Exception e)
+        {
+            logger.error("Error in initialise:" + e.getMessage(), e);
+            throw new InitialisationException(CoreMessages.failedToCreate("PGPKeyRingImpl"), e, this);
+        }
+    }
+
+    private void readPublicKeyRing() throws Exception
+    {
+        InputStream in = IOUtils.getResourceAsStream(getPublicKeyRingFileName(), getClass());
+        PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(in);
+        in.close();
+        
+        for (Iterator iterator = collection.getKeyRings(); iterator.hasNext();)
+        {
+            PGPPublicKeyRing ring = (PGPPublicKeyRing) iterator.next();
+            String userID = "";
+            for (Iterator iterator2 = ring.getPublicKeys(); iterator2.hasNext();)
+            {
+                PGPPublicKey publicKey = (PGPPublicKey) iterator2.next();
+                Iterator userIDs = publicKey.getUserIDs();
+                if (userIDs.hasNext()) {
+                    userID = (String) userIDs.next();
+                }
+                principalsKeyBundleMap.put(userID, publicKey);
+            }
+        }
+    }
+
+    private void readPrivateKeyBundle() throws Exception
+    {
+        InputStream in = IOUtils.getResourceAsStream(getSecretKeyRingFileName(), getClass());
+        PGPSecretKeyRingCollection collection = new PGPSecretKeyRingCollection(in);
+        in.close();
+        secretKey = collection.getSecretKey(Long.valueOf(getSecretAliasId()));
     }
 
     public String getSecretKeyRingFileName()
@@ -78,21 +122,9 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         this.secretPassphrase = value;
     }
 
-    private void readPrivateKeyBundle() throws Exception
+    public PGPSecretKey getSecretKey()
     {
-        InputStream in = IOUtils.getResourceAsStream(secretKeyRingFileName, getClass());
-
-        ExtendedKeyStore ring = (ExtendedKeyStore) ExtendedKeyStore.getInstance("OpenPGP/KeyRing");
-        ring.load(in, null);
-
-        in.close();
-
-        secretKeyBundle = ring.getKeyBundle(secretAliasId);
-    }
-
-    public KeyBundle getSecretKeyBundle()
-    {
-        return secretKeyBundle;
+        return secretKey;
     }
 
     public String getPublicKeyRingFileName()
@@ -105,54 +137,8 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         this.publicKeyRingFileName = value;
     }
 
-    public KeyBundle getKeyBundle(String principalId)
+    public PGPPublicKey getPublicKey(String principalId)
     {
-        return (KeyBundle) principalsKeyBundleMap.get(principalId);
-    }
-
-    public void initialise() throws InitialisationException
-    {
-        try
-        {
-            java.security.Security.addProvider(new cryptix.jce.provider.CryptixCrypto());
-            java.security.Security.addProvider(new cryptix.openpgp.provider.CryptixOpenPGP());
-
-            principalsKeyBundleMap = new HashMap();
-
-            readPublicKeyRing();
-            readPrivateKeyBundle();
-        }
-        catch (Exception e)
-        {
-            logger.error("errore in inizializzazione:" + e.getMessage(), e);
-            throw new InitialisationException(CoreMessages.failedToCreate("PGPKeyRingImpl"), e, this);
-        }
-    }
-
-    private void readPublicKeyRing() throws Exception
-    {
-        logger.debug(System.getProperties().get("user.dir"));
-        InputStream in = IOUtils.getResourceAsStream(publicKeyRingFileName, getClass());
-
-        ExtendedKeyStore ring = (ExtendedKeyStore) ExtendedKeyStore.getInstance("OpenPGP/KeyRing");
-        ring.load(in, null);
-        in.close();
-
-        for (Enumeration e = ring.aliases(); e.hasMoreElements();)
-        {
-            String aliasId = (String) e.nextElement();
-
-            KeyBundle bundle = ring.getKeyBundle(aliasId);
-
-            if (bundle != null)
-            {
-                for (Iterator users = bundle.getPrincipals(); users.hasNext();)
-                {
-                    Principal princ = (Principal) users.next();
-
-                    principalsKeyBundleMap.put(princ.getName(), bundle);
-                }
-            }
-        }
+        return principalsKeyBundleMap.get(principalId);
     }
 }

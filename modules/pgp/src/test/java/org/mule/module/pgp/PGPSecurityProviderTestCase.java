@@ -12,11 +12,10 @@ package org.mule.module.pgp;
 
 import org.mule.api.security.Authentication;
 
-import cryptix.message.Message;
-import cryptix.message.MessageFactory;
-
 import java.io.FileInputStream;
 import java.net.URL;
+
+import org.apache.commons.io.IOUtils;
 
 public class PGPSecurityProviderTestCase extends AbstractEncryptionStrategyTestCase
 {
@@ -32,12 +31,10 @@ public class PGPSecurityProviderTestCase extends AbstractEncryptionStrategyTestC
         securityProvider.setKeyManager(keyManager);
         securityProvider.initialise();
 
-        MessageFactory mf = MessageFactory.getInstance("OpenPGP");
-
         URL url = Thread.currentThread().getContextClassLoader().getResource("./signed.asc");
         FileInputStream in = new FileInputStream(url.getFile());
 
-        message = (Message)mf.generateMessages(in).iterator().next();
+        message = MessageFactory.getMessage(IOUtils.toByteArray(in));
     }
 
     @Override

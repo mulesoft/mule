@@ -10,6 +10,7 @@
 
 package org.mule.module.pgp;
 
+import org.mule.security.MuleHeaderCredentialsAccessor;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.net.URL;
@@ -55,13 +56,13 @@ public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleTes
         url = loader.getResource("./serverPrivate.gpg");
         keyM.setSecretKeyRingFileName(url.getFile());
     
-        keyM.setSecretAliasId("0x6168F39C");
+        keyM.setSecretAliasId("6247672658342245276");
         keyM.setSecretPassphrase("TestingPassphrase");
         keyM.initialise();
     
         kbStrategy = new KeyBasedEncryptionStrategy();
         kbStrategy.setKeyManager(keyM);
-        kbStrategy.setCredentialsAccessor(new FakeCredentialAccessor());
+        kbStrategy.setCredentialsAccessor(new FakeCredentialAccessor("Mule server <mule_server@mule.com>"));
         kbStrategy.initialise();
         
         keyManager = keyM;

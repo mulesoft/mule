@@ -12,6 +12,8 @@ package org.mule.transformer.encryption;
 
 import org.mule.api.security.CryptoFailureException;
 
+import java.io.InputStream;
+
 /**
  * <code>EncryptionTransformer</code> will transform an encrypted array of bytes or
  * string into an decrypted array of bytes
@@ -19,8 +21,8 @@ import org.mule.api.security.CryptoFailureException;
 public class DecryptionTransformer extends AbstractEncryptionTransformer
 {
     @Override
-    protected byte[] getTransformedBytes(byte[] buffer) throws CryptoFailureException
+    protected InputStream primTransform(InputStream input) throws CryptoFailureException
     {
-        return getStrategy().decrypt(buffer, null);
+        return getStrategy().decrypt(input, null);
     }
 }

@@ -16,26 +16,16 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.CredentialsAccessor;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.module.pgp.i18n.PGPMessages;
 import org.mule.security.AbstractNamedEncryptionStrategy;
 
-import cryptix.message.EncryptedMessage;
-import cryptix.message.EncryptedMessageBuilder;
-import cryptix.message.LiteralMessageBuilder;
-import cryptix.message.Message;
-import cryptix.message.MessageFactory;
-import cryptix.message.SignedMessageBuilder;
-import cryptix.openpgp.PGPArmouredMessage;
-import cryptix.openpgp.PGPDetachedSignatureMessage;
-import cryptix.openpgp.PGPSignedMessage;
-import cryptix.openpgp.packet.PGPSignaturePacket;
-import cryptix.openpgp.provider.PGPDetachedSignatureMessageImpl;
-import cryptix.pki.KeyBundle;
-
-import java.io.ByteArrayInputStream;
-import java.util.Collection;
+import java.io.InputStream;
+import java.util.Calendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openpgp.PGPPublicKey;
 
 public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
 {
@@ -46,119 +36,79 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
 
     private PGPKeyRing keyManager;
     private CredentialsAccessor credentialsAccessor;
-
-    public byte[] encrypt(byte[] data, Object cryptInfo) throws CryptoFailureException
-    {
-        try
-        {
-            PGPCryptInfo pgpCryptInfo;
-            KeyBundle publicKey;
-            
-            if (cryptInfo == null)
-            {
-                MuleEvent event = RequestContext.getEvent();
-                publicKey = keyManager.getKeyBundle((String)credentialsAccessor.getCredentials(
-                    event));
-                
-                pgpCryptInfo = new PGPCryptInfo(publicKey, false);
-            }
-            else
-            {
-                pgpCryptInfo = (PGPCryptInfo)cryptInfo;
-                publicKey = pgpCryptInfo.getKeyBundle();
-            }
-
-            LiteralMessageBuilder lmb = LiteralMessageBuilder.getInstance("OpenPGP");
-
-            lmb.init(data);
-
-            Message msg = lmb.build();
-
-            if (pgpCryptInfo.isSignRequested())
-            {
-                SignedMessageBuilder smb = SignedMessageBuilder.getInstance("OpenPGP");
-
-                smb.init(msg);
-                smb.addSigner(keyManager.getSecretKeyBundle(), keyManager.getSecretPassphrase().toCharArray());
-
-                msg = smb.build();
-            }
-
-            EncryptedMessageBuilder emb = EncryptedMessageBuilder.getInstance("OpenPGP");
-            emb.init(msg);
-            emb.addRecipient(publicKey);
-            msg = emb.build();
-
-            return new PGPArmouredMessage(msg).getEncoded();
-        }
-        catch (Exception e)
-        {
-            throw new CryptoFailureException(this, e);
-        }
-    }
-
-    public byte[] decrypt(byte[] data, Object cryptInfo) throws CryptoFailureException
-    {
-        try
-        {
-            ByteArrayInputStream in = new ByteArrayInputStream(data);
-            MessageFactory mf = MessageFactory.getInstance("OpenPGP");
-            Collection<?> msgs = mf.generateMessages(in);
-            Message msg = (Message) msgs.iterator().next();
-
-            if (msg instanceof EncryptedMessage)
-            {
-                EncryptedMessage encryptedMessage = (EncryptedMessage) msg;
-                KeyBundle secretKeyBundle = keyManager.getSecretKeyBundle();
-                char[] passphrase = keyManager.getSecretPassphrase().toCharArray();
-                msg = encryptedMessage.decrypt(secretKeyBundle, passphrase);
-                
-                applyStrongEncryptionWorkaround(msg);
-
-                return new PGPArmouredMessage(msg).getEncoded();
-            }
-        }
-        catch (Exception e)
-        {
-            throw new CryptoFailureException(this, e);
-        }
-
-        return data;
-    }
-
-    // cryptix seems to have trouble with some kinds of messsage encryption. Work around this
-    // by setting up the proper internal state first
-    private void applyStrongEncryptionWorkaround(Message msg) throws Exception
-    {
-        if (msg instanceof PGPSignedMessage)
-        {
-            PGPSignedMessage signedMessage = (PGPSignedMessage) msg;
-            
-            PGPDetachedSignatureMessage signature = signedMessage.getDetachedSignature();
-            if (signature instanceof PGPDetachedSignatureMessageImpl)
-            {
-                PGPDetachedSignatureMessageImpl signatureImpl = 
-                    (PGPDetachedSignatureMessageImpl) signature;
-                PGPSignaturePacket packet = signatureImpl.getPacket();
-                if (packet.getVersion() == 4)
-                {
-                    packet.parseSignatureSubPackets();
-                }
-            }
-        }
-    }
+    private boolean checkKeyExpirity = false;
 
     public void initialise() throws InitialisationException
     {
         try
         {
-            java.security.Security.addProvider(new cryptix.jce.provider.CryptixCrypto());
-            java.security.Security.addProvider(new cryptix.openpgp.provider.CryptixOpenPGP());
+            java.security.Security.addProvider(new BouncyCastleProvider());
         }
         catch (Exception e)
         {
-            throw new InitialisationException(
-                CoreMessages.failedToCreate("KeyBasedEncryptionStrategy"), e, this);
+            throw new InitialisationException(CoreMessages.failedToCreate("KeyBasedEncryptionStrategy"), e,
+                this);
+        }
+    }
+
+    public InputStream encrypt(InputStream data, Object cryptInfo) throws CryptoFailureException
+    {
+        try
+        {
+            PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
+            PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
+            return new LazyInputStream(new EncryptOutputStreamWriter(data, publicKey));
+        }
+        catch (Exception e)
+        {
+            throw new CryptoFailureException(this, e);
+        }
+    }
+
+    public InputStream decrypt(InputStream data, Object cryptInfo) throws CryptoFailureException
+    {
+        try
+        {
+            PGPCryptInfo pgpCryptInfo = this.safeGetCryptInfo(cryptInfo);
+            PGPPublicKey publicKey = pgpCryptInfo.getPublicKey();
+            return new LazyInputStream(new DecryptOutputStreamWriter(data, publicKey,
+                this.keyManager.getSecretKey(), this.keyManager.getSecretPassphrase()));
+        }
+        catch (Exception e)
+        {
+            throw new CryptoFailureException(this, e);
+        }
+    }
+
+    private PGPCryptInfo safeGetCryptInfo(Object cryptInfo)
+    {
+        if (cryptInfo == null)
+        {
+            MuleEvent event = RequestContext.getEvent();
+            PGPPublicKey publicKey = keyManager.getPublicKey((String) this.getCredentialsAccessor().getCredentials(event));
+            this.checkKeyExpirity(publicKey);
+            return new PGPCryptInfo(publicKey, false);
+        }
+        else
+        {
+            PGPCryptInfo info = (PGPCryptInfo) cryptInfo;
+            this.checkKeyExpirity(info.getPublicKey());
+            return info;
+        }
+    }
+
+    private void checkKeyExpirity(PGPPublicKey publicKey)
+    {
+        if (this.isCheckKeyExpirity() && publicKey.getValidDays() != 0)
+        {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(publicKey.getCreationTime());
+            calendar.add(Calendar.DATE, publicKey.getValidDays());
+
+            if (!calendar.getTime().after(Calendar.getInstance().getTime()))
+            {
+                throw new InvalidPublicKeyException(PGPMessages.pgpPublicKeyExpired());
+            }
         }
     }
 
@@ -172,11 +122,23 @@ public class KeyBasedEncryptionStrategy extends AbstractNamedEncryptionStrategy
         this.keyManager = keyManager;
     }
 
-    public CredentialsAccessor getCredentialsAccessor() {
+    public CredentialsAccessor getCredentialsAccessor()
+    {
         return credentialsAccessor;
     }
 
-    public void setCredentialsAccessor(CredentialsAccessor credentialsAccessor) {
+    public void setCredentialsAccessor(CredentialsAccessor credentialsAccessor)
+    {
         this.credentialsAccessor = credentialsAccessor;
+    }
+
+    public boolean isCheckKeyExpirity()
+    {
+        return checkKeyExpirity;
+    }
+
+    public void setCheckKeyExpirity(boolean checkKeyExpirity)
+    {
+        this.checkKeyExpirity = checkKeyExpirity;
     }
 }

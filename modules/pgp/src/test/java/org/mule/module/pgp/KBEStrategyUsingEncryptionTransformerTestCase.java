@@ -10,12 +10,15 @@
 
 package org.mule.module.pgp;
 
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
 import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
+import org.mule.api.MuleEvent;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.encryption.EncryptionTransformer;
 import org.mule.transformer.simple.ByteArrayToObject;
-
 
 public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncryptionStrategyTestCase
 {
@@ -23,15 +26,17 @@ public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncry
     {
         String msg = "Test Message";
         
-        DefaultMuleEvent event = (DefaultMuleEvent)getTestEvent(msg, getTestService("orange", Orange.class));
-        RequestContext.setEvent(event);
+        MuleEvent event = (DefaultMuleEvent) getTestEvent(msg, getTestService("orange", Orange.class));
+        event = RequestContext.setEvent(event);
         
         EncryptionTransformer etrans = new EncryptionTransformer();
         etrans.setStrategy(kbStrategy);
         Object result = etrans.doTransform(msg.getBytes(), "UTF-8");
         
         assertNotNull(result);
-        String encrypted = (String) new ByteArrayToObject().doTransform(result,"UTF-8");
+        InputStream inputStream = (InputStream) result;
+        String message = IOUtils.toString(inputStream);
+        String encrypted = (String) new ByteArrayToObject().doTransform(message.getBytes(), "UTF-8");
         assertTrue(encrypted.startsWith("-----BEGIN PGP MESSAGE-----"));
     }
 }

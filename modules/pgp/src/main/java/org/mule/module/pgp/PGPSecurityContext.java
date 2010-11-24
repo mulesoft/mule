@@ -19,7 +19,7 @@ public class PGPSecurityContext implements SecurityContext
 
     public PGPSecurityContext(PGPAuthentication authentication)
     {
-        this.authentication = authentication;
+        this.setAuthentication(authentication);
     }
 
     public void setAuthentication(Authentication authentication)

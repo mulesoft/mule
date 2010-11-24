@@ -32,6 +32,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
+import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.session.DefaultMuleSession;
 import org.mule.session.LegacySessionHandler;
 import org.mule.transaction.TransactionCoordination;
@@ -197,6 +198,15 @@ public abstract class AbstractMessageReceiver extends AbstractConnectable implem
         {
             applyResponseTransformers(resultEvent);
         }
+        
+        if (connector.isEnableMessageEvents() && endpoint.getExchangePattern() == MessageExchangePattern.REQUEST_RESPONSE)
+        {
+			connector.fireNotification(new EndpointMessageNotification(
+					resultEvent.getMessage(), endpoint, resultEvent
+							.getFlowConstruct().getName(),
+					EndpointMessageNotification.MESSAGE_RESPONSE));
+        }
+        
         return resultEvent;
     }
     

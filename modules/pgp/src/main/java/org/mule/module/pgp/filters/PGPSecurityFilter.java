@@ -19,23 +19,19 @@ import org.mule.api.security.SecurityContext;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.module.pgp.LiteralMessage;
+import org.mule.module.pgp.Message;
+import org.mule.module.pgp.MessageFactory;
 import org.mule.module.pgp.PGPAuthentication;
 import org.mule.module.pgp.PGPCryptInfo;
 import org.mule.module.pgp.PGPKeyRing;
+import org.mule.module.pgp.SignedMessage;
 import org.mule.module.pgp.i18n.PGPMessages;
 import org.mule.security.AbstractEndpointSecurityFilter;
 
-import cryptix.message.LiteralMessage;
-import cryptix.message.Message;
-import cryptix.message.MessageFactory;
-import cryptix.message.SignedMessage;
-import cryptix.pki.KeyBundle;
-
-import java.io.ByteArrayInputStream;
-import java.util.Collection;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.openpgp.PGPPublicKey;
 
 public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 {
@@ -120,13 +116,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 
     private Message decodeMsgRaw(byte[] raw) throws Exception
     {
-        MessageFactory mf = MessageFactory.getInstance("OpenPGP");
-
-        ByteArrayInputStream in = new ByteArrayInputStream(raw);
-
-        Collection msgs = mf.generateMessages(in);
-
-        return (Message)msgs.iterator().next();
+        return MessageFactory.getMessage(raw);
     }
 
     private String getUnencryptedMessageWithoutSignature(PGPAuthentication auth) throws Exception
@@ -160,7 +150,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 
         MuleMessage message = event.getMessage();
 
-        KeyBundle userKeyBundle = keyManager.getKeyBundle((String)getCredentialsAccessor().getCredentials(
+        PGPPublicKey userKeyBundle = keyManager.getPublicKey((String)getCredentialsAccessor().getCredentials(
             event));
 
         final PGPCryptInfo cryptInfo = new PGPCryptInfo(userKeyBundle, signRequired);

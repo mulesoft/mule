@@ -43,6 +43,11 @@ public class PGPMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 5);
     }
+    
+    public static Message pgpPublicKeyExpired()
+    {
+        return factory.createMessage(BUNDLE_PATH, 6);
+    }
 }
 
 

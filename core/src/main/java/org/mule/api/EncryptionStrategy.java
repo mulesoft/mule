@@ -13,6 +13,8 @@ package org.mule.api;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.security.CryptoFailureException;
 
+import java.io.InputStream;
+
 /**
  * <code>EncryptionStrategy</code> can be used to provide different types of
  * Encryption strategy objects. These can be configured with different information
@@ -24,6 +26,10 @@ public interface EncryptionStrategy extends Initialisable
 {
     String getName();
 
+    InputStream encrypt(InputStream data, Object info) throws CryptoFailureException;
+
+    InputStream decrypt(InputStream data, Object info) throws CryptoFailureException;
+    
     byte[] encrypt(byte[] data, Object info) throws CryptoFailureException;
 
     byte[] decrypt(byte[] data, Object info) throws CryptoFailureException;

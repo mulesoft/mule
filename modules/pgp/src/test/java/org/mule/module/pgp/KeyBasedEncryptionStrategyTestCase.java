@@ -25,14 +25,17 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
         byte[] msg = IOUtils.toByteArray(in);
         in.close();
 
-        String result = new String(kbStrategy.decrypt(msg, null));
-        assertNotNull(result);
+        PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
+            "Mule client <mule_client@mule.com>"), true);
+
+        String result = new String(kbStrategy.decrypt(msg, cryptInfo));
+        assertEquals("This is a test message.\r\nThis is another line.\r\n", result);
     }
 
     public void testEncrypt() throws Exception
     {
         String msg = "Test Message";
-        PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getKeyBundle(
+        PGPCryptInfo cryptInfo = new PGPCryptInfo(kbStrategy.getKeyManager().getPublicKey(
             "Mule client <mule_client@mule.com>"), true);
 
         String result = new String(kbStrategy.encrypt(msg.getBytes(), cryptInfo));

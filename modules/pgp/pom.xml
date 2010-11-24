@@ -11,6 +11,11 @@
     <name>PGP Security</name>
     <description>A Mule implementation of PGP security using cryptix libraries.</description>
 
+    <properties>
+        <bouncycastle.jdk>jdk15</bouncycastle.jdk>
+        <bouncycastle.version>1.45</bouncycastle.version>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
@@ -27,29 +32,24 @@
             <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
-            <groupId>cryptix-jce</groupId>
-            <artifactId>cryptix-jce-api</artifactId>
-            <version>${cryptixJceVersion}-osgi</version>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpg-${bouncycastle.jdk}</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
-            <groupId>cryptix-jce</groupId>
-            <artifactId>cryptix-jce-provider</artifactId>
-            <version>${cryptixJceVersion}-osgi</version>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-ext-${bouncycastle.jdk}</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
-            <groupId>cryptix-openpgp</groupId>
-            <artifactId>cryptix-message-api</artifactId>
-            <version>${cryptixVersion}-osgi</version>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-${bouncycastle.jdk}</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
-            <groupId>cryptix-openpgp</groupId>
-            <artifactId>cryptix-openpgp-provider</artifactId>
-            <version>${cryptixVersion}-osgi</version>
-        </dependency>
-        <dependency>
-            <groupId>cryptix-openpgp</groupId>
-            <artifactId>cryptix-pki-api</artifactId>
-            <version>${cryptixVersion}-osgi</version>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bctsp-${bouncycastle.jdk}</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
 
         <!-- Unit tests -->
@@ -74,6 +74,12 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-file</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
             <version>${version}</version>
             <scope>test</scope>
         </dependency>

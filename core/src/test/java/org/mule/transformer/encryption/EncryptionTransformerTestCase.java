@@ -17,6 +17,7 @@ import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 
 public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
@@ -38,7 +39,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
     {
         try
         {
-            return strat.encrypt(TEST_DATA.getBytes(), null);
+            return new ByteArrayInputStream(strat.encrypt(TEST_DATA.getBytes(), null));
         }
         catch (CryptoFailureException e)
         {
@@ -50,7 +51,7 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
     @Override
     public Object getTestData()
     {
-        return TEST_DATA;
+        return new ByteArrayInputStream(TEST_DATA.getBytes());
     }
 
     @Override
@@ -74,7 +75,6 @@ public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
     {
         DecryptionTransformer transformer = new DecryptionTransformer();
         transformer.setStrategy(strat);
-        transformer.setReturnDataType(DataTypeFactory.STRING);
         try
         {
             transformer.initialise();

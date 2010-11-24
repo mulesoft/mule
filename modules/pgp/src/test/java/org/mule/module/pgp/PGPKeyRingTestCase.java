@@ -10,19 +10,20 @@
 
 package org.mule.module.pgp;
 
-import cryptix.pki.KeyBundle;
+import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPSecretKey;
 
 public class PGPKeyRingTestCase extends AbstractEncryptionStrategyTestCase
 {
     public void testClientKey()
     {
-        KeyBundle clientKey = keyManager.getKeyBundle("Mule client <mule_client@mule.com>");
+        PGPPublicKey clientKey = keyManager.getPublicKey("Mule client <mule_client@mule.com>");
         assertNotNull(clientKey);
     }
 
     public void testServerKey()
     {
-        KeyBundle serverKey = keyManager.getSecretKeyBundle();
+        PGPSecretKey serverKey = keyManager.getSecretKey();
         assertNotNull(serverKey);
     }
 }

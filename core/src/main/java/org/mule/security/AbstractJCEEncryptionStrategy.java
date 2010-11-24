@@ -15,6 +15,9 @@ import org.mule.api.security.CryptoFailureException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.Base64;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.KeySpec;
@@ -22,6 +25,7 @@ import java.security.spec.KeySpec;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -87,6 +91,28 @@ public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncrypt
 
     protected abstract SecretKey getSecretKey() throws GeneralSecurityException;
 
+    public InputStream encrypt(InputStream data, Object info) throws CryptoFailureException {
+        try
+        {
+            return new ByteArrayInputStream(this.encrypt(IOUtils.toByteArray(data), info));
+        }
+        catch (IOException e)
+        {
+            throw new CryptoFailureException(this, e);
+        }
+    }
+
+    public InputStream decrypt(InputStream data, Object info) throws CryptoFailureException {
+        try
+        {
+            return new ByteArrayInputStream(this.decrypt(IOUtils.toByteArray(data), info));
+        }
+        catch (IOException e)
+        {
+            throw new CryptoFailureException(this, e);
+        }
+    }
+    
     public byte[] encrypt(byte[] data, Object info) throws CryptoFailureException
     {
         try

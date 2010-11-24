@@ -18,10 +18,8 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.module.pgp.i18n.PGPMessages;
 import org.mule.security.AbstractSecurityProvider;
 
-import cryptix.message.Message;
-import cryptix.message.MessageException;
-import cryptix.message.SignedMessage;
-import cryptix.pki.KeyBundle;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openpgp.PGPPublicKey;
 
 public class PGPSecurityProvider extends AbstractSecurityProvider
 {
@@ -43,9 +41,9 @@ public class PGPSecurityProvider extends AbstractSecurityProvider
             throw new UnauthorisedException(CoreMessages.objectIsNull("UserId"));
         }
 
-        KeyBundle userKeyBundle = keyManager.getKeyBundle(userId);
+        PGPPublicKey publicKey = keyManager.getPublicKey(userId);
 
-        if (userKeyBundle == null)
+        if (publicKey == null)
         {
             throw new UnauthorisedException(PGPMessages.noPublicKeyForUser(userId));
         }
@@ -56,19 +54,19 @@ public class PGPSecurityProvider extends AbstractSecurityProvider
         {
             try
             {
-                if (!((SignedMessage) msg).verify(userKeyBundle))
+                if (!((SignedMessage) msg).verify())
                 {
                     throw new UnauthorisedException(PGPMessages.invalidSignature());
                 }
             }
-            catch (MessageException e)
+            catch (Exception e)
             {
                 throw new UnauthorisedException(PGPMessages.errorVerifySignature(), e);
             }
         }
 
         auth.setAuthenticated(true);
-        auth.setDetails(userKeyBundle);
+        auth.setDetails(publicKey);
 
         return auth;
     }
@@ -84,9 +82,7 @@ public class PGPSecurityProvider extends AbstractSecurityProvider
     {
         try
         {
-            java.security.Security.addProvider(new cryptix.jce.provider.CryptixCrypto());
-            java.security.Security.addProvider(new cryptix.openpgp.provider.CryptixOpenPGP());
-
+            java.security.Security.addProvider(new BouncyCastleProvider());
             setSecurityContextFactory(new PGPSecurityContextFactory());
         }
         catch (Exception e)

@@ -13,17 +13,18 @@
     <spring:bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl" init-method="initialise">
         <spring:property name="publicKeyRingFileName" value="serverPublic.gpg"/>
         <spring:property name="secretKeyRingFileName" value="serverPrivate.gpg"/>
-        <spring:property name="secretAliasId" value="0x6168F39C"/>
+        <spring:property name="secretAliasId" value="6247672658342245276"/>
         <spring:property name="secretPassphrase" value="TestingPassphrase"/>
     </spring:bean>
     
-    <spring:bean id="fakeCredentialAccessor" class="org.mule.module.pgp.FakeCredentialAccessor"/>
+    <spring:bean id="credentialAccessor" class="org.mule.security.MuleHeaderCredentialsAccessor"/>
 
     <file:connector name="sendConnector" outputPattern="[TARGET_FILE]"/>
 
     <pgp:security-manager>
         <pgp:security-provider name="pgpSecurityProvider" keyManager-ref="pgpKeyManager"/>
-        <pgp:keybased-encryption-strategy name="keyBasedEncryptionStrategy" keyManager-ref="pgpKeyManager"/>
+        <pgp:keybased-encryption-strategy name="keyBasedEncryptionStrategy" keyManager-ref="pgpKeyManager" 
+            credentialsAccessor-ref="credentialAccessor"/>
     </pgp:security-manager>
 
     <model name="test">
@@ -31,7 +32,7 @@
             <inbound>
                 <inbound-endpoint address="vm://echo" exchange-pattern="one-way">
                     <pgp:security-filter strategyName="keyBasedEncryptionStrategy" signRequired="true"
-                                         credentialsAccessor-ref="fakeCredentialAccessor"
+                                         credentialsAccessor-ref="credentialAccessor"
                                          keyManager-ref="pgpKeyManager"/>
                 </inbound-endpoint>
             </inbound>
@@ -40,7 +41,7 @@
                 <pass-through-router>
                     <outbound-endpoint address="file://output" exchange-pattern="one-way">
                         <pgp:security-filter strategyName="keyBasedEncryptionStrategy" signRequired="true"
-                                             credentialsAccessor-ref="fakeCredentialAccessor"
+                                             credentialsAccessor-ref="credentialAccessor"
                                              keyManager-ref="pgpKeyManager"/>
                     </outbound-endpoint>
                 </pass-through-router>

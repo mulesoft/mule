@@ -14,6 +14,9 @@ import org.mule.api.EncryptionStrategy;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.CryptoFailureException;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 /**
  * Empty mock for tests
  */
@@ -33,6 +36,16 @@ public class MockEncryptionStrategy extends Named implements EncryptionStrategy
     public void initialise() throws InitialisationException
     {
         // nothing to do
+    }
+
+    public InputStream decrypt(InputStream data, Object info) throws CryptoFailureException
+    {
+        return new ByteArrayInputStream(new byte[0]);
+    }
+
+    public InputStream encrypt(InputStream data, Object info) throws CryptoFailureException
+    {
+        return new ByteArrayInputStream(new byte[0]);
     }
 
 }

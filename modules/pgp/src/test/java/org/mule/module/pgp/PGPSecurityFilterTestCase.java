@@ -12,6 +12,7 @@ package org.mule.module.pgp;
 
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.FileUtils;
@@ -30,7 +31,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
 {
     protected static final String TARGET = "/encrypted.txt";
     protected static final String DIRECTORY = "output";
-    protected static final String MESSAGE_EXCEPTION = "No signed message found. Message payload is of type: String";
+    protected static final String MESSAGE_EXCEPTION = "The required object/property \"UserId\" is null. Message payload is of type: String";
 
     @Override
     protected boolean isDisabledInThisEnvironment()
@@ -49,6 +50,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
 
         Map<String, String> props = new HashMap<String, String>();
         props.put("TARGET_FILE", TARGET);
+        props.put(MuleProperties.MULE_USER_PROPERTY, "Mule server <mule_server@mule.com>");
 
         MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://echo", new String(msg), props);
@@ -98,7 +100,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
     }
 
     // see MULE-3672
-    public void _testAuthenticationNotAuthorised() throws Exception
+    public void testAuthenticationNotAuthorised() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
 

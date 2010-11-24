@@ -10,13 +10,14 @@
 
 package org.mule.module.pgp;
 
-import cryptix.pki.KeyBundle;
+import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPSecretKey;
 
 public interface PGPKeyRing
 {
     public abstract String getSecretPassphrase();
 
-    public abstract KeyBundle getSecretKeyBundle();
+    public abstract PGPSecretKey getSecretKey();
 
-    public abstract KeyBundle getKeyBundle(String principalId);
+    public abstract PGPPublicKey getPublicKey(String principalId);
 }

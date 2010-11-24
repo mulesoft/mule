@@ -10,29 +10,29 @@
 
 package org.mule.module.pgp;
 
-import cryptix.pki.KeyBundle;
+import org.bouncycastle.openpgp.PGPPublicKey;
 
 public class PGPCryptInfo
 {
-    KeyBundle keyBundle;
-    boolean signRequested;
+    private PGPPublicKey publicKey;
+    private boolean signRequested;
 
-    public PGPCryptInfo(KeyBundle keyBundle, boolean signRequested)
+    public PGPCryptInfo(PGPPublicKey publicKey, boolean signRequested)
     {
         super();
 
-        this.keyBundle = keyBundle;
-        this.signRequested = signRequested;
+        this.setPublicKey(publicKey);
+        this.setSignRequested(signRequested);
     }
 
-    public KeyBundle getKeyBundle()
+    public PGPPublicKey getPublicKey()
     {
-        return keyBundle;
+        return publicKey;
     }
 
-    public void setKeyBundle(KeyBundle keyBundle)
+    public void setPublicKey(PGPPublicKey publicKey)
     {
-        this.keyBundle = keyBundle;
+        this.publicKey = publicKey;
     }
 
     public boolean isSignRequested()

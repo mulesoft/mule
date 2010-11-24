@@ -12,20 +12,20 @@ package org.mule.module.pgp;
 
 import org.mule.api.security.Authentication;
 
-import cryptix.message.Message;
-import cryptix.pki.KeyBundle;
-
 import java.util.Map;
+
+import org.bouncycastle.openpgp.PGPPublicKey;
 
 public class PGPAuthentication implements Authentication
 {
-    boolean authenticated = false;
+    private boolean authenticated;
     private String userName;
     private Message message;
-    private KeyBundle userKeyBundle = null;
+    private PGPPublicKey publicKey;
 
     public PGPAuthentication(String userName, Message message)
     {
+        this.authenticated = false;
         this.userName = userName;
         this.message = message;
     }
@@ -47,12 +47,12 @@ public class PGPAuthentication implements Authentication
 
     public Object getDetails()
     {
-        return userKeyBundle;
+        return publicKey;
     }
 
-    protected void setDetails(KeyBundle kb)
+    protected void setDetails(PGPPublicKey publicKey)
     {
-        userKeyBundle = kb;
+        this.publicKey = publicKey;
     }
 
     public Object getPrincipal()
