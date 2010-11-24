@@ -40,7 +40,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
 {
     private static final DataType<Entry> TYPE_ENTRY = DataTypeFactory.create(Entry.class);
     private static final DataType<OutputHandler> TYPE_OUTPUT_HANDLER = DataTypeFactory.create(OutputHandler.class);
-    
+
     public AtomEntryBuilderTransformer()
     {
         setReturnDataType(TYPE_OUTPUT_HANDLER);
@@ -54,19 +54,20 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
 
         for (ExpressionArgument arg: arguments)
         {
-            if (arg.getName().equals("title"))
+            String argName = arg.getName();
+            if (argName.equals("title"))
             {
                 entry.setTitle(StringUtils.trimToEmpty((String) arg.evaluate(message)));
             }
-            else if (arg.getName().equals("id"))
+            else if (argName.equals("id"))
             {
                 entry.setId(StringUtils.trimToEmpty((String) arg.evaluate(message)));
             }
-            else if (arg.getName().equals("summary"))
+            else if (argName.equals("summary"))
             {
                 entry.setSummary(StringUtils.trimToEmpty((String) arg.evaluate(message)));
             }
-            else if (arg.getName().equals("content"))
+            else if (argName.equals("content"))
             {
                 Object content = arg.evaluate(message);
                 if (content instanceof DataHandler)
@@ -86,7 +87,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
                     entry.setContent((InputStream) content);
                 }
             }
-            else if (arg.getName().equals("updated"))
+            else if (argName.equals("updated"))
             {
                 Object date = arg.evaluate(message);
                 if (date instanceof Date)
@@ -98,7 +99,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
                     entry.setUpdated(date.toString());
                 }
             }
-            else if (arg.getName().equals("edited"))
+            else if (argName.equals("edited"))
             {
                 Object date = arg.evaluate(message);
                 if (date instanceof Date)
@@ -110,7 +111,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
                     entry.setEdited(date.toString());
                 }
             }
-            else if (arg.getName().equals("published"))
+            else if (argName.equals("published"))
             {
                 Object date = arg.evaluate(message);
                 if (date instanceof Date)
@@ -122,15 +123,15 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
                     entry.setPublished(date.toString());
                 }
             }
-            else if (arg.getName().equals("rights"))
+            else if (argName.equals("rights"))
             {
                 entry.setRights((String) arg.evaluate(message));
             }
-            else if (arg.getName().equals("draft"))
+            else if (argName.equals("draft"))
             {
                 entry.setDraft((Boolean) arg.evaluate(message));
             }
-            else if (arg.getName().equals("author"))
+            else if (argName.equals("author"))
             {
                 Object author = arg.evaluate(message);
                 if (author instanceof Person)
@@ -142,7 +143,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
                     entry.addAuthor(author.toString());
                 }
             }
-            else if (arg.getName().equals("category"))
+            else if (argName.equals("category"))
             {
                 Object category = arg.evaluate(message);
                 if (category instanceof Category)
@@ -154,7 +155,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
                     entry.addCategory(category.toString());
                 }
             }
-            else if (arg.getName().equals("contributor"))
+            else if (argName.equals("contributor"))
             {
                 Object author = arg.evaluate(message);
                 if (author instanceof Person)
@@ -166,7 +167,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
                     entry.addContributor(author.toString());
                 }
             }
-            else if (arg.getName().equals("link"))
+            else if (argName.equals("link"))
             {
                 Object link = arg.evaluate(message);
                 if (link instanceof Link)
@@ -180,7 +181,7 @@ public class AtomEntryBuilderTransformer extends AbstractExpressionTransformer
             }
             else
             {
-                throw new TransformerException(CoreMessages.propertyHasInvalidValue("entry-property.name", arg.getName()), this);
+                throw new TransformerException(CoreMessages.propertyHasInvalidValue("entry-property.name", argName), this);
             }
 
         }

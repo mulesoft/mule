@@ -46,10 +46,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AbderaServiceComponent extends DefaultJavaComponent
 {
-
     public static final String EVENT_CONTEXT = "_muleEventContext";
-
-    protected static transient final Log logger = LogFactory.getLog(AbderaServiceComponent.class);
 
     private Provider provider;
 
@@ -63,13 +60,13 @@ public class AbderaServiceComponent extends DefaultJavaComponent
 
     public static final class AbderaCallable implements Callable
     {
+        protected static transient final Log logger = LogFactory.getLog(AbderaServiceComponent.class);
 
         private final AbderaServiceComponent abderaServiceComponent;
 
         public AbderaCallable(AbderaServiceComponent abderaServiceComponent)
         {
             this.abderaServiceComponent = abderaServiceComponent;
-
         }
 
         public Object onCall(MuleEventContext event) throws MuleException
@@ -78,6 +75,7 @@ public class AbderaServiceComponent extends DefaultJavaComponent
             {
                 logger.debug(event.getMessageAsString());
             }
+
             MuleMessage msg = event.getMessage();
             IRI baseIri = initBaseUri(event.getEndpointURI());
             String contextPath = msg.getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY, StringUtils.EMPTY);
