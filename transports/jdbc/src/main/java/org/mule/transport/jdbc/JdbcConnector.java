@@ -318,41 +318,40 @@ public class JdbcConnector extends AbstractConnector
         for (int i = 0; i < paramNames.size(); i++)
         {
             String param = (String) paramNames.get(i);
-            Object value = null;
-            // If we find a value and it happens to be null, thats acceptable
-            boolean foundValue = false;
-            boolean validExpression = muleContext.getExpressionManager().isValidExpression(param);
-            //There must be an expression namespace to use the ExpresionEvaluator i.e. header:type
-            if (message != null && validExpression)
-            {
-                value = muleContext.getExpressionManager().evaluate(param, message);
-                foundValue = value != null;
-            }
-            if (!foundValue)
-            {
-                String name = param.substring(2, param.length() - 1);
-                //MULE-3597
-                if (!validExpression)
-                {
-                    logger.warn(MessageFormat.format("Config is using the legacy param format {0} (no evaluator defined)." +
-                                                     " This expression can be replaced with {1}header:{2}{3}",
-                                                     param, ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
-                                                     name, ExpressionManager.DEFAULT_EXPRESSION_POSTFIX));
-                }
-                value = endpoint.getProperty(name);
-            }
+            Object value = getParamValue(endpoint, message, param);
 
-            // Allow null values which may be acceptable to the user
-            // Why shouldn't nulls be allowed? Otherwise every null parameter has to
-            // be defined
-            // if (value == null && !foundValue)
-            // {
-            // throw new IllegalArgumentException("Can not retrieve argument " +
-            // name);
-            // }
             params[i] = value;
         }
         return params;
+    }
+
+    protected Object getParamValue(ImmutableEndpoint endpoint, MuleMessage message, String param)
+    {
+        Object value = null;
+        // If we find a value and it happens to be null, that is acceptable
+        boolean foundValue = false;
+        boolean validExpression = muleContext.getExpressionManager().isValidExpression(param);
+
+        //There must be an expression namespace to use the ExpressionEvaluator i.e. header:type
+        if (message != null && validExpression)
+        {
+            value = muleContext.getExpressionManager().evaluate(param, message);
+            foundValue = value != null;
+        }
+        if (!foundValue)
+        {
+            String name = getNameFromParam(param);
+            //MULE-3597
+            if (!validExpression)
+            {
+                logger.warn(MessageFormat.format("Config is using the legacy param format {0} (no evaluator defined)." +
+                                                 " This expression can be replaced with {1}header:{2}{3}",
+                                                 param, ExpressionManager.DEFAULT_EXPRESSION_PREFIX,
+                                                 name, ExpressionManager.DEFAULT_EXPRESSION_POSTFIX));
+            }
+            value = endpoint.getProperty(name);
+        }
+        return value;
     }
 
     protected String getNameFromParam(String param)
