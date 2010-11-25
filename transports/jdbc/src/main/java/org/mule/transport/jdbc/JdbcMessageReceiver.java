@@ -26,10 +26,13 @@ import org.mule.util.MapUtils;
 
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
-/** TODO */
+/**
+ * Implements {@link TransactedPollingMessageReceiver} reading data from a database.
+ * Provides a way to acknowledge each read data using a SQL statement.
+ */
 public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
 {
 
@@ -82,7 +85,15 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         this.connector = (JdbcConnector) connector;
         this.setReceiveMessagesInTransaction(endpoint.getTransactionConfig().isTransacted()
             && !this.connector.isTransactionPerMessage());
-        
+
+        parseStatements(readStmt, ackStmt);
+    }
+
+    /**
+     * Parses the read and acknowledge SQL statements
+     */
+    protected void parseStatements(String readStmt, String ackStmt)
+    {
         this.readParams = new ArrayList();
         this.readStmt = this.connector.parseStatement(readStmt, this.readParams);
         this.ackParams = new ArrayList();
@@ -116,24 +127,13 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         {
             con = this.connector.getConnection();
             MuleMessage muleMessage = createMuleMessage(message, endpoint.getEncoding());
-            if (this.ackStmt != null)
+            if (hasAckStatement())
             {
                 if (aggregateResult)
                 {
-                    List rows = (List) message;
-                    Object[][] paramValuesArray = new Object[rows.size()][];
+                    List<MuleMessage> messages = createMuleMessages((List) message);
+                    int[] nbRows = executeBatchAckStatement(con, messages);
 
-                    HashMap record;
-                    for (int i = 0; i <  rows.size(); i++)
-                    {
-                        record = (HashMap) rows.get(i);
-                        paramValuesArray[i] = connector.getParams(endpoint, this.ackParams, new DefaultMuleMessage(record, connector.getMuleContext()), this.endpoint.getEndpointURI().getAddress());
-                    }
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(ackParams));
-                    }
-                    int[] nbRows = connector.getQueryRunnerFor(endpoint).batch(con, this.ackStmt, paramValuesArray);
                     if (nbRows[0] == 0)
                     {
                         logger.warn(".ack statement did not update any rows");
@@ -143,12 +143,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                 }
                 else
                 {
-                    Object[] paramValues = connector.getParams(endpoint, this.ackParams, muleMessage, this.endpoint.getEndpointURI().getAddress());
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(paramValues));
-                    }
-                    int nbRows = connector.getQueryRunnerFor(endpoint).update(con, this.ackStmt, paramValues);
+                    int nbRows = executeAckStatement(con, muleMessage);
                     if (nbRows == 0)
                     {
                         logger.warn(".ack statement did not update any rows");
@@ -188,23 +183,85 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         }
     }
 
-    @Override
-    public List<MuleMessage> getMessages() throws Exception
+    protected boolean hasAckStatement()
+    {
+        return this.ackStmt != null;
+    }
+
+    /**
+     * Creates a mule message per each data record.
+     *
+     * @param records data records used to created the payload of the new messages.
+     * @return the created messages
+     */
+    protected List<MuleMessage> createMuleMessages(List<Object> records)
+    {
+        List<MuleMessage> messages = new LinkedList<MuleMessage>();
+        for (Object record : records)
+        {
+            messages.add(new DefaultMuleMessage(record, connector.getMuleContext()));
+        }
+
+        return messages;
+    }
+
+    /**
+     * Executes the acknowledge SQL statement for a given message.
+     *
+     * @param con         database connection to execute the statement
+     * @param muleMessage message to been acknowledge
+     * @return the number of updated rows by the SQL statement
+     * @throws Exception
+     */
+    protected int executeAckStatement(Connection con, MuleMessage muleMessage)
+            throws Exception
+    {
+        Object[] paramValues = connector.getParams(endpoint, this.ackParams, muleMessage, this.endpoint.getEndpointURI().getAddress());
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(paramValues));
+        }
+        int nbRows = connector.getQueryRunnerFor(endpoint).update(con, this.ackStmt, paramValues);
+        return nbRows;
+    }
+
+    /**
+     * Executes the acknowledge SQL statement for a list of messages.
+     *
+     * @param con      database connection to execute the statement
+     * @param messages messages to be acknowledge
+     * @return the number of updated rows by each batched execution
+     * @throws Exception
+     */
+    protected int[] executeBatchAckStatement(Connection con, List<MuleMessage> messages)
+            throws Exception
+    {
+        Object[][] paramValuesArray = new Object[messages.size()][];
+
+        for (int i = 0; i < messages.size(); i++)
+        {
+            MuleMessage message = messages.get(i);
+            paramValuesArray[i] = connector.getParams(endpoint, this.ackParams, message, this.endpoint.getEndpointURI().getAddress());
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("SQL UPDATE: " + ackStmt + ", params = " + ArrayUtils.toString(ackParams));
+        }
+
+        int[] nbRows = connector.getQueryRunnerFor(endpoint).batch(con, this.ackStmt, paramValuesArray);
+
+        return nbRows;
+    }
+
+    public List getMessages() throws Exception
     {
         Connection con = null;
         try
         {
             con = this.connector.getConnection();
 
-            Object[] readParams = connector.getParams(endpoint, this.readParams, null, this.endpoint.getEndpointURI().getAddress());
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("SQL QUERY: " + readStmt + ", params = " + ArrayUtils.toString(readParams));
-            }
-            Object results = connector.getQueryRunnerFor(endpoint).query(con, this.readStmt, readParams,
-                    connector.getResultSetHandler());
-
-            List resultList = (List) results;
+            List resultList = executeReadStatement(con);
             if (resultList != null && resultList.size() > 1 && isReceiveMessagesInTransaction() && !receiveMessagesInXaTransaction)
             {
                 aggregateResult = true;
@@ -225,4 +282,23 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         }
     }
 
+    /**
+     * Executes the read SQL statement to get data from the database.
+     *
+     * @param con database connection to execute the statement
+     * @return the list of read records
+     * @throws Exception
+     */
+    protected List executeReadStatement(Connection con) throws Exception
+    {
+        Object[] readParams = connector.getParams(endpoint, this.readParams, null, this.endpoint.getEndpointURI().getAddress());
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("SQL QUERY: " + readStmt + ", params = " + ArrayUtils.toString(readParams));
+        }
+        Object results = connector.getQueryRunnerFor(endpoint).query(con, this.readStmt, readParams,
+                connector.getResultSetHandler());
+
+        return (List) results;
+    }
 }
