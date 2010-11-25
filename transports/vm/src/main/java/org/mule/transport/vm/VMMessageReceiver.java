@@ -223,7 +223,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         }
 
         @Override
-        public void run()
+        protected void poll() throws Exception
         {
             /*
              * We simply run our own polling loop all the time as long as the receiver is started. The
@@ -232,7 +232,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
              */
             while (this.getReceiver().isConnected())
             {
-                super.run();
+                super.poll();
             }
         }
     }
