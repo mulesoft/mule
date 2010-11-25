@@ -18,7 +18,6 @@ import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Level;
@@ -35,7 +34,7 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
 
     protected transient Log logger;
 
-    protected String expression;
+    protected String message;
     protected String category;
     protected String level = "DEBUG";
 
@@ -71,14 +70,7 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
         }
         else
         {
-            if (StringUtils.isEmpty(expression))
-            {
-                logWithLevel(event.getMessage(), level);
-            }
-            else
-            {
-                logWithLevel(expressionManager.evaluate(expression, event.getMessage()), level);
-            }
+            logWithLevel(expressionManager.parse(message, event.getMessage()), level);
         }
     }
 
@@ -120,9 +112,9 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
         this.muleContext = muleContext;
     }
 
-    public void setExpression(String expression)
+    public void setMessage(String message)
     {
-        this.expression = expression;
+        this.message = message;
     }
 
     public void setCategory(String category)

@@ -512,11 +512,11 @@
     <xsd:complexType name="loggerType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
-                <xsd:attribute name="expression" type="xsd:string" use="optional">
+                <xsd:attribute name="message" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Evaulator expression used to extract value from the current message to be logged.  If an expression is 
-                            not specified then the current message will be used.
+                            Message that will be logged.  Embedded expressions can be used to extract value from the current message.  If no message is 
+                            specified then the current message is used.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

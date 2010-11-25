@@ -308,7 +308,7 @@
 
     <flow name="loggerHeader">
         <vm:inbound-endpoint path="loggerheader-in" exchange-pattern="request-response"/>
-        <logger expression="#[header:INBOUND:toLog]" level="ERROR" category="mycategory"/>
+        <logger message="Ths is my header value: #[header:INBOUND:toLog]" level="ERROR" category="mycategory"/>
     </flow>
 
 
