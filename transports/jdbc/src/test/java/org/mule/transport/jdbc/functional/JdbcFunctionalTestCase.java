@@ -37,13 +37,13 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
     public void testDirectSql() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.request("jdbc://?sql=SELECT * FROM TEST", 1000);
+        MuleMessage message = client.request("jdbc://SELECT * FROM TEST", 1000);
         assertResultSetEmpty(message);
         
         QueryRunner qr = jdbcConnector.getQueryRunner();
         int updated = qr.update(jdbcConnector.getConnection(), "INSERT INTO TEST(TYPE, DATA) VALUES (1, '" + DEFAULT_MESSAGE + "')");
         assertEquals(1, updated);
-        message = client.request("jdbc://?sql=SELECT * FROM TEST", 1000);
+        message = client.request("jdbc://SELECT * FROM TEST", 1000);
         assertResultSetNotEmpty(message);
     }
 

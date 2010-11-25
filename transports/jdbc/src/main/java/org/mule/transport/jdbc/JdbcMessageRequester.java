@@ -61,7 +61,8 @@ public class JdbcMessageRequester extends AbstractMessageRequester
      */
     protected MuleMessage doRequest(long timeout, MuleEvent event) throws Exception
     {
-        SqlStatementStrategy strategy = connector.getSqlStatementStrategyFactory().create("select", null);
+        String statement = connector.getStatement(endpoint);
+        SqlStatementStrategy strategy = connector.getSqlStatementStrategyFactory().create(statement, null);
         return strategy.executeStatement(connector, endpoint, event, timeout);        
     }
 
