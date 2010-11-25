@@ -22,20 +22,22 @@ import org.mule.endpoint.URIBuilder;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.transport.jdbc.JdbcTransactionFactory;
 
-/** Registers Bean Definition Parsers for the "jdbc" namespace. */
+/**
+ * Registers Bean Definition Parsers for the "jdbc" namespace.
+ */
 public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
 {
 
     public static final String QUERY_KEY = "queryKey";
     public static final String[] ADDRESS_ATTRIBUTES = new String[]{QUERY_KEY};
-    public static final String ATTRIBUTE_SQL_STATEMENT_FACTORY = "sqlStatementStrategyFactory";
+    public static final String SQL_STATEMENT_FACTORY_PROPERTY = "sqlStatementStrategyFactory";
 
     public void init()
     {
         registerStandardTransportEndpoints(JdbcConnector.JDBC, ADDRESS_ATTRIBUTES).addAlias(QUERY_KEY, URIBuilder.PATH);
         registerConnectorDefinitionParser(JdbcConnector.class);
         registerBeanDefinitionParser("dataSource", new ObjectFactoryWrapper("dataSourceFactory"));
-        registerBeanDefinitionParser(ATTRIBUTE_SQL_STATEMENT_FACTORY, new ClassOrRefDefinitionParser(ATTRIBUTE_SQL_STATEMENT_FACTORY));
+        registerBeanDefinitionParser(SQL_STATEMENT_FACTORY_PROPERTY, new ClassOrRefDefinitionParser(SQL_STATEMENT_FACTORY_PROPERTY));
         MuleDefinitionParser connectorQuery = new ChildSingletonMapDefinitionParser("query");
         MuleDefinitionParser endpointQuery = new NestedMapDefinitionParser("properties", "queries");
         endpointQuery.addCollection("properties");
@@ -43,5 +45,4 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("extractors", new ParentDefinitionParser());
         registerBeanDefinitionParser("transaction", new TransactionDefinitionParser(JdbcTransactionFactory.class));
     }
-
 }
