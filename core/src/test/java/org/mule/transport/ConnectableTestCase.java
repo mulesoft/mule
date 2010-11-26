@@ -12,6 +12,7 @@ package org.mule.transport;
 
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.Connectable;
 import org.mule.tck.AbstractMuleTestCase;
 
 public class ConnectableTestCase extends AbstractMuleTestCase
@@ -22,11 +23,11 @@ public class ConnectableTestCase extends AbstractMuleTestCase
      */
     public void testDoNotConnectIfConnected() throws Exception
     {
-        AbstractConnectable connectable = new TestConnectable(getTestInboundEndpoint("test"), true);
+        Connectable connectable = new TestConnectable(getTestInboundEndpoint("test"), true);
         connectable.connect();
     }
 
-    class TestConnectable extends AbstractConnectable
+    class TestConnectable extends AbstractTransportMessageHandler
     {
         public TestConnectable(ImmutableEndpoint endpoint, boolean connected)
         {

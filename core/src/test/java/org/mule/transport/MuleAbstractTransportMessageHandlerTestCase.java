@@ -17,7 +17,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.transport.MuleAbstractConnectableTestCase.MethodInvocation.MethodPart;
+import org.mule.transport.MuleAbstractTransportMessageHandlerTestCase.MethodInvocation.MethodPart;
 
 import java.util.List;
 import java.util.Vector;
@@ -43,22 +43,22 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * This test tests class {@link AbstractConnectable} but its name starts with "Mule"
+ * This test tests class {@link AbstractTransportMessageHandler} but its name starts with "Mule"
  * because there is an exclusion rule in parent pom for test classes that have their
  * names starting with "Abstract".
  */
-public class MuleAbstractConnectableTestCase
+public class MuleAbstractTransportMessageHandlerTestCase
 {
     /**
      * The logger used for this class
      */
-    static Log log = LogFactory.getLog(MuleAbstractConnectableTestCase.class);
+    static Log log = LogFactory.getLog(MuleAbstractTransportMessageHandlerTestCase.class);
 
     @Test
     public void testStartRethrowsMuleExceptionCorrectly() throws Exception
     {
         final MuleException someMuleException = mock(MuleException.class);
-        AbstractConnectable connectable = new AbstractConnectable(createDummyEndpoint())
+        AbstractTransportMessageHandler connectable = new AbstractTransportMessageHandler(createDummyEndpoint())
         {
             @Override
             protected void doStart() throws MuleException
@@ -93,8 +93,8 @@ public class MuleAbstractConnectableTestCase
 
     /**
      * This test tests that start method is thread safe and that
-     * {@link AbstractConnectable#doStart()} is always called making sure that the
-     * connectable is {@link AbstractConnectable#isConnected() connected}.
+     * {@link AbstractTransportMessageHandler#doStart()} is always called making sure that the
+     * connectable is {@link AbstractTransportMessageHandler#isConnected() connected}.
      * <p>
      * To make multithreaded test easier it uses a library called <a
      * href="http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html"
@@ -112,7 +112,7 @@ public class MuleAbstractConnectableTestCase
 
     /**
      * This inner class will do the work of
-     * {@link MuleAbstractConnectableTestCase#testStartIsThreadSafe()
+     * {@link MuleAbstractTransportMessageHandlerTestCase#testStartIsThreadSafe()
      * testStartIsThreadSafe()}.
      */
     @Ignore
@@ -184,7 +184,7 @@ public class MuleAbstractConnectableTestCase
         }
 
         /**
-         * This is a specific implementation of {@link AbstractConnectable} for this
+         * This is a specific implementation of {@link AbstractTransportMessageHandler} for this
          * test that will only implement {@link #doConnect()} and {@link #doStart()}
          * methods.
          * <p>
@@ -195,7 +195,7 @@ public class MuleAbstractConnectableTestCase
          * finished.
          */
         @Ignore
-        class AbstractConnectableForTest extends AbstractConnectable
+        class AbstractConnectableForTest extends AbstractTransportMessageHandler
         {
             private final AtomicBoolean doConnectCalled = new AtomicBoolean();
             private final AtomicBoolean doStartCalled = new AtomicBoolean();

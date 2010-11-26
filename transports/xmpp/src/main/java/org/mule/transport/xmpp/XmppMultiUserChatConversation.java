@@ -11,6 +11,7 @@
 package org.mule.transport.xmpp;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transport.Connector;
 import org.mule.transport.ConnectException;
 import org.mule.util.UUID;
 
@@ -26,10 +27,12 @@ public class XmppMultiUserChatConversation extends AbstractXmppConversation
 {
     private MultiUserChat chat;
     private String nickname;
+    private final Connector connector;
     
     public XmppMultiUserChatConversation(ImmutableEndpoint endpoint)
     {
         super(endpoint);
+        connector = endpoint.getConnector();
         
         Object nickValue = endpoint.getProperty(XmppConnector.XMPP_NICKNAME);
         if (nickValue != null)
@@ -63,7 +66,7 @@ public class XmppMultiUserChatConversation extends AbstractXmppConversation
             }
             else
             {
-                throw new ConnectException(e, this);
+                throw new ConnectException(e, connector);
             }
         }
     }
@@ -106,7 +109,7 @@ public class XmppMultiUserChatConversation extends AbstractXmppConversation
         }
         catch (XMPPException e)
         {
-            throw new ConnectException(e, this);
+            throw new ConnectException(e, connector);
         }
     }
 

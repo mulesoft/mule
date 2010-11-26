@@ -60,7 +60,6 @@ import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.processor.OptionalAsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.session.SerializeAndEncodeSessionHandler;
 import org.mule.transformer.TransformerUtils;
@@ -77,11 +76,9 @@ import org.mule.util.concurrent.NamedThreadFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -821,69 +818,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     public void handleException(Exception exception)
     {
-        handleException(exception, null);
-    }
-
-    protected void handleException(Exception exception, Connectable failed)
-    {
-        // unwrap any exception caused by using reflection apis, but only the top
-        // layer
-        if (exception instanceof InvocationTargetException)
-        {
-            Throwable target = exception.getCause();
-            // just because API accepts Exception, not Throwable :\
-            exception = target instanceof Exception ? (Exception) target : new Exception(target);
-        }
-
-        if (isConnected() && exception instanceof ConnectException
-                && !(retryPolicyTemplate instanceof NoRetryPolicyTemplate))
-        {
-            logger.info("Exception caught is a ConnectException, attempting to reconnect...");
-            try
-            {
-                try
-                {
-                    disconnect();
-                }
-                catch (Exception de)
-                {
-                    logger.error(de);
-                }
-
-                // Log or otherwise handle exception
-                muleContext.getExceptionListener().handleException(exception);
-
-                // Store some info. about the receiver/dispatcher which threw the
-                // ConnectException so
-                // that we can make sure that problem has been resolved when we go to
-                // reconnect.
-                Map<Object, Object> info = new HashMap<Object, Object>();
-                if (failed instanceof MessageReceiver)
-                {
-                    info.put(RetryContext.FAILED_RECEIVER, ((MessageReceiver) failed).getReceiverKey());
-                }
-                else if (failed instanceof MessageDispatcher)
-                {
-                    info.put(RetryContext.FAILED_DISPATCHER, ((MessageDispatcher) failed).getEndpoint());
-                }
-                else if (failed instanceof MessageRequester)
-                {
-                    info.put(RetryContext.FAILED_REQUESTER, ((MessageRequester) failed).getEndpoint());
-                }
-                retryPolicyTemplate.setMetaInfo(info);
-
-                // Reconnect (retry policy will go into effect here if configured)
-                connect();
-            }
-            catch (Exception e)
-            {
-                muleContext.getExceptionListener().handleException(exception);
-            }
-        }
-        else
-        {
-            muleContext.getExceptionListener().handleException(exception);
-        }
+        muleContext.getExceptionListener().handleException(exception);
     }
 
     public void exceptionThrown(Exception e)
@@ -1600,66 +1535,18 @@ public abstract class AbstractConnector implements Connector, WorkListener
         {
             public void doWork(RetryContext context) throws Exception
             {
-                if (validateConnections && !validateConnection(context).isOk())
+                // Try validateConnection() rather than connect() which may be a less expensive operation while we're retrying.
+                if (validateConnections && context.getLastFailure() instanceof ConnectException)
                 {
-                    throw new ConnectException(
-                            MessageFactory.createStaticMessage("Unable to connect to resource"),
-                            context.getLastFailure(), null);
-                }
-                doConnect();
-
-                // Make sure the receiver or dispatcher which triggered the
-                // reconnection is now able to
-                // connect successfully. This info. was previously stored by the
-                // handleException() method, above.
-                Map<Object, Object> info = context.getMetaInfo();
-                if (info.get(RetryContext.FAILED_RECEIVER) != null)
-                {
-                    String receiverKey = (String) info.get(RetryContext.FAILED_RECEIVER);
-                    MessageReceiver receiver = receivers.get(receiverKey);
-                    if (validateConnections && !receiver.validateConnection(context).isOk())
+                    Connectable failed = ((ConnectException) context.getLastFailure()).getFailed();                    
+                    if (!failed.validateConnection(context).isOk())
                     {
                         throw new ConnectException(
-                                MessageFactory.createStaticMessage("Unable to connect receiver to resource"),
-                                context.getLastFailure(), receiver);
+                                MessageFactory.createStaticMessage("Still unable to connect to resource " + failed.getClass().getName()),
+                                context.getLastFailure(), failed);
                     }
                 }
-                else if (info.get(RetryContext.FAILED_DISPATCHER) != null)
-                {
-                    OutboundEndpoint endpoint = (OutboundEndpoint) info.get(RetryContext.FAILED_DISPATCHER);
-                    MessageDispatcher dispatcher = (MessageDispatcher) dispatchers.borrowObject(endpoint);
-                    try
-                    {
-                        if (validateConnections && !dispatcher.validateConnection(context).isOk())
-                        {
-                            throw new ConnectException(
-                                    MessageFactory.createStaticMessage("Unable to connect dispatcher to resource"),
-                                    context.getLastFailure(), null);
-                        }
-                    }
-                    finally
-                    {
-                        dispatchers.returnObject(endpoint, dispatcher);
-                    }
-                }
-                else if (info.get(RetryContext.FAILED_REQUESTER) != null)
-                {
-                    InboundEndpoint endpoint = (InboundEndpoint) info.get(RetryContext.FAILED_REQUESTER);
-                    MessageRequester requester = (MessageRequester) requesters.borrowObject(endpoint);
-                    try
-                    {
-                        if (validateConnections && !requester.validateConnection(context).isOk())
-                        {
-                            throw new ConnectException(
-                                    MessageFactory.createStaticMessage("Unable to connect requester to resource"),
-                                    context.getLastFailure(), null);
-                        }
-                    }
-                    finally
-                    {
-                        requesters.returnObject(endpoint, requester);
-                    }
-                }
+                doConnect();
                 setConnected(true);
 
                 logger.info("Connected: " + getWorkDescription());

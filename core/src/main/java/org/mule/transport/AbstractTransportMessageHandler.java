@@ -42,7 +42,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Provide a default dispatch (client) support for handling threads lifecycle and validation.
  */
-public abstract class AbstractConnectable<O> implements Connectable, LifecycleStateEnabled
+public abstract class AbstractTransportMessageHandler<O> implements Connectable, LifecycleStateEnabled
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -63,7 +63,7 @@ public abstract class AbstractConnectable<O> implements Connectable, LifecycleSt
 
     protected ConnectableLifecycleManager<O> lifecycleManager;
 
-    public AbstractConnectable(ImmutableEndpoint endpoint)
+    public AbstractTransportMessageHandler(ImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
         this.connector = (AbstractConnector) endpoint.getConnector();
@@ -353,7 +353,7 @@ public abstract class AbstractConnectable<O> implements Connectable, LifecycleSt
             }
             catch (InterruptedException e)
             {
-                throw new StartException(CoreMessages.failedToStart("Connectable: " + this), e, AbstractConnectable.this);
+                throw new StartException(CoreMessages.failedToStart("Connectable: " + this), e, this);
             }
         }
         else
@@ -367,18 +367,6 @@ public abstract class AbstractConnectable<O> implements Connectable, LifecycleSt
                         doStart();
                     }
                 });
-//                retryTemplate.execute(new RetryCallback()
-//                {
-//                    public void doWork(RetryContext context) throws InterruptedException, MuleException
-//                    {
-//                        callDoStartWhenItIsConnected();
-//                    }
-//
-//                    public String getWorkDescription()
-//                    {
-//                        return "starting " + getConnectionDescription();
-//                    }
-//                }, getWorkManager());
             }
             catch (MuleException e)
             {
@@ -386,7 +374,7 @@ public abstract class AbstractConnectable<O> implements Connectable, LifecycleSt
             }
             catch (Exception e)
             {
-                throw new StartException(CoreMessages.failedToStart("Connectable: " + this), e, AbstractConnectable.this);
+                throw new StartException(CoreMessages.failedToStart("Connectable: " + this), e, this);
             }
         }
     }

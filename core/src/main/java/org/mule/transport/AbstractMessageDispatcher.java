@@ -30,7 +30,7 @@ import java.util.List;
  * send messages over over a specific transport. Different implementations may
  * support different Message Exchange Patterns.
  */
-public abstract class AbstractMessageDispatcher extends AbstractConnectable implements MessageDispatcher
+public abstract class AbstractMessageDispatcher extends AbstractTransportMessageHandler implements MessageDispatcher
 {
 
     protected List<Transformer> defaultOutboundTransformers;

@@ -49,7 +49,7 @@ import org.apache.commons.lang.SerializationException;
  * Receivers provided with Mule. A message receiver enables an endpoint to receive a
  * message from an external system.
  */
-public abstract class AbstractMessageReceiver extends AbstractConnectable implements MessageReceiver
+public abstract class AbstractMessageReceiver extends AbstractTransportMessageHandler implements MessageReceiver
 {
     /**
      * The Service with which this receiver is associated with

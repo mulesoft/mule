@@ -28,7 +28,7 @@ import java.util.List;
  * This is often used programatically but will not be used for inbound endpoints
  * configured on services.
  */
-public abstract class AbstractMessageRequester extends AbstractConnectable implements MessageRequester
+public abstract class AbstractMessageRequester extends AbstractTransportMessageHandler implements MessageRequester
 {
     private List<Transformer> defaultInboundTransformers;
 
