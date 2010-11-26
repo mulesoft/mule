@@ -1,5 +1,5 @@
 <!--
- $Id: about.xsl 8077 2007-08-27 20:15:25Z aperepel $
+ $Id$
  
  Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  
