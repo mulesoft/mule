@@ -22,6 +22,7 @@ public class RestServiceWrapperFunctionalTestCase extends DynamicPortTestCase
 {
     protected static String TEST_REQUEST = "Test Http Request";
 
+    @Override
     protected String getConfigResources()
     {
         return "http-rest-service-wrapper-functional-test.xml";
@@ -63,13 +64,22 @@ public class RestServiceWrapperFunctionalTestCase extends DynamicPortTestCase
     public void testRequiredParametersMissing() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
 
         MuleMessage result = client.send("restServiceEndpoint3", null, props);
         assertEquals(NullPayload.getInstance(),result.getPayload());
         assertNotNull(result.getExceptionPayload());
     }
 
+    public void testRestServiceComponentInFlow() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        
+        MuleMessage result = client.send("vm://toFlow", TEST_REQUEST, null);
+        assertNotNull(result);
+        assertEquals("echo=Test Http Request", result.getPayloadAsString());
+    }
+    
     @Override
     protected int getNumPortsToFind()
     {
