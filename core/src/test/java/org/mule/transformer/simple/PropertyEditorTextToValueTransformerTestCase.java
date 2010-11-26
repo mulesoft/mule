@@ -13,6 +13,8 @@ package org.mule.transformer.simple;
 import org.mule.api.transformer.Transformer;
 import org.mule.transformer.AbstractTransformerTestCase;
 
+import java.beans.PropertyEditor;
+
 public class PropertyEditorTextToValueTransformerTestCase extends AbstractTransformerTestCase
 {
 
@@ -25,7 +27,7 @@ public class PropertyEditorTextToValueTransformerTestCase extends AbstractTransf
     @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
-        return new PropertyEditorValueToTextTransformer(new sun.beans.editors.BoolEditor(), Boolean.class);
+        return new PropertyEditorValueToTextTransformer((PropertyEditor) Class.forName("sun.beans.editors.BoolEditor").newInstance(), Boolean.class);
     }
 
     @Override
@@ -37,7 +39,7 @@ public class PropertyEditorTextToValueTransformerTestCase extends AbstractTransf
     @Override
     public Transformer getTransformer() throws Exception
     {
-        return new PropertyEditorTextToValueTransformer(new sun.beans.editors.BoolEditor(), Boolean.class);
+        return new PropertyEditorTextToValueTransformer((PropertyEditor) Class.forName("sun.beans.editors.BoolEditor").newInstance(), Boolean.class);
     }
 
 }
