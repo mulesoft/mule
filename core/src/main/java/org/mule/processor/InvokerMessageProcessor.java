@@ -114,20 +114,26 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
         {
             for (int i = 0; i < args.length; i++)
             {
-                Object arg = expressionManager.evaluate(expressions[i], event.getMessage());
-                // If expression evaluates to a MuleMessage then use it's payload
-                if (arg instanceof MuleMessage)
+                Object arg = null;
+                if (expressions[i] != null)
                 {
-                    arg = ((MuleMessage) arg).getPayload();
-                }
-                if (!(argumentTypes[i].isAssignableFrom(arg.getClass())))
-                {
-                    DataType<?> source = DataTypeFactory.create(arg.getClass());
-                    DataType<?> target = DataTypeFactory.create(argumentTypes[i]);
-                    // Throws TransformerException if no suitable transformer is
-                    // found
-                    Transformer t = event.getMuleContext().getRegistry().lookupTransformer(source, target);
-                    arg = t.transform(arg);
+                    arg = expressionManager.evaluate(expressions[i], event.getMessage());
+                    // If expression evaluates to a MuleMessage then use it's payload
+                    if (arg instanceof MuleMessage)
+                    {
+                        arg = ((MuleMessage) arg).getPayload();
+                    }
+                    if (!(argumentTypes[i].isAssignableFrom(arg.getClass())))
+                    {
+                        DataType<?> source = DataTypeFactory.create(arg.getClass());
+                        DataType<?> target = DataTypeFactory.create(argumentTypes[i]);
+                        // Throws TransformerException if no suitable transformer is
+                        // found
+                        Transformer t = event.getMuleContext()
+                            .getRegistry()
+                            .lookupTransformer(source, target);
+                        arg = t.transform(arg);
+                    }
                 }
                 args[i] = arg;
             }
