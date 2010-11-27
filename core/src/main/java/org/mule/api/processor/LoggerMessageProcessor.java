@@ -17,6 +17,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,7 +71,14 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
         }
         else
         {
-            logWithLevel(expressionManager.parse(message, event.getMessage()), level);
+            if (StringUtils.isEmpty(message))
+            {
+                logWithLevel(event.getMessage(), level);
+            }
+            else
+            {
+                logWithLevel(expressionManager.parse(message, event.getMessage()), level);
+            }
         }
     }
 
