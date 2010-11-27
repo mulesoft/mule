@@ -10,6 +10,9 @@
 
 package org.mule.module.json;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -17,11 +20,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * A wrapper for the {@link org.codehaus.jackson.JsonNode} object that
@@ -126,16 +125,6 @@ public class JsonData implements Serializable
         if (o.isValueNode())
         {
             return o.getValueAsText();
-        }
-        else if (o.isArray())
-        {
-            List<String> parts = new ArrayList<String>();
-            for (Iterator<JsonNode> i = o.getElements(); i.hasNext();)
-            {
-                JsonNode arrayNode = i.next();
-                parts.add(arrayNode.toString());
-            }
-            return parts;
         }
         else
         {
