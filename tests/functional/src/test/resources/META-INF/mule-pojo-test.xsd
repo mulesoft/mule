@@ -25,7 +25,7 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="mule:abstractMessageProcessorType">
-                    <xsd:attribute name="object" type="xsd:string" />
+                    <xsd:attribute name="object-ref" type="xsd:string" />
                     <xsd:attribute name="arg1" type="xsd:string" />
                 </xsd:extension>
             </xsd:complexContent>
@@ -36,7 +36,7 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="mule:abstractMessageProcessorType">
-                    <xsd:attribute name="object" type="xsd:string" />
+                    <xsd:attribute name="object-ref" type="xsd:string" />
                     <xsd:attribute name="arg1" type="xsd:string" use="required"/>
                     <xsd:attribute name="arg2" type="xsd:string" />
                 </xsd:extension>
