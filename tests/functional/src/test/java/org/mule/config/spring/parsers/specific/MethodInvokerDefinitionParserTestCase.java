@@ -21,10 +21,10 @@ public class MethodInvokerDefinitionParserTestCase extends FunctionalTestCase
         SimpleFlowConstruct flow = muleContext.getRegistry().lookupObject("pojoFlow");
         SimpleFlowConstruct flow2 = muleContext.getRegistry().lookupObject("pojoFlow2");
 
-        assertEquals("start method2Arg1config1Val arg2Valmethod2Arg1Arg2config2Val ", flow.process(
+        assertEquals("start nullmethod2Arg1Arg2config2Val arg2Valmethod2Arg1Arg2config2Val ", flow.process(
             getTestEvent("start ")).getMessageAsString());
 
-        assertEquals("start method2Arg1config1Val arg2Valmethod2Arg1Arg2null ", flow2.process(
+        assertEquals("start nullmethod2Arg1Arg2null arg2Valmethod2Arg1Arg2null ", flow2.process(
             getTestEvent("start ")).getMessageAsString());
 
     }
