@@ -17,6 +17,8 @@ import org.mule.routing.filters.ExpressionFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 
+import java.util.List;
+
 public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
     public void testExpressions() throws Exception
@@ -29,7 +31,24 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
         assertEquals("Mule Test", eval.evaluate("[0]/user/name", message));
         assertEquals("Mule Test9", eval.evaluate("[9]/'user'/name", message));
+        assertTrue(eval.evaluate("", message) instanceof List);
         assertNull(eval.evaluate("[9]/user/XXX", message));
+    }
+    
+    public void testArrays() throws Exception
+    {
+        String json = IOUtils.getResourceAsString("test-data2.json", getClass());
+        MuleMessage message = new DefaultMuleMessage(json, muleContext);
+        JsonExpressionEvaluator eval = new JsonExpressionEvaluator();
+
+        assertTrue(eval.evaluate("results", message) instanceof List);
+        assertEquals(3,((List)eval.evaluate("results", message)).size());
+
+        assertNull(eval.evaluate("results/text", message));
+
+        assertTrue(eval.evaluate("results[0]/values", message) instanceof List);
+        assertEquals(2,((List)eval.evaluate("results[0]/values", message)).size());
+        
     }
 
     public void testExpressionsUsingManager() throws Exception
