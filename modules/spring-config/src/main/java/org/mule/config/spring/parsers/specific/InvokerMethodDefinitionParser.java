@@ -43,17 +43,24 @@ public class InvokerMethodDefinitionParser extends ChildDefinitionParser
     @Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        builder.addPropertyReference("object", element.getAttribute("object"));
+        builder.addPropertyReference("object",
+            element.getAttribute(getTargetPropertyConfiguration().getAttributeAlias("object-ref")));
 
         List<String> expressions = new ArrayList<String>();
-        for (String parameterName : parameterNames)
+        if (parameterNames != null)
         {
-            if (!StringUtils.isEmpty(element.getAttribute(parameterName)))
+            for (String parameterName : parameterNames)
             {
-                expressions.add(element.getAttribute(parameterName));
+                if (!StringUtils.isEmpty(element.getAttribute(parameterName)))
+                {
+                    expressions.add(element.getAttribute(parameterName));
+                }
+                else
+                {
+                    expressions.add(null);
+                }
             }
         }
-
         builder.addPropertyValue("argumentExpressions", expressions.toArray(new String[expressions.size()]));
         builder.addPropertyValue("methodName", methodName);
 
