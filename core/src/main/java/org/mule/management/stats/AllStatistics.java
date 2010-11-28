@@ -88,6 +88,11 @@ public class AllStatistics
         {
             statistics.setEnabled(b);
         }
+
+        if (!b)
+        {
+            ProcessingTime.stopTimer();
+        }
     }
 
     public synchronized long getStartTime()

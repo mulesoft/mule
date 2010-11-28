@@ -36,30 +36,58 @@ public class ProcessingTime implements Serializable
     private static volatile Timer timer;
     private static ReferenceQueue<ProcessingTime> queue = new ReferenceQueue<ProcessingTime>();
     private static Map refs = new ConcurrentHashMap();
-    private AtomicLong accumulator = new AtomicLong();
 
-    public ProcessingTime(MuleSession session)
+    private AtomicLong accumulator = new AtomicLong();
+    private FlowConstructStatistics statistics;
+
+
+    /**
+     * Create a ProcessingTime for the specified MuleSession.
+     * @return ProcessingTime if the session has an enabled FlowConstructStatistics or null otherwise
+     */
+    public static ProcessingTime createProcessingTime(MuleSession session)
     {
         if (session != null)
         {
             FlowConstruct fc = session.getFlowConstruct();
-            if (fc != null && fc.getStatistics() != null && fc.getStatistics().isEnabled())
+            if (fc != null)
             {
-                if (timer == null)
+                FlowConstructStatistics stats = fc.getStatistics();
+                if (stats != null && fc.getStatistics().isEnabled())
                 {
-                    startTimer();
+                    return new ProcessingTime(stats);
                 }
-                refs.put(new Reference(this, fc.getStatistics()), refs);
             }
         }
+
+        return null;
     }
 
     /**
-     * Record the time it took one branch to complete its processing
+     * Create a Processing Time
+     * @param stats never null
      */
-    public long recordExecutionBranchTime(long time)
+    private ProcessingTime(FlowConstructStatistics stats)
     {
-        return accumulator.addAndGet(getEffectiveTime(time));
+        this.statistics = stats;
+        if (timer == null)
+        {
+            startTimer();
+        }
+        refs.put(new Reference(this), refs);
+    }
+
+    /**
+     * Add the execution time for this branch to the flow construct's statistics
+     * @param startTime  time this branch started
+     */
+    public void addFlowExecutionBranchTime(long startTime)
+    {
+        if (statistics.isEnabled())
+        {
+            long elapsedTime = getEffectiveTime(System.currentTimeMillis() - startTime);
+            statistics.addFlowExecutionBranchTime(elapsedTime, accumulator.addAndGet(elapsedTime));
+        }
     }
 
     /**
@@ -74,60 +102,55 @@ public class ProcessingTime implements Serializable
     /**
      * Start timer that processes reference queue
      */
-    public void startTimer()
+    public static synchronized void startTimer()
     {
-        synchronized (ProcessingTime.class)
+        if (timer == null)
         {
-            if (timer == null)
+            timer = new Timer("ProcessingTimeMonitor", true);
+            timer.schedule(new TimerTask()
             {
-                timer = new Timer("ProcessingTimeMonitor", true);
-                timer.schedule(new TimerTask()
+                @Override
+                public void run()
+                {
+                    try
                     {
-                        @Override
-                        public void run()
+                        Reference ref;
+                        do
                         {
-                            try
+                            ref = (Reference)queue.poll();
+                            if (ref != null)
                             {
-                                Reference ref;
-                                do
+                                refs.remove(ref);
+                                FlowConstructStatistics stats = ref.getStatistics();
+                                if (stats.isEnabled())
                                 {
-                                    ref = (Reference)queue.poll();
-                                    if (ref != null)
-                                    {
-                                        refs.remove(ref);
-                                        FlowConstructStatistics stats = ref.getStatistics();
-                                        if (stats.isEnabled())
-                                        {
-                                            stats.addCompleteFlowExecutionTime(ref.getAccumulator().longValue());
-                                        }
-                                    }
+                                    stats.addCompleteFlowExecutionTime(ref.getAccumulator().longValue());
                                 }
-                                while (ref != null);
-                            }
-                            catch (Exception ex)
-                            {
-                                // Don't let exception escape -- it kills the timer
-                                logger.error(this, ex);
                             }
                         }
-                    }, TIMER_PERIOD, TIMER_PERIOD);
-            }
+                        while (ref != null);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Don't let exception escape -- it kills the timer
+                        logger.error(this, ex);
+                    }
+                }
+            }, TIMER_PERIOD, TIMER_PERIOD);
         }
     }
 
     /**
      * Stop timer that processes reference queue
      */
-    public void stopTimer()
+    public synchronized static void stopTimer()
     {
-        synchronized (ProcessingTime.class)
+        if (timer != null)
         {
-            if (timer != null)
-            {
-                timer.cancel();
-                timer = null;
-            }
+            timer.cancel();
+            timer = null;
         }
+        refs.clear();
     }
 
     /**
@@ -138,10 +161,10 @@ public class ProcessingTime implements Serializable
         private FlowConstructStatistics statistics;
         private AtomicLong accumulator;
 
-        Reference(ProcessingTime time, FlowConstructStatistics statistics)
+        Reference(ProcessingTime time)
         {
             super(time, queue);
-            this.statistics = statistics;
+            this.statistics = time.statistics;
             this.accumulator = time.accumulator;
         }
 

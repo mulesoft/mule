@@ -130,7 +130,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.endpoint = endpoint;
         this.timeout = previousEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
-        this.processingTime = new ProcessingTime(this.session);
+        this.processingTime = ProcessingTime.createProcessingTime(this.session);
         fillProperties(previousEvent);
     }
 
@@ -146,7 +146,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.endpoint = endpoint;
         this.timeout = previousEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
-        this.processingTime = new ProcessingTime(this.session);
+        this.processingTime = ProcessingTime.createProcessingTime(this.session);
         fillProperties(previousEvent);
     }
 
@@ -186,7 +186,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.id = generateEventId();
         this.outputStream = outputStream;
         fillProperties(null);
-        this.processingTime = time != null ? time : new ProcessingTime(this.session);
+        this.processingTime = time != null ? time : ProcessingTime.createProcessingTime(this.session);
     }
     
     /**
@@ -212,7 +212,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
         else
         {
-            this.processingTime = new ProcessingTime(this.session);
+            this.processingTime = ProcessingTime.createProcessingTime(this.session);
         }
         fillProperties(rewriteEvent);
     }

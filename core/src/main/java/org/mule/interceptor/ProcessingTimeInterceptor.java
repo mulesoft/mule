@@ -48,13 +48,9 @@ public class ProcessingTimeInterceptor extends AbstractEnvelopeInterceptor
     @Override
     public MuleEvent last(MuleEvent event, ProcessingTime time, long startTime, boolean exceptionWasThrown) throws MuleException
     {
-        if (flowConstruct != null)
+        if (time != null)
         {
-            FlowConstructStatistics stats = flowConstruct.getStatistics();
-            if (stats != null && stats.isEnabled())
-            {
-                stats.addFlowExecutionBranchTime(time, System.currentTimeMillis() - startTime);
-            }
+            time.addFlowExecutionBranchTime(startTime);
         }
         return event;
     }
