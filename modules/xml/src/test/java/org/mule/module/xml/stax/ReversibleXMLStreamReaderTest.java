@@ -120,14 +120,12 @@ public class ReversibleXMLStreamReaderTest extends TestCase
         @Override
         public void assertDocumentStart(XMLStreamReader xsr) throws XMLStreamException
         {
-            assertEquals(XMLStreamConstants.SPACE, xsr.next());
             assertEquals(XMLStreamConstants.START_ELEMENT, xsr.next());
         }
 
         @Override
         public void assertDocumentEnd(XMLStreamReader xsr) throws XMLStreamException
         {
-            assertEquals(XMLStreamConstants.SPACE, xsr.next());
             assertEquals(XMLStreamConstants.END_DOCUMENT, xsr.next());
         }
     }
