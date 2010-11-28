@@ -44,10 +44,10 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     protected Method defaultMethod;
 
     protected CxfConfiguration configuration;
-    protected List<Interceptor> inInterceptors;
-    protected List<Interceptor> inFaultInterceptors;
-    protected List<Interceptor> outInterceptors;
-    protected List<Interceptor> outFaultInterceptors;
+    protected List<Interceptor<? extends Message>> inInterceptors;
+    protected List<Interceptor<? extends Message>> inFaultInterceptors;
+    protected List<Interceptor<? extends Message>> outInterceptors;
+    protected List<Interceptor<? extends Message>> outFaultInterceptors;
     protected DataBinding databinding;
     protected List<AbstractFeature> features;
     protected String wsdlLocation;
@@ -139,7 +139,7 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     }
 
     @SuppressWarnings("unchecked")
-    private void addInterceptors(List<Interceptor<? extends Message>> col, List<Interceptor> supplied)
+    private void addInterceptors(List<Interceptor<? extends Message>> col, List<Interceptor<? extends Message>> supplied)
     {
         if (supplied != null) 
         {
@@ -210,42 +210,42 @@ public abstract class AbstractOutboundMessageProcessorBuilder
         this.mtomEnabled = mtomEnabled;
     }
     
-    public List<Interceptor> getInInterceptors()
+    public List<Interceptor<? extends Message>> getInInterceptors()
     {
         return inInterceptors;
     }
 
-    public void setInInterceptors(List<Interceptor> inInterceptors)
+    public void setInInterceptors(List<Interceptor<? extends Message>> inInterceptors)
     {
         this.inInterceptors = inInterceptors;
     }
 
-    public List<Interceptor> getInFaultInterceptors()
+    public List<Interceptor<? extends Message>> getInFaultInterceptors()
     {
         return inFaultInterceptors;
     }
 
-    public void setInFaultInterceptors(List<Interceptor> inFaultInterceptors)
+    public void setInFaultInterceptors(List<Interceptor<? extends Message>> inFaultInterceptors)
     {
         this.inFaultInterceptors = inFaultInterceptors;
     }
 
-    public List<Interceptor> getOutInterceptors()
+    public List<Interceptor<? extends Message>> getOutInterceptors()
     {
         return outInterceptors;
     }
 
-    public void setOutInterceptors(List<Interceptor> outInterceptors)
+    public void setOutInterceptors(List<Interceptor<? extends Message>> outInterceptors)
     {
         this.outInterceptors = outInterceptors;
     }
 
-    public List<Interceptor> getOutFaultInterceptors()
+    public List<Interceptor<? extends Message>> getOutFaultInterceptors()
     {
         return outFaultInterceptors;
     }
 
-    public void setOutFaultInterceptors(List<Interceptor> outFaultInterceptors)
+    public void setOutFaultInterceptors(List<Interceptor<? extends Message>> outFaultInterceptors)
     {
         this.outFaultInterceptors = outFaultInterceptors;
     }

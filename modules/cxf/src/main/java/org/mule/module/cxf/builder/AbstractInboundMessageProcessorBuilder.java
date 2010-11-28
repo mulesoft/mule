@@ -65,10 +65,10 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     private String service;
     private String namespace;
     private List<AbstractFeature> features;
-    private List<Interceptor> inInterceptors = new CopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> inFaultInterceptors = new CopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> outInterceptors = new CopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> outFaultInterceptors = new CopyOnWriteArrayList<Interceptor>();
+    private List<Interceptor<? extends Message>> inInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> inFaultInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> outInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> outFaultInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
     protected MuleContext muleContext;
     private String port;
     private Map<String,Object> properties;
@@ -335,42 +335,42 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         this.features = features;
     }
 
-    public List<Interceptor> getInInterceptors()
+    public List<Interceptor<? extends Message>> getInInterceptors()
     {
         return inInterceptors;
     }
 
-    public void setInInterceptors(List<Interceptor> inInterceptors)
+    public void setInInterceptors(List<Interceptor<? extends Message>> inInterceptors)
     {
         this.inInterceptors = inInterceptors;
     }
 
-    public List<Interceptor> getInFaultInterceptors()
+    public List<Interceptor<? extends Message>> getInFaultInterceptors()
     {
         return inFaultInterceptors;
     }
 
-    public void setInFaultInterceptors(List<Interceptor> inFaultInterceptors)
+    public void setInFaultInterceptors(List<Interceptor<? extends Message>> inFaultInterceptors)
     {
         this.inFaultInterceptors = inFaultInterceptors;
     }
 
-    public List<Interceptor> getOutInterceptors()
+    public List<Interceptor<? extends Message>> getOutInterceptors()
     {
         return outInterceptors;
     }
 
-    public void setOutInterceptors(List<Interceptor> outInterceptors)
+    public void setOutInterceptors(List<Interceptor<? extends Message>> outInterceptors)
     {
         this.outInterceptors = outInterceptors;
     }
 
-    public List<Interceptor> getOutFaultInterceptors()
+    public List<Interceptor<? extends Message>> getOutFaultInterceptors()
     {
         return outFaultInterceptors;
     }
 
-    public void setOutFaultInterceptors(List<Interceptor> outFaultInterceptors)
+    public void setOutFaultInterceptors(List<Interceptor<? extends Message>> outFaultInterceptors)
     {
         this.outFaultInterceptors = outFaultInterceptors;
     }
