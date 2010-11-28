@@ -38,7 +38,7 @@ public class EventTest extends FunctionalTestCase
     {
         repository = (Repository) muleContext.getRegistry().lookupObject("jcrRepository");
 
-        Thread.sleep(2000);
+        Thread.sleep(5000);
 
         AbderaClient client = new AbderaClient();
         ClientResponse res = client.get("http://localhost:9002/events");
