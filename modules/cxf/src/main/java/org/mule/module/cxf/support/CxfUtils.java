@@ -29,7 +29,7 @@ public final class CxfUtils
 {
 
     @SuppressWarnings("unchecked")
-    public static void removeInterceptor(List<Interceptor> inInterceptors, String name) {
+    public static void removeInterceptor(List<Interceptor<? extends Message>> inInterceptors, String name) {
 
         for (Interceptor<?> i : inInterceptors) {
             if (i instanceof PhaseInterceptor) {

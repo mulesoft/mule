@@ -29,3 +29,5 @@ org.mule.module.cxf.payload.TreatNullPayloadAsVoidTestCase
 org.mule.module.cxf.DatabindingTestCase
 org.mule.module.cxf.wsa.WSATest
 org.mule.module.cxf.ClientSimpleFrontendTestCase
+
+org.mule.module.cxf.StaxFeatureTestCase

@@ -65,7 +65,7 @@ public class ServletTestCase extends FunctionalTestCase
                         "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " +
                         "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
                         "<soap:Body>" +
-                        "<ns1:echo xmlns:ns1=\"http://testmodels.cxf.transport.mule.org/\">" +
+                        "<ns1:echo xmlns:ns1=\"http://testmodels.cxf.module.mule.org/\">" +
                         "<text>Test String</text>" +
                         "</ns1:echo>" +
                         "</soap:Body>" +

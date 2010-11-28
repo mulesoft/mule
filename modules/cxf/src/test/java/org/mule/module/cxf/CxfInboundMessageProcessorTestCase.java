@@ -24,8 +24,8 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleTestCase
 {
     String msg = 
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
-            "<ns1:echo xmlns:ns1=\"http://testmodels.cxf.transport.mule.org/\">" +
-                "<ns1:text>echo</ns1:text>" +
+            "<ns1:echo xmlns:ns1=\"http://testmodels.cxf.module.mule.org/\">" +
+                "<text>echo</text>" +
             "</ns1:echo>" +
         "</soap:Body></soap:Envelope>";
 
@@ -41,7 +41,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleTestCase
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 payload = event.getMessage().getPayload();
-                assertTrue(payload instanceof Object[]);
+                assertEquals("echo", payload);
                 event.getMessage().setPayload("echo");
                 gotEvent = true;
                 return event;
@@ -70,7 +70,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleTestCase
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 payload = event.getMessage().getPayload();
-                assertTrue(payload instanceof Object[]);
+                assertEquals("echo", payload);
                 event.getMessage().setPayload("echo");
                 gotEvent = true;
                 return null;

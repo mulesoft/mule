@@ -157,13 +157,15 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
         Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
         props.put("holder", responseHolder);
+        props.put(org.apache.cxf.message.Message.ENDPOINT_ADDRESS, event.getEndpoint().getEndpointURI().toString());
+        
         // Set custom soap action if set on the event or endpoint
         String soapAction = event.getMessage().getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
         if (soapAction != null)
         {
             soapAction = parseSoapAction(soapAction, new QName(method.getName()), event);
             props.put(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION, soapAction);
-        }
+        }   
 
         clientProxy.getRequestContext().putAll(props);
 

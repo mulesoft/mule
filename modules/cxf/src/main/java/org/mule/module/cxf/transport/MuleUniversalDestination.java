@@ -15,7 +15,6 @@ import org.mule.module.cxf.support.DelegatingOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.util.logging.Logger;
 
 import org.apache.cxf.message.Message;
@@ -23,7 +22,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 public class MuleUniversalDestination extends AbstractDestination
@@ -59,25 +57,6 @@ public class MuleUniversalDestination extends AbstractDestination
         transport.remove(this);
 
         super.shutdown();
-    }
-
-    @Override
-    protected boolean markPartialResponse(Message partialResponse, EndpointReferenceType decoupledTarget)
-    {
-        // setup the outbound message to for 202 Accepted
-        partialResponse.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_ACCEPTED);
-        partialResponse.getExchange().put(EndpointReferenceType.class, decoupledTarget);
-        return true;
-    }
-
-    /**
-     * @return the associated conduit initiator, or null if decoupled mode not
-     *         supported.
-     */
-    @Override
-    protected ConduitInitiator getConduitInitiator()
-    {
-        return transport;
     }
 
     public class ResponseConduit extends AbstractConduit

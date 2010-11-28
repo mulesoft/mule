@@ -15,7 +15,7 @@
         <cxf-core:bus>
             <cxf-core:features>
                   <cxf:stax xmlInputFactory="com.ctc.wstx.stax.WstxInputFactory"
-                          xmlOutputFactory="com.ctc.wstx.stax.WstxOutputFactory"/>
+                            xmlOutputFactory="com.ctc.wstx.stax.WstxOutputFactory"/>
             </cxf-core:features>
         </cxf-core:bus>
     </spring:beans>

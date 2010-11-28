@@ -29,6 +29,7 @@ import org.mule.module.cxf.support.MuleProtocolHeadersOutInterceptor;
 import org.mule.module.cxf.support.MuleServiceConfiguration;
 import org.mule.util.ClassUtils;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.invoker.Invoker;
@@ -123,22 +125,22 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         
         if (inInterceptors != null)
         {
-            sfb.getInInterceptors().addAll(inInterceptors);
+            sfb.getInInterceptors().addAll((Collection<? extends Interceptor<? extends Message>>) inInterceptors);
         }
         
         if (inFaultInterceptors != null)
         {
-            sfb.getInFaultInterceptors().addAll(inFaultInterceptors);
+            sfb.getInFaultInterceptors().addAll((Collection<? extends Interceptor<? extends Message>>) inFaultInterceptors);
         }
         
         if (outInterceptors != null)
         {
-            sfb.getOutInterceptors().addAll(outInterceptors);
+            sfb.getOutInterceptors().addAll((Collection<? extends Interceptor<? extends Message>>) outInterceptors);
         }
         
         if (outFaultInterceptors != null)
         {
-            sfb.getOutFaultInterceptors().addAll(outFaultInterceptors);
+            sfb.getOutFaultInterceptors().addAll((Collection<? extends Interceptor<? extends Message>>) outFaultInterceptors);
         }
         
         if (enableMuleSoapHeaders)

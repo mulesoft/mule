@@ -54,7 +54,7 @@ public class WsdlCxfEndpointBuilder extends AbstractMetaEndpointBuilder
     {
         final WsdlClientMessageProcessorBuilder builder = new WsdlClientMessageProcessorBuilder();
         builder.setMuleContext(muleContext);
-        builder.setWsdlLocation(wsdlAddress);
+        builder.setWsdlLocation(getEndpointBuilder().toString() + "?wsdl");
         builder.setOperation(getOperation());
 
         try

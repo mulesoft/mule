@@ -24,6 +24,7 @@ import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.module.cxf.support.MuleProtocolHeadersOutInterceptor;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ import org.apache.cxf.message.Message;
 public abstract class AbstractOutboundMessageProcessorBuilder 
     implements MessageProcessorBuilder, MuleContextAware
 {
+    private static int count = 0;
     protected Client client;
     protected String defaultMethodName;
     protected Method defaultMethod;
@@ -137,11 +139,11 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     }
 
     @SuppressWarnings("unchecked")
-    private void addInterceptors(List<Interceptor> col, List<Interceptor> supplied)
+    private void addInterceptors(List<Interceptor<? extends Message>> col, List<Interceptor> supplied)
     {
         if (supplied != null) 
         {
-            col.addAll(supplied);
+            col.addAll((Collection<? extends Interceptor<? extends Message>>) supplied);
         }
     }
     

@@ -10,6 +10,9 @@
 
 package org.mule.module.cxf.transport;
 
+import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
+import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
@@ -57,14 +60,10 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
-import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
-
-import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
-import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
 
 /**
  * A Conduit is primarily responsible for sending messages from CXF to somewhere
@@ -80,13 +79,7 @@ public class MuleUniversalConduit extends AbstractConduit
 
     private CxfConfiguration configuration;
 
-    private Destination decoupledDestination;
-
-    private String decoupledEndpoint;
-
     private MuleUniversalTransport transport;
-
-    private int decoupledDestinationRefCount;
 
     private boolean closeInput = true;
 
@@ -130,32 +123,6 @@ public class MuleUniversalConduit extends AbstractConduit
     protected Logger getLogger()
     {
         return LOGGER;
-    }
-
-    @Override
-    public synchronized Destination getBackChannel()
-    {
-        if (decoupledDestination == null && decoupledEndpoint != null)
-        {
-            setUpDecoupledDestination();
-        }
-        return decoupledDestination;
-    }
-
-    protected void setUpDecoupledDestination()
-    {
-        EndpointInfo ei = new EndpointInfo();
-        ei.setAddress(decoupledEndpoint);
-        try
-        {
-            decoupledDestination = transport.getDestination(ei);
-            decoupledDestination.setMessageObserver(new InterposedMessageObserver());
-            duplicateDecoupledDestination();
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
     }
 
     /**
@@ -202,6 +169,7 @@ public class MuleUniversalConduit extends AbstractConduit
         MuleEvent event = (MuleEvent) message.getExchange().get(MULE_EVENT_PROPERTY);
         if (event == null)
         {
+            // we've got an out of band WS-RM message or a message from a standalone client
             MuleContext muleContext = configuration.getMuleContext();
             MuleMessage muleMsg = new DefaultMuleMessage(handler, muleContext);
             MuleSession session = new DefaultMuleSession(muleContext);
@@ -220,13 +188,13 @@ public class MuleUniversalConduit extends AbstractConduit
             event.setTimeout(MuleEvent.TIMEOUT_NOT_SET_VALUE);
             RequestContext.setEvent(event);
         }
-        else
+        else 
         {
             event.getMessage().setPayload(handler);
         }
         message.getExchange().put(CxfConstants.MULE_EVENT, event);
     }
-    
+
     protected synchronized OutboundEndpoint getEndpoint(MuleContext muleContext, String uri) throws MuleException
     {
         if (endpoints.get(uri) != null)
@@ -239,7 +207,7 @@ public class MuleUniversalConduit extends AbstractConduit
         return ndpoint;
     }
     
-    protected String setupURL(Message message) throws MalformedURLException
+    public String setupURL(Message message) throws MalformedURLException
     {
         String value = (String) message.get(Message.ENDPOINT_ADDRESS);
         String pathInfo = (String) message.get(Message.PATH_INFO);
@@ -388,37 +356,6 @@ public class MuleUniversalConduit extends AbstractConduit
     @Override
     public void close()
     {
-        // in decoupled case, close response Destination if reference count
-        // hits zero
-        //
-        if (decoupledDestination != null)
-        {
-            releaseDecoupledDestination();
-        }
-    }
-
-    protected synchronized void duplicateDecoupledDestination()
-    {
-        decoupledDestinationRefCount++;
-    }
-
-    protected synchronized void releaseDecoupledDestination()
-    {
-        if (--decoupledDestinationRefCount == 0)
-        {
-            // LOG.log(Level.INFO, "shutting down decoupled destination");
-            decoupledDestination.shutdown();
-        }
-    }
-
-    public String getDecoupledEndpoint()
-    {
-        return decoupledEndpoint;
-    }
-
-    public void setDecoupledEndpoint(String decoupledEndpoint)
-    {
-        this.decoupledEndpoint = decoupledEndpoint;
     }
 
     /**
