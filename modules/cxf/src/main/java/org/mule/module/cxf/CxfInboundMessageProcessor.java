@@ -53,6 +53,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
@@ -90,13 +92,6 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                 MessageFactory.createStaticMessage("No CXF bus instance, this component has not been initialized properly."),
                 this);
         }
-
-        if (server == null)
-        {
-            throw new InitialisationException(
-                MessageFactory.createStaticMessage("No CXF Server instance, this component has not been initialized properly."),
-                this);
-        }
     }
 
     public void stop() throws MuleException
@@ -110,7 +105,10 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     public void start() throws MuleException
     {
         // Start the CXF Server
-        server.start();
+        if (server != null)
+        {
+            server.start();
+        }
     }
 
     public void dispose()
@@ -164,7 +162,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     {
         // TODO: Is there a way to make this not so ugly?
         String ctxUri = event.getMessage().getInboundProperty(HttpConnector.HTTP_CONTEXT_PATH_PROPERTY);
-        String wsdlUri = getWsdlUri(event, req);
+        String wsdlUri = getUri(event);
         String serviceUri = wsdlUri.substring(0, wsdlUri.indexOf('?'));
 
         EndpointInfo ei = getServer().getEndpoint().getEndpointInfo();
@@ -208,11 +206,12 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         return event;
     }
 
-    private String getWsdlUri(MuleEvent event, String reqPath)
+    private String getUri(MuleEvent event)
     {
         EndpointURI epUri = event.getEndpoint().getEndpointURI();
         String host = event.getMessage().getInboundProperty("Host", epUri.getHost());
         String ctx = event.getMessage().getInboundProperty(HttpConnector.HTTP_REQUEST_PROPERTY);
+
         return epUri.getScheme() + "://" + host + ctx;
     }
 
@@ -257,7 +256,23 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
             String soapAction = getSoapAction(event.getMessage());
             m.put(org.mule.module.cxf.SoapConstants.SOAP_ACTION_PROPERTY_CAPS, soapAction);
 
-            org.apache.cxf.transport.Destination d = server.getDestination();
+            org.apache.cxf.transport.Destination d;
+            
+            if (server != null) 
+            {
+                d = server.getDestination();
+            }
+            else
+            {
+                String serviceUri = getUri(event);
+
+                DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
+                DestinationFactory df = dfm.getDestinationFactoryForUri(serviceUri);
+                
+                EndpointInfo ei = new EndpointInfo();
+                ei.setAddress(serviceUri);
+                d = df.getDestination(ei);
+            }
 
             // Set up a listener for the response
             m.put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);

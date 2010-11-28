@@ -136,23 +136,6 @@ public class MuleUniversalConduit extends AbstractConduit
         message.setContent(OutputStream.class, delegating);
         message.setContent(DelegatingOutputStream.class, delegating);
         
-        AbstractPhaseInterceptor<Message> i = new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM)
-        {
-            public void handleMessage(Message m) throws Fault
-            {
-                try
-                {
-                    dispatchMuleMessage(m);
-                }
-                catch (IOException e)
-                {
-                    throw new Fault(e);
-                }
-            }
-        };
-        i.getAfter().add(MuleProtocolHeadersOutInterceptor.class.getName());
-        message.getInterceptorChain().add(i);
-        
         OutputHandler handler = new OutputHandler()
         {
             public void write(MuleEvent event, OutputStream out) throws IOException
@@ -191,8 +174,26 @@ public class MuleUniversalConduit extends AbstractConduit
         else 
         {
             event.getMessage().setPayload(handler);
+            message.getExchange().put(CxfConstants.MULE_EVENT, event);
         }
-        message.getExchange().put(CxfConstants.MULE_EVENT, event);
+        
+        final MuleEvent finalEvent = event;
+        AbstractPhaseInterceptor<Message> i = new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM)
+        {
+            public void handleMessage(Message m) throws Fault
+            {
+                try
+                {
+                    dispatchMuleMessage(m, finalEvent);
+                }
+                catch (IOException e)
+                {
+                    throw new Fault(e);
+                }
+            }
+        };
+        i.getAfter().add(MuleProtocolHeadersOutInterceptor.class.getName());
+        message.getInterceptorChain().add(i);
     }
 
     protected synchronized OutboundEndpoint getEndpoint(MuleContext muleContext, String uri) throws MuleException
@@ -236,11 +237,9 @@ public class MuleUniversalConduit extends AbstractConduit
         return result;
     }
     
-    protected void dispatchMuleMessage(Message m) throws IOException {
+    protected void dispatchMuleMessage(Message m, MuleEvent reqEvent) throws IOException {
         try
-        {
-            MuleEvent reqEvent = (MuleEvent) m.getExchange().get(CxfConstants.MULE_EVENT);
-            
+        {   
             MuleMessage req = reqEvent.getMessage();
             req.setOutboundProperty(HttpConnector.HTTP_DISABLE_STATUS_CODE_EXCEPTION_CHECK, Boolean.TRUE.toString());
 

@@ -18,7 +18,8 @@
             clientClass="org.apache.hello_world_soap_http.SOAPService"
             port="SoapPort"
             operation="greetMe"
-            wsdlLocation="classpath:/wsdl/hello_world.wsdl"/>
+            wsdlLocation="classpath:/wsdl/hello_world.wsdl"
+            decoupledEndpoint="http://localhost:63082/response"/>
     </endpoint>
 
     <flow name="Greeter">

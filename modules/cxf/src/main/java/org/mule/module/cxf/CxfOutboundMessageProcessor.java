@@ -48,6 +48,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.ws.addressing.WSAContextUtils;
 
 /**
  * The CxfOutboundMessageProcessor performs outbound CXF processing, sending an event
@@ -65,6 +66,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     private boolean proxy;
     private String operation;
     private BindingProvider clientProxy;
+    private String decoupledEndpoint;
 
     public CxfOutboundMessageProcessor(Client client)
     {
@@ -157,7 +159,6 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
         Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
         props.put("holder", responseHolder);
-        props.put(org.apache.cxf.message.Message.ENDPOINT_ADDRESS, event.getEndpoint().getEndpointURI().toString());
         
         // Set custom soap action if set on the event or endpoint
         String soapAction = event.getMessage().getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
@@ -203,7 +204,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         // Holds the response from the transport
         Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
         props.put("holder", responseHolder);
-
+        
         // Set custom soap action if set on the event or endpoint
         String soapAction = event.getMessage().getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
         if (soapAction != null)
@@ -365,6 +366,13 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(MuleProperties.MULE_EVENT_PROPERTY, event);
         props.put(CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR, this);
+        props.put(org.apache.cxf.message.Message.ENDPOINT_ADDRESS, event.getEndpoint().getEndpointURI().toString());
+        
+        if (decoupledEndpoint != null)
+        {
+            props.put(WSAContextUtils.REPLYTO_PROPERTY, decoupledEndpoint);
+        }
+        
         return props;
     }
 
@@ -498,6 +506,11 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     public Client getClient()
     {
         return client;
+    }
+
+    public void setDecoupledEndpoint(String decoupledEndpoint)
+    {
+        this.decoupledEndpoint = decoupledEndpoint;
     }
 
 }

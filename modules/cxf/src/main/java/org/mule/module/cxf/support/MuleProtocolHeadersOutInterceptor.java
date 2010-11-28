@@ -40,6 +40,11 @@ public class MuleProtocolHeadersOutInterceptor
     public void handleMessage(Message message) throws Fault
     {
         MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+        if (event == null) 
+        {
+            return;
+        }
+        
         MuleMessage muleMsg = event.getMessage();
         
         if (muleMsg == null)

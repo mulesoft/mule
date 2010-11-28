@@ -14,9 +14,13 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.construct.SimpleFlowConstruct;
 import org.mule.module.cxf.CxfConfiguration;
+import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.CxfPayloadToArguments;
 import org.mule.module.cxf.support.MuleHeadersInInterceptor;
@@ -24,6 +28,7 @@ import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.module.cxf.support.MuleProtocolHeadersOutInterceptor;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +43,6 @@ import org.apache.cxf.message.Message;
 public abstract class AbstractOutboundMessageProcessorBuilder 
     implements MessageProcessorBuilder, MuleContextAware
 {
-    private static int count = 0;
     protected Client client;
     protected String defaultMethodName;
     protected Method defaultMethod;
@@ -58,6 +62,7 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     protected MuleContext muleContext;
     protected String address;
     protected String operation;
+    protected String decoupledEndpoint;
     
     @SuppressWarnings("unchecked")
     public CxfOutboundMessageProcessor build() throws MuleException
@@ -109,6 +114,26 @@ public abstract class AbstractOutboundMessageProcessorBuilder
         processor.setOperation(operation);
         configureMessageProcessor(processor);
         processor.setPayloadToArguments(payloadToArguments);
+        
+        if (decoupledEndpoint != null) 
+        {
+            processor.setDecoupledEndpoint(decoupledEndpoint);
+            
+            CxfInboundMessageProcessor cxfInboundMP = new CxfInboundMessageProcessor();
+            cxfInboundMP.setMuleContext(muleContext);
+            cxfInboundMP.setBus(getBus());
+            
+            List<MessageProcessor> mps = new ArrayList<MessageProcessor>();
+            mps.add(cxfInboundMP);
+            
+            EndpointBuilder ep = muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(decoupledEndpoint);
+            
+            SimpleFlowConstruct flow = new SimpleFlowConstruct("decoupled-" + ep.toString(), muleContext);
+            flow.setMessageProcessors(mps);
+            flow.setMessageSource(ep.buildInboundEndpoint());
+            muleContext.getRegistry().registerObject(flow.getName(), flow);
+        }
+        
         return processor;
     }
 
@@ -308,6 +333,16 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     public void setProperties(Map<String, Object> properties)
     {
         this.properties = properties;
+    }
+
+    public String getDecoupledEndpoint()
+    {
+        return decoupledEndpoint;
+    }
+
+    public void setDecoupledEndpoint(String decoupledEndpoint)
+    {
+        this.decoupledEndpoint = decoupledEndpoint;
     }
 
     public void setMuleContext(MuleContext context)
