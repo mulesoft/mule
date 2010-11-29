@@ -49,62 +49,21 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         String output = "";
 
         if (src instanceof InputStream)
         {
-            InputStream is = (InputStream) src;
-            try
-            {
-                ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-                IOUtils.copy(is, byteOut);
-                output = new String(byteOut.toByteArray(), encoding);
-            }
-            catch (IOException e)
-            {
-                throw new TransformerException(CoreMessages.errorReadingStream(), e);
-            }
-            finally
-            {
-                try
-                {
-                    is.close();
-                }
-                catch (IOException e)
-                {
-                    logger.warn("Could not close stream", e);
-                }
-            }
+            output = createStringFromInputStream((InputStream) src, outputEncoding);
         }
         else if (src instanceof OutputHandler)
         {
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            
-            try
-            {
-                ((OutputHandler) src).write(RequestContext.getEvent(), bytes);
-                
-                output = new String(bytes.toByteArray(), encoding);
-            }
-            catch (IOException e)
-            {
-                throw new TransformerException(this, e);
-            }
-            
-            
+            output = createStringFromOutputHandler((OutputHandler) src, outputEncoding);
         }
         else if (src instanceof byte[])
         {
-            try
-            {
-                output = new String((byte[]) src, encoding);
-            }
-            catch (UnsupportedEncodingException e)
-            {
-                throw new TransformerException(this, e);
-            }
+            output = createStringFromByteArray((byte[]) src, outputEncoding);
         }
         else
         {
@@ -112,6 +71,60 @@ public class ObjectToString extends AbstractTransformer implements DiscoverableT
         }
 
         return output;
+    }
+
+    protected String createStringFromInputStream(InputStream input, String outputEncoding)
+        throws TransformerException
+    {
+        try
+        {
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            IOUtils.copy(input, byteOut);
+            return byteOut.toString(outputEncoding);
+        }
+        catch (IOException e)
+        {
+            throw new TransformerException(CoreMessages.errorReadingStream(), e);
+        }
+        finally
+        {
+            try
+            {
+                input.close();
+            }
+            catch (IOException e)
+            {
+                logger.warn("Could not close stream", e);
+            }
+        }
+    }
+
+    protected String createStringFromOutputHandler(OutputHandler handler, String outputEncoding)
+        throws TransformerException
+    {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try
+        {
+            handler.write(RequestContext.getEvent(), bytes);
+            return bytes.toString(outputEncoding);
+        }
+        catch (IOException e)
+        {
+            throw new TransformerException(this, e);
+        }
+    }
+
+    protected String createStringFromByteArray(byte[] bytes, String outputEncoding)
+        throws TransformerException
+    {
+        try
+        {
+            return new String(bytes, outputEncoding);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new TransformerException(this, e);
+        }
     }
 
     public int getPriorityWeighting()
