@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Mule Echo Example</title>
+
+<script type="text/javascript">
+
+var echoUrlPrefix = "http://localhost:65082/services/EchoUMO/echo/text/"
+
+function doEcho() {
+    var data = new Object();
+    data.url = echoUrlPrefix + document.getElementById('phrase').value;
+    data.method = 'GET';
+    mule.rpc("/examples/ajaxproxy", data, rpcEchoResponse);
+}
+
+function rpcEchoResponse(message) {
+	$("#response-output").html('<pre class="prettyprint">' + html2entity(getJsonResponse(message.data)) + '</pre>');
+	prettyPrint();	
+}
+
+</script>
+</head>
+<body>
+
+<p><b>Instructions:</b></p>
+<p>Enter some text below and press <b>Send!</b>.</p>
+
+<div>Enter some text to echo: <input id="phrase" type="text" /> <input
+    id="sendButton" class="button" type="submit" name="Go" value="Send!"
+    onclick="doEcho();" /></div>
+
+<p><b>Response:</b></p>
+<div id='response-output' style="height:50px;width:100%;overflow:scroll;" class='response'></div>
+<br/>
+
+<p><b>Additional Information:</b></p>
+<p>
+You can also consume this service by directly calling the CXF endpoint, opening a URL such as <a
+    href="http://localhost:65082/services/EchoUMO/echo/text/hello"
+    target="_blank">http://localhost:65082/services/EchoUMO/echo/text/hello</a>, replacing "hello" with the message you want to submit.
+</p>
+<p>    
+    Complete documentation for this example can be found <a
+    href="http://www.mulesoft.org/documentation/display/MULE3INTRO/Echo+Example"
+    target="_blank">here</a>.
+</p>
+</body>
+</html>

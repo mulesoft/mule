@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:ajax="http://www.mulesoft.org/schema/mule/ajax"
+      xmlns:json="http://www.mulesoft.org/schema/mule/json"
+      xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.0/mule-json.xsd
+        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
+
+    <ajax:connector name="ajaxServer" jsonCommented="false" serverUrl="http://0.0.0.0:18082/examples" resourceBase="${app.home}/docroot"/>
+
+	<json:json-to-object-transformer name="JsonToObject"/>
+	
+	<flow name="ajaxProxyFlow">
+		<ajax:inbound-endpoint channel="/examples/ajaxproxy" connector-ref="ajaxServer" transformer-refs="JsonToObject"/>
+        <component>
+            <singleton-object class="org.mule.example.launcher.SimpleHTTPClient"/>
+        </component>
+	</flow>
+</mule>
