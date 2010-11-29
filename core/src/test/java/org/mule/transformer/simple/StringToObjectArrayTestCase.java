@@ -1,0 +1,92 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.transformer.simple;
+
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.transformer.Transformer;
+import org.mule.config.i18n.LocaleMessageHandler;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.transformer.AbstractTransformerTestCase;
+import org.mule.transformer.types.DataTypeFactory;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Locale;
+
+public class StringToObjectArrayTestCase extends AbstractTransformerTestCase
+{
+
+	private String encoding = "Windows-31J";
+
+	@Override
+	public Object getResultData()
+	{
+		return new String[]{ getMessage("char0"), getMessage("char1"), getMessage("char2") };
+	}
+
+	@Override
+	public Object getTestData()
+	{
+	    try
+	    {
+		    return getMessage("message").getBytes(encoding);
+	    }
+	    catch (UnsupportedEncodingException e)
+	    {
+	    	throw new RuntimeException(e);
+	    }
+	}
+
+	@Override
+	public Transformer getTransformer() throws Exception
+	{
+        Transformer trans = createObject(StringToObjectArray.class);
+        trans.setReturnDataType(DataTypeFactory.create(Object[].class));
+
+        EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
+        builder.setEncoding(encoding);
+        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+            builder);
+        trans.setEndpoint(endpoint);
+
+        return trans;
+	}
+
+	@Override
+	public Transformer getRoundTripTransformer() throws Exception
+	{
+		return new ObjectArrayToString();
+	}
+
+	@Override
+	public boolean compareResults(Object expected, Object result)
+	{
+        return super.compareResults(expected, result);
+	}
+
+	@Override
+    public boolean compareRoundtripResults(Object expected, Object result)
+	{
+        try
+        {
+        	return super.compareRoundtripResults(expected, ((String)result).getBytes(encoding));
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String getMessage(String key)
+    {
+        return LocaleMessageHandler.getString("test-data", Locale.JAPAN, "StringToObjectArrayTestCase." + key, new Object[] {});
+    }
+
+}

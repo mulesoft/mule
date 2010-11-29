@@ -17,6 +17,7 @@ import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  * <code>StringToObjectArray</code> converts a String into an object array. This
@@ -24,7 +25,6 @@ import java.io.InputStream;
  * an Object[] in order to be passed to a SOAP service. The input String is parsed
  * into the array based on a configurable delimiter - default is a space.
  */
-
 public class StringToObjectArray extends AbstractTransformer
 {
     private String delimiter = null;
@@ -39,33 +39,49 @@ public class StringToObjectArray extends AbstractTransformer
     }
 
     @Override
-    public Object doTransform(Object src, String encoding) throws TransformerException
+    public Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         String in;
 
         if (src instanceof byte[])
         {
-            in = new String((byte[])src);
+            in = createStringFromByteArray((byte[]) src, outputEncoding);
         }
         else if (src instanceof InputStream)
         {
-            InputStream input = (InputStream) src;
-            try
-            {
-                in = IOUtils.toString(input);
-            }
-            finally
-            {
-                IOUtils.closeQuietly(input);
-            }
+            in = createStringFromInputStream((InputStream) src);
         }
         else
         {
-            in = (String)src;
+            in = (String) src;
         }
 
         String[] out = StringUtils.splitAndTrim(in, getDelimiter());
         return out;
+    }
+
+    protected String createStringFromByteArray(byte[] bytes, String outputEncoding) throws TransformerException
+    {
+        try
+        {
+            return new String(bytes, outputEncoding);
+        }
+        catch (UnsupportedEncodingException uee)
+        {
+            throw new TransformerException(this, uee);
+        }
+    }
+
+    protected String createStringFromInputStream(InputStream input)
+    {
+        try
+        {
+            return IOUtils.toString(input);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(input);
+        }
     }
 
     /**
@@ -90,5 +106,5 @@ public class StringToObjectArray extends AbstractTransformer
     {
         this.delimiter = delimiter;
     }
-        
+
 }
