@@ -3549,6 +3549,7 @@
             <xsd:enumeration value="headers"/>
             <xsd:enumeration value="headers-list"/>
             <xsd:enumeration value="json"/>
+            <xsd:enumeration value="json-node"/>
             <xsd:enumeration value="jxpath"/>
             <xsd:enumeration value="map-payload"/>
             <xsd:enumeration value="message"/>

@@ -92,7 +92,7 @@ public class JsonData implements Serializable
         return node.isArray();
     }
 
-    public Object get(String expression)
+    public JsonNode get(String expression)
     {
         List<String> tokens = parseTokens(expression);
 
@@ -122,13 +122,19 @@ public class JsonData implements Serializable
             }
         }
 
-        if (o.isValueNode())
+        return o;
+    }
+    
+    public String getAsString(String expression)
+    {
+        JsonNode node = get(expression);
+        if (node.isValueNode())
         {
-            return o.getValueAsText();
+            return node.getValueAsText();
         }
         else
         {
-            return o;
+            return node.toString();
         }
     }
     

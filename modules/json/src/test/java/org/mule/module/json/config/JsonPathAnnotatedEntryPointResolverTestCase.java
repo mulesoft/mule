@@ -19,10 +19,10 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
 import org.mule.tck.AbstractMuleTestCase;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.node.ArrayNode;
-
+import java.util.List;
 import java.util.Map;
+
+import org.codehaus.jackson.JsonNode;
 
 public class JsonPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
 {
@@ -81,8 +81,8 @@ public class JsonPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTes
         Map<?, ?> map = (Map<?, ?>)result.getResult();
         assertEquals(2, map.size());
         assertTrue(map.get("foo") instanceof JsonNode);
-        assertTrue(map.get("bar") instanceof ArrayNode);
-        assertEquals(2, ((ArrayNode)map.get("bar")).size());
+        assertTrue(map.get("bar") instanceof List);
+        assertEquals(2, ((List)map.get("bar")).size());
     }
 
     public void testAnnotatedMethodRequiredMissing() throws Exception

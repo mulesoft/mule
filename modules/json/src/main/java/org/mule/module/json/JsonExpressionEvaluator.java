@@ -16,8 +16,16 @@ import org.mule.api.expression.ExpressionEvaluator;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.NumberUtils;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
+import org.codehaus.jackson.node.ValueNode;
 
 /**
  * An expression evaluator to allow users to define json expressions in their mule configuration, i.e.
@@ -90,33 +98,35 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
             JsonData data = new JsonData(json);
             try
             {
-                Object result = data.get(expression);
+                JsonNode resultNode = data.get(expression);
                 if (compareTo != null)
                 {
+                    Object resultValue = resultNode.isValueNode() ? resultNode.getValueAsText() : resultNode;
                     if (compareTo.equalsIgnoreCase("null"))
                     {
-                        boolean answer = result == null;
+                        boolean answer = resultValue == null;
                         return (not ? !answer : answer);
                     }
-                    else if (result instanceof Number && NumberUtils.isDigits(compareTo))
+                    else if (resultValue instanceof Number && NumberUtils.isDigits(compareTo))
                     {
-                        boolean answer = NumberUtils.createNumber(compareTo).equals(result);
+                        boolean answer = NumberUtils.createNumber(compareTo).equals(resultValue);
                         return (not ? !answer : answer);
                     }
-                    else if (result instanceof Boolean && (compareTo.equalsIgnoreCase("true") || compareTo.equalsIgnoreCase("false")))
+                    else if (resultValue instanceof Boolean
+                             && (compareTo.equalsIgnoreCase("true") || compareTo.equalsIgnoreCase("false")))
                     {
-                        boolean answer = result.equals(Boolean.valueOf(compareTo));
+                        boolean answer = resultValue.equals(Boolean.valueOf(compareTo));
                         return (not ? !answer : answer);
                     }
                     else
                     {
-                        boolean answer = compareTo.equals(result);
+                        boolean answer = compareTo.equals(resultValue);
                         return (not ? !answer : answer);
                     }
                 }
                 else
                 {
-                    return result;
+                    return extractResultFromNode(resultNode);
                 }
             }
             catch (IllegalArgumentException e)
@@ -136,6 +146,32 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
         }
     }
 
+    protected Object extractResultFromNode(JsonNode result)
+    {
+        if (result instanceof ValueNode)
+        {
+            return result.getValueAsText();
+        }
+        if (result instanceof ObjectNode)
+        {
+            return ((ObjectNode) result).toString();
+        }
+        else if (result instanceof ArrayNode)
+        {
+            List parts = new ArrayList();
+            for (Iterator<JsonNode> i = ((JsonNode) result).getElements(); i.hasNext();)
+            {
+                JsonNode arrayNode = i.next();
+                parts.add(extractResultFromNode(arrayNode));
+            }
+            return parts;
+        }
+        else
+        {
+            return result;
+        }
+    }
+    
     public void setName(String name)
     {
         throw new UnsupportedOperationException("setName");

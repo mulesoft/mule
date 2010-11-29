@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Evaluator("json")
+@Evaluator("json-node")
 public @interface JsonPath
 {
     String value();

@@ -42,7 +42,7 @@ public class JsonCustomTransformerWithMixinsTestCase extends AbstractMuleTestCas
         String json = message.getPayload(DataTypeFactory.STRING);
         assertNotNull(json);
         JsonData data = new JsonData(json);
-        assertEquals("true", data.get("bitten"));
-        assertEquals("false", data.get("washed"));
+        assertEquals("true", data.getAsString("bitten"));
+        assertEquals("false", data.getAsString("washed"));
     }
 }

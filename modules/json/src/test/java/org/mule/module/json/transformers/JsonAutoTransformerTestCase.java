@@ -37,8 +37,8 @@ public class JsonAutoTransformerTestCase extends AbstractMuleTestCase
         assertNotNull(json);
         assertEquals(ITEM_JSON, json);
         JsonData data = new JsonData(json);
-        assertEquals("1234", data.get("code"));
-        assertEquals("Vacuum Cleaner", data.get("description"));
-        assertEquals("true", data.get("in-stock"));
+        assertEquals("1234", data.getAsString("code"));
+        assertEquals("Vacuum Cleaner", data.getAsString("description"));
+        assertEquals("true", data.getAsString("in-stock"));
     }
 }

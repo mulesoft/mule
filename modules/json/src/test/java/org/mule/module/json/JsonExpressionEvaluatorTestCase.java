@@ -17,48 +17,87 @@ import org.mule.routing.filters.ExpressionFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
+
+    protected JsonExpressionEvaluator eval;
+    protected String evalName;
+    protected MuleMessage message;
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        eval = getEvaluator();
+        evalName = getEvaluatorName();
+        message = new DefaultMuleMessage(IOUtils.getResourceAsString("test-data.json", getClass()),
+            muleContext);
+    }
+
+    protected JsonExpressionEvaluator getEvaluator()
+    {
+        return new JsonExpressionEvaluator();
+    }
+
+    protected String getEvaluatorName()
+    {
+        return "json";
+    }
+
     public void testExpressions() throws Exception
     {
-        String json = IOUtils.getResourceAsString("test-data.json", getClass());
-        MuleMessage message = new DefaultMuleMessage(json, muleContext);
-        JsonExpressionEvaluator eval = new JsonExpressionEvaluator();
-
-        assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", eval.evaluate("[0]/text", message));
+        assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", eval.evaluate("[0]/text",
+            message));
 
         assertEquals("Mule Test", eval.evaluate("[0]/user/name", message));
         assertEquals("Mule Test9", eval.evaluate("[9]/'user'/name", message));
         assertNull(eval.evaluate("[9]/user/XXX", message));
     }
 
+    public void testReturnTypes()
+    {
+        // String
+        assertEquals(String.class, eval.evaluate("[0]/user/name", message).getClass());
+        // Number
+        assertEquals(String.class, eval.evaluate("[0]/id", message).getClass());
+        // Boolean
+        assertEquals(String.class, eval.evaluate("[0]/truncated", message).getClass());
+        // Object
+        assertEquals(String.class, eval.evaluate("[0]/user", message).getClass());
+        // Array
+        assertEquals(ArrayList.class, eval.evaluate("[0]/anArray", message).getClass());
+        assertEquals(String.class, ((List) eval.evaluate("[0]/anArray", message)).get(0).getClass());
+        assertEquals(String.class, ((List) eval.evaluate("[0]/anArray", message)).get(1).getClass());
+        assertEquals(ArrayList.class, ((List) eval.evaluate("[0]/anArray", message)).get(2).getClass());
+    }
+
     public void testExpressionsUsingManager() throws Exception
     {
-        String json = IOUtils.getResourceAsString("test-data.json", getClass());
-        MuleMessage message = new DefaultMuleMessage(json, muleContext);
+        assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492",
+            muleContext.getExpressionManager().evaluate("#[json:[0]/text]", message));
 
-        assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", muleContext.getExpressionManager().evaluate("#[json:[0]/text]", message));
-
-        assertEquals("Mule Test", muleContext.getExpressionManager().evaluate("json:[0]/user/name", message));
-        assertEquals("Mule Test9", muleContext.getExpressionManager().evaluate("#[json:[9]/'user'/name]", message));
-        assertNull(muleContext.getExpressionManager().evaluate("json:[9]/user/XXX", message, false));
+        assertEquals("Mule Test", muleContext.getExpressionManager().evaluate(evalName + ":[0]/user/name",
+            message));
+        assertEquals("Mule Test9", muleContext.getExpressionManager().evaluate("#[json:[9]/'user'/name]",
+            message));
+        assertNull(muleContext.getExpressionManager().evaluate(evalName + ":[9]/user/XXX", message, false));
 
         try
         {
-            muleContext.getExpressionManager().evaluate("json:[9]/user/XXX", message, true);
+            muleContext.getExpressionManager().evaluate(evalName + ":[9]/user/XXX", message, true);
             fail("A value was required");
         }
         catch (ExpressionRuntimeException e)
         {
-            //Expected
+            // Expected
         }
     }
 
     public void testExpressionFilter() throws Exception
     {
-        String json = IOUtils.getResourceAsString("test-data.json", getClass());
-        MuleMessage message = new DefaultMuleMessage(json, muleContext);
-
         ExpressionFilter filter = new ExpressionFilter("#[json:[0]/text]");
         filter.setMuleContext(muleContext);
         assertTrue(filter.accept(message));
@@ -78,9 +117,6 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     public void testExpressionFilterWithBooleanLogic() throws Exception
     {
-        String json = IOUtils.getResourceAsString("test-data.json", getClass());
-        MuleMessage message = new DefaultMuleMessage(json, muleContext);
-
         ExpressionFilter filter = new ExpressionFilter("#[json:[0]/text]");
         filter.setMuleContext(muleContext);
         assertTrue(filter.accept(message));
@@ -97,14 +133,11 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
         filter.setExpression("[0]/source!= null");
         assertTrue(filter.accept(message));
 
-
     }
 
     public void testExpressionFilterWithBooleanLogicWhereElementDoesNotExist() throws Exception
     {
-        //Checks against elements that do not exist
-        String json = IOUtils.getResourceAsString("test-data.json", getClass());
-        MuleMessage message = new DefaultMuleMessage(json, muleContext);
+        // Checks against elements that do not exist
 
         ExpressionFilter filter = new ExpressionFilter("#[json:[0]/xyz = null]");
         filter.setMuleContext(muleContext);

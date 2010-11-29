@@ -11,11 +11,11 @@ package org.mule.module.json.config;
 
 import org.mule.api.annotations.expression.JsonPath;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.node.ArrayNode;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.codehaus.jackson.JsonNode;
 
 public class AnnotatedComponent
 {
@@ -45,7 +45,7 @@ public class AnnotatedComponent
 
     public Map<String, Object> doStuff3(
             @JsonPath("/foo") JsonNode foo,
-            @JsonPath("/foo/bar") ArrayNode barNodes)
+            @JsonPath("/foo/bar") List barNodes)
     {
         Map<String, Object> map = new HashMap<String, Object>(3);
         map.put("foo", foo);

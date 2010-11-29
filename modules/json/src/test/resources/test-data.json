@@ -9,7 +9,8 @@
         "truncated":true,
         "in_reply_to_status_id":null,
         "id":2653676554,
-        "source":"<a href=\"http:\/\/apiwiki.twitter.com\/\">API<\/a>"
+        "source":"<a href=\"http:\/\/apiwiki.twitter.com\/\">API<\/a>",
+        "anArray": [1,{"id":1},["a","b","c"]]
     },
     {
         "in_reply_to_user_id":null,

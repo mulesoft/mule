@@ -16,17 +16,18 @@ import org.mule.util.IOUtils;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 
-public class  JsonDataTestCase extends AbstractMuleTestCase
+public class JsonDataTestCase extends AbstractMuleTestCase
 {
     public void testReadingArrayData() throws Exception
     {
         JsonData jsonData = readJsonData("test-data.json");
         assertTrue(jsonData.isArray());
-        assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", jsonData.get("[0]/text"));
-        assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", jsonData.get("[0]/'text'"));
+        assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", jsonData.getAsString("[0]/text"));
+        assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492",
+            jsonData.getAsString("[0]/'text'"));
 
-        assertEquals("Mule Test", jsonData.get("[0]/'user'/name"));
-        assertEquals("Mule Test9", jsonData.get("[9]/user/name"));
+        assertEquals("Mule Test", jsonData.getAsString("[0]/'user'/name"));
+        assertEquals("Mule Test9", jsonData.getAsString("[9]/user/name"));
         // test toString() since it was broken for arrays
         assertNotNull(jsonData.toString());
         try
@@ -36,7 +37,7 @@ public class  JsonDataTestCase extends AbstractMuleTestCase
         }
         catch (Exception e)
         {
-            //expected
+            // expected
         }
         try
         {
@@ -45,7 +46,7 @@ public class  JsonDataTestCase extends AbstractMuleTestCase
         }
         catch (Exception e)
         {
-            //expected
+            // expected
         }
 
         try
@@ -55,7 +56,7 @@ public class  JsonDataTestCase extends AbstractMuleTestCase
         }
         catch (Exception e)
         {
-            //expected
+            // expected
         }
     }
 
@@ -64,9 +65,9 @@ public class  JsonDataTestCase extends AbstractMuleTestCase
         JsonData jsonData = readJsonData("filters.json");
         assertFalse(jsonData.isArray());
 
-        //assertEquals("/**", jsonData.get("filters[0]/channels"));
-        assertEquals("teh ", jsonData.get("filters[1]/init[1][0]"));
-        assertEquals("the ", jsonData.get("filters[1]/init[1][1]"));
+        // assertEquals("/**", jsonData.get("filters[0]/channels"));
+        assertEquals("teh ", jsonData.getAsString("filters[1]/init[1][0]"));
+        assertEquals("the ", jsonData.getAsString("filters[1]/init[1][1]"));
         // test toString() since it was broken for arrays
         assertNotNull(jsonData.toString());
     }
@@ -74,14 +75,15 @@ public class  JsonDataTestCase extends AbstractMuleTestCase
     public void testReadingWithQuotedString() throws Exception
     {
         JsonData jsonData = readJsonData("bitly-response.json");
-        assertEquals("NfeyS", jsonData.get("results/'http://rossmason.blogspot.com/2008/01/about-me.html'/hash"));
+        assertEquals("NfeyS",
+            jsonData.getAsString("results/'http://rossmason.blogspot.com/2008/01/about-me.html'/hash"));
     }
 
     public void testReadingArray() throws Exception
     {
         JsonData jsonData = readJsonData("flickr-response.json");
 
-        assertEquals("4136507840", jsonData.get("photos/photo[0]/id"));
+        assertEquals("4136507840", jsonData.getAsString("photos/photo[0]/id"));
 
         ArrayNode photos = (ArrayNode) jsonData.get("photos/photo");
         assertNotNull(photos);
@@ -91,7 +93,7 @@ public class  JsonDataTestCase extends AbstractMuleTestCase
         assertNotNull(o);
         assertTrue(o instanceof ObjectNode);
     }
-        
+
     private JsonData readJsonData(String filename) throws Exception
     {
         String json = IOUtils.getResourceAsString(filename, getClass());
