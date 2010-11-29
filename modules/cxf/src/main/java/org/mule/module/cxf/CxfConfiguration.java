@@ -78,6 +78,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
         dfm.registerDestinationFactory("http://cxf.apache.org/transports/http/configuration", transport);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/http/", transport);
         dfm.registerDestinationFactory("http://www.w3.org/2003/05/soap/bindings/HTTP/", transport);
+        dfm.registerDestinationFactory("http://cxf.apache.org/transports/jms", transport);
         dfm.registerDestinationFactory(MuleUniversalTransport.TRANSPORT_ID, transport);
 
         ConduitInitiatorManager extension = bus.getExtension(ConduitInitiatorManager.class);
@@ -99,6 +100,7 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
         extension.registerConduitInitiator("http://www.w3.org/2003/05/soap/bindings/HTTP/", transport);
         extension.registerConduitInitiator("http://cxf.apache.org/transports/http/configuration", transport);
         extension.registerConduitInitiator("http://cxf.apache.org/bindings/xformat", transport);
+        extension.registerConduitInitiator("http://cxf.apache.org/transports/jms", transport);
         extension.registerConduitInitiator(MuleUniversalTransport.TRANSPORT_ID, transport);
     }
 
