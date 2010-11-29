@@ -108,4 +108,8 @@ public abstract class AbstractPluggableDelegate implements MuleDefinitionParser
         return this;
     }
 
+    public void setDeprecationWarning(String deprecationWarning)
+    {
+        delegate.setDeprecationWarning(deprecationWarning);
+    }
 }
