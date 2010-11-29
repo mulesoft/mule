@@ -16,6 +16,8 @@ import org.mule.tck.FunctionalTestCase;
 
 public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
 {
+    private static final int TIMEOUT = 5000;
+
     @Override
     protected String getConfigResources()
     {
@@ -39,7 +41,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         assertNotNull(response);
         assertEquals("input:A:B:service1:C:D", response.getPayload());
 
-        response = client.request("vm://out2", 1000);
+        response = client.request("vm://out2", TIMEOUT);
         assertNotNull(response);
         assertEquals("input:A:B:service1:E:F", response.getPayload());
     }
@@ -59,38 +61,38 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         
         client.dispatch("vm://in4", "input1,input2,input3", null);
 
-        MuleMessage response = client.request("vm://wiretap1", 1000);
+        MuleMessage response = client.request("vm://wiretap1", TIMEOUT);
         assertNotNull(response);
         assertEquals("input1,input2,input3 (tapped)", response.getPayload());
 
-        response = client.request("vm://wiretap2", 1000);
+        response = client.request("vm://wiretap2", TIMEOUT);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().startsWith("input"));
         assertTrue(response.getPayloadAsString().endsWith(":A:B:service1 (tapped)"));
-        response = client.request("vm://wiretap2", 1000);
+        response = client.request("vm://wiretap2", TIMEOUT);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().startsWith("input"));
         assertTrue(response.getPayloadAsString().endsWith(":A:B:service1 (tapped)"));
-        response = client.request("vm://wiretap2", 1000);
+        response = client.request("vm://wiretap2", TIMEOUT);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().startsWith("input"));
         assertTrue(response.getPayloadAsString().endsWith(":A:B:service1 (tapped)"));
-        response = client.request("vm://wiretap2", 1000);
+        response = client.request("vm://wiretap2", TIMEOUT);
         assertNull(response);
 
-        response = client.request("vm://out4", 1000);
+        response = client.request("vm://out4", TIMEOUT);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().startsWith("input"));
         assertTrue(response.getPayloadAsString().endsWith(":A:B:service1:E:F"));
-        response = client.request("vm://out4", 1000);
+        response = client.request("vm://out4", TIMEOUT);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().startsWith("input"));
         assertTrue(response.getPayloadAsString().endsWith(":A:B:service1:E:F"));
-        response = client.request("vm://out4", 1000);
+        response = client.request("vm://out4", TIMEOUT);
         assertNotNull(response);
         assertTrue(response.getPayloadAsString().startsWith("input"));
         assertTrue(response.getPayloadAsString().endsWith(":A:B:service1:E:F"));
-        response = client.request("vm://out4", 1000);
+        response = client.request("vm://out4", TIMEOUT);
         assertNull(response);
     }
 }
