@@ -32,6 +32,14 @@
                     <encoding>ISO-8859-1</encoding>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <useCache>false</useCache> 
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
