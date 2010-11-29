@@ -130,7 +130,7 @@ public class AjaxMuleMessageFactory extends AbstractMuleMessageFactory
         JsonData data = new JsonData(transportMessage.toString());
         if (data.hasNode(AjaxConnector.REPLYTO_PARAM))
         {
-            muleMessage.setReplyTo(data.get(AjaxConnector.REPLYTO_PARAM));
+            muleMessage.setReplyTo(data.getAsString(AjaxConnector.REPLYTO_PARAM));
         }
     }
 }
