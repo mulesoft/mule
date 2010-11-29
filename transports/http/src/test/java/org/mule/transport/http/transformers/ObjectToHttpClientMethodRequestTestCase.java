@@ -31,7 +31,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
     {
         HttpRequest request = new HttpRequest(new RequestLine("GET", url, HttpVersion.HTTP_1_1), null, "UTF-8");
 
-        MuleEvent event = getTestEvent(request, muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(url));
+        MuleEvent event = getTestEvent(request, muleContext.getEndpointFactory().getInboundEndpoint(url));
         MuleMessage message = event.getMessage();
         message.setOutboundProperty(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
         message.setOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, url);

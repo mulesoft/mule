@@ -15,6 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.NamedObject;
 import org.mule.api.agent.Agent;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -380,6 +381,22 @@ public class MuleRegistryHelper implements MuleRegistry
     /**
      * {@inheritDoc}
      */
+    public FlowConstruct lookupFlowConstruct(String name)
+    {
+        return (FlowConstruct) registry.lookupObject(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Collection<FlowConstruct> lookupFlowConstructs()
+    {
+        return lookupObjects(FlowConstruct.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public final void registerTransformer(Transformer transformer) throws MuleException
     {
         registry.registerObject(getName(transformer), transformer, Transformer.class);
@@ -499,6 +516,22 @@ public class MuleRegistryHelper implements MuleRegistry
     public void unregisterService(String serviceName) throws MuleException
     {
         registry.unregisterObject(serviceName, Service.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException
+    {
+        registry.registerObject(getName(flowConstruct), flowConstruct, FlowConstruct.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void unregisterFlowConstruct(String flowConstructName) throws MuleException
+    {
+        registry.unregisterObject(flowConstructName, FlowConstruct.class);
     }
 
     /**

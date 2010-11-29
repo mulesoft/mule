@@ -50,7 +50,7 @@ public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
         props.put(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, StringBuffer.class.getName());
         builder.setProperties(props);
 
-        OutboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        OutboundEndpoint ep = muleContext.getEndpointFactory().getOutboundEndpoint(
             builder);
         try
         {
@@ -74,7 +74,7 @@ public class EjbFunctionalTestCase extends AbstractFunctionalTestCase
         props.put(RmiConnector.PROPERTY_SERVICE_METHOD_PARAM_TYPES, String.class.getName());
         builder.setProperties(props);
         
-        OutboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        OutboundEndpoint ep = muleContext.getEndpointFactory().getOutboundEndpoint(
             builder);
         
         try

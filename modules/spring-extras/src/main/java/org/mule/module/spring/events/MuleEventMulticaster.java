@@ -492,7 +492,7 @@ public class MuleEventMulticaster
         OutboundEndpoint endpoint;
         try
         {
-            endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+            endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
                 applicationEvent.getEndpoint());
         }
         catch (MuleException e)
@@ -602,7 +602,7 @@ public class MuleEventMulticaster
             {
                 endpoint = (String) iterator.next();
 
-                InboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+                InboundEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(
                     endpoint);
 
                 // check whether the endpoint has already been set on the
@@ -649,7 +649,7 @@ public class MuleEventMulticaster
             s.setModel(muleContext.getRegistry().lookupSystemModel());
             s.setQueueProfile(new QueueProfile());
             ((CompositeMessageSource) s.getMessageSource()).addSource(
-                muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(newEndpoint));
+                muleContext.getEndpointFactory().getInboundEndpoint(newEndpoint));
             final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(listener));
             component.setMuleContext(muleContext);
             s.setComponent(component);
@@ -733,7 +733,7 @@ public class MuleEventMulticaster
         {
             logger.info("No receive endpoints have been set, using default '*'");
             ((CompositeMessageSource) service.getMessageSource()).addSource(
-                muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("vm://*"));
+                muleContext.getEndpointFactory().getInboundEndpoint("vm://*"));
         }
         else
         {

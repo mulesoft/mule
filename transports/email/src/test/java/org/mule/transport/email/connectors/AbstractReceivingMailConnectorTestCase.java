@@ -68,7 +68,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
         });
 
         Service service = MuleTestUtils.getTestService(uniqueName("testComponent"), FunctionalTestComponent.class, props, muleContext, /*initialize*/false);
-        EndpointBuilder eb = muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(getTestEndpointURI());
+        EndpointBuilder eb = muleContext.getEndpointFactory().getEndpointBuilder(getTestEndpointURI());
         eb.setDisableTransportTransformer(true);
         InboundEndpoint ep = eb.buildInboundEndpoint();
         ((CompositeMessageSource) service.getMessageSource()).addSource(ep);

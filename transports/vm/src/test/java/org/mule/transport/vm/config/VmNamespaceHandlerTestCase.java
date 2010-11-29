@@ -73,7 +73,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testGlobalEndpoint() throws Exception
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("vmEndpoint");
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("vmEndpoint");
         assertNotNull(endpoint);
         EndpointURI uri = endpoint.getEndpointURI();
         assertNotNull(uri);
@@ -83,7 +83,7 @@ public class VmNamespaceHandlerTestCase extends FunctionalTestCase
     
     public void testVmTransaction() throws Exception
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("globalWithTx");
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("globalWithTx");
         assertNotNull(endpoint);
         
         TransactionConfig txConfig = endpoint.getTransactionConfig();

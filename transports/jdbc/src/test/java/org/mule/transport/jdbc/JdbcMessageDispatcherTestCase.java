@@ -33,7 +33,7 @@ public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
         connector.setDataSource(new TestDataSource());
         muleContext.getRegistry().registerConnector(connector);
         
-        InboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        InboundEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(
             "jdbc://select * from test");
         ep.request(0);
     }

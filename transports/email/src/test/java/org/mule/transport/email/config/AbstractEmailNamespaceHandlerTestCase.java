@@ -18,14 +18,14 @@ public abstract class AbstractEmailNamespaceHandlerTestCase extends FunctionalTe
     protected void testInboundEndpoint(String name, String protocolName) throws MuleException
     {
         ImmutableEndpoint endpoint =
-            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(name);
+            muleContext.getEndpointFactory().getInboundEndpoint(name);
         testEndpoint(endpoint, protocolName);
     }
 
     protected void testOutboundEndpoint(String name, String protocolName) throws MuleException
     {
         ImmutableEndpoint endpoint =
-            muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(name);
+            muleContext.getEndpointFactory().getOutboundEndpoint(name);
         testEndpoint(endpoint, protocolName);
     }
 

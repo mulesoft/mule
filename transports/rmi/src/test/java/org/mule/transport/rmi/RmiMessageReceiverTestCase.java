@@ -85,7 +85,7 @@ public class RmiMessageReceiverTestCase extends AbstractMessageReceiverTestCase
             properties.put("methodArgumentsList", Arrays.asList(new String[]{"test"}));
 
             builder.setProperties(properties);
-            endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+            endpoint = muleContext.getEndpointFactory().getInboundEndpoint(builder);
 
             return endpoint;
         }

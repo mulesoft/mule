@@ -49,6 +49,6 @@ public class FileMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     public InboundEndpoint getEndpoint() throws Exception
     {
-        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("file://./simple");
+        return muleContext.getEndpointFactory().getInboundEndpoint("file://./simple");
     }
 }

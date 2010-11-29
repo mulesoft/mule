@@ -100,7 +100,7 @@ public class RemoteDispatcher implements Disposable
 
         EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpoint);
         endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
-        syncServerEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        syncServerEndpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
             endpointBuilder);
 
         wireFormat = requestWireFormat();

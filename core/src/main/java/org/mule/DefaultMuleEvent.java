@@ -626,12 +626,12 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
             {
                 if (isInboundEndpoint)
                 {
-                    endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+                    endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
                             endpointBuilderName);
                 }
                 else
                 {
-                    endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+                    endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
                             endpointBuilderName);
                 }
             }
@@ -659,12 +659,12 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
                 if (isInboundEndpoint)
                 {
-                    endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+                    endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
                             endpointBuilder);
                 }
                 else
                 {
-                    endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+                    endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
                             endpointBuilder);
                 }
             }

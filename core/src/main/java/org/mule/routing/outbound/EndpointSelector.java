@@ -166,7 +166,7 @@ public class EndpointSelector extends FilteringOutboundRouter
         }
         try
         {
-            return getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointName);
+            return getMuleContext().getEndpointFactory().getOutboundEndpoint(endpointName);
         }
         catch (MalformedEndpointException e)
         {

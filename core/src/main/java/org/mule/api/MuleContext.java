@@ -15,6 +15,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.InitialisationException;
@@ -211,6 +212,13 @@ public interface MuleContext extends Lifecycle
      */
     ExpressionManager getExpressionManager();
 
+    /**
+     * Returns the EndpointFactory configured for this instance of Mule
+     * @return the EndpointFactory configured for this instance of Mule
+     * @see EndpointFactory
+     */
+    EndpointFactory getEndpointFactory();
+    
     void setExecutionClassLoader(ClassLoader cl);
 
     ClassLoader getExecutionClassLoader();

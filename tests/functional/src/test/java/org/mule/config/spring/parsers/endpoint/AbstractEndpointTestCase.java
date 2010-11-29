@@ -20,7 +20,7 @@ public abstract class AbstractEndpointTestCase extends FunctionalTestCase
 
     public ImmutableEndpoint doTest(String name) throws MuleException
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(name);
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(name);
         assertNotNull(endpoint);
         EndpointURI uri = endpoint.getEndpointURI();
         assertNotNull(uri);

@@ -51,6 +51,6 @@ public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCas
 
     public InboundEndpoint getEndpoint() throws Exception
     {
-        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("stdio://System");
+        return muleContext.getEndpointFactory().getInboundEndpoint("stdio://System");
     }
 }

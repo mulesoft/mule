@@ -102,7 +102,7 @@ public class CallOutboundEndpoint extends org.mule.endpoint.DynamicOutboundEndpo
                 {
                     BeanUtils.populateWithoutFail(cnn, props, false);
                 }
-                EndpointBuilder builder = context.getRegistry().lookupEndpointFactory().getEndpointBuilder(address);
+                EndpointBuilder builder = context.getEndpointFactory().getEndpointBuilder(address);
                 builder.setConnector(cnn);
                 builder.setName(epData.getName());
                 builder.setProperties(props);

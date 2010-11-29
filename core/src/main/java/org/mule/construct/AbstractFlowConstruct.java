@@ -10,12 +10,9 @@
 
 package org.mule.construct;
 
-import org.mule.DefaultMuleEvent;
-import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleSession;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
@@ -41,7 +38,6 @@ import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
-import org.mule.session.DefaultMuleSession;
 import org.mule.util.ClassUtils;
 
 import java.beans.ExceptionListener;
@@ -69,7 +65,7 @@ import org.apache.commons.logging.LogFactory;
  * {@link #doStop()} and {@link #doDispose()} if they need to perform any action on
  * lifecycle transitions.
  */
-public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle, MessageProcessor
+public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -377,22 +373,6 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle,
         }
     }
     
-    public MuleEvent process(MuleEvent event) throws MuleException
-    {
-        FlowConstruct flowConstruct = event.getFlowConstruct();
-        MuleSession calledSession = new DefaultMuleSession(event.getSession(), this);
-        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event.getEndpoint(), event, calledSession);
-        RequestContext.setEvent(newEvent);
-        try
-        {
-            return messageProcessorChain.process(newEvent);
-        }
-        finally
-        {
-            RequestContext.setEvent(event);
-        }
-    }
-
     public MessageProcessorChain getMessageProcessorChain()
     {
         return this.messageProcessorChain;

@@ -57,7 +57,7 @@ public class JsonBeanRoundTripNonAsciiTestCase extends JsonBeanRoundTripTestCase
         Transformer trans = super.getRoundTripTransformer();
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
         builder.setEncoding(ENCODING);
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             builder);
         trans.setEndpoint(endpoint);
         return trans;
@@ -70,7 +70,7 @@ public class JsonBeanRoundTripNonAsciiTestCase extends JsonBeanRoundTripTestCase
         trans.setReturnDataType(new SimpleDataType<byte[]>(byte[].class));
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
         builder.setEncoding(ENCODING);
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             builder);
         trans.setEndpoint(endpoint);
         return trans;

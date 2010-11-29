@@ -194,7 +194,7 @@ public class MuleRESTReceiverServlet extends MuleReceiverServlet
             }
         }
 
-        InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointName);
+        InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(endpointName);
         if (endpoint == null)
         {
             // if we dont find an endpoint for the given name, lets check the

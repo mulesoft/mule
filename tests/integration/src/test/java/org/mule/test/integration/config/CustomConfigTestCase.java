@@ -28,7 +28,7 @@ public class CustomConfigTestCase extends FunctionalTestCase
 
     public void testCustomEndpointConfig() throws Exception
     {
-        ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        ImmutableEndpoint ep = muleContext.getEndpointFactory().getOutboundEndpoint(
             "fooEndpoint");
         assertNotNull("fooEndpoint should not be null", ep);
         TestFilter tf = (TestFilter)ep.getFilter();

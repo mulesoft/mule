@@ -119,13 +119,13 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         endpointBuilder.setName("testIn");
         endpointBuilder.setConnector(connector);
         endpointBuilder.setTransactionConfig(txConfig);
-        InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             endpointBuilder);
 
         EndpointBuilder endpointBuilder2 = new EndpointURIEndpointBuilder(getOutDest(), muleContext);
         endpointBuilder2.setName("testOut");
         endpointBuilder2.setConnector(connector);
-        OutboundEndpoint outProvider = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        OutboundEndpoint outProvider = muleContext.getEndpointFactory().getOutboundEndpoint(
             endpointBuilder2);
         
         service.setOutboundMessageProcessor(new DefaultOutboundRouterCollection());

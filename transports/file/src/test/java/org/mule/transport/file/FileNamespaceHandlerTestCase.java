@@ -84,11 +84,11 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testTransformersOnEndpoints() throws Exception
     {
-        Object transformer1 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("ep1").getTransformers().get(0);
+        Object transformer1 = muleContext.getEndpointFactory().getInboundEndpoint("ep1").getTransformers().get(0);
         assertNotNull(transformer1);
         assertEquals(FileToByteArray.class, transformer1.getClass());
 
-        Object transformer2 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("ep2").getTransformers().get(0);
+        Object transformer2 = muleContext.getEndpointFactory().getInboundEndpoint("ep2").getTransformers().get(0);
         assertNotNull(transformer2);
         assertEquals(FileToString.class, transformer2.getClass());
     }

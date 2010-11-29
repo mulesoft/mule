@@ -37,7 +37,7 @@ public class ExceptionsTestCase extends AbstractMuleTestCase
 
     public final void testRoutingExceptionNullMessageValidEndpoint() throws MuleException
     {
-        OutboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint("test://outbound");
+        OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint("test://outbound");
         assertNotNull(endpoint);
 
         RoutingException rex = new RoutingException((MuleEvent) null, endpoint);

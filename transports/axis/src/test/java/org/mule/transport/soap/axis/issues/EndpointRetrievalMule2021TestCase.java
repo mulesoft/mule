@@ -44,30 +44,30 @@ public class EndpointRetrievalMule2021TestCase extends DynamicPortTestCase
 
     public void testGetOutboundEndpoint() throws MuleException
     {
-        ImmutableEndpoint endpoint1 = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        ImmutableEndpoint endpoint1 = muleContext.getEndpointFactory().getOutboundEndpoint(
             "Endpoint");
         assertEndpointOk(endpoint1);
-        ImmutableEndpoint endpoint2 = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        ImmutableEndpoint endpoint2 = muleContext.getEndpointFactory().getOutboundEndpoint(
             "axis:http://localhost:" + getPorts().get(0) + "/mule/Service?method=toString");
         assertEndpointOk(endpoint2);
     }
 
     public void testGetInboundEndpoint() throws MuleException
     {
-        ImmutableEndpoint endpoint1 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint1 = muleContext.getEndpointFactory().getInboundEndpoint(
             "Endpoint");
         assertEndpointOk(endpoint1);
-        ImmutableEndpoint endpoint2 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint2 = muleContext.getEndpointFactory().getInboundEndpoint(
             "axis:http://localhost:" + getPorts().get(0) + "/mule/Service?method=toString");
         assertEndpointOk(endpoint2);
     }
 
     public void testGetResponseEndpoint() throws MuleException
     {
-        ImmutableEndpoint endpoint1 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint1 = muleContext.getEndpointFactory().getInboundEndpoint(
             "Endpoint");
         assertEndpointOk(endpoint1);
-        ImmutableEndpoint endpoint2 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint2 = muleContext.getEndpointFactory().getInboundEndpoint(
             "axis:http://localhost:" + getPorts().get(0) + "/mule/Service?method=toString");
         assertEndpointOk(endpoint2);
     }

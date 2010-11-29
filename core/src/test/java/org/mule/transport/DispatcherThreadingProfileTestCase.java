@@ -193,7 +193,7 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
 
     private void dispatchTwoAsyncEvents() throws DispatchException, Exception
     {
-        OutboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
             "test://test");
         endpoint.process(getTestEvent("data", endpoint));
         endpoint.process(getTestEvent("data", endpoint));

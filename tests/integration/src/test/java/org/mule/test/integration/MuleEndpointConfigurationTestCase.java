@@ -130,7 +130,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
 
     public void testEndpointFromURI() throws Exception
     {
-        ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(
             "test://hello?exchangePattern=request-response&responseTimeout=2002&connector=testConnector1");
         assertEquals(MessageExchangePattern.REQUEST_RESPONSE, ep.getExchangePattern());
         assertEquals(2002, ep.getResponseTimeout());
@@ -140,7 +140,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("hello", muleContext), ep, MuleTestUtils.getTestSession(muleContext));
         assertEquals(2002, event.getTimeout());
 
-        ImmutableEndpoint ep2 = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint ep2 = muleContext.getEndpointFactory().getInboundEndpoint(
             "test://hello?connector=testConnector1");
 
         event = new DefaultMuleEvent(new DefaultMuleMessage("hello", muleContext), ep2, MuleTestUtils.getTestSession(muleContext));

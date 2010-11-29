@@ -10,8 +10,10 @@
 
 package org.mule.api.registry;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -71,12 +73,18 @@ public interface MuleRegistry extends Registry
      */
     EndpointBuilder lookupEndpointBuilder(String name);
 
+    /**
+     * @Deprecated use {@link MuleContext#getEndpointFactory()} instead/
+     * @return
+     */
     EndpointFactory lookupEndpointFactory();
 
     Transformer lookupTransformer(String name);
 
     Service lookupService(String name);
 
+    FlowConstruct lookupFlowConstruct(String name);
+    
     /**
      * This method will return a list of {@link org.mule.api.transformer.Transformer} objects that accept the given
      * input and return the given output type of object
@@ -125,6 +133,8 @@ public interface MuleRegistry extends Registry
 
     Collection<Service> lookupServices();
 
+    Collection<FlowConstruct> lookupFlowConstructs();
+    
     Model lookupModel(String name);
 
     Model lookupSystemModel();
@@ -180,6 +190,10 @@ public interface MuleRegistry extends Registry
 
     void unregisterService(String serviceName) throws MuleException;
 
+    void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException;
+
+    void unregisterFlowConstruct(String flowConstructName) throws MuleException;
+    
     void registerModel(Model model) throws MuleException;
 
     void unregisterModel(String modelName) throws MuleException;

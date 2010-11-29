@@ -307,7 +307,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
 
         endpointBuilder.setExchangePattern(MessageExchangePattern.ONE_WAY);
 
-        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
+        return muleContext.getEndpointFactory().getInboundEndpoint(endpointBuilder);
     }
 
     /**

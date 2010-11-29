@@ -2006,7 +2006,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     public MuleMessage request(String uri, long timeout) throws Exception
     {
-        return request(getMuleContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(uri),
+        return request(getMuleContext().getEndpointFactory().getInboundEndpoint(uri),
                 timeout);
     }
 

@@ -58,7 +58,7 @@ public class CxfWsdlTestCase extends AbstractMuleTestCase
         endpointBuilder.setProperty("wsdlUrl", TEST_URL_WSDL);
 
         OutboundEndpoint endpoint = 
-            muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
+            muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
 
         MuleMessage message = new DefaultMuleMessage("test1", muleContext);
         MuleSession session = new DefaultMuleSession(message,

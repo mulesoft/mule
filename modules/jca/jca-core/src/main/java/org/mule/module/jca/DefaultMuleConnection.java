@@ -67,7 +67,7 @@ public class DefaultMuleConnection implements MuleConnection
     public void dispatch(String url, Object payload, Map messageProperties) throws MuleException
     {
         MuleMessage message = new DefaultMuleMessage(payload, messageProperties, muleContext);
-        OutboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(url);
+        OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(url);
         MuleEvent event = getEvent(message,endpoint);
         try
         {
@@ -139,7 +139,7 @@ public class DefaultMuleConnection implements MuleConnection
      */
     public MuleMessage request(String url, long timeout) throws MuleException
     {
-        InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(url);
+        InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(url);
 
         try
         {
@@ -158,7 +158,7 @@ public class DefaultMuleConnection implements MuleConnection
             .lookupEndpointFactory()
             .getEndpointBuilder(uri);
         endpointBuilder.setExchangePattern(exchangePattern);
-        return muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
+        return muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
     }
 
     /**

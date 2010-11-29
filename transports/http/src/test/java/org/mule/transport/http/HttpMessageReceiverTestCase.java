@@ -37,7 +37,7 @@ public class HttpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     {
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder("http://localhost:6789", muleContext);
         endpointBuilder.setResponseTransformers(CollectionUtils.singletonList(new MuleMessageToHttpResponse()));
-        endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
+        endpoint = muleContext.getEndpointFactory().getInboundEndpoint(endpointBuilder);
         return endpoint;
     }
 }

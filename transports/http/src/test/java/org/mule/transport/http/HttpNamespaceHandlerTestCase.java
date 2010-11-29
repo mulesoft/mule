@@ -74,7 +74,7 @@ public class HttpNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCa
     
     private InboundEndpoint lookupInboundEndpoint(String endpointName) throws Exception
     {
-        InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointName);
+        InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(endpointName);
         assertNotNull(endpoint);
         return endpoint;
     }

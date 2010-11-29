@@ -32,6 +32,6 @@ public class IBeansMessageReceiverTestCase extends AbstractMessageReceiverTestCa
     public InboundEndpoint getEndpoint() throws Exception
     {
         String url = "ibean://hostip.getHostInfo";
-        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(url);
+        return muleContext.getEndpointFactory().getInboundEndpoint(url);
     }
 }

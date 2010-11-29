@@ -168,7 +168,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             EndpointBuilder builder = new EndpointURIEndpointBuilder(RequestContext.getEvent().getEndpoint());
             // TODO - is this correct? it stops any other transformer from being set
             builder.setTransformers(new LinkedList());
-            ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+            ImmutableEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(builder);
             MuleEvent event = new DefaultMuleEvent(action.getMessage(), ep, context.getSession());
             event = RequestContext.setEvent(event);
 
@@ -202,7 +202,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
         {
             if (RemoteDispatcherNotification.ACTION_DISPATCH == action.getAction())
             {
-                endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+                endpoint = managementContext.getEndpointFactory().getOutboundEndpoint(
                     action.getResourceIdentifier());
                 context.dispatchEvent(action.getMessage(), endpoint);
                 return null;
@@ -212,7 +212,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
                 EndpointFactory endpointFactory = managementContext.getRegistry().lookupEndpointFactory();
                 EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(action.getResourceIdentifier());
                 endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
-                endpoint = managementContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
+                endpoint = managementContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
                 result = context.sendEvent(action.getMessage(), endpoint);
                 if (result == null)
                 {

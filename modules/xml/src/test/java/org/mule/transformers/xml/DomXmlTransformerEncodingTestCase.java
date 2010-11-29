@@ -47,7 +47,7 @@ public class DomXmlTransformerEncodingTestCase extends AbstractXmlTransformerTes
 
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
         builder.setEncoding("US-ASCII");
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             builder);
 
         trans.setEndpoint(endpoint);

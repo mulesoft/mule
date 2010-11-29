@@ -126,7 +126,7 @@ public abstract class AbstractOutboundMessageProcessorBuilder
             List<MessageProcessor> mps = new ArrayList<MessageProcessor>();
             mps.add(cxfInboundMP);
             
-            EndpointBuilder ep = muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(decoupledEndpoint);
+            EndpointBuilder ep = muleContext.getEndpointFactory().getEndpointBuilder(decoupledEndpoint);
             
             SimpleFlowConstruct flow = new SimpleFlowConstruct("decoupled-" + ep.toString(), muleContext);
             flow.setMessageProcessors(mps);

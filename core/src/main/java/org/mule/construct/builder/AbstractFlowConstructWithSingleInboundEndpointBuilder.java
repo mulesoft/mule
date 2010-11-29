@@ -59,7 +59,7 @@ public abstract class AbstractFlowConstructWithSingleInboundEndpointBuilder<T ex
 
         if (inboundEndpointBuilder == null)
         {
-            inboundEndpointBuilder = muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(
+            inboundEndpointBuilder = muleContext.getEndpointFactory().getEndpointBuilder(
                 inboundAddress);
         }
 

@@ -18,7 +18,7 @@ public class ConnectorFactoryTestCase extends AbstractMuleTestCase
     public void testCreate() throws Exception
     {
         ImmutableEndpoint endpoint = 
-            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("tcp://7877");
+            muleContext.getEndpointFactory().getInboundEndpoint("tcp://7877");
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
         assertEquals("tcp://localhost:7877", endpoint.getEndpointURI().getAddress());

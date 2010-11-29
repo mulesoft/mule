@@ -82,7 +82,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
 
         try
         {
-            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+            muleContext.getEndpointFactory().getInboundEndpoint(builder);
             fail("Inbound SMTP endpoints are not supported");
         }
         catch (EndpointException ex)
@@ -94,7 +94,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
     public void testSend() throws Exception
     {
         //muleContext.getRegistry().registerConnector(createConnector(false));
-        OutboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
             getTestEndpointURI());
         
         Service service = getTestService(uniqueName("testComponent"), FunctionalTestComponent.class);

@@ -45,7 +45,7 @@ public class OutboundEndpointFactoryBean extends AbstractEndpointFactoryBean
         TransportServiceDescriptor tsd = (TransportServiceDescriptor) muleContext.getRegistry().lookupServiceDescriptor(ServiceType.TRANSPORT, scheme, null);
         EndpointBuilder endpointBuilder = tsd.createEndpointBuilder(this);
         
-        return muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
+        return muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
     }
 
 }

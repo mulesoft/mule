@@ -53,7 +53,7 @@ public class Rfc822ByteArrayTestCase extends FunctionalTestCase
     {
         Rfc822ByteArraytoMimeMessage transformer = new Rfc822ByteArraytoMimeMessage();
         ImmutableEndpoint endpoint = 
-            muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(SmtpConnector.SMTP);
+            muleContext.getEndpointFactory().getOutboundEndpoint(SmtpConnector.SMTP);
         transformer.setEndpoint(endpoint);
         Object result = transformer.transform(bytes);
         assertTrue(result instanceof MimeMessage);

@@ -33,6 +33,6 @@ public class MulticastMessageReceiverTestCase extends AbstractMessageReceiverTes
 
     public InboundEndpoint getEndpoint() throws Exception
     {
-        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("multicast://228.2.3.4:10100");
+        return muleContext.getEndpointFactory().getInboundEndpoint("multicast://228.2.3.4:10100");
     }
 }

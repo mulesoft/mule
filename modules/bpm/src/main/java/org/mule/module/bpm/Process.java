@@ -271,7 +271,7 @@ public class Process implements Initialisable, Disposable, MessageService
         message.addProperties(messageProperties, PropertyScope.INVOCATION);
 
         //TODO should probably cache this
-        EndpointBuilder endpointBuilder = muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(endpoint);
+        EndpointBuilder endpointBuilder = muleContext.getEndpointFactory().getEndpointBuilder(endpoint);
         endpointBuilder.setExchangePattern(exchangePattern);
         OutboundEndpoint ep = endpointBuilder.buildOutboundEndpoint();
        

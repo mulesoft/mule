@@ -48,7 +48,7 @@ public class XmlToOutputHandlerByteArrayTestCase extends AbstractXmlTransformerT
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
         builder.setEncoding("UTF-8");
         ImmutableEndpoint endpoint =
-            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+            muleContext.getEndpointFactory().getInboundEndpoint(builder);
 
         trans.setEndpoint(endpoint);
         return trans;

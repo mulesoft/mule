@@ -30,6 +30,6 @@ public class SslMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     public InboundEndpoint getEndpoint() throws Exception
     {
-        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("ssl://localhost:1234");
+        return muleContext.getEndpointFactory().getInboundEndpoint("ssl://localhost:1234");
     }
 }

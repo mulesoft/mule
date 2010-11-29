@@ -20,6 +20,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Disposable;
@@ -645,5 +646,10 @@ public class DefaultMuleContext implements MuleContext
     public void setExceptionListener(SystemExceptionHandler exceptionListener)
     {
         this.exceptionListener = exceptionListener;
+    }
+
+    public EndpointFactory getEndpointFactory()
+    {
+        return (EndpointFactory) registryBroker.lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
 }

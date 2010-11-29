@@ -108,7 +108,7 @@ public class PollingHttpMessageReceiver extends AbstractPollingMessageReceiver
             endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor>emptyList());
             endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
 
-            outboundEndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+            outboundEndpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
                     endpointBuilder);
         }
 

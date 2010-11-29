@@ -311,7 +311,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
     private MuleEvent createEventToSerialize() throws Exception
     {
         createAndRegisterTransformersEndpointBuilderService();
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             muleContext.getRegistry().lookupEndpointBuilder("epBuilderTest"));
         Service service = muleContext.getRegistry().lookupService("appleService");
         return RequestContext.setEvent(getTestEvent("payload", service, endpoint));

@@ -203,7 +203,7 @@ public class MuleUniversalConduit extends AbstractConduit
             return endpoints.get(uri);
         }
 
-        OutboundEndpoint ndpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri);
+        OutboundEndpoint ndpoint = muleContext.getEndpointFactory().getOutboundEndpoint(uri);
         endpoints.put(uri, ndpoint);
         return ndpoint;
     }

@@ -747,7 +747,7 @@ public class MuleClient implements Disposable
         InboundEndpoint endpoint = (InboundEndpoint) inboundEndpointCache.get(uri);
         if (endpoint == null)
         {
-            endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(uri);
+            endpoint = muleContext.getEndpointFactory().getInboundEndpoint(uri);
             InboundEndpoint concurrentlyAddedEndpoint = (InboundEndpoint) inboundEndpointCache.putIfAbsent(uri, endpoint);
             if (concurrentlyAddedEndpoint != null)
             {
@@ -771,13 +771,13 @@ public class MuleClient implements Disposable
         if (endpoint == null)
         {
             EndpointBuilder endpointBuilder = 
-                muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(uri);
+                muleContext.getEndpointFactory().getEndpointBuilder(uri);
             endpointBuilder.setExchangePattern(exchangePattern);
             if (responseTimeout != null && responseTimeout > 0)
             {
                 endpointBuilder.setResponseTimeout(responseTimeout.intValue());
             }
-            endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
+            endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
             OutboundEndpoint concurrentlyAddedEndpoint = 
                 (OutboundEndpoint) outboundEndpointCache.putIfAbsent(key, endpoint);
             if (concurrentlyAddedEndpoint != null)
@@ -815,7 +815,7 @@ public class MuleClient implements Disposable
                     EndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint);
                     builder.setTransformers(new LinkedList());
                     builder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
-                    return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+                    return muleContext.getEndpointFactory().getInboundEndpoint(builder);
                 }
             }
             else
@@ -827,7 +827,7 @@ public class MuleClient implements Disposable
         {
             EndpointBuilder builder = new EndpointURIEndpointBuilder("vm://mule.client", muleContext);
             builder.setName("muleClientProvider");
-            endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+            endpoint = muleContext.getEndpointFactory().getInboundEndpoint(builder);
         }
         return endpoint;
     }

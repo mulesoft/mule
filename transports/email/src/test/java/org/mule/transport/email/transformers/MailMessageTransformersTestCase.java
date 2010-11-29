@@ -38,7 +38,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
     public Transformer getRoundTripTransformer() throws Exception
     {
         StringToEmailMessage trans = createObject(StringToEmailMessage.class);
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
             "smtp://a:a@a.com");
 
         // We need to init the connector without actually connecting for this test

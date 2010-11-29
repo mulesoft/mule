@@ -10,7 +10,12 @@
 
 package org.mule.construct;
 
+import org.mule.DefaultMuleEvent;
+import org.mule.RequestContext;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.MuleSession;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
@@ -24,6 +29,7 @@ import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.OptionalAsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.session.DefaultMuleSession;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +43,7 @@ import java.util.List;
  * If not message processors are configured then the source message is simply
  * returned.
  */
-public class SimpleFlowConstruct extends AbstractFlowConstruct
+public class SimpleFlowConstruct extends AbstractFlowConstruct implements MessageProcessor
 {
     protected List<MessageProcessor> messageProcessors = Collections.emptyList();
 
@@ -115,4 +121,20 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct
     {
         return "Flow";
     }
+    
+    public MuleEvent process(MuleEvent event) throws MuleException
+    {
+        MuleSession calledSession = new DefaultMuleSession(event.getSession(), this);
+        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event.getEndpoint(), event, calledSession);
+        RequestContext.setEvent(newEvent);
+        try
+        {
+            return messageProcessorChain.process(newEvent);
+        }
+        finally
+        {
+            RequestContext.setEvent(event);
+        }
+    }
+
 }

@@ -152,7 +152,7 @@ public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesT
     private MessageConsumer createJMSMessageConsumer() throws MuleException, JMSException
     {
         InboundEndpoint endpoint = 
-            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("jms://out");
+            muleContext.getEndpointFactory().getInboundEndpoint("jms://out");
         JmsConnector jmsConnector = (JmsConnector) muleContext.getRegistry().lookupConnector("jmsConnector");
         JmsSupport jmsSupport = jmsConnector.getJmsSupport();
         MessageConsumer consumer = jmsSupport.createConsumer(jmsConnector.getSession(endpoint),

@@ -617,7 +617,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage requestEvent(EndpointURI endpointUri, long timeout) throws MuleException
     {
-        InboundEndpoint endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        InboundEndpoint endpoint = getMuleContext().getEndpointFactory().getInboundEndpoint(
             endpointUri);
         return requestEvent(endpoint, timeout);
     }

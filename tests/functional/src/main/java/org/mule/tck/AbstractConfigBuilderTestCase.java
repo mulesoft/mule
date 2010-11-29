@@ -86,7 +86,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testGlobalEndpointConfig() throws MuleException
     {
         super.testGlobalEndpointConfig();
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("fruitBowlEndpoint");
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("fruitBowlEndpoint");
         assertNotNull(endpoint);
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
 
@@ -101,7 +101,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         super.testEndpointConfig();
 
         // test that targets have been resolved on targets
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("waterMelonEndpoint");
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("waterMelonEndpoint");
         assertNotNull(endpoint);
         assertEquals("UTF-8-TEST", endpoint.getEncoding());
         assertEquals("test.queue", endpoint.getEndpointURI().getAddress());

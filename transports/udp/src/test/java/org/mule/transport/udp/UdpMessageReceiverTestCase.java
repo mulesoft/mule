@@ -25,7 +25,7 @@ public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
     @Override
     public MessageReceiver getMessageReceiver() throws Exception
     {
-        endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             "udp://localhost:10100");
         Mock mockComponent = new Mock(Service.class);
         mockComponent.expect("getResponseRouter");
@@ -42,6 +42,6 @@ public class UdpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         
         EndpointBuilder builder = new EndpointURIEndpointBuilder("udp://localhost:10100", muleContext);
         builder.setConnector(connector);
-        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+        return muleContext.getEndpointFactory().getInboundEndpoint(builder);
     }
 }

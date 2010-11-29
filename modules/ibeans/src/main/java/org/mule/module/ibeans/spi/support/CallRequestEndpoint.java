@@ -71,7 +71,7 @@ public class CallRequestEndpoint extends DynamicRequestEndpoint
     {
         try
         {
-            EndpointBuilder builder = context.getRegistry().lookupEndpointFactory().getEndpointBuilder("dynamic://null");
+            EndpointBuilder builder = context.getEndpointFactory().getEndpointBuilder("dynamic://null");
             builder.setExchangePattern(epData.getMep());
             builder.setConnector(epData.getConnector());
             builder.setName(epData.getName());

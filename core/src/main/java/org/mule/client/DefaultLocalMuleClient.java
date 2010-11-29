@@ -172,7 +172,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
             {
                 endpointBuilder.setResponseTimeout(responseTimeout.intValue());
             }
-            endpoint = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
+            endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
             OutboundEndpoint concurrentlyAddedEndpoint = (OutboundEndpoint) outboundEndpointCache.putIfAbsent(
                 uri + ":" + mep.toString() + ":" + responseTimeout, endpoint);
             if (concurrentlyAddedEndpoint != null)
@@ -192,7 +192,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
                 .lookupEndpointFactory()
                 .getEndpointBuilder(uri);
             endpointBuilder.setExchangePattern(mep);
-            endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
+            endpoint = muleContext.getEndpointFactory().getInboundEndpoint(endpointBuilder);
             InboundEndpoint concurrentlyAddedEndpoint = (InboundEndpoint) inboundEndpointCache.putIfAbsent(
                 uri + ":" + mep.toString(), endpoint);
             if (concurrentlyAddedEndpoint != null)

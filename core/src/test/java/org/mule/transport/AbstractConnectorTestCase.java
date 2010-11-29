@@ -143,7 +143,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         Service service = getTestService("anApple", Apple.class);
 
         InboundEndpoint endpoint = 
-            muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(getTestEndpointURI());
+            muleContext.getEndpointFactory().getInboundEndpoint(getTestEndpointURI());
 
         try
         {

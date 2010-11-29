@@ -91,12 +91,12 @@ public final class MuleTestUtils
     // if (ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
     // {
     // return (Endpoint)
-    // context.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
+    // context.getEndpointFactory().getInboundEndpoint(endpointBuilder);
     // }
     // else if (ImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
     // {
     // return (Endpoint)
-    // context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
+    // context.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
     // }
     // else
     // {
@@ -113,7 +113,7 @@ public final class MuleTestUtils
         {
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
-                return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+                return context.getEndpointFactory().getInboundEndpoint(builder);
             }
         }, null);
     }
@@ -125,7 +125,7 @@ public final class MuleTestUtils
         {
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
-                return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+                return context.getEndpointFactory().getOutboundEndpoint(builder);
             }
         }, null);
     }
@@ -143,7 +143,7 @@ public final class MuleTestUtils
             {
                 public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
                 {
-                    return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+                    return context.getEndpointFactory().getInboundEndpoint(builder);
                 }
             }, connector);
     }
@@ -160,7 +160,7 @@ public final class MuleTestUtils
             {
                 public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
                 {
-                    return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+                    return context.getEndpointFactory().getOutboundEndpoint(builder);
                 }
             }, null);
     }
@@ -179,7 +179,7 @@ public final class MuleTestUtils
                 public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
                 {
                     builder.setConnector(connector);
-                    return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+                    return context.getEndpointFactory().getOutboundEndpoint(builder);
                 }
             }, null);
     }
@@ -195,7 +195,7 @@ public final class MuleTestUtils
             {
                 builder.setConnector(connector);
                 builder.setExchangePattern(mep);
-                return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+                return context.getEndpointFactory().getOutboundEndpoint(builder);
             }
         }, null);
     }
@@ -209,7 +209,7 @@ public final class MuleTestUtils
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
                 builder.setExchangePattern(mep);
-                return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+                return context.getEndpointFactory().getOutboundEndpoint(builder);
             }
         }, null);
     }
@@ -222,7 +222,7 @@ public final class MuleTestUtils
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
                 builder.setExchangePattern(mep);
-                return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+                return context.getEndpointFactory().getOutboundEndpoint(builder);
             }
         }, null);
     }
@@ -237,7 +237,7 @@ public final class MuleTestUtils
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
                 builder.setExchangePattern(mep);
-                return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+                return context.getEndpointFactory().getInboundEndpoint(builder);
             }
         }, connector);
     }
@@ -250,7 +250,7 @@ public final class MuleTestUtils
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
                 builder.setExchangePattern(mep);
-                return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+                return context.getEndpointFactory().getInboundEndpoint(builder);
             }
         }, null);
     }
@@ -267,7 +267,7 @@ public final class MuleTestUtils
                 txConfig.setAction(TransactionConfig.ACTION_BEGIN_OR_JOIN);
                 txConfig.setFactory(new TestTransactionFactory());
                 builder.setTransactionConfig(txConfig);
-                return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+                return context.getEndpointFactory().getInboundEndpoint(builder);
             }
         }, null);
     }
@@ -340,12 +340,12 @@ public final class MuleTestUtils
     // if (ImmutableEndpoint.ENDPOINT_TYPE_RECEIVER.equals(type))
     // {
     // return (Endpoint)
-    // context.getRegistry().lookupEndpointFactory().getInboundEndpoint(endpointBuilder);
+    // context.getEndpointFactory().getInboundEndpoint(endpointBuilder);
     // }
     // else if (ImmutableEndpoint.ENDPOINT_TYPE_SENDER.equals(type))
     // {
     // return (Endpoint)
-    // context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(endpointBuilder);
+    // context.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
     // }
     // else
     // {
@@ -364,7 +364,7 @@ public final class MuleTestUtils
         {
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
-                return context.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+                return context.getEndpointFactory().getInboundEndpoint(builder);
             }
         });
     }
@@ -378,7 +378,7 @@ public final class MuleTestUtils
         {
             public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
             {
-                return context.getRegistry().lookupEndpointFactory().getOutboundEndpoint(builder);
+                return context.getEndpointFactory().getOutboundEndpoint(builder);
             }
         });
     }

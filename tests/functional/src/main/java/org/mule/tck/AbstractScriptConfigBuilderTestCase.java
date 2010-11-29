@@ -73,7 +73,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
 
     public void testGlobalEndpointConfig() throws MuleException
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             "fruitBowlEndpoint");
         assertNotNull(endpoint);
         assertEquals(endpoint.getEndpointURI().getAddress(), "fruitBowlPublishQ");
@@ -82,14 +82,14 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(filter);
         assertEquals("foo=bar", filter.getPattern());
 
-        ImmutableEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("testEPWithCS");
+        ImmutableEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint("testEPWithCS");
         assertNotNull(ep);
     }
 
     public void testEndpointConfig() throws MuleException
     {
         // test that targets have been resolved on targets
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             "waterMelonEndpoint");
         assertNotNull(endpoint);
         // aliases no longer possible
@@ -155,7 +155,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
      */
     public void testEndpointPropertiesConfig() throws Exception
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             "endpointWithProps");
 
         Map props = endpoint.getProperties();

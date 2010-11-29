@@ -20,7 +20,7 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
 {
     public void testHostInfoReplace() throws Exception
     {
-        OutboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        OutboundEndpoint ep = muleContext.getEndpointFactory().getOutboundEndpoint(
             "axis:http://mycompany.com:8080/services/myService?method=foo");
         
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
@@ -32,7 +32,7 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
 
     public void testHostReplace() throws Exception
     {
-        OutboundEndpoint ep = muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(
+        OutboundEndpoint ep = muleContext.getEndpointFactory().getOutboundEndpoint(
             "axis:http://mycompany.com:8080/services/myService?method=foo");
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         MuleEvent event = getTestEvent("test,", ep);

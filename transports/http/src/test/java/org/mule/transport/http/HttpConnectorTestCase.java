@@ -43,7 +43,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
     public void testValidListener() throws Exception
     {
         Service service = getTestService("orange", Orange.class);
-        InboundEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             getTestEndpointURI());
 
         getConnector().registerListener(endpoint, getSensingNullMessageProcessor(), service);

@@ -33,6 +33,6 @@ public class TcpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
     public InboundEndpoint getEndpoint() throws Exception
     {
-        return muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("tcp://localhost:1234");
+        return muleContext.getEndpointFactory().getInboundEndpoint("tcp://localhost:1234");
     }
 }

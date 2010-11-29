@@ -142,7 +142,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
         OutboundEndpoint endpoint = null;
         if (null != getMuleContext() && null != getMuleContext().getRegistry())
         {
-            endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(uri.getAddress());
+            endpoint = getMuleContext().getEndpointFactory().getOutboundEndpoint(uri.getAddress());
         }
         if (null != endpoint)
         {
@@ -157,7 +157,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
         OutboundEndpoint endpoint = (OutboundEndpoint) recipientCache.get(recipient);
         if (null == endpoint && null != getMuleContext() && null != getMuleContext().getRegistry())
         {
-            endpoint = getMuleContext().getRegistry().lookupEndpointFactory().getOutboundEndpoint(recipient);
+            endpoint = getMuleContext().getEndpointFactory().getOutboundEndpoint(recipient);
         }
         return endpoint;
     }

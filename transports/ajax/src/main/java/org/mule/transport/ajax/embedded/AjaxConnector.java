@@ -209,7 +209,7 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
         connector.setHost(serverUrl.getHost());
         
         getHttpServer().addConnector(connector);
-        EndpointBuilder builder = muleContext.getRegistry().lookupEndpointFactory().getEndpointBuilder(serverUrl.toString());
+        EndpointBuilder builder = muleContext.getEndpointFactory().getEndpointBuilder(serverUrl.toString());
 
         servlet = (ContinuationCometdServlet)createServlet(connector, builder.buildInboundEndpoint());
     }

@@ -20,13 +20,13 @@ public class TcpSocketKeyTestCase extends DynamicPortTestCase
     public void testHashAndEquals() throws MuleException
     {
         ImmutableEndpoint endpoint1in =
-                muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("globalEndpoint1");
+                muleContext.getEndpointFactory().getInboundEndpoint("globalEndpoint1");
         TcpSocketKey key1in = new TcpSocketKey(endpoint1in);
         ImmutableEndpoint endpoint1out =
-                muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint("globalEndpoint1");
+                muleContext.getEndpointFactory().getOutboundEndpoint("globalEndpoint1");
         TcpSocketKey key1out = new TcpSocketKey(endpoint1out);
         ImmutableEndpoint endpoint2in =
-                muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint("globalEndpoint2");
+                muleContext.getEndpointFactory().getInboundEndpoint("globalEndpoint2");
         TcpSocketKey key2in = new TcpSocketKey(endpoint2in);
 
         assertEquals(key1in, key1in);

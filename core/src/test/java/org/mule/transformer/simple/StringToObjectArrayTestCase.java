@@ -52,7 +52,7 @@ public class StringToObjectArrayTestCase extends AbstractTransformerTestCase
 
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://test", muleContext);
         builder.setEncoding(encoding);
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             builder);
         trans.setEndpoint(endpoint);
 

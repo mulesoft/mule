@@ -36,7 +36,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
 
     public void testGlobalEndpoint1() throws MuleException
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             "ep1");
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
@@ -62,7 +62,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
 
     public void testGlobalEndpoint2() throws MuleException
     {
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             "ep2");
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();

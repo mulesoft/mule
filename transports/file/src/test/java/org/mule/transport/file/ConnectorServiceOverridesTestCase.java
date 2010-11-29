@@ -60,7 +60,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
     public void testServiceOverrides3() throws InterruptedException, MuleException
     {
         // EndpointURI uri = new MuleEndpointURI("file:///temp?connector=fileConnector1");
-        ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             "file:///temp?connector=fileConnector1");
 
         assertNotNull(endpoint);
@@ -74,19 +74,19 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         EndpointBuilder builder = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector1",
             muleContext);
         builder.setConnector(c);
-        endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder);
+        endpoint = muleContext.getEndpointFactory().getInboundEndpoint(builder);
         assertNotNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
         EndpointBuilder builder2 = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector3",
             muleContext);
         builder.setConnector(c);
-        endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder2);
+        endpoint = muleContext.getEndpointFactory().getInboundEndpoint(builder2);
         assertNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
         EndpointBuilder builder3 = new EndpointURIEndpointBuilder("file:///temp?connector=fileConnector2",
             muleContext);
         builder.setConnector(c);
-        endpoint = muleContext.getRegistry().lookupEndpointFactory().getInboundEndpoint(builder3);
+        endpoint = muleContext.getEndpointFactory().getInboundEndpoint(builder3);
         assertNotNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
 
     }
