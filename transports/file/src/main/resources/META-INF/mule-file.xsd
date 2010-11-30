@@ -154,9 +154,16 @@
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <xsd:extension base="mule:inboundEndpointTypeWithoutExchangePattern">                
+            <xsd:extension base="mule:inboundEndpointTypeWithoutExchangePattern">
                 <xsd:attributeGroup ref="addressAttributes"/>
                 <xsd:attributeGroup ref="inboundAttributes"/>
+                <xsd:attribute name="processSynchronously" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If this is set to true, files read from this endpoint are by default processed synchronously.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

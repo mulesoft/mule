@@ -18,5 +18,8 @@ import org.mule.api.transport.MessageRequesting;
 
 public interface InboundEndpoint extends ImmutableEndpoint, MessageRequesting, MessageSource, FlowConstructAware, Startable, Stoppable
 {
-    // empty
+    /**
+     * True when inbound events should be processed synchronously
+     */
+    boolean shouldProcessInboundEventsSynchronously();
 }

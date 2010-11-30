@@ -18,7 +18,9 @@ import org.mule.api.service.Service;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transformer.Transformer;
 import org.mule.component.DefaultJavaComponent;
+import org.mule.endpoint.AbstractEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
+import org.mule.interceptor.AbstractEnvelopeInterceptor;
 import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.tck.functional.EventCallback;
@@ -148,7 +150,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
 
         File moveToDir = configureConnector(inFile, false, false, true, FileMuleMessageFactory.class);
 
-        assertRecevied(configureService(inFile, false, true));
+        assertRecevied(configureService(inFile, false, true, true));
         //TODO MULE-3198
         //assertFiles(inFile, moveToDir, false, true);
     }
@@ -165,6 +167,11 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     protected Latch configureService(File inFile, boolean streaming, boolean filePayload) throws Exception
+    {
+        return configureService(inFile, streaming, filePayload, false);
+    }
+
+    protected Latch configureService(File inFile, boolean streaming, boolean filePayload, boolean sync) throws Exception
     {
         Service service = new SedaService(muleContext);
         service.setName("moveDeleteBridgeService");
@@ -194,6 +201,10 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         }
         
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(url, muleContext);
+        if (sync)
+        {
+            endpointBuilder.setProperty(AbstractEndpoint.PROPERTY_PROCESS_SYNCHRONOUSLY, "true");
+        }
         endpointBuilder.addMessageProcessor(transformer);
         if (filePayload)
         {
@@ -211,8 +222,8 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
             public void eventReceived(final MuleEventContext context, final Object message) throws Exception
             {                
                 assertEquals(1, latch.getCount());
-                latch.countDown();
                 assertEquals(TEST_MESSAGE, context.transformMessageToString());
+                latch.countDown();
             }
         });
         testComponent.initialise();
@@ -228,7 +239,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     protected void assertRecevied(Latch latch) throws Exception
     {
         assertNotNull(latch);
-        assertTrue(latch.await(2000, TimeUnit.MILLISECONDS));
+        assertTrue(latch.await(20000000000L, TimeUnit.MILLISECONDS));
     }
 
     private class FileMessageFactoryAssertingTransformer extends AbstractMessageTransformer

@@ -50,6 +50,8 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable
 
     private static final long serialVersionUID = -1650380871293160973L;
 
+    public static final String PROPERTY_PROCESS_SYNCHRONOUSLY = "processSynchronously";
+
     /**
      * logger used by this class
      */
@@ -122,7 +124,9 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable
     private final String endpointMimeType;
 
     private boolean disableTransportTransformer = false;
-    
+
+    private boolean forceSynchronousProcessing = false;
+
     public AbstractEndpoint(Connector connector,
                             EndpointURI endpointUri,
                             String name,
@@ -191,6 +195,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable
         else
         {
             this.responseMessageProcessors = responseMessageProcessors;
+        }
+        String sync = (String) properties.get(PROPERTY_PROCESS_SYNCHRONOUSLY);
+        if (sync != null)
+        {
+            forceSynchronousProcessing = Boolean.valueOf(sync);
         }
     }
 
@@ -506,6 +515,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable
             messageProcessorChain = createMessageProcessorChain(flowContruct);
         }
         return messageProcessorChain;
+    }
+
+    public boolean shouldProcessInboundEventsSynchronously()
+    {
+        return forceSynchronousProcessing || getExchangePattern().hasResponse() || getTransactionConfig().isTransacted();
     }
 
     abstract protected MessageProcessor createMessageProcessorChain(FlowConstruct flowContruct) throws MuleException;

@@ -266,4 +266,9 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     {
         return endpoint.process(event);
     }
+
+    public boolean shouldProcessInboundEventsSynchronously()
+    {
+        return endpoint.shouldProcessInboundEventsSynchronously();
+    }
 }

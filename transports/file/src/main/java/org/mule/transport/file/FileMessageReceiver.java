@@ -92,22 +92,24 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             throw new CreateException(FileMessages.invalidFileFilter(endpoint.getEndpointURI()), this);
         }
         
-        logWarningWhenConnectorAutoDeletesAndEndpointIsOneWay();
+        logWarningWhenEndpointAutoDeletesFilesAndIsNotSync(endpoint);
     }
 
-    private void logWarningWhenConnectorAutoDeletesAndEndpointIsOneWay() throws CreateException
+    private void logWarningWhenEndpointAutoDeletesFilesAndIsNotSync(InboundEndpoint endpoint) throws CreateException
     {
         boolean connectorIsAutoDelete = false;
+        boolean isStreaming = false;
         if (connector instanceof FileConnector)
         {
             connectorIsAutoDelete = ((FileConnector) connector).isAutoDelete();
+            isStreaming = ((FileConnector) connector).isStreaming();
         }
 
         boolean messageFactoryConsumes = (createMuleMessageFactory() instanceof FileContentsMuleMessageFactory);
         
-        if (connectorIsAutoDelete && !messageFactoryConsumes)
+        if (connectorIsAutoDelete && !messageFactoryConsumes && !isStreaming && !endpoint.shouldProcessInboundEventsSynchronously())
         {
-            logger.warn(FileMessages.connectorAutodeletesWithoutConsuming(connector).getMessage());
+            logger.warn(FileMessages.endpointAutoDeletesAndIsNotSync(endpoint).getMessage());
         }
     }
 

@@ -43,8 +43,7 @@ public class OptionalAsyncInterceptingMessageProcessor extends AsyncIntercepting
 
     protected boolean isProcessAsync(MuleEvent event) throws MessagingException
     {
-        return doThreading && !event.getEndpoint().getExchangePattern().hasResponse()
-               && !event.getEndpoint().getTransactionConfig().isTransacted();
+        return doThreading && !event.getEndpoint().shouldProcessInboundEventsSynchronously();
     }
 
 }

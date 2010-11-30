@@ -11,6 +11,7 @@
 package org.mule.transport.file.i18n;
 
 import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
@@ -63,9 +64,9 @@ public class FileMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 8, filter.getClass().getName());
     }
 
-    public static Message connectorAutodeletesWithoutConsuming(Connector connector)
+    public static Message endpointAutoDeletesAndIsNotSync(InboundEndpoint endpoint)
     {
-        return factory.createMessage(BUNDLE_PATH, 9, connector.getName());
+        return factory.createMessage(BUNDLE_PATH, 9, endpoint.getName());
     }
 }
 
