@@ -239,7 +239,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     protected void assertRecevied(Latch latch) throws Exception
     {
         assertNotNull(latch);
-        assertTrue(latch.await(20000000000L, TimeUnit.MILLISECONDS));
+        assertTrue(latch.await(2000L, TimeUnit.MILLISECONDS));
     }
 
     private class FileMessageFactoryAssertingTransformer extends AbstractMessageTransformer
