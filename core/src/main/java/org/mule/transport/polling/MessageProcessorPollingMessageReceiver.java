@@ -1,0 +1,71 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
+package org.mule.transport.polling;
+
+import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transport.Connector;
+import org.mule.session.DefaultMuleSession;
+import org.mule.transport.AbstractConnector;
+import org.mule.transport.AbstractPollingMessageReceiver;
+import org.mule.util.StringUtils;
+
+import java.util.Map;
+
+public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessageReceiver
+{
+    public static final String SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME = "sourceMessageProcessor";
+
+    protected MessageProcessor sourceMessageProcessor;
+
+    public MessageProcessorPollingMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
+        throws CreateException
+    {
+        super(connector, flowConstruct, endpoint);
+    }
+
+    @Override
+    protected void doInitialise() throws InitialisationException
+    {
+        super.doInitialise();
+
+        sourceMessageProcessor = (MessageProcessor) endpoint.getProperty(SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME);
+
+        Long tempPolling = (Long) endpoint.getProperties().get(AbstractConnector.PROPERTY_POLLING_FREQUENCY);
+        if (tempPolling != null)
+        {
+            setFrequency(tempPolling);
+        }
+    }
+
+    @Override
+    public void poll() throws Exception
+    {
+        MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null,
+            connector.getMuleContext());
+        MuleEvent event = new DefaultMuleEvent(request, endpoint, new DefaultMuleSession(flowConstruct,  
+            connector.getMuleContext()));
+
+        MuleEvent sourceEvent = sourceMessageProcessor.process(event);
+        if (sourceEvent != null)
+        {
+            routeMessage(sourceEvent.getMessage());
+        }
+    }
+
+}

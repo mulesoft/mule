@@ -311,5 +311,11 @@
         <logger message="Ths is my header value: #[header:INBOUND:toLog]" level="ERROR" category="mycategory"/>
     </flow>
 
+    <flow name="poll">
+        <poll frequency="3000">
+            <append-string-transformer message=" Hello foo" />
+        </poll>
+        <logger level="ERROR" message="#[payload]"/>
+    </flow>
 
 </mule>

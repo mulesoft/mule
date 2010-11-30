@@ -28,6 +28,7 @@ import org.mule.config.spring.factories.CompositeMessageSourceFactoryBean;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
 import org.mule.config.spring.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
+import org.mule.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
@@ -281,6 +282,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         //Endpoint elements
         registerBeanDefinitionParser("endpoint", new OrphanEndpointDefinitionParser(EndpointURIEndpointBuilder.class));
         registerBeanDefinitionParser("inbound-endpoint", new ChildEndpointDefinitionParser(InboundEndpointFactoryBean.class));
+        registerBeanDefinitionParser("poll", new ChildEndpointDefinitionParser(PollingMessageSourceFactoryBean.class));
         registerBeanDefinitionParser("outbound-endpoint", new ChildEndpointDefinitionParser(OutboundEndpointFactoryBean.class));
         registerBeanDefinitionParser("custom-transaction", new TransactionDefinitionParser());
         registerBeanDefinitionParser("xa-transaction", new TransactionDefinitionParser(XaTransactionFactory.class));

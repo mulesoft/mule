@@ -134,6 +134,8 @@ public abstract class AbstractConnector implements Connector, WorkListener
     public static final int DEFAULT_NUM_CONCURRENT_TX_RECEIVERS = 4;
 
     private static final long SCHEDULER_FORCED_SHUTDOWN_TIMEOUT = 5000l;
+    
+    public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
 
     /**
      * logger used by this class

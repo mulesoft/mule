@@ -546,6 +546,8 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    
      
     <!--  TODO 
     <xsd:element name="seda-stage" substitutionGroup="abstract-message-processor">
@@ -820,10 +822,10 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element ref="abstract-reconnection-strategy" minOccurs="0">
+            <xsd:element ref="abstract-retry-policy" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
-                        The default reconnection strategy, used by connectors and endpoints. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
+                        The default retry policy, used by connectors and endpoints. This can also be configured on connectors, in which case the connector configuration is used instead of this default.
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
@@ -1450,27 +1452,27 @@
         </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:element name="abstract-reconnection-strategy" abstract="true" type="abstractReconnectionStrategyType">
+    <xsd:element name="abstract-retry-policy" abstract="true" type="abstractRetryPolicyType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for a reconnection strategy element. Reconnection strategies define how Mule should attempt to handle a connection failure.
+                A placeholder for a retry policy element. Retry policies define how Mule should retry a failed message send/dispatch/request.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractReconnectionStrategyType">
+    <xsd:complexType name="abstractRetryPolicyType">
         <xsd:sequence>
-            <xsd:element ref="abstract-reconnect-notifier" minOccurs="0" maxOccurs="1"/>
+            <xsd:element ref="abstract-retry-notifier" minOccurs="0" maxOccurs="1"/>
         </xsd:sequence>
     </xsd:complexType>
 
-    <xsd:element name="abstract-reconnect-notifier" abstract="true" type="abstractReconnectNotifierType">
+    <xsd:element name="abstract-retry-notifier" abstract="true" type="abstractRetryNotifierType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for a reconnection notifier element. The RetryNotifier interface is a callback that allows actions to be performed after each reconnection attempt, e.g., firing server notification events on success or failure.
+                A placeholder for a retry notifier element. The RetryNotifier interface is a callback that allows actions to be performed after each retry. For example, when retrying connections, Mule will fire server notification events on success or failure.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractReconnectNotifierType"/>
+    <xsd:complexType name="abstractRetryNotifierType"/>
 
     <xsd:complexType name="asyncReplyCollectionType">
         <xsd:sequence>
@@ -2502,6 +2504,29 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    <xsd:element name="poll" type="pollInboundEndpointType" substitutionGroup="abstract-inbound-endpoint">
+        <xsd:annotation>
+            <xsd:documentation>
+                Polls the nested message processor for new messages
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="pollInboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractInboundEndpointType">
+                <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
+                <xsd:attribute name="frequency"  type="substitutableLong" default="1000">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Polling frequency in milliseconds. Default frequency is 1000ms (1s).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
 
     <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="abstract-outbound-endpoint">
         <xsd:annotation>
@@ -2548,7 +2573,7 @@
                     </xsd:complexType>
                 </xsd:element>
                 <xsd:element ref="abstract-transaction" minOccurs="0"/>
-                <xsd:element ref="abstract-reconnection-strategy" minOccurs="0"/>
+                <xsd:element ref="abstract-retry-policy" minOccurs="0"/>
                 <xsd:element ref="abstract-multi-transaction" minOccurs="0"/>
                 <xsd:group ref="propertiesGroup"/>
             </xsd:sequence>
@@ -3549,7 +3574,6 @@
             <xsd:enumeration value="headers"/>
             <xsd:enumeration value="headers-list"/>
             <xsd:enumeration value="json"/>
-            <xsd:enumeration value="json-node"/>
             <xsd:enumeration value="jxpath"/>
             <xsd:enumeration value="map-payload"/>
             <xsd:enumeration value="message"/>
@@ -5947,10 +5971,10 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
-                    <xsd:element ref="abstract-reconnection-strategy" minOccurs="0">
+                    <xsd:element ref="abstract-retry-policy" minOccurs="0">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Reconnection strategy that defines how Mule should handle a connection failure.
+                                Retry policy that defines how Mule should retry if a receive/request/dispatch operation fails.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>

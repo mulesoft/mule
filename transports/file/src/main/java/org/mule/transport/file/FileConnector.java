@@ -56,7 +56,6 @@ public class FileConnector extends AbstractConnector
 
     // These are properties that can be overridden on the Receiver by the endpoint declaration
     // inbound only
-    public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
     public static final String PROPERTY_FILE_AGE = "fileAge";
     public static final String PROPERTY_MOVE_TO_PATTERN = "moveToPattern";
     public static final String PROPERTY_MOVE_TO_DIRECTORY = "moveToDirectory";
