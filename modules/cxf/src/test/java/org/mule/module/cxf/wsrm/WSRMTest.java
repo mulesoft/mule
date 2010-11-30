@@ -1,5 +1,5 @@
 /*
- * $Id: WSATest.java 20320 2010-11-24 15:03:31Z dfeist $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
