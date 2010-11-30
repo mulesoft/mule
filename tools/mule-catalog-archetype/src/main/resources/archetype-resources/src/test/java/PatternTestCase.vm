@@ -47,16 +47,6 @@ public class ${patternClassName}TestCase extends AbstractFlowConstuctTestCase
         return ${patternVariableName};
     }
 
-    public void testProcess() throws Exception
-    {
-        ${patternVariableName}.initialise();
-        ${patternVariableName}.start();
-
-        final String testPayload = RandomStringUtils.randomAlphanumeric(10);
-        final MuleEvent response = ${patternVariableName}.process(MuleTestUtils.getTestInboundEvent(testPayload,
-            muleContext));
-        assertEquals(testPayload, response.getMessageAsString());
-    }
 #if($patternType != "mp")
 
     public void testMessageSource() throws Exception
