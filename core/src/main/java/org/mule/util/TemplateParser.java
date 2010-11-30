@@ -42,7 +42,7 @@ public final class TemplateParser
         patterns.put(ANT_TEMPLATE_STYLE, new PatternInfo(ANT_TEMPLATE_STYLE, "\\$\\{[^\\}]+\\}", "${", "}"));
         patterns.put(SQUARE_TEMPLATE_STYLE, new PatternInfo(SQUARE_TEMPLATE_STYLE, "\\[[^\\]]+\\]", "[", "]"));
         patterns.put(CURLY_TEMPLATE_STYLE, new PatternInfo(CURLY_TEMPLATE_STYLE, "\\{[^\\}]+\\}", "{", "}"));
-        patterns.put(WIGGLY_MULE_TEMPLATE_STYLE, new PatternInfo(WIGGLY_MULE_TEMPLATE_STYLE, "#\\[[^\\]]+\\]*", "#[", "]"));
+        patterns.put(WIGGLY_MULE_TEMPLATE_STYLE, new PatternInfo(WIGGLY_MULE_TEMPLATE_STYLE, "#\\[[^\\]]+\\]+", "#[", "]"));
     }
 
 
