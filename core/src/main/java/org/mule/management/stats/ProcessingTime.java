@@ -117,6 +117,9 @@ public class ProcessingTime implements Serializable
                         Reference ref;
                         do
                         {
+                            // The next two lines look silly, but
+                            //       ref = (Reference) queue.poll();
+                            // fails on the IBM 1.5 compiler
                             Object temp = queue.poll();
                             ref = (Reference) temp;
                             if (ref != null)
