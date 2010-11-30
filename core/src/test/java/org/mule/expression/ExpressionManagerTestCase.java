@@ -87,13 +87,5 @@ public class ExpressionManagerTestCase extends AbstractMuleTestCase
         String result = muleContext.getExpressionManager().parse("http://#[header:user]:#[header:password]@#[header:host]:#[header:port]/foo/bar", msg);
         assertNotNull(result);
         assertEquals("http://vasya:pupkin@example.com:12345/foo/bar", result);
-        
-        assertEquals("hi vasya", muleContext.getExpressionManager().parse("#[string:hi #[header:OUTBOUND:user]]", msg));
-
-        // Not supported
-        // assertEquals("hi vasya your password is pupkin",
-        // muleContext.getExpressionManager().parse("#[string:hi #[header:OUTBOUND:user] your password is #[header:OUTBOUND:password]]",
-        // msg));
-        
     }
 }
