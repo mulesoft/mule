@@ -20,7 +20,6 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.context.notification.MessageProcessorNotification;
-import org.mule.context.notification.OptimisedNotificationHandler;
 import org.mule.util.ObjectUtils;
 
 import org.apache.commons.logging.Log;
@@ -42,8 +41,7 @@ public abstract class AbstractInterceptingMessageProcessor implements Intercepti
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
-        notificationHandler = new OptimisedNotificationHandler(muleContext.getNotificationManager(),
-                                                               MessageProcessorNotification.class);
+        notificationHandler = muleContext.getNotificationManager();
     }
 
     public void setListener(MessageProcessor next)
