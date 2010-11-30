@@ -117,7 +117,8 @@ public class ProcessingTime implements Serializable
                         Reference ref;
                         do
                         {
-                            ref = (Reference)queue.poll();
+                            Object temp = queue.poll();
+                            ref = (Reference) temp;
                             if (ref != null)
                             {
                                 refs.remove(ref);
