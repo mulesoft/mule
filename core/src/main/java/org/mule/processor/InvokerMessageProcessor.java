@@ -117,7 +117,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
                 Object arg = null;
                 if (expressions[i] != null)
                 {
-                    arg = expressionManager.evaluate(expressions[i], event.getMessage());
+                    arg = expressionManager.parse(expressions[i], event.getMessage());
                     // If expression evaluates to a MuleMessage then use it's payload
                     if (arg instanceof MuleMessage)
                     {
