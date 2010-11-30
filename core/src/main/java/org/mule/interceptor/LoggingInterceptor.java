@@ -31,9 +31,9 @@ public class LoggingInterceptor extends AbstractEnvelopeInterceptor
     @Override
     public MuleEvent before(MuleEvent event)
     {
-        if (logger.isInfoEnabled())
+        if (logger.isDebugEnabled())
         {
-            logger.info("Started event processing for " + event.getFlowConstruct().getName());
+            logger.debug("Started event processing for " + event.getFlowConstruct().getName());
         }
         return event;
 
@@ -42,12 +42,9 @@ public class LoggingInterceptor extends AbstractEnvelopeInterceptor
     @Override
     public MuleEvent after(MuleEvent event)
     {
-        if (logger.isInfoEnabled() && (event != null))
+        if (logger.isDebugEnabled() && event != null)
         {
-            if (event != null)
-            {
-                logger.info("Finished event processing for " + event.getFlowConstruct().getName());
-            }
+            logger.debug("Finished event processing for " + event.getFlowConstruct().getName());
         }
         return event;
     }
