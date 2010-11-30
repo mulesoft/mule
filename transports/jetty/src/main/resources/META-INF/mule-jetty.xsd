@@ -39,6 +39,9 @@
     <xsd:complexType name="jettyConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractConnectorType">
+                <xsd:sequence minOccurs="1" maxOccurs="1">
+                    <xsd:element minOccurs="0" maxOccurs="1" name="webapps" type="webappsType"/>
+                </xsd:sequence>
                 <xsd:attribute name="configFile" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -64,6 +67,26 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:complexType name="webappsType">
+        <xsd:attribute name="port" type="xsd:integer">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="host" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="directory" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
     
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>

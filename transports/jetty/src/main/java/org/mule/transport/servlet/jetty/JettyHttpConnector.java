@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServlet;
 
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.deployer.WebAppDeployer;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
@@ -69,8 +70,11 @@ public class JettyHttpConnector extends AbstractConnector
 
     private String resourceBase;
 
+    private WebappsConfiguration webappsConfiguration;
 
     protected HashMap<String, ConnectorHolder> holders = new HashMap<String, ConnectorHolder>();
+
+    private WebAppDeployer deployer;
 
     public JettyHttpConnector(MuleContext context)
     {
@@ -89,6 +93,22 @@ public class JettyHttpConnector extends AbstractConnector
     protected void doInitialise() throws InitialisationException
     {
         httpServer = new Server();
+
+        if (webappsConfiguration != null)
+        {
+            deployer = new WebAppDeployer();
+            deployer.setWebAppDir(webappsConfiguration.getDirectory());
+            deployer.setExtract(true);
+             
+            org.mortbay.jetty.AbstractConnector connector = createJettyConnector();
+            connector.setHost(webappsConfiguration.getHost());
+            connector.setPort(webappsConfiguration.getPort());
+            deployer.setContexts(httpServer);
+            
+            httpServer.addConnector(connector);
+            httpServer.addLifeCycle(deployer);
+        }
+        
         initialiseFromConfigFile();
 
         try
@@ -166,6 +186,12 @@ public class JettyHttpConnector extends AbstractConnector
         try
         {
             httpServer.start();
+            
+            if (deployer != null)
+            {
+                deployer.start();
+            }
+            
             for (ConnectorHolder<?, ?> contextHolder : holders.values())
             {
                 contextHolder.start();
@@ -183,6 +209,12 @@ public class JettyHttpConnector extends AbstractConnector
         try
         {
             httpServer.stop();
+            
+            if (deployer != null)
+            {
+                deployer.stop();
+            }
+            
             for (ConnectorHolder<?, ?> connectorRef : holders.values())
             {
                 connectorRef.stop();
@@ -367,9 +399,8 @@ public class JettyHttpConnector extends AbstractConnector
         context.setConnectorNames(new String[]{connector.getName()});
         context.addEventListener(new MuleServletContextListener(muleContext, getName()));
 
-        if(resourceBase!=null)
+        if (resourceBase != null)
         {
-
             Context resourceContext = new Context(handlerCollection, path, Context.NO_SECURITY);
             resourceContext.setResourceBase(resourceBase);
         }
@@ -449,5 +480,15 @@ public class JettyHttpConnector extends AbstractConnector
     public void setResourceBase(String resourceBase)
     {
         this.resourceBase = resourceBase;
+    }
+
+    public WebappsConfiguration getWebappsConfiguration()
+    {
+        return webappsConfiguration;
+    }
+
+    public void setWebappsConfiguration(WebappsConfiguration webappsConfiguration)
+    {
+        this.webappsConfiguration = webappsConfiguration;
     }
 }
