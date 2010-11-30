@@ -22,18 +22,19 @@ rem ###############################################################
 rem Customized for Mule
 rem ###############################################################
 
-rem MULE_HOME must be set
-if "%MULE_HOME%" == "" (
-   set MULE_HOME="%_REALPATH%.."
-   echo "MULE_HOME is set to %MULE_HOME%" 
-)
+rem make sure that MULE_HOME is set. If no value was set in the environment,
+rem use the path that was used to launch this script. Sinc this script resides
+rem in the bin folder of the Mule distribution, we need to cut off the
+rem last 5 chars (\bin\) from the real path to determine the proper MULE_HOME
+if "%MULE_HOME%" == "" set MULE_HOME=%_REALPATH:~0,-5%
+echo MULE_HOME is set to %MULE_HOME%
 
 rem If MULE_BASE is not set, set it to MULE_HOME
 if "%MULE_BASE%" == "" SET MULE_BASE=%MULE_HOME%
 
 if "%MULE_APP%" == "" (
     set MULE_APP=mule
-)
+) 
 if "%MULE_APP_LONG%" == "" (
     set MULE_APP_LONG=Mule
 )
