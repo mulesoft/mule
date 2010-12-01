@@ -267,8 +267,8 @@
         <xsd:attribute name="validationEnabled" type="mule:substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    Whether or not validation should be enabled on this service. For
-                    proxy services, validation only will occur on the inbound.
+                    Whether or not validation should be enabled on this service. 
+                    Validation only occurs on inbound server messages.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
