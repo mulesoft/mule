@@ -40,9 +40,10 @@ import java.util.List;
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
+
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.deployer.WebAppDeployer;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
@@ -93,18 +94,21 @@ public class JettyHttpConnector extends AbstractConnector
     protected void doInitialise() throws InitialisationException
     {
         httpServer = new Server();
-
+        
         if (webappsConfiguration != null)
         {
             deployer = new WebAppDeployer();
             deployer.setWebAppDir(webappsConfiguration.getDirectory());
             deployer.setExtract(true);
-             
+            deployer.setParentLoaderPriority(false);
+            deployer.setServerClasses(webappsConfiguration.getServerClasses());
+            deployer.setSystemClasses(webappsConfiguration.getSystemClasses());
+
             org.mortbay.jetty.AbstractConnector connector = createJettyConnector();
             connector.setHost(webappsConfiguration.getHost());
             connector.setPort(webappsConfiguration.getPort());
             deployer.setContexts(httpServer);
-            
+
             httpServer.addConnector(connector);
             httpServer.addLifeCycle(deployer);
         }

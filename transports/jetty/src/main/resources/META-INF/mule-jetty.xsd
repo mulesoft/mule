@@ -40,7 +40,14 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractConnectorType">
                 <xsd:sequence>
-                    <xsd:element minOccurs="0" maxOccurs="1" name="webapps" type="webappsType"/>
+                    <xsd:element minOccurs="0" maxOccurs="1" name="webapps" type="webappsType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Allows configuring of an directory which contains WAR files to be
+                                served out by Jetty.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="configFile" type="xsd:string">
                     <xsd:annotation>
@@ -71,18 +78,37 @@
         <xsd:attribute name="port" type="xsd:integer">
             <xsd:annotation>
                 <xsd:documentation>
+                    The port of the Jetty instance.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="host" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
+                    The host of the Jetty instance.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="directory" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
+                    The directory where webapps can be found.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="serverClasses" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                A comma delimited list of classes which cannot be seen by webapp context classloaders but can be overridden by the webapp.
+                Defaults to: org.mortbay.jetty.plus.jaas., org.mortbay.jetty., org.slf4j.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="systemClasses" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                A comma delimited list of classes which cannot be overridden by webapp classloaders.
+                Defaults to: java., javax.servlet., javax.xml., org.mortbay., org.xml.,org.w3c., org.apache.commons.logging., org.apache.log4j.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
