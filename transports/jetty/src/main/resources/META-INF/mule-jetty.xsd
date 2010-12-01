@@ -39,7 +39,7 @@
     <xsd:complexType name="jettyConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractConnectorType">
-                <xsd:sequence minOccurs="1" maxOccurs="1">
+                <xsd:sequence>
                     <xsd:element minOccurs="0" maxOccurs="1" name="webapps" type="webappsType"/>
                 </xsd:sequence>
                 <xsd:attribute name="configFile" type="xsd:string">
