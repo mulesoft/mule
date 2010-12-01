@@ -26,15 +26,7 @@
 
   #set($url = "${baseUrl}/${path}.html")
 
-  #set($globalHelper=$action.getGlobalHelper())
-  #set($renderer=$globalHelper.getWikiStyleRenderer())
-  #set($context=$content.toPageContext())
-  #set($renderedBody=$renderer.convertWikiToXHtml($context, "${body}"))
-
-  #set($renderedBody = $renderedBody.replace("<p>", ""))
-  #set($renderedBody = $renderedBody.trim().replace("</p>", ""))
-
-  <a href="$url">$renderedBody</a>
+  <a href="$url">$body</a>
 #else 
   $body <span style="color: red">$param0: Unknown</span>
 #end
