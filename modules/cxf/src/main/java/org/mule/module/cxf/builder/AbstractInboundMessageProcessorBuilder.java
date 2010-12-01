@@ -72,6 +72,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     protected MuleContext muleContext;
     private String port;
     private Map<String,Object> properties;
+    private boolean validationEnabled;
     
     public CxfInboundMessageProcessor build() throws MuleException
     {
@@ -175,6 +176,16 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         if (null != configurer)
         {
             configurer.configureBean(svcFac.getEndpointName().toString(), sfb);
+        }
+        
+        if (properties == null)
+        {
+            properties = new HashMap<String, Object>();
+        }
+        
+        if (validationEnabled) 
+        {
+            properties.put("schema-validation-enabled", "true");
         }
         
         sfb.setProperties(properties);
@@ -399,4 +410,15 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     {
         this.properties = properties;
     }
+
+    public boolean isValidationEnabled()
+    {
+        return validationEnabled;
+    }
+
+    public void setValidationEnabled(boolean validationEnabled)
+    {
+        this.validationEnabled = validationEnabled;
+    }
+    
 }

@@ -71,15 +71,24 @@ public class ProxyTestCase extends FunctionalTestCase
     public void testServerClientProxy() throws Exception
     {
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
-                     + "<soap:Body> <test xmlns=\"http://foo\"></test>" + "</soap:Body>" + "</soap:Envelope>";
+                     + "<soap:Body> <foo xmlns=\"http://foo\"></foo>" + "</soap:Body>" + "</soap:Envelope>";
 
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://localhost:63081/services/proxy", msg, null);
         String resString = result.getPayloadAsString();
-        System.out.println(resString);
-        assertTrue(resString.indexOf("<test xmlns=\"http://foo\"") != -1);
+
+        assertTrue(resString.indexOf("<foo xmlns=\"http://foo\"") != -1);
     }
 
+    public void testProxyValidation() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage result = client.send("http://localhost:63081/services/proxyWithValidation", msg, null);
+        String resString = result.getPayloadAsString();
+        System.out.println(resString);
+        assertTrue(resString.indexOf("Schema validation error on message") != -1);
+    }
+    
     public void testServerClientProxyWithWsdl() throws Exception
     {
         final Latch latch = new Latch();

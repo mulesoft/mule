@@ -18,6 +18,24 @@
 
     <mule-xml:xslt-transformer xsl-file="proxy.xsl" name="TestXslt" returnClass="org.mule.module.xml.transformer.DelayedResult"/>
 
+    <flow name="serverClientProxyWithValidation">
+        <inbound-endpoint
+            address="http://localhost:63081/services/proxyWithValidation"
+            exchange-pattern="request-response">
+        </inbound-endpoint>
+        <cxf:proxy-service 
+            service="WebService2"
+            wsdlLocation="localWsdl.wsdl" 
+            namespace="http://www.muleumo.org"
+            validationEnabled="true">
+        </cxf:proxy-service>
+        <test:component/>
+        <cxf:proxy-client />
+        <outbound-endpoint address="http://localhost:63081/services/Echo"
+            exchange-pattern="request-response">
+        </outbound-endpoint>
+    </flow>
+    
     <model name="BridgeTest">
     
         <service name="jaxwsProxy">
@@ -201,8 +219,7 @@
                 </pass-through-router>
             </outbound>
         </service>
-        
-        
+       
         <service name="serverClientProxyWithTransform">
             <inbound>
                 <inbound-endpoint address="http://localhost:63081/services/proxyWithTransform" 

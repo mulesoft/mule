@@ -20,6 +20,7 @@ import org.mule.module.cxf.support.ProxyServiceFactoryBean;
 import org.mule.module.cxf.support.ResetStaxInterceptor;
 import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
 
+import org.apache.cxf.aegis.databinding.AegisSchemaValidationInInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.databinding.stax.StaxDataBinding;
 import org.apache.cxf.databinding.stax.StaxDataBindingFeature;
@@ -67,6 +68,11 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
             CxfUtils.removeInterceptor(server.getEndpoint().getBinding().getOutInterceptors(), SoapOutInterceptor.class.getName());
         }
         
+        if (isValidationEnabled())
+        {
+            server.getEndpoint().getInInterceptors().add(new AegisSchemaValidationInInterceptor(getConfiguration().getCxfBus(), 
+               server.getEndpoint().getService().getServiceInfos().get(0)));
+        }
     }
 
     @Override
