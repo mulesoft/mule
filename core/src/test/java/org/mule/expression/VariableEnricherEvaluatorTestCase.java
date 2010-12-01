@@ -61,8 +61,16 @@ public class VariableEnricherEvaluatorTestCase extends AbstractMuleTestCase
         assertNotNull(result);
         assertEquals("fooValue", result);
 
-        // Value required + not found (returns null)
-        assertNull(expressionManager.evaluate("#[variable:foo]", message));
+        // Value required + not found (throws exception)
+        try
+        {
+            expressionManager.evaluate("#[variable:fool]", message);
+            fail("required value");
+        }
+        catch (Exception e)
+        {
+            // Expected
+        }
 
         // Variable is stored as an invocation property
         result = message.getProperty("foo", PropertyScope.INVOCATION);
