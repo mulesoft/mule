@@ -105,7 +105,15 @@ public interface ExpressionManager
      */
     public Object evaluate(String expression, String evaluator, MuleMessage message, boolean failIfNull) throws ExpressionRuntimeException;
 
-    
+
+    public boolean evaluateBoolean(String expression, String evaluator, MuleMessage message) throws ExpressionRuntimeException;
+
+    public boolean evaluateBoolean(String expression, MuleMessage message) throws ExpressionRuntimeException;
+
+    public boolean evaluateBoolean(String expression, String evaluator, MuleMessage message, boolean nullReturnsTrue) throws ExpressionRuntimeException;
+
+    public boolean evaluateBoolean(String expression, MuleMessage message, boolean nullReturnsTrue) throws ExpressionRuntimeException;
+
     public void enrich(String expression, MuleMessage message, Object object);
 
 

@@ -279,6 +279,64 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         return result;
     }
 
+    public boolean evaluateBoolean(String expression, String evaluator, MuleMessage message)
+        throws ExpressionRuntimeException
+    {
+        return evaluateBoolean(expression, evaluator, message, false);
+    }
+
+    public boolean evaluateBoolean(String expression, MuleMessage message) throws ExpressionRuntimeException
+    {
+        return evaluateBoolean(expression, message, false);
+    }
+
+    public boolean evaluateBoolean(String expression,
+                                   String evaluator,
+                                   MuleMessage message,
+                                   boolean nullReturnsTrue) throws ExpressionRuntimeException
+    {
+        return resolveBoolean(evaluate(expression, evaluator, message, false), nullReturnsTrue, expression);
+    }
+
+    public boolean evaluateBoolean(String expression, MuleMessage message, boolean nullReturnsTrue)
+        throws ExpressionRuntimeException
+    {
+        return resolveBoolean(evaluate(expression, message, false), nullReturnsTrue, expression);
+
+    }
+
+    private boolean resolveBoolean(Object result, boolean nullReturnsTrue, String expression)
+    {
+        if (result == null)
+        {
+            return nullReturnsTrue;
+        }
+        else if (result instanceof Boolean)
+        {
+            return (Boolean) result;
+        }
+        else if (result instanceof String)
+        {
+            if (result.toString().toLowerCase().equalsIgnoreCase("false"))
+            {
+                return false;
+            }
+            else if (result.toString().toLowerCase().equalsIgnoreCase("true"))
+            {
+                return true;
+            }
+            else
+            {
+                return !nullReturnsTrue;
+            }
+        }
+        else
+        {
+            logger.warn("Expression: " + expression + ", returned an non-boolean result. Returning: "
+                        + nullReturnsTrue);
+            return nullReturnsTrue;
+        }
+    }
 
     /**
      * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If

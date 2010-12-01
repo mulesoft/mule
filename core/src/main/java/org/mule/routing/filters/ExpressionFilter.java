@@ -9,6 +9,9 @@
  */
 package org.mule.routing.filters;
 
+import static org.mule.util.ClassUtils.equal;
+import static org.mule.util.ClassUtils.hash;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
@@ -19,9 +22,6 @@ import java.text.MessageFormat;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
 
 /**
  * Allows boolean expressions to be executed on a message. Note that when using this filter you must be able to either specify
@@ -110,8 +110,6 @@ public class ExpressionFilter implements Filter, MuleContextAware
             return result;
         }
 
-        Object result;
-
         // MULE-4797 Because there is no way to specify the class-loader that script
         // engines use and because scripts when used for expressions are compiled in
         // runtime rather than at initialization the only way to ensure the correct
@@ -122,42 +120,12 @@ public class ExpressionFilter implements Filter, MuleContextAware
         try
         {
             Thread.currentThread().setContextClassLoader(expressionEvaluationClassLoader);
-            result = muleContext.getExpressionManager().evaluate(expr, message, false);
+            return muleContext.getExpressionManager().evaluateBoolean(expr, message, false);
         }
         finally
         {
             // Restore original context class-loader
             Thread.currentThread().setContextClassLoader(originalContextClassLoader);
-        }
-
-        if (result == null)
-        {
-            return nullReturnsTrue;
-        }
-        else if (result instanceof Boolean)
-        {
-            return (Boolean) result;
-        }
-        else if (result instanceof String)
-        {
-            if(result.toString().toLowerCase().equalsIgnoreCase("false"))
-            {
-                return false;
-            }
-            else if(result.toString().toLowerCase().equalsIgnoreCase("true"))
-            {
-                return true;
-            }
-            else
-            {
-                return !nullReturnsTrue;
-            }
-        }
-        else
-        {
-            logger.warn("Expression: " + expr + ", returned an non-boolean result. Returning: "
-                        + !nullReturnsTrue);
-            return !nullReturnsTrue;
         }
     }
 
