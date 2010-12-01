@@ -329,7 +329,14 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     @Override
     public MuleEvent processNext(MuleEvent event) throws MuleException
     {
-        return next.process(event);
+        if (next != null)
+        {
+            return next.process(event);
+        }
+        else
+        {
+            return event;
+        }
     }
 
     protected OutputHandler getRessponseOutputHandler(final MessageImpl m)
