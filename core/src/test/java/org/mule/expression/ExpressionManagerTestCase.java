@@ -10,8 +10,10 @@
 package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transformer.simple.StringAppendTransformer;
 
 import java.sql.Timestamp;
 
@@ -76,13 +78,18 @@ public class ExpressionManagerTestCase extends AbstractMuleTestCase
 
     }
 
-    public void testParsing()
+    public void testParsing() throws Exception
     {
+        muleContext.getRegistry().registerObject("processor1", new StringAppendTransformer("b"));
+        muleContext.getRegistry().registerObject("processor2", new StringAppendTransformer("c"));
+        
         MuleMessage msg = new DefaultMuleMessage("test", muleContext);
         msg.setOutboundProperty("user", "vasya");
         msg.setOutboundProperty("password", "pupkin");
         msg.setOutboundProperty("host", "example.com");
         msg.setOutboundProperty("port", "12345");
+        
+        RequestContext.setEvent(getTestEvent(""));
 
         String result = muleContext.getExpressionManager().parse("http://#[header:user]:#[header:password]@#[header:host]:#[header:port]/foo/bar", msg);
         assertNotNull(result);
@@ -106,15 +113,9 @@ public class ExpressionManagerTestCase extends AbstractMuleTestCase
         assertFalse(muleContext.getExpressionManager().evaluateBoolean("header:ur", msg));
         assertTrue(muleContext.getExpressionManager().evaluateBoolean("header:ur", msg, true, false));
         assertFalse(muleContext.getExpressionManager().evaluateBoolean("header:ur", msg, false, false));
-        assertFalse(muleContext.getExpressionManager().evaluateBoolean("groovy:p", msg));
         
         // Boolean value
-        assertTrue(muleContext.getExpressionManager().evaluateBoolean("groovy:payload=='test'", msg));
-        assertFalse(muleContext.getExpressionManager().evaluateBoolean("groovy:payload=='t'", msg));
-        assertTrue(muleContext.getExpressionManager().evaluateBoolean("groovy:payload=='test'", msg, false, false));
-        assertFalse(muleContext.getExpressionManager().evaluateBoolean("groovy:payload=='t'", msg, false, false));
-        assertTrue(muleContext.getExpressionManager().evaluateBoolean("groovy:payload=='test'", msg, true, true));
-        assertFalse(muleContext.getExpressionManager().evaluateBoolean("groovy:payload=='t'", msg, true, true));
-
+        assertTrue(muleContext.getExpressionManager().evaluateBoolean("string:true", msg));
+        assertFalse(muleContext.getExpressionManager().evaluateBoolean("string:false", msg));
     }
 }
