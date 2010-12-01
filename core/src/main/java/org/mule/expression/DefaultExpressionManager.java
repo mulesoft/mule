@@ -235,6 +235,11 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
             enricherName = expression;
             expression = null;
         }
+        enrich(expression, enricherName, message, object);
+    }
+
+    public void enrich(String expression, String enricherName, MuleMessage message, Object object)
+    {
         ExpressionEnricher enricher = (ExpressionEnricher) enrichers.get(enricherName);
         if (enricher == null)
         {
@@ -243,7 +248,7 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         }
         enricher.enrich(expression, message, object);
     }
-    
+
     /**
      * Evaluates the given expression.  The expression should be a single expression definition with or without
      * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. For situations where
@@ -282,30 +287,38 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
     public boolean evaluateBoolean(String expression, String evaluator, MuleMessage message)
         throws ExpressionRuntimeException
     {
-        return evaluateBoolean(expression, evaluator, message, false);
+        return evaluateBoolean(expression, evaluator, message, false, false);
     }
 
     public boolean evaluateBoolean(String expression, MuleMessage message) throws ExpressionRuntimeException
     {
-        return evaluateBoolean(expression, message, false);
+        return evaluateBoolean(expression, message, false, false);
     }
 
     public boolean evaluateBoolean(String expression,
                                    String evaluator,
                                    MuleMessage message,
-                                   boolean nullReturnsTrue) throws ExpressionRuntimeException
+                                   boolean nullReturnsTrue,
+                                   boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException
     {
-        return resolveBoolean(evaluate(expression, evaluator, message, false), nullReturnsTrue, expression);
+        return resolveBoolean(evaluate(expression, evaluator, message, false), nullReturnsTrue,
+            nonBooleanReturnsTrue, expression);
     }
 
-    public boolean evaluateBoolean(String expression, MuleMessage message, boolean nullReturnsTrue)
-        throws ExpressionRuntimeException
+    public boolean evaluateBoolean(String expression,
+                                   MuleMessage message,
+                                   boolean nullReturnsTrue,
+                                   boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException
     {
-        return resolveBoolean(evaluate(expression, message, false), nullReturnsTrue, expression);
+        return resolveBoolean(evaluate(expression, message, false), nullReturnsTrue, nonBooleanReturnsTrue,
+            expression);
 
     }
 
-    private boolean resolveBoolean(Object result, boolean nullReturnsTrue, String expression)
+    protected boolean resolveBoolean(Object result,
+                                     boolean nullReturnsTrue,
+                                     boolean nonBooleanReturnsTrue,
+                                     String expression)
     {
         if (result == null)
         {
@@ -327,14 +340,14 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
             }
             else
             {
-                return !nullReturnsTrue;
+                return nonBooleanReturnsTrue;
             }
         }
         else
         {
             logger.warn("Expression: " + expression + ", returned an non-boolean result. Returning: "
-                        + nullReturnsTrue);
-            return nullReturnsTrue;
+                        + nonBooleanReturnsTrue);
+            return nonBooleanReturnsTrue;
         }
     }
 

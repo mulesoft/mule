@@ -120,7 +120,8 @@ public class ExpressionFilter implements Filter, MuleContextAware
         try
         {
             Thread.currentThread().setContextClassLoader(expressionEvaluationClassLoader);
-            return muleContext.getExpressionManager().evaluateBoolean(expr, message, false);
+            return muleContext.getExpressionManager().evaluateBoolean(expr, message, nullReturnsTrue,
+                !nullReturnsTrue);
         }
         finally
         {
