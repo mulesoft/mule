@@ -301,8 +301,15 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
                                    boolean nullReturnsTrue,
                                    boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException
     {
-        return resolveBoolean(evaluate(expression, evaluator, message, false), nullReturnsTrue,
-            nonBooleanReturnsTrue, expression);
+        try
+        {
+            return resolveBoolean(evaluate(expression, evaluator, message, false), nullReturnsTrue,
+                nonBooleanReturnsTrue, expression);
+        }
+        catch (RequiredValueException e)
+        {
+            return nullReturnsTrue;
+        }
     }
 
     public boolean evaluateBoolean(String expression,
@@ -310,9 +317,15 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
                                    boolean nullReturnsTrue,
                                    boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException
     {
-        return resolveBoolean(evaluate(expression, message, false), nullReturnsTrue, nonBooleanReturnsTrue,
-            expression);
-
+        try
+        {
+            return resolveBoolean(evaluate(expression, message, false), nullReturnsTrue,
+                nonBooleanReturnsTrue, expression);
+        }
+        catch (RequiredValueException e)
+        {
+            return nullReturnsTrue;
+        }
     }
 
     protected boolean resolveBoolean(Object result,
