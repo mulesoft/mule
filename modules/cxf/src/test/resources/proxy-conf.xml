@@ -29,11 +29,9 @@
             namespace="http://www.muleumo.org"
             validationEnabled="true">
         </cxf:proxy-service>
-        <test:component/>
-        <cxf:proxy-client />
-        <outbound-endpoint address="http://localhost:63081/services/Echo"
-            exchange-pattern="request-response">
-        </outbound-endpoint>
+        <static-component>
+            <return-data>&lt;echoResponse xmlns="http://www.muleumo.org"&gt;&lt;echo&gt;test&lt;/echo&gt;&lt;/echoResponse&gt;</return-data>
+        </static-component>
     </flow>
     
     <model name="BridgeTest">
@@ -115,11 +113,7 @@
             <inbound>
                 <inbound-endpoint address="http://localhost:63081/services/Echo" 
                                   exchange-pattern="request-response">
-                    <cxf:proxy-service>
-                        <cxf:features>
-                            <cxf-core:logging/>
-                        </cxf:features>
-                    </cxf:proxy-service>
+                    <cxf:proxy-service/>
                 </inbound-endpoint>
             </inbound>
             <outbound>
@@ -133,7 +127,7 @@
             <inbound>
                 <inbound-endpoint address="vm://test" exchange-pattern="request-response"/>
             </inbound>
-            <echo-component/>
+            <log-component/>
         </service>
         
         <service name="serverClientProxy">
