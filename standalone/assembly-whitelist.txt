@@ -60,7 +60,6 @@ geronimo-j2ee-management_1.0_spec-1.1-osgi
 geronimo-jms_1.1_spec-1.1-osgi
 geronimo-jta_1.0.1B_spec-1.1-osgi
 geronimo-stax-api_1.0_spec-1.0.1
-geronimo-ws-metadata_2.0_spec-1.1.2
 groovy-all-1.6.7
 hibernate-commons-annotations-3.2.0.Final
 hibernate-core-3.6.0.Final
@@ -76,7 +75,7 @@ jaxb-api-2.1-osgi
 jaxb-impl-2.1.9-osgi
 jaxb-xjc-2.1.9-osgi
 jaxen-1.1.1-osgi
-jaxws-api-2.1-1-osgi
+jaxws-api-2.2.1
 jbpm-api-4.4
 jbpm-jpdl-4.4
 jbpm-log-4.4
@@ -93,6 +92,7 @@ jetty-6.1.22
 jetty-util-6.1.22
 jetty-util5-6.1.22
 joda-time-1.6
+jsr181-api-1.0-MR1
 jsr250-api-1.0
 jsr311-api-1.1.1
 juel-api-2.2.1

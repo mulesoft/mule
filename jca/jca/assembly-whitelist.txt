@@ -69,7 +69,7 @@ jaxb-api-2.1-osgi
 jaxb-impl-2.1.9-osgi
 jaxb-xjc-2.1.9-osgi
 jaxen-1.1.1-osgi
-jaxws-api-2.1-1-osgi
+jaxws-api-2.2.1
 jbpm-api-4.4
 jbpm-jpdl-4.4
 jbpm-log-4.4
