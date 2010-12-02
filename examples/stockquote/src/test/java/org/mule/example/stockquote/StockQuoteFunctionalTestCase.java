@@ -12,6 +12,7 @@ package org.mule.example.stockquote;
 
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.util.WebServiceOnlineCheck;
+import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
 
 import java.util.Locale;
@@ -73,7 +74,7 @@ public class StockQuoteFunctionalTestCase extends FunctionalTestCase
 
         // FIXME : there is still a chance this test will fail when the webservice
         // goes down in between tests
-        if(responseCode == 200) // we should have a proper quote to check if the return code is 200
+        if (responseCode == HttpConstants.SC_OK)
         {
             assertTrue("Stock quote should contain \"CISCO\": " + text, StringUtils.containsIgnoreCase(text, "CISCO"));
             //  the stockquote message is localized ...
@@ -82,6 +83,9 @@ public class StockQuoteFunctionalTestCase extends FunctionalTestCase
                 assertTrue("Stock quote should start with \"StockQuote[\":" + text, text.startsWith("StockQuote["));
             }
         }
-        // otherwise don't do anything else
+        else
+        {
+            fail();
+        }
     }
 }

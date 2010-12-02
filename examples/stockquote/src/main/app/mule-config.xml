@@ -63,55 +63,37 @@
         </choice>
     </flow>
     
-    <model>
-        <service name="REST">
-            <inbound>
-                <vm:inbound-endpoint path="rest" exchange-pattern="request-response"
-                    transformer-refs="ExtractSymbol"
-                    responseTransformer-refs="ToString XmlDecoder XsltRest XmlToObject"/>
-            </inbound>
-            <http:rest-service-component
-                    serviceUrl="http://www.webservicex.net/stockquote.asmx/GetQuote"
-                    httpMethod="POST">
-                <http:payloadParameterName value="symbol"/>
-            </http:rest-service-component>
-        </service>
-        
-        <service name="SOAP">
-            <inbound>
-                <vm:inbound-endpoint path="soap" exchange-pattern="request-response"
-                    transformer-refs="ExtractSymbol"
-                    responseTransformer-refs="XmlDecoder XsltSoap XmlToObject"/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint
-                            address="http://www.webservicex.net/stockquote.asmx"
-                            exchange-pattern="request-response">
-                        <cxf:jaxws-client
-                            clientClass="net.webservicex.StockQuote"
-                            operation="GetQuote" 
-                            port="StockQuoteSoap" 
-                            wsdlLocation="classpath:stockquote.wsdl" />
-                    </outbound-endpoint>
-                </pass-through-router>
-            </outbound>
-        </service>
-        
-        <service name="WSDL">
-            <inbound>
-                <vm:inbound-endpoint path="wsdl" exchange-pattern="request-response"
-                    transformer-refs="ExtractSymbol"
-                    responseTransformer-refs="XmlDecoder XsltSoap XmlToObject"/>
-                <forwarding-router/>
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint 
-                        address="wsdl-cxf:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"
-                        exchange-pattern="request-response"/>
-                </pass-through-router>
-            </outbound>
-        </service>
-    </model>
+    <flow name="REST">
+        <vm:inbound-endpoint path="rest" exchange-pattern="request-response"
+            transformer-refs="ExtractSymbol"
+            responseTransformer-refs="ToString XmlDecoder XsltRest XmlToObject"/>
+        <http:rest-service-component
+                serviceUrl="http://www.webservicex.net/stockquote.asmx/GetQuote"
+                httpMethod="POST">
+            <http:payloadParameterName value="symbol"/>
+        </http:rest-service-component>
+    </flow>
+
+    <flow name="SOAP">
+        <vm:inbound-endpoint path="soap" exchange-pattern="request-response"
+            transformer-refs="ExtractSymbol"
+            responseTransformer-refs="XmlDecoder XsltSoap XmlToObject"/>
+        <outbound-endpoint address="http://www.webservicex.net/stockquote.asmx"
+                exchange-pattern="request-response">
+            <cxf:jaxws-client
+                clientClass="net.webservicex.StockQuote"
+                operation="GetQuote" 
+                port="StockQuoteSoap" 
+                wsdlLocation="classpath:stockquote.wsdl" />
+        </outbound-endpoint>
+    </flow>
+
+    <flow name="WSDL">
+        <vm:inbound-endpoint path="wsdl" exchange-pattern="request-response"
+            transformer-refs="ExtractSymbol"
+            responseTransformer-refs="XmlDecoder XsltSoap XmlToObject"/>
+        <outbound-endpoint 
+            address="wsdl-cxf:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"
+            exchange-pattern="request-response"/>
+    </flow>
 </mule>
