@@ -13,6 +13,20 @@
     <name>Bookstore Example</name>
     <description>Bookstore Example App</description>
 
+    <build>
+        <plugins>
+            <!-- Run mvn war:war to build the bookstore-admin webapp as a deployable .WAR archive -->	
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <warName>bookstore-admin</warName>	
+                    <warSourceDirectory>src/main/app/bookstore-admin</warSourceDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <!--
         ATTENTION: if you change any version here, make sure to change the pom
         in the dist directory, too
