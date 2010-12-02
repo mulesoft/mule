@@ -11,6 +11,7 @@ package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
@@ -80,22 +81,29 @@ public class ExpressionManagerTestCase extends AbstractMuleTestCase
 
     public void testParsing() throws Exception
     {
-        muleContext.getRegistry().registerObject("processor1", new StringAppendTransformer("b"));
-        muleContext.getRegistry().registerObject("processor2", new StringAppendTransformer("c"));
-        
         MuleMessage msg = new DefaultMuleMessage("test", muleContext);
         msg.setOutboundProperty("user", "vasya");
         msg.setOutboundProperty("password", "pupkin");
         msg.setOutboundProperty("host", "example.com");
         msg.setOutboundProperty("port", "12345");
-        
-        RequestContext.setEvent(getTestEvent(""));
 
         String result = muleContext.getExpressionManager().parse("http://#[header:user]:#[header:password]@#[header:host]:#[header:port]/foo/bar", msg);
         assertNotNull(result);
         assertEquals("http://vasya:pupkin@example.com:12345/foo/bar", result);
     }
     
+    public void testNestedParsing() throws Exception
+    {
+        muleContext.getRegistry().registerObject("proc1", new StringAppendTransformer("c"));
+        muleContext.getRegistry().registerObject("proc2", new StringAppendTransformer("e"));
+
+        MuleEvent event = getTestInboundEvent("b");
+        RequestContext.setEvent(event);
+
+        assertEquals("-1-abcde-2-", muleContext.getExpressionManager().parse(
+            "-#[string:1]-#[process:proc2:#[string:a#[process:proc1]d]]-#[string:2]-", event.getMessage()));
+    }
+
     public void testBooleanEvaluation()
     {
         MuleMessage msg = new DefaultMuleMessage("test", muleContext);

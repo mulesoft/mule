@@ -397,7 +397,15 @@ public class DefaultExpressionManager implements ExpressionManager, MuleContextA
         {
             public Object match(String token)
             {
-                return evaluate(token, message, failIfNull);
+                Object result = evaluate(token, message, failIfNull);
+                if (result instanceof MuleMessage)
+                {
+                    return ((MuleMessage) result).getPayload();
+                }
+                else
+                {
+                    return result;
+                }
             }
         }, expression);
     }
