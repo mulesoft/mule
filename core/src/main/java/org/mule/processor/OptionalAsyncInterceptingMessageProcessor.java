@@ -42,11 +42,16 @@ public class OptionalAsyncInterceptingMessageProcessor extends AsyncIntercepting
         super(threadingProfile, name, shutdownTimeout);
     }
 
+    @Override
     protected boolean isProcessAsync(MuleEvent event) throws MessagingException
-    {
-        boolean forceSync = Boolean.TRUE.equals(event.getMessage().getInvocationProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY));
-        return !forceSync && doThreading && !event.getEndpoint().getExchangePattern().hasResponse()
-               && !event.getEndpoint().getTransactionConfig().isTransacted();
+    {   
+        Object messageProperty = event.getMessage().getInvocationProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY);
+        boolean forceSync = Boolean.TRUE.equals(messageProperty);
+        
+        boolean hasResponse = event.getEndpoint().getExchangePattern().hasResponse();
+        boolean isTransacted = event.getEndpoint().getTransactionConfig().isTransacted();
+        
+        return !forceSync && doThreading && !hasResponse && !isTransacted;
     }
 
 }
