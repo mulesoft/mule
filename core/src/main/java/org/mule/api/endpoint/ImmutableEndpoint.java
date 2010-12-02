@@ -222,11 +222,6 @@ public interface ImmutableEndpoint extends Serializable
      * Return the mime type defined for the endpoint, if any
      */
     String getMimeType();
-
-    /**
-     * Should inbound events be processed synchronously
-     */
-    boolean shouldProcessInboundEventsSynchronously();
     
     boolean isDisableTransportTransformer();
 }

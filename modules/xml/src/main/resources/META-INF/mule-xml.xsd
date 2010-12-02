@@ -546,7 +546,7 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
         <xsd:attribute name="packageNames" type="xsd:string" use="required">
                 <xsd:annotation>
                     <xsd:documentation>
-                        A comma-separated list of packages where JAXB classes live
+                        A colon-separated list of packages where JAXB classes live
                     </xsd:documentation>
                 </xsd:annotation>
         </xsd:attribute>

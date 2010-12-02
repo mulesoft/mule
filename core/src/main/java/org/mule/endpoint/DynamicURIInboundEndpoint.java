@@ -304,9 +304,4 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
     {
         this.listener = listener;
     }
-
-    public boolean shouldProcessInboundEventsSynchronously()
-    {
-        return endpoint.shouldProcessInboundEventsSynchronously();
-    }
 }

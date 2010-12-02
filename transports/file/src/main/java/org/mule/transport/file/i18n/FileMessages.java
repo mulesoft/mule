@@ -64,10 +64,6 @@ public class FileMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 8, filter.getClass().getName());
     }
 
-    public static Message endpointAutoDeletesAndIsNotSync(InboundEndpoint endpoint)
-    {
-        return factory.createMessage(BUNDLE_PATH, 9, endpoint.getName());
-    }
 }
 
 

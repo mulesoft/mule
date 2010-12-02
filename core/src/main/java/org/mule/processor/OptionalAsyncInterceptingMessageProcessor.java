@@ -12,6 +12,7 @@ package org.mule.processor;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManagerSource;
 
@@ -43,7 +44,9 @@ public class OptionalAsyncInterceptingMessageProcessor extends AsyncIntercepting
 
     protected boolean isProcessAsync(MuleEvent event) throws MessagingException
     {
-        return doThreading && !event.getEndpoint().shouldProcessInboundEventsSynchronously();
+        boolean forceSync = Boolean.TRUE.equals(event.getMessage().getInvocationProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY));
+        return !forceSync && doThreading && !event.getEndpoint().getExchangePattern().hasResponse()
+               && !event.getEndpoint().getTransactionConfig().isTransacted();
     }
 
 }

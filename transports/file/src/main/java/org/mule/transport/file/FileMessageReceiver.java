@@ -15,6 +15,7 @@ import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -61,6 +62,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     private String workFileNamePattern = null;
     private FilenameFilter filenameFilter = null;
     private FileFilter fileFilter = null;
+    private boolean forceSync;
 
     public FileMessageReceiver(Connector connector,
                                FlowConstruct flowConstruct,
@@ -92,10 +94,13 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             throw new CreateException(FileMessages.invalidFileFilter(endpoint.getEndpointURI()), this);
         }
         
-        logWarningWhenEndpointAutoDeletesFilesAndIsNotSync(endpoint);
+        checkMustForceSync(endpoint);
     }
 
-    private void logWarningWhenEndpointAutoDeletesFilesAndIsNotSync(InboundEndpoint endpoint) throws CreateException
+    /**
+     * If we will be autodeleting File objects, events must be processed synchronously to avoid a race
+     */
+    private void checkMustForceSync(InboundEndpoint endpoint) throws CreateException
     {
         boolean connectorIsAutoDelete = false;
         boolean isStreaming = false;
@@ -107,10 +112,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
 
         boolean messageFactoryConsumes = (createMuleMessageFactory() instanceof FileContentsMuleMessageFactory);
         
-        if (connectorIsAutoDelete && !messageFactoryConsumes && !isStreaming && !endpoint.shouldProcessInboundEventsSynchronously())
-        {
-            logger.warn(FileMessages.endpointAutoDeletesAndIsNotSync(endpoint).getMessage());
-        }
+        forceSync = connectorIsAutoDelete && !messageFactoryConsumes && !isStreaming;
     }
 
     @Override
@@ -229,7 +231,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         fileParserMessasge.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
         
         File workFile = null;
-        if (workDir != null && (moveDir == null || (moveDir != null && fileConnector.isStreaming())))
+        if (workDir != null)
         {
             String workFileName = sourceFileOriginalName;
             
@@ -280,7 +282,10 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
 
         message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
-
+        if (forceSync)
+        {
+            message.setInvocationProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE);
+        }
         if (!fileConnector.isStreaming())
         {
             moveAndDelete(sourceFile, destinationFile, sourceFileOriginalName, message);

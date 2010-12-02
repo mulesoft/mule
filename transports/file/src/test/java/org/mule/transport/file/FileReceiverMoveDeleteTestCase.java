@@ -18,9 +18,7 @@ import org.mule.api.service.Service;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transformer.Transformer;
 import org.mule.component.DefaultJavaComponent;
-import org.mule.endpoint.AbstractEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.interceptor.AbstractEnvelopeInterceptor;
 import org.mule.model.seda.SedaService;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.tck.functional.EventCallback;
@@ -54,11 +52,31 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, true);
     }
 
+    public void testMoveAndDeleteWorkDirStreaming() throws Exception
+    {
+        File inFile = initForRequest();
+
+        File moveToDir = configureConnector(inFile, true, true, true, true, null);
+
+        assertRecevied(configureService(inFile, true, false));
+        assertFiles(inFile, moveToDir, true, true);
+    }
+
     public void testMoveOnlyStreaming() throws Exception
     {
         File inFile = initForRequest();
 
         File moveToDir = configureConnector(inFile, true, true, false, null);
+
+        assertRecevied(configureService(inFile, true, false));
+        assertFiles(inFile, moveToDir, true, false);
+    }
+
+    public void testMoveOnlyWorkDirStreaming() throws Exception
+    {
+        File inFile = initForRequest();
+
+        File moveToDir = configureConnector(inFile, true, true, false, true, null);
 
         assertRecevied(configureService(inFile, true, false));
         assertFiles(inFile, moveToDir, true, false);
@@ -150,7 +168,10 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
 
         File moveToDir = configureConnector(inFile, false, false, true, FileMuleMessageFactory.class);
 
-        assertRecevied(configureService(inFile, false, true, true));
+        assertRecevied(configureService(inFile, false, true));
+
+        // Don't call tear down until the file has been processed
+        Thread.sleep(2000);
         //TODO MULE-3198
         //assertFiles(inFile, moveToDir, false, true);
     }
@@ -167,11 +188,6 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
     }
 
     protected Latch configureService(File inFile, boolean streaming, boolean filePayload) throws Exception
-    {
-        return configureService(inFile, streaming, filePayload, false);
-    }
-
-    protected Latch configureService(File inFile, boolean streaming, boolean filePayload, boolean sync) throws Exception
     {
         Service service = new SedaService(muleContext);
         service.setName("moveDeleteBridgeService");
@@ -201,10 +217,6 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         }
         
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(url, muleContext);
-        if (sync)
-        {
-            endpointBuilder.setProperty(AbstractEndpoint.PROPERTY_PROCESS_SYNCHRONOUSLY, "true");
-        }
         endpointBuilder.addMessageProcessor(transformer);
         if (filePayload)
         {

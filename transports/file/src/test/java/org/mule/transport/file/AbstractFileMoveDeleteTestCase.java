@@ -21,8 +21,14 @@ import java.util.Map;
 public abstract class AbstractFileMoveDeleteTestCase extends AbstractFileFunctionalTestCase
 {
 
-    protected File configureConnector(File inFile, boolean stream, boolean move, boolean delete, 
-        Class<? extends AbstractMuleMessageFactory> messageFactoryClass) throws Exception
+    protected File configureConnector(File inFile, boolean stream, boolean move, boolean delete,
+                                      Class<? extends AbstractMuleMessageFactory> messageFactoryClass) throws Exception
+    {
+        return configureConnector(inFile, stream, move, delete, false, messageFactoryClass);
+    }
+
+    protected File configureConnector(File inFile, boolean stream, boolean move, boolean delete,
+        boolean useWorkDir, Class<? extends AbstractMuleMessageFactory> messageFactoryClass) throws Exception
     {
         FileConnector fc = new FileConnector(muleContext);
         
@@ -40,10 +46,16 @@ public abstract class AbstractFileMoveDeleteTestCase extends AbstractFileFunctio
         fc.setName("moveDeleteConnector");
         File moveToDir = new File(inFile.getParent() + "/moveto/");
         moveToDir.mkdir();
+        File workDir = new File(inFile.getParent() + "/work/");
+        workDir.mkdir();
         muleContext.getRegistry().registerConnector(fc);
         if (move)
         {
             fc.setMoveToDirectory(moveToDir.getPath());
+        }
+        if (useWorkDir)
+        {
+            fc.setWorkDirectory(workDir.getPath());
         }
         fc.setAutoDelete(delete);
         fc.setStreaming(stream);
