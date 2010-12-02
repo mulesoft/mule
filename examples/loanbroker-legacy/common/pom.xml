@@ -37,8 +37,8 @@
             <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
         </dependency>
     </dependencies>
 </project>

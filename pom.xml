@@ -117,7 +117,7 @@
         <javaMailVersion>1.4.3</javaMailVersion>
         <javaScriptVersion>2.0.5</javaScriptVersion>
         <javaXmlBindVersion>2.1.9</javaXmlBindVersion>
-        <javaXmlWsVersion>2.1-1</javaXmlWsVersion>
+        <javaXmlWsVersion>2.2.1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
         <jbossTsVersion>4.2.3-SP5</jbossTsVersion>
         <jbpmVersion>4.4</jbpmVersion>
@@ -126,6 +126,7 @@
         <jettyVersion>6.1.22</jettyVersion>
         <jettyServletApiVersion>2.5-20081211</jettyServletApiVersion>
         <jugVersion>2.0.0</jugVersion>
+        <jsr181Version>1.0-MR1</jsr181Version>
         <jsr250AnnotationVerson>1.0</jsr250AnnotationVerson>
         <log4jVersion>1.2.14</log4jVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
@@ -162,12 +163,6 @@
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-annotation_1.0_spec</artifactId>
                 <version>${geronimoSpecsAnnotationVersion}</version>
-            </dependency>
-            <dependency>
-                <!-- OSGi-ready -->
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
-                <version>${geronimoSpecsWsMetadataVersion}</version>
             </dependency>
             <dependency>
                 <!-- OSGi-ready -->
@@ -572,13 +567,12 @@
             <dependency>
                 <groupId>javax.xml.ws</groupId>
                 <artifactId>jaxws-api</artifactId>
-                <version>${javaXmlWsVersion}-osgi</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.jws</groupId>
-                        <artifactId>jsr181</artifactId>
-                    </exclusion>
-                </exclusions>
+                <version>${javaXmlWsVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.jws</groupId>
+                <artifactId>jsr181-api</artifactId>
+                <version>${jsr181Version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.xml.bind</groupId>

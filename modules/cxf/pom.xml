@@ -636,13 +636,6 @@
          <dependency>
             <groupId>javax.xml.ws</groupId>
             <artifactId>jaxws-api</artifactId>
-            <version>${javaXmlWsVersion}-osgi</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.jws</groupId>
-                    <artifactId>jsr181</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!--  for dynamic client -->
         <dependency>
@@ -663,4 +656,11 @@
             </exclusions>
         </dependency>
     </dependencies>
+    
+    <repositories>
+        <repository>
+            <id>java.net</id>
+            <url>http://download.java.net/maven/2/</url>
+        </repository>
+    </repositories>
 </project>
