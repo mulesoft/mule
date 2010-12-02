@@ -1,4 +1,3 @@
-package org.mule.example.loanbroker;
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
@@ -9,6 +8,7 @@ package org.mule.example.loanbroker;
  * LICENSE.txt file.
  */
 
+package org.mule.example.loanbroker;
 
 
 import org.mule.config.i18n.MessageFactory;
@@ -17,7 +17,7 @@ import org.mule.example.loanbroker.messages.LoanQuote;
 public class LocaleMessage extends MessageFactory
 {
     private static final LocaleMessage factory = new LocaleMessage();
-    
+
     private static final String BUNDLE_PATH = "messages.loanbroker-example-messages";
 
     public static String receivedRequest(String[] params)
@@ -44,7 +44,7 @@ public class LocaleMessage extends MessageFactory
     {
         return factory.getString(BUNDLE_PATH, 5, quote.toString());
     }
-    
+
     public static String lowestQuote(LoanQuote lowestQuote)
     {
         return factory.getString(BUNDLE_PATH, 6, lowestQuote.toString());
