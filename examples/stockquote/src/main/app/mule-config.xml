@@ -62,19 +62,19 @@
 
     <flow name="SOAP">
         <transformer ref="ExtractSymbol" />
-        <http:outbound-endpoint host="www.webservicex.net" path="stockquote.asmx">
+        <outbound-endpoint address="http://www.webservicex.net/stockquote.asmx">
             <cxf:jaxws-client clientClass="net.webservicex.StockQuote" operation="GetQuote"
                 port="StockQuoteSoap" wsdlLocation="classpath:stockquote.wsdl" />
-        </http:outbound-endpoint>
+        </outbound-endpoint>
         <transformer ref="XmlDecoder" />
         <transformer ref="XsltSoap" />
     </flow>
 
     <flow name="WSDL">
         <transformer ref="ExtractSymbol" />
-        <http:outbound-endpoint host="ww.webservicex.net" path="stockquote.asmx">
+        <outbound-endpoint address="http://www.webservicex.net/stockquote.asmx">
             <cxf:jaxws-client operation="GetQuote" wsdlLocation="http://www.webservicex.net/stockquote.asmx?WSDL" />
-        </http:outbound-endpoint>
+        </outbound-endpoint>
         <transformer ref="XmlDecoder" />
         <transformer ref="XsltSoap" />
     </flow>

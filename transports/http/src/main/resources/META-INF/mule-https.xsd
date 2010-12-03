@@ -124,63 +124,43 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="inbound-endpoint" substitutionGroup="mule:abstract-inbound-endpoint">
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                An inbound HTTPS endpoint exposes a service securely over HTTPS, essentially
-                making it an HTTP server. If polling of a remote HTTP service is required, this endpoint
-                should be configured with a polling HTTPS connector.
+                An inbound HTTPS endpoint exposes a service securely over HTTPS, essentially making it an HTTP server. If polling of a remote HTTP service is required, this endpoint should be configured with a polling HTTPS connector.
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="http:baseEndpointType">
-                    <xsd:attributeGroup ref="portAttributes" />
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
     </xsd:element>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="http:inboundEndpointType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
 
-    <xsd:element name="outbound-endpoint" substitutionGroup="mule:abstract-outbound-endpoint">
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                The HTTPS outbound endpoint allows Mule to send requests securely using SSL to
-                external servers or Mule inbound HTTP endpoints using HTTP over SSL protocol.
+                The HTTPS outbound endpoint allows Mule to send requests securely using SSL to external servers or Mule inbound HTTP endpoints using HTTP over SSL protocol.
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="http:baseOutboundEndpointType">
-                    <xsd:attributeGroup ref="portAttributes" />
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
     </xsd:element>
+    <xsd:complexType name="outboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="http:outboundEndpointType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
 
-
-    <xsd:element name="endpoint" substitutionGroup="mule:abstract-global-endpoint">
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                Configures a global HTTPS endpoint that can be referenced by services. Services
-                can augment the configuration defined in the global endpoint with local configuration
-                elements.
+                Configures a global HTTPS endpoint that can be referenced by services. Services can augment the configuration defined in the global endpoint with local configuration elements.
             </xsd:documentation>
         </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="http:baseGlobalEndpointType">
-                    <xsd:attributeGroup ref="portAttributes" />
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
     </xsd:element>
-    
-    <xsd:attributeGroup name="portAttributes">
-        <xsd:attribute name="port" type="mule:substitutablePortNumber" default="443">
-            <xsd:annotation>
-                <xsd:documentation>The port number to use when a connection is made.</xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:attributeGroup>
+    <xsd:complexType name="globalEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="http:globalEndpointType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 </xsd:schema>
