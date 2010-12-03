@@ -23,8 +23,7 @@ public class FlowRefDefinitionParser extends ChildDefinitionParser
 
     public FlowRefDefinitionParser()
     {
-        super("messageProcessors", FlowRefFactoryBean.class);
-        addCollection("messageProcessors");
+        super("messageProcessor", FlowRefFactoryBean.class);
     }
 
     @Override
