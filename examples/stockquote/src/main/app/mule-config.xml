@@ -72,9 +72,9 @@
 
     <flow name="WSDL">
         <transformer ref="ExtractSymbol" />
-        <outbound-endpoint address="http://www.webservicex.net/stockquote.asmx">
-            <cxf:jaxws-client operation="GetQuote" wsdlLocation="http://www.webservicex.net/stockquote.asmx?WSDL" />
-        </outbound-endpoint>
+        <outbound-endpoint 
+            address="wsdl-cxf:http://www.webservicex.net/stockquote.asmx?WSDL&amp;method=GetQuote"
+            exchange-pattern="request-response"/>
         <transformer ref="XmlDecoder" />
         <transformer ref="XsltSoap" />
     </flow>
