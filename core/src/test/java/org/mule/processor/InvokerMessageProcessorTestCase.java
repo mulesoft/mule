@@ -38,14 +38,29 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         invoker.process(getTestEvent(""));
     }
 
-    // MULE-5218 ExpressionManager parse() chokes on nested expressions
-    // public void testMethodFoundNestedExpression() throws MuleException, Exception
-    // {
-    // invoker.setMethodName("testMethod3");
-    // invoker.setArgumentExpressionsString("#[string:#[string:1]]");
-    // invoker.initialise();
-    // assertEquals("1 echo",invoker.process(getTestEvent("")).getMessageAsString());
-    // }
+    public void testMethodFoundNestedExpression() throws MuleException, Exception
+    {
+        invoker.setMethodName("testMethod3");
+        invoker.setArgumentExpressionsString("#[string:#[string:1]]");
+        invoker.initialise();
+        assertEquals("1 echo", invoker.process(getTestEvent("")).getMessageAsString());
+    }
+
+    public void testMethodFoundParseStringWithExpressions() throws MuleException, Exception
+    {
+        invoker.setMethodName("testMethod3");
+        invoker.setArgumentExpressionsString("1-#[string:#[string:2]]-3");
+        invoker.initialise();
+        assertEquals("1-2-3 echo", invoker.process(getTestEvent("")).getMessageAsString());
+    }
+    
+    public void testMethodFoundParseStringNoExpressions() throws MuleException, Exception
+    {
+        invoker.setMethodName("testMethod3");
+        invoker.setArgumentExpressionsString("1");
+        invoker.initialise();
+        assertEquals("1 echo", invoker.process(getTestEvent("")).getMessageAsString());
+    }
 
     public void testMethodFoundNullArgument() throws MuleException, Exception
     {

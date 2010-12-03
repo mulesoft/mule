@@ -28,6 +28,8 @@ import org.mule.transformer.TransformerTemplate;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
+import org.mule.util.TemplateParser;
+import org.mule.util.TemplateParser.PatternInfo;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -45,13 +47,14 @@ import java.util.List;
  */
 public class InvokerMessageProcessor implements MessageProcessor, Initialisable
 {
-    private Object object;
-    private String methodName;
-    private String[] argumentExpressions;
-    private Class<?>[] argumentTypes;
-    private String name;
+    protected Object object;
+    protected String methodName;
+    protected String[] argumentExpressions;
+    protected Class<?>[] argumentTypes;
+    protected String name;
+    protected PatternInfo patternInfo = TemplateParser.createMuleStyleParser().getStyle();
 
-    private Method method;
+    protected Method method;
 
     public void initialise() throws InitialisationException
     {
@@ -117,7 +120,19 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
                 Object arg = null;
                 if (expressions[i] != null)
                 {
-                    arg = expressionManager.parse(expressions[i], event.getMessage());
+                    // If string contains is a single expression then evaluate otherwise
+                    // parse. We can't use parse() always because that will convert
+                    // everything to a string
+                    if (expressions[i].startsWith(patternInfo.getPrefix())
+                        && expressions[i].startsWith(patternInfo.getSuffix()))
+                    {
+                        arg = expressionManager.evaluate(expressions[i], event.getMessage());
+                    }
+                    else
+                    {
+                        arg = expressionManager.parse(expressions[i], event.getMessage());
+                    }
+
                     // If expression evaluates to a MuleMessage then use it's payload
                     if (arg instanceof MuleMessage)
                     {
