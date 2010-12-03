@@ -124,7 +124,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
                     // parse. We can't use parse() always because that will convert
                     // everything to a string
                     if (expressions[i].startsWith(patternInfo.getPrefix())
-                        && expressions[i].startsWith(patternInfo.getSuffix()))
+                        && expressions[i].endsWith(patternInfo.getSuffix()))
                     {
                         arg = expressionManager.evaluate(expressions[i], event.getMessage());
                     }
