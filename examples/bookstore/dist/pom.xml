@@ -128,8 +128,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
+                <version>2.1</version>
                 <configuration>
-                    <warName>bookstore-admin</warName>	
+                    <warName>bookstore-admin</warName>
                     <warSourceDirectory>src/main/app/bookstore-admin</warSourceDirectory>
                 </configuration>
             </plugin>
