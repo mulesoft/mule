@@ -177,14 +177,14 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="host" type="xsd:string">
+        <xsd:attribute name="host" type="xsd:string" >
             <xsd:annotation>
                 <xsd:documentation>
                     An IP address (such as www.mulesoft.com, localhost, or 192.168.0.1).
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="port" type="mule:substitutablePortNumber">
+        <xsd:attribute name="port" type="mule:substitutablePortNumber" default="21">
             <xsd:annotation>
                 <xsd:documentation>
                     The port number to connect on.
