@@ -8,6 +8,7 @@ import org.codehaus.groovy.ant.FileScanner
 
 //  the structure of xsd locations
 corexsd = /.*(\/|\\)spring-config(\/|\\).*(\/|\\)mule.xsd/
+coreEnterpriseXsd = /.*(\/|\\)spring-config(\/|\\).*(\/|\\)mule-ee.xsd/
 otherxsd = /.*(\/|\\)(transports|modules|tests)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-(.*)\.xsd/
 
 def cliBuilder = new CliBuilder()
@@ -102,6 +103,10 @@ def printSchemaEntry(projectName, projectFile, xsdFile)
     if (xsdFile.absolutePath ==~ corexsd)
     {
         schemaSource = "${base}core/$schemaVersion/mule.xsd"
+    }
+    else if (options.e && xsdFile.absolutePath ==~ coreEnterpriseXsd)
+    {
+        schemaSource = "${base}core/$schemaVersion/mule-ee.xsd"
     }
     else if (xsdFile.absolutePath ==~ otherxsd)
     {
