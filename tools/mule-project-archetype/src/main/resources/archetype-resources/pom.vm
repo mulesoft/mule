@@ -22,6 +22,21 @@
     </properties>
 
     <build>
+        <!--
+            Use a newer version of the install plugin than what your Maven uses by default. The
+            older version failed to install the project if there was no target/classes folder.
+            Since we use mule packaging on the project we actually create and attach the zip that
+            must be installed.
+        -->
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.3.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.mule.tools</groupId>
