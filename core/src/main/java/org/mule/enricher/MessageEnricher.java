@@ -10,6 +10,7 @@
 
 package org.mule.enricher;
 
+import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -30,7 +31,8 @@ public class MessageEnricher implements MessageProcessor
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
-        MuleMessage enrichmentMessage = enrichmentProcessor.process(event).getMessage();
+        MuleMessage enrichmentMessage = enrichmentProcessor.process(
+            RequestContext.cloneAndUpdateEventEndpoint(event, enrichmentProcessor)).getMessage();
 
         if (enrichmentMessage != null)
         {

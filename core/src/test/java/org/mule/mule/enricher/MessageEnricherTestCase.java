@@ -13,6 +13,7 @@ package org.mule.mule.enricher;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
@@ -35,8 +36,10 @@ public class MessageEnricherTestCase extends AbstractMuleTestCase
                 return event;
             }
         });
-
-        assertEquals("test", enricher.process(getTestEvent("")).getMessage().getOutboundProperty("myHeader"));
+        
+        MuleMessage result = enricher.process(getTestEvent("")).getMessage();
+        assertEquals("test", result.getOutboundProperty("myHeader"));
+        assertEquals("", result.getPayload());
     }
 
     public void testEnrichHeaderWithHeader() throws Exception
@@ -53,7 +56,9 @@ public class MessageEnricherTestCase extends AbstractMuleTestCase
             }
         });
 
-        assertEquals("test", enricher.process(getTestEvent("")).getMessage().getOutboundProperty("myHeader"));
+        MuleMessage result = enricher.process(getTestEvent("")).getMessage();
+        assertEquals("test", result.getOutboundProperty("myHeader"));
+        assertEquals("", result.getPayload());
     }
 
     public void testEnrichHeadersMToN() throws Exception
@@ -74,13 +79,13 @@ public class MessageEnricherTestCase extends AbstractMuleTestCase
             }
         });
 
-        assertNull(enricher.process(getTestEvent("")).getMessage().getOutboundProperty("myHeader"));
-        assertEquals("test2", enricher.process(getTestEvent(""))
-            .getMessage()
-            .getOutboundProperty("myHeader2"));
-        assertEquals("test3", enricher.process(getTestEvent(""))
-            .getMessage()
-            .getOutboundProperty("myHeader3"));
+        MuleMessage result = enricher.process(getTestEvent("")).getMessage();
+
+        assertNull(result.getOutboundProperty("myHeader"));
+        assertEquals("test2",result.getOutboundProperty("myHeader2"));
+        assertEquals("test3",result.getOutboundProperty("myHeader3"));
+
+        assertEquals("", result.getPayload());
     }
 
     public void testEnrichHeaderNestedEvaluator() throws Exception
