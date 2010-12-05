@@ -37,6 +37,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
     {
         MuleSession session = getTestSession(getTestService(), muleContext);
         FirstSuccessful fs = new FirstSuccessful();
+        fs.setMuleContext(muleContext);
         List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
         routes.add(new TestProcessor("abc"));
         routes.add(new TestProcessor("def"));

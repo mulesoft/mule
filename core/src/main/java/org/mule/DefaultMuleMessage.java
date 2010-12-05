@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Reader;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
@@ -122,6 +123,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         addToConsumableClasses("javax.xml.stream.XMLStreamReader");
         addToConsumableClasses("javax.xml.transform.stream.StreamSource");
         consumableClasses.add(OutputHandler.class);
+        consumableClasses.add(InputStream.class);
+        consumableClasses.add(Reader.class);
     }
 
     private static void addToConsumableClasses(String className)

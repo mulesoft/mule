@@ -15,7 +15,7 @@
     <model>
         <service name="Echo">
             <inbound>
-                <inbound-endpoint address="http://localhost:65082/services/EchoUMO"
+                <inbound-endpoint address="http://localhost:${port1}/services/EchoUMO"
                     exchange-pattern="request-response">
                     <cxf:simple-service serviceClass="org.mule.api.component.simple.EchoService" /> 
                 </inbound-endpoint>

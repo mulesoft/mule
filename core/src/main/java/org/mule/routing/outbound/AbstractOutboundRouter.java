@@ -11,6 +11,7 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -451,10 +452,7 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
             throw new DispatchException(CoreMessages.objectIsNull("Outbound Endpoint"), routedEvent, null);
         }
 
-        ImmutableEndpoint endpoint = (route instanceof ImmutableEndpoint)
-                                                                         ? (ImmutableEndpoint) route
-                                                                         : routedEvent.getEndpoint();
-        MuleEvent event = new DefaultMuleEvent(message, endpoint, routedEvent.getSession(), routedEvent.getProcessingTime());
+        MuleEvent event = createEventToRoute(routedEvent, message, route);
 
         if (awaitResponse)
         {
@@ -466,6 +464,25 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
         }
 
         return route.process(event);
+    }
+
+    /**
+     * Create a new event to be routed to the target MP
+     */
+    protected MuleEvent createEventToRoute(MuleEvent routedEvent, MuleMessage message, MessageProcessor route)
+    {
+        ImmutableEndpoint endpoint = (route instanceof ImmutableEndpoint) ? (ImmutableEndpoint) route : routedEvent.getEndpoint();
+        MuleEvent event = new DefaultMuleEvent(message, endpoint, routedEvent.getSession(), routedEvent.getProcessingTime());
+        return event;
+    }
+
+    /**
+     * Create a fresh copy of a message.
+     */
+    protected MuleMessage cloneMessage(MuleMessage message)
+    {
+        MuleMessage clonedMessage = new DefaultMuleMessage(message.getPayload(), message, muleContext);
+        return clonedMessage;
     }
 
     /**

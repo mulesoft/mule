@@ -71,9 +71,8 @@ public class MulticastingRouter extends FilteringOutboundRouter
                             CoreMessages.cannotCopyStreamPayload(message.getPayload().getClass().getName()),
                             event);
                     }
-                    
-                    MuleMessage clonedMessage = new DefaultMuleMessage(message.getPayload(), 
-                        message, muleContext);
+
+                    MuleMessage clonedMessage = cloneMessage(message);
                     MuleEvent result = sendRequest(event, clonedMessage, mp, true);
                     if (result != null)
                     {

@@ -17,8 +17,6 @@ import java.io.Serializable;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
@@ -31,9 +29,13 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ProcessingTime implements Serializable
 {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
+    
     private static final Log logger = LogFactory.getLog(ProcessingTime.class);
-    private static final long TIMER_PERIOD = 1000 * 30;
-    private static volatile Timer timer;
+    private static volatile Thread referenceThread;
     private static ReferenceQueue<ProcessingTime> queue = new ReferenceQueue<ProcessingTime>();
     private static Map refs = new ConcurrentHashMap();
 
@@ -70,9 +72,9 @@ public class ProcessingTime implements Serializable
     private ProcessingTime(FlowConstructStatistics stats)
     {
         this.statistics = stats;
-        if (timer == null)
+        if (referenceThread == null)
         {
-            startTimer();
+            startThread();
         }
         refs.put(new Reference(this), refs);
     }
@@ -102,28 +104,30 @@ public class ProcessingTime implements Serializable
     /**
      * Start timer that processes reference queue
      */
-    public static synchronized void startTimer()
+    public static synchronized void startThread()
     {
-        if (timer == null)
+        if (referenceThread == null)
         {
-            timer = new Timer("ProcessingTimeMonitor", true);
-            timer.schedule(new TimerTask()
-            {
-                @Override
-                public void run()
+            referenceThread = new Thread(new Runnable()
                 {
-                    try
+                    /**
+                     * As weak references to completed ProcessingTimes are delivered, record them
+                     */
+                    public void run()
                     {
-                        Reference ref;
-                        do
+                        try
                         {
-                            // The next two lines look silly, but
-                            //       ref = (Reference) queue.poll();
-                            // fails on the IBM 1.5 compiler
-                            Object temp = queue.poll();
-                            ref = (Reference) temp;
-                            if (ref != null)
+                            while (true)
                             {
+                                if (Thread.currentThread() != referenceThread)
+                                {
+                                    break;
+                                }
+                                // The next two lines look silly, but
+                                //       ref = (Reference) queue.poll();
+                                // fails on the IBM 1.5 compiler
+                                Object temp = queue.remove();
+                                Reference ref = (Reference) temp;
                                 refs.remove(ref);
                                 FlowConstructStatistics stats = ref.getStatistics();
                                 if (stats.isEnabled())
@@ -132,15 +136,19 @@ public class ProcessingTime implements Serializable
                                 }
                             }
                         }
-                        while (ref != null);
+                        catch (InterruptedException ex )
+                        {
+                            ;
+                        }
+                        catch (Exception ex)
+                        {
+                            // Don't let exception escape -- it kills the thread
+                            logger.error(this, ex);
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        // Don't let exception escape -- it kills the timer
-                        logger.error(this, ex);
-                    }
-                }
-            }, TIMER_PERIOD, TIMER_PERIOD);
+                }, "ProcessingTimeMonitor");
+            referenceThread.setDaemon(true);
+            referenceThread.start();
         }
     }
 
@@ -149,10 +157,10 @@ public class ProcessingTime implements Serializable
      */
     public synchronized static void stopTimer()
     {
-        if (timer != null)
+        if (referenceThread != null)
         {
-            timer.cancel();
-            timer = null;
+            referenceThread.interrupt();
+            referenceThread = null;
         }
         refs.clear();
     }

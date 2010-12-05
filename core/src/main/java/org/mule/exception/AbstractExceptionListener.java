@@ -295,10 +295,11 @@ public abstract class AbstractExceptionListener implements Initialisable, Dispos
         // This is required because we don't always have the service available which
         // is required to use an outbound route. This approach doesn't
         // support everything but rather is an intermediate improvement.
-        for (int i = 0; i < messageProcessors.size(); i++)
+        int numProcessors = messageProcessors.size();
+        for (int i = 0; i < numProcessors; i++)
         {
             MessageProcessor processor = messageProcessors.get(i);
-            if (((DefaultMuleMessage) exceptionMessage).isConsumable())
+            if (numProcessors > 1 && ((DefaultMuleMessage) exceptionMessage).isConsumable())
             {
                 throw new MessagingException(
                     CoreMessages.cannotCopyStreamPayload(exceptionMessage.getPayload().getClass().getName()),

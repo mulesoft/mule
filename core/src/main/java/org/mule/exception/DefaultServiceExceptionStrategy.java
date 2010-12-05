@@ -104,8 +104,8 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
         }
         else
         {
-            //this will ever happen, but JIC
-            logger.fatal("The Default Service Exception Strategy has been invoked but there is no current flow construct on the context. Please report this to dev@mule.codehaus.org");
+            //this can happen, e.g. with event constructed to handle exceptions
+            // logger.fatal("The Default Service Exception Strategy has been invoked but there is no current flow construct on the context. Please report this to dev@mule.codehaus.org");
             return null;
         }
     }

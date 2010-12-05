@@ -40,12 +40,8 @@ public class FirstSuccessful extends AbstractOutboundRouter
         {
             try
             {
-                MuleEvent toProcess = event;
-                if (mp instanceof OutboundEndpoint)
-                {
-                    toProcess = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint)mp, event.getSession());
-                }
-                
+                MuleMessage clonedMessage = cloneMessage(event.getMessage());
+                MuleEvent toProcess = createEventToRoute(event, clonedMessage, mp);                
                 returnEvent = mp.process(toProcess);
                 
                 if (returnEvent == null)
