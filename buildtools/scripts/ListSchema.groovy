@@ -31,7 +31,7 @@
 */
 
 // Schema version
-def version = 3.0
+def version = 3.1
 
 // Provide the location where https://dav.codehaus.org/dist/mule is mounted on your file system
 // as a parameter to the script.
@@ -206,7 +206,7 @@ def generateDeployCommand = {
     source = schemaSources[name]
     pathUri = new URI(schemaDestinationPaths[name])
     schemaUri = new URI(schemaDestinations[name])
-//    println "mkdir -p ${davfs}${pathUri.path}"
+    println "mkdir -p ${davfs}${pathUri.path}"
     println "curl -T $source https://dav.codehaus.org/dist/mule${schemaUri.path} --user " + '$CURLUSER:$CURLPASSWD'
     println "echo curl result code: " + '$?'
     println "echo diff result"
