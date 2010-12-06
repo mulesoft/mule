@@ -25,6 +25,8 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.util.ObjectUtils;
 import org.mule.util.concurrent.Latch;
 
+import java.util.Map;
+
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
@@ -34,7 +36,6 @@ import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterceptingMessageProcessor
     implements RequestReplyRequesterMessageProcessor
 {
-
     public static final int MAX_PROCESSED_GROUPS = 50000;
 
     protected volatile long timeout = -1;
@@ -43,7 +44,9 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     protected FlowConstruct flowConstruct;
     private final MessageProcessor internalAsyncReplyMessageProcessor = new InternalAsyncReplyMessageProcessor();
 
-    protected final ConcurrentMap locks = new ConcurrentHashMap();
+    @SuppressWarnings("unchecked")
+    protected final Map<String, Latch> locks = new ConcurrentHashMap();
+    
     protected final ConcurrentMap responseEvents = new ConcurrentHashMap();
     protected final Object processedLock = new Object();
     // @GuardedBy processedLock
@@ -84,6 +87,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
     protected void verifyReplyMessageSource(MessageSource messageSource)
     {
+        // template method
     }
 
     protected String getAsyncReplyCorrelationId(MuleEvent event)
@@ -106,7 +110,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     protected MuleEvent receiveAsyncReply(MuleEvent event) throws ResponseTimeoutException
     {
         String asyncReplyCorrelationId = getAsyncReplyCorrelationId(event);
-        Latch asyncReplyLatch = (Latch) locks.get(asyncReplyCorrelationId);
+        Latch asyncReplyLatch = locks.get(asyncReplyCorrelationId);
         // flag for catching the interrupted status of the Thread waiting for a
         // result
         boolean interruptedWhileWaiting = false;
@@ -244,7 +248,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
                 // processed. Can this actually happen?
                 throw new IllegalStateException("Detected duplicate result message with id: " + messageId);
             }
-            Latch l = (Latch) locks.get(messageId);
+            Latch l = locks.get(messageId);
             if (l != null)
             {
                 l.countDown();
