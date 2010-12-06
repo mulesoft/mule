@@ -11,9 +11,9 @@
 package org.mule.transport.jms;
 
 import org.mule.api.MuleEventContext;
+import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.context.notification.ExceptionNotification;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.tck.functional.CounterCallback;
@@ -34,7 +34,7 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
 
     public void testRedelivery() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         // required if broker is not restarted with the test - it tries to deliver those messages to the client
         // purge the queue
         while (client.request(DESTINATION, 1000) != null)

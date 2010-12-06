@@ -4,6 +4,3 @@
 
 # MULE-3682
 org.mule.transport.jms.integration.JmsXATransactionComponentTestCase
-
-# Broken by BL-165
-org.mule.transport.jms.JmsRedeliveryTestCase
