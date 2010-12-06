@@ -18,6 +18,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
@@ -54,7 +55,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         assertEquals("No ghi", getPayload(fs, session, "ABCDEF"));
         assertEquals(EXCEPTION_SEEN, getPayload(fs, session, "ABCDEFGHI"));
     }
-    
+
     public void testFailureExpression() throws MuleException, Exception
     {
         FirstSuccessful fs = new FirstSuccessful();
@@ -73,6 +74,48 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         fs.setMuleContext(muleContext);
         fs.initialise();
         assertEquals("abc", fs.process(getTestEvent("")).getMessageAsString());
+    }
+
+    public void testRouteReturnsNullEvent() throws MuleException, Exception
+    {
+        FirstSuccessful fs = new FirstSuccessful();
+        List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
+        routes.add(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                return null;
+            }
+        });
+        fs.setMessageProcessors(routes);
+        fs.setMuleContext(muleContext);
+        fs.initialise();
+        assertNull(fs.process(getTestEvent("")));
+    }
+
+    public void testRouteReturnsNullMessage() throws MuleException, Exception
+    {
+        FirstSuccessful fs = new FirstSuccessful();
+        List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
+        routes.add(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                return new DefaultMuleEvent(null, event);
+            }
+        });
+        fs.setMessageProcessors(routes);
+        fs.setMuleContext(muleContext);
+        fs.initialise();
+        try
+        {
+            fs.process(getTestEvent(""));
+            fail("Exception expected");
+        }
+        catch (CouldNotRouteOutboundMessageException e)
+        {
+
+        }
     }
 
     private String getPayload(MessageProcessor mp, MuleSession session, String message) throws Exception
@@ -96,6 +139,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
             return EXCEPTION_SEEN;
         }
     }
+
     static class TestProcessor implements MessageProcessor
     {
         private String rejectIfMatches;
