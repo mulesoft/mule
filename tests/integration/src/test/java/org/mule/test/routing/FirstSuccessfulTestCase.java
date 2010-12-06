@@ -40,4 +40,21 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
         assertTrue(ex instanceof MessagingException);
     }
 
+    public void testFirstSuccessfulWithExpression() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage response = client.send("vm://input2", "XYZ", null);
+        assertEquals("XYZ is a string", response.getPayloadAsString());
+    }
+
+    public void testFirstSuccessfulWithExpressionAllFail() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+        MuleMessage response = client.send("vm://input3", "XYZ", null);
+        ExceptionPayload ep = response.getExceptionPayload();
+        assertNotNull(ep);
+        Throwable ex = ep.getException();
+        assertTrue(ex instanceof MessagingException);
+    }
+
 }

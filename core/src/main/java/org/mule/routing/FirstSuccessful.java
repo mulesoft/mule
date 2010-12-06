@@ -10,23 +10,43 @@
 
 package org.mule.routing;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
+import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 
 /**
- * FirstSuccessful routes an event to the first target route that can accept it without throwing or 
- * returning an  exception. If no such route can be found, an exception is thrown. Note that this 
- * works more reliable with synchronous targets, but no such restriction is imposed.
+ * FirstSuccessful routes an event to the first target route that can accept it
+ * without throwing or returning an exception. If no such route can be found, an
+ * exception is thrown. Note that this works more reliable with synchronous targets,
+ * but no such restriction is imposed.
  */
 public class FirstSuccessful extends AbstractOutboundRouter
 {
+
+    protected String failureExpression;
+    protected ExpressionFilter failureExpressionFilter;
+
+    @Override
+    public void initialise() throws InitialisationException
+    {
+        super.initialise();
+        if (failureExpression != null)
+        {
+            failureExpressionFilter = new ExpressionFilter(failureExpression);
+        }
+        else
+        {
+            failureExpressionFilter = new ExpressionFilter("exception-type:");
+        }
+        failureExpressionFilter.setMuleContext(muleContext);
+    }
+
     /**
      * Route the given event to one of our targets
      */
@@ -41,9 +61,9 @@ public class FirstSuccessful extends AbstractOutboundRouter
             try
             {
                 MuleMessage clonedMessage = cloneMessage(event.getMessage());
-                MuleEvent toProcess = createEventToRoute(event, clonedMessage, mp);                
+                MuleEvent toProcess = createEventToRoute(event, clonedMessage, mp);
                 returnEvent = mp.process(toProcess);
-                
+
                 if (returnEvent == null)
                 {
                     failed = false;
@@ -51,7 +71,7 @@ public class FirstSuccessful extends AbstractOutboundRouter
                 else
                 {
                     MuleMessage msg = returnEvent.getMessage();
-                    failed = (msg != null) && (msg.getExceptionPayload() != null);
+                    failed = msg == null || failureExpressionFilter.accept(msg);
                 }
             }
             catch (Exception ex)
@@ -75,5 +95,17 @@ public class FirstSuccessful extends AbstractOutboundRouter
     public boolean isMatch(MuleMessage message) throws MuleException
     {
         return true;
+    }
+
+    /**
+     * Specifies an expression that when evaluated as determines if the processing of
+     * one a route was a failure or not.
+     * 
+     * @param failureExpression
+     * @see ExpressionFilter
+     */
+    public void setFailureExpression(String failureExpression)
+    {
+        this.failureExpression = failureExpression;
     }
 }

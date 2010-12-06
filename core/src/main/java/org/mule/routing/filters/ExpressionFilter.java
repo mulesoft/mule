@@ -17,6 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.routing.filter.Filter;
 import org.mule.expression.ExpressionConfig;
+import org.mule.util.StringUtils;
 
 import java.text.MessageFormat;
 
@@ -164,7 +165,14 @@ public class ExpressionFilter implements Filter, MuleContextAware
             {
                 try
                 {
-                    delegateFilter = new ExceptionTypeFilter(config.getExpression());
+                    if (StringUtils.isEmpty(config.getExpression()))
+                    {
+                        delegateFilter = new ExceptionTypeFilter();
+                    }
+                    else
+                    {
+                        delegateFilter = new ExceptionTypeFilter(config.getExpression());
+                    }
                 }
                 catch (ClassNotFoundException e)
                 {

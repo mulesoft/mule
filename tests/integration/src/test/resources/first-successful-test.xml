@@ -35,4 +35,20 @@
         </first-successful>
     </flow>
 
+    <flow name="test-router2">
+        <vm:inbound-endpoint path="input2" exchange-pattern="request-response" />
+        <first-successful failureExpression="groovy:payload.contains('is a number')">
+            <test:component appendString=" is a number" />
+            <test:component appendString=" is a string" />
+        </first-successful>
+    </flow>
+
+    <flow name="test-router3">
+        <vm:inbound-endpoint path="input3" exchange-pattern="request-response" />
+        <first-successful failureExpression="groovy:payload.contains('is a ')">
+            <test:component appendString=" is a number" />
+            <test:component appendString=" is a string" />
+        </first-successful>
+    </flow>
+
 </mule>

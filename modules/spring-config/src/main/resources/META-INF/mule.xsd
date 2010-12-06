@@ -4515,13 +4515,26 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="first-successful" substitutionGroup="abstract-routing-message-processor"
-                 type="processorWithAtLeastOneTargetType">
+    <xsd:element name="first-successful" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Sends a message to a list of message processors until one processes it successfully
+                Sends a message to a list of message processors until one processes it
+                successfully
             </xsd:documentation>
         </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="processorWithAtLeastOneTargetType">
+                    <xsd:attribute name="failureExpression" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Specifies an expression that when evaluated as determines if the processing of one a route was a failure or not.
+                            </xsd:documentation>                        
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="round-robin" substitutionGroup="abstract-routing-message-processor"

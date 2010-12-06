@@ -20,6 +20,7 @@ import org.mule.api.MuleSession;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.transformer.simple.StringAppendTransformer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,8 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         routes.add(new TestProcessor("def"));
         routes.add(new TestProcessor("ghi"));
         fs.setMessageProcessors(routes);
+        fs.setMuleContext(muleContext);
+        fs.initialise();
         assertEquals("No abc", getPayload(fs, session, ""));
         assertEquals("No def", getPayload(fs, session, "abc"));
         assertEquals("No ghi", getPayload(fs, session, "abcdef"));
@@ -50,6 +53,26 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         assertEquals("No def", getPayload(fs, session, "ABC"));
         assertEquals("No ghi", getPayload(fs, session, "ABCDEF"));
         assertEquals(EXCEPTION_SEEN, getPayload(fs, session, "ABCDEFGHI"));
+    }
+    
+    public void testFailureExpression() throws MuleException, Exception
+    {
+        FirstSuccessful fs = new FirstSuccessful();
+        fs.setFailureExpression("#[payload-type:java.lang.Integer]");
+        List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
+        routes.add(new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                event.getMessage().setPayload(Integer.valueOf(1));
+                return event;
+            }
+        });
+        routes.add(new StringAppendTransformer("abc"));
+        fs.setMessageProcessors(routes);
+        fs.setMuleContext(muleContext);
+        fs.initialise();
+        assertEquals("abc", fs.process(getTestEvent("")).getMessageAsString());
     }
 
     private String getPayload(MessageProcessor mp, MuleSession session, String message) throws Exception
