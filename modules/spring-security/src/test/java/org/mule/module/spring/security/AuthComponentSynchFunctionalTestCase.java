@@ -21,8 +21,9 @@ import org.mule.transport.NullPayload;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.context.SecurityContextImpl;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
+
 
 public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
 {

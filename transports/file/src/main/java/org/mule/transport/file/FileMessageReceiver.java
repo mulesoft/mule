@@ -20,6 +20,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.Message;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
@@ -284,7 +285,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
         if (forceSync)
         {
-            message.setInvocationProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE);
+            message.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE, PropertyScope.INBOUND);
         }
         if (!fileConnector.isStreaming())
         {

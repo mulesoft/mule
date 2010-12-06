@@ -17,9 +17,10 @@ import org.mule.security.AbstractSecurityProvider;
 
 import java.util.Map;
 
-import org.springframework.security.AuthenticationException;
-import org.springframework.security.AuthenticationManager;
-import org.springframework.security.providers.AuthenticationProvider;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+
 
 /**
  * <code>AcegiProviderAdapter</code> is a wrapper for an Acegi Security provider to
@@ -55,7 +56,7 @@ public class SpringProviderAdapter extends AbstractSecurityProvider implements A
 
     public Authentication authenticate(Authentication authentication) throws SecurityException
     {
-        org.springframework.security.Authentication auth = null;
+        org.springframework.security.core.Authentication auth = null;        
         if (authentication instanceof SpringAuthenticationAdapter)
         {
             auth = ((SpringAuthenticationAdapter)authentication).getDelegate();
@@ -69,7 +70,7 @@ public class SpringProviderAdapter extends AbstractSecurityProvider implements A
         return new SpringAuthenticationAdapter(auth, getSecurityProperties());
     }
 
-    public org.springframework.security.Authentication authenticate(org.springframework.security.Authentication authentication) throws AuthenticationException
+    public org.springframework.security.core.Authentication authenticate(org.springframework.security.core.Authentication authentication) throws AuthenticationException    
     {
         return delegate.authenticate(authentication);
     }

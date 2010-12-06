@@ -20,12 +20,12 @@ import org.mule.tck.FunctionalTestCase;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.context.SecurityContextImpl;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
+
 
 public class AuthComponentAsynchFunctionalTestCase extends FunctionalTestCase
 {
-
     protected String getConfigResources()
     {
         return "auth-component-asynch-test.xml";

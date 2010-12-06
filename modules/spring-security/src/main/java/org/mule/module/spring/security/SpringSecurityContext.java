@@ -13,7 +13,8 @@ package org.mule.module.spring.security;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
 
-import org.springframework.security.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 
 /**
  * <code>AcegiSecurityContext</code> is a SecurityContext wrapper used to
@@ -22,10 +23,11 @@ import org.springframework.security.context.SecurityContextHolder;
 
 public class SpringSecurityContext implements SecurityContext
 {
-    private org.springframework.security.context.SecurityContext delegate;
+    private org.springframework.security.core.context.SecurityContext delegate;
     private SpringAuthenticationAdapter authentication;
 
-    public SpringSecurityContext(org.springframework.security.context.SecurityContext delegate)
+    public SpringSecurityContext(org.springframework.security.core.context.SecurityContext delegate)
+    
     {
         this.delegate = delegate;
         SecurityContextHolder.setContext(this.delegate);

@@ -59,7 +59,7 @@ public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
         for (Iterator<String> iterator = methods.iterator(); iterator.hasNext();)
         {
             String methodName = iterator.next();
-            method = getMethodByName(methodName, context);
+            method = getMethodByName(component, methodName, context);
 
             if (method == null)
             {
@@ -67,7 +67,7 @@ public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
             }
             if (method != null)
             {
-                addMethodByName(method, context);
+                addMethodByName(component, method, context);
                 
                 // check if the current payload can be handled by this method
                 Class<?>[] parameterTypes = method.getParameterTypes();

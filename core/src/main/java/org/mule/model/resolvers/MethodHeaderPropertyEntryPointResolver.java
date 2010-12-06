@@ -83,7 +83,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
         else
         {
             methodName = methodProp.toString();
-            method = getMethodByName(methodName, context);
+            method = getMethodByName(component, methodName, context);
         }
 
         if (method != null && method.getParameterTypes().length == 0)
@@ -107,7 +107,7 @@ public class MethodHeaderPropertyEntryPointResolver extends AbstractEntryPointRe
         }
 
         validateMethod(component, method);
-        addMethodByName(method, context);
+        addMethodByName(component, method, context);
 
         return invokeMethod(component, method, payload);
     }

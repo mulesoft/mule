@@ -14,8 +14,9 @@ import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
 import org.mule.api.security.SecurityContextFactory;
 
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.context.SecurityContextImpl;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
+
 
 /**
  * <code>AcegiSecurityContextFactory</code> creates an AcegiSecurityContext for an
@@ -25,7 +26,7 @@ public class SpringSecurityContextFactory implements SecurityContextFactory
 {
     public SecurityContext create(Authentication authentication)
     {
-        org.springframework.security.context.SecurityContext context = new SecurityContextImpl();
+        org.springframework.security.core.context.SecurityContext context = new SecurityContextImpl();        
         context.setAuthentication(((SpringAuthenticationAdapter)authentication).getDelegate());
 
         if (authentication.getProperties() != null)

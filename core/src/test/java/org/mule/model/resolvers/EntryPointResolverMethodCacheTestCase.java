@@ -26,12 +26,22 @@ public class EntryPointResolverMethodCacheTestCase extends AbstractMuleTestCase
     public void testMethodCaching() throws Exception
     {
         Method method = this.getClass().getMethod(METHOD, new Class[] { String.class});
+        Method anotherMethod = AnotherClass.class.getMethod(METHOD, new Class[] { String.class});
         
         MuleEventContext eventContext = getTestEventContext(null);
         MockEntryPointResolver epResolver = new MockEntryPointResolver();
-        epResolver.addMethodByName(method, eventContext);
-        
-        assertEquals(method, epResolver.getMethodByName(METHOD, eventContext));   
+
+        epResolver.addMethodByName(this, method, eventContext);
+        Method method1 = epResolver.getMethodByName(this, METHOD, eventContext);
+        assertEquals(method, method1);
+        assertEquals(this.getClass(), method1.getDeclaringClass());
+
+        AnotherClass anotherObject = new AnotherClass();
+        epResolver.addMethodByName(anotherObject, anotherMethod, eventContext);
+        Method anotherMethod1 = epResolver.getMethodByName(anotherObject, METHOD, eventContext);
+        assertEquals(anotherMethod, anotherMethod1);
+        assertEquals(AnotherClass.class, anotherMethod.getDeclaringClass());
+
     }
     
     public void aMethod(String payload)
@@ -44,6 +54,14 @@ public class EntryPointResolverMethodCacheTestCase extends AbstractMuleTestCase
         public InvocationResult invoke(Object component, MuleEventContext context) throws Exception
         {
             throw new AssertionFailedError("do not invoke this method");
+        }
+    }
+
+    private static class AnotherClass
+    {
+        public void aMethod(String payload)
+        {
+            // this method exists only for being cached in the test
         }
     }
     

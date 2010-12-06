@@ -45,7 +45,7 @@ public class OptionalAsyncInterceptingMessageProcessor extends AsyncIntercepting
     @Override
     protected boolean isProcessAsync(MuleEvent event) throws MessagingException
     {   
-        Object messageProperty = event.getMessage().getInvocationProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY);
+        Object messageProperty = event.getMessage().getInboundProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY);
         boolean forceSync = Boolean.TRUE.equals(messageProperty);
         
         boolean hasResponse = event.getEndpoint().getExchangePattern().hasResponse();

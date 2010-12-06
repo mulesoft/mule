@@ -182,7 +182,7 @@ spring-context-3.0.3.RELEASE
 spring-core-3.0.3.RELEASE
 spring-jdbc-3.0.3.RELEASE
 spring-jms-3.0.3.RELEASE
-spring-security-core-2.0.4
+spring-security-core-3.0.3.RELEASE
 spring-tx-3.0.3.RELEASE
 spring-web-3.0.3.RELEASE
 spring-asm-3.0.3.RELEASE

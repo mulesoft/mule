@@ -10,8 +10,9 @@
 
 package org.mule.module.spring.security;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.providers.preauth.PreAuthenticatedAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+
 
 /**
  * Provides a pre authenticated authentication

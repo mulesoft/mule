@@ -143,7 +143,7 @@
         <springOsgiVersion>1.0.2</springOsgiVersion>
         <!-- see http://www.springsource.com/security/cve-2010-1622 -->
         <springVersion>3.0.3.RELEASE</springVersion>
-        <springSecurityVersion>2.0.4</springSecurityVersion>
+        <springSecurityVersion>3.0.3.RELEASE</springSecurityVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <sxcVersion>0.7.3</sxcVersion>
         <woodstoxVersion>4.0.8</woodstoxVersion>

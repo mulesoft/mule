@@ -14,6 +14,8 @@ import org.mule.api.security.Authentication;
 
 import java.util.Map;
 
+import org.springframework.security.core.GrantedAuthority;
+
 /**
  * 
  */
@@ -21,15 +23,15 @@ public class SpringAuthenticationAdapter implements Authentication
 {
     private static final long serialVersionUID = -5906282218126929871L;
 
-    private org.springframework.security.Authentication delegate;
+    private org.springframework.security.core.Authentication delegate;    
     private Map properties;
 
-    public SpringAuthenticationAdapter(org.springframework.security.Authentication authentication)
+    public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication)    
     {
         this.delegate = authentication;
     }
 
-    public SpringAuthenticationAdapter(org.springframework.security.Authentication authentication, Map properties)
+    public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication, Map properties)    
     {
         this.delegate = authentication;
         this.properties = properties;
@@ -45,9 +47,9 @@ public class SpringAuthenticationAdapter implements Authentication
         return delegate.isAuthenticated();
     }
 
-    public org.springframework.security.GrantedAuthority[] getAuthorities()
+    public org.springframework.security.core.GrantedAuthority[] getAuthorities()    
     {
-        return delegate.getAuthorities();
+        return (GrantedAuthority[]) delegate.getAuthorities().toArray();        
     }
 
     public Object getCredentials()
@@ -80,7 +82,7 @@ public class SpringAuthenticationAdapter implements Authentication
         return delegate.getName();
     }
 
-    public org.springframework.security.Authentication getDelegate()
+    public org.springframework.security.core.Authentication getDelegate()    
     {
         return delegate;
     }

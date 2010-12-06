@@ -26,7 +26,7 @@ public interface SpringAuthenticationProvider
      * @param authentication the mule's authentication
      * @return the spring's authentication
      */
-    org.springframework.security.Authentication getAuthentication(Authentication authentication);
+    org.springframework.security.core.Authentication getAuthentication(Authentication authentication);    
 }
 
 

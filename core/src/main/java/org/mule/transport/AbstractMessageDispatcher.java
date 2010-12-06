@@ -70,10 +70,15 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
             {
                 applyOutboundTransformers(event);            
             }
-            if (endpoint.getExchangePattern().hasResponse())
+            // TODO this is the same logic as in OptionalAsyncInterceptingMessageProcessor.  Better to have it in one place
+            Object forceSyncPropertyValue = event.getMessage().getInboundProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY);
+            boolean forceSync = Boolean.TRUE.equals(forceSyncPropertyValue);
+            boolean hasResponse = endpoint.getExchangePattern().hasResponse();
+            boolean isTransacted = endpoint.getTransactionConfig().isTransacted();
+            if (forceSync || hasResponse || isTransacted)            
             {
                 MuleMessage resultMessage = doSend(event);
-                if (resultMessage != null)
+                if (hasResponse && resultMessage != null)
                 {
                     resultEvent = new DefaultMuleEvent(resultMessage, event);
                     // TODO It seems like this should go here but it causes unwanted behaviour and breaks test cases.

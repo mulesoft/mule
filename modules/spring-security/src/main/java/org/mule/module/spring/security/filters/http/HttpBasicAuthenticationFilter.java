@@ -31,7 +31,9 @@ import org.mule.transport.http.HttpConstants;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
 
 /**
  * <code>HttpBasicAuthenticationFilter</code> TODO

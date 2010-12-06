@@ -101,7 +101,7 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
 
         for (String methodName : methods)
         {
-            method = getMethodByName(methodName, context);
+            method = getMethodByName(component, methodName, context);
 
             if (method == null)
             {
@@ -110,7 +110,7 @@ public abstract class AbstractArgumentEntryPointResolver extends ReflectionEntry
             }
             if (method != null)
             {
-                addMethodByName(method, context);
+                addMethodByName(component, method, context);
                 break;
             }
         }

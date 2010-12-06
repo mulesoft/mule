@@ -10,7 +10,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.1/mule-http.xsd
        http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/3.1/mule-spring-security.xsd
-       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 
     <mule-ss:security-manager>
         <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
@@ -20,15 +20,16 @@
     
     <spring:beans>
         <spring:bean class="org.mule.module.spring.security.PreAuthenticatedAuthenticationProvider" name="authenticationProvider"/>
-        
-        <ss:authentication-manager alias="authenticationManager"/>
 
-        <ss:authentication-provider>
-            <ss:user-service id="userService">
-                <ss:user name="ross" password="ross" authorities="ROLE_ADMIN" />
-                <ss:user name="anon" password="anon" authorities="ROLE_ANON" />
-            </ss:user-service>
-        </ss:authentication-provider>
+        <ss:authentication-manager alias="authenticationManager">
+            <ss:authentication-provider>
+                <ss:user-service id="userService">
+                    <ss:user name="ross" password="ross" authorities="ROLE_ADMIN" />
+                    <ss:user name="anon" password="anon" authorities="ROLE_ANON" />
+                </ss:user-service>
+            </ss:authentication-provider>
+        </ss:authentication-manager>
+
     </spring:beans>
 
     

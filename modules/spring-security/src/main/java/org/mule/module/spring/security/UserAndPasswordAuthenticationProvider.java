@@ -10,8 +10,8 @@
 
 package org.mule.module.spring.security;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.providers.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 
 /**
  * A spring authentication provider that return 

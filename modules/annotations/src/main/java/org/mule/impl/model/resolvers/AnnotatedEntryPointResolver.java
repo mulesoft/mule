@@ -90,6 +90,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
             return result;
         }
 
+        ConcurrentHashMap methodCache = getMethodCache(component);
         if(methodCache.size()==0)
         {
             InvocationResult result = new InvocationResult(this, InvocationResult.State.NOT_SUPPORTED);
@@ -115,7 +116,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
         //on the method
         if (methodName != null)
         {
-            method = getMethodByName(methodName, context);
+            method = getMethodByName(component, methodName, context);
             if (method == null)
             {
                 InvocationResult result = new InvocationResult(this, InvocationResult.State.NOT_SUPPORTED);
@@ -218,7 +219,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
                             Method method = component.getClass().getMethods()[i];
                             if (AnnotationUtils.getParamAnnotationsWithMeta(method, Evaluator.class).size() > 0)
                             {
-                                this.addMethodByName(method, context);
+                                this.addMethodByName(component, method, context);
                             }
                         }
                     }
