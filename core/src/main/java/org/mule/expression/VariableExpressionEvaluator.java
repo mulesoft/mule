@@ -12,9 +12,7 @@ package org.mule.expression;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.expression.RequiredValueException;
 import org.mule.api.transport.PropertyScope;
-import org.mule.config.i18n.CoreMessages;
 
 /**
  * Looks up the variable on the message using the name given.
@@ -28,17 +26,8 @@ public class VariableExpressionEvaluator implements ExpressionEvaluator
 
     public Object evaluate(String expression, MuleMessage message)
     {
-        Object value = message.getProperty(expression, PropertyScope.INVOCATION);
-        if (value == null)
-        {
-            throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("header",
-                expression));
-        }
-        else
-        {
-            return value;
-        }
-
+        // Variable is a shortcut for invocation properties
+        return ExpressionUtils.getProperty(expression, PropertyScope.INVOCATION, message);
     }
 
     /**

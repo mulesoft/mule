@@ -36,13 +36,24 @@ public final class ExpressionUtils
         // don't instantiate
     }
 
+    /**
+     * Gets a property or map/list of properties specific by an expression supporting multiple return types as well as all and optional modifiers
+     * 
+     * Handles scope-aware expressions like "#[header:INBOUND:foo]
+     * @param expression the header name to evaluate.  this can be prefixed with a message scope such as INBOUND, OUTBOUND
+     * or INVOCATION scope. If no scope is defined the default scope is OUTBOUND
+     * 
+     * @param msg the message to evaluate on
+     */
     public static Object getPropertyWithScope(String expression, MuleMessage msg)
     {
         return getPropertyWithScope(expression, msg, Object.class);
     }
-
+    
     /**
-     * Handler scope-aware expressions like "#[header:INBOUND:foo]
+     * Gets a property or map/list of properties specific by an expression supporting multiple return types as well as all and optional modifiers
+     *
+     * Handles scope-aware expressions like "#[header:INBOUND:foo]
      * @param expression the header name to evaluate.  this can be prefixed with a message scope such as INBOUND, OUTBOUND
      * or INVOCATION scope. If no scope is defined the default scope is OUTBOUND
      * 
@@ -51,47 +62,87 @@ public final class ExpressionUtils
      * @return  an object of type 'type' corresponding to the message header requested or null if the header was not on
      * the message in the specified scope
      */
-    @SuppressWarnings("unchecked")
     public static <T> T getPropertyWithScope(String expression, MuleMessage msg, Class<T> type)
     {
-        PropertyScope defaultScope = getScope(expression);
-        if (defaultScope != null)
-        {
-            // cut-off leading scope and separator
-            expression = expression.substring(defaultScope.getScopeName().length() + 1);
-        }
-        else
-        {
-            // default
-            defaultScope = PropertyScope.OUTBOUND;
-        }
+        return getPropertyInternal(expression, PropertyScope.OUTBOUND, true, msg, type);
+    }
+    
+    /**
+     * Gets a property or map/list of properties specific by an expression supporting multiple return types as well as all and optional modifiers
+     * 
+     * @param msg the message to evaluate on
+     * @param type the expected return type for this evaluation
+     * @return  an object of type 'type' corresponding to the message header requested or null if the header was not on
+     * the message in the specified scope
+     */
+    public static Object getProperty(String expression, PropertyScope scope, MuleMessage msg)
+    {
+        return getProperty(expression, scope, msg, Object.class);
+    }
+    
+    /**
+     * Gets a property or map/list of properties specific by an expression supporting multiple return types as well as all and optional modifiers
+     * 
+     * @param msg the message to evaluate on
+     * @param type the expected return type for this evaluation
+     * @return  an object of type 'type' corresponding to the message header requested or null if the header was not on
+     * the message in the specified scope
+     */
+    public static <T> T getProperty(String expression, PropertyScope scope,  MuleMessage msg, Class<T> type)
+    {
+        return getPropertyInternal(expression, scope, false, msg, type);
+    }
 
+    /**
+     * Obtains a property or map/list of properties from a message using an expression that specifies which property or properties to evaluate.
+     * This method can be used  default scope 
+     * @param expression the expression used to evaluator the message
+     * @param scope the scope to be used when obtaining a property.  This is the default if parseScopes is true.
+     * @param parseScope should scope we parsed from expression string.  When true the scope acts as a default.
+     * @param msg the message to be evaluated
+     * @param type return type expected
+     * @return property or list/map of evaluated property values 
+     */
+    @SuppressWarnings("unchecked")
+    protected static <T> T getPropertyInternal(String expression, PropertyScope scope, boolean parseScope, MuleMessage msg, Class<T> type)
+    {
+        if (parseScope)
+        {
+            PropertyScope tempScope = getScope(expression);
+            if (tempScope != null)
+            {
+                // cut-off leading scope and separator
+                expression = expression.substring(tempScope.getScopeName().length() + 1);
+                scope = tempScope;
+            }
+        }
+        
         if (expression.contains(ALL_ARGUMENT))
         {
             WildcardFilter filter = new WildcardFilter(expression);
             if (Map.class.isAssignableFrom(type))
             {
                 Map<String, Object> props = new HashMap<String, Object>();
-                for (String name : msg.getPropertyNames(defaultScope))
+                for (String name : msg.getPropertyNames(scope))
                 {
                     if (filter.accept(name))
                     {
-                        props.put(name, msg.getProperty(name, defaultScope));
+                        props.put(name, msg.getProperty(name, scope));
                     }
                 }
-                return (T) returnMap(props, defaultScope);
+                return (T) returnMap(props, scope);
             }
             else if (List.class.isAssignableFrom(type))
             {
                 List<Object> values = new ArrayList<Object>();
-                for (String name : msg.getPropertyNames(defaultScope))
+                for (String name : msg.getPropertyNames(scope))
                 {
                     if (filter.accept(name))
                     {
-                        values.add(msg.getProperty(name, defaultScope));
+                        values.add(msg.getProperty(name, scope));
                     }
                 }
-                return (T) returnList(values, defaultScope);
+                return (T) returnList(values, scope);
             }
             else
             {
@@ -107,32 +158,36 @@ public final class ExpressionUtils
             {
                 boolean required = true;
                 name = name.trim();
-                PropertyScope scope = getScope(name);
-                if (scope != null)
+                PropertyScope entryScope = scope;
+                if (parseScope)
                 {
-                    // cut-off leading scope and separator
-                    name = name.substring(scope.getScopeName().length() + 1);
-                }
-                else
-                {
-                    scope = defaultScope;
+                    entryScope = getScope(name);
+                    if (entryScope != null)
+                    {
+                        // cut-off leading scope and separator
+                        name = name.substring(entryScope.getScopeName().length() + 1);
+                    }
+                    else
+                    {
+                        entryScope = scope;
+                    }
                 }
                 if (name.endsWith(OPTIONAL_ARGUMENT))
                 {
                     name = name.substring(0, name.length() - OPTIONAL_ARGUMENT.length());
                     required = false;
                 }
-                Object value = msg.getProperty(name, scope);
+                Object value = msg.getProperty(name, entryScope);
                 if (value == null && required)
                 {
-                    throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("headers", scope.getScopeName() + ":" + name));
+                    throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("headers", entryScope.getScopeName() + ":" + name));
                 }
                 else if (value != null)
                 {
                     props.put(name, value);
                 }
             }
-            return (T) returnMap(props, defaultScope);
+            return (T) returnMap(props, scope);
         }
         else if (List.class.isAssignableFrom(type))
         {
@@ -142,15 +197,19 @@ public final class ExpressionUtils
             {
                 boolean required = true;
                 name = name.trim();
-                PropertyScope scope = getScope(name);
-                if (scope != null)
+                PropertyScope itemScope = scope;
+                if (parseScope)
                 {
-                    // cut-off leading scope and separator
-                    name = name.substring(scope.getScopeName().length() + 1);
-                }
-                else
-                {
-                    scope = defaultScope;
+                    itemScope = getScope(name);
+                    if (itemScope != null)
+                    {
+                        // cut-off leading scope and separator
+                        name = name.substring(itemScope.getScopeName().length() + 1);
+                    }
+                    else
+                    {
+                        itemScope = scope;
+                    }
                 }
                 if (name.endsWith(OPTIONAL_ARGUMENT))
                 {
@@ -158,17 +217,17 @@ public final class ExpressionUtils
                     required = false;
                 }
                 name = name.trim();
-                Object value = msg.getProperty(name, scope);
+                Object value = msg.getProperty(name, itemScope);
                 if (value == null && required)
                 {
-                    throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("headers-list", scope.getScopeName() + ":" + name));
+                    throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("headers-list", itemScope.getScopeName() + ":" + name));
                 }
                 else if (value != null)
                 {
                     values.add(value);
                 }
             }
-            return (T) returnList(values, defaultScope);
+            return (T) returnList(values, scope);
         }
         else
         {
@@ -178,10 +237,10 @@ public final class ExpressionUtils
                 expression = expression.substring(0, expression.length() - OPTIONAL_ARGUMENT.length());
                 required = false;
             }
-            Object result = msg.getProperty(expression.trim(), defaultScope);
+            Object result = msg.getProperty(expression.trim(), scope);
             if (result == null && required)
             {
-                throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("header", defaultScope.getScopeName() + ":" + expression));
+                throw new RequiredValueException(CoreMessages.expressionEvaluatorReturnedNull("header", scope.getScopeName() + ":" + expression));
 
             }
             return (T) result;
