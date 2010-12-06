@@ -92,7 +92,10 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
                     methodName, argumentExpressions.length, object), this);
             }
         }
-        logger.debug("Initialised with method: '" + method + "'");
+        if (logger.isDebugEnabled())
+        {
+            logger.error(String.format("Initialised %s to use method: '%s'", this, method));
+        }
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -100,8 +103,11 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
         MuleEvent resultEvent = event;
         Object[] args = evaluateArguments(event, argumentExpressions);
 
-        logger.debug("Invoking  '" + method.getName() + "' of '" + object + "' with arguments: '" + args
-                     + "'");
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(String.format("Invoking  '%s' of '%s' with arguments: '%s'", method.getName(),
+                object, args));
+        }
 
         try
         {
@@ -224,6 +230,14 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
     public void setArgumentTypes(Class[] argumentTypes)
     {
         this.argumentTypes = argumentTypes;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format(
+            "InvokerMessageProcessor [name=%s, object=%s, methodName=%s, argExpressions=%s, argTypes=%s]",
+            name, object, methodName, argumentExpressions, argumentTypes);
     }
 
 }
