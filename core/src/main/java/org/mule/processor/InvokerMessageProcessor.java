@@ -36,6 +36,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <code>InvokerMessageProcessor</code> invokes a specified method of an object. An
  * array of argument expressions can be provided to map the message to the method
@@ -47,6 +50,8 @@ import java.util.List;
  */
 public class InvokerMessageProcessor implements MessageProcessor, Initialisable
 {
+    protected final transient Log logger = LogFactory.getLog(getClass());
+
     protected Object object;
     protected String methodName;
     protected String[] argumentExpressions;
@@ -87,12 +92,16 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
                     methodName, argumentExpressions.length, object), this);
             }
         }
+        logger.debug("Initialised with method: '" + method + "'");
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleEvent resultEvent = event;
         Object[] args = evaluateArguments(event, argumentExpressions);
+
+        logger.debug("Invoking  '" + method.getName() + "' of '" + object + "' with arguments: '" + args
+                     + "'");
 
         try
         {
@@ -120,7 +129,8 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
                 Object arg = null;
                 if (expressions[i] != null)
                 {
-                    // If string contains is a single expression then evaluate otherwise
+                    // If string contains is a single expression then evaluate
+                    // otherwise
                     // parse. We can't use parse() always because that will convert
                     // everything to a string
                     if (expressions[i].startsWith(patternInfo.getPrefix())
