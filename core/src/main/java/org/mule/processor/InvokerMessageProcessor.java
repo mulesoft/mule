@@ -94,7 +94,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
         }
         if (logger.isDebugEnabled())
         {
-            logger.error(String.format("Initialised %s to use method: '%s'", this, method));
+            logger.debug(String.format("Initialised %s to use method: '%s'", this, method));
         }
     }
 
