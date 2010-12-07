@@ -237,13 +237,15 @@
         <vm:inbound-endpoint path="choice2-in" exchange-pattern="request-response"/>
         <choice>
             <when expression="payload=='foo'" evaluator="groovy">
-                <append-string-transformer message=" Hello foo" />
+                <append-string-transformer message=" Hello" />
+                <append-string-transformer message=" foo" />
             </when>
             <when expression="payload=='bar'" evaluator="groovy">
                 <append-string-transformer message=" Hello bar" />
             </when>
             <otherwise>
                 <append-string-transformer message=" Hello ?" />
+                <append-string-transformer message=" ?" />
             </otherwise>
         </choice>
     </flow>

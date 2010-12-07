@@ -13,16 +13,21 @@ package org.mule.config.spring.factories;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.routing.filter.Filter;
+import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.MessageProcessorFilterPair;
 import org.mule.routing.filters.AcceptAllFilter;
 import org.mule.routing.filters.ExpressionFilter;
+
+import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
 public class MessageProcessorFilterPairFactoryBean implements FactoryBean, MuleContextAware
 {
-    private MessageProcessor messageProcessor;
+    private List<MessageProcessor> messageProcessors;
     private Filter filter = new ExpressionFilter();
 
     public void setFilter(Filter filter)
@@ -30,31 +35,48 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean, MuleC
         this.filter = filter;
     }
 
-    public void setMessageProcessor(MessageProcessor messageProcessor)
+    public void setMessageProcessors(List<MessageProcessor> messageProcessors)
     {
-        this.messageProcessor = messageProcessor;
+        this.messageProcessors = messageProcessors;
     }
-    
+
     public void setExpression(String expression)
     {
-        ((ExpressionFilter)filter).setExpression(expression);
+        ((ExpressionFilter) filter).setExpression(expression);
     }
-    
+
     public void setEvaluator(String evaluator)
     {
-        ((ExpressionFilter)filter).setEvaluator(evaluator);
+        ((ExpressionFilter) filter).setEvaluator(evaluator);
     }
-    
+
     public void setCustomEvaluator(String customEvaluator)
     {
-        ((ExpressionFilter)filter).setCustomEvaluator(customEvaluator);
+        ((ExpressionFilter) filter).setCustomEvaluator(customEvaluator);
     }
 
     public Object getObject() throws Exception
     {
+        MessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+        for (Object processor : messageProcessors)
+        {
+            if (processor instanceof MessageProcessor)
+            {
+                builder.chain((MessageProcessor) processor);
+            }
+            else if (processor instanceof MessageProcessorBuilder)
+            {
+                builder.chain((MessageProcessorBuilder) processor);
+            }
+            else
+            {
+                throw new IllegalArgumentException(
+                    "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
+            }
+        }
         return filter == null
-                             ? new MessageProcessorFilterPair(messageProcessor, AcceptAllFilter.INSTANCE)
-                             : new MessageProcessorFilterPair(messageProcessor, filter);
+                             ? new MessageProcessorFilterPair(builder.build(), AcceptAllFilter.INSTANCE)
+                             : new MessageProcessorFilterPair(builder.build(), filter);
     }
 
     public Class<?> getObjectType()
@@ -66,13 +88,9 @@ public class MessageProcessorFilterPairFactoryBean implements FactoryBean, MuleC
     {
         return true;
     }
-    
+
     public void setMuleContext(MuleContext context)
     {
-        if (messageProcessor != null && messageProcessor instanceof MuleContextAware)
-        {
-            ((MuleContextAware) messageProcessor).setMuleContext(context);
-        }
         if (filter != null && filter instanceof MuleContextAware)
         {
             ((MuleContextAware) filter).setMuleContext(context);

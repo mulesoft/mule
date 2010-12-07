@@ -4405,7 +4405,7 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="1" />
+            <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded" />
           </xsd:sequence>
           <xsd:attribute name="evaluator" use="optional" type="standardExpressionEvaluators">
               <xsd:annotation>
@@ -4432,7 +4432,7 @@
     <xsd:complexType name="otherwiseMessageProcessorFilterPairType">
       <xsd:complexContent>
         <xsd:extension base="abstractMessageProcessorFilterPairType">
-          <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="1" />
+          <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded" />
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
