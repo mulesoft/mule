@@ -244,7 +244,7 @@
                 <append-string-transformer message=" Hello bar" />
             </when>
             <otherwise>
-                <append-string-transformer message=" Hello ?" />
+                <append-string-transformer message=" Hello" />
                 <append-string-transformer message=" ?" />
             </otherwise>
         </choice>
