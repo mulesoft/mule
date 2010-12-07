@@ -11,6 +11,7 @@
 package org.mule.routing.filters;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
@@ -156,5 +157,14 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         assertFalse(filter.accept(message));
         message.setOutboundProperty("foo", "car");
         assertTrue("Filter didn't accept the message", filter.accept(message));
+    }
+
+    public void testMessagePropertyWithEnum() throws Exception
+    {
+        MessagePropertyFilter filter = new MessagePropertyFilter("foo=ONE_WAY");
+        MuleMessage message = new DefaultMuleMessage("", muleContext);
+        assertFalse(filter.accept(message));
+        message.setOutboundProperty("foo", MessageExchangePattern.ONE_WAY);
+        assertTrue(filter.accept(message));
     }
 }
