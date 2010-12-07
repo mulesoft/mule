@@ -33,7 +33,11 @@
     
     <flow name="http-inbound">
         <http:inbound-endpoint host="0.0.0.0" port="47493" path="change-machine"
-            exchange-pattern="request-response" transformer-refs="HttpRequestToMap"/>
+            exchange-pattern="request-response" transformer-refs="HttpRequestToMap">
+            <not-filter>
+                <wildcard-filter pattern="/favicon.ico"/>
+            </not-filter>
+        </http:inbound-endpoint>
 
         <choice>
             <when expression="payload.currency == 'USD'" evaluator="groovy">
