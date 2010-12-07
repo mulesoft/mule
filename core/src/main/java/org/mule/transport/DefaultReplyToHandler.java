@@ -27,7 +27,6 @@ import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReplyToHandler;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.ServiceStatistics;
-import org.mule.service.AbstractService;
 
 import java.util.HashMap;
 import java.util.List;
