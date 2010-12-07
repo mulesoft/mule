@@ -11,11 +11,16 @@
 package org.mule.processor;
 
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
 {
@@ -28,6 +33,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         super.doSetUp();
         invoker = new InvokerMessageProcessor();
         invoker.setObject(new TestInvokeObject());
+        invoker.setMuleContext(muleContext);
     }
 
     public void testMethodFound() throws MuleException, Exception
@@ -53,7 +59,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         invoker.initialise();
         assertEquals("1-2-3 echo", invoker.process(getTestEvent("")).getMessageAsString());
     }
-    
+
     public void testMethodFoundParseStringNoExpressions() throws MuleException, Exception
     {
         invoker.setMethodName("testMethod3");
@@ -65,12 +71,11 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
     public void testMethodFoundNullArgument() throws MuleException, Exception
     {
         invoker.setMethodName("testMethod3");
-        invoker.setArgumentExpressions(new String[]{null});
+        invoker.setArguments(Collections.singletonList(null));
         invoker.initialise();
-        assertEquals("null echo",invoker.process(getTestEvent("")).getMessageAsString());
+        assertEquals("null echo", invoker.process(getTestEvent("")).getMessageAsString());
     }
 
-    
     public void testMethodNameNotFound() throws MuleException, Exception
     {
         invoker.setMethodName("testMethodNotHere");
@@ -136,6 +141,38 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         assertEquals("hello echo", invoker.process(getTestEvent("hello")).getMessageAsString());
     }
 
+    public void testArrayArg() throws MuleException, Exception
+    {
+        invoker.setMethodName("testArrayArg");
+        invoker.setArguments(Collections.singletonList(new String[]{"#[string:1]", "#[string:2]"}));
+        invoker.initialise();
+        MuleEvent result = invoker.process(getTestEvent(""));
+        assertEquals(String[].class, result.getMessage().getPayload().getClass());
+        assertEquals("1", ((String[]) result.getMessage().getPayload())[0]);
+        assertEquals("2", ((String[]) result.getMessage().getPayload())[1]);
+    }
+
+    public void testListArg() throws MuleException, Exception
+    {
+        invoker.setMethodName("testListArg");
+        invoker.setArguments(Collections.singletonList(Collections.singletonList("#[string:1]")));
+        invoker.initialise();
+        MuleEvent result = invoker.process(getTestEvent(""));
+        assertTrue(List.class.isAssignableFrom(result.getMessage().getPayload().getClass()));
+        assertEquals("1", ((List) result.getMessage().getPayload()).get(0));
+    }
+
+    public void testMapArg() throws MuleException, Exception
+    {
+        invoker.setMethodName("testMapArg");
+        invoker.setArguments(Collections.singletonList(Collections.singletonMap("#[string:key]",
+            "#[string:val]")));
+        invoker.initialise();
+        MuleEvent result = invoker.process(getTestEvent(""));
+        assertTrue(Map.class.isAssignableFrom(result.getMessage().getPayload().getClass()));
+        assertEquals("val", ((Map) result.getMessage().getPayload()).get("key"));
+    }
+
     private class TestInvokeObject
     {
 
@@ -171,6 +208,21 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         public String testDuplicateNameMethod(String text, int i)
         {
             return text + i + "(string and int)";
+        }
+
+        public String[] testArrayArg(String[] array)
+        {
+            return array;
+        }
+
+        public List<String> testListArg(List<String> list)
+        {
+            return list;
+        }
+
+        public Map<String, String> testMapArg(Map<String, String> map)
+        {
+            return map;
         }
 
     }

@@ -13,9 +13,11 @@ package org.mule.processor;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -33,8 +35,13 @@ import org.mule.util.TemplateParser.PatternInfo;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,18 +55,20 @@ import org.apache.commons.logging.LogFactory;
  * methods with the same name and same number of arguments are not supported
  * currently.
  */
-public class InvokerMessageProcessor implements MessageProcessor, Initialisable
+public class InvokerMessageProcessor implements MessageProcessor, Initialisable, MuleContextAware
 {
     protected final transient Log logger = LogFactory.getLog(getClass());
 
     protected Object object;
     protected String methodName;
-    protected String[] argumentExpressions;
+    protected List<?> arguments;
     protected Class<?>[] argumentTypes;
     protected String name;
     protected PatternInfo patternInfo = TemplateParser.createMuleStyleParser().getStyle();
 
     protected Method method;
+    protected ExpressionManager expressionManager;
+    protected MuleContext muleContext;
 
     public void initialise() throws InitialisationException
     {
@@ -78,7 +87,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
             for (Method methodCandidate : object.getClass().getMethods())
             {
                 if (methodCandidate.getName().equals(methodName)
-                    && methodCandidate.getParameterTypes().length == argumentExpressions.length)
+                    && methodCandidate.getParameterTypes().length == arguments.size())
                     matchingMethods.add(methodCandidate);
             }
             if (matchingMethods.size() == 1)
@@ -89,9 +98,10 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
             else
             {
                 throw new InitialisationException(CoreMessages.methodWithNumParamsNotFoundOnObject(
-                    methodName, argumentExpressions.length, object), this);
+                    methodName, arguments.size(), object), this);
             }
         }
+        expressionManager = muleContext.getExpressionManager();
         if (logger.isDebugEnabled())
         {
             logger.debug(String.format("Initialised %s to use method: '%s'", this, method));
@@ -101,7 +111,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleEvent resultEvent = event;
-        Object[] args = evaluateArguments(event, argumentExpressions);
+        Object[] args = evaluateArguments(event, arguments);
 
         if (logger.isDebugEnabled())
         {
@@ -124,49 +134,57 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
         return resultEvent;
     }
 
-    protected Object[] evaluateArguments(MuleEvent event, String[] expressions) throws MessagingException
+    @SuppressWarnings("unchecked")
+    protected Object[] evaluateArguments(MuleEvent event, List<?> argumentTemplates)
+        throws MessagingException
     {
-        ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
-        Object[] args = new Object[expressions.length];
+        Object[] args = new Object[argumentTemplates.size()];
+        MuleMessage message = event.getMessage();
         try
         {
             for (int i = 0; i < args.length; i++)
             {
                 Object arg = null;
-                if (expressions[i] != null)
+                Object argumentTemplate = argumentTemplates.get(i);
+                if (argumentTemplate != null)
                 {
-                    // If string contains is a single expression then evaluate
-                    // otherwise
-                    // parse. We can't use parse() always because that will convert
-                    // everything to a string
-                    if (expressions[i].startsWith(patternInfo.getPrefix())
-                        && expressions[i].endsWith(patternInfo.getSuffix()))
+                    if (argumentTemplate instanceof Collection<?>)
                     {
-                        arg = expressionManager.evaluate(expressions[i], event.getMessage());
+                        Collection<Object> collectionTemplate = (Collection<Object>) argumentTemplate;
+                        Collection<Object> newCollection = new ArrayList<Object>();
+                        for (Object object : collectionTemplate)
+                        {
+                            newCollection.add(evaluateExpressionCandidate(object, message));
+                        }
+                        arg = newCollection;
+                    }
+                    else if (argumentTemplate instanceof Map<?, ?>)
+                    {
+                        Map<Object, Object> mapTemplate = (Map<Object, Object>) argumentTemplate;
+                        Map<Object, Object> newMap = new HashMap<Object, Object>();
+                        for (Entry<Object, Object> entry : mapTemplate.entrySet())
+                        {
+                            newMap.put(evaluateExpressionCandidate(entry.getKey(), message),
+                                evaluateExpressionCandidate(entry.getValue(), message));
+                        }
+                        arg = newMap;
+                    }
+                    else if (argumentTemplate instanceof String[])
+                    {
+                        String[] stringArrayTemplate = (String[]) argumentTemplate;
+                        Object[] newArray = new String[stringArrayTemplate.length];
+                        for (int j = 0; j < stringArrayTemplate.length; j++)
+                        {
+                            newArray[j] = evaluateExpressionCandidate(stringArrayTemplate[j], message);
+                        }
+                        arg = newArray;
                     }
                     else
                     {
-                        arg = expressionManager.parse(expressions[i], event.getMessage());
+                        arg = evaluateExpressionCandidate((String) argumentTemplate, message);
                     }
-
-                    // If expression evaluates to a MuleMessage then use it's payload
-                    if (arg instanceof MuleMessage)
-                    {
-                        arg = ((MuleMessage) arg).getPayload();
-                    }
-                    if (!(argumentTypes[i].isAssignableFrom(arg.getClass())))
-                    {
-                        DataType<?> source = DataTypeFactory.create(arg.getClass());
-                        DataType<?> target = DataTypeFactory.create(argumentTypes[i]);
-                        // Throws TransformerException if no suitable transformer is
-                        // found
-                        Transformer t = event.getMuleContext()
-                            .getRegistry()
-                            .lookupTransformer(source, target);
-                        arg = t.transform(arg);
-                    }
+                    args[i] = transformArgument(arg, argumentTypes[i]);
                 }
-                args[i] = arg;
             }
             return args;
         }
@@ -174,6 +192,53 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
         {
             throw new MessagingException(event, e);
         }
+    }
+
+    protected Object evaluateExpressionCandidate(Object expressionCandidate, MuleMessage message)
+        throws TransformerException
+    {
+        if (expressionCandidate instanceof String)
+        {
+            Object arg;
+            String expression = (String) expressionCandidate;
+            // If string contains is a single expression then evaluate otherwise
+            // parse. We can't use parse() always because that will convert
+            // everything to a string
+            if (expression.startsWith(patternInfo.getPrefix())
+                && expression.endsWith(patternInfo.getSuffix()))
+            {
+                arg = expressionManager.evaluate(expression, message);
+            }
+            else
+            {
+                arg = expressionManager.parse(expression, message);
+            }
+
+            // If expression evaluates to a MuleMessage then use it's payload
+            if (arg instanceof MuleMessage)
+            {
+                arg = ((MuleMessage) arg).getPayload();
+            }
+            return arg;
+        }
+        else
+        {
+            // Not an expression so use object itself
+            return expressionCandidate;
+        }
+    }
+
+    private Object transformArgument(Object arg, Class<?> type) throws TransformerException
+    {
+        if (!(type.isAssignableFrom(arg.getClass())))
+        {
+            DataType<?> source = DataTypeFactory.create(arg.getClass());
+            DataType<?> target = DataTypeFactory.create(type);
+            // Throws TransformerException if no suitable transformer is found
+            Transformer t = muleContext.getRegistry().lookupTransformer(source, target);
+            arg = t.transform(arg);
+        }
+        return arg;
     }
 
     public void setObject(Object object)
@@ -188,12 +253,12 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
 
     public void setArgumentExpressionsString(String arguments)
     {
-        this.argumentExpressions = arguments.split("\\s*,\\s*");
+        this.arguments = Arrays.asList(arguments.split("\\s*,\\s*"));
     }
 
-    public void setArgumentExpressions(String[] argumentExpressions)
+    public void setArguments(List<?> arguments)
     {
-        this.argumentExpressions = argumentExpressions;
+        this.arguments = arguments;
     }
 
     protected MuleEvent createResultEvent(MuleEvent event, Object result) throws MuleException
@@ -227,7 +292,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
         this.name = name;
     }
 
-    public void setArgumentTypes(Class[] argumentTypes)
+    public void setArgumentTypes(Class<?>[] argumentTypes)
     {
         this.argumentTypes = argumentTypes;
     }
@@ -237,7 +302,12 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable
     {
         return String.format(
             "InvokerMessageProcessor [name=%s, object=%s, methodName=%s, argExpressions=%s, argTypes=%s]",
-            name, object, methodName, argumentExpressions, argumentTypes);
+            name, object, methodName, arguments, argumentTypes);
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
     }
 
 }
