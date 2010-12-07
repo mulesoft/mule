@@ -36,16 +36,19 @@ public class InterceptingChainLifecycleWrapper extends AbstractMessageProcessorC
         this.chain = chain;
     }
 
+    @Override
     public List<MessageProcessor> getMessageProcessors()
     {
         return chain.getMessageProcessors();
     }
 
+    @Override
     public String getName()
     {
         return chain.getName();
     }
 
+    @Override
     public Policies getPolicies()
     {
         return chain.getPolicies();
