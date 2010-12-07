@@ -156,7 +156,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         }
 
         List<AnnotationMetaData> metaData = AnnotationUtils.getMethodAnnotations(object.getClass(), PostConstruct.class);
-        if(metaData.size()==0)
+        if (metaData.size() == 0)
         {
             return null;
         }
@@ -174,7 +174,7 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
 
     protected Method findDisposeMethod(Object object)
     {
-        if(object instanceof Disposable)
+        if (object instanceof Disposable)
         {
             try
             {
@@ -187,11 +187,11 @@ public class DefaultComponentLifecycleAdapter implements LifecycleAdapter
         }
 
         List<AnnotationMetaData> metaData = AnnotationUtils.getMethodAnnotations(object.getClass(), PreDestroy.class);
-        if(metaData.size()==0)
+        if (metaData.size() == 0)
         {
             return null;
         }
-        else if(metaData.size() > 1)
+        else if (metaData.size() > 1)
         {
             throw new IllegalArgumentException(CoreMessages.objectHasMoreThanOnePreDestroyAnnotation(object.getClass()).getMessage());
         }

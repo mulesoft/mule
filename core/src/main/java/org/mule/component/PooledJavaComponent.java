@@ -73,12 +73,6 @@ public class PooledJavaComponent extends AbstractJavaComponent
     }
 
     @Override
-    protected void doInitialise() throws InitialisationException
-    {
-        super.doInitialise();    //To change body of overridden methods use File | Settings | File Templates.
-    }
-
-    @Override
     protected void doStart() throws MuleException
     {
         super.doStart();
@@ -126,8 +120,7 @@ public class PooledJavaComponent extends AbstractJavaComponent
      */
     protected class LifeCycleAdapterFactory implements ObjectFactory
     {
-
-        public Object getInstance(MuleContext muleContext) throws Exception
+        public Object getInstance(MuleContext context) throws Exception
         {
             return createLifecycleAdaptor();
         }
@@ -167,5 +160,4 @@ public class PooledJavaComponent extends AbstractJavaComponent
             return objectFactory.isAutoWireObject();
         }
     }
-
 }

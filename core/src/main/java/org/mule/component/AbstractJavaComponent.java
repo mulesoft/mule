@@ -40,7 +40,6 @@ import java.util.List;
  */
 public abstract class AbstractJavaComponent extends AbstractComponent implements JavaComponent
 {
-
     protected EntryPointResolverSet entryPointResolverSet;
 
     protected List<InterfaceBinding> bindings = new ArrayList<InterfaceBinding>();
