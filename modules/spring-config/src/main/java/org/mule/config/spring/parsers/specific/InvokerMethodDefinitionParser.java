@@ -61,7 +61,7 @@ public class InvokerMethodDefinitionParser extends ChildDefinitionParser
                 }
             }
         }
-        builder.addPropertyValue("argumentExpressions", expressions.toArray(new String[expressions.size()]));
+        builder.addPropertyValue("arguments", expressions);
         builder.addPropertyValue("methodName", methodName);
 
         BeanAssembler assembler = getBeanAssembler(element, builder);
