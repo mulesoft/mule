@@ -22,14 +22,19 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class InvokerMethodDefinitionParser extends ChildDefinitionParser
+public class InvokerMessageProcessorDefinitionParser extends ChildDefinitionParser
 {
+    private final Class<?> objectType;
     private final String methodName;
     private final String[] parameterNames;
 
-    public InvokerMethodDefinitionParser(String setterMethod, String methodName, String[] parameterNames)
+    public InvokerMessageProcessorDefinitionParser(String setterMethod,
+                                         Class<?> objectType,
+                                         String methodName,
+                                         String[] parameterNames)
     {
         super(setterMethod, InvokerMessageProcessor.class);
+        this.objectType = objectType;
         this.methodName = methodName;
         this.parameterNames = parameterNames;
     }
@@ -43,8 +48,15 @@ public class InvokerMethodDefinitionParser extends ChildDefinitionParser
     @Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        builder.addPropertyReference("object",
-            element.getAttribute(getTargetPropertyConfiguration().getAttributeAlias("object-ref")));
+        if (element.getAttribute(getTargetPropertyConfiguration().getAttributeAlias("config-ref")) != null)
+        {
+            builder.addPropertyReference("object",
+                element.getAttribute(getTargetPropertyConfiguration().getAttributeAlias("config-ref")));
+        }
+        else
+        {
+            builder.addPropertyValue("objectType", objectType);
+        }
 
         List<String> expressions = new ArrayList<String>();
         if (parameterNames != null)
