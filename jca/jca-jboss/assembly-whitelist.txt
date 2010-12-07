@@ -13,6 +13,7 @@ asm-3.1-osgi
 asm-commons-3.1
 asm-tree-3.1
 aspectjrt-1.5.4
+aspectjweaver-1.6.8
 axiom-api-1.2.5
 axiom-impl-1.2.5
 backport-util-concurrent-3.1-osgi
@@ -158,6 +159,8 @@ spring-core-3.0.3.RELEASE
 spring-jdbc-3.0.3.RELEASE
 spring-jms-3.0.3.RELEASE
 spring-security-core-3.0.3.RELEASE
+spring-security-config-3.0.3.RELEASE
+spring-security-web-3.0.3.RELEASE
 spring-tx-3.0.3.RELEASE
 spring-web-3.0.3.RELEASE
 spring-asm-3.0.3.RELEASE
