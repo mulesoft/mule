@@ -6,8 +6,14 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
         http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd">
 
-    <spring:bean id="componentOne" class="org.mule.tck.functional.FunctionalTestComponent">
-        <spring:property name="appendString" value=" One" />
+    <!-- cannot use FunctionalTestComponent here because lifecycle is not properly propagated -->
+    <spring:bean id="componentOne" class="org.mule.test.integration.interceptor.SharedInterceptorStackTestCase$CustomComponent">
+        <spring:property name="appendString" value=" ComponentOne"/>
+    </spring:bean>
+
+    <!-- cannot use FunctionalTestComponent here because lifecycle is not properly propagated -->
+    <spring:bean id="componentTwo" class="org.mule.test.integration.interceptor.SharedInterceptorStackTestCase$CustomComponent">
+        <spring:property name="appendString" value=" ComponentTwo"/>
     </spring:bean>
 
     <interceptor-stack name="stack">
@@ -23,6 +29,16 @@
             <pooled-component>
                 <interceptor-stack ref="stack" />
                 <spring-object bean="componentOne" />
+            </pooled-component>
+        </service>
+        
+        <service name="serviceTwo">
+            <inbound>
+                <vm:inbound-endpoint path="stackTwo" exchange-pattern="request-response"/>
+            </inbound>
+            <pooled-component>
+                <interceptor-stack ref="stack"/>
+                <spring-object bean="componentTwo"/>
             </pooled-component>
         </service>
     </model>

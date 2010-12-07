@@ -15,7 +15,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.interceptor.Interceptor;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.tck.FunctionalTestCase;
 
 public class SharedInterceptorStackTestCase extends FunctionalTestCase
@@ -26,29 +26,45 @@ public class SharedInterceptorStackTestCase extends FunctionalTestCase
         return "shared-interceptor-stack.xml";
     }
     
-    public void testSharedInterceptorOnFlowOne() throws MuleException
+    public void testSharedInterceptorOnServiceOne() throws MuleException
     {
         MuleClient client = muleContext.getClient();
         
         MuleMessage response = client.send("vm://stackOne", TEST_MESSAGE, null);
-        assertEquals(TEST_MESSAGE + " CustomInterceptor One", response.getPayload());
+        assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentOne", response.getPayload());
     }
-    
-    public static class CustomInterceptor implements Interceptor
-    {
-        public void setListener(MessageProcessor listener)
-        {
-            // do nothing
-        }
 
+    public void testSharedInterceptorOnServiceTwo() throws MuleException
+    {
+        MuleClient client = muleContext.getClient();
+        
+        MuleMessage response = client.send("vm://stackTwo", TEST_MESSAGE, null);
+        assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentTwo", response.getPayload());
+    }
+
+    public static class CustomInterceptor extends AbstractInterceptingMessageProcessor implements Interceptor
+    {
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             MuleMessage message = event.getMessage();
             String payload = message.getPayload().toString();
             message.setPayload(payload + " CustomInterceptor");
-            return event;
+            return processNext(event);
+        }
+    }
+
+    public static class CustomComponent
+    {
+        private String appendString;
+        
+        public String process(String input)
+        {
+            return input + appendString;
+        }
+        
+        public void setAppendString(String string)
+        {
+            this.appendString = string;
         }
     }
 }
-
-
