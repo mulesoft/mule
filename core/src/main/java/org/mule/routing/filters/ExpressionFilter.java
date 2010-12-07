@@ -16,6 +16,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.routing.filter.Filter;
+import org.mule.api.transport.PropertyScope;
 import org.mule.expression.ExpressionConfig;
 import org.mule.util.StringUtils;
 
@@ -139,6 +140,11 @@ public class ExpressionFilter implements Filter, MuleContextAware
             if(config.getEvaluator().equals("header"))
             {
                 delegateFilter = new MessagePropertyFilter(config.getExpression());
+            }
+            if (config.getEvaluator().equals("variable"))
+            {
+                delegateFilter = new MessagePropertyFilter(PropertyScope.INVOCATION_NAME + ":"
+                                                           + config.getExpression());
             }
             else if(config.getEvaluator().equals("regex"))
             {
