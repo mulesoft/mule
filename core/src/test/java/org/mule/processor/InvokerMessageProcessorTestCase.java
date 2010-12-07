@@ -162,6 +162,17 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         assertEquals("1", ((List) result.getMessage().getPayload()).get(0));
     }
 
+    public void testListNestedMapArg() throws MuleException, Exception
+    {
+        invoker.setMethodName("testListArg");
+        invoker.setArguments(Collections.singletonList(Collections.singletonList(Collections.singletonMap(
+            "#[string:key]", "#[string:val]"))));
+        invoker.initialise();
+        MuleEvent result = invoker.process(getTestEvent(""));
+        assertTrue(List.class.isAssignableFrom(result.getMessage().getPayload().getClass()));
+        assertEquals("val", ((Map) ((List) result.getMessage().getPayload()).get(0)).get("key"));
+    }
+
     public void testMapArg() throws MuleException, Exception
     {
         invoker.setMethodName("testMapArg");

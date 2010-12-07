@@ -134,7 +134,6 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
         return resultEvent;
     }
 
-    @SuppressWarnings("unchecked")
     protected Object[] evaluateArguments(MuleEvent event, List<?> argumentTemplates)
         throws MessagingException
     {
@@ -144,46 +143,11 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
         {
             for (int i = 0; i < args.length; i++)
             {
-                Object arg = null;
                 Object argumentTemplate = argumentTemplates.get(i);
                 if (argumentTemplate != null)
                 {
-                    if (argumentTemplate instanceof Collection<?>)
-                    {
-                        Collection<Object> collectionTemplate = (Collection<Object>) argumentTemplate;
-                        Collection<Object> newCollection = new ArrayList<Object>();
-                        for (Object object : collectionTemplate)
-                        {
-                            newCollection.add(evaluateExpressionCandidate(object, message));
-                        }
-                        arg = newCollection;
-                    }
-                    else if (argumentTemplate instanceof Map<?, ?>)
-                    {
-                        Map<Object, Object> mapTemplate = (Map<Object, Object>) argumentTemplate;
-                        Map<Object, Object> newMap = new HashMap<Object, Object>();
-                        for (Entry<Object, Object> entry : mapTemplate.entrySet())
-                        {
-                            newMap.put(evaluateExpressionCandidate(entry.getKey(), message),
-                                evaluateExpressionCandidate(entry.getValue(), message));
-                        }
-                        arg = newMap;
-                    }
-                    else if (argumentTemplate instanceof String[])
-                    {
-                        String[] stringArrayTemplate = (String[]) argumentTemplate;
-                        Object[] newArray = new String[stringArrayTemplate.length];
-                        for (int j = 0; j < stringArrayTemplate.length; j++)
-                        {
-                            newArray[j] = evaluateExpressionCandidate(stringArrayTemplate[j], message);
-                        }
-                        arg = newArray;
-                    }
-                    else
-                    {
-                        arg = evaluateExpressionCandidate((String) argumentTemplate, message);
-                    }
-                    args[i] = transformArgument(arg, argumentTypes[i]);
+                    args[i] = transformArgument(evaluateExpressionCandidate(argumentTemplate, message),
+                        argumentTypes[i]);
                 }
             }
             return args;
@@ -194,9 +158,41 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected Object evaluateExpressionCandidate(Object expressionCandidate, MuleMessage message)
         throws TransformerException
     {
+        if (expressionCandidate instanceof Collection<?>)
+        {
+            Collection<Object> collectionTemplate = (Collection<Object>) expressionCandidate;
+            Collection<Object> newCollection = new ArrayList<Object>();
+            for (Object object : collectionTemplate)
+            {
+                newCollection.add(evaluateExpressionCandidate(object, message));
+            }
+            return newCollection;
+        }
+        else if (expressionCandidate instanceof Map<?, ?>)
+        {
+            Map<Object, Object> mapTemplate = (Map<Object, Object>) expressionCandidate;
+            Map<Object, Object> newMap = new HashMap<Object, Object>();
+            for (Entry<Object, Object> entry : mapTemplate.entrySet())
+            {
+                newMap.put(evaluateExpressionCandidate(entry.getKey(), message), evaluateExpressionCandidate(
+                    entry.getValue(), message));
+            }
+            return newMap;
+        }
+        else if (expressionCandidate instanceof String[])
+        {
+            String[] stringArrayTemplate = (String[]) expressionCandidate;
+            Object[] newArray = new String[stringArrayTemplate.length];
+            for (int j = 0; j < stringArrayTemplate.length; j++)
+            {
+                newArray[j] = evaluateExpressionCandidate(stringArrayTemplate[j], message);
+            }
+            return newArray;
+        }
         if (expressionCandidate instanceof String)
         {
             Object arg;
