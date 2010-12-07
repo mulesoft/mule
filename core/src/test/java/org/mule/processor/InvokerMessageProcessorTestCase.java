@@ -184,6 +184,19 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         assertEquals("val", ((Map) result.getMessage().getPayload()).get("key"));
     }
 
+    public void testLookupClassInstance() throws MuleException, Exception
+    {
+        muleContext.getRegistry().registerObject("object", new TestInvokeObject());
+
+        invoker = new InvokerMessageProcessor();
+        invoker.setMuleContext(muleContext);
+        invoker.setObjectType(TestInvokeObject.class);
+        invoker.setMethodName("testMethod3");
+        invoker.setArgumentExpressionsString("#[string:1]");
+        invoker.initialise();
+        assertEquals("1 echo", invoker.process(getTestEvent("")).getMessageAsString());
+    }
+
     private class TestInvokeObject
     {
 

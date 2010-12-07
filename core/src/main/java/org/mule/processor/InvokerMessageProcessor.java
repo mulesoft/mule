@@ -22,6 +22,7 @@ import org.mule.api.expression.ExpressionManager;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
@@ -60,6 +61,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
     protected final transient Log logger = LogFactory.getLog(getClass());
 
     protected Object object;
+    protected Class<?> objectType;
     protected String methodName;
     protected List<?> arguments;
     protected Class<?>[] argumentTypes;
@@ -71,6 +73,18 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
     protected MuleContext muleContext;
 
     public void initialise() throws InitialisationException
+    {
+        if (object == null)
+        {
+            lookupObjectInstance();
+        }
+
+        resolveMethodToInvoke();
+
+        expressionManager = muleContext.getExpressionManager();
+    }
+
+    protected void resolveMethodToInvoke() throws InitialisationException
     {
         if (argumentTypes != null)
         {
@@ -101,10 +115,38 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
                     methodName, arguments.size(), object), this);
             }
         }
-        expressionManager = muleContext.getExpressionManager();
+
         if (logger.isDebugEnabled())
         {
             logger.debug(String.format("Initialised %s to use method: '%s'", this, method));
+        }
+    }
+
+    protected void lookupObjectInstance() throws InitialisationException
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(String.format(
+                "No object instance speciedied.  Looking up single instance of type %s in mule registry",
+                objectType));
+        }
+
+        try
+        {
+            object = muleContext.getRegistry().lookupObject(objectType);
+        }
+        catch (RegistrationException e)
+        {
+            throw new InitialisationException(
+                CoreMessages.initialisationFailure(String.format(
+                    "Muliple instances of '%s' were found in the registry so you need to configure a specific instance",
+                    objectType)), this);
+        }
+        if (object == null)
+        {
+            throw new InitialisationException(CoreMessages.initialisationFailure(String.format(
+                "No instance of '%s' was found in the registry", objectType)), this);
+
         }
     }
 
@@ -304,6 +346,11 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
+    }
+
+    public void setObjectType(Class<?> objectType)
+    {
+        this.objectType = objectType;
     }
 
 }
