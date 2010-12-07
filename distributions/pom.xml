@@ -19,7 +19,7 @@
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -34,9 +34,7 @@
     </build>
 
     <modules>
-        <module>ear</module>
         <module>embedded</module>
-        <module>jca</module>
         <module>profiler</module>
         <module>scripting</module>
         <module>standalone</module>
