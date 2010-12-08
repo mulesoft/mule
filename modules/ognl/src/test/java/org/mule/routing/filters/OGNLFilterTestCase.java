@@ -26,7 +26,7 @@ public class OGNLFilterTestCase extends FunctionalTestCase
     public static final String FIRST_MESSAGE = "foo";
     public static final String SECOND_MESSAGE = "foobar";
     public static final String THIRD_MESSAGE = "INPUT MESSAGE";
-    public static final long TIMEOUT = 2000;
+    public static final long TIMEOUT = 5000;
     public static final String OGNL_EXSPRESSION = " equals(\"foo\") || content.endsWith(\"bar\") ";
     public static final String SERVICE_NAME = "OGNLServiceWrapper1";
 

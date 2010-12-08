@@ -23,7 +23,7 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
 
     protected int getNumberOfRequests()
     {
-        return 2000;
+        return 1000;
     }
 
     public void testSingleLoanRequest() throws Exception
@@ -57,7 +57,6 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
         {
             for (; i < numRequests; i++)
             {
-                
                 if(i==501){
                     start = System.currentTimeMillis();
                 }
@@ -66,11 +65,11 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
 
                 MuleMessage result = client.send("CustomerRequests", loanRequest, null);
                 assertNotNull(result);
-                assertFalse("received a NullPayload", result.getPayload() instanceof NullPayload);
-                assertTrue("did not receive a LoanQuote but: " + result.getPayload(),
+                assertFalse("received a NullPayload at loan request : " + i, result.getPayload() instanceof NullPayload);
+                assertTrue("did not receive a LoanQuote but: " + result.getPayload() + " at iteration : " + i,
                     result.getPayload() instanceof LoanQuote);
                 LoanQuote quote = (LoanQuote)result.getPayload();
-                assertTrue(quote.getInterestRate() > 0);
+                assertTrue("interest rate is less than 0 at iteration : " + i, quote.getInterestRate() > 0);
             }
         }
         finally
