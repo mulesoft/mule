@@ -94,7 +94,6 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct implements Messag
                     "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
             }
         }
-        builder.chain(new ReplyToPropertyRequestReplyReplier());
     }
 
     public void setThreadingProfile(ThreadingProfile threadingProfile)

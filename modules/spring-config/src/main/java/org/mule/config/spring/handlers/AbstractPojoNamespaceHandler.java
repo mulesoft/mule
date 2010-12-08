@@ -42,7 +42,7 @@ public abstract class AbstractPojoNamespaceHandler extends AbstractMuleNamespace
                 {
                     String[] parameterNames = paramReader.getParameterNames(m);
 
-                    registerMuleBeanDefinitionParser(m.getName(),
+                    registerMuleBeanDefinitionParser(splitCamelCase(m.getName()),
                         new InvokerMessageProcessorDefinitionParser("messageProcessor", cls, m.getName(),
                             parameterNames));
                 }
@@ -53,4 +53,16 @@ public abstract class AbstractPojoNamespaceHandler extends AbstractMuleNamespace
             throw new RuntimeException(e);
         }
     }
+
+    protected static String splitCamelCase(String s)
+    {
+        if (s.contains("get"))
+        {
+            s = s.substring(3);
+        }
+        return s.replaceAll(
+            String.format("%s|%s|%s", "(?<=[A-Z])(?=[A-Z][a-z][0-9])", "(?<=[^A-Z])(?=[A-Z])",
+                "(?<=[A-Za-z0-9])(?=[^A-Za-z0-9])"), "-").toLowerCase();
+    }
+    
 }
