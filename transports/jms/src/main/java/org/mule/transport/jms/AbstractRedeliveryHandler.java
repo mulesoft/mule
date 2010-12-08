@@ -13,6 +13,8 @@ package org.mule.transport.jms;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.ImmutableEndpoint;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -21,7 +23,7 @@ public abstract class AbstractRedeliveryHandler implements RedeliveryHandler
 {
     protected JmsConnector connector;
 
-    public abstract void handleRedelivery(Message message) throws JMSException, MuleException;
+    public abstract void handleRedelivery(Message message, ImmutableEndpoint endpoint, FlowConstruct flow) throws JMSException, MuleException;
 
     /**
      * The connector associated with this handler is set before

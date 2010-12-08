@@ -11,9 +11,11 @@
 package org.mule.transport.jms;
 
 import org.mule.api.MuleEventContext;
+import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.context.notification.ExceptionNotification;
+import org.mule.message.ExceptionMessage;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.tck.functional.CounterCallback;
@@ -26,6 +28,7 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
 {
     private final int timeout = getTestTimeoutSecs() * 1000 / 4;
     private static final String DESTINATION = "jms://in";
+    private static final int MAX_REDELIVERY = 3;
 
     protected String getConfigResources()
     {
@@ -53,6 +56,10 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
                 if (notification.getException() instanceof MessageRedeliveredException)
                 {
                     mrexFired.countDown();
+                    // Test for MULE-4630
+                    assertEquals(DESTINATION, ((MessageRedeliveredException) notification.getException()).getEndpoint().getEndpointURI().toString());
+                    assertEquals(MAX_REDELIVERY, ((MessageRedeliveredException) notification.getException()).getMaxRedelivery());
+                    assertTrue(((MessageRedeliveredException) notification.getException()).getMuleMessage().getPayload() instanceof javax.jms.Message);
                 }
             }
         });
@@ -70,12 +77,18 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
         };
         ftc.setEventCallback(callback);
 
-        client.dispatch(DESTINATION, "test", null);
+        client.dispatch(DESTINATION, TEST_MESSAGE, null);
 
         Thread.sleep(2000);
         mrexFired.await(timeout, TimeUnit.MILLISECONDS);
         assertEquals("MessageRedeliveredException never fired.", 0, mrexFired.getCount());
-        assertEquals("Wrong number of delivery attempts", 4, callback.getCallbackCount());
-    }
+        assertEquals("Wrong number of delivery attempts", MAX_REDELIVERY + 1, callback.getCallbackCount());
 
+        MuleMessage dl = client.request("jms://dead.letter", 1000);
+        assertNotNull(dl);
+        assertTrue(dl.getPayload() instanceof ExceptionMessage);
+        ExceptionMessage em = (ExceptionMessage) dl.getPayload();
+        assertNotNull(em.getException());
+        assertTrue(em.getException() instanceof MessageRedeliveredException);
+    }
 }

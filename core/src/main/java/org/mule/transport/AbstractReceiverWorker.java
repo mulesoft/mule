@@ -9,6 +9,7 @@
  */
 package org.mule.transport;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -147,6 +148,10 @@ public abstract class AbstractReceiverWorker implements Work
         {
             List results = (List) tt.execute(cb);
             handleResults(results);
+        }
+        catch (MessagingException e)
+        {
+            receiver.getFlowConstruct().getExceptionListener().handleException(e, e.getEvent());
         }
         catch (Exception e)
         {

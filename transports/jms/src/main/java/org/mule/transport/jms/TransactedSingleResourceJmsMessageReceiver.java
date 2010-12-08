@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.StopException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.MessageReceiver;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transaction.TransactionTemplate;
 import org.mule.transport.AbstractMessageReceiver;
@@ -194,7 +195,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
     {
         try
         {
-            getWorkManager().scheduleWork(new MessageReceiverWorker(message));
+            getWorkManager().scheduleWork(new MessageReceiverWorker(message, this));
         }
         catch (Exception e)
         {
@@ -205,10 +206,12 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
     protected class MessageReceiverWorker implements Work
     {
         Message message;
+        MessageReceiver receiver;
 
-        public MessageReceiverWorker(Message message)
+        public MessageReceiverWorker(Message message, MessageReceiver receiver)
         {
             this.message = message;
+            this.receiver = receiver;
         }
 
         public void run()
@@ -264,7 +267,7 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
                                             + message.getJMSCorrelationID()
                                             + " is redelivered. handing off to Exception Handler");
                                 }
-                                redeliveryHandler.handleRedelivery(message);
+                                redeliveryHandler.handleRedelivery(message, receiver.getEndpoint(), receiver.getFlowConstruct());
                             }
 
                             MuleMessage messageToRoute = createMuleMessage(message, encoding);

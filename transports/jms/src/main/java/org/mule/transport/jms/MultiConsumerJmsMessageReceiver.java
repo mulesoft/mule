@@ -381,7 +381,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
                     logger.debug("Message with correlationId: " + m.getJMSCorrelationID()
                                  + " has redelivered flag set, handing off to Redelivery Handler");
                 }
-                redeliveryHandler.handleRedelivery(m);
+                redeliveryHandler.handleRedelivery(m, receiver.getEndpoint(), receiver.getFlowConstruct());
             }
             return m;
 

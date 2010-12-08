@@ -13,10 +13,9 @@ package org.mule.transport.jms;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.transport.jms.i18n.JmsMessages;
-
-import java.text.MessageFormat;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -43,7 +42,7 @@ public class JmsXRedeliveryHandler extends AbstractRedeliveryHandler
      * 
      */
     @Override
-    public void handleRedelivery(Message message) throws JMSException, MuleException
+    public void handleRedelivery(Message message, ImmutableEndpoint endpoint, FlowConstruct flow) throws JMSException, MuleException
     {
         final int connectorRedelivery = connector.getMaxRedelivery();
         if (connectorRedelivery == JmsConnector.REDELIVERY_IGNORE || connectorRedelivery < 0 ) // just in case, for manual setting)
@@ -81,21 +80,13 @@ public class JmsXRedeliveryHandler extends AbstractRedeliveryHandler
             if (connectorRedelivery == JmsConnector.REDELIVERY_FAIL_ON_FIRST)
             {
                 MuleMessage msg = createMuleMessage(message);
-                throw new MessageRedeliveredException(
-                    JmsMessages.tooManyRedeliveries(messageId, String.valueOf(redeliveryCount),
-                        connectorRedelivery, connector.getName()), msg);
+                throw new MessageRedeliveredException(messageId, redeliveryCount, connectorRedelivery, endpoint, flow, msg);
             }
         }
         else if (redeliveryCount > connectorRedelivery)
         {
-            logger.debug(MessageFormat.format(
-                    "Message with id: {0} has been redelivered {1} times, which exceeds the maxRedelivery setting " +
-                    "of {2} on the connector {3}", messageId, redeliveryCount, connectorRedelivery, connector.getName()));
-
             MuleMessage msg = createMuleMessage(message);
-            throw new MessageRedeliveredException(
-                JmsMessages.tooManyRedeliveries(messageId, String.valueOf(redeliveryCount),
-                    connectorRedelivery, connector.getName()), msg);
+            throw new MessageRedeliveredException(messageId, redeliveryCount, connectorRedelivery, endpoint, flow, msg);
         }
         else
         {

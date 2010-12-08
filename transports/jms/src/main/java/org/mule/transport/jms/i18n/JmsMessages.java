@@ -12,6 +12,7 @@ package org.mule.transport.jms.i18n;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.ClassUtils;
@@ -60,9 +61,9 @@ public class JmsMessages extends MessageFactory
         return factory.createMessage(BUNDLE_PATH, 8, ObjectUtils.toString(object, "null"));
     }
 
-    public static Message tooManyRedeliveries(String messageId, String times, int maxRedelivery, String connectorName)
+    public static Message tooManyRedeliveries(String messageId, int times, int maxRedelivery, ImmutableEndpoint endpoint)
     {
-        return factory.createMessage(BUNDLE_PATH, 11, messageId, times, maxRedelivery, connectorName);
+        return factory.createMessage(BUNDLE_PATH, 11, messageId, times, maxRedelivery, endpoint.getEndpointURI(), endpoint.getConnector().getName());
     }
 
     public static Message invalidResourceType(Class<?> expectedClass, Object object)

@@ -10,10 +10,12 @@
 
 package org.mule.transport.jms;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.config.i18n.Message;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.session.DefaultMuleSession;
 import org.mule.transport.jms.i18n.JmsMessages;
 
 public class MessageRedeliveredException extends MessagingException
@@ -23,22 +25,39 @@ public class MessageRedeliveredException extends MessagingException
      */
     private static final long serialVersionUID = 9013890402770563931L;
 
-    public MessageRedeliveredException(MuleEvent event)
-    {
-        super(JmsMessages.messageMarkedForRedelivery(event), event);
-    }
+    protected final transient ImmutableEndpoint endpoint;
+    
+    String messageId;
+    int redeliveryCount;
+    int maxRedelivery;
 
-    /**
-     * @deprecated use MessageRedeliveredException(Message, MuleEvent)
-     */
-    @Deprecated
-    public MessageRedeliveredException(Message message, MuleMessage muleMessage)
-    {
-        super(message.setNextMessage(JmsMessages.messageMarkedForRedelivery(muleMessage)), muleMessage);
+    public MessageRedeliveredException(String messageId, int redeliveryCount, int maxRedelivery, ImmutableEndpoint endpoint, FlowConstruct flow, MuleMessage muleMessage)
+    {        
+        super(JmsMessages.tooManyRedeliveries(messageId, redeliveryCount, maxRedelivery, endpoint), 
+            new DefaultMuleEvent(muleMessage, endpoint, new DefaultMuleSession(flow, endpoint.getMuleContext())));
+        this.messageId = messageId;
+        this.redeliveryCount = redeliveryCount;
+        this.maxRedelivery = maxRedelivery;
+        this.endpoint = endpoint;
     }
     
-    public MessageRedeliveredException(Message message, MuleEvent event)
+    public String getMessageId()
     {
-        super(message.setNextMessage(JmsMessages.messageMarkedForRedelivery(event)), event);
+        return messageId;
+    }
+
+    public int getRedeliveryCount()
+    {
+        return redeliveryCount;
+    }
+
+    public int getMaxRedelivery()
+    {
+        return maxRedelivery;
+    }
+
+    public ImmutableEndpoint getEndpoint()
+    {
+        return endpoint;
     }
 }

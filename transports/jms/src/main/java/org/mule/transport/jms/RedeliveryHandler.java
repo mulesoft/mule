@@ -11,6 +11,8 @@
 package org.mule.transport.jms;
 
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.ImmutableEndpoint;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -39,12 +41,14 @@ public interface RedeliveryHandler
      * handled by the connector's exception handler.
      * 
      * @param message the redelivered message
+     * @param endpoint from which the message was received
+     * @param flow/service in which the exception occured, this is used to obtain the appropriate exception handler
      * @throws JMSException if properties cannot be read from the JMSMessage
      * @throws MessageRedeliveredException should be thrown if the message should be
      *             handled by the connection exception handler
      * @throws MuleException if there is a problem reading or proessing the
      *             message
      */
-    public void handleRedelivery(Message message) throws JMSException, MuleException;
+    public void handleRedelivery(Message message, ImmutableEndpoint endpoint, FlowConstruct flow) throws JMSException, MuleException;
 
 }
