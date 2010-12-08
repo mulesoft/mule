@@ -45,7 +45,6 @@ import org.mule.session.DefaultMuleSession;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.CollectionUtils;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -241,19 +240,7 @@ public abstract class AbstractExceptionListener implements Initialisable, Dispos
                     endpointUri = ((ImmutableEndpoint)target).getEndpointURI();
                 }
                 
-                // The payload needs to be serializable so that we can send it over the wire 
-                // if necessary (depends on the transport used).
-                Serializable payload;
-                if (message.getPayload() instanceof Serializable)
-                {
-                    payload = (Serializable) message.getPayload();
-                }
-                else
-                {
-                    payload = message.getPayloadAsString();
-                }
-                ExceptionMessage msg = new ExceptionMessage(payload, t, component, endpointUri);
-
+                ExceptionMessage msg = new ExceptionMessage(message.getPayload(), t, component, endpointUri);
                 MuleMessage exceptionMessage;
                 if (ctx == null)
                 {

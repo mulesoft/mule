@@ -15,36 +15,56 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>ExceptionMessage</code> is used by the DefaultServiceExceptionStrategy
  * for wrapping an exception with a message to send via an endpointUri.
  */
-public class ExceptionMessage extends BaseMessageDTO
+public class ExceptionMessage implements Serializable
 {
     /**
      * Serial version
      */
     private static final long serialVersionUID = -538516243574950621L;
 
-    private Throwable exception;
+    // This object uses custom serialization via the writeObject() method
+    private transient Object payload;
+    // This object uses custom serialization via the writeObject() method
+    private transient Throwable exception;
+    
+    protected Map<String, Object> properties;
     private String componentName;
     private String endpointUri;
     private Date timeStamp;
 
-    public ExceptionMessage(Serializable message,
+    private transient final Log logger = LogFactory.getLog(ExceptionMessage.class);
+    
+    public ExceptionMessage(Object payload,
                             Throwable exception,
                             String componentName,
                             EndpointURI endpointUri)
     {
-        super(message);
+        this.payload = payload;
+        properties = new HashMap<String, Object>();
         this.exception = exception;
         timeStamp = new Date();
         this.componentName = componentName;
-        this.endpointUri = endpointUri.toString();
+        if (endpointUri != null)
+        {
+            this.endpointUri = endpointUri.toString();
+        }
 
         MuleEventContext ctx = RequestContext.getEventContext();
         if (ctx != null)
@@ -56,44 +76,100 @@ public class ExceptionMessage extends BaseMessageDTO
                 setProperty(propertyKey, msg.getProperty(propertyKey));
             }
         }
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException
+    {
+        out.defaultWriteObject();
+        try
+        {
+            out.writeObject(exception);
+        }
+        catch (NotSerializableException e)
+        {
+            logger.warn("Exception " + exception.getClass().getName() + " is not serializable and will be lost when sending ExceptionMessage over the wire: " + e.getMessage());
+        }
+        try
+        {
+            out.writeObject(payload);
+        }
+        catch (NotSerializableException e)
+        {
+            logger.warn("Payload " + payload.getClass().getName() + " is not serializable and will be lost when sending ExceptionMessage over the wire: " + e.getMessage());
+        }
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+    {
+        in.defaultReadObject();
+        try
+        {
+            exception = (Throwable) in.readObject();
+        }
+        catch (Exception e)
+        {
+            // ignore
+        }
+        try
+        {
+            payload = in.readObject();
+        }
+        catch (Exception e)
+        {
+            // ignore
+        }
+    }
+    
+    public void setPayload(Object payload)
+    {
+        this.payload = payload;
     }
 
     /**
-     * @deprecated Use ExceptionMessage(Serializable message...) instead
+     * @return the current message
      */
-    public ExceptionMessage(Object message,
-                            Throwable exception,
-                            String componentName,
-                            EndpointURI endpointUri)
+    public Object getPayload()
     {
-        super(getAsSerializable(message));
-        this.exception = exception;
-        timeStamp = new Date();
-        this.componentName = componentName;
-        this.endpointUri = endpointUri.toString();
-
-        MuleEventContext ctx = RequestContext.getEventContext();
-        if (ctx != null)
-        {
-            MuleMessage msg = ctx.getMessage();
-            for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
-            {
-                String propertyKey = (String) iterator.next();
-                setProperty(propertyKey, msg.getProperty(propertyKey));
-            }
-        }
+        return payload;
     }
 
-    protected static Serializable getAsSerializable(Object message)
+
+    /**
+     * Adds a map of properties to associated with this message
+     *
+     * @param properties the properties add to this message
+     */
+    public void addProperties(Map<String, Object> properties)
     {
-        if (message instanceof Serializable)
-        {
-            return (Serializable) message;
-        }
-        else
-        {
-            return message.toString();
-        }
+        this.properties.putAll(properties);
+    }
+
+    /**
+     * Removes all properties on this message
+     */
+    public void clearProperties()
+    {
+        properties.clear();
+    }
+
+    /**
+     * Returns a map of all properties on this message
+     *
+     * @return a map of all properties on this message
+     */
+    public Map getProperties()
+    {
+        return properties;
+    }
+
+    public void setProperty(String key, Object value)
+    {
+        properties.put(key, value);
+    }
+
+    public Object getProperty(String key)
+    {
+        return properties.get(key);
     }
 
     public String getComponentName()
