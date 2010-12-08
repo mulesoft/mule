@@ -12,7 +12,7 @@
     <description>Bookstore Example App</description>
 
     <properties>
-        <muleVersion>3.1.0-SNAPSHOT</muleVersion>
+        <muleVersion>3.2.0-SNAPSHOT</muleVersion>
         <jettyVersion>6.1.22</jettyVersion>
         <xalanVersion>2.7.1</xalanVersion>
     </properties>
