@@ -7,17 +7,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.config.spring.handlers;
 
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.config.spring.parsers.specific.InvokerMethodDefinitionParser;
+import org.mule.config.spring.parsers.specific.InvokerMessageProcessorDefinitionParser;
 import org.mule.config.spring.util.ParamReader;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 
 /**
- * Turns a POJO into a config element and a set of method tags which map to MessageProcessors.
+ * Turns a POJO into a config element and a set of method tags which map to
+ * MessageProcessors.
  */
 public abstract class AbstractPojoNamespaceHandler extends AbstractMuleNamespaceHandler
 {
@@ -31,16 +33,18 @@ public abstract class AbstractPojoNamespaceHandler extends AbstractMuleNamespace
         // register invoker parser for each non setter
         try
         {
-            ParamReader paramReader = new ParamReader(cls); // use the parameter names from our class
+            ParamReader paramReader = new ParamReader(cls); // use the parameter
+            // names from our class
             for (Method m : cls.getDeclaredMethods())
             {
                 // don't create parsers for setters
-                if (!m.getName().startsWith("set")) 
-                { 
+                if (!m.getName().startsWith("set"))
+                {
                     String[] parameterNames = paramReader.getParameterNames(m);
-                    
-                    registerMuleBeanDefinitionParser(m.getName(), 
-                        new InvokerMethodDefinitionParser("messageProcessor", m.getName(), parameterNames));
+
+                    registerMuleBeanDefinitionParser(m.getName(),
+                        new InvokerMessageProcessorDefinitionParser("messageProcessor", cls, m.getName(),
+                            parameterNames));
                 }
             }
         }
