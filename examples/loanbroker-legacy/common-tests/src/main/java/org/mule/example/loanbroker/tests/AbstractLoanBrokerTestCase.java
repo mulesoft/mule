@@ -11,10 +11,10 @@
 package org.mule.example.loanbroker.tests;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.example.loanbroker.messages.Customer;
 import org.mule.example.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.example.loanbroker.messages.LoanQuote;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
@@ -23,12 +23,12 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
 
     protected int getNumberOfRequests()
     {
-        return 10;
+        return 2000;
     }
 
     public void testSingleLoanRequest() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        final MuleClient client = muleContext.getClient();
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest request = new CustomerQuoteRequest(c, 100000, 48);
         MuleMessage result = client.send("CustomerRequests", request, null);
@@ -42,14 +42,14 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
 
     public void testLotsOfLoanRequests() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        final MuleClient client = muleContext.getClient();
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest[] requests = new CustomerQuoteRequest[3];
         requests[0] = new CustomerQuoteRequest(c, 100000, 48);
         requests[1] = new CustomerQuoteRequest(c, 1000, 12);
         requests[2] = new CustomerQuoteRequest(c, 10, 24);
 
-        long start = System.currentTimeMillis();
+        long start =0;
 
         int numRequests = getNumberOfRequests();
         int i = 0;
@@ -57,6 +57,11 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
         {
             for (; i < numRequests; i++)
             {
+                
+                if(i==501){
+                    start = System.currentTimeMillis();
+                }
+                
                 CustomerQuoteRequest loanRequest = requests[i % 3];
 
                 MuleMessage result = client.send("CustomerRequests", loanRequest, null);
