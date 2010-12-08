@@ -141,7 +141,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
             {
                 delegateFilter = new MessagePropertyFilter(config.getExpression());
             }
-            if (config.getEvaluator().equals("variable"))
+            else if (config.getEvaluator().equals("variable"))
             {
                 delegateFilter = new MessagePropertyFilter(PropertyScope.INVOCATION_NAME + ":"
                                                            + config.getExpression());
