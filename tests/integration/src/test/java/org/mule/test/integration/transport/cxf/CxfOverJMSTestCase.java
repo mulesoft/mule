@@ -48,7 +48,8 @@ public class CxfOverJMSTestCase extends FunctionalTestCase
         msg.setProperty("method", "echo", PropertyScope.INVOCATION);
         client.dispatch("cxf:jms://TestComponent2", msg);
         MuleMessage message = client.request("jms://testout", 10000);
-        assertNotNull(message.getPayload());
+        assertNotNull("message reply is null", message);
+        assertNotNull("message payload is null", message.getPayload());
         assertTrue(message.getPayloadAsString().equals("hello"));
     }
 
