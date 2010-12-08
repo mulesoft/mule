@@ -6,7 +6,7 @@
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
 -->
-<project name="Mule Examples: Scripting" default="setup">
+<project name="Mule Examples: Scripting" default="set-paths" basedir=".">
 
     <property name="app.name" value="mule-example-scripting"/>
     <property environment="env"/>
@@ -103,32 +103,10 @@
             <copy file="${dir.build}/lib/jython-2.2.1.jar" todir="${dir.mule.home}/lib/user"/>
    </target>
 
-   <target name="setup">
-      <fail message="MULE_HOME environment variable has not been set.">
-       <condition>
-        <or>
-         <equals arg1="${env.MULE_HOME}" arg2=""/>
-          <!-- Using a trick here. If there was no MULE_HOME environment
-               variable set, ant will set the value to the unprocessed
-               template string -->
-          <equals arg1="${env.MULE_HOME}" arg2="$${env.MULE_HOME}"/>
-         </or>
-        </condition>
-      </fail>
-
-      <antcall target="ifMuleBase"/>
-      <antcall target="ifMuleHome"/>
-   </target>
-
-   <target name="ifMuleBase" if="env.MULE_BASE">
-      <property name="dir.mule.home" value="${env.MULE_BASE}"/>
+   <target name="set-paths">
+      <property name="dir.mule.home" value="${basedir}/../.."/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
       <antcall target="deploy"/>
    </target>
 
-   <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
-      <property name="dir.mule.home" value="${env.MULE_HOME}"/>
-      <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
-   </target>
 </project>

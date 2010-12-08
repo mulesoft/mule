@@ -5,7 +5,7 @@
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
 -->
-<project name="Mule Examples: Loan Broker Common" default="deploy">
+<project name="Mule Examples: Loan Broker Common" default="deploy" basedir=".">
 
     <property name="app.name" value="mule-example-loanbroker-common"/>
     <property environment="env"/>
@@ -17,12 +17,12 @@
 
     <target name="clean"
             description="Clean the output directory (start from scratch)."
-        depends="setup,ifMuleBase,ifMuleHome">
+        depends="set-paths">
         <delete dir="${dir.build}"/>
         <delete dir="${dir.deploy}"/>
     </target>
 
-    <target name="init" depends="setup,ifMuleBase,ifMuleHome">
+    <target name="init" depends="set-paths">
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
 
@@ -81,27 +81,8 @@
               verbose="true"/>
    </target>
 
-   <target name="setup">
-      <fail message="MULE_HOME environment variable has not been set.">
-       <condition>
-        <or>
-         <equals arg1="${env.MULE_HOME}" arg2=""/>
-          <!-- Using a trick here. If there was no MULE_HOME environment 
-               variable set, ant will set the value to the unprocessed 
-               template string -->
-          <equals arg1="${env.MULE_HOME}" arg2="$${env.MULE_HOME}"/>
-         </or>
-        </condition>
-      </fail>
-   </target>
-
-   <target name="ifMuleBase" if="env.MULE_BASE">
-      <property name="dir.mule.home" value="${env.MULE_BASE}"/>
-      <property name="dir.deploy" value="${dir.mule.home}/lib/shared/${domain}/"/>
-   </target>
-
-   <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
-      <property name="dir.mule.home" value="${env.MULE_HOME}"/>
+   <target name="set-paths">
+      <property name="dir.mule.home" value="${basedir}/../.."/>
       <property name="dir.deploy" value="${dir.mule.home}/lib/shared/${domain}/"/>
    </target>
 </project>

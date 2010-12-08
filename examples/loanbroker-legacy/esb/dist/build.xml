@@ -5,7 +5,7 @@
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
 -->
-<project name="Mule Examples: Loan Broker ESB" default="deploy">
+<project name="Mule Examples: Loan Broker ESB" default="deploy" basedir=".">
 
     <property name="app.name" value="mule-example-loanbroker-esb"/>
     <property environment="env"/>
@@ -24,7 +24,7 @@
 
     <target name="clean"
             description="Clean the output directory (start from scratch)."
-            depends="setup,ifMuleBase,ifMuleHome">        
+            depends="set-paths">        
         <delete dir="${dir.build}"/>
         <delete dir="${dir.ejb.app}"/>
         <delete dir="${dir.esb.app}"/>
@@ -49,7 +49,7 @@
              usetimestamp="true"/>
     </target>
 
-    <target name="init" depends="setup,ifMuleBase,ifMuleHome,get.libraries">
+    <target name="init" depends="set-paths">
 
        <ant dir="${dir.common.tests}" antfile="build.xml" inheritall="false" inheritrefs="false"/>   
            
@@ -144,20 +144,12 @@
       </fail>
    </target>
 
-   <target name="ifMuleBase" if="env.MULE_BASE">
-      <property name="dir.mule.home" value="${env.MULE_BASE}"/>
+   <target name="set-paths">
+      <property name="dir.mule.home" value="${basedir}/../.."/>
       <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
       <property name="dir.common.deploy" value="${dir.mule.home}/lib/shared/${domain}/"/>
       <property name="dir.ejb.app" value="${dir.mule.home}/apps/${ejb.instance.name}"/>
       <property name="dir.esb.app" value="${dir.mule.home}/apps/${esb.instance.name}"/>
-   </target>
-
-   <target name="ifMuleHome" if="env.MULE_HOME" unless="env.MULE_BASE">
-      <property name="dir.mule.home" value="${env.MULE_HOME}"/>
-      <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <property name="dir.common.deploy" value="${dir.mule.home}/lib/shared/${domain}/"/>
-       <property name="dir.ejb.app" value="${dir.mule.home}/apps/${ejb.instance.name}"/>
-       <property name="dir.esb.app" value="${dir.mule.home}/apps/${esb.instance.name}"/>
    </target>
     
     <target name="test" depends="compile">
