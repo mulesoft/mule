@@ -29,7 +29,6 @@ import org.mule.util.queue.QueueManager;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.AssertionFailedError;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -212,7 +211,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         {
             public Object onCall(MuleEventContext eventContext) throws Exception
             {
-                assertTrue(Thread.currentThread().getName().startsWith(serviceName));
+                assertTrue(Thread.currentThread().getName().startsWith("seda." + serviceName));
                 latch.countDown();
                 return null;
             }
