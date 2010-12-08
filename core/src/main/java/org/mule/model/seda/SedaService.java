@@ -35,6 +35,7 @@ import org.mule.service.processor.ServiceOutboundMessageProcessor;
 import org.mule.service.processor.ServiceOutboundStatisticsMessageProcessor;
 import org.mule.service.processor.ServiceSetEventRequestContextMessageProcessor;
 import org.mule.service.processor.ServiceStatisticsMessageProcessor;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 /**
  * A Seda service runs inside a Seda Model and is responsible for managing a Seda
@@ -129,10 +130,7 @@ public class SedaService extends AbstractService
         // Threading profile, but it is more difficult than it seems
 
         final MuleConfiguration config = muleContext.getConfiguration();
-        final boolean containerMode = config.isContainerMode();
-        final String threadPrefix = containerMode
-                ? String.format("[%s].%s", config.getId(), getName())
-                : getName();
+        final String threadPrefix = ThreadNameHelper.sedaService(muleContext, getName());
         workManager = threadingProfile.createWorkManager(threadPrefix, config.getShutdownTimeout());
 
         if (queueProfile == null && model != null)

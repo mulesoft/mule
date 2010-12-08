@@ -72,6 +72,7 @@ import org.mule.util.ObjectNameHelper;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,7 +95,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -686,15 +686,10 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     protected void initWorkManagers() throws MuleException
     {
-        // container mode has additional thread naming requirements
-        final boolean containerMode = muleContext.getConfiguration().isContainerMode();
-        final String id = muleContext.getConfiguration().getId();
         if (receiverWorkManager.get() == null)
         {
 
-            final String threadPrefix = containerMode
-                    ? String.format("[%s].%s.receiver", id, getName())
-                    : String.format("%s.receiver", getName());
+            final String threadPrefix = ThreadNameHelper.receiver(muleContext, getName());
             WorkManager newWorkManager = this.getReceiverThreadingProfile().createWorkManager(
                     threadPrefix, muleContext.getConfiguration().getShutdownTimeout());
 
@@ -711,9 +706,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 dispatcherThreadingProfile.setMuleContext(muleContext);
             }
 
-            final String threadPrefix = containerMode
-                    ? String.format("[%s].%s.dispatcher", id, getName())
-                    : String.format("%s.dispatcher", getName());
+            final String threadPrefix = ThreadNameHelper.dispatcher(muleContext, getName());
             WorkManager newWorkManager = dispatcherThreadingProfile.createWorkManager(
                     threadPrefix, muleContext.getConfiguration().getShutdownTimeout());
 
@@ -724,9 +717,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
         if (requesterWorkManager.get() == null)
         {
-            final String threadPrefix = containerMode
-                    ? String.format("[%s].%s.requester", id, getName())
-                    : String.format("%s.requester", getName());
+            final String threadPrefix = ThreadNameHelper.requester(muleContext, getName());
             WorkManager newWorkManager = this.getRequesterThreadingProfile().createWorkManager(
                     threadPrefix, muleContext.getConfiguration().getShutdownTimeout());
 
@@ -2242,7 +2233,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      * so, see {@link org.mule.model.streaming.CallbackOutputStream}.
      *
      * @param endpoint the endpoint that releates to this Dispatcher
-     * @param message  the current message being processed
+     * @param event  the current event being processed
      * @return the output stream to use for this request
      * @throws MuleException in case of any error
      */

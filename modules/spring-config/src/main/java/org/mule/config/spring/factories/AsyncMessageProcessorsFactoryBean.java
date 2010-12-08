@@ -19,6 +19,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.util.List;
 
@@ -57,10 +58,8 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
 
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
         final MuleConfiguration config = muleContext.getConfiguration();
-        final boolean containerMode = config.isContainerMode();
-        final String threadPrefix = containerMode
-                                        ? String.format("[%s].%s.processor.async", config.getId(), name)
-                                        : String.format("%s.processor.async", name);
+        final String threadPrefix = ThreadNameHelper.asyncProcessor(muleContext, name);
+
         AsyncInterceptingMessageProcessor asyncProcessor = new AsyncInterceptingMessageProcessor(threadingProfile,
                                                                                                  threadPrefix,
                                                                                                  config.getShutdownTimeout());

@@ -16,7 +16,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleSession;
-import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -29,8 +28,8 @@ import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.OptionalAsyncInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.routing.requestreply.ReplyToPropertyRequestReplyReplier;
 import org.mule.session.DefaultMuleSession;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.util.Collections;
 import java.util.List;
@@ -63,11 +62,7 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct implements Messag
             threadingProfile = muleContext.getDefaultServiceThreadingProfile();
         }
 
-        final MuleConfiguration config = muleContext.getConfiguration();
-        final boolean containerMode = config.isContainerMode();
-        final String threadPrefix = containerMode
-                                                 ? String.format("[%s].flow.%s", config.getId(), getName())
-                                                 : String.format("flow.%s", getName());
+        final String threadPrefix = ThreadNameHelper.flow(muleContext, getName());
 
         builder.chain(new ProcessIfStartedMessageProcessor(this, getLifecycleState()));
         builder.chain(new ProcessingTimeInterceptor());
