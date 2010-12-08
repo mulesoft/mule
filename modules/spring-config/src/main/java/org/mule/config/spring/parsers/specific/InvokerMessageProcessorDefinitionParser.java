@@ -48,7 +48,8 @@ public class InvokerMessageProcessorDefinitionParser extends ChildDefinitionPars
     @Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
-        if (element.getAttribute(getTargetPropertyConfiguration().getAttributeAlias("config-ref")) != null)
+        if (!StringUtils.isEmpty(element.getAttribute(getTargetPropertyConfiguration().getAttributeAlias(
+            "config-ref"))))
         {
             builder.addPropertyReference("object",
                 element.getAttribute(getTargetPropertyConfiguration().getAttributeAlias("config-ref")));
