@@ -26,6 +26,7 @@ import org.mule.transaction.TransactionTemplate;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
+import org.mule.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.util.ClassUtils;
 
 import javax.jms.Destination;

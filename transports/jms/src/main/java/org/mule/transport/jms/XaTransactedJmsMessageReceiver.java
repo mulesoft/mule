@@ -24,6 +24,7 @@ import org.mule.transaction.XaTransaction;
 import org.mule.transport.ConnectException;
 import org.mule.transport.TransactedPollingMessageReceiver;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
+import org.mule.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 

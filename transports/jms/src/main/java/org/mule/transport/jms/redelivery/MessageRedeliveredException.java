@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jms;
+package org.mule.transport.jms.redelivery;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;

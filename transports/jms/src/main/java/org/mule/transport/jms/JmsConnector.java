@@ -32,6 +32,8 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jms.i18n.JmsMessages;
+import org.mule.transport.jms.redelivery.AutoDiscoveryRedeliveryHandlerFactory;
+import org.mule.transport.jms.redelivery.RedeliveryHandlerFactory;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
 import org.mule.util.BeanUtils;
 

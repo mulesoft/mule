@@ -8,9 +8,11 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jms;
+package org.mule.transport.jms.redelivery;
 
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.jms.JmsConnector;
+import org.mule.transport.jms.JmsConstants;
 
 import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  * those, if available, otherwise falling back to the manual counting of redeliveries.
  *
  * @see CountingRedeliveryHandlerFactory
- * @see org.mule.transport.jms.JmsXRedeliveryHandlerFactory
+ * @see org.mule.transport.jms.redelivery.JmsXRedeliveryHandlerFactory
  * @see javax.jms.ConnectionMetaData
  */
 public class AutoDiscoveryRedeliveryHandlerFactory implements RedeliveryHandlerFactory

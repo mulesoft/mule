@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jms;
+package org.mule.transport.jms.redelivery;
 
 
 public class JmsXRedeliveryHandlerFactory implements RedeliveryHandlerFactory

@@ -10,8 +10,8 @@
 
 package org.mule.transport.jms.test;
 
-import org.mule.transport.jms.RedeliveryHandler;
-import org.mule.transport.jms.RedeliveryHandlerFactory;
+import org.mule.transport.jms.redelivery.RedeliveryHandler;
+import org.mule.transport.jms.redelivery.RedeliveryHandlerFactory;
 
 public class TestRedeliveryHandlerFactory implements RedeliveryHandlerFactory
 {

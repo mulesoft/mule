@@ -10,7 +10,7 @@
 
 package org.mule.transport.jms.test;
 
-import org.mule.transport.jms.CountingRedeliveryHandler;
+import org.mule.transport.jms.redelivery.CountingRedeliveryHandler;
 
 
 public class TestRedeliveryHandler extends CountingRedeliveryHandler

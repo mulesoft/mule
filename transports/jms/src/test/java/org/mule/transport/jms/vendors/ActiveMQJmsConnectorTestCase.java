@@ -13,8 +13,8 @@ package org.mule.transport.jms.vendors;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.jms.DefaultJmsTopicResolver;
 import org.mule.transport.jms.JmsConnector;
-import org.mule.transport.jms.JmsXRedeliveryHandler;
 import org.mule.transport.jms.activemq.ActiveMQJmsConnector;
+import org.mule.transport.jms.redelivery.JmsXRedeliveryHandler;
 import org.mule.transport.jms.test.TestRedeliveryHandler;
 
 import javax.jms.ConnectionFactory;

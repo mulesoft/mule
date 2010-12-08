@@ -8,7 +8,8 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jms;
+package org.mule.transport.jms.redelivery;
+
 
 import java.util.concurrent.atomic.AtomicReference;
 

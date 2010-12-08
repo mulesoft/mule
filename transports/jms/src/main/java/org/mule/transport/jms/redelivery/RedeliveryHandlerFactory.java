@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jms;
+package org.mule.transport.jms.redelivery;
 
 /**
  * Implementors of this interface are responsible to create {@link RedeliveryHandler}
