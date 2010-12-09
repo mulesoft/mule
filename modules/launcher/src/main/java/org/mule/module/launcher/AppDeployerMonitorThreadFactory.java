@@ -26,7 +26,7 @@ public class AppDeployerMonitorThreadFactory implements ThreadFactory
         SecurityManager s = System.getSecurityManager();
         group = (s != null) ? s.getThreadGroup() :
                 Thread.currentThread().getThreadGroup();
-        namePrefix = String.format("app-deployer-monitor-%d-thread-",  poolNumber.getAndIncrement());
+        namePrefix = String.format("Mule.app.deployer.monitor.%d.thread.",  poolNumber.getAndIncrement());
     }
 
     public Thread newThread(Runnable r)
