@@ -16,10 +16,14 @@ import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.processor.AbstractFilteringMessageProcessor;
+import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.util.ObjectUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * The <code>WireTap</code> MessageProcessor allows inspection of messages in a flow.
@@ -35,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/WireTap.html">http://www.eaipatterns.com/WireTap.html<a/>
  */
-public class WireTap implements MessageProcessor
+public class WireTap extends AbstractMessageProcessorOwner implements MessageProcessor
 {
     protected final transient Log logger = LogFactory.getLog(getClass());
     protected volatile MessageProcessor tap;
@@ -126,6 +130,12 @@ public class WireTap implements MessageProcessor
     public String toString()
     {
         return ObjectUtils.toString(this);
+    }
+
+        @Override
+    protected List<MessageProcessor> getOwnedMessageProcessors()
+    {
+        return Collections.singletonList(tap);
     }
 
 }
