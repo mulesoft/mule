@@ -13,11 +13,13 @@ import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
+import org.mule.api.transport.PropertyScope;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.ajax.embedded.AjaxConnector;
@@ -67,6 +69,12 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver implements Baye
             messageToRoute.setInvocationProperty(AjaxConnector.COMETD_CLIENT, client);
 
             Object replyTo = messageToRoute.getReplyTo();
+            if (replyTo != null)
+            {
+                messageToRoute.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE, PropertyScope.INBOUND);
+            }
+
+            
             MuleEvent event = AjaxMessageReceiver.this.routeMessage(messageToRoute);
             MuleMessage message = event == null ? null : event.getMessage();
             //If a replyTo channel is set the client is expecting a response.
