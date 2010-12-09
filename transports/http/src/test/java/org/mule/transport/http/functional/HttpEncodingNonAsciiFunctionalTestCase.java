@@ -22,6 +22,7 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
+import org.mule.util.SystemUtils;
 import org.mule.util.concurrent.Latch;
 
 import java.net.URLEncoder;
@@ -42,6 +43,13 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends DynamicPortTestCase
     private static final String ENCODING_JP = "ISO-2022-JP";
     private static final String FORM_ENCODED_CONTENT_TYPE_HEADER = "application/x-www-form-urlencoded; charset=" + ENCODING_JP;
     private static final String PLAIN_CONTENT_TYPE_HEADER = "text/plain; charset=" + ENCODING_JP;
+
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+        // MULE-5268
+        return SystemUtils.isIbmJDK();
+    }
 
     @Override
     protected String getConfigResources()
