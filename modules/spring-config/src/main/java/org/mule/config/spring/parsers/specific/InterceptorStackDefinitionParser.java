@@ -23,7 +23,6 @@ import org.mule.interceptor.InterceptorStack;
  */
 public class InterceptorStackDefinitionParser extends ParentContextDefinitionParser
 {
-
     public static final String INTERCEPTOR_STACK = "interceptor";
     public static final String ATTRIBUTE_NAME = AbstractMuleBeanDefinitionParser.ATTRIBUTE_NAME;
 
@@ -32,8 +31,10 @@ public class InterceptorStackDefinitionParser extends ParentContextDefinitionPar
      */
     public InterceptorStackDefinitionParser()
     {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(InterceptorStack.class,
-            true));
+        // Interceptor stacks get next message processor etc. set in their chains and thus
+        // cannot be singletons
+        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, 
+            new MuleOrphanDefinitionParser(InterceptorStack.class, false));
         otherwise(addAlias(new ParentDefinitionParser(), AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF,
             INTERCEPTOR_STACK));
         super.addIgnored(ATTRIBUTE_NAME);
@@ -44,5 +45,4 @@ public class InterceptorStackDefinitionParser extends ParentContextDefinitionPar
         parser.addAlias(alias, name);
         return parser;
     }
-
 }
