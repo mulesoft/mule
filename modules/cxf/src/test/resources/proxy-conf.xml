@@ -18,16 +18,34 @@
 
     <mule-xml:xslt-transformer xsl-file="proxy.xsl" name="TestXslt" returnClass="org.mule.module.xml.transformer.DelayedResult"/>
 
-    <flow name="serverClientProxyWithValidation">
+    <flow name="serverClientProxyEnvelopeWithValidation">
         <inbound-endpoint
-            address="http://localhost:63081/services/proxyWithValidation"
+            address="http://localhost:63081/services/proxyEnvelopeWithValidation"
             exchange-pattern="request-response">
         </inbound-endpoint>
         <cxf:proxy-service 
             service="WebService2"
             wsdlLocation="localWsdl.wsdl" 
             namespace="http://www.muleumo.org"
-            validationEnabled="true">
+            validationEnabled="true"
+            payload="envelope">
+        </cxf:proxy-service>
+        <static-component>
+            <return-data>&lt;echoResponse xmlns="http://www.muleumo.org"&gt;&lt;echo&gt;test&lt;/echo&gt;&lt;/echoResponse&gt;</return-data>
+        </static-component>
+    </flow>
+    
+    <flow name="serverClientProxyBodyWithValidation">
+        <inbound-endpoint
+            address="http://localhost:63081/services/proxyBodyWithValidation"
+            exchange-pattern="request-response">
+        </inbound-endpoint>
+        <cxf:proxy-service 
+            service="WebService2"
+            wsdlLocation="localWsdl.wsdl" 
+            namespace="http://www.muleumo.org"
+            validationEnabled="true"
+            payload="body">
         </cxf:proxy-service>
         <static-component>
             <return-data>&lt;echoResponse xmlns="http://www.muleumo.org"&gt;&lt;echo&gt;test&lt;/echo&gt;&lt;/echoResponse&gt;</return-data>

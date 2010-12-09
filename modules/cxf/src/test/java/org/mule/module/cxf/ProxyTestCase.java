@@ -80,10 +80,20 @@ public class ProxyTestCase extends FunctionalTestCase
         assertTrue(resString.indexOf("<foo xmlns=\"http://foo\"") != -1);
     }
 
-    public void testProxyValidation() throws Exception
+    public void testProxyBodyValidation() throws Exception
+    {
+        doTestProxyValidation("http://localhost:63081/services/proxyBodyWithValidation");
+    }
+
+    public void testProxyEnvelopeValidation() throws Exception
+    {
+        doTestProxyValidation("http://localhost:63081/services/proxyEnvelopeWithValidation");
+    }
+    
+    public void doTestProxyValidation(String url) throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:63081/services/proxyWithValidation", msg, null);
+        MuleMessage result = client.send(url, msg, null);
         String resString = result.getPayloadAsString();
         assertTrue(resString.indexOf("Schema validation error on message") != -1);
         
@@ -95,7 +105,7 @@ public class ProxyTestCase extends FunctionalTestCase
                     "</echo>" 
             + "</soap:Body>" 
             + "</soap:Envelope>";
-        result = client.send("http://localhost:63081/services/proxyWithValidation", valid, null);
+        result = client.send(url, valid, null);
         resString = result.getPayloadAsString();
         assertTrue(resString.contains("<echoResponse xmlns=\"http://www.muleumo.org\">"));
     }

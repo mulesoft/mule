@@ -15,12 +15,12 @@ import org.mule.module.cxf.support.CopyAttachmentInInterceptor;
 import org.mule.module.cxf.support.CopyAttachmentOutInterceptor;
 import org.mule.module.cxf.support.CxfUtils;
 import org.mule.module.cxf.support.OutputPayloadInterceptor;
+import org.mule.module.cxf.support.ProxySchemaValidationInInterceptor;
 import org.mule.module.cxf.support.ProxyService;
 import org.mule.module.cxf.support.ProxyServiceFactoryBean;
 import org.mule.module.cxf.support.ResetStaxInterceptor;
 import org.mule.module.cxf.support.ReversibleStaxInInterceptor;
 
-import org.apache.cxf.aegis.databinding.AegisSchemaValidationInInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.databinding.stax.StaxDataBinding;
 import org.apache.cxf.databinding.stax.StaxDataBindingFeature;
@@ -70,7 +70,7 @@ public class ProxyServiceMessageProcessorBuilder extends AbstractInboundMessageP
         
         if (isValidationEnabled())
         {
-            server.getEndpoint().getInInterceptors().add(new AegisSchemaValidationInInterceptor(getConfiguration().getCxfBus(), 
+            server.getEndpoint().getInInterceptors().add(new ProxySchemaValidationInInterceptor(getConfiguration().getCxfBus(), 
                server.getEndpoint().getService().getServiceInfos().get(0)));
         }
     }
