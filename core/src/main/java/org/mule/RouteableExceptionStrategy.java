@@ -10,10 +10,19 @@
 
 package org.mule;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.routing.OutboundRouter;
 import org.mule.exception.AbstractMessagingExceptionStrategy;
 import org.mule.message.DefaultExceptionPayload;
@@ -31,8 +40,9 @@ import org.apache.commons.lang.exception.ExceptionUtils;
  * @author estebanroblesluna
  * @since 2.2.6
  */
-public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrategy
+public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrategy implements FlowConstructAware, Lifecycle
 {
+
     private OutboundRouter router;
 
     private boolean stopFurtherProcessing = true;
@@ -281,5 +291,59 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
     public void setStopFurtherProcessing(boolean stopFurtherProcessing)
     {
         this.stopFurtherProcessing = stopFurtherProcessing;
+    }
+
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        if (router instanceof FlowConstructAware)
+        {
+            router.setFlowConstruct(flowConstruct);
+        }
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        super.setMuleContext(context);
+        if (router instanceof MuleContextAware)
+        {
+            router.setMuleContext(context);
+        }
+    }
+
+    @Override
+    protected void doInitialise(MuleContext muleContext) throws InitialisationException
+    {
+        super.doInitialise(muleContext);
+        if (router instanceof Initialisable)
+        {
+            router.initialise();
+        }
+    }
+
+    @Override
+    public void dispose()
+    {
+        super.dispose();
+        if (router instanceof Disposable)
+        {
+            router.dispose();
+        }
+    }
+
+    public void stop() throws MuleException
+    {
+        if (router instanceof Stoppable)
+        {
+            router.stop();
+        }
+    }
+
+    public void start() throws MuleException
+    {
+        if (router instanceof Stoppable)
+        {
+            router.stop();
+        }
     }
 }

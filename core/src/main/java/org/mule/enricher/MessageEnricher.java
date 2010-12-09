@@ -16,12 +16,14 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class MessageEnricher implements MessageProcessor
+public class MessageEnricher extends AbstractMessageProcessorOwner implements MessageProcessor
 {
 
     private List<EnrichExpressionPair> enrichExpressionPairs = new ArrayList<EnrichExpressionPair>();
@@ -138,4 +140,9 @@ public class MessageEnricher implements MessageProcessor
         }
     }
 
+    @Override
+    protected List<MessageProcessor> getOwnedMessageProcessors()
+    {
+        return Collections.singletonList(enrichmentProcessor);
+    }
 }

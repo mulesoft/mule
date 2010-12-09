@@ -11,21 +11,24 @@
 package org.mule.routing.requestreply;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 
 public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyRequester
-    implements Startable, Stoppable, FlowConstructAware
+    implements Startable, Stoppable, MuleContextAware
 {
 
     private MessageProcessor requestMessageProcessor;
@@ -95,6 +98,21 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
                 ((Startable) replyMessageSource).start();
             }
         }
+        if (requestMessageProcessor != null)
+        {
+            if (requestMessageProcessor instanceof FlowConstructAware)
+            {
+                ((FlowConstructAware) requestMessageProcessor).setFlowConstruct(this.flowConstruct);
+            }
+            if (requestMessageProcessor instanceof Initialisable)
+            {
+                ((Initialisable) requestMessageProcessor).initialise();
+            }
+            if (requestMessageProcessor instanceof Startable)
+            {
+                ((Startable) requestMessageProcessor).start();
+            }
+        }
     }
 
     public void stop() throws MuleException
@@ -102,12 +120,21 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
         if (replyMessageSource != null && replyMessageSource instanceof Stoppable)
         {
             ((Stoppable) replyMessageSource).stop();
+
+            if (requestMessageProcessor != null && requestMessageProcessor instanceof Stoppable)
+            {
+                ((Stoppable) requestMessageProcessor).stop();
+            }
         }
     }
 
-    public void setFlowConstruct(FlowConstruct flowConstruct)
+    @Override
+    public void setMuleContext(MuleContext context)
     {
-        this.flowConstruct = flowConstruct;
+        super.setMuleContext(context);
+        if (requestMessageProcessor instanceof MuleContextAware)
+        {
+            ((MuleContextAware)requestMessageProcessor).setMuleContext(context);
+        }
     }
-
 }

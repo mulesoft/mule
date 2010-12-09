@@ -20,6 +20,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
@@ -30,6 +31,7 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 
 import java.beans.ExceptionListener;
 import java.util.List;
@@ -136,6 +138,19 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
             ((FlowConstructAware) processorChain).setFlowConstruct(flowContruct);
         }
         if (processorChain instanceof Initialisable)
+        {
+            ((Initialisable) processorChain).initialise();
+        }
+        OutboundEndpoint polledEndpoint = (OutboundEndpoint) getProperty(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME);
+        if (polledEndpoint instanceof MuleContextAware)
+        {
+            ((MuleContextAware) processorChain).setMuleContext(getMuleContext());
+        }
+        if (polledEndpoint instanceof FlowConstructAware)
+        {
+            ((FlowConstructAware) processorChain).setFlowConstruct(flowContruct);
+        }
+        if (polledEndpoint instanceof Initialisable)
         {
             ((Initialisable) processorChain).initialise();
         }

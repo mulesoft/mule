@@ -37,6 +37,7 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.management.stats.RouterStatistics;
+import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.routing.CorrelationMode;
 import org.mule.routing.DefaultRouterResultsHandler;
 import org.mule.transaction.TransactionTemplate;
@@ -57,7 +58,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>AbstractOutboundRouter</code> is a base router class that tracks statistics about message processing
  * through the router.
  */
-public abstract class AbstractOutboundRouter implements OutboundRouter
+public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwner implements OutboundRouter
 {
     /**
      * These properties are automatically propagated by Mule from inbound to outbound
@@ -87,9 +88,6 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
     protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
 
     private RouterStatistics routerStatistics;
-
-    protected MuleContext muleContext;
-    protected FlowConstruct flowConstruct;
 
     protected AtomicBoolean initialised = new AtomicBoolean(false);
     protected AtomicBoolean started = new AtomicBoolean(false);
@@ -411,7 +409,6 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
     /**
      * @param name the route identifier
      * @return the route or null if the endpoint's Uri is not registered
-     * @see org.mule.api.routing.InboundRouterCollection
      */
     public MessageProcessor getRoute(String name)
     {
@@ -507,21 +504,7 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
     {
         synchronized (routes)
         {
-            for (MessageProcessor processor : routes)
-            {
-                if (processor instanceof MuleContextAware)
-                {
-                    ((MuleContextAware) processor).setMuleContext(muleContext);
-                }
-                if (processor instanceof FlowConstructAware)
-                {
-                    ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
-                }
-                if (processor instanceof Initialisable)
-                {
-                    ((Initialisable) processor).initialise();
-                }
-            }
+            super.initialise();
             initialised.set(true);
         }
     }
@@ -530,14 +513,7 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
     {
         synchronized (routes)
         {
-            for (MessageProcessor processor : routes)
-            {
-    
-                if (processor instanceof Disposable)
-                {
-                    ((Disposable) processor).dispose();
-                }
-            }
+            super.dispose();
             routes = Collections.<MessageProcessor> emptyList();
             initialised.set(false);
         }
@@ -547,13 +523,7 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
     {
         synchronized (routes)
         {
-            for (MessageProcessor processor : routes)
-            {
-                if (processor instanceof Startable)
-                {
-                    ((Startable) processor).start();
-                }
-            }
+            super.start();
             started.set(true);
         }
     }
@@ -562,25 +532,9 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
     {
         synchronized (routes)
         {
-            for (MessageProcessor processor : routes)
-            {
-                if (processor instanceof Stoppable)
-                {
-                    ((Stoppable) processor).stop();
-                }
-            }
+            super.stop();
             started.set(false);
         }
-    }
-
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
-
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
     }
 
     public MuleContext getMuleContext()
@@ -598,4 +552,9 @@ public abstract class AbstractOutboundRouter implements OutboundRouter
         return routerStatistics;
     }
 
+    @Override
+    protected List<MessageProcessor> getOwnedMessageProcessors()
+    {
+        return routes;
+    }
 }
