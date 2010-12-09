@@ -27,14 +27,6 @@
         </plugins>
     </build>
 
-    <!--
-        ATTENTION: if you change any version here, make sure to change the pom
-        in the dist directory, too
-    -->
-    <properties>
-        <xalanVersion>2.7.1</xalanVersion>
-    </properties>
-
     <dependencies>
         <!-- Contains MuleXmlBuilderContextListener -->
         <dependency>
