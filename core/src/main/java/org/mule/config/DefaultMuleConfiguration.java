@@ -23,15 +23,15 @@ import org.mule.util.NumberUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 
 import javax.xml.parsers.SAXParserFactory;
-
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes
@@ -101,7 +101,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     /**
      * Where Mule stores any runtime files to disk. Note that in container
      * mode each app will have its working dir set one level under this dir
-     * (with app's name).
+     * (with app's name) in the {@link #setMuleContext} callback.
      *
      */
     private String workingDirectory = "./.mule";
@@ -196,8 +196,10 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         this.muleContext = context;
         if (containerMode)
         {
+            // empty string if not defined, prefix for the workDir
+            final String muleHome = System.getProperty("mule.home", "");
             // in container mode the id is the app name, have each app isolate its work dir
-            this.workingDirectory = String.format("%s/%s", getWorkingDirectory(), getId());
+            this.workingDirectory = String.format("%s/%s/%s", muleHome, getWorkingDirectory(), getId());
         }
     }
 
