@@ -20,12 +20,12 @@ import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -236,7 +236,7 @@ public class MuleContainer
     {
         public MuleShutdownHook()
         {
-            super();
+            super("Mule.shutdown.hook");
         }
 
         @Override
