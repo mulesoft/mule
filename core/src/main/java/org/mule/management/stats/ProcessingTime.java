@@ -33,7 +33,7 @@ public class ProcessingTime implements Serializable
      * Serial version
      */
     private static final long serialVersionUID = 1L;
-    
+
     private static final Log logger = LogFactory.getLog(ProcessingTime.class);
     private static volatile Thread referenceThread;
     private static ReferenceQueue<ProcessingTime> queue = new ReferenceQueue<ProcessingTime>();
@@ -109,20 +109,23 @@ public class ProcessingTime implements Serializable
         if (referenceThread == null)
         {
             referenceThread = new Thread(new Runnable()
+            {
+                /**
+                 * As weak references to completed ProcessingTimes are delivered, record them
+                 */
+                public void run()
                 {
-                    /**
-                     * As weak references to completed ProcessingTimes are delivered, record them
-                     */
-                    public void run()
+
+                    try
                     {
-                        try
+                        while (true)
                         {
-                            while (true)
+                            if (Thread.currentThread() != referenceThread)
                             {
-                                if (Thread.currentThread() != referenceThread)
-                                {
-                                    break;
-                                }
+                                break;
+                            }
+                            try
+                            {
                                 // The next two lines look silly, but
                                 //       ref = (Reference) queue.poll();
                                 // fails on the IBM 1.5 compiler
@@ -135,18 +138,23 @@ public class ProcessingTime implements Serializable
                                     stats.addCompleteFlowExecutionTime(ref.getAccumulator().longValue());
                                 }
                             }
-                        }
-                        catch (InterruptedException ex )
-                        {
-                            ;
-                        }
-                        catch (Exception ex)
-                        {
-                            // Don't let exception escape -- it kills the thread
-                            logger.error(this, ex);
+                            catch (InterruptedException ex )
+                            {
+                                break;
+                            }
+                            catch (Exception ex)
+                            {
+                                // Don't let exception escape -- it kills the thread
+                                logger.error(this, ex);
+                            }
                         }
                     }
-                }, "ProcessingTimeMonitor");
+                    finally
+                    {
+                        referenceThread = null;
+                    }
+                }
+            }, "ProcessingTimeMonitor");
             referenceThread.setDaemon(true);
             referenceThread.start();
         }
