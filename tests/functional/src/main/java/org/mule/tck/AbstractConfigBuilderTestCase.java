@@ -375,12 +375,10 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     public void testInterceptors()
     {
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
-        InterceptorStack globalInterceptorStack = (InterceptorStack) muleContext.getRegistry().lookupObject(
-            "testInterceptorStack");
         AbstractComponent component = (AbstractComponent) service.getComponent();
         assertEquals(3, component.getInterceptors().size());
         assertEquals(LoggingInterceptor.class, component.getInterceptors().get(0).getClass());
-        assertEquals(globalInterceptorStack, component.getInterceptors().get(1));
+        assertEquals(InterceptorStack.class, component.getInterceptors().get(1).getClass());
         assertEquals(TimerInterceptor.class, component.getInterceptors().get(2).getClass());
     }
     
