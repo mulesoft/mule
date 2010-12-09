@@ -96,6 +96,7 @@
 			<exclude>geomail/**</exclude>
             <!-- Legacy LoanBroker example, used for testing only -->
             <exclude>loanbroker-legacy/**</exclude>
+            <exclude>mule-example-launcher/**</exclude>
         </excludes>
     </fileSet>
 
