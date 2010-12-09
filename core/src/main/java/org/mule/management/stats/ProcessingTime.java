@@ -10,8 +10,10 @@
 
 package org.mule.management.stats;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.util.concurrent.ThreadNameHelper;
 
 import java.io.Serializable;
 import java.lang.ref.ReferenceQueue;
@@ -20,7 +22,6 @@ import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,13 +42,13 @@ public class ProcessingTime implements Serializable
 
     private AtomicLong accumulator = new AtomicLong();
     private FlowConstructStatistics statistics;
-
+    private String threadName;
 
     /**
      * Create a ProcessingTime for the specified MuleSession.
      * @return ProcessingTime if the session has an enabled FlowConstructStatistics or null otherwise
      */
-    public static ProcessingTime createProcessingTime(MuleSession session)
+    public static ProcessingTime newInstance(MuleSession session, MuleContext muleContext)
     {
         if (session != null)
         {
@@ -57,9 +58,10 @@ public class ProcessingTime implements Serializable
                 FlowConstructStatistics stats = fc.getStatistics();
                 if (stats != null && fc.getStatistics().isEnabled())
                 {
-                    return new ProcessingTime(stats);
+                    return new ProcessingTime(stats, muleContext);
                 }
             }
+
         }
 
         return null;
@@ -68,10 +70,12 @@ public class ProcessingTime implements Serializable
     /**
      * Create a Processing Time
      * @param stats never null
+     * @param muleContext
      */
-    private ProcessingTime(FlowConstructStatistics stats)
+    private ProcessingTime(FlowConstructStatistics stats, MuleContext muleContext)
     {
         this.statistics = stats;
+        this.threadName = String.format("%sprocessing.time.monitor", ThreadNameHelper.getPrefix(muleContext));
         if (referenceThread == null)
         {
             startThread();
@@ -104,7 +108,7 @@ public class ProcessingTime implements Serializable
     /**
      * Start timer that processes reference queue
      */
-    public static synchronized void startThread()
+    public synchronized void startThread()
     {
         if (referenceThread == null)
         {
@@ -140,6 +144,7 @@ public class ProcessingTime implements Serializable
                             }
                             catch (InterruptedException ex )
                             {
+                                Thread.currentThread().interrupt();
                                 break;
                             }
                             catch (Exception ex)
@@ -154,7 +159,7 @@ public class ProcessingTime implements Serializable
                         referenceThread = null;
                     }
                 }
-            }, "ProcessingTimeMonitor");
+            }, this.threadName);
             referenceThread.setDaemon(true);
             referenceThread.start();
         }

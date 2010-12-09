@@ -21,6 +21,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.routing.EventGroup;
 import org.mule.util.StringMessageUtils;
+import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 
@@ -36,7 +37,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -78,7 +78,7 @@ public class EventCorrelator
 
     private MessageInfoMapping messageInfoMapping;
 
-    private MuleContext context;
+    private MuleContext muleContext;
 
     private EventCorrelatorCallback callback;
 
@@ -91,7 +91,7 @@ public class EventCorrelator
      */
     private Map expiredAndDispatchedGroups = new ConcurrentHashMap();
 
-    public EventCorrelator(EventCorrelatorCallback callback, MessageProcessor timeoutMessageProcessor, MessageInfoMapping messageInfoMapping, MuleContext context)
+    public EventCorrelator(EventCorrelatorCallback callback, MessageProcessor timeoutMessageProcessor, MessageInfoMapping messageInfoMapping, MuleContext muleContext)
     {
         if (callback == null)
         {
@@ -101,13 +101,13 @@ public class EventCorrelator
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("MessageInfoMapping").getMessage());
         }
-        if (context == null)
+        if (muleContext == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("MuleContext").getMessage());
         }
         this.callback = callback;
         this.messageInfoMapping = messageInfoMapping;
-        this.context = context;
+        this.muleContext = muleContext;
         this.timeoutMessageProcessor = timeoutMessageProcessor;
     }
 
@@ -118,7 +118,7 @@ public class EventCorrelator
             return;
         }
 
-        this.context.getWorkManager().scheduleWork(new ExpiringGroupWork());
+        this.muleContext.getWorkManager().scheduleWork(new ExpiringGroupWork());
     }
 
     public void forceGroupExpiry(String groupId)
@@ -185,7 +185,7 @@ public class EventCorrelator
                             ". Dropping event");
                 }
                 //Fire a notification to say we received this message
-                context.fireNotification(new RoutingNotification(event.getMessage(),
+                muleContext.fireNotification(new RoutingNotification(event.getMessage(),
                         event.getEndpoint().getEndpointURI().toString(),
                         RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT));
                 return null;
@@ -311,7 +311,7 @@ public class EventCorrelator
         if (isFailOnTimeout())
         {
             final MuleMessageCollection messageCollection = group.toMessageCollection();
-            context.fireNotification(new RoutingNotification(messageCollection, null,
+            muleContext.fireNotification(new RoutingNotification(messageCollection, null,
                                                              RoutingNotification.CORRELATION_TIMEOUT));
             service.getExceptionListener().handleException(
                     new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
@@ -374,7 +374,8 @@ public class EventCorrelator
         
         public ExpiringGroupWork()
         {
-            this.expiryMonitor = new ExpiryMonitor("EventCorrelator", 1000 * 60);
+            final String name = String.format("%sevent.correlator", ThreadNameHelper.getPrefix(muleContext));
+            this.expiryMonitor = new ExpiryMonitor(name, 1000 * 60);
             //clean up every 30 minutes
             this.expiryMonitor.addExpirable(1000 * 60 * 30, TimeUnit.MILLISECONDS, this);
         }

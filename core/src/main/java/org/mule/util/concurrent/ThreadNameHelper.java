@@ -26,41 +26,41 @@ public class ThreadNameHelper
 
     public static String receiver(MuleContext muleContext, String connectorName)
     {
-        return String.format("%s%s.receiver", getAppPrefix(muleContext), connectorName);
+        return String.format("%s%s.receiver", getPrefix(muleContext), connectorName);
     }
 
     public static String dispatcher(MuleContext muleContext, String connectorName)
     {
-        return String.format("%s%s.dispatcher", getAppPrefix(muleContext), connectorName);
+        return String.format("%s%s.dispatcher", getPrefix(muleContext), connectorName);
     }
 
     public static String requester(MuleContext muleContext, String connectorName)
     {
-        return String.format("%s%s.requester", getAppPrefix(muleContext), connectorName);
+        return String.format("%s%s.requester", getPrefix(muleContext), connectorName);
     }
 
     public static String asyncProcessor(MuleContext muleContext, String mpName)
     {
-        return String.format("%s%s.processor.async", getAppPrefix(muleContext), mpName);
+        return String.format("%s%s.processor.async", getPrefix(muleContext), mpName);
     }
 
     public static String sedaService(MuleContext muleContext, String name)
     {
-        return String.format("%sseda.%s", getAppPrefix(muleContext), name);
+        return String.format("%sseda.%s", getPrefix(muleContext), name);
     }
 
     public static String flow(MuleContext muleContext, String name)
     {
-        return String.format("%sflow.%s", getAppPrefix(muleContext), name);
+        return String.format("%sflow.%s", getPrefix(muleContext), name);
 
     }
 
     /**
-     * Generate a generic thread name prefix for this application.
-     * @param muleContext
-     * @return "[appName]." if Mule is running as a container, otherwise empty string
+     * Generate a generic thread name prefix for this context.
+     * @param muleContext context to generate the name prefix for
+     * @return "[appName]." if Mule is running as a container, otherwise "Mule."
      */
-    public static String getAppPrefix(MuleContext muleContext)
+    public static String getPrefix(MuleContext muleContext)
     {
         final boolean containerMode = muleContext.getConfiguration().isContainerMode();
         final String id = muleContext.getConfiguration().getId();
