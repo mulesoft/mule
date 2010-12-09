@@ -100,6 +100,11 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
                 ((Startable) getMessageProcessorChain(flowConstruct)).start();
             }
             getConnector().registerListener(this, getMessageProcessorChain(flowConstruct), flowConstruct);
+            MessageProcessor polledMp = getPolledMessageProcessor();
+            if (polledMp instanceof Startable)
+            {
+                 ((Startable)polledMp).start();
+            }
         }
         catch (Exception e)
         {
@@ -115,6 +120,11 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
             if (getMessageProcessorChain(flowConstruct) instanceof Stoppable)
             {
                 ((Stoppable) getMessageProcessorChain(flowConstruct)).stop();
+            }
+            MessageProcessor polledMp = getPolledMessageProcessor();
+            if (polledMp instanceof Stoppable)
+            {
+                ((Stoppable)polledMp).stop();
             }
         }
         catch (Exception e)
@@ -141,20 +151,25 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
         {
             ((Initialisable) processorChain).initialise();
         }
-        OutboundEndpoint polledEndpoint = (OutboundEndpoint) getProperty(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME);
-        if (polledEndpoint instanceof MuleContextAware)
+        MessageProcessor polledMp = getPolledMessageProcessor();
+        if (polledMp instanceof MuleContextAware)
         {
-            ((MuleContextAware) processorChain).setMuleContext(getMuleContext());
+            ((MuleContextAware) polledMp).setMuleContext(getMuleContext());
         }
-        if (polledEndpoint instanceof FlowConstructAware)
+        if (polledMp instanceof FlowConstructAware)
         {
-            ((FlowConstructAware) processorChain).setFlowConstruct(flowContruct);
+            ((FlowConstructAware) polledMp).setFlowConstruct(flowContruct);
         }
-        if (polledEndpoint instanceof Initialisable)
+        if (polledMp instanceof Initialisable)
         {
-            ((Initialisable) processorChain).initialise();
+            ((Initialisable) polledMp).initialise();
         }
         return processorChain;
+    }
+
+    protected MessageProcessor getPolledMessageProcessor()
+    {
+        return (MessageProcessor) getProperty(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME);
     }
 
     public void setFlowConstruct(FlowConstruct flowConstruct)
