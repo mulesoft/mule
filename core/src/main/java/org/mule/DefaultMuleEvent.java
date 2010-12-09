@@ -39,6 +39,9 @@ import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -49,9 +52,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>DefaultMuleEvent</code> represents any data event occurring in the Mule
@@ -130,7 +130,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.endpoint = endpoint;
         this.timeout = previousEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
-        this.processingTime = ProcessingTime.createProcessingTime(this.session);
+        this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
         fillProperties(previousEvent);
     }
 
@@ -146,7 +146,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.endpoint = endpoint;
         this.timeout = previousEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
-        this.processingTime = ProcessingTime.createProcessingTime(this.session);
+        this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
         fillProperties(previousEvent);
     }
 
@@ -186,7 +186,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.id = generateEventId();
         this.outputStream = outputStream;
         fillProperties(null);
-        this.processingTime = time != null ? time : ProcessingTime.createProcessingTime(this.session);
+        this.processingTime = time != null ? time : ProcessingTime.newInstance(this.session, message.getMuleContext());
     }
     
     /**
@@ -212,7 +212,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
         else
         {
-            this.processingTime = ProcessingTime.createProcessingTime(this.session);
+            this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
         }
         fillProperties(rewriteEvent);
     }
