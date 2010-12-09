@@ -17,10 +17,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -34,8 +36,9 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
 
     protected MessageProcessor sourceMessageProcessor;
 
-    public MessageProcessorPollingMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
-        throws CreateException
+    public MessageProcessorPollingMessageReceiver(Connector connector,
+                                                  FlowConstruct flowConstruct,
+                                                  InboundEndpoint endpoint) throws CreateException
     {
         super(connector, flowConstruct, endpoint);
     }
@@ -46,6 +49,15 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
         super.doInitialise();
 
         sourceMessageProcessor = (MessageProcessor) endpoint.getProperty(SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME);
+
+        if (sourceMessageProcessor instanceof OutboundEndpoint
+            && !((OutboundEndpoint) sourceMessageProcessor).getExchangePattern().hasResponse())
+        {
+            // TODO DF: i18n
+            throw new InitialisationException(CoreMessages.createStaticMessage(String.format(
+                "The endpoint %s does not return responses and therefore can't be used for polling.",
+                sourceMessageProcessor)), this);
+        }
 
         Long tempPolling = (Long) endpoint.getProperties().get(AbstractConnector.PROPERTY_POLLING_FREQUENCY);
         if (tempPolling != null)
@@ -65,13 +77,19 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
             ep = (ImmutableEndpoint) sourceMessageProcessor;
         }
 
-        MuleEvent event = new DefaultMuleEvent(request, ep, new DefaultMuleSession(flowConstruct,  
+        MuleEvent event = new DefaultMuleEvent(request, ep, new DefaultMuleSession(flowConstruct,
             connector.getMuleContext()));
 
         MuleEvent sourceEvent = sourceMessageProcessor.process(event);
         if (sourceEvent != null)
         {
             routeMessage(sourceEvent.getMessage());
+        }
+        else
+        {
+            // TODO DF: i18n
+            logger.info(String.format("Polling of '%s' returned null, the flow will not be invoked.",
+                sourceMessageProcessor));
         }
     }
 
