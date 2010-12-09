@@ -8,3 +8,4 @@ org.mule.example.loanbroker.esn.VMLoanBrokerAsynchronousFunctionalTestCase
 org.mule.example.loanbroker.esn.CxfLoanBrokerAsynchronousFunctionalTestCase
 # MULE-4160
 org.mule.example.loanbroker.esn.CxfLoanBrokerSynchronousFunctionalTestCase
+org.mule.example.loanbroker.esn.CxfLoanBrokerSynchronousFlowFunctionalTestCase
