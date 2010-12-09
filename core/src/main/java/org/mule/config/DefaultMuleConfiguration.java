@@ -196,10 +196,16 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         this.muleContext = context;
         if (containerMode)
         {
-            // empty string if not defined, prefix for the workDir
-            final String muleHome = System.getProperty("mule.home", "");
+            final String muleHome = System.getProperty("mule.home");
             // in container mode the id is the app name, have each app isolate its work dir
-            this.workingDirectory = String.format("%s/%s/%s", muleHome, getWorkingDirectory(), getId());
+            if (StringUtils.isBlank(muleHome)) {
+                // fallback to current dir as a parent
+                this.workingDirectory = String.format("%s/%s", getWorkingDirectory(), getId());
+            }
+            else
+            {
+                this.workingDirectory = String.format("%s/%s/%s", muleHome.trim(), getWorkingDirectory(), getId());
+            }
         }
     }
 
