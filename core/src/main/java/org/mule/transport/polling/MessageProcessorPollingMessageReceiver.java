@@ -15,6 +15,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
@@ -58,7 +59,13 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
     {
         MuleMessage request = new DefaultMuleMessage(StringUtils.EMPTY, (Map<String, Object>) null,
             connector.getMuleContext());
-        MuleEvent event = new DefaultMuleEvent(request, endpoint, new DefaultMuleSession(flowConstruct,  
+        ImmutableEndpoint ep = endpoint;
+        if (sourceMessageProcessor instanceof ImmutableEndpoint)
+        {
+            ep = (ImmutableEndpoint) sourceMessageProcessor;
+        }
+
+        MuleEvent event = new DefaultMuleEvent(request, ep, new DefaultMuleSession(flowConstruct,  
             connector.getMuleContext()));
 
         MuleEvent sourceEvent = sourceMessageProcessor.process(event);
