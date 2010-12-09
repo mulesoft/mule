@@ -171,6 +171,7 @@ public class CollectionDataType<T> extends SimpleDataType<T>
         int result = getType().hashCode();
         result = 31 * result + getItemType().hashCode();
         result = 31 * result + (getMimeType() != null ? getMimeType().hashCode() : 0);
+        result = 31 * result + (getEncoding() != null ? getEncoding().hashCode() : 0);
         return result;
     }
 

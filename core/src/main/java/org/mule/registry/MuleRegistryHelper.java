@@ -75,7 +75,8 @@ public class MuleRegistryHelper implements MuleRegistry
     /**
      * We cache transformer searches so that we only search once
      */
-    protected Map<String, List<Transformer>> transformerListCache = new ConcurrentHashMap/*<String, List<Transformer>>*/(8);
+    protected ConcurrentHashMap/*<String, Transformer>*/ exactTransformerCache = new ConcurrentHashMap/*<String, Transformer>*/(8);
+    protected ConcurrentHashMap/*Map<String, List<Transformer>>*/ transformerListCache = new ConcurrentHashMap/*<String, List<Transformer>>*/(8);
 
     private MuleContext muleContext;
 
@@ -102,6 +103,7 @@ public class MuleRegistryHelper implements MuleRegistry
     public void dispose()
     {
         transformerListCache.clear();
+        exactTransformerCache.clear();
     }
 
     public void fireLifecycle(String phase) throws LifecycleException
@@ -224,15 +226,44 @@ public class MuleRegistryHelper implements MuleRegistry
      */
     public Transformer lookupTransformer(DataType source, DataType result) throws TransformerException
     {
+        final String dataTypePairHash = getDataTypeSourceResultPairHash(source, result);
+        Transformer cachedTransformer = (Transformer) exactTransformerCache.get(dataTypePairHash);
+        if (cachedTransformer != null)
+        {
+            return cachedTransformer;
+        }
 
-        Transformer trans;
+        Transformer trans = resolveTransformer(source, result);
+
+        if (trans != null)
+        {
+            Transformer concurrentlyAddedTransformer = (Transformer) exactTransformerCache.putIfAbsent(
+                dataTypePairHash, trans);
+            if (concurrentlyAddedTransformer != null)
+            {
+                return concurrentlyAddedTransformer;
+            }
+            else
+            {
+                return trans;
+            }
+        }
+        else
+        {
+            throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, result));
+        }
+    }
+
+    protected Transformer resolveTransformer(DataType source, DataType result) throws TransformerException
+    {
         List<TransformerResolver> resolvers = (List<TransformerResolver>) lookupObjects(TransformerResolver.class);
         Collections.sort(resolvers, new TransformerResolverComparator());
+
         for (TransformerResolver resolver : resolvers)
         {
             try
             {
-                trans = resolver.resolve(source, result);
+                Transformer trans = resolver.resolve(source, result);
                 if (trans != null)
                 {
                     return trans;
@@ -243,7 +274,7 @@ public class MuleRegistryHelper implements MuleRegistry
                 throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, result), e);
             }
         }
-        throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, result));
+        return null;
     }
 
     /**
@@ -251,7 +282,9 @@ public class MuleRegistryHelper implements MuleRegistry
      */
     public List<Transformer> lookupTransformers(DataType source, DataType result)
     {
-        List<Transformer> results = transformerListCache.get(source.toString() + result.toString());
+        final String dataTypePairHash = getDataTypeSourceResultPairHash(source, result);
+
+        List<Transformer> results = (List<Transformer>) transformerListCache.get(dataTypePairHash);
         if (results != null)
         {
             return results;
@@ -261,8 +294,9 @@ public class MuleRegistryHelper implements MuleRegistry
         Collection<Transformer> transformers = getTransformers();
         for (Transformer t : transformers)
         {
-            //The transformer must have the DiscoveryTransformer interface if we are going to
-            //find it here
+            // The transformer must have the DiscoveryTransformer interface if we are
+            // going to
+            // find it here
             if (!(t instanceof DiscoverableTransformer))
             {
                 continue;
@@ -274,8 +308,16 @@ public class MuleRegistryHelper implements MuleRegistry
             }
         }
 
-        transformerListCache.put(source.toString() + result.toString(), results);
-        return results;
+        List<Transformer> concurrentlyAddedTransformers = (List<Transformer>) transformerListCache.putIfAbsent(
+            dataTypePairHash, results);
+        if (concurrentlyAddedTransformers != null)
+        {
+            return concurrentlyAddedTransformers;
+        }
+        else
+        {
+            return results;
+        }
     }
 
     /**
@@ -413,6 +455,7 @@ public class MuleRegistryHelper implements MuleRegistry
                 resolver.transformerChange(t, action);
             }
             transformerListCache.clear();
+            exactTransformerCache.clear();
         }
     }
 
@@ -749,7 +792,12 @@ public class MuleRegistryHelper implements MuleRegistry
     {
         return false;
     }
-
+    
+    private String getDataTypeSourceResultPairHash(DataType<?> source, DataType<?> result)
+    {
+        return String.format("%s%s:%s%s", source.getClass().getName(), source.hashCode(), result.getClass()
+            .getName(), result.hashCode());
+    }
 
     private class TransformerResolverComparator implements Comparator<TransformerResolver>
     {
