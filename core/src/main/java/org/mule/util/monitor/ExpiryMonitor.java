@@ -20,7 +20,6 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledThreadPoolExecutor;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -85,9 +84,9 @@ public class ExpiryMonitor implements Runnable, Disposable
         if (scheduler == null)
         {
             this.scheduler = new ScheduledThreadPoolExecutor(1);
-            scheduler.setThreadFactory(new DaemonThreadFactory(name + "-Monitor", contextClassLoader));
+            scheduler.setThreadFactory(new DaemonThreadFactory(name + ".expiry.monitor", contextClassLoader));
             scheduler.scheduleWithFixedDelay(this, 0, monitorFrequency,
-                    TimeUnit.MILLISECONDS);
+                                             TimeUnit.MILLISECONDS);
         }
     }
 

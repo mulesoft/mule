@@ -15,9 +15,6 @@ import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.util.concurrent.ThreadNameHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.Serializable;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -25,6 +22,8 @@ import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Accumulates the processing time for all branches of a flow
@@ -76,7 +75,7 @@ public class ProcessingTime implements Serializable
     private ProcessingTime(FlowConstructStatistics stats, MuleContext muleContext)
     {
         this.statistics = stats;
-        this.threadName = String.format("%sprocessing.time.monitor", ThreadNameHelper.getAppPrefix(muleContext));
+        this.threadName = String.format("%sprocessing.time.monitor", ThreadNameHelper.getPrefix(muleContext));
         if (referenceThread == null)
         {
             startThread();

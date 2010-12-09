@@ -23,6 +23,7 @@ import org.mule.model.streaming.CallbackOutputStream;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConfigurableKeyedObjectPool;
 import org.mule.transport.tcp.protocols.SafeProtocol;
+import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.monitor.ExpiryMonitor;
 
 import java.io.BufferedOutputStream;
@@ -96,9 +97,6 @@ public class TcpConnector extends AbstractConnector
         setSocketFactory(new TcpSocketFactory());
         setServerSocketFactory(new TcpServerSocketFactory());
         setTcpProtocol(new SafeProtocol());
-        // Use connector's classloader so that other temporary classloaders
-        // aren't used when things are started lazily or from elsewhere.
-        keepAliveMonitor = new ExpiryMonitor("SocketTimeoutMonitor", 1000, this.getClass().getClassLoader());
     }
 
     public void configureSocket(boolean client, Socket socket) throws SocketException
@@ -157,6 +155,13 @@ public class TcpConnector extends AbstractConnector
         //There should only be one pooled instance per socket (key)
         socketsPool.setMaxActive(1);
         socketsPool.setWhenExhaustedAction(GenericKeyedObjectPool.WHEN_EXHAUSTED_BLOCK);
+
+        // Use connector's classloader so that other temporary classloaders
+        // aren't used when things are started lazily or from elsewhere.
+        final String monitorName = String.format("%s%s.socket",
+                                                 ThreadNameHelper.getPrefix(muleContext),
+                                                 getName());
+        keepAliveMonitor = new ExpiryMonitor(monitorName, 1000, this.getClass().getClassLoader());
     }
 
     @Override
