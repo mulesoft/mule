@@ -1797,12 +1797,12 @@
                 <repository>
                     <id>mule-ee-releases</id>
                     <name>Mule Release Repository</name>
-                    <url>http://dev.ee.mulesoft.com/repository/content/repositories/releases/</url>
+                    <url>http://dev.ee.mulesource.com/repository/content/repositories/releases/</url>
                 </repository>
                 <snapshotRepository>
                     <id>mule-ee-snapshots</id>
                     <name>Mule Snapshot Repository</name>
-                    <url>http://dev.ee.mulesoft.com/repository/content/repositories/snapshots/</url>
+                    <url>http://dev.ee.mulesource.com/repository/content/repositories/snapshots/</url>
                     <uniqueVersion>false</uniqueVersion>
                 </snapshotRepository>
             </distributionManagement>

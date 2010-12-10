@@ -80,16 +80,12 @@ org.mule.config.spring.RootSchemaValidationTestCase
 
 # These tests have a property propagation / MEPs issue
 org.mule.routing.outbound.ChainingRouterPropertyPropagationTestCase
-org.mule.test.integration.messaging.meps.InOutAsyncTestCase
 org.mule.test.integration.messaging.meps.InOptionalOutOutOptionalInTestCase
 org.mule.test.integration.messaging.meps.InOutOutOnlyAsyncRouterTestCase
 
 # BL-38 Need to port for CXF changes
 org.mule.test.integration.transport.cxf.CxfClientPassivateTestCase
 org.mule.test.integration.message.MessagePropertyInResponseTransformersTestCase
-
-# Broken by BL-165
-org.mule.test.integration.exceptions.ExceptionStrategyTransactionTestCase
 
 # MULE-4976 (broken with migration to Spring 3)
 org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCase
