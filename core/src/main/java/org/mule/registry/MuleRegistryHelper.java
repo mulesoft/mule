@@ -795,8 +795,8 @@ public class MuleRegistryHelper implements MuleRegistry
     
     private String getDataTypeSourceResultPairHash(DataType<?> source, DataType<?> result)
     {
-        return String.format("%s%s:%s%s", source.getClass().getName(), source.hashCode(), result.getClass()
-            .getName(), result.hashCode());
+        return source.getClass().getName() + source.hashCode() + ":" + result.getClass().getName()
+               + result.hashCode();
     }
 
     private class TransformerResolverComparator implements Comparator<TransformerResolver>
