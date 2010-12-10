@@ -88,9 +88,6 @@ org.mule.test.integration.messaging.meps.InOutOutOnlyAsyncRouterTestCase
 org.mule.test.integration.transport.cxf.CxfClientPassivateTestCase
 org.mule.test.integration.message.MessagePropertyInResponseTransformersTestCase
 
-# Broken by BL-165
-org.mule.test.integration.exceptions.ExceptionStrategyTransactionTestCase
-
 # MULE-4976 (broken with migration to Spring 3)
 org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCase
 

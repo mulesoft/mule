@@ -82,7 +82,8 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase
 
             try
             {
-                if (!TransactionCoordination.getInstance().getTransaction().isRollbackOnly())
+                if (TransactionCoordination.getInstance().getTransaction() != null &&
+                    !TransactionCoordination.getInstance().getTransaction().isRollbackOnly())
                 {
                     failure = "transaction should have been set for rollback";
                 }
