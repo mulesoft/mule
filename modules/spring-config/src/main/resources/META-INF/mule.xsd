@@ -1432,7 +1432,7 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="unbounded">
+            <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="1">
                 <xsd:annotation>
                     <xsd:documentation>Destination to which an ExceptionMessage will be sent; this could be an outbound endpoint, a router, or other message processor.
                     </xsd:documentation>

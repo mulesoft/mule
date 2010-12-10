@@ -12,10 +12,12 @@ package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.message.ExceptionMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 
@@ -32,7 +34,11 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
 
     public void testDefaultExceptionStrategySingleEndpoint() throws MuleException
     {
-        assertExceptionStrategyHasNumberOfEndpoints("testService1", 1);
+        Service service = muleContext.getRegistry().lookupService("testService1");
+        assertNotNull(service);
+        assertNotNull(service.getExceptionListener());
+        assertTrue(service.getExceptionListener() instanceof DefaultServiceExceptionStrategy);
+        assertEquals(1, ((DefaultServiceExceptionStrategy) service.getExceptionListener()).getMessageProcessors().size());
 
         MuleClient mc = new MuleClient(muleContext);
         mc.dispatch("vm://in1", "test", null);
@@ -43,7 +49,15 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
 
     public void testDefaultExceptionStrategyMultipleEndpoints() throws MuleException
     {
-        assertExceptionStrategyHasNumberOfEndpoints("testService2", 2);
+        Service service = muleContext.getRegistry().lookupService("testService2");
+        assertNotNull(service);
+        assertNotNull(service.getExceptionListener());
+        assertTrue(service.getExceptionListener() instanceof DefaultServiceExceptionStrategy);
+        DefaultServiceExceptionStrategy exceptionListener = 
+            (DefaultServiceExceptionStrategy) service.getExceptionListener();
+        MessageProcessor mp = exceptionListener.getMessageProcessors().iterator().next();
+        assertTrue(mp.getClass().getName(), mp instanceof MulticastingRouter);
+        assertEquals(2, ((MulticastingRouter) mp).getRoutes().size());
 
         MuleClient mc = new MuleClient(muleContext);
         mc.dispatch("vm://in2", "test", null);
@@ -80,16 +94,5 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload();
         assertEquals(FunctionalTestException.class, exceptionMessage.getException().getCause().getClass());
         assertEquals("test", exceptionMessage.getPayload());
-    }
-    
-    private void assertExceptionStrategyHasNumberOfEndpoints(String serviceName, int numberOfEndpoints)
-    {
-        Service service = muleContext.getRegistry().lookupService(serviceName);
-        assertNotNull(service);
-        assertNotNull(service.getExceptionListener());
-        assertTrue(service.getExceptionListener() instanceof DefaultServiceExceptionStrategy);
-        DefaultServiceExceptionStrategy exceptionListener = 
-            (DefaultServiceExceptionStrategy) service.getExceptionListener();
-        assertEquals(numberOfEndpoints, exceptionListener.getMessageProcessors().size());
     }
 }
