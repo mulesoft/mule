@@ -1,9 +1,9 @@
 +----------------------------+
 | Loan Broker Simple Example |
 +----------------------------+
-Copy the pre-built application archive (mule-example-loanbroker-simple.zip) to the application
-folder ($MULE_HOME/apps) and start Mule. When Mule is running go to your browser
-to run it:
+Copy the pre-built application archive (mule-example-loanbroker-simple.zip) to the
+application folder ($MULE_HOME/apps) and start Mule. When Mule is running go to
+your browser to run it:
 
     http://localhost:11081
 
@@ -14,14 +14,11 @@ Now, modify the loan amount requested, and see different banks responding:
 
     http://localhost:11081/?amount=100
 
-Try different amounts (100, 10000, 20000). Also try invalid numbers to see the error handling in action.
+Try different amounts (100, 10000, 20000). Also try invalid numbers to see the error
+handling in action.
 
 +----------------------+
 | Building the example |
 +----------------------+
-First, make sure you have set the MULE_HOME environment variable as recommended 
-in Mule's README.txt
-
 Run "mvn" from the example source folder.  This will compile the example
-classes, produce an application zip file and copy it to 
-$MULE_HOME/apps.
+classes, produce an application zip file and copy it to $MULE_HOME/apps.
