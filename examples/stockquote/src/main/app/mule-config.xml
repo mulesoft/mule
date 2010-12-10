@@ -14,10 +14,12 @@
 
     <!--
         If you need to use a web proxy to access www.webservicesx.com configure your proxy settings in
-        proxy.properties and uncomment this block. <context:property-placeholder location="proxy.properties"/>
+        proxy.properties and uncomment this block.
+
+        <context:property-placeholder location="proxy.properties"/>
 
         <http:connector name="HttpConnector" proxyHostname="${proxyHostname}" proxyPassword="${proxyPassword}"
-        proxyPort="${proxyPort}" proxyUsername="${proxyUsername}"/>
+            proxyPort="${proxyPort}" proxyUsername="${proxyUsername}"/>
     -->
 
     <xml-entity-decoder-transformer name="XmlDecoder" />
