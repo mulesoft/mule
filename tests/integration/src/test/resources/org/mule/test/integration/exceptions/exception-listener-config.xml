@@ -23,9 +23,9 @@
                     <outbound-endpoint address="vm://component.out" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
-            <default-service-exception-strategy>
+            <default-exception-strategy>
                 <outbound-endpoint address="vm://error.queue" exchange-pattern="one-way"/>
-            </default-service-exception-strategy>
+            </default-exception-strategy>
         </service>
     </model>
 </mule>

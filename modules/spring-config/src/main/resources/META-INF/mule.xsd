@@ -1432,6 +1432,12 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
+            <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="0" maxOccurs="unbounded">
+                <xsd:annotation>
+                    <xsd:documentation>Destination to which an ExceptionMessage will be sent; this could be an outbound endpoint, a router, or other message processor.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:group>
         </xsd:sequence>
         <xsd:attribute name="enableNotifications" type="xsd:boolean">
             <xsd:annotation>
@@ -3907,23 +3913,14 @@
     <!--   Exception strategies                                       -->
     <!--==============================================================-->
 
-    <xsd:element name="default-service-exception-strategy" type="endpointExceptionStrategyType"
+    <xsd:element name="default-exception-strategy" type="abstractExceptionStrategyType"
                  substitutionGroup="abstract-exception-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                Provide default exception handling for a service via an endpoint.
+                Provides default exception handling.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="endpointExceptionStrategyType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractExceptionStrategyType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-outbound-endpoint" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:element name="custom-exception-strategy" type="customExceptionStrategyType"
                  substitutionGroup="abstract-exception-strategy">
@@ -3935,7 +3932,7 @@
     </xsd:element>
     <xsd:complexType name="customExceptionStrategyType">
         <xsd:complexContent>
-            <xsd:extension base="endpointExceptionStrategyType">
+            <xsd:extension base="abstractExceptionStrategyType">
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
                         <xsd:annotation>
@@ -3956,23 +3953,15 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="routeable-exception-strategy" type="routeableExceptionStrategyType"
+    <!-- This is left in for backwards-compatibility only, remove for next major version. -->
+    <xsd:element name="default-service-exception-strategy" type="abstractExceptionStrategyType"
                  substitutionGroup="abstract-exception-strategy">
         <xsd:annotation>
             <xsd:documentation>
-                An exception strategy the routes exceptions through routers
+                Deprecated: Use default-exception-strategy instead.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="routeableExceptionStrategyType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractExceptionStrategyType">
-                <xsd:sequence>
-                    <xsd:element ref="abstract-outbound-router" minOccurs="1" maxOccurs="1"/>
-                </xsd:sequence>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <!-- Custom connector element -->
 

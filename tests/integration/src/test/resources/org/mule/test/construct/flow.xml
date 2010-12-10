@@ -28,7 +28,7 @@
             <append-string-transformer message="c" />
         </processor-chain>
         <append-string-transformer message="3" />
-        <default-service-exception-strategy />
+        <default-exception-strategy />
     </flow>
 
     <flow name="flow2">
@@ -189,7 +189,7 @@
             <vm:transaction action="ALWAYS_JOIN" />
         </transactional>    
         <append-string-transformer message="c" />
-        <default-service-exception-strategy />    
+        <default-exception-strategy />    
     </flow>
 
     <flow name="transactionalRollback">

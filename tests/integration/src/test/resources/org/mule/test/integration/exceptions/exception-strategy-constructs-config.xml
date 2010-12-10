@@ -14,20 +14,20 @@
     <vm:connector name="vmConnector"/>
 
     <model>
-        <default-service-exception-strategy>
+        <default-exception-strategy>
             <vm:outbound-endpoint path="modelout" exchange-pattern="one-way"
                                   connector-ref="vmConnector"/>
-        </default-service-exception-strategy>
+        </default-exception-strategy>
 
         <service name="testService1">
             <inbound>
                 <vm:inbound-endpoint path="inservice1" exchange-pattern="one-way"/>
             </inbound>
             <test:component throwException="true"/>
-            <default-service-exception-strategy>
+            <default-exception-strategy>
                 <vm:outbound-endpoint path="service1out" exchange-pattern="one-way"
                     connector-ref="vmConnector"/>
-            </default-service-exception-strategy>
+            </default-exception-strategy>
         </service>
 
         <service name="testService">
@@ -43,10 +43,10 @@
     <simple-service name="testSS1"
                     address="vm://inss1">
         <test:component throwException="true" />
-        <default-service-exception-strategy>
+        <default-exception-strategy>
             <vm:outbound-endpoint path="ss1out" exchange-pattern="one-way"
                                   connector-ref="vmConnector"/>
-        </default-service-exception-strategy>
+        </default-exception-strategy>
     </simple-service>
 
     <simple-service name="testSS2"
@@ -57,10 +57,10 @@
     <flow name="testflow1">
         <vm:inbound-endpoint path="inflow1" exchange-pattern="one-way"/>
         <custom-processor class="org.mule.test.integration.exceptions.ExceptionStrategyConstructsTestCase$ExceptionThrowingProcessor"/>
-        <default-service-exception-strategy>
+        <default-exception-strategy>
             <vm:outbound-endpoint path="flow1out" exchange-pattern="one-way"
                                   connector-ref="vmConnector"/>
-        </default-service-exception-strategy>
+        </default-exception-strategy>
     </flow>
 
 </mule>

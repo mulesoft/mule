@@ -74,9 +74,9 @@
         </choice>
     
         <!-- Route unexpected errors to separate error handler -->
-        <default-service-exception-strategy>
+        <default-exception-strategy>
             <vm:outbound-endpoint path="systemErrorHandler" exchange-pattern="one-way"/>
-        </default-service-exception-strategy>
+        </default-exception-strategy>
     </flow>
 
     <model>

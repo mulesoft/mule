@@ -23,9 +23,9 @@
             <outbound-endpoint ref="output2"/>
             <outbound-endpoint ref="output3"/>
         </all>
-        <default-service-exception-strategy>
+        <default-exception-strategy>
             <vm:outbound-endpoint path="errors" exchange-pattern="one-way"/>
-        </default-service-exception-strategy>
+        </default-exception-strategy>
     </flow>
 
         <flow name="first-successful">

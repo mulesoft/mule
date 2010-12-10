@@ -35,12 +35,12 @@
             <!-- this exception strategy will forward the current message to a jms queue
             and will do so in the current transaction if it is available
             -->
-            <default-service-exception-strategy>
+            <default-exception-strategy>
                 <commit-transaction exception-pattern="*"/>
                 <jms:outbound-endpoint queue="DLQ" exchange-pattern="one-way">
                     <jms:transaction action="BEGIN_OR_JOIN"/>
                 </jms:outbound-endpoint>
-            </default-service-exception-strategy>
+            </default-exception-strategy>
         </service>
     </model>
 </mule>

@@ -53,9 +53,9 @@
                 </pass-through-router>
             </outbound>
 
-            <default-service-exception-strategy>
+            <default-exception-strategy>
                 <rollback-transaction exception-pattern="*"/>
-            </default-service-exception-strategy>
+            </default-exception-strategy>
             <queue-profile persistent="true"/>
         </service>
 

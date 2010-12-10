@@ -11,9 +11,9 @@
     <custom-transformer name="fail" class="org.mule.test.transformers.FailingTransformer"/>
 
     <model name="test">
-        <default-service-exception-strategy>
+        <default-exception-strategy>
             <vm:outbound-endpoint path="error" exchange-pattern="one-way"/>
-        </default-service-exception-strategy>
+        </default-exception-strategy>
 
         <service name="with-router">
             <inbound>

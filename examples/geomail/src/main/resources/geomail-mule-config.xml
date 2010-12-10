@@ -152,9 +152,9 @@
                 </pass-through-router>
             </outbound>
 
-            <default-service-exception-strategy>
+            <default-exception-strategy>
                 <outbound-endpoint ref="Fraudlabs"/>
-            </default-service-exception-strategy>
+            </default-exception-strategy>
         </service>
 
         <service name="FraudlabsService">

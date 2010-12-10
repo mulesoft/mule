@@ -19,10 +19,10 @@
                 <vm:inbound-endpoint path="in1" exchange-pattern="one-way"/>
             </inbound>
             <test:component throwException="true"/>
-            <default-service-exception-strategy>
+            <default-exception-strategy>
                 <vm:outbound-endpoint path="out1" exchange-pattern="one-way" 
                     connector-ref="vmConnector"/> 
-            </default-service-exception-strategy>
+            </default-exception-strategy>
         </service>
 
         <service name="testService2">
@@ -30,12 +30,12 @@
                 <vm:inbound-endpoint path="in2" exchange-pattern="one-way"/>
             </inbound>
             <test:component throwException="true"/>
-            <default-service-exception-strategy>
+            <default-exception-strategy>
                 <vm:outbound-endpoint path="out2" exchange-pattern="one-way" 
                     connector-ref="vmConnector"/> 
                 <vm:outbound-endpoint path="out3" exchange-pattern="one-way" 
                     connector-ref="vmConnector"/> 
-            </default-service-exception-strategy>
+            </default-exception-strategy>
         </service>
     </model>
 </mule>

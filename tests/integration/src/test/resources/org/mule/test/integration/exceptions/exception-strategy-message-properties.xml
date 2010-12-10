@@ -12,9 +12,9 @@
     
     <model name="processModel">
     
-        <default-service-exception-strategy>
+        <default-exception-strategy>
             <vm:outbound-endpoint path="error" exchange-pattern="one-way"/>
-        </default-service-exception-strategy>
+        </default-exception-strategy>
 
         <service name="inbound">
             <inbound>

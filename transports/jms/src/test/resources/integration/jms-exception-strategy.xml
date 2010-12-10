@@ -20,10 +20,10 @@
                     <outbound-endpoint ref="out" />
                 </pass-through-router>
             </outbound>
-            <default-service-exception-strategy>
+            <default-exception-strategy>
                 <commit-transaction exception-pattern="*"/>
                 <outbound-endpoint ref="dlq" />
-            </default-service-exception-strategy>
+            </default-exception-strategy>
         </service>
     </model>
 
