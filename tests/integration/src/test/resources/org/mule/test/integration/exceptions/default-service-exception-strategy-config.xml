@@ -31,10 +31,12 @@
             </inbound>
             <test:component throwException="true"/>
             <default-exception-strategy>
-                <vm:outbound-endpoint path="out2" exchange-pattern="one-way" 
-                    connector-ref="vmConnector"/> 
-                <vm:outbound-endpoint path="out3" exchange-pattern="one-way" 
-                    connector-ref="vmConnector"/> 
+                <all>
+                    <vm:outbound-endpoint path="out2" exchange-pattern="one-way" 
+                        connector-ref="vmConnector"/> 
+                    <vm:outbound-endpoint path="out3" exchange-pattern="one-way" 
+                        connector-ref="vmConnector"/> 
+                </all>
             </default-exception-strategy>
         </service>
     </model>

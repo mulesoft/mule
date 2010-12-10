@@ -11,6 +11,7 @@
 package org.mule;
 
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.exception.AbstractExceptionListener;
 import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
@@ -31,7 +32,7 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase
 
     public void testSetGoodEndpoints() throws Exception
     {
-        List<OutboundEndpoint> list = new ArrayList<OutboundEndpoint>();
+        List<MessageProcessor> list = new ArrayList<MessageProcessor>();
         list.add(getTestOutboundEndpoint("test"));
         list.add(getTestOutboundEndpoint("test"));
         
