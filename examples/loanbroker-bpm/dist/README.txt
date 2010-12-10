@@ -19,9 +19,6 @@ Try different amounts (100, 10000, 20000). Also try invalid numbers to see the e
 +----------------------+
 | Building the example |
 +----------------------+
-First, make sure you have set the MULE_HOME environment variable as recommended 
-in Mule's README.txt
-
 Run "mvn" from the example source folder.  This will compile the example
 classes, produce an application zip file and copy it to 
 $MULE_HOME/apps.
