@@ -89,7 +89,7 @@ public abstract class AbstractExceptionListener implements Initialisable, Dispos
         return messageProcessors;
     }
 
-    public void setMessageProcessors(List<OutboundEndpoint> processors)
+    public void setMessageProcessors(List<MessageProcessor> processors)
     {
         if (processors != null)
         {
