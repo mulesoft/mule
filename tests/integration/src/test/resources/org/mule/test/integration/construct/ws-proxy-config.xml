@@ -48,7 +48,7 @@
   <ws:proxy name="weather-forecast-ws-proxy-exception-strategy"
             inboundAddress="http://localhost:8090/weather-forecast/5"
             outboundEndpoint-ref="target-ws-endpoint">
-    <default-service-exception-strategy />
+    <default-exception-strategy />
   </ws:proxy>
   
   <ws:proxy name="weather-forecast-ws-proxy-abstract-parent"

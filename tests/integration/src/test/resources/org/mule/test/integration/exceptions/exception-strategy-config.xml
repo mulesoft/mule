@@ -10,10 +10,10 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd">
 
     <model>
-        <default-service-exception-strategy enableNotifications="false">
+        <default-exception-strategy enableNotifications="false">
             <commit-transaction exception-pattern="java.io.*"/>
             <rollback-transaction exception-pattern="org.mule.*, javax.*"/>
-        </default-service-exception-strategy>
+        </default-exception-strategy>
 
         <service name="testService1">
             <inbound>

@@ -192,9 +192,9 @@
                 </custom-async-reply-router>
             </async-reply>
 
-            <default-service-exception-strategy>
+            <default-exception-strategy>
                 <outbound-endpoint address="test://orange.exceptions" exchange-pattern="one-way"/>
-            </default-service-exception-strategy>
+            </default-exception-strategy>
             
         </service>
 

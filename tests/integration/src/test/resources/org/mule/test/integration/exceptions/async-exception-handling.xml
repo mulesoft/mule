@@ -45,9 +45,9 @@
                     <vm:outbound-endpoint path="response-channel" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
-            <default-service-exception-strategy>
+            <default-exception-strategy>
                 <vm:outbound-endpoint path="exception-channel" exchange-pattern="one-way"/>
-            </default-service-exception-strategy>
+            </default-exception-strategy>
         </service>
         
         <service name="ResponseFlow">

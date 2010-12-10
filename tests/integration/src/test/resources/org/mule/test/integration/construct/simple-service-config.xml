@@ -74,7 +74,7 @@
   <simple-service name="exception-strategy"
                   address="vm://exst.in"
                   component-class="org.mule.tck.services.SimpleMathsComponent">
-    <default-service-exception-strategy />
+    <default-exception-strategy />
   </simple-service>
   
   <simple-service name="global-exception-strategy"

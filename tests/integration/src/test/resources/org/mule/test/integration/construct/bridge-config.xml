@@ -43,7 +43,7 @@
   <bridge name="exception-bridge"
           inboundAddress="vm://exception-bridge.in"
           outboundEndpoint-ref="maths-service-channel">
-    <default-service-exception-strategy />
+    <default-exception-strategy />
   </bridge>          
 
   <bridge name="transacted-bridge"

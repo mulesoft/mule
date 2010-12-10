@@ -11,9 +11,9 @@
     <file:connector name="fileConnector" outputAppend="true" outputPattern="test-#[function:count].out" />
 
     <model name="ESTest">
-        <default-service-exception-strategy>
+        <default-exception-strategy>
             <outbound-endpoint address="file://./.mule/errors" exchange-pattern="one-way"/>
-        </default-service-exception-strategy>
+        </default-exception-strategy>
 
         <service name="FolderToVM">
             <inbound>
