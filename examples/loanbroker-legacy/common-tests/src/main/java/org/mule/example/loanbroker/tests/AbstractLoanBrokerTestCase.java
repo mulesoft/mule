@@ -11,10 +11,10 @@
 package org.mule.example.loanbroker.tests;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.client.MuleClient;
 import org.mule.example.loanbroker.messages.Customer;
 import org.mule.example.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.example.loanbroker.messages.LoanQuote;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
@@ -23,12 +23,12 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
 
     protected int getNumberOfRequests()
     {
-        return 1000;
+        return 10;
     }
 
     public void testSingleLoanRequest() throws Exception
     {
-        final MuleClient client = muleContext.getClient();
+        MuleClient client = new MuleClient(muleContext);
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest request = new CustomerQuoteRequest(c, 100000, 48);
         MuleMessage result = client.send("CustomerRequests", request, null);
@@ -42,14 +42,14 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
 
     public void testLotsOfLoanRequests() throws Exception
     {
-        final MuleClient client = muleContext.getClient();
+        MuleClient client = new MuleClient(muleContext);
         Customer c = new Customer("Ross Mason", 1234);
         CustomerQuoteRequest[] requests = new CustomerQuoteRequest[3];
         requests[0] = new CustomerQuoteRequest(c, 100000, 48);
         requests[1] = new CustomerQuoteRequest(c, 1000, 12);
         requests[2] = new CustomerQuoteRequest(c, 10, 24);
 
-        long start =0;
+        long start = System.currentTimeMillis();
 
         int numRequests = getNumberOfRequests();
         int i = 0;
@@ -57,19 +57,15 @@ public abstract class AbstractLoanBrokerTestCase extends FunctionalTestCase
         {
             for (; i < numRequests; i++)
             {
-                if(i==501){
-                    start = System.currentTimeMillis();
-                }
-                
                 CustomerQuoteRequest loanRequest = requests[i % 3];
 
                 MuleMessage result = client.send("CustomerRequests", loanRequest, null);
                 assertNotNull(result);
-                assertFalse("received a NullPayload at loan request : " + i, result.getPayload() instanceof NullPayload);
-                assertTrue("did not receive a LoanQuote but: " + result.getPayload() + " at iteration : " + i,
+                assertFalse("received a NullPayload", result.getPayload() instanceof NullPayload);
+                assertTrue("did not receive a LoanQuote but: " + result.getPayload(),
                     result.getPayload() instanceof LoanQuote);
                 LoanQuote quote = (LoanQuote)result.getPayload();
-                assertTrue("interest rate is less than 0 at iteration : " + i, quote.getInterestRate() > 0);
+                assertTrue(quote.getInterestRate() > 0);
             }
         }
         finally
