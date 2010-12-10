@@ -10,8 +10,18 @@
 
 package org.mule.routing;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.lifecycle.Disposable;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
@@ -27,7 +37,7 @@ import org.mule.processor.AbstractFilteringMessageProcessor;
  * <p/>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Filter.html">http://www.eaipatterns.com/Filter.html<a/>
  */
-public class MessageFilter extends AbstractFilteringMessageProcessor
+public class MessageFilter extends AbstractFilteringMessageProcessor implements FlowConstructAware, Lifecycle
 {
     protected Filter filter;
 
@@ -95,5 +105,55 @@ public class MessageFilter extends AbstractFilteringMessageProcessor
     public String toString()
     {
         return (filter == null ? "null filter" : filter.getClass().getName()) + " (wrapped by " + this.getClass().getSimpleName() + ")";
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        super.setMuleContext(context);
+        if (unacceptedMessageProcessor instanceof MuleContextAware)
+        {
+            ((MuleContextAware)unacceptedMessageProcessor).setMuleContext(context);
+        }
+    }
+
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        if (unacceptedMessageProcessor instanceof FlowConstructAware)
+        {
+            ((FlowConstructAware)unacceptedMessageProcessor).setFlowConstruct(flowConstruct);
+        }
+    }
+
+    public void initialise() throws InitialisationException
+    {
+        if (unacceptedMessageProcessor instanceof Initialisable)
+        {
+            ((Initialisable)unacceptedMessageProcessor).initialise();
+        }
+    }
+
+    public void start() throws MuleException
+    {
+        if (unacceptedMessageProcessor instanceof Startable)
+        {
+            ((Startable)unacceptedMessageProcessor).start();
+        }
+    }
+
+    public void stop() throws MuleException
+    {
+        if (unacceptedMessageProcessor instanceof Stoppable)
+        {
+            ((Stoppable)unacceptedMessageProcessor).stop();
+        }
+    }
+
+    public void dispose()
+    {
+        if (unacceptedMessageProcessor instanceof Disposable)
+        {
+            ((Disposable)unacceptedMessageProcessor).dispose();
+        }
     }
 }

@@ -17,11 +17,13 @@ import java.util.List;
 
 import org.apache.commons.collections.ListUtils;
 import org.mule.DefaultMuleEvent;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -41,7 +43,7 @@ import org.mule.management.stats.RouterStatistics;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractSelectiveRouter
-    implements SelectiveRouter, RouterStatisticsRecorder, Lifecycle, FlowConstructAware
+    implements SelectiveRouter, RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware
 {
     private final List<MessageProcessorFilterPair> conditionalMessageProcessors = new ArrayList<MessageProcessorFilterPair>();
     private MessageProcessor defaultProcessor;
@@ -52,6 +54,7 @@ public abstract class AbstractSelectiveRouter
     final AtomicBoolean starting = new AtomicBoolean(false);
     final AtomicBoolean started = new AtomicBoolean(false);
     private FlowConstruct flowConstruct;
+    private MuleContext muleContext;
 
     public AbstractSelectiveRouter()
     {
@@ -63,6 +66,11 @@ public abstract class AbstractSelectiveRouter
         this.flowConstruct = flowConstruct;
     }
 
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+    }
+
     public void initialise() throws InitialisationException
     {
         synchronized (conditionalMessageProcessors)
@@ -72,6 +80,10 @@ public abstract class AbstractSelectiveRouter
                 if (o instanceof FlowConstructAware)
                 {
                     ((FlowConstructAware) o).setFlowConstruct(flowConstruct);
+                }
+                if (o instanceof MuleContextAware)
+                {
+                    ((MuleContextAware) o).setMuleContext(muleContext);
                 }
                 if (o instanceof Initialisable)
                 {
@@ -220,6 +232,11 @@ public abstract class AbstractSelectiveRouter
             if ((flowConstruct != null) && (managedObject instanceof FlowConstructAware))
             {
                 ((FlowConstructAware) managedObject).setFlowConstruct(flowConstruct);
+            }
+
+            if ((muleContext != null) && (managedObject instanceof MuleContextAware))
+            {
+                ((MuleContextAware) managedObject).setMuleContext(muleContext);
             }
 
             if ((initialised.get()) && (managedObject instanceof Initialisable))
