@@ -33,9 +33,6 @@ example and activate the config changes.
 +----------------------+
 | Building the example |
 +----------------------+
-First, make sure you have set the MULE_HOME environment variable as recommended
-in Mule's README.txt
-
 Depending on the build tool you are using (Ant or Maven), you can build the
 example by simply running "ant" or "mvn".  This will compile the example
 classes, produce an application zip file, and copy everything to $MULE_HOME/apps.
