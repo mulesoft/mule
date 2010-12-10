@@ -80,7 +80,6 @@ org.mule.config.spring.RootSchemaValidationTestCase
 
 # These tests have a property propagation / MEPs issue
 org.mule.routing.outbound.ChainingRouterPropertyPropagationTestCase
-org.mule.test.integration.messaging.meps.InOutAsyncTestCase
 org.mule.test.integration.messaging.meps.InOptionalOutOutOptionalInTestCase
 org.mule.test.integration.messaging.meps.InOutOutOnlyAsyncRouterTestCase
 
