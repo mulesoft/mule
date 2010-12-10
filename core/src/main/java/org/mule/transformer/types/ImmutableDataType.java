@@ -87,4 +87,10 @@ class ImmutableDataType<T> implements DataType<T>
     {
         throw new UnsupportedOperationException("Attempt to change immutable DataType " + theDataType);
     }
+    
+    @Override
+    public int hashCode()
+    {
+        return theDataType.hashCode();
+    }
 }

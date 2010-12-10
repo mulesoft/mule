@@ -172,10 +172,12 @@ public class SimpleDataType<T> implements DataType<T>, Cloneable
     public int hashCode()
     {
         int result = type.hashCode();
+        result = 31 * result + (encoding != null ? encoding.hashCode() : 0);
         result = 31 * result + (mimeType != null ? mimeType.hashCode() : 0);
         return result;
     }
 
+    
     @Override
     public String toString()
     {
