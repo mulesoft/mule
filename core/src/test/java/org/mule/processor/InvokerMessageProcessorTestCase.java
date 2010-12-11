@@ -19,6 +19,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -165,8 +166,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
     public void testListNestedMapArg() throws MuleException, Exception
     {
         invoker.setMethodName("testListArg");
-        invoker.setArguments(Collections.singletonList(Collections.singletonList(Collections.singletonMap(
-            "#[string:key]", "#[string:val]"))));
+        Map<Object, Object> map = new HashMap<Object, Object>();
+        map.put("key", "#[string:val]");
+        invoker.setArguments(Collections.singletonList(Collections.singletonList(map)));
         invoker.initialise();
         MuleEvent result = invoker.process(getTestEvent(""));
         assertTrue(List.class.isAssignableFrom(result.getMessage().getPayload().getClass()));
@@ -176,8 +178,9 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
     public void testMapArg() throws MuleException, Exception
     {
         invoker.setMethodName("testMapArg");
-        invoker.setArguments(Collections.singletonList(Collections.singletonMap("#[string:key]",
-            "#[string:val]")));
+        Map<Object, Object> map = new HashMap<Object, Object>();
+        map.put("key", "#[string:val]");
+        invoker.setArguments(Collections.singletonList(map));
         invoker.initialise();
         MuleEvent result = invoker.process(getTestEvent(""));
         assertTrue(Map.class.isAssignableFrom(result.getMessage().getPayload().getClass()));
