@@ -39,5 +39,21 @@
                 </all>
             </default-exception-strategy>
         </service>
+        
+        <service name="testService3">
+            <inbound>
+                <vm:inbound-endpoint path="in3" exchange-pattern="one-way"/>
+            </inbound>
+            <test:component throwException="true"/>
+            <default-exception-strategy>
+                <processor-chain>
+	            	<static-component>
+	            		<return-data>ERROR!</return-data>
+	            	</static-component>
+                    <vm:outbound-endpoint path="out4" exchange-pattern="one-way" 
+                        connector-ref="vmConnector"/> 
+                </processor-chain>
+            </default-exception-strategy>
+        </service>
     </model>
 </mule>

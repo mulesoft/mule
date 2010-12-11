@@ -166,17 +166,12 @@ public abstract class AbstractService implements Service, MessageProcessor
                         exceptionListener = getModel().getExceptionListener();
                     }
 
-                    if (messageSource instanceof FlowConstructAware)
-                    {
-                        ((FlowConstructAware) messageSource).setFlowConstruct(object);
-                    }
-                    asyncReplyMessageSource.setFlowConstruct(object);
-                    // Ensure Component has service instance and is initialised. If the component
-                    // was configured with spring and is therefore in the registry it will get
-                    // started automatically, if it was set on the service directly then it won't
-                    // be started automatically. So to be sure we start it here.
-                    component.setFlowConstruct(object);
-
+                    injectFlowConstructMuleContext(messageSource);
+                    injectFlowConstructMuleContext(asyncReplyMessageSource);
+                    injectFlowConstructMuleContext(messageProcessorChain);
+                    injectFlowConstructMuleContext(component);
+                    injectFlowConstructMuleContext(exceptionListener);
+                    
                     doInitialise();
                 }
             });
@@ -349,39 +344,23 @@ public abstract class AbstractService implements Service, MessageProcessor
 
     protected void doStop() throws MuleException
     {
-        if (messageSource instanceof Stoppable)
-        {
-            ((Stoppable) messageSource).stop();
-        }
+        stopIfStoppable(messageSource);
         asyncReplyMessageSource.stop();
 
         // Component is not in chain
-        if (component instanceof Stoppable)
-        {
-            ((Stoppable) component).stop();
-        }
-        if (messageProcessorChain instanceof Stoppable)
-        {
-            ((Stoppable) messageProcessorChain).stop();
-        }
+        stopIfStoppable(component);
+        stopIfStoppable(messageProcessorChain);
+        stopIfStoppable(exceptionListener);
     }
 
     protected void doStart() throws MuleException
     {
         // Component is not in chain
-        if (component instanceof Startable)
-        {
-            ((Startable) component).start();
-        }
-        if (messageProcessorChain instanceof Startable)
-        {
-            ((Startable) messageProcessorChain).start();
-        }
+        startIfStartable(component);
+        startIfStartable(messageProcessorChain);
+        startIfStartable(exceptionListener);
 
-        if (messageSource instanceof Startable)
-        {
-            ((Startable) messageSource).start();
-        }
+        startIfStartable(messageSource);
         if (asyncReplyMessageSource.getEndpoints().size() > 0)
         {
             asyncReplyMessageSource.start();
@@ -391,18 +370,10 @@ public abstract class AbstractService implements Service, MessageProcessor
     protected void doDispose()
     {
         // Component is not in chain
-        if (component instanceof Disposable)
-        {
-            ((Disposable) component).dispose();
-        }
-        if (messageProcessorChain instanceof Disposable)
-        {
-            ((Disposable) messageProcessorChain).dispose();
-        }
-        if (messageSource instanceof Disposable)
-        {
-            ((Disposable) messageSource).dispose();
-        }
+        disposeIfDisposable(component);
+        disposeIfDisposable(messageProcessorChain);
+        disposeIfDisposable(messageSource);
+        disposeIfDisposable(exceptionListener);
         muleContext.getStatistics().remove(stats);
     }
 
@@ -444,24 +415,15 @@ public abstract class AbstractService implements Service, MessageProcessor
             }
         });
 
-        // Component is not in chain
-        if (component instanceof Initialisable)
-        {
-            ((Initialisable) component).initialise();
-        }
-        if (messageProcessorChain instanceof Initialisable)
-        {
-            ((Initialisable) messageProcessorChain).initialise();
-        }
-        if (messageSource instanceof Initialisable)
-        {
-            ((Initialisable) messageSource).initialise();
-        }
+        initialiseIfInitialisable(component);
+        initialiseIfInitialisable(messageProcessorChain);
+        initialiseIfInitialisable(messageSource);
+        initialiseIfInitialisable(exceptionListener);
+        
         if (asyncReplyMessageSource.getEndpoints().size() > 0)
         {
             asyncReplyMessageSource.initialise();
         }
-
     }
 
     public void forceStop() throws MuleException
@@ -692,5 +654,49 @@ public abstract class AbstractService implements Service, MessageProcessor
     public MessageProcessorChain getMessageProcessorChain()
     {
         return messageProcessorChain;
+    }
+    
+    protected void injectFlowConstructMuleContext(Object candidate)
+    {
+        if (candidate instanceof FlowConstructAware)
+        {
+            ((FlowConstructAware) candidate).setFlowConstruct(this);
+        }
+        if (candidate instanceof MuleContextAware)
+        {
+            ((MuleContextAware) candidate).setMuleContext(muleContext);
+        }
+    }
+
+    protected void initialiseIfInitialisable(Object candidate) throws InitialisationException
+    {
+        if (candidate instanceof Initialisable)
+        {
+            ((Initialisable) candidate).initialise();
+        }
+    }
+
+    protected void startIfStartable(Object candidate) throws MuleException
+    {
+        if (candidate instanceof Startable)
+        {
+            ((Startable) candidate).start();
+        }
+    }
+
+    protected void stopIfStoppable(Object candidate) throws MuleException
+    {
+        if (candidate instanceof Stoppable)
+        {
+            ((Stoppable) candidate).stop();
+        }
+    }
+
+    protected void disposeIfDisposable(Object candidate)
+    {
+        if (candidate instanceof Disposable)
+        {
+            ((Disposable) candidate).dispose();
+        }
     }
 }

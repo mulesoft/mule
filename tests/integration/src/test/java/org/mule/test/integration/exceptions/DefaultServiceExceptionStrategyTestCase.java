@@ -12,6 +12,7 @@ package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.LocalMuleClient;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.exception.DefaultServiceExceptionStrategy;
@@ -67,6 +68,16 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         assertExceptionMessage(out3);
         assertNotSame(out2, out3);
         assertEquals(out2.getPayload(), out3.getPayload());
+    }
+    
+    public void testDefaultExceptionStrategyNonEndpoint() throws Exception
+    {
+        LocalMuleClient mc = muleContext.getClient();
+
+        mc.dispatch("vm://in3", "test", null);
+
+        MuleMessage out4 = mc.request("vm://out4", FunctionalTestCase.RECEIVE_TIMEOUT);
+        assertEquals("ERROR!", out4.getPayloadAsString());
     }
 
     public void testSerializablePayload() throws MuleException

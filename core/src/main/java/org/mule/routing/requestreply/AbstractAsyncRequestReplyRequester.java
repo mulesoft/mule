@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
@@ -34,7 +35,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 
 public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterceptingMessageProcessor
-    implements RequestReplyRequesterMessageProcessor
+    implements RequestReplyRequesterMessageProcessor, FlowConstructAware
 {
     public static final int MAX_PROCESSED_GROUPS = 50000;
 
@@ -266,5 +267,10 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     public String toString()
     {
         return ObjectUtils.toString(this);
+    }
+    
+    public void setFlowConstruct(FlowConstruct flowConstruct)
+    {
+        this.flowConstruct = flowConstruct;
     }
 }

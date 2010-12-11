@@ -19,6 +19,7 @@ import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
@@ -26,10 +27,10 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 
 public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyRequester
-    implements Startable, Stoppable, MuleContextAware
+    implements Startable, Stoppable
 {
 
-    private MessageProcessor requestMessageProcessor;
+    protected MessageProcessor requestMessageProcessor;
 
     @Override
     protected void sendAsyncRequest(MuleEvent event) throws MuleException
@@ -124,6 +125,17 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
                 ((Stoppable) requestMessageProcessor).stop();
             }
         }
+        if (requestMessageProcessor != null)
+        {
+            if (requestMessageProcessor instanceof Stoppable)
+            {
+                ((Stoppable) requestMessageProcessor).stop();
+            }
+            if (requestMessageProcessor instanceof Disposable)
+            {
+                ((Disposable) requestMessageProcessor).dispose();
+            }
+        }
     }
 
     @Override
@@ -135,4 +147,5 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
             ((MuleContextAware)requestMessageProcessor).setMuleContext(context);
         }
     }
+
 }

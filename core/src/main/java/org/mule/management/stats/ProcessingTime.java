@@ -108,60 +108,63 @@ public class ProcessingTime implements Serializable
     /**
      * Start timer that processes reference queue
      */
-    public synchronized void startThread()
+    public void startThread()
     {
-        if (referenceThread == null)
+        synchronized (ProcessingTime.class)
         {
-            referenceThread = new Thread(new Runnable()
+            if (referenceThread == null)
             {
-                /**
-                 * As weak references to completed ProcessingTimes are delivered, record them
-                 */
-                public void run()
+                referenceThread = new Thread(new Runnable()
                 {
-
-                    try
+                    /**
+                     * As weak references to completed ProcessingTimes are delivered, record them
+                     */
+                    public void run()
                     {
-                        while (true)
+
+                        try
                         {
-                            if (Thread.currentThread() != referenceThread)
+                            while (true)
                             {
-                                break;
-                            }
-                            try
-                            {
-                                // The next two lines look silly, but
-                                //       ref = (Reference) queue.poll();
-                                // fails on the IBM 1.5 compiler
-                                Object temp = queue.remove();
-                                Reference ref = (Reference) temp;
-                                refs.remove(ref);
-                                FlowConstructStatistics stats = ref.getStatistics();
-                                if (stats.isEnabled())
+                                if (Thread.currentThread() != referenceThread)
                                 {
-                                    stats.addCompleteFlowExecutionTime(ref.getAccumulator().longValue());
+                                    break;
+                                }
+                                try
+                                {
+                                    // The next two lines look silly, but
+                                    //       ref = (Reference) queue.poll();
+                                    // fails on the IBM 1.5 compiler
+                                    Object temp = queue.remove();
+                                    Reference ref = (Reference) temp;
+                                    refs.remove(ref);
+                                    FlowConstructStatistics stats = ref.getStatistics();
+                                    if (stats.isEnabled())
+                                    {
+                                        stats.addCompleteFlowExecutionTime(ref.getAccumulator().longValue());
+                                    }
+                                }
+                                catch (InterruptedException ex )
+                                {
+                                    Thread.currentThread().interrupt();
+                                    break;
+                                }
+                                catch (Exception ex)
+                                {
+                                    // Don't let exception escape -- it kills the thread
+                                    logger.error(this, ex);
                                 }
                             }
-                            catch (InterruptedException ex )
-                            {
-                                Thread.currentThread().interrupt();
-                                break;
-                            }
-                            catch (Exception ex)
-                            {
-                                // Don't let exception escape -- it kills the thread
-                                logger.error(this, ex);
-                            }
+                        }
+                        finally
+                        {
+                            referenceThread = null;
                         }
                     }
-                    finally
-                    {
-                        referenceThread = null;
-                    }
-                }
-            }, this.threadName);
-            referenceThread.setDaemon(true);
-            referenceThread.start();
+                }, this.threadName);
+                referenceThread.setDaemon(true);
+                referenceThread.start();
+            }
         }
     }
 

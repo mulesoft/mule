@@ -111,8 +111,10 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
 
                     injectFlowConstructMuleContext(messageSource);
                     injectFlowConstructMuleContext(messageProcessorChain);
+                    injectFlowConstructMuleContext(exceptionListener);
                     initialiseIfInitialisable(messageSource);
                     initialiseIfInitialisable(messageProcessorChain);
+                    initialiseIfInitialisable(exceptionListener);
 
                     doInitialise();
 
@@ -138,6 +140,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
             public void onTransition(String phaseName, FlowConstruct object) throws MuleException
             {
                 startIfStartable(messageProcessorChain);
+                startIfStartable(exceptionListener);
                 startIfStartable(messageSource);
                 doStart();
             }
@@ -152,6 +155,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
             {
                 stopIfStoppable(messageSource);
                 stopIfStoppable(messageProcessorChain);
+                stopIfStoppable(exceptionListener);
                 doStop();
             }
         });
@@ -171,6 +175,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
                 public void onTransition(String phaseName, FlowConstruct object) throws MuleException
                 {
                     disposeIfDisposable(messageProcessorChain);
+                    disposeIfDisposable(exceptionListener);
                     disposeIfDisposable(messageSource);
                     doDispose();
                 }
@@ -323,7 +328,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         // Empty template method
     }
 
-    private void injectFlowConstructMuleContext(Object candidate)
+    protected void injectFlowConstructMuleContext(Object candidate)
     {
         if (candidate instanceof FlowConstructAware)
         {
@@ -341,7 +346,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         return String.format("%s{%s}", ClassUtils.getSimpleName(this.getClass()), getName());
     }
 
-    private void initialiseIfInitialisable(Object candidate) throws InitialisationException
+    protected void initialiseIfInitialisable(Object candidate) throws InitialisationException
     {
         if (candidate instanceof Initialisable)
         {
@@ -349,7 +354,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         }
     }
 
-    private void startIfStartable(Object candidate) throws MuleException
+    protected void startIfStartable(Object candidate) throws MuleException
     {
         if (candidate instanceof Startable)
         {
@@ -357,7 +362,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         }
     }
 
-    private void stopIfStoppable(Object candidate) throws MuleException
+    protected void stopIfStoppable(Object candidate) throws MuleException
     {
         if (candidate instanceof Stoppable)
         {
@@ -365,7 +370,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         }
     }
 
-    private void disposeIfDisposable(Object candidate)
+    protected void disposeIfDisposable(Object candidate)
     {
         if (candidate instanceof Disposable)
         {

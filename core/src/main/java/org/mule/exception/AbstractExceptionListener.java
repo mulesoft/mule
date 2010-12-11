@@ -21,12 +21,9 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.OutboundRouter;
@@ -39,6 +36,7 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.message.ExceptionMessage;
+import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.session.DefaultMuleSession;
@@ -60,7 +58,7 @@ import org.apache.commons.logging.LogFactory;
  * this exception listener and provides an implementation for dispatching exception
  * events from this Listener.
  */
-public abstract class AbstractExceptionListener implements Initialisable, Disposable, MuleContextAware
+public abstract class AbstractExceptionListener extends AbstractMessageProcessorOwner
 {
     /**
      * logger used by this class
@@ -72,17 +70,10 @@ public abstract class AbstractExceptionListener implements Initialisable, Dispos
 
     protected AtomicBoolean initialised = new AtomicBoolean(false);
 
-    protected MuleContext muleContext;
-
     protected WildcardFilter rollbackTxFilter;
     protected WildcardFilter commitTxFilter;
 
     protected boolean enableNotifications = true;
-
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
 
     public List<MessageProcessor> getMessageProcessors()
     {
@@ -140,6 +131,7 @@ public abstract class AbstractExceptionListener implements Initialisable, Dispos
      */
     public final synchronized void initialise() throws InitialisationException
     {
+        super.initialise();
         if (!initialised.get())
         {
             doInitialise(muleContext);
@@ -414,11 +406,6 @@ public abstract class AbstractExceptionListener implements Initialisable, Dispos
         return initialised.get();
     }
 
-    public void dispose()
-    {
-        // Template method
-    }
-
     /**
      * Fires a server notification to all registered
      * {@link org.mule.api.context.notification.ExceptionNotificationListener}
@@ -467,5 +454,11 @@ public abstract class AbstractExceptionListener implements Initialisable, Dispos
     public void setRollbackTxFilter(WildcardFilter rollbackTxFilter)
     {
         this.rollbackTxFilter = rollbackTxFilter;
+    }
+    
+    @Override
+    protected List<MessageProcessor> getOwnedMessageProcessors()
+    {
+        return messageProcessors;
     }
 }

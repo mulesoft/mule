@@ -13,9 +13,11 @@ package org.mule.routing;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -28,7 +30,7 @@ import org.mule.api.routing.filter.Filter;
 /**
  * A holder for a pair of MessageProcessor and Filter.
  */
-public class MessageProcessorFilterPair implements FlowConstructAware, Lifecycle
+public class MessageProcessorFilterPair implements FlowConstructAware, MuleContextAware, Lifecycle
 {
     private final MessageProcessor messageProcessor;
     private final Filter filter;
@@ -69,6 +71,18 @@ public class MessageProcessorFilterPair implements FlowConstructAware, Lifecycle
         if (filter instanceof FlowConstructAware)
         {
             ((FlowConstructAware) filter).setFlowConstruct(flowConstruct);
+        }
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+         if (messageProcessor instanceof MuleContextAware)
+        {
+            ((MuleContextAware) messageProcessor).setMuleContext(context);
+        }
+        if (filter instanceof MuleContextAware)
+        {
+            ((MuleContextAware) filter).setMuleContext(context);
         }
     }
 
