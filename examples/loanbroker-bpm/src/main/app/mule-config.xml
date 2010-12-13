@@ -31,75 +31,50 @@
     <vm:endpoint name="MediumBank" path="medium.bank" exchange-pattern="request-response" />
     <vm:endpoint name="SmallBank" path="small.bank" exchange-pattern="request-response" />
 
-    <model name="loan-broker">
+    <!-- ***************************************************
+        HTTP Front End
+        *************************************************** -->
 
-        <!-- ***************************************************
-            HTTP Front End
-            *************************************************** -->
+    <flow name="HttpService">
+        <inbound-endpoint ref="HttpUrlCustomerRequests" />
+        <outbound-endpoint ref="CustomerRequests" />
+    </flow>
 
-        <service name="HttpService">
-            <inbound>
-                <inbound-endpoint ref="HttpUrlCustomerRequests" />
-            </inbound>
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="CustomerRequests" />
-                </pass-through-router>
-            </outbound>
-        </service>
+    <!-- ***************************************************
+        Process Engine
+        *************************************************** -->
 
-        <!-- ***************************************************
-            Process Engine
-            *************************************************** -->
+    <flow name="ToBPMS">
+        <composite-source>
+            <inbound-endpoint ref="CustomerRequests" />
+            <inbound-endpoint ref="CreditProfiles" />
+        </composite-source>
+        <bpm:process processName="LoanBroker" processDefinition="loan-broker-process.jpdl.xml" />
+    </flow>
 
-        <!-- Messages sent to the process engine -->
-        <service name="ToBPMS">
-            <inbound>
-                <!-- Incoming message = CustomerRequest -->
-                <inbound-endpoint ref="CustomerRequests" />
-                <!-- Incoming message = CreditProfile -->
-                <inbound-endpoint ref="CreditProfiles" />
-            </inbound>
-            <bpm:process processName="LoanBroker" processDefinition="loan-broker-process.jpdl.xml" />
-        </service>
+    <!-- ***************************************************
+        Services
+        *************************************************** -->
+    <!-- The credit agency service will get the credit profile for a customer -->
+    <flow name="ACreditAgency">
+        <inbound-endpoint ref="CreditAgency" />
+        <component class="org.mule.example.loanbroker.credit.DefaultCreditAgency" />
+        <outbound-endpoint ref="CreditProfiles" />
+    </flow>
 
-
-        <!-- ***************************************************
-            Services
-            *************************************************** -->
-        <!-- The credit agency service will get the credit profile for a customer -->
-        <service name="ACreditAgency">
-            <inbound>
-                <inbound-endpoint ref="CreditAgency" />
-            </inbound>
-            <component class="org.mule.example.loanbroker.credit.DefaultCreditAgency" />
-            <outbound>
-                <pass-through-router>
-                    <outbound-endpoint ref="CreditProfiles" />
-                </pass-through-router>
-            </outbound>
-        </service>
-
-        <!-- These are mock bank services that represent remote bank loan services -->
-        <service name="ABigBank">
-            <inbound>
-                <inbound-endpoint ref="BigBank" />
-            </inbound>
-            <component class="org.mule.example.loanbroker.bank.Bank" />
-        </service>
-        <service name="AMediumBank">
-            <inbound>
-                <inbound-endpoint ref="MediumBank" />
-            </inbound>
-            <component class="org.mule.example.loanbroker.bank.Bank" />
-        </service>
-        <service name="ASmallBank">
-            <inbound>
-                <inbound-endpoint ref="SmallBank" />
-            </inbound>
-            <component class="org.mule.example.loanbroker.bank.Bank" />
-        </service>
-    </model>
+    <!-- These are mock bank services that represent remote bank loan services -->
+    <flow name="ABigBank">
+        <inbound-endpoint ref="BigBank" />
+        <component class="org.mule.example.loanbroker.bank.Bank" />
+    </flow>
+    <flow name="AMediumBank">
+        <inbound-endpoint ref="MediumBank" />
+        <component class="org.mule.example.loanbroker.bank.Bank" />
+    </flow>
+    <flow name="ASmallBank">
+        <inbound-endpoint ref="SmallBank" />
+        <component class="org.mule.example.loanbroker.bank.Bank" />
+    </flow>
     
     <http:endpoint name="HttpUrlCustomerRequests" address="http://0.0.0.0:12081"
                    exchange-pattern="request-response">
@@ -130,5 +105,4 @@
             </expression-transformer>
         </response>
     </http:endpoint>
-
 </mule>
