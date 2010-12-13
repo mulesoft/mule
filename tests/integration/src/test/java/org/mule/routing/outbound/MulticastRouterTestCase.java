@@ -19,9 +19,13 @@ import org.mule.util.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MulticastRouterTestCase extends FunctionalTestCase
 {
+    private static AtomicInteger errorCounter = new AtomicInteger(0);
+    
+    
     @Override
     protected String getConfigResources()
     {
@@ -51,12 +55,16 @@ public class MulticastRouterTestCase extends FunctionalTestCase
         Object payload = response.getPayload();
         assertNotNull(payload);
         assertEquals("Hello, world", response.getPayload());
+        assertEquals(errorCounter.get(), 2);
+        MuleMessage error = client.request("vm://errors2", 2000);
+        assertNull(error);
     }
 
     public static class Fail implements Callable
     {
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
+            errorCounter.incrementAndGet();
             eventContext.getMessage().setPayload("Exception was thrown");
             throw new Exception();
         }
