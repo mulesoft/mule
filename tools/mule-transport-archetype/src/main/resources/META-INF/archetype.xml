@@ -75,8 +75,8 @@ transformer? (i.e. ObjectToJmsMessage)
                 <variable>
                     <name>hasCustomMessageFactory</name>
                     <description>Does the transport need a custom MuleMessageFactory? [y] or [n]
-(This is usually only required if the underlying transport has an API that has a message object
-i.e. JMSMessage or HttpServletRequest)</description>
+(This is usually only required if the underlying transport has an API that has a
+message object i.e. JMSMessage or HttpServletRequest)</description>
                     <defvalue>n</defvalue>
                 </variable>
 
