@@ -6,7 +6,8 @@ the objects managed by Mule and how to publish events to multiple outbound
 endpoints.  The example consists of two components: ExceptionManager and
 BusinessErrorManager.
 
-For more information, refer to http://www.mulesoft.org/documentation/display/MULE3INTRO/Error+Handler+Example
+For more information, refer to 
+http://www.mulesoft.org/documentation/display/MULE3INTRO/Error+Handler+Example
 
 +---------------------+
 | Running the example |
@@ -17,13 +18,14 @@ In one window, Simply copy the pre-built application archive
 (mule-example-errorhandler.zip) to the application folder ($MULE_HOME/apps)
 and start Mule.
 
-If you want to receive emails when certain exceptions occur, update the $MULE_HOME/apps/mule-example-errorhandler/classes/email.properties file with your
-mail server credentials.  Then touch the $MULE_HOME/apps/mule-example-errorhandler/mule-config.xml
-to reload the app.
+If you want to receive emails when certain exceptions occur, update the 
+$MULE_HOME/apps/mule-example-errorhandler/classes/email.properties file with 
+your mail server credentials.  Then touch the 
+$MULE_HOME/apps/mule-example-errorhandler/mule-config.xml to reload the app.
 
 In the second window, copy the files (one by one so you can see the results)
-from the $MULE_HOME/apps/mule-example-errorhandler/test-data/out directory to the
-$MULE_HOME/apps/mule-example-errorhandler/test-data/in directory.
+from the $MULE_HOME/apps/mule-example-errorhandler/test-data/out directory to 
+the $MULE_HOME/apps/mule-example-errorhandler/test-data/in directory.
 
 +----------------------+
 | Building the example |

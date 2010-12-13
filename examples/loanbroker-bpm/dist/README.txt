@@ -1,6 +1,15 @@
-+----------------------------+
++-------------------------+
 | Loan Broker BPM Example |
-+----------------------------+
++-------------------------+
+The BPM example uses a business process engine to orchestrate a loan broker 
+application.
+
+For more information, refer to 
+http://www.mulesoft.org/documentation/display/MULE3INTRO/Loan+Broker+BPM+Example
+
++---------------------+
+| Running the example |
++---------------------+
 Copy the pre-built application archive (mule-example-loanbroker-bpm.zip) to the 
 application folder ($MULE_HOME/apps) and start Mule. When Mule is running go to 
 your browser to send a loan request (there are some default request values 

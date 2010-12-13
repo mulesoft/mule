@@ -4,17 +4,17 @@
 This example demonstrates capturing and firing notifications and uses AJAX to
 send notifications to the browser.
 
-For more information, refer to http://www.mulesoft.org/documentation/display/MULE3INTRO/Notifications+Example
+For more information, refer to 
+http://www.mulesoft.org/documentation/display/MULE3INTRO/Notifications+Example
 
 +---------------------+
 | Running the example |
 +---------------------+
 Simply copy the pre-built application archive (mule-example-notifications.zip)
-to the application folder ($MULE_HOME/apps) and start Mule. Open the URL
+to the application folder ($MULE_HOME/apps) and start Mule. Open the following
+URI in your browser:
 
     http://localhost:8082/services/notifications/index.html
-
-from your browser.
 
 +----------------------+
 | Building the example |

@@ -5,20 +5,19 @@ This example demonstrates how to invoke an ASPX web service from Mule and
 transform the result using XSLT and deserialise the result to a StockQuote
 JavaBean. The example demonstrates using REST and SOAP to invoke the service.
 
-For more information, refer http://www.mulesoft.org/documentation/display/MULE3INTRO/Stock+Quote+Example
+For more information, refer 
+http://www.mulesoft.org/documentation/display/MULE3INTRO/Stock+Quote+Example
 
 +---------------------+
 | Running the example |
 +---------------------+
 Simply copy the pre-built application archive to the application folder
 ($MULE_HOME/apps) and start Mule. To access the web service
-invoke one of the following:
+invoke one of the following URIs from your browser:
 
     http://localhost:48309/stockquote?symbol=CSCO&method=REST
     http://localhost:48309/stockquote?symbol=CSCO&method=SOAP
     http://localhost:48309/stockquote?symbol=CSCO&method=WSDL
-
-from your browser.
 
 +-------------------+
 | Firewall settings |
@@ -35,4 +34,5 @@ example and activate the config changes.
 +----------------------+
 Depending on the build tool you are using (Ant or Maven), you can build the
 example by simply running "ant" or "mvn".  This will compile the example
-classes, produce an application zip file, and copy everything to $MULE_HOME/apps.
+classes, produce an application zip file, and copy everything to 
+$MULE_HOME/apps.
