@@ -14,13 +14,13 @@ import org.mule.api.config.MuleProperties;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class MuleApplicationClassLoader extends GoodCitizenClassLoader
 {

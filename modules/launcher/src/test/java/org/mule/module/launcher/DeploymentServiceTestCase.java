@@ -24,9 +24,6 @@ import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.Latch;
 
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -36,6 +33,9 @@ import java.util.List;
 import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+
 import static org.junit.Assert.assertArrayEquals;
 
 /**
