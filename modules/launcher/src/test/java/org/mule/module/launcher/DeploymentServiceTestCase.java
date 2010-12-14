@@ -24,6 +24,9 @@ import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.Latch;
 
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -32,9 +35,6 @@ import java.util.Collection;
 import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-
 import static org.junit.Assert.assertArrayEquals;
 
 /**
@@ -168,13 +168,16 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
         assertAppsDir(NONE, new String[] {"dummy-app"});
+        assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+
         // set up a new deployment latch (can't reuse the old one)
         deployLatch = new Latch();
         addAppArchive(url);
         assertTrue("Undeploy never invoked", undeployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
         assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertAppsDir(NONE, new String[] {"dummy-app"});
-    }
+        assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+        assertAppsDir(NONE, new String[]{"dummy-app"});
+ }
 
     /**
      * Find a deployed app, performing some basic assertions.
