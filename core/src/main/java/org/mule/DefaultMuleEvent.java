@@ -39,9 +39,6 @@ import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -52,6 +49,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>DefaultMuleEvent</code> represents any data event occurring in the Mule
@@ -131,7 +131,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.timeout = previousEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
         this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
-        fillProperties(previousEvent);
+        fillProperties();
     }
 
     public DefaultMuleEvent(MuleMessage message,
@@ -147,7 +147,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.timeout = previousEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
         this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
-        fillProperties(previousEvent);
+        fillProperties();
     }
 
     public DefaultMuleEvent(MuleMessage message,
@@ -185,10 +185,10 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.session = session;
         this.id = generateEventId();
         this.outputStream = outputStream;
-        fillProperties(null);
+        fillProperties();
         this.processingTime = time != null ? time : ProcessingTime.newInstance(this.session, message.getMuleContext());
     }
-    
+
     /**
      * A helper constructor used to rewrite an event payload
      *
@@ -214,14 +214,14 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         {
             this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
         }
-        fillProperties(rewriteEvent);
+        fillProperties();
     }
 
-    protected void fillProperties(MuleEvent previousEvent)
+    protected void fillProperties()
     {
         if (endpoint != null && endpoint.getProperties() != null)
         {
-            for (Iterator iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
+            for (Iterator<?> iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
             {
                 String prop = (String) iterator.next();
                 Object value = endpoint.getProperties().get(prop);
@@ -309,7 +309,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("cast")
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
         return (T) transformMessage(DataTypeFactory.create(outputType));
@@ -539,7 +539,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         out.writeInt(endpoint.hashCode());
         out.writeBoolean(endpoint instanceof InboundEndpoint);
         out.writeObject(endpoint.getEndpointBuilderName());
-        
+
         // make sure to write out the connector's name along with the endpoint URI. Omitting the
         // connector will fail rebuilding the endpoint when this event is read back in and there
         // is more than one connector for the protocol.
