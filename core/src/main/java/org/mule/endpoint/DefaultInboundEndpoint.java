@@ -20,7 +20,6 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointMessageProcessorChainFactory;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.Startable;
@@ -129,7 +128,7 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
         }
         catch (Exception e)
         {
-            throw new LifecycleException(CoreMessages.failedToStartInboundEndpoint(this), e, this);
+            throw new LifecycleException(CoreMessages.failedToStopInboundEndpoint(this), e, this);
         }
     }
 
