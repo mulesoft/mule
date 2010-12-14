@@ -150,7 +150,7 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     {
         return endpoint.getMessageProcessorsFactory();
     }
-    
+
     public List <MessageProcessor> getMessageProcessors()
     {
         return endpoint.getMessageProcessors();
@@ -185,7 +185,7 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     {
         return endpoint.isReadOnly();
     }
-    
+
     public MessageExchangePattern getExchangePattern()
     {
         return endpoint.getExchangePattern();
@@ -205,7 +205,7 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     {
         return endpoint.isDisableTransportTransformer();
     }
-    
+
     @Override
     public int hashCode()
     {
@@ -261,7 +261,7 @@ public class DynamicURIOutboundEndpoint implements OutboundEndpoint
     {
         return getConnector().supportsProtocol(protocol);
     }
-    
+
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         return endpoint.process(event);

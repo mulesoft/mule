@@ -28,16 +28,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This is a base implementation of the {@link org.mule.api.lifecycle.LifecycleManager} interface and provides
- * almost all the plumbing required to write a {@link org.mule.api.lifecycle.LifecycleManager} implementation.  This
- * class handles the tracking ofg the phases, transition validation and checking state.
+ * This is a base implementation of the {@link org.mule.api.lifecycle.LifecycleManager} interface
+ * and provides almost all the plumbing required to write a {@link org.mule.api.lifecycle.LifecycleManager}
+ * implementation. This class handles the tracking ofg the phases, transition validation and
+ * checking state.
  *
  * @param <O> The object type being managed by this {@link org.mule.api.lifecycle.LifecycleManager}
  * @since 3.0
  */
 public abstract class AbstractLifecycleManager<O> implements LifecycleManager
 {
-
     /**
      * logger used by this class
      */
@@ -53,7 +53,6 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
     protected LifecycleState state;
 
     private TreeMap<String, LifecycleCallback> callbacks = new TreeMap<String, LifecycleCallback>();
-
 
     public AbstractLifecycleManager(String id, O object)
     {
@@ -203,9 +202,9 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
      * state from the 'completedPhases' collection once a transition occurs. This is only necessary for a Lifecycle
      * Manager that introduces a new phase pair.
      *
-     * @param currentPhase the currently completed phase
+     * @param phase the currently completed phase
      */
-    protected void notifyTransition(String currentPhase)
+    protected void notifyTransition(String phase)
     {
         //do nothing
     }
@@ -227,6 +226,4 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
     {
         return state;
     }
-
-
 }
