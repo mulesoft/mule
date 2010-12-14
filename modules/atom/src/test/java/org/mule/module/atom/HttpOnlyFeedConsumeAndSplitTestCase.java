@@ -15,6 +15,8 @@ import org.mule.tck.functional.FunctionalTestComponent;
 
 public class HttpOnlyFeedConsumeAndSplitTestCase extends FunctionalTestCase
 {
+    private static final long SLEEP_TIME = 10000;
+
     private final CounterCallback counter = new CounterCallback();
 
     @Override
@@ -30,14 +32,17 @@ public class HttpOnlyFeedConsumeAndSplitTestCase extends FunctionalTestCase
         comp.setEventCallback(counter);
     }
 
-    public void testConsume() throws Exception {
+    public void testConsume() throws Exception
+    {
+        // wait until the polling kicks in
+        Thread.sleep(SLEEP_TIME);
 
-        Thread.sleep(4000);
         int count = counter.getCallbackCount();
-        assertTrue(count > 0);
-        Thread.sleep(3000);
+        assertTrue("did not receive any artices from feed", count > 0);
+
+        // wait a bit more for the connector to poll again
+        Thread.sleep(SLEEP_TIME);
         //We should only receive entries once
         assertEquals(count, counter.getCallbackCount());
-
     }
 }
