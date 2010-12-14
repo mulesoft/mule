@@ -8,9 +8,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.transport.${ModuleNameLower};
+package org.mule.transport.${ModuleNameLower}.config;
 
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.${ModuleNameLower}.${ModuleName}Connector;
 
 /**
  * TODO
