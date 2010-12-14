@@ -223,6 +223,29 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    <xsd:element name="filter" type="scriptFilterType" substitutionGroup="mule:abstract-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                Runs a script to perform filter on the current message. 
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="scriptFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractFilterType">
+                <xsd:sequence>
+                    <xsd:element name="script" type="scriptType">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                A script to be executed by a JSR-223 compliant script engine such as Groovy, JavaScript(Rhino), Python, Ruby, or Beanshell.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="groovy-refreshable" type="groovyRefreshableType" substitutionGroup="mule:abstract-extension">
         <xsd:annotation>
