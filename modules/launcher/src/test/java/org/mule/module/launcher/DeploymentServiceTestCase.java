@@ -94,7 +94,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
 
-        assertAppsDir(NONE, new String[] {"priviledged-dummy-app"});
+        assertAppsDir(NONE, new String[] {"priviledged-dummy-app"}, true);
 
         final Application app = findApp("priviledged-dummy-app", 1);
         // now that we're sure it's the app we wanted, assert the registry has everything
@@ -119,7 +119,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         // a basic latch isn't ideal here, as there are 2 apps to deploy
         assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
 
-        assertAppsDir(NONE, new String[] {"dummy-app", "priviledged-dummy-app"});
+        assertAppsDir(NONE, new String[] {"dummy-app", "priviledged-dummy-app"}, true);
 
         final Application privApp = findApp("priviledged-dummy-app", 2);
         final Application dummyApp = findApp("dummy-app", 2);
@@ -149,7 +149,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
 
-        assertAppsDir(NONE, new String[] {"dummy-app"});
+        assertAppsDir(NONE, new String[] {"dummy-app"}, true);
 
         // just assert no priviledged entries were put in the registry
         final Application app = findApp("dummy-app", 1);
@@ -167,7 +167,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         deploymentService.start();
 
         assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertAppsDir(NONE, new String[] {"dummy-app"});
+        assertAppsDir(NONE, new String[] {"dummy-app"}, true);
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
         // set up a new deployment latch (can't reuse the old one)
@@ -176,8 +176,22 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertTrue("Undeploy never invoked", undeployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
         assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
-        assertAppsDir(NONE, new String[]{"dummy-app"});
- }
+        assertAppsDir(NONE, new String[]{"dummy-app"}, true);
+    }
+
+    public void testBrokenApp() throws Exception
+    {
+        final URL url = getClass().getResource("/broken-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        deploymentService.start();
+
+        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        // don't assert dir state, we want to check internal deployer state next
+        assertAppsDir(NONE, new String[] {"dummy-app"}, false);
+        assertEquals("No apps should have been registered with Mule.", 0, deploymentService.getApplications().size());
+    }
 
     /**
      * Find a deployed app, performing some basic assertions.
@@ -193,13 +207,17 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         return app;
     }
 
-    private void assertAppsDir(String[] expectedZips, String[] expectedApps)
+    private void assertAppsDir(String[] expectedZips, String[] expectedApps, boolean performValidation)
     {
         final String[] actualZips = appsDir.list(new SuffixFileFilter(".zip"));
-        assertArrayEquals("Invalid Mule application archives set", expectedZips, actualZips);
+        if (performValidation) {
+            assertArrayEquals("Invalid Mule application archives set", expectedZips, actualZips);
+        }
         final String[] actualApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-        assertTrue("Invalid Mule exploded applications set",
-                   CollectionUtils.isEqualCollection(Arrays.asList(expectedApps), Arrays.asList(actualApps)));
+        if (performValidation) {
+            assertTrue("Invalid Mule exploded applications set",
+                       CollectionUtils.isEqualCollection(Arrays.asList(expectedApps), Arrays.asList(actualApps)));
+        }
     }
 
     /**
