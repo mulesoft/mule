@@ -18,11 +18,14 @@ import java.lang.reflect.Method;
  */
 public class InvocationResult
 {
-    public static enum State {
+    public static enum State
+    {
         /** the resolver performing the invocation knows that it cannot attempt to make the invocation */
         NOT_SUPPORTED,
+
         /** the invocation was successful */
         SUCCESSFUL,
+
         /** The invocation was attempted but failed */
         FAILED
     }
