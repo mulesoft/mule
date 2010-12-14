@@ -154,7 +154,14 @@ public class DefaultMuleDeployer implements MuleDeployer
         // TODO plug in app-bloodhound/validator here?
         if (!url.toString().endsWith(".zip"))
         {
-            throw new IllegalArgumentException("Only Mule application zips are supported: " + url);
+            throw new IllegalArgumentException("Invalid Mule application archive: " + url);
+        }
+
+        final String baseName = FilenameUtils.getBaseName(url.toString());
+        if (baseName.contains("%20"))
+        {
+            throw new DeploymentInitException(
+                    MessageFactory.createStaticMessage("Mule application name may not contain spaces: " + baseName));
         }
 
         final ReentrantLock lock = deploymentService.getLock();

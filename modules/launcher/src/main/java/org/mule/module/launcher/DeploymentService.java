@@ -31,6 +31,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -59,6 +60,7 @@ public class DeploymentService
     private ReentrantLock lock = new DebuggableReentrantLock(true);
 
     private ObservableList<Application> applications = new ObservableList<Application>();
+    private Map<URL, Long> zombieMap = new HashMap<URL, Long>();
     private ObservableList<URL> zombieLand = new ObservableList<URL>();
 
     public DeploymentService()
@@ -99,12 +101,24 @@ public class DeploymentService
                 {
                     // we don't care about the returned app object on startup
                     deployer.installFromAppDir(zip);
-        }
-        catch (IOException e)
-        {
-            logger.error(String.format("Failed to install app from archive '%s'", zip), e);
-        }
-    }
+                }
+                catch (Throwable t)
+                {
+                    logger.error(String.format("Failed to install app from archive '%s'", zip), t);
+                    File appFile = new File(appsDir, zip);
+                    try
+                    {
+                        addZombie(appFile.toURL());
+                    }
+                    catch (MalformedURLException muex)
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug(muex);
+                        }
+                    }
+                }
+            }
 
             // TODO this is a place to put a FQN of the custom sorter (use AND filter)
             // Add string shortcuts for bundled ones
@@ -212,11 +226,11 @@ public class DeploymentService
     }
 
     /**
-     * @return immutable list of URLs which previously failed to deploy
+     * @return URL/lastModified of apps which previously failed to deploy
      */
-    public List<URL> getZombieURLs()
+    public Map<URL, Long> getZombieMap()
     {
-        return Collections.unmodifiableList(zombieLand);
+        return zombieMap;
     }
 
 
@@ -288,10 +302,19 @@ public class DeploymentService
     protected void addZombie(URL appArchiveUrl)
     {
         // no sync required as deploy operations are single-threaded
-        if (appArchiveUrl != null && !zombieLand.contains(appArchiveUrl))
+        if (appArchiveUrl == null)
         {
-            zombieLand.add(appArchiveUrl);
+            return;
         }
+
+        long lastModified = -1;
+        // get timestamp only from file:// urls
+        if ("file".equals(appArchiveUrl.getProtocol()))
+        {
+            lastModified = new File(appArchiveUrl.getFile()).lastModified();
+        }
+
+        zombieMap.put(appArchiveUrl, lastModified);
     }
 
     /**

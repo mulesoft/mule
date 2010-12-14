@@ -33,6 +33,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertArrayEquals;
@@ -190,14 +191,45 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         deploymentService.start();
 
         assertTrue("Install never invoked", installLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+
+        // let the file system's write-behind cache commit the delete operation?
+        Thread.sleep(1000);
+
         // zip stays intact, no app dir created
         assertAppsDir(new String[] {"broken-app.zip"}, NONE, true);
         // don't assert dir contents, we want to check internal deployer state next
         assertAppsDir(NONE, new String[] {"dummy-app"}, false);
         assertEquals("No apps should have been registered with Mule.", 0, deploymentService.getApplications().size());
-        final List<URL> zombieURLs = deploymentService.getZombieURLs();
-        assertEquals("Wrong number of zombie apps registered.", 1, zombieURLs.size());
-        assertEquals("Wrong URL tagged as zombie.", "broken-app.zip", new File(zombieURLs.get(0).getFile()).getName());
+        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
+        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "broken-app.zip", new File(zombie.getKey().getFile()).getName());
+        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    }
+
+    public void testBrokenAppName() throws Exception
+    {
+        final URL url = getClass().getResource("/app with spaces.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        try
+        {
+            deploymentService.start();
+        }
+        catch (DeploymentInitException e)
+        {
+            assertTrue(e.getMessage().contains("may not contain spaces"));
+        }
+
+        // zip stays intact, no app dir created
+        // %20 is returned by java file api :/
+        assertAppsDir(new String[] {"app%20with%20spaces.zip"}, NONE, true);
+        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
+        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "app%20with%20spaces.zip", new File(zombie.getKey().getFile()).getName());
+        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
     }
 
     /**
