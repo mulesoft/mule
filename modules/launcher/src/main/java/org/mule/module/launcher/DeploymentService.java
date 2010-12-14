@@ -11,6 +11,7 @@
 package org.mule.module.launcher;
 
 import org.mule.config.StartupContext;
+import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationFactory;
 import org.mule.module.launcher.util.DebuggableReentrantLock;
@@ -25,6 +26,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,8 +58,8 @@ public class DeploymentService
     // fair lock
     private ReentrantLock lock = new DebuggableReentrantLock(true);
 
-    // @GuardedBy #lock
     private ObservableList<Application> applications = new ObservableList<Application>();
+    private ObservableList<URL> zombieLand = new ObservableList<URL>();
 
     public DeploymentService()
     {
@@ -97,13 +99,12 @@ public class DeploymentService
                 {
                     // we don't care about the returned app object on startup
                     deployer.installFromAppDir(zip);
-                }
-                catch (IOException e)
-                {
-                    // TODO logging
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-            }
+        }
+        catch (IOException e)
+        {
+            logger.error(String.format("Failed to install app from archive '%s'", zip), e);
+        }
+    }
 
             // TODO this is a place to put a FQN of the custom sorter (use AND filter)
             // Add string shortcuts for bundled ones
@@ -210,6 +211,16 @@ public class DeploymentService
         return Collections.unmodifiableList(applications);
     }
 
+    /**
+     * @return immutable list of URLs which previously failed to deploy
+     */
+    public List<URL> getZombieURLs()
+    {
+        return Collections.unmodifiableList(zombieLand);
+    }
+
+
+
     protected MuleDeployer getDeployer()
     {
         return deployer;
@@ -253,9 +264,34 @@ public class DeploymentService
 
     public void deploy(URL appArchiveUrl) throws IOException
     {
-        final Application application = deployer.installFrom(appArchiveUrl);
-        applications.add(application);
-        deployer.deploy(application);
+        final Application application;
+        try
+        {
+            application = deployer.installFrom(appArchiveUrl);
+            applications.add(application);
+            deployer.deploy(application);
+        }
+        catch (Throwable t)
+        {
+            addZombie(appArchiveUrl);
+            if (t instanceof DeploymentException)
+            {
+                // re-throw
+                throw ((DeploymentException) t);
+            }
+
+            final String msg = "Failed to deploy from URL: " + appArchiveUrl;
+            throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
+        }
+    }
+
+    protected void addZombie(URL appArchiveUrl)
+    {
+        // no sync required as deploy operations are single-threaded
+        if (appArchiveUrl != null && !zombieLand.contains(appArchiveUrl))
+        {
+            zombieLand.add(appArchiveUrl);
+        }
     }
 
     /**
@@ -368,6 +404,7 @@ public class DeploymentService
                 // new packed Mule apps
                 for (String zip : zips)
                 {
+                    URL url = null;
                     try
                     {
                         // check if this app is running first, undeploy it then
@@ -377,11 +414,13 @@ public class DeploymentService
                         {
                             undeploy(appName);
                         }
-                        deploy(new File(appsDir, zip).toURI().toURL());
+                        url = new File(appsDir, zip).toURI().toURL();
+                        deploy(url);
                     }
                     catch (Throwable t)
                     {
                         logger.error("Failed to deploy application archive: " + zip, t);
+                        addZombie(url);
                     }
                 }
 
@@ -405,6 +444,17 @@ public class DeploymentService
                     catch (Throwable t)
                     {
                         logger.error("Failed to deploy exploded application: " + addedApp, t);
+                        try
+                        {
+                            addZombie(new File(appsDir, addedApp).toURI().toURL());
+                        }
+                        catch (MalformedURLException e)
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug(e);
+                            }
+                        }
                     }
                 }
 

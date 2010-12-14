@@ -51,6 +51,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     protected DeploymentService deploymentService;
     // these latches are re-created during the test, thus need to be declared volatile
     protected volatile Latch deployLatch;
+    protected volatile Latch installLatch;
     protected volatile Latch undeployLatch;
 
     @Override
@@ -68,6 +69,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         deploymentService = new DeploymentService();
         deploymentService.setDeployer(new TestDeployer());
+        installLatch = new Latch();
         deployLatch = new Latch();
         undeployLatch = new Latch();
     }
@@ -179,7 +181,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertAppsDir(NONE, new String[]{"dummy-app"}, true);
     }
 
-    public void testBrokenApp() throws Exception
+    public void testBrokenAppArchive() throws Exception
     {
         final URL url = getClass().getResource("/broken-app.zip");
         assertNotNull("Test app file not found " + url, url);
@@ -187,10 +189,15 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         deploymentService.start();
 
-        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
-        // don't assert dir state, we want to check internal deployer state next
+        assertTrue("Install never invoked", installLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        // zip stays intact, no app dir created
+        assertAppsDir(new String[] {"broken-app.zip"}, NONE, true);
+        // don't assert dir contents, we want to check internal deployer state next
         assertAppsDir(NONE, new String[] {"dummy-app"}, false);
         assertEquals("No apps should have been registered with Mule.", 0, deploymentService.getApplications().size());
+        final List<URL> zombieURLs = deploymentService.getZombieURLs();
+        assertEquals("Wrong number of zombie apps registered.", 1, zombieURLs.size());
+        assertEquals("Wrong URL tagged as zombie.", "broken-app.zip", new File(zombieURLs.get(0).getFile()).getName());
     }
 
     /**
@@ -253,12 +260,14 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         public Application installFromAppDir(String packedMuleAppFileName) throws IOException
         {
+            installLatch.release();
             System.out.println("DeploymentServiceTestCase$TestDeployer.installFromAppDir");
             return delegate.installFromAppDir(packedMuleAppFileName);
         }
 
         public Application installFrom(URL url) throws IOException
         {
+            installLatch.release();
             System.out.println("DeploymentServiceTestCase$TestDeployer.installFrom");
             return delegate.installFrom(url);
         }

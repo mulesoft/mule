@@ -10,6 +10,7 @@
 
 package org.mule.module.launcher;
 
+import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
@@ -58,8 +59,14 @@ public class DefaultMuleDeployer implements MuleDeployer
         }
         catch (Throwable t)
         {
-            // TODO logging
-            t.printStackTrace();
+            if (t instanceof DeploymentException)
+            {
+                // re-throw as is
+                throw ((DeploymentException) t);
+            }
+
+            final String msg = String.format("Failed to deploy application [%s]", app.getAppName());
+            throw new DeploymentException(MessageFactory.createStaticMessage(msg), t);
         }
         finally
         {
@@ -153,6 +160,8 @@ public class DefaultMuleDeployer implements MuleDeployer
         final ReentrantLock lock = deploymentService.getLock();
 
         String appName;
+        File appDir = null;
+        boolean errorEncountered = false;
         try
         {
             if (!lock.tryLock(0, TimeUnit.SECONDS))
@@ -170,7 +179,7 @@ public class DefaultMuleDeployer implements MuleDeployer
             }
 
             appName = FilenameUtils.getBaseName(fullPath);
-            File appDir = new File(appsDir, appName);
+            appDir = new File(appsDir, appName);
             // normalize the full path + protocol to make unzip happy
             final File source = new File(url.toURI());
             
@@ -182,17 +191,42 @@ public class DefaultMuleDeployer implements MuleDeployer
         }
         catch (URISyntaxException e)
         {
+            errorEncountered = true;
             final IOException ex = new IOException(e.getMessage());
             ex.fillInStackTrace();
             throw ex;
         }
         catch (InterruptedException e)
         {
+            errorEncountered = true;
             Thread.currentThread().interrupt();
             throw new IOException("Install operation has been interrupted");
         }
-        finally
+        catch (IOException e)
         {
+            errorEncountered = true;
+            // re-throw
+            throw e;
+        }
+        catch (Throwable t)
+        {
+            errorEncountered = true;
+            final String msg = "Failed to install app from URL: " + url;
+            throw new DeploymentInitException(MessageFactory.createStaticMessage(msg), t);
+        }
+        finally {
+            // delete an app dir, as it's broken
+            if (errorEncountered && appDir != null && appDir.exists())
+            {
+                final boolean couldNotDelete = FileUtils.deleteTree(appDir);
+                /*
+                if (couldNotDelete)
+                {
+                    final String msg = String.format("Couldn't delete app directory '%s' after it failed to install", appDir);
+                    logger.error(msg);
+                }
+                */
+            }
             if (lock.isHeldByCurrentThread())
             {
                 lock.unlock();
