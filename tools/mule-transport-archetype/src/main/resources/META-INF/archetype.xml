@@ -97,11 +97,12 @@ message object i.e. JMSMessage or HttpServletRequest)</description>
                 <variable>
                     <name>transports</name>
                     <description>
-Which Mule transports do you want to include in this project? If you intend extending a transport you should add it here:
+Which Mule transports do you want to include in this project? If you intend
+extending a transport you should add it here:
 
 (options: ajax, ejb, file, ftp, http, https, imap, imaps, jbpm, jdbc,
-          jetty, jetty-ssl, jms, jnp, multicast, pop3, pop3s, quartz, rmi, servlet,
-          smtp, smtps, ssl, tls, stdio, tcp, udp, vm, xmpp):
+          jetty, jetty-ssl, jms, jnp, multicast, pop3, pop3s, quartz, rmi,
+          servlet, smtp, smtps, ssl, tls, stdio, tcp, udp, vm, xmpp):
 
                     </description>
                     <defvalue>vm</defvalue>
@@ -109,7 +110,8 @@ Which Mule transports do you want to include in this project? If you intend exte
                 <variable>
                     <name>modules</name>
                     <description>
-Which Mule modules do you want to include in this project? The client is added for testing:
+Which Mule modules do you want to include in this project? The client is added
+for testing:
 
 (options: acegi, annotations, atom, boot, builders, client, cxf, guice, ibeans,
           jaas, jbossts, jersey, json, management, ognl, pgp, rss, scripting,
@@ -122,7 +124,8 @@ Which Mule modules do you want to include in this project? The client is added f
         </variable>
         <variable>
             <name>hasRequestor</name>
-            <description>Can the transport request individual messages from the underlying resource? [y] or [n]</description>
+            <description>Can the transport request individual messages from the underlying resource?
+[y] or [n]</description>
             <defvalue>n</defvalue>
         </variable>
 
@@ -147,12 +150,14 @@ Which Mule modules do you want to include in this project? The client is added f
         </variable>
         <variable>
             <name>hasCustomSchema</name>
-            <description>Will this transport have a custom schema for configuring the transport in Xml? [y] or [n]</description>
+            <description>Will this transport have a custom schema for configuring the transport in Xml?
+[y] or [n]</description>
             <defvalue>y</defvalue>
         </variable>
         <variable>
             <name>hasBootstrap</name>
-            <description>Will this module make objects available in the Registry as soon as it's loaded? [y] or [n]</description>
+            <description>Will this module make objects available in the Registry as soon as it's loaded?
+[y] or [n]</description>
             <defvalue>n</defvalue>
         </variable>
     </variables>
@@ -352,9 +357,9 @@ Which Mule modules do you want to include in this project? The client is added f
             <dependsOnVar>hasCustomMessageFactory=y</dependsOnVar>
         </template>
         <template>
-            <file>src/test/java/org/mule/transport/NamespaceHandlerTestCase.vm</file>
+            <file>src/test/java/org/mule/transport/config/NamespaceHandlerTestCase.vm</file>
             <output>
-                src/test/java/org/mule/transport/${ModuleNameLower}/${ModuleName}NamespaceHandlerTestCase.java
+                src/test/java/org/mule/transport/${ModuleNameLower}/config/${ModuleName}NamespaceHandlerTestCase.java
             </output>
             <dependsOnVar>hasCustomSchema=y</dependsOnVar>
         </template>
