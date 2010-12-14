@@ -28,7 +28,13 @@ public class ImapMessageRequesterTestCase extends DynamicPortTestCase
     private static final String USER = "bob";
     
     private GreenMail server;
-    
+
+    public ImapMessageRequesterTestCase()
+    {
+        super();
+        setStartContext(false);
+    }
+
     @Override
     protected void doSetUp() throws Exception
     {
@@ -42,7 +48,6 @@ public class ImapMessageRequesterTestCase extends DynamicPortTestCase
         ServerSetup setup = new ServerSetup(PORT, null, ImapConnector.IMAP);
         server = new GreenMail(setup);
         server.start();
-
         GreenMailUtilities.storeEmail(server.getManagers().getUserManager(), EMAIL, USER, PASSWORD,
             GreenMailUtilities.toMessage(MESSAGE, EMAIL, null));
     }
@@ -62,6 +67,7 @@ public class ImapMessageRequesterTestCase extends DynamicPortTestCase
 
     public void testMessageRequester() throws Exception
     {
+        muleContext.start();
         String imapUri = String.format("imap://%1s:%2s@localhost:%3d/INBOX", USER, PASSWORD, PORT);
         
         MuleClient client = new MuleClient(muleContext);
