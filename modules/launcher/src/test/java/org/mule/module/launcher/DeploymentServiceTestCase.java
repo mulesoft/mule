@@ -30,6 +30,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -51,6 +52,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     protected DeploymentService deploymentService;
     // these latches are re-created during the test, thus need to be declared volatile
     protected volatile Latch deployLatch;
+    protected volatile Latch installLatch;
     protected volatile Latch undeployLatch;
 
     @Override
@@ -68,6 +70,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         deploymentService = new DeploymentService();
         deploymentService.setDeployer(new TestDeployer());
+        installLatch = new Latch();
         deployLatch = new Latch();
         undeployLatch = new Latch();
     }
@@ -94,7 +97,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
 
-        assertAppsDir(NONE, new String[] {"priviledged-dummy-app"});
+        assertAppsDir(NONE, new String[] {"priviledged-dummy-app"}, true);
 
         final Application app = findApp("priviledged-dummy-app", 1);
         // now that we're sure it's the app we wanted, assert the registry has everything
@@ -119,7 +122,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         // a basic latch isn't ideal here, as there are 2 apps to deploy
         assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
 
-        assertAppsDir(NONE, new String[] {"dummy-app", "priviledged-dummy-app"});
+        assertAppsDir(NONE, new String[] {"dummy-app", "priviledged-dummy-app"}, true);
 
         final Application privApp = findApp("priviledged-dummy-app", 2);
         final Application dummyApp = findApp("dummy-app", 2);
@@ -149,7 +152,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
 
-        assertAppsDir(NONE, new String[] {"dummy-app"});
+        assertAppsDir(NONE, new String[] {"dummy-app"}, true);
 
         // just assert no priviledged entries were put in the registry
         final Application app = findApp("dummy-app", 1);
@@ -167,13 +170,66 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         deploymentService.start();
 
         assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertAppsDir(NONE, new String[] {"dummy-app"});
+        assertAppsDir(NONE, new String[] {"dummy-app"}, true);
+        assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+
         // set up a new deployment latch (can't reuse the old one)
         deployLatch = new Latch();
         addAppArchive(url);
         assertTrue("Undeploy never invoked", undeployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
         assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
-        assertAppsDir(NONE, new String[] {"dummy-app"});
+        assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+        assertAppsDir(NONE, new String[]{"dummy-app"}, true);
+    }
+
+    public void testBrokenAppArchive() throws Exception
+    {
+        final URL url = getClass().getResource("/broken-app.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        deploymentService.start();
+
+        assertTrue("Install never invoked", installLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+
+        // let the file system's write-behind cache commit the delete operation?
+        Thread.sleep(1000);
+
+        // zip stays intact, no app dir created
+        assertAppsDir(new String[] {"broken-app.zip"}, NONE, true);
+        // don't assert dir contents, we want to check internal deployer state next
+        assertAppsDir(NONE, new String[] {"dummy-app"}, false);
+        assertEquals("No apps should have been registered with Mule.", 0, deploymentService.getApplications().size());
+        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
+        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "broken-app.zip", new File(zombie.getKey().getFile()).getName());
+        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+    }
+
+    public void testBrokenAppName() throws Exception
+    {
+        final URL url = getClass().getResource("/app with spaces.zip");
+        assertNotNull("Test app file not found " + url, url);
+        addAppArchive(url);
+
+        try
+        {
+            deploymentService.start();
+        }
+        catch (DeploymentInitException e)
+        {
+            assertTrue(e.getMessage().contains("may not contain spaces"));
+        }
+
+        // zip stays intact, no app dir created
+        // %20 is returned by java file api :/
+        assertAppsDir(new String[] {"app%20with%20spaces.zip"}, NONE, true);
+        final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
+        assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
+        final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
+        assertEquals("Wrong URL tagged as zombie.", "app%20with%20spaces.zip", new File(zombie.getKey().getFile()).getName());
+        assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
     }
 
     /**
@@ -190,13 +246,17 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         return app;
     }
 
-    private void assertAppsDir(String[] expectedZips, String[] expectedApps)
+    private void assertAppsDir(String[] expectedZips, String[] expectedApps, boolean performValidation)
     {
         final String[] actualZips = appsDir.list(new SuffixFileFilter(".zip"));
-        assertArrayEquals("Invalid Mule application archives set", expectedZips, actualZips);
+        if (performValidation) {
+            assertArrayEquals("Invalid Mule application archives set", expectedZips, actualZips);
+        }
         final String[] actualApps = appsDir.list(DirectoryFileFilter.DIRECTORY);
-        assertTrue("Invalid Mule exploded applications set",
-                   CollectionUtils.isEqualCollection(Arrays.asList(expectedApps), Arrays.asList(actualApps)));
+        if (performValidation) {
+            assertTrue("Invalid Mule exploded applications set",
+                       CollectionUtils.isEqualCollection(Arrays.asList(expectedApps), Arrays.asList(actualApps)));
+        }
     }
 
     /**
@@ -232,12 +292,14 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         public Application installFromAppDir(String packedMuleAppFileName) throws IOException
         {
+            installLatch.release();
             System.out.println("DeploymentServiceTestCase$TestDeployer.installFromAppDir");
             return delegate.installFromAppDir(packedMuleAppFileName);
         }
 
         public Application installFrom(URL url) throws IOException
         {
+            installLatch.release();
             System.out.println("DeploymentServiceTestCase$TestDeployer.installFrom");
             return delegate.installFrom(url);
         }
