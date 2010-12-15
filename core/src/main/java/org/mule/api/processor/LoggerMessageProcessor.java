@@ -24,15 +24,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Level;
 
 /**
- * MessageProcessor implementation that logs the current element of a value evaluated
- * from it using an expression evaluator. By default the current messages is logged
- * using the {@link Level#DEBUG} level to the
- * 'org.mule.api.processor.LoggerMessageProcessor' category but the level and
+ * MessageProcessor implementation that logs the current element of a value evaluated from it using
+ * an expression evaluator. By default the current messages is logged using the {@link Level#DEBUG}
+ * level to the 'org.mule.api.processor.LoggerMessageProcessor' category. The level and
  * category can both be configured to suit your needs.
  */
 public class LoggerMessageProcessor implements MessageProcessor, Initialisable, MuleContextAware
 {
-
     protected transient Log logger;
 
     protected String message;
@@ -44,6 +42,12 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
 
     public void initialise() throws InitialisationException
     {
+        initLogger();
+        expressionManager = muleContext.getExpressionManager();
+    }
+
+    protected void initLogger()
+    {
         if (category != null)
         {
             logger = LogFactory.getLog(category);
@@ -52,9 +56,6 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
         {
             logger = LogFactory.getLog(LoggerMessageProcessor.class);
         }
-
-        expressionManager = muleContext.getExpressionManager();
-
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException
@@ -134,5 +135,4 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
     {
         this.level = level.toUpperCase();
     }
-
 }
