@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.distributions</groupId>
@@ -31,7 +33,11 @@
                                     <artifactId>mule-core</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
-                                <!-- Transports -->
+                                <artifactItem>
+                                    <groupId>org.mule.transports</groupId>
+                                    <artifactId>mule-transport-ajax</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.transports</groupId>
                                     <artifactId>mule-transport-ejb</artifactId>
@@ -122,10 +128,19 @@
                                     <artifactId>mule-transport-xmpp</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
-                                <!-- Modules -->
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-acegi</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-annotations</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-atom</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
@@ -140,6 +155,11 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-cxf</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-builders</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
@@ -150,17 +170,12 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
-                                    <artifactId>mule-module-cxf</artifactId>
+                                    <artifactId>mule-module-ibeans</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-jaas</artifactId>
-                                    <version>${version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.mule.modules</groupId>
-                                    <artifactId>mule-module-jersey</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
@@ -171,6 +186,11 @@
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-jbpm</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-json</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
@@ -190,6 +210,11 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-rss</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-scripting</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
@@ -205,7 +230,22 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-spring-security</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
                                     <artifactId>mule-module-sxc</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-tomcat</artifactId>
+                                    <version>${version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mule.modules</groupId>
+                                    <artifactId>mule-module-ws</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
@@ -242,7 +282,7 @@
                             <!--
                                 'attached' ensures there's only a single run bound to m2's lifecycle.
                                 The default 'assembly' goal would run every plugin in this pom twice.
-                                -->
+                            -->
                             <goal>attached</goal>
                         </goals>
                         <configuration>
@@ -280,25 +320,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.mule.examples</groupId>
-            <artifactId>mule-examples-all</artifactId>
-            <version>${version}</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-modules-all</artifactId>
-            <version>${version}</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transports-all</artifactId>
-            <version>${version}</version>
-            <type>pom</type>
-        </dependency>
-    </dependencies>
 </project>
