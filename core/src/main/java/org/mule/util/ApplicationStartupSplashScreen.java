@@ -15,10 +15,10 @@ import org.mule.api.agent.Agent;
 import org.mule.config.i18n.CoreMessages;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 public class ApplicationStartupSplashScreen extends SplashScreen
 {
+    @Override
     protected void doHeader(MuleContext context)
     {
         header.add("Application: " + context.getConfiguration().getId());
@@ -27,7 +27,8 @@ public class ApplicationStartupSplashScreen extends SplashScreen
                                  context.getConfiguration().getDefaultEncoding()));
         header.add(" ");
     }
-   
+
+    @Override
     protected void doFooter(MuleContext context)
     {
         // Mule Agents
@@ -36,7 +37,7 @@ public class ApplicationStartupSplashScreen extends SplashScreen
             footer.add(" ");
         }
         //List agents
-        Collection agents = context.getRegistry().lookupObjects(Agent.class);
+        Collection<Agent> agents = context.getRegistry().lookupObjects(Agent.class);
         if (agents.size() == 0)
         {
             footer.add(CoreMessages.agentsRunning().getMessage() + " "
@@ -45,12 +46,10 @@ public class ApplicationStartupSplashScreen extends SplashScreen
         else
         {
             footer.add(CoreMessages.agentsRunning().getMessage());
-            Agent agent;
-            for (Iterator iterator = agents.iterator(); iterator.hasNext();)
+            for (Agent agent : agents)
             {
-                agent = (Agent) iterator.next();
                 footer.add("  " + agent.getDescription());
             }
         }
-    }    
+    }
 }

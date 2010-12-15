@@ -20,8 +20,7 @@ import org.mule.util.StringUtils;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 public class MuleContainerStartupSplashScreen extends SplashScreen
@@ -32,7 +31,7 @@ public class MuleContainerStartupSplashScreen extends SplashScreen
 
         // Mule Version, Timestamp, and Server ID
         Manifest mf = MuleManifest.getManifest();
-        Map att = mf.getMainAttributes();
+        Attributes att = mf.getMainAttributes();
         if (att.values().size() > 0)
         {
             doBody(StringUtils.defaultString(MuleManifest.getProductDescription(), notset));
@@ -74,6 +73,7 @@ public class MuleContainerStartupSplashScreen extends SplashScreen
         }
     }
 
+    @Override
     protected void doFooter(MuleContext context)
     {
         // Mule Agents
@@ -82,7 +82,7 @@ public class MuleContainerStartupSplashScreen extends SplashScreen
             footer.add(" ");
         }
         //List agents
-        Collection agents = context.getRegistry().lookupObjects(Agent.class);
+        Collection<Agent> agents = context.getRegistry().lookupObjects(Agent.class);
         if (agents.size() == 0)
         {
             footer.add(CoreMessages.agentsRunning().getMessage() + " "
@@ -91,12 +91,10 @@ public class MuleContainerStartupSplashScreen extends SplashScreen
         else
         {
             footer.add(CoreMessages.agentsRunning().getMessage());
-            Agent agent;
-            for (Iterator iterator = agents.iterator(); iterator.hasNext();)
+            for (Agent agent : agents)
             {
-                agent = (Agent) iterator.next();
                 footer.add("  " + agent.getDescription());
             }
         }
-    }    
+    }
 }

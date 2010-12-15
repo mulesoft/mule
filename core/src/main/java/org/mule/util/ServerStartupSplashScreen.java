@@ -19,19 +19,19 @@ import org.mule.config.i18n.CoreMessages;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 public class ServerStartupSplashScreen extends SplashScreen
 {
+    @Override
     protected void doHeader(MuleContext context)
     {
         String notset = CoreMessages.notSet().getMessage();
 
         // Mule Version, Timestamp, and Server ID
         Manifest mf = MuleManifest.getManifest();
-        Map att = mf.getMainAttributes();
+        Attributes att = mf.getMainAttributes();
         if (att.values().size() > 0)
         {
             header.add(StringUtils.defaultString(MuleManifest.getProductDescription(), notset));
@@ -53,7 +53,7 @@ public class ServerStartupSplashScreen extends SplashScreen
         header.add("Server ID: " + context.getConfiguration().getId());
 
         // JDK, Encoding, OS, and Host
-        header.add("JDK: " + System.getProperty("java.version") + " (" 
+        header.add("JDK: " + System.getProperty("java.version") + " ("
             + System.getProperty("java.vm.info") + ")");
         header.add("OS encoding: " + System.getProperty("file.encoding")
                 + ", Mule encoding: " + context.getConfiguration().getDefaultEncoding());
@@ -77,7 +77,8 @@ public class ServerStartupSplashScreen extends SplashScreen
 
         header.add(" ");
     }
-   
+
+    @Override
     protected void doFooter(MuleContext context)
     {
         // Mule Agents
@@ -86,7 +87,7 @@ public class ServerStartupSplashScreen extends SplashScreen
             footer.add(" ");
         }
         //List agents
-        Collection agents = context.getRegistry().lookupObjects(Agent.class);
+        Collection<Agent> agents = context.getRegistry().lookupObjects(Agent.class);
         if (agents.size() == 0)
         {
             footer.add(CoreMessages.agentsRunning().getMessage() + " "
@@ -95,12 +96,10 @@ public class ServerStartupSplashScreen extends SplashScreen
         else
         {
             footer.add(CoreMessages.agentsRunning().getMessage());
-            Agent agent;
-            for (Iterator iterator = agents.iterator(); iterator.hasNext();)
+            for (Agent agent : agents)
             {
-                agent = (Agent) iterator.next();
                 footer.add("  " + agent.getDescription());
             }
         }
-    }    
+    }
 }
