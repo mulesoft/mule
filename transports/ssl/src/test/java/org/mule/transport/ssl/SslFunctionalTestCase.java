@@ -13,13 +13,13 @@ package org.mule.transport.ssl;
 import org.mule.api.MuleMessage;
 import org.mule.api.service.Service;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.testmodels.mule.TestSedaService;
 
-public class SslFunctionalTestCase extends FunctionalTestCase 
+public class SslFunctionalTestCase extends DynamicPortTestCase 
 {
     private static int NUM_MESSAGES = 100;
 
@@ -65,5 +65,11 @@ public class SslFunctionalTestCase extends FunctionalTestCase
         MuleMessage response = client.request("asyncEndpoint", 5000);
         assertNotNull("Response is null", response);
         assertEquals(TEST_MESSAGE + " Received Async", response.getPayloadAsString());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 3;
     }
 }

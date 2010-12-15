@@ -15,11 +15,11 @@
         <ssl:server path="trustStore" storePassword="mulepassword"/>
     </ssl:connector>
 
-    <endpoint name="sendEndpoint" address="ssl://localhost:60198" exchange-pattern="request-response"/>
+    <endpoint name="sendEndpoint" address="ssl://localhost:${port3}" exchange-pattern="request-response"/>
 
-    <ssl:endpoint name="sendManyEndpoint" address="ssl://localhost:60197" exchange-pattern="request-response"/>
+    <ssl:endpoint name="sendManyEndpoint" address="ssl://localhost:${port2}" exchange-pattern="request-response"/>
 
-    <ssl:endpoint name="asyncEndpoint" host="localhost" port="60196" exchange-pattern="one-way"/>
+    <ssl:endpoint name="asyncEndpoint" host="localhost" port="${port1}" exchange-pattern="one-way"/>
 
     <model name="main">
         <custom-service name="testComponent1" class="org.mule.tck.testmodels.mule.TestSedaService">

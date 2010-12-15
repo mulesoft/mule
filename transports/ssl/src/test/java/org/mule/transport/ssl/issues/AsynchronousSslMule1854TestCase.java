@@ -12,9 +12,9 @@ package org.mule.transport.ssl.issues;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
-public class AsynchronousSslMule1854TestCase extends FunctionalTestCase 
+public class AsynchronousSslMule1854TestCase extends DynamicPortTestCase 
 {
     protected String getConfigResources()
     {
@@ -30,5 +30,11 @@ public class AsynchronousSslMule1854TestCase extends FunctionalTestCase
         MuleMessage response = client.request("asyncEndpoint", 5000);
         assertNotNull("Response is null", response);
         assertEquals(TEST_MESSAGE + " Received Async", response.getPayloadAsString());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 3;
     }
 }
