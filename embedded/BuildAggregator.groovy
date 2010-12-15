@@ -56,7 +56,8 @@ fileScanner = ant.fileScanner
 {
     fileset(dir: muleRoot)
     {
-        include(name: "**/registry-bootstrap.properties")
+        // MULE-5293 Only include registry-bootstrap.properties from mule-core
+        include(name: "**core/**/registry-bootstrap.properties")
         exclude(name: "**/target/**")
     }
 }
