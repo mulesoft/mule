@@ -32,7 +32,7 @@
 
         <component class="org.mule.module.atom.event.BlobEventPublisher"/>
 
-        <outbound-endpoint address="http://localhost:9002/events" mimeType="text/plain" connector-ref="HttpConnector">
+        <outbound-endpoint address="http://localhost:${port1}/events" mimeType="text/plain" connector-ref="HttpConnector">
             <message-properties-transformer scope="outbound">
                 <add-message-property key="Slug" value="Blob Event"/>
             </message-properties-transformer>
@@ -40,12 +40,12 @@
     </flow>
 
     <flow name="atomPubEventStore">
-        <inbound-endpoint address="http://localhost:9002" connector-ref="HttpConnector"/>
+        <inbound-endpoint address="http://localhost:${port1}" connector-ref="HttpConnector"/>
         <atom:component provider-ref="provider"/>
     </flow>
 
     <flow name="eventConsumer">
-        <atom:inbound-endpoint address="http://localhost:9002/events" connector-ref="PollingHttpConnector"/>
+        <atom:inbound-endpoint address="http://localhost:${port1}/events" connector-ref="PollingHttpConnector"/>
         <component>
             <singleton-object class="org.mule.module.atom.event.EntryReceiver"/>
         </component>

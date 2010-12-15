@@ -9,7 +9,7 @@
  */
 package org.mule.module.atom.event;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -23,7 +23,7 @@ import org.apache.abdera.model.Feed;
 import org.apache.abdera.protocol.client.AbderaClient;
 import org.apache.abdera.protocol.client.ClientResponse;
 
-public class EventTest extends FunctionalTestCase
+public class EventTest extends DynamicPortTestCase
 {
 
     private Repository repository;
@@ -41,11 +41,15 @@ public class EventTest extends FunctionalTestCase
         Thread.sleep(5000);
 
         AbderaClient client = new AbderaClient();
-        ClientResponse res = client.get("http://localhost:9002/events");
+        ClientResponse res = client.get("http://localhost:" + getPorts().get(0) + "/events");
 
         Document<Feed> doc = res.getDocument();
+        // see if this helps with intermittent failures
+        doc.complete();
         Feed feed = doc.getRoot();
-
+        // see if this helps with intermittent failures
+        feed.complete();
+        assertNotNull("feed is null", feed);
         assertTrue( feed.getEntries().size() >= 1);
         EntryReceiver component = (EntryReceiver)getComponent("eventConsumer");
 
@@ -98,6 +102,12 @@ public class EventTest extends FunctionalTestCase
         {
             t.printStackTrace();
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }
