@@ -33,7 +33,7 @@ import org.apache.log4j.Level;
 public class LoggerMessageProcessor implements MessageProcessor, Initialisable, MuleContextAware
 {
 
-    protected static final Log logger = LogFactory.getLog(LoggerMessageProcessor.class);
+    protected transient Log logger;
 
     protected String message;
     protected String category;
@@ -44,7 +44,17 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
 
     public void initialise() throws InitialisationException
     {
+        if (category != null)
+        {
+            logger = LogFactory.getLog(category);
+        }
+        else
+        {
+            logger = LogFactory.getLog(LoggerMessageProcessor.class);
+        }
+
         expressionManager = muleContext.getExpressionManager();
+
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException

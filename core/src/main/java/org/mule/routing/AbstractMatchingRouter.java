@@ -44,7 +44,7 @@ public class AbstractMatchingRouter implements MatchingRouter
     /**
      * logger used by this class
      */
-    protected final static Log logger = LogFactory.getLog(AbstractMatchingRouter.class);
+    protected final transient Log logger = LogFactory.getLog(getClass());
 
     @SuppressWarnings("unchecked")
     protected List<MatchableMessageProcessor> matchableRoutes = new CopyOnWriteArrayList();

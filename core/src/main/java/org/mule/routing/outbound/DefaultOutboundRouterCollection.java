@@ -52,7 +52,7 @@ public class DefaultOutboundRouterCollection implements OutboundRouterCollection
     /**
      * logger used by this class
      */
-    protected final static Log logger = LogFactory.getLog(DefaultOutboundRouterCollection.class);
+    protected final transient Log logger = LogFactory.getLog(getClass());
 
     @SuppressWarnings("unchecked")
     protected List<MatchableMessageProcessor> routers = new CopyOnWriteArrayList();

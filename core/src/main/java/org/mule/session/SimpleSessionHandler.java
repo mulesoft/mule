@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SimpleSessionHandler implements SessionHandler
 {
-    protected static Log logger = LogFactory.getLog(SimpleSessionHandler.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
     {

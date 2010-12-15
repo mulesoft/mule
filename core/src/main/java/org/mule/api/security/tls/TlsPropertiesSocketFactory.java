@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 public class TlsPropertiesSocketFactory extends SSLSocketFactory
 {
 
-    private static Log logger = LogFactory.getLog(TlsPropertiesSocketFactory.class);
+    private Log logger = LogFactory.getLog(getClass());
     private boolean anon;
     private String namespace;
     private SSLSocketFactory factory;

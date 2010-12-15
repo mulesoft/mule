@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class WireTap extends AbstractMessageProcessorOwner implements MessageProcessor
 {
-    protected final static Log logger = LogFactory.getLog(WireTap.class);
+    protected final transient Log logger = LogFactory.getLog(getClass());
     protected volatile MessageProcessor tap;
     protected volatile Filter filter;
 

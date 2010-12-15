@@ -25,7 +25,7 @@ public class DefaultWorkListener implements WorkListener
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(DefaultWorkListener.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     public void workAccepted(WorkEvent event)
     {

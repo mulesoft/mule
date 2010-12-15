@@ -50,7 +50,7 @@ public class ExpressionFilter implements Filter, MuleContextAware
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(ExpressionFilter.class);
+    protected transient final Log logger = LogFactory.getLog(ExpressionFilter.class);
 
     private ExpressionConfig config;
     private String fullExpression;

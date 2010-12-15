@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SerializeOnlySessionHandler implements SessionHandler
 {
-    protected static Log logger = LogFactory.getLog(SerializeOnlySessionHandler.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     public MuleSession retrieveSessionInfoFromMessage(MuleMessage message) throws MuleException
     {

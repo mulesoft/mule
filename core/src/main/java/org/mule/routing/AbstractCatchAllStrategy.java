@@ -38,7 +38,7 @@ public abstract class AbstractCatchAllStrategy implements OutboundRouterCatchAll
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(AbstractCatchAllStrategy.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     /** Router statistics used to monitor if a catch all strategy is invoked and if any events are dispatched
      * from the strategy i.e. from the {@link org.mule.routing.ForwardingCatchAllStrategy}.

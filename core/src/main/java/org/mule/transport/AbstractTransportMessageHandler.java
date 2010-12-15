@@ -44,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractTransportMessageHandler<O> implements Connectable, LifecycleStateEnabled
 {
-    protected static Log logger = LogFactory.getLog(AbstractTransportMessageHandler.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     protected ImmutableEndpoint endpoint;
     protected final AbstractConnector connector;

@@ -65,7 +65,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MuleRegistryHelper implements MuleRegistry
 {
-    protected static Log logger = LogFactory.getLog(MuleRegistryHelper.class);
+    protected transient Log logger = LogFactory.getLog(MuleRegistryHelper.class);
 
     /**
      * A reference to Mule's internal registry

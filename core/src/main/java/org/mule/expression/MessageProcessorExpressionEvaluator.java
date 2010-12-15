@@ -47,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MessageProcessorExpressionEvaluator implements ExpressionEvaluator
 {
-    protected static Log logger = LogFactory.getLog(MessageProcessorExpressionEvaluator.class);
+    protected transient Log logger = LogFactory.getLog(MessageProcessorExpressionEvaluator.class);
 
     public static final String NAME = "process";
 

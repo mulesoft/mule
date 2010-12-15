@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class OutboundLoggingMessageProcessor implements MessageProcessor
 {
-    protected final static Log logger = LogFactory.getLog(OutboundLoggingMessageProcessor.class);
+    protected final transient Log logger = LogFactory.getLog(getClass());
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {

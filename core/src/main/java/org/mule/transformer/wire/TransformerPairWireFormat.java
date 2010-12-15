@@ -38,7 +38,7 @@ public class TransformerPairWireFormat implements WireFormat
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(TransformerPairWireFormat.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     protected Transformer inboundTransformer;
     protected Transformer outboundTransformer;

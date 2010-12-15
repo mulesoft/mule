@@ -33,7 +33,7 @@ public class EndpointInfoExpressionEvaluator implements ExpressionEvaluator, Mul
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(EndpointInfoExpressionEvaluator.class);
+    protected transient final Log logger = LogFactory.getLog(EndpointInfoExpressionEvaluator.class);
 
     protected MuleContext muleContext;
 

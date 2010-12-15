@@ -46,7 +46,7 @@ public abstract class AbstractObjectFactory implements ObjectFactory, FlowConstr
     protected FlowConstruct flowConstruct;
     protected boolean disposed = false;
 
-    protected static Log logger = LogFactory.getLog(AbstractObjectFactory.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     /**
      * For Spring only

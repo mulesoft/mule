@@ -58,7 +58,7 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
 
     protected MuleContext muleContext;
 
-    protected static final Log logger = LogFactory.getLog(AbstractTransformer.class);
+    protected final Log logger = LogFactory.getLog(getClass());
 
     /**
      * The return type that will be returned by the {@link #transform} method is

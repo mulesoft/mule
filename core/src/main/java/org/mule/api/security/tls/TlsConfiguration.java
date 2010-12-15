@@ -117,7 +117,7 @@ public final class TlsConfiguration
     public static final String DEFAULT_KEYSTORE_TYPE = KeyStore.getDefaultType();
     public static final String JSSE_NAMESPACE = "javax.net";
 
-    private static final Log logger = LogFactory.getLog(TlsConfiguration.class);
+    private Log logger = LogFactory.getLog(getClass());
 
     private SecurityProviderFactory spFactory = new AutoDiscoverySecurityProviderFactory();
     private SecurityProviderInfo spInfo = spFactory.getSecurityProviderInfo();

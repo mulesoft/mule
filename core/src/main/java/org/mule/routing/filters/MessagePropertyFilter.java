@@ -40,7 +40,7 @@ public class MessagePropertyFilter implements Filter
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(MessagePropertyFilter.class);
+    protected transient final Log logger = LogFactory.getLog(MessagePropertyFilter.class);
     private boolean caseSensitive = true;
     private boolean not = false;
 

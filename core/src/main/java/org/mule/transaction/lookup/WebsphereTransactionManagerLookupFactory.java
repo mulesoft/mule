@@ -40,7 +40,7 @@ public class WebsphereTransactionManagerLookupFactory implements TransactionMana
 
     private static final String FACTORY_CLASS_4 = "com.ibm.ejs.jts.jta.JTSXA";
 
-    private static final Log logger = LogFactory.getLog(WebsphereTransactionManagerLookupFactory.class);
+    private final Log logger = LogFactory.getLog(getClass());
 
     /**
      * This constructor retrieves the WebSphere TransactionManager factory class, so

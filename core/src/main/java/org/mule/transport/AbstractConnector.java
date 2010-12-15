@@ -140,7 +140,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(AbstractConnector.class);
+    protected final Log logger = LogFactory.getLog(getClass());
 
     /**
      * The name that identifies the endpoint

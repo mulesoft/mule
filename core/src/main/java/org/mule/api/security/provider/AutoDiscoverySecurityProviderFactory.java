@@ -35,7 +35,7 @@ public class AutoDiscoverySecurityProviderFactory implements SecurityProviderFac
     /**
      * Logger used by this class.
      */
-    protected static final Log logger = LogFactory.getLog(AutoDiscoverySecurityProviderFactory.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     /**
      * Security provider properties for IBM JDK.

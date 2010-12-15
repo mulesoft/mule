@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RegExFilter implements Filter, ObjectFilter
 {
-    protected static Log logger = LogFactory.getLog(RegExFilter.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     private Pattern pattern;
 

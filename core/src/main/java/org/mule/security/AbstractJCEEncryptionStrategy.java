@@ -38,7 +38,7 @@ public abstract class AbstractJCEEncryptionStrategy extends AbstractNamedEncrypt
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(AbstractJCEEncryptionStrategy.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     protected KeySpec keySpec;
     protected SecretKey secretKey;

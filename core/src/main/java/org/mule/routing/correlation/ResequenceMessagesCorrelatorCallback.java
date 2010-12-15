@@ -33,7 +33,7 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(ResequenceMessagesCorrelatorCallback.class);
+    protected transient final Log logger = LogFactory.getLog(ResequenceMessagesCorrelatorCallback.class);
 
     protected Comparator eventComparator;
     protected MuleContext muleContext;

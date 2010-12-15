@@ -46,7 +46,7 @@ public class JndiObjectFactory implements ObjectFactory
     
     private Object _object;
 
-    protected static final Log logger = LogFactory.getLog(JndiObjectFactory.class);
+    protected final Log logger = LogFactory.getLog(getClass());
     
     public JndiObjectFactory()
     {

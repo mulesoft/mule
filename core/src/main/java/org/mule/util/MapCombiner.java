@@ -33,7 +33,7 @@ public class MapCombiner implements Map<Object, Object>, Serializable
     public static final String LIST = "list"; // the setter/getter
     public static final int UNLIMITED_DEPTH = -1;
 
-    private static Log logger = LogFactory.getLog(MapCombiner.class);
+    private transient Log logger = LogFactory.getLog(getClass());
     private int maxDepth = UNLIMITED_DEPTH;
     private List list;
     private Map cachedMerge = new HashMap();

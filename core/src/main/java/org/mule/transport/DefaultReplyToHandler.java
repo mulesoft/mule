@@ -45,7 +45,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(DefaultReplyToHandler.class);
+    protected transient final Log logger = LogFactory.getLog(getClass());
 
     private volatile List<Transformer> transformers;
     private final Map<String, ImmutableEndpoint> endpointCache = new HashMap<String, ImmutableEndpoint>();

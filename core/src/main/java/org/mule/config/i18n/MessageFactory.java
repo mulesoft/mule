@@ -28,7 +28,7 @@ public abstract class MessageFactory
     private static final int STATIC_ERROR_CODE = -1;
     private static final transient Object[] EMPTY_ARGS = new Object[]{};
 
-    protected static Log logger = LogFactory.getLog(MessageFactory.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
     // since java 6 only
     //protected final ReloadControl control = new ReloadControl();
 

@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class LegacySessionHandler implements SessionHandler
 {
-    protected static Log logger = LogFactory.getLog(LegacySessionHandler.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     private static Transformer encoder = new Base64Encoder();
     private static Transformer decoder = new Base64Decoder();

@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractEntryPointResolver implements EntryPointResolver
 {
     /** logger used by this class */
-    protected static final Log logger = LogFactory.getLog(AbstractEntryPointResolver.class);
+    protected transient final Log logger = LogFactory.getLog(getClass());
 
     private boolean acceptVoidMethods = false;
 

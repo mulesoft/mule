@@ -35,7 +35,7 @@ public class FlowConstructLifecycleManager extends SimpleLifecycleManager<FlowCo
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(FlowConstructLifecycleManager.class);
+    protected transient final Log logger = LogFactory.getLog(FlowConstructLifecycleManager.class);
     protected MuleContext muleContext;
 
 

@@ -71,7 +71,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
     /**
      * logger used by this class
      */
-    protected static Log logger = LogFactory.getLog(AbstractOutboundRouter.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
 
     @SuppressWarnings("unchecked")
     protected List<MessageProcessor> routes = new CopyOnWriteArrayList();

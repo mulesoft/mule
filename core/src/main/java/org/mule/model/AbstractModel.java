@@ -47,7 +47,7 @@ public abstract class AbstractModel implements Model
     private LifecycleAdapterFactory lifecycleAdapterFactory = new DefaultComponentLifecycleAdapterFactory();
     private MessagingExceptionHandler exceptionListener = new DefaultServiceExceptionStrategy();
 
-    protected static Log logger = LogFactory.getLog(AbstractModel.class);
+    protected transient Log logger = LogFactory.getLog(getClass());
     protected MuleContext muleContext;
 
     protected ModelLifecycleManager lifecycleManager = new ModelLifecycleManager(this);

@@ -32,7 +32,7 @@ import static org.mule.util.ClassUtils.hash;
 
 public class WildcardFilter implements Filter, ObjectFilter
 {
-    protected static final Log logger = LogFactory.getLog(WildcardFilter.class);
+    protected final Log logger = LogFactory.getLog(this.getClass());
 
     protected volatile String pattern;
     protected volatile String[] patterns;

@@ -32,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractInterceptingMessageProcessor implements InterceptingMessageProcessor, MuleContextAware
 {
-    protected static Log logger = LogFactory.getLog(AbstractInterceptingMessageProcessor.class);
+    protected Log logger = LogFactory.getLog(getClass());
 
     protected ServerNotificationHandler notificationHandler;
 

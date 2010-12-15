@@ -33,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractMonitoredObjectStore<T extends Serializable> 
     implements ObjectStore<T>, Runnable, MuleContextAware, Initialisable, Disposable
 {
-    protected static final Log logger = LogFactory.getLog(AbstractMonitoredObjectStore.class);
+    protected final Log logger = LogFactory.getLog(this.getClass());
 
     protected MuleContext context;
     protected ScheduledThreadPoolExecutor scheduler;

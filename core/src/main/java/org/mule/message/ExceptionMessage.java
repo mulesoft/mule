@@ -49,7 +49,7 @@ public class ExceptionMessage implements Serializable
     private String endpointUri;
     private Date timeStamp;
 
-    private static final Log logger = LogFactory.getLog(ExceptionMessage.class);
+    private transient final Log logger = LogFactory.getLog(ExceptionMessage.class);
     
     public ExceptionMessage(Object payload,
                             Throwable exception,

@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractTransaction implements Transaction
 {
 
-    protected final static Log logger = LogFactory.getLog(AbstractTransaction.class);
+    protected final transient Log logger = LogFactory.getLog(getClass());
 
     protected String id = UUID.getUUID();
 

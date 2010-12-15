@@ -50,7 +50,7 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(DynamicOutboundEndpoint.class);
+    protected transient final Log logger = LogFactory.getLog(DynamicOutboundEndpoint.class);
 
     private static final long serialVersionUID = 8861985949279708638L;
 

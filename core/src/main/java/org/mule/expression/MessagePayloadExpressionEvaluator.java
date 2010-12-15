@@ -52,7 +52,7 @@ public class MessagePayloadExpressionEvaluator implements ExpressionEvaluator, M
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(MessagePayloadExpressionEvaluator.class);
+    protected transient final Log logger = LogFactory.getLog(MessagePayloadExpressionEvaluator.class);
 
     protected MuleContext muleContext;
 

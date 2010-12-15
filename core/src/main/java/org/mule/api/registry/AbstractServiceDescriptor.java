@@ -25,7 +25,7 @@ public abstract class AbstractServiceDescriptor implements ServiceDescriptor
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(AbstractServiceDescriptor.class);
+    protected final Log logger = LogFactory.getLog(getClass());
 
     protected String service;
 

@@ -45,7 +45,7 @@ import org.apache.commons.logging.LogFactory;
 public class TransientRegistry extends AbstractRegistry
 {
     /** logger used by this class */
-    protected static final Log logger = LogFactory.getLog(TransientRegistry.class);
+    protected transient final Log logger = LogFactory.getLog(TransientRegistry.class);
     public static final String REGISTRY_ID = "org.mule.Registry.Transient";
 
     //@ThreadSafe synchronized(registry)

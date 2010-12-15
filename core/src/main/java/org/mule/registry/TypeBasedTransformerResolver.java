@@ -45,7 +45,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, MuleCo
     /**
      * logger used by this class
      */
-    protected static final Log logger = LogFactory.getLog(TypeBasedTransformerResolver.class);
+    protected transient final Log logger = LogFactory.getLog(TypeBasedTransformerResolver.class);
 
     private ObjectToString objectToString;
     private ObjectToByteArray objectToByteArray;
