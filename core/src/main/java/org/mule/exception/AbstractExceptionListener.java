@@ -288,16 +288,8 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
             MuleMessage clonedMessage = new DefaultMuleMessage(exceptionMessage.getPayload(),
                 exceptionMessage, muleContext);
             MuleEvent exceptionEvent = null;
-            if (processor instanceof OutboundEndpoint)
-            {
-                exceptionEvent = new DefaultMuleEvent(clonedMessage, (OutboundEndpoint) processor,
-                    new DefaultMuleSession(muleContext));
-            }
-            else
-            {
-                exceptionEvent = new DefaultMuleEvent(clonedMessage, RequestContext.getEvent().getEndpoint(),
-                    new DefaultMuleSession(muleContext));
-            }
+            exceptionEvent = new DefaultMuleEvent(clonedMessage, RequestContext.getEvent().getEndpoint(),
+                new DefaultMuleSession(muleContext));
             exceptionEvent = RequestContext.setEvent(exceptionEvent);
 
             processor.process(exceptionEvent);

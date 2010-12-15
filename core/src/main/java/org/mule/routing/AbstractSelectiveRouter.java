@@ -10,13 +10,6 @@
 
 package org.mule.routing;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.collections.ListUtils;
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -24,7 +17,6 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -40,7 +32,14 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.management.stats.RouterStatistics;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+
+import org.apache.commons.collections.ListUtils;
 
 public abstract class AbstractSelectiveRouter
     implements SelectiveRouter, RouterStatisticsRecorder, Lifecycle, FlowConstructAware, MuleContextAware
@@ -301,15 +300,7 @@ public abstract class AbstractSelectiveRouter
                                            MessageProcessor processor,
                                            List<MuleEvent> results) throws MuleException
     {
-        MuleEvent processedEvent = event;
-
-        if (processor instanceof OutboundEndpoint)
-        {
-            processedEvent = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint) processor,
-                event.getSession());
-        }
-
-        results.add(processor.process(processedEvent));
+        results.add(processor.process(event));
 
         if (getRouterStatistics() != null && getRouterStatistics().isEnabled())
         {

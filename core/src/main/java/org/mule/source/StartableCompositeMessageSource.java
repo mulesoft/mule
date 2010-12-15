@@ -10,12 +10,10 @@
 
 package org.mule.source;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
@@ -218,11 +216,6 @@ public class StartableCompositeMessageSource
         {
             if (started.get() || starting.get())
             {
-                // If the next message processor is an outbound router then create outbound event
-                if (listener instanceof OutboundEndpoint)
-                {
-                    event = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint) listener, event.getSession());
-                }
                 return listener.process(event);
             }
             else

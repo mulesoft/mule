@@ -10,12 +10,10 @@
 
 package org.mule.processor.chain;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.SimpleFlowConstruct;
 
@@ -52,13 +50,6 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
         MuleEvent resultEvent;
         for (MessageProcessor processor : processors)
         {
-            // If the next message processor is an outbound router then create
-            // outbound event
-            if (processor instanceof OutboundEndpoint)
-            {
-                currentEvent = new DefaultMuleEvent(currentEvent.getMessage(), (OutboundEndpoint) processor,
-                    currentEvent.getSession());
-            }
             resultEvent = processor.process(currentEvent);
             if (resultEvent != null)
             {
