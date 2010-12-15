@@ -32,13 +32,13 @@ import org.apache.commons.logging.LogFactory;
 class Configuration
 {
 
-    protected Log logger = LogFactory.getLog(getClass());
+    protected static Log logger = LogFactory.getLog(Configuration.class);
     private Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToTypes =
             new HashMap<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>>(); // map from interface to collection of events
     private Set<ListenerSubscriptionPair> listenerSubscriptionPairs = new HashSet<ListenerSubscriptionPair>();
     private Set<Class<? extends ServerNotificationListener>> disabledInterfaces = new HashSet<Class<? extends ServerNotificationListener>>();
     private Set<Class<? extends ServerNotification>> disabledNotificationTypes = new HashSet<Class<? extends ServerNotification>>();
-    private boolean dirty = true;
+    private volatile boolean dirty = true;
     private Policy policy;
 
     synchronized void addInterfaceToType(Class<? extends ServerNotificationListener> iface, Class<? extends ServerNotification> type)
@@ -150,12 +150,18 @@ class Configuration
         }
     }
 
-    synchronized Policy getPolicy()
+    Policy getPolicy()
     {
         if (dirty)
         {
-            policy = new Policy(interfaceToTypes, listenerSubscriptionPairs, disabledInterfaces, disabledNotificationTypes);
-            dirty = false;
+            synchronized (this)
+            {
+                if (dirty)
+                {
+                    policy = new Policy(interfaceToTypes, listenerSubscriptionPairs, disabledInterfaces, disabledNotificationTypes);
+                    dirty = false;
+                }
+            }
         }
         return policy;
     }

@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class ServiceLoggingMessageProcessor implements MessageProcessor
 {
-    protected final transient Log logger = LogFactory.getLog(getClass());
+    protected final static Log logger = LogFactory.getLog(ServiceLoggingMessageProcessor.class);
     protected Service service;
 
     public ServiceLoggingMessageProcessor(Service service)

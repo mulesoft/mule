@@ -48,7 +48,7 @@ public class EventCorrelator
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(EventCorrelator.class);
+    protected static final Log logger = LogFactory.getLog(EventCorrelator.class);
 
     public static final String NO_CORRELATION_ID = "no-id";
     

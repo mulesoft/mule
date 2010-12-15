@@ -66,7 +66,7 @@ public class DefaultMuleContext implements MuleContext
     /**
      * logger used by this class
      */
-    private transient Log logger = LogFactory.getLog(DefaultMuleContext.class);
+    private static Log logger = LogFactory.getLog(DefaultMuleContext.class);
 
     /**
      * Internal registry facade which delegates to other registries.

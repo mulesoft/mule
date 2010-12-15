@@ -101,7 +101,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
     protected String registryId = null;
     protected MuleContext muleContext;
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected static Log logger = LogFactory.getLog(AbstractEndpointBuilder.class);
 
     public InboundEndpoint buildInboundEndpoint() throws EndpointException, InitialisationException
     {

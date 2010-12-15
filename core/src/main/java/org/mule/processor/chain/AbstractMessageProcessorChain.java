@@ -44,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractMessageProcessorChain extends AbstractInterceptingMessageProcessor
                                                     implements MessageProcessorChain, Lifecycle, FlowConstructAware, MuleContextAware
 {
-    protected final transient Log log = LogFactory.getLog(getClass());
+    protected final static Log log = LogFactory.getLog(AbstractMessageProcessorChain.class);
     protected String name;
     protected List<MessageProcessor> processors;
     private final Policies policies = new Policies(this);

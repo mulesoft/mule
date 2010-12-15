@@ -31,7 +31,7 @@ import org.objectweb.asm.commons.EmptyVisitor;
  */
 public class AnnotationsScanner extends EmptyVisitor implements ClassScanner
 {
-    protected final Log log = LogFactory.getLog(getClass());
+    protected static final Log log = LogFactory.getLog(AnnotationsScanner.class);
 
     private List<AnnotationInfo> classAnnotations = new ArrayList<AnnotationInfo>();
     private List<AnnotationInfo> fieldAnnotations = new ArrayList<AnnotationInfo>();

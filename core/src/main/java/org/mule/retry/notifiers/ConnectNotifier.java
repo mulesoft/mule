@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ConnectNotifier implements RetryNotifier
 {
-    protected transient final Log logger = LogFactory.getLog(ConnectNotifier.class);
+    protected static final Log logger = LogFactory.getLog(ConnectNotifier.class);
 
     public void onSuccess(RetryContext context)
     {

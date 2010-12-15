@@ -69,7 +69,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
 {
 
     public static final String NULL_SUBSCRIPTION = "NULL";
-    protected Log logger = LogFactory.getLog(getClass());
+    protected static Log logger = LogFactory.getLog(ServerNotificationManager.class);
     private boolean dynamic = false;
     private Configuration configuration = new Configuration();
     private AtomicBoolean disposed = new AtomicBoolean(false);

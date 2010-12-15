@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
 public class CallbackOutputStream extends OutputStream
 {
 
-    protected final Log logger = LogFactory.getLog(CallbackOutputStream.class);
+    protected static final Log logger = LogFactory.getLog(CallbackOutputStream.class);
 
     public static interface Callback
     {

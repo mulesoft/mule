@@ -28,7 +28,7 @@ public class MetaAnnotationTypeFilter implements AnnotationFilter
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(MetaAnnotationTypeFilter.class);
+    protected static final Log logger = LogFactory.getLog(MetaAnnotationTypeFilter.class);
 
     private Class<? extends Annotation> annotation;
 

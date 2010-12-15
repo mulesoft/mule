@@ -55,7 +55,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
     /**
      * logger used by this class
      */
-    protected final Log logger = LogFactory.getLog(this.getClass());
+    protected static final Log logger = LogFactory.getLog(AbstractComponent.class);
 
     protected FlowConstruct flowConstruct;
     protected ComponentStatistics statistics = null;

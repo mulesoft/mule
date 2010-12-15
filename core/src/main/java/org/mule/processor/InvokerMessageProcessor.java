@@ -58,7 +58,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class InvokerMessageProcessor implements MessageProcessor, Initialisable, MuleContextAware
 {
-    protected final transient Log logger = LogFactory.getLog(getClass());
+    protected final static Log logger = LogFactory.getLog(InvokerMessageProcessor.class);
 
     protected Object object;
     protected Class<?> objectType;

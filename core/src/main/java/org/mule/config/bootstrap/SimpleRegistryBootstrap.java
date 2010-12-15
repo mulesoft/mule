@@ -83,7 +83,7 @@ public class SimpleRegistryBootstrap implements Initialisable, MuleContextAware
     public String TRANSFORMER_KEY = ".transformer.";
     public String OBJECT_KEY = ".object.";
 
-    protected final transient Log logger = LogFactory.getLog(getClass());
+    protected final static Log logger = LogFactory.getLog(SimpleRegistryBootstrap.class);
 
     protected MuleContext context;
 

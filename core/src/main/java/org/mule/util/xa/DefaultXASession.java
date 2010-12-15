@@ -27,7 +27,7 @@ public class DefaultXASession implements XAResource
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected static  Log logger = LogFactory.getLog(DefaultXASession.class);
 
     protected AbstractTransactionContext localContext;
     protected Xid localXid;

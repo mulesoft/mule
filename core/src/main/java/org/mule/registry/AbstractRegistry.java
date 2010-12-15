@@ -35,7 +35,7 @@ public abstract class AbstractRegistry implements Registry
     /** the unique id for this Registry */
     private String id;
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected static Log logger = LogFactory.getLog(AbstractRegistry.class);
 
     protected MuleContext muleContext;
 

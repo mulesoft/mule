@@ -41,7 +41,7 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(AbstractLifecycleManager.class);
+    protected static final Log logger = LogFactory.getLog(AbstractLifecycleManager.class);
 
     protected String lifecycleManagerId;
     protected String currentPhase = NotInLifecyclePhase.PHASE_NAME;

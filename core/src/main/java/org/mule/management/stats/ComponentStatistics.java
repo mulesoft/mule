@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 public class ComponentStatistics implements Statistics
 {
 
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected static final Log logger = LogFactory.getLog(ComponentStatistics.class);
 
     /**
      * Serial version

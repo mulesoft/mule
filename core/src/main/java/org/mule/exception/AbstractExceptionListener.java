@@ -63,7 +63,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected static Log logger = LogFactory.getLog(AbstractExceptionListener.class);
 
     @SuppressWarnings("unchecked")
     protected List<MessageProcessor> messageProcessors = new CopyOnWriteArrayList();

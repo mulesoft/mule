@@ -37,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class GenericTransactionManagerLookupFactory implements TransactionManagerFactory, Initialisable
 {
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected static final Log logger = LogFactory.getLog(GenericTransactionManagerLookupFactory.class);
 
     protected Context context;
 

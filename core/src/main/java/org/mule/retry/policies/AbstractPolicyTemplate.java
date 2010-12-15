@@ -42,7 +42,7 @@ public abstract class AbstractPolicyTemplate implements RetryPolicyTemplate, Mul
 
     private MuleContext muleContext;
 
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    protected static final Log logger = LogFactory.getLog(AbstractPolicyTemplate.class);
 
     public void setMuleContext(MuleContext context)
     {

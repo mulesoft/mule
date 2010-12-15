@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 public class TimingPolicy implements AroundPolicy
 {
 
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected static final Log logger = LogFactory.getLog(TimingPolicy.class);
 
     public String getName()
     {

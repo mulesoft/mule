@@ -207,20 +207,19 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
         }
     }
 
+    /**
+     * logger used by inner class
+     */
+    protected static final Log callbackLogger = LogFactory.getLog(RegistryLifecycleCallback.class);
     class RegistryLifecycleCallback implements LifecycleCallback<Object>
     {
-        /**
-         * logger used by this class
-         */
-        protected transient final Log logger = LogFactory.getLog(RegistryLifecycleCallback.class);
-
         public void onTransition(String phaseName, Object object) throws MuleException
         {
             LifecyclePhase phase = phases.get(phaseName);
 
-            if (logger.isDebugEnabled())
+            if (callbackLogger.isDebugEnabled())
             {
-                logger.debug("Applying lifecycle phase: " + phase + " for registry: " + object.getClass().getSimpleName());
+                callbackLogger.debug("Applying lifecycle phase: " + phase + " for registry: " + object.getClass().getSimpleName());
             }
 
             if (phase instanceof ContainerManagedLifecyclePhase)
@@ -253,9 +252,9 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
                     }
                     else
                     {
-                        if (logger.isDebugEnabled())
+                        if (callbackLogger.isDebugEnabled())
                         {
-                            logger.debug("lifecycle phase: " + phase.getName() + " for object: " + o);
+                            callbackLogger.debug("lifecycle phase: " + phase.getName() + " for object: " + o);
                         }
                         phase.applyLifecycle(o);
                         target.remove();

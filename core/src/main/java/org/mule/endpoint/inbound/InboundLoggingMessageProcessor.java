@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class InboundLoggingMessageProcessor implements MessageProcessor
 {
-    protected final transient Log logger = LogFactory.getLog(getClass());
+    protected final static Log logger = LogFactory.getLog(InboundLoggingMessageProcessor.class);
     protected InboundEndpoint endpoint;
 
     public InboundLoggingMessageProcessor(InboundEndpoint endpoint)

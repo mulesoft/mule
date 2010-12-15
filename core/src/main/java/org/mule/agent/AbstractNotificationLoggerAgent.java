@@ -53,7 +53,7 @@ public abstract class AbstractNotificationLoggerAgent extends AbstractAgent
     /**
      * The logger used for this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected static final Log logger = LogFactory.getLog(AbstractNotificationLoggerAgent.class);
 
     private boolean ignoreManagerNotifications = false;
     private boolean ignoreModelNotifications = false;

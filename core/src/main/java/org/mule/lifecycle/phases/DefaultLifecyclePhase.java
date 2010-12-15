@@ -49,7 +49,7 @@ import org.mule.lifecycle.LifecycleObject;
  */
 public class DefaultLifecyclePhase implements LifecyclePhase, MuleContextAware
 {
-    protected transient final Log logger = LogFactory.getLog(DefaultLifecyclePhase.class);
+    protected static final Log logger = LogFactory.getLog(DefaultLifecyclePhase.class);
     private Class<?> lifecycleClass;
     private final Method lifecycleMethod;
     private Set<LifecycleObject> orderedLifecycleObjects = new LinkedHashSet<LifecycleObject>(6);

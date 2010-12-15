@@ -67,7 +67,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected static Log logger = LogFactory.getLog(AbstractFlowConstruct.class);
 
     protected String name;
     protected MessageSource messageSource;

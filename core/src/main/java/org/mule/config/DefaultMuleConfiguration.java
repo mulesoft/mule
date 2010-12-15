@@ -131,7 +131,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
 
     private boolean autoWrapMessageAwareTransform = true;
     
-    protected transient Log logger = LogFactory.getLog(DefaultMuleConfiguration.class);
+    protected static Log logger = LogFactory.getLog(DefaultMuleConfiguration.class);
 
     private MuleContext muleContext;
     private boolean containerMode;

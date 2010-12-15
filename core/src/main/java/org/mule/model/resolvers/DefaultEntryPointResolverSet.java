@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultEntryPointResolverSet implements EntryPointResolverSet
 {
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected static final Log logger = LogFactory.getLog(DefaultEntryPointResolverSet.class);
 
     private final Set<EntryPointResolver> entryPointResolvers = new LinkedHashSet<EntryPointResolver>(4);
 

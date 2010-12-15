@@ -34,7 +34,7 @@ public class ServiceLifecycleManager extends SimpleLifecycleManager<FlowConstruc
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(ServiceLifecycleManager.class);
+    protected static final Log logger = LogFactory.getLog(ServiceLifecycleManager.class);
     protected MuleContext muleContext;
 
     public ServiceLifecycleManager(FlowConstruct service, MuleContext muleContext) throws MuleException

@@ -35,7 +35,7 @@ public class RegistryExpressionEvaluator implements ExpressionEvaluator, MuleCon
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(RegistryExpressionEvaluator.class);
+    protected static final Log logger = LogFactory.getLog(RegistryExpressionEvaluator.class);
 
 
     public static final String NAME = "registry";

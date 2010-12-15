@@ -64,7 +64,7 @@ public abstract class AbstractService implements Service, MessageProcessor
     /**
      * logger used by this class
      */
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected static Log logger = LogFactory.getLog(AbstractService.class);
 
     protected ServiceStatistics stats;
     /**

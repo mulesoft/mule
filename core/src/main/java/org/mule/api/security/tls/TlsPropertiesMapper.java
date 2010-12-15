@@ -33,7 +33,7 @@ public class TlsPropertiesMapper
     private static final String KEY_TYPE_SUFFIX = ".ssl.keyStoreType";
     private static final String KEY_PASSWORD_SUFFIX = ".ssl.keyStorePassword";
 
-    private Log logger = LogFactory.getLog(getClass());
+    private static Log logger = LogFactory.getLog(TlsPropertiesMapper.class);
     private String namespace;
 
     public TlsPropertiesMapper(String namespace)

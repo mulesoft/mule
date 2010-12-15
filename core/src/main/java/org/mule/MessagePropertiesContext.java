@@ -48,7 +48,7 @@ public class MessagePropertiesContext implements Serializable
     private static final long serialVersionUID = -5230693402768953742L;
     private static final PropertyScope DEFAULT_SCOPE = PropertyScope.OUTBOUND;
 
-    private Log logger = LogFactory.getLog(getClass());
+    private static Log logger = LogFactory.getLog(MessagePropertiesContext.class);
 
     /**
      * Map of maps containing the scoped properties, each scope has its own Map.

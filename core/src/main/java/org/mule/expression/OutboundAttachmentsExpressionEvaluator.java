@@ -26,7 +26,7 @@ public class OutboundAttachmentsExpressionEvaluator implements ExpressionEvaluat
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(OutboundAttachmentsExpressionEvaluator.class);
+    protected static final Log logger = LogFactory.getLog(OutboundAttachmentsExpressionEvaluator.class);
 
 
     public Object evaluate(String expression, MuleMessage message)

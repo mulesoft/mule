@@ -61,7 +61,7 @@ public class ClasspathScanner
     /**
      * logger used by this class
      */
-    protected transient final Log logger = LogFactory.getLog(ClasspathScanner.class);
+    protected static final Log logger = LogFactory.getLog(ClasspathScanner.class);
 
     private ClassLoader classLoader;
     

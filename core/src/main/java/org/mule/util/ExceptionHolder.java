@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
 /** TODO */
 public class ExceptionHolder implements ExceptionListener
 {
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected static final Log logger = LogFactory.getLog(ExceptionHolder.class);
     private List<Exception> exceptions = new ArrayList<Exception>(2);
 
     public void exceptionThrown(Exception e)

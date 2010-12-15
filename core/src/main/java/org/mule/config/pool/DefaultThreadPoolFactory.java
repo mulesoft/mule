@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultThreadPoolFactory extends ThreadPoolFactory
 {
     // deliberately shadow the superclass' static logger as to avoid log congestion on it
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final static Log logger = LogFactory.getLog(DefaultThreadPoolFactory.class);
 
     public ThreadPoolExecutor createPool(String name, ThreadingProfile tp)
     {
