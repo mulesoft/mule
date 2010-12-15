@@ -39,7 +39,7 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
 
    /** The default queueStore directory for persistence */
    public static final String DEFAULT_QUEUE_STORE = "queuestore";
-    
+
     public static final String EXTENSION = ".msg";
 
     private File store;
@@ -68,16 +68,16 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
 
     public Object store(String queue, Object obj) throws IOException
     {
-        String id = UUID.getAscendingOrderUUID();
-        
+        String id = UUID.getUUID();
+
         String filename = queue + File.separator + id + EXTENSION;
         File file = FileUtils.newFile(store, filename);
-        
+
         if (!file.getParentFile().exists())
         {
             createStoreDirectory(file.getParentFile());
         }
-        
+
         OutputStream out = new FileOutputStream(file);
         try
         {
@@ -93,10 +93,10 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
         {
             out.close();
         }
-        
+
         return id;
     }
-    
+
     protected synchronized void createStoreDirectory(File direcetory) throws IOException
     {
         // To support concurrency we need to check if directory exists again inside
@@ -154,16 +154,16 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
             logger.warn("No store has be set on the File Persistence Strategy. Not restoring at this time");
             return msgs;
         }
-        
+
         try
         {
             restoreFiles(store, msgs);
-            
+
             if (logger.isDebugEnabled())
             {
                 logger.debug("Restore retrieved " + msgs.size() + " objects");
             }
-            
+
             return msgs;
         }
         catch (ClassNotFoundException e)

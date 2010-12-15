@@ -19,9 +19,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Provides the default implementation of an {@link org.mule.api.model.EntryPointResolverSet}
  * It resolves a method to call on the given service when an event is received.
@@ -31,8 +28,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultEntryPointResolverSet implements EntryPointResolverSet
 {
-    protected final Log logger = LogFactory.getLog(getClass());
-
     private final Set<EntryPointResolver> entryPointResolvers = new LinkedHashSet<EntryPointResolver>(4);
 
     public Object invoke(Object component, MuleEventContext context) throws Exception

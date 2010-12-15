@@ -18,14 +18,11 @@ import org.apache.commons.logging.LogFactory;
 
 public class CallbackOutputStream extends OutputStream
 {
-
-    protected final Log logger = LogFactory.getLog(CallbackOutputStream.class);
+    private static final Log logger = LogFactory.getLog(CallbackOutputStream.class);
 
     public static interface Callback
     {
-
         public void onClose() throws Exception;
-
     }
 
     private OutputStream delegate;
@@ -37,21 +34,25 @@ public class CallbackOutputStream extends OutputStream
         this.callback = callback;
     }
 
+    @Override
     public void write(int b) throws IOException
     {
         delegate.write(b);
     }
 
+    @Override
     public void write(byte b[]) throws IOException
     {
         delegate.write(b);
     }
 
+    @Override
     public void write(byte b[], int off, int len) throws IOException
     {
         delegate.write(b, off, len);
     }
 
+    @Override
     public void close() throws IOException
     {
         try
@@ -79,5 +80,4 @@ public class CallbackOutputStream extends OutputStream
         }
 
     }
-
 }

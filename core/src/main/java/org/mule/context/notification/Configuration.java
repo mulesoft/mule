@@ -13,7 +13,6 @@ package org.mule.context.notification;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
 import org.mule.config.i18n.CoreMessages;
-import static org.mule.context.notification.ServerNotificationManager.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -26,19 +25,21 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import static org.mule.context.notification.ServerNotificationManager.toClass;
+
 /**
- * This acts as a synchronized collection.  No call blocks and all are synchronized.
+ * This acts as a synchronized collection. No call blocks and all are synchronized.
  */
 class Configuration
 {
 
-    protected Log logger = LogFactory.getLog(getClass());
+    protected static Log logger = LogFactory.getLog(Configuration.class);
     private Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToTypes =
             new HashMap<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>>(); // map from interface to collection of events
     private Set<ListenerSubscriptionPair> listenerSubscriptionPairs = new HashSet<ListenerSubscriptionPair>();
     private Set<Class<? extends ServerNotificationListener>> disabledInterfaces = new HashSet<Class<? extends ServerNotificationListener>>();
     private Set<Class<? extends ServerNotification>> disabledNotificationTypes = new HashSet<Class<? extends ServerNotification>>();
-    private boolean dirty = true;
+    private volatile boolean dirty = true;
     private Policy policy;
 
     synchronized void addInterfaceToType(Class<? extends ServerNotificationListener> iface, Class<? extends ServerNotification> type)
@@ -70,7 +71,7 @@ class Configuration
     synchronized void addAllInterfaceToTypes(Map<Class<? extends ServerNotificationListener>, Set<Class<? extends ServerNotification>>> interfaceToTypes) throws ClassNotFoundException
     {
         dirty = true;
-       
+
         for (Iterator ifaces = interfaceToTypes.keySet().iterator(); ifaces.hasNext();)
         {
             Object iface = ifaces.next();
@@ -150,12 +151,18 @@ class Configuration
         }
     }
 
-    synchronized Policy getPolicy()
+    protected Policy getPolicy()
     {
         if (dirty)
         {
-            policy = new Policy(interfaceToTypes, listenerSubscriptionPairs, disabledInterfaces, disabledNotificationTypes);
-            dirty = false;
+            synchronized (this)
+            {
+                if (dirty)
+                {
+                    policy = new Policy(interfaceToTypes, listenerSubscriptionPairs, disabledInterfaces, disabledNotificationTypes);
+                    dirty = false;
+                }
+            }
         }
         return policy;
     }

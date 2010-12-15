@@ -12,7 +12,7 @@ package org.mule.util.queue;
 
 public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTestCase
 {
-
+    @Override
     protected TransactionalQueueManager createQueueManager() throws Exception
     {
         TransactionalQueueManager mgr = new TransactionalQueueManager();
@@ -23,9 +23,9 @@ public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTest
         return mgr;
     }
 
+    @Override
     protected boolean isPersistent()
     {
         return true;
     }
-
 }

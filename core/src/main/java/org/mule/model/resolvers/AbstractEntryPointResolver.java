@@ -34,8 +34,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractEntryPointResolver implements EntryPointResolver
 {
-    /** logger used by this class */
-    protected transient final Log logger = LogFactory.getLog(getClass());
+    private static final Log logger = LogFactory.getLog(AbstractEntryPointResolver.class);
 
     private boolean acceptVoidMethods = false;
 
@@ -56,7 +55,7 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
 
     protected ConcurrentHashMap getMethodCache(Object component)
     {
-        Class componentClass = component.getClass();
+        Class<?> componentClass = component.getClass();
         ConcurrentHashMap cache = (ConcurrentHashMap) methodCache.get(componentClass);
         if (cache == null)
         {

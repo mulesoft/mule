@@ -39,18 +39,18 @@ public class ExceptionMessage implements Serializable
      */
     private static final long serialVersionUID = -538516243574950621L;
 
+    private static final Log logger = LogFactory.getLog(ExceptionMessage.class);
+
     // This object uses custom serialization via the writeObject() method
     private transient Object payload;
     // This object uses custom serialization via the writeObject() method
     private transient Throwable exception;
-    
+
     protected Map<String, Object> properties;
     private String componentName;
     private String endpointUri;
     private Date timeStamp;
 
-    private transient final Log logger = LogFactory.getLog(ExceptionMessage.class);
-    
     public ExceptionMessage(Object payload,
                             Throwable exception,
                             String componentName,
@@ -119,7 +119,7 @@ public class ExceptionMessage implements Serializable
             // ignore
         }
     }
-    
+
     public void setPayload(Object payload)
     {
         this.payload = payload;
@@ -192,6 +192,7 @@ public class ExceptionMessage implements Serializable
         return exception;
     }
 
+    @Override
     public String toString()
     {
         return "ExceptionMessage{" + "payload=" + getPayload() + ", context=" + properties + "exception=" + exception

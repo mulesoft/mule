@@ -16,6 +16,7 @@ import org.mule.util.generics.GenericsUtils;
 import org.mule.util.generics.MethodParameter;
 
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -23,6 +24,8 @@ import java.util.Collection;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Factory class used to create {@link DataType} objects based on the parameter types passed into
@@ -78,9 +81,9 @@ public class DataTypeFactory
                 return new CollectionDataType(collectionType, itemType, mimeType);
             }
         }
-        
+
         // Special case where proxies are used for testing
-        if (Proxy.isProxyClass(type))
+        if (isProxyClass(type))
         {
             return new SimpleDataType<T>(type.getInterfaces()[0], mimeType);
         }
@@ -233,4 +236,56 @@ public class DataTypeFactory
         }
     }
 
+
+    private static ConcurrentHashMap proxyClassCache = new ConcurrentHashMap();
+    /**
+     * Cache which classes are proxies.  Very experimental
+     */
+    protected static<T> boolean isProxyClass(Class<T> type)
+    {
+        /**
+         * map value
+         */
+        class ProxyIndicator
+        {
+            private final WeakReference<Class> targetClassRef;
+            private final boolean isProxy;
+
+            ProxyIndicator(Class targetClass, boolean proxy)
+            {
+                this.targetClassRef = new WeakReference<Class>(targetClass);
+                isProxy = proxy;
+            }
+
+            public Class getTargetClass()
+            {
+                return targetClassRef.get();
+            }
+
+            public boolean isProxy()
+            {
+                return isProxy;
+            }
+        }
+
+        String typeName = type.getName();
+        ProxyIndicator indicator = (ProxyIndicator) proxyClassCache.get(typeName);
+        if (indicator != null)
+        {
+            Class classInMap = indicator.getTargetClass();
+            if (classInMap == type)
+            {
+                return indicator.isProxy();
+            }
+            else if (classInMap != null)
+            {
+                // We have duplicate class names from different active classloaders.  Skip the optimization for this one
+                return Proxy.isProxyClass(type);
+            }
+        }
+        // Either there's no indicator in the map or there's one that is due to be replaced
+        boolean isProxy = Proxy.isProxyClass(type);
+        proxyClassCache.put(typeName, new ProxyIndicator(type, isProxy));
+        return isProxy;
+    }
 }

@@ -30,7 +30,7 @@ public class UUIDTestCase extends AbstractMuleTestCase
         final int numberOfIdsToGenerate = 10000;
         for (int index = 0; index < numberOfIdsToGenerate; index++)
         {
-            String generatedId = UUID.getAscendingOrderUUID();
+            String generatedId = UUID.getUUID();
             idsWithIndexes.add(new Object[]{generatedId, Integer.valueOf(index)});
             if (ids.contains(generatedId))
             {
