@@ -66,28 +66,34 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
         for (int i = processors.size() - 1; i >= 0; i--)
         {
             MessageProcessor processor = initializeMessageProcessor(processors.get(i));
-            if ((processors.get(i)) instanceof InterceptingMessageProcessor)
+            if (processor instanceof InterceptingMessageProcessor)
             {
+                InterceptingMessageProcessor interceptingProcessor = (InterceptingMessageProcessor) processor;
                 // Processor is intercepting so we can't simply iterate
                 if (i + 1 < processors.size())
                 {
                     // The current processor is not the last in the list
                     if (tempList.isEmpty())
                     {
-                        ((InterceptingMessageProcessor) processor).setListener(initializeMessageProcessor(processors.get(i + 1)));
+                        interceptingProcessor.setListener(initializeMessageProcessor(processors.get(i + 1)));
+                    }
+                    else if (tempList.size() == 1)
+                    {
+                        interceptingProcessor.setListener(tempList.get(0));
                     }
                     else
                     {
-                        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(name,
-                            new ArrayList<MessageProcessor>(tempList));
-                        ((InterceptingMessageProcessor) processor).setListener(chain);
+                        final DefaultMessageProcessorChain chain = new DefaultMessageProcessorChain(
+                            "(inner iterating chain) of " + name, new ArrayList<MessageProcessor>(tempList));
+                        interceptingProcessor.setListener(chain);
                     }
                 }
                 tempList = new LinkedList<MessageProcessor>(Collections.singletonList(processor));
             }
             else
             {
-                // Processor is not intercepting so we can invoke it using iteration (add to temp list)
+                // Processor is not intercepting so we can invoke it using iteration
+                // (add to temp list)
                 tempList.addFirst(initializeMessageProcessor(processor));
             }
         }
