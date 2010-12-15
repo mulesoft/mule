@@ -56,8 +56,7 @@ fileScanner = ant.fileScanner
 {
     fileset(dir: muleRoot)
     {
-        // MULE-5293 Only include registry-bootstrap.properties from mule-core
-        include(name: "**core/**/registry-bootstrap.properties")
+        include(name: "**/registry-bootstrap.properties")
         exclude(name: "**/target/**")
     }
 }
@@ -77,13 +76,21 @@ fileScanner.each
         {
             // avoid class cast exceptions when storing the properties object below
             def key = "object.${objectCounter++}".toString()
-            accumulatedProps.put(key, entry.getValue())
+            // Make all objects optional to avoid CNF at startup (see MULE-5293)
+            if (!entry.getValue().endsWith("optional"))
+            {
+                accumulatedProps.put(key, entry.getValue() + ",optional")
+            }
         }
         else if (entry.getKey().startsWith("transformer"))
         {
             // avoid class cast exceptions when storing the properties object below
             def key = "transformer.${transformerCounter++}".toString()
-            accumulatedProps.put(key, entry.getValue())
+            // Make all objects optional to avoid CNF at startup (see MULE-5293)
+            if (!entry.getValue().endsWith("optional"))
+            {
+                accumulatedProps.put(key, entry.getValue() + ",optional")
+            }
         }
         else
         {
@@ -96,7 +103,11 @@ fileScanner.each
             }
             else
             {
-                accumulatedProps.put(entry.getKey(), entry.getValue())
+                // Make all objects optional to avoid CNF at startup (see MULE-5293)
+                if (!entry.getValue().endsWith("optional"))
+                {
+                    accumulatedProps.put(entry.getKey(), entry.getValue() + ",optional")
+                }
             }
         }
     }
