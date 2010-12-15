@@ -24,7 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This is a static class that provides access to the Mule core manifest file. 
+ * This is a static class that provides access to the Mule core manifest file.
  */
 // TODO EE-572
 public class MuleManifest
@@ -86,7 +86,7 @@ public class MuleManifest
     {
         return getManifestProperty("Build-Revision");
     }
-    
+
     public static String getBuildDate()
     {
         return getManifestProperty("Build-Date");
@@ -114,11 +114,11 @@ public class MuleManifest
                     {
                         try
                         {
-                            Enumeration e = MuleConfiguration.class.getClassLoader().getResources(
-                                    ("META-INF/MANIFEST.MF"));
+                            Enumeration<URL> e =
+                                MuleConfiguration.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
                             while (e.hasMoreElements())
                             {
-                                URL url = (URL) e.nextElement();
+                                URL url = e.nextElement();
                                 if ((url.toExternalForm().indexOf("mule-core") > -1 && url.toExternalForm()
                                     .indexOf("tests.jar") < 0)
                                     || url.toExternalForm().matches(".*mule.*-.*-embedded.*\\.jar.*"))
