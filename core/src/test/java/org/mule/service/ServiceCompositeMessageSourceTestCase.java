@@ -77,7 +77,7 @@ public class ServiceCompositeMessageSourceTestCase extends StartableCompositeMes
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             return processNext(new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage().getPayload()
-                                                                           + appendString, muleContext),
+                                                                           + appendString, ServiceCompositeMessageSourceTestCase.muleContext),
                 event));
         }
     }

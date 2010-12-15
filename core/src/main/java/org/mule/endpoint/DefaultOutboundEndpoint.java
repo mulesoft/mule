@@ -88,7 +88,10 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         // Update event endpoint for outbound endpoint
-        event = new DefaultMuleEvent(event.getMessage(), this, event.getSession());
+        if (!event.getEndpoint().equals(this))
+        {
+            event = new DefaultMuleEvent(event.getMessage(), this, event.getSession());
+        }
 
         return getMessageProcessorChain(event.getFlowConstruct()).process(event);
     }
