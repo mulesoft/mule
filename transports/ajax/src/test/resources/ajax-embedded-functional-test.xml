@@ -26,7 +26,7 @@
             <test:component appendString=" Received"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint ref="ajax-endpoint1"/>
+                    <outbound-endpoint ref="ajax-endpoint1" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
         </service>

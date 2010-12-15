@@ -52,6 +52,9 @@ public class AjaxFunctionalTestCase extends DynamicPortTestCase
         bayeuxClient = new BayeuxClient(httpClient, new Address("localhost", SERVER_PORT), "/ajax/cometd");
         // need to start the client before you can add subscriptions
         bayeuxClient.start();
+        
+        assertTrue("httpClient is not running", httpClient.isRunning());
+        assertTrue("bayeuxClient is not running", bayeuxClient.isRunning());
     }
 
     @Override
@@ -61,10 +64,29 @@ public class AjaxFunctionalTestCase extends DynamicPortTestCase
         {
             httpClient.stop();
         }
+
+        try
+        {
+            /*
+             * always try to stop the client as I think there is a timing issue of it
+             * staying up between tests and even if it thinks it's running, calling
+             * stop sometimes throws an exception
+             */
+            bayeuxClient.stop();
+        }
+        catch (Exception e)
+        {
+            // dont do anything
+        }
     }
 
     public void testClientSubscribeWithString() throws Exception
     {
+        /*
+         * Give mule and the clients time to warm up; we get an intermittent failure,
+         * see if this helps
+         */
+        Thread.sleep(5000); 
         final Latch latch = new Latch();
 
         final AtomicReference<Object> data = new AtomicReference<Object>();
@@ -72,6 +94,7 @@ public class AjaxFunctionalTestCase extends DynamicPortTestCase
         {
             public void deliver(Client fromClient, Client toClient, Message message)
             {
+
                 if (message.getData() != null)
                 {
                     // This simulates what the browser would receive
@@ -84,8 +107,8 @@ public class AjaxFunctionalTestCase extends DynamicPortTestCase
 
         MuleClient muleClient = new MuleClient(muleContext);
         muleClient.dispatch("vm://in1", "Ross", null);
-        latch.await(10, TimeUnit.SECONDS);
 
+        latch.await(10, TimeUnit.SECONDS);
         assertNotNull(data.get());
         
         // parse the result string into java objects.  different jvms return it in different order, so we can't do a straight string comparison 
