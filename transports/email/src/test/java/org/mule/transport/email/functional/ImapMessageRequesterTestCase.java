@@ -15,6 +15,7 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
 import org.mule.transport.email.GreenMailUtilities;
 import org.mule.transport.email.ImapConnector;
+import org.mule.transport.email.Pop3Connector;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
@@ -32,17 +33,16 @@ public class ImapMessageRequesterTestCase extends DynamicPortTestCase
     public ImapMessageRequesterTestCase()
     {
         super();
-        setStartContext(false);
     }
 
     @Override
-    protected void doSetUp() throws Exception
+    protected void suitePreSetUp() throws Exception
     {
         super.doSetUp();
         PORT = getPorts().get(0);
         startGreenmailServer();
-    }
-
+    }    
+    
     private void startGreenmailServer() throws Exception
     {
         ServerSetup setup = new ServerSetup(PORT, null, ImapConnector.IMAP);
@@ -51,7 +51,7 @@ public class ImapMessageRequesterTestCase extends DynamicPortTestCase
         GreenMailUtilities.storeEmail(server.getManagers().getUserManager(), EMAIL, USER, PASSWORD,
             GreenMailUtilities.toMessage(MESSAGE, EMAIL, null));
     }
-    
+            
     @Override
     protected void doTearDown() throws Exception
     {
@@ -67,7 +67,6 @@ public class ImapMessageRequesterTestCase extends DynamicPortTestCase
 
     public void testMessageRequester() throws Exception
     {
-        muleContext.start();
         String imapUri = String.format("imap://%1s:%2s@localhost:%3d/INBOX", USER, PASSWORD, PORT);
         
         MuleClient client = new MuleClient(muleContext);
