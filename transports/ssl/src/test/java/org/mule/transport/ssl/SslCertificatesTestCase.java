@@ -12,7 +12,7 @@ package org.mule.transport.ssl;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 
 import java.security.cert.Certificate;
@@ -22,7 +22,7 @@ import java.util.Iterator;
  * A different version of {@link org.mule.transport.ssl.SslCertificateTestCase} to see if we can get
  * different timing.
  */
-public class SslCertificatesTestCase extends FunctionalTestCase
+public class SslCertificatesTestCase extends DynamicPortTestCase
 {
     private static int NUM_MESSAGES = 100;
 
@@ -63,5 +63,11 @@ public class SslCertificatesTestCase extends FunctionalTestCase
             assertTrue("No cert at " + i, certificates.hasNext());
             assertNotNull("Null cert at " + i, certificates.next());
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

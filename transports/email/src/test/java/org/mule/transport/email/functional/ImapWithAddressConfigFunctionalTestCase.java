@@ -10,12 +10,12 @@
 
 package org.mule.transport.email.functional;
 
-public class ImapFunctionalTestCase extends AbstractEmailFunctionalTestCase
+public class ImapWithAddressConfigFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
-    public ImapFunctionalTestCase()
+    public ImapWithAddressConfigFunctionalTestCase()
     {
-        super(STRING_MESSAGE, "imap");
+        super(STRING_MESSAGE, "imap", "imap-with-address-functional-test.xml");
     }
 
     public void testRequest() throws Exception

@@ -86,7 +86,6 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
     {
         this.isMimeMessage = isMimeMessage;
         this.protocol = protocol;
-        //this.port = port;
         this.configFile = configFile;
         this.email = email;
         this.user = user;

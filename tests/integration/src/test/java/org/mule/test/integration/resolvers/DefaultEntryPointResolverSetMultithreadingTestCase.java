@@ -19,8 +19,6 @@ import org.mule.util.Base64;
 import java.util.List;
 import java.util.Random;
 
-// failing test: reported as MULE-5161. 
-
 public class DefaultEntryPointResolverSetMultithreadingTestCase extends FunctionalTestCase
 {
     public DefaultEntryPointResolverSetMultithreadingTestCase()

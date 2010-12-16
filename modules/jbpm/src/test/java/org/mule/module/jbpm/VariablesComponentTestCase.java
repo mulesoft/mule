@@ -22,6 +22,8 @@ import java.util.Map;
 
 public class VariablesComponentTestCase extends FunctionalTestCase
 {
+    private final int TIMEOUT = 5000;
+    
     @Override
     protected String getConfigResources()
     {
@@ -40,7 +42,7 @@ public class VariablesComponentTestCase extends FunctionalTestCase
         String processId = (String)bpms.getId(response.getPayload());
         assertNotNull(processId);
 
-        response = client.request("vm://queueA", 3000);
+        response = client.request("vm://queueA", TIMEOUT);
         assertNotNull(response);
         assertEquals("bar", response.getInboundProperty("foo"));
         assertEquals(0.75, response.getInboundProperty("fraction"));
@@ -52,7 +54,7 @@ public class VariablesComponentTestCase extends FunctionalTestCase
         props.put("time", new Date());
         response = client.send("vm://variables", "data", props);
         
-        response = client.request("vm://queueB", 3000);
+        response = client.request("vm://queueB", TIMEOUT);
         assertNotNull(response);
         assertEquals("bar", response.getInboundProperty("foo"));
         assertEquals(0.75, response.getInboundProperty("fraction"));
