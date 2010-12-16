@@ -30,6 +30,7 @@ import org.mule.config.spring.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.factories.PollingMessageSourceFactoryBean;
 import org.mule.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
+import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListEntryDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildMapDefinitionParser;
@@ -66,7 +67,6 @@ import org.mule.config.spring.parsers.specific.MessageEnricherDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorChainDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
-import org.mule.config.spring.parsers.specific.MessageProcessorRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessagePropertiesTransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.ModelDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
@@ -231,7 +231,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         //Transformer elements
 
-        registerBeanDefinitionParser("transformer", new MessageProcessorRefDefinitionParser());
+        registerMuleBeanDefinitionParser("transformer", new ParentDefinitionParser()).addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "messageProcessor");
 
         registerBeanDefinitionParser("custom-transformer", new MessageProcessorDefinitionParser());
         registerBeanDefinitionParser("auto-transformer", new MessageProcessorDefinitionParser(AutoTransformer.class));
@@ -289,7 +289,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("xa-transaction", new TransactionDefinitionParser(XaTransactionFactory.class));
 
         // Message Processors
-        registerBeanDefinitionParser("processor", new MessageProcessorRefDefinitionParser());
+        registerMuleBeanDefinitionParser("processor", new ParentDefinitionParser()).addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "messageProcessor");
         registerMuleBeanDefinitionParser("custom-processor", new MessageProcessorDefinitionParser()).addIgnored("name");
         registerBeanDefinitionParser("processor-chain", new MessageProcessorChainDefinitionParser());
         registerBeanDefinitionParser("response", new ResponseDefinitionParser());

@@ -22,22 +22,22 @@ import org.springframework.beans.factory.FactoryBean;
 public class ResponseMessageProcessorsFactoryBean implements FactoryBean
 {
 
-    protected List responseMessageProcessors;
+    protected List messageProcessors;
 
     public Class getObjectType()
     {
         return MessageProcessor.class;
     }
 
-    public void setResponseMessageProcessors(List responseMessageProcessors)
+    public void setMessageProcessors(List messageProcessors)
     {
-        this.responseMessageProcessors = responseMessageProcessors;
+        this.messageProcessors = messageProcessors;
     }
 
     public Object getObject() throws Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
-        for (Object processor : responseMessageProcessors)
+        for (Object processor : messageProcessors)
         {
             if (processor instanceof MessageProcessor)
             {

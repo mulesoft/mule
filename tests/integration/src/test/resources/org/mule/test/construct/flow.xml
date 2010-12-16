@@ -124,6 +124,7 @@
         <append-string-transformer message="a" />
         <response>
             <append-string-transformer message="i" />
+            <test:component/>
         </response>
         <append-string-transformer message="b" />
         <response>
@@ -135,6 +136,9 @@
             <append-string-transformer message="e" />
         </response>
         <append-string-transformer message="c" />
+        <response>
+            <test:component/>
+        </response>
         <append-string-transformer message="d" />
     </flow>
 
