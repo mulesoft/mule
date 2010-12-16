@@ -10,7 +10,6 @@
 
 package org.mule.transport.soap.axis.functional;
 
-
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -21,7 +20,7 @@ import java.util.Properties;
 public class WebServiceWrapperWithAxisTestCase extends DynamicPortTestCase
 {
     private String testString = "test";
-    
+
     public void testWsCall() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -29,7 +28,7 @@ public class WebServiceWrapperWithAxisTestCase extends DynamicPortTestCase
         assertNotNull(result.getPayload());
         assertEquals("Payload", "Received: "+ testString, result.getPayloadAsString());
     }
-    
+
     public void testWsCallWithUrlFromMessage() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -39,7 +38,7 @@ public class WebServiceWrapperWithAxisTestCase extends DynamicPortTestCase
         assertNotNull(result.getPayload());
         assertEquals("Payload", "Received: "+ testString, result.getPayloadAsString());
     }
-    
+
     public void testWsCallWithComplexParameters() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -49,7 +48,8 @@ public class WebServiceWrapperWithAxisTestCase extends DynamicPortTestCase
         assertTrue(result.getPayload() instanceof Long);
         assertEquals("Payload", 6, ((Long)result.getPayload()).intValue());
     }
-    
+
+    @Override
     protected String getConfigResources()
     {
         return "mule-ws-wrapper-config.xml";
@@ -58,6 +58,6 @@ public class WebServiceWrapperWithAxisTestCase extends DynamicPortTestCase
     @Override
     protected int getNumPortsToFind()
     {
-        return 1;
+        return 2;
     }
 }
