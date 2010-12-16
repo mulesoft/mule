@@ -10,14 +10,11 @@
 
 package org.mule.module.launcher.descriptor;
 
-import org.mule.util.PropertiesUtils;
 import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.BooleanUtils;
@@ -46,21 +43,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
         d.setConfigurationBuilder(p.getProperty(PROPERTY_CONFIG_BUILDER));
         d.setDomain(p.getProperty(PROPERTY_DOMAIN));
 
-        // get a ref to an optional app props file (right next to the descriptor)
-        final File appPropsFile = new File(descriptor.getParent(), ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE);
-        if (appPropsFile.exists() && appPropsFile.canRead())
-        {
-            final Properties props = PropertiesUtils.loadProperties(appPropsFile.toURI().toURL());
-            // ugh, no straightforward way to convert to a map
-            Map<String, String> m = new HashMap<String, String>(props.size());
-            for (Object key : props.keySet())
-            {
-                m.put(key.toString(), props.getProperty(key.toString()));
-            }
-            d.setAppProperties(m);
-        }
-        
-        // supports true (case insensitive), yes, on as positive values
+        // supports 'true' (case insensitive), 'yes', 'on' as positive values
         d.setParentFirstClassLoader(BooleanUtils.toBoolean(p.getProperty(PROPERTY_CLASSLOADER_PARENT_FIRST, Boolean.TRUE.toString())));
 
         final String resProps = p.getProperty(PROPERTY_CONFIG_RESOURCES);
