@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:activiti="http://www.mulesoft.org/schema/mule/activiti"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+    xsi:schemaLocation="
+    	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+    	http://www.mulesoft.org/schema/mule/activiti http://www.mulesoft.org/schema/mule/activiti/3.1/mule-activiti.xsd
+        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.1/mule-scripting.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd">
+
+    <vm:connector name="asynchVm" />
+
+    <activiti:connector name="actServer"
+        activitiServerURL="http://localhost:8080/activiti-rest/service/"
+        username="kermit" password="kermit" />
+
+    <flow name="checkProcessDefinitions">
+        <activiti:inbound-endpoint description="readProcessDefinitions">
+            <activiti:list-process-definitions pollingFrequency="100000" />
+        </activiti:inbound-endpoint>
+        <activiti:json-to-process-definitions />
+        <collection-splitter />
+        <script:filter>
+            <script:script engine="groovy">
+                return payload.getKey().startsWith("financialReport")
+            </script:script>
+        </script:filter>
+        <script:component>
+            <script:script engine="groovy">
+                return payload.getId()
+            </script:script>
+        </script:component>
+        <all>
+            <vm:outbound-endpoint path="processCreated" connector-ref="asynchVm" />
+            <activiti:outbound-endpoint description="createFinancialReportProcess">
+                <activiti:create-process />
+            </activiti:outbound-endpoint>
+        </all>
+    </flow>
+
+    <flow name="claimTasksOfUser">
+        <activiti:inbound-endpoint description="readCandidates">
+            <activiti:list-candidate-tasks user="kermit" pollingFrequency="10000" />
+        </activiti:inbound-endpoint>
+        <activiti:json-to-tasks />
+        <collection-splitter />
+        <script:component>
+            <script:script engine="groovy">
+                Map map = new HashMap();
+                map.put("taskId", payload.getId());
+                map.put("operation", org.mule.module.activiti.action.Operation.CLAIM);
+                return map;
+            </script:script>
+        </script:component>
+        <all>
+            <vm:outbound-endpoint path="claimedTask" connector-ref="asynchVm" />
+            <activiti:outbound-endpoint description="performTask">
+                <activiti:perform-task-operation />
+            </activiti:outbound-endpoint>
+        </all>
+    </flow>
+
+</mule>

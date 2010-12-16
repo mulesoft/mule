@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/activiti"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
+            targetNamespace="http://www.mulesoft.org/schema/mule/activiti"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+            
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd" />
+    <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.1/mule-schemadoc.xsd"/>
+
+    <xsd:annotation>
+        <xsd:documentation>Activiti BPMN</xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>Activiti</schemadoc:short-name>
+            <schemadoc:page-title>Activiti Module</schemadoc:page-title>
+            <schemadoc:transport-features receiveEvents="true" dispatchEvents="false" responseEvents="true"
+                                          requestEvents="false"
+                                          transactions="false" streaming="false">
+                <schemadoc:MEPs supported="request-response" default="request-response"/>
+            </schemadoc:transport-features>
+        </xsd:appinfo>
+    </xsd:annotation>
+
+    <xsd:element name="connector" type="activitiConnectorType" substitutionGroup="mule:abstract-connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                Activiti BPMN
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+
+    <xsd:complexType name="activitiConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:connectorType">
+                <xsd:attribute name="activitiServerURL" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The URL of the Activiti server.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="username" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The username to be used for authentication.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="password" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The password to be used for authentication.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--
+    The following define endpoint elements for this transport. Attributes for the endpoint can be defined at the section
+    at the bottom
+    -->
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:complexType name="inboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractInboundEndpointType">
+                <xsd:sequence minOccurs="1" maxOccurs="1">
+                    <xsd:element ref="inbound-activiti-action"/>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="addressAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>
+    <xsd:complexType name="outboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractOutboundEndpointType">
+                <xsd:sequence minOccurs="1" maxOccurs="1">
+                    <xsd:element ref="outbound-activiti-action"/>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="addressAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:complexType name="globalEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractGlobalEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="addressAttributes">
+        <xsd:attribute name="description" type="xsd:string"/>
+    </xsd:attributeGroup>
+    
+    <!-- INBOUND ACTIONS -->
+    <xsd:element name="inbound-activiti-action" type="inboundActionType" abstract="true"/>
+    <xsd:complexType name="inboundActionType">
+        <xsd:attribute name="pollingFrequency" type="mule:substitutableLong"/>
+    </xsd:complexType>
+
+    <xsd:element name="list-process-definitions" type="listProcessDefinitionsType" substitutionGroup="inbound-activiti-action"/>
+    <xsd:complexType name="listProcessDefinitionsType">
+        <xsd:complexContent>
+            <xsd:extension base="inboundActionType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="listTasksType">
+        <xsd:complexContent>
+            <xsd:extension base="inboundActionType">
+                <xsd:attribute name="start" type="mule:substitutableLong"/>
+                <xsd:attribute name="size" type="mule:substitutableLong"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="list-assigned-tasks" type="listAssignedTasksType" substitutionGroup="inbound-activiti-action"/>
+    <xsd:complexType name="listAssignedTasksType">
+        <xsd:complexContent>
+            <xsd:extension base="listTasksType">
+                <xsd:attribute name="user" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="list-candidate-tasks" type="listCandidateTasksType" substitutionGroup="inbound-activiti-action"/>
+    <xsd:complexType name="listCandidateTasksType">
+        <xsd:complexContent>
+            <xsd:extension base="listTasksType">
+                <xsd:attribute name="user" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="list-candidate-group-tasks" type="listCandidateGroupTasksType" substitutionGroup="inbound-activiti-action"/>
+    <xsd:complexType name="listCandidateGroupTasksType">
+        <xsd:complexContent>
+            <xsd:extension base="listTasksType">
+                <xsd:attribute name="candidateGroup" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    
+    <!-- OUTBOUND ACTIONS -->
+    <xsd:element name="outbound-activiti-action" type="outboundActionType" abstract="true"/>
+    <xsd:complexType name="outboundActionType"/>
+
+    <xsd:element name="create-process" type="createProcessType" substitutionGroup="outbound-activiti-action"/>
+    <xsd:complexType name="createProcessType">
+        <xsd:complexContent>
+            <xsd:extension base="outboundActionType">
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="perform-task-operation" type="performTaskOperationType" substitutionGroup="outbound-activiti-action"/>
+    <xsd:complexType name="performTaskOperationType">
+        <xsd:complexContent>
+            <xsd:extension base="outboundActionType">
+                <xsd:attribute name="operation" type="operationTypes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:simpleType name="operationTypes">
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="COMPLETE"/>
+            <xsd:enumeration value="CLAIM"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <!-- TRANSFORMERS -->
+    <xsd:element name="json-to-process-definitions" type="jsonToProcessDefinitions" substitutionGroup="mule:abstract-message-processor"/>
+    <xsd:complexType name="jsonToProcessDefinitions">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:element name="json-to-tasks" type="jsonToTasks" substitutionGroup="mule:abstract-message-processor"/>
+    <xsd:complexType name="jsonToTasks">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractMessageProcessorType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+</xsd:schema>
