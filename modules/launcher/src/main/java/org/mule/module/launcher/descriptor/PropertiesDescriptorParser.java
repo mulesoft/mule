@@ -53,9 +53,9 @@ public class PropertiesDescriptorParser implements DescriptorParser
             final Properties props = PropertiesUtils.loadProperties(appPropsFile.toURI().toURL());
             // ugh, no straightforward way to convert to a map
             Map<String, String> m = new HashMap<String, String>(props.size());
-            for (String key : m.keySet())
+            for (Object key : props.keySet())
             {
-                m.put(key, props.getProperty(key));
+                m.put(key.toString(), props.getProperty(key.toString()));
             }
             d.setAppProperties(m);
         }
