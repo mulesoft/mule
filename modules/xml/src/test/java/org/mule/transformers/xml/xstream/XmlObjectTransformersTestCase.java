@@ -23,7 +23,7 @@ import java.util.Map;
 public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCase
 {
     private Apple testObject = null;
-    private Map<String, Class> aliases = new HashMap<String, Class>();
+    private Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
 
     public XmlObjectTransformersTestCase()
     {
@@ -32,6 +32,7 @@ public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCas
         testObject.wash();
     }
 
+    @Override
     public Transformer getTransformer() throws Exception
     {
         ObjectToXml trans =  createObject(ObjectToXml.class);
@@ -39,6 +40,7 @@ public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCas
         return trans;
     }
 
+    @Override
     public Transformer getRoundTripTransformer() throws Exception
     {
         XmlToObject trans = createObject(XmlToObject.class);
@@ -46,22 +48,24 @@ public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCas
         return trans;
     }
 
+    @Override
     public Object getTestData()
     {
         return testObject;
     }
 
+    @Override
     public Object getResultData()
     {
         return "<apple>\n" + "  <bitten>false</bitten>\n"
                + "  <washed>true</washed>\n" + "</apple>";
     }
-    
+
     public void testStreaming() throws Exception
     {
         XmlToObject transformer = createObject(XmlToObject.class);
         transformer.setAliases(aliases);
-        
+
         String input = (String) this.getResultData();
         assertEquals(testObject, transformer.transform(new ByteArrayInputStream(input.getBytes())));
     }

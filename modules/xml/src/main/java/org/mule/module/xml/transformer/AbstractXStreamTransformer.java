@@ -34,7 +34,7 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
 {
     private final AtomicReference/* XStream */xstream = new AtomicReference();
     private volatile String driverClass = XStreamFactory.XSTREAM_XPP_DRIVER;
-    private volatile Map<String, Class> aliases = new HashMap<String, Class>();
+    private volatile Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
     private volatile Set<Class <? extends Converter>> converters = new HashSet<Class <? extends Converter>>();
 
     @Override
@@ -53,7 +53,7 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
             throw new InitialisationException(e, this);
         }
     }
-    
+
     public final XStream getXStream() throws TransformerException
     {
         XStream instance = (XStream) xstream.get();
@@ -77,6 +77,7 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
         return instance;
     }
 
+    @Override
     public Object clone() throws CloneNotSupportedException
     {
         AbstractXStreamTransformer clone = (AbstractXStreamTransformer) super.clone();
@@ -84,9 +85,9 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
 
         if (aliases != null)
         {
-            clone.setAliases(new HashMap<String, Class>(aliases));
+            clone.setAliases(new HashMap<String, Class<?>>(aliases));
         }
-        
+
         if (converters != null)
         {
             clone.setConverters(new HashSet<Class <? extends Converter>>(converters));
@@ -107,12 +108,12 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
         this.xstream.set(null);
     }
 
-    public Map<String, Class> getAliases()
+    public Map<String, Class<?>> getAliases()
     {
         return aliases;
     }
 
-    public void setAliases(Map<String, Class> aliases)
+    public void setAliases(Map<String, Class<?>> aliases)
     {
         this.aliases = aliases;
         // force XStream instance update
@@ -131,12 +132,12 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
         this.xstream.set(null);
     }
 
-    public void addAlias(String alias, Class aClass)
+    public void addAlias(String alias, Class<?> aClass)
     {
         aliases.put(alias, aClass);
     }
 
-    public Class removeAlias(String alias)
+    public Class<?> removeAlias(String alias)
     {
         return aliases.remove(alias);
     }
