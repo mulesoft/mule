@@ -134,6 +134,24 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         MuleMessage message = factory.create(payload, encoding);
         assertEquals(sessionId, message.<Object>getInboundProperty(ServletConnector.SESSION_ID_PROPERTY_KEY));
     }
+
+    /**
+     * Test for MULE-5101
+     * @throws Exception
+     */
+    public void testUniqueMessageId() throws Exception
+    {
+        String sessionId = UUID.getUUID();
+        Object payload = buildGetRequestWithSession(sessionId);
+        Object payload2 = buildGetRequestWithSession(sessionId);
+        MuleMessage message = factory.create(payload, encoding);
+        MuleMessage message2 = factory.create(payload2, encoding);
+        assertEquals(sessionId, message.<Object>getInboundProperty(ServletConnector.SESSION_ID_PROPERTY_KEY));
+        assertEquals(sessionId, message2.<Object>getInboundProperty(ServletConnector.SESSION_ID_PROPERTY_KEY));
+
+        assertFalse(message.getUniqueId().equals(message2.getUniqueId()));
+    }    
+    
     
     public void testCharacterEncodingFromHttpRequest() throws Exception
     {
