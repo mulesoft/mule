@@ -14,6 +14,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.registry.MuleRegistry;
 import org.mule.construct.SimpleService;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationWrapper;
@@ -156,9 +157,13 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         // just assert no priviledged entries were put in the registry
         final Application app = findApp("dummy-app", 1);
-        final Object obj = app.getMuleContext().getRegistry().lookupObject(PriviledgedMuleApplication.REGISTRY_KEY_DEPLOYMENT_SERVICE);
+        final MuleRegistry registry = app.getMuleContext().getRegistry();
+        final Object obj = registry.lookupObject(PriviledgedMuleApplication.REGISTRY_KEY_DEPLOYMENT_SERVICE);
         assertNull(obj);
         assertFalse(((ApplicationWrapper) app).getDelegate() instanceof PriviledgedMuleApplication);
+
+        // mule-app.properties from the zip archive must have loaded properly
+        assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
     }
 
     public void testUpdateAppViaZip() throws Exception

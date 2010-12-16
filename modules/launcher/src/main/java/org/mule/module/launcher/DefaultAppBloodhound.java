@@ -20,6 +20,7 @@ import org.mule.module.launcher.descriptor.PropertiesDescriptorParser;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.FilenameUtils;
+import org.mule.util.PropertiesUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +31,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.imageio.spi.ServiceRegistry;
 
@@ -66,22 +68,15 @@ public class DefaultAppBloodhound implements AppBloodhound
     {
         final File appsDir = MuleContainerBootstrapUtils.getMuleAppsDir();
         File appDir = new File(appsDir, appName);
-        if(!appDir.exists())
+        if (!appDir.exists())
         {
             throw new MuleRuntimeException(
                     MessageFactory.createStaticMessage(
-                            String.format("Application directory does not exist '%s'", appName)));
+                            String.format("Application directory does not exist: '%s'", appDir)));
         }
         // list mule-deploy.* files
         @SuppressWarnings("unchecked")
         Collection<File> deployFiles = FileUtils.listFiles(appDir, new WildcardFileFilter("mule-deploy.*"), null);
-
-        // none found, return defaults
-        if (deployFiles.isEmpty())
-        {
-            return new EmptyApplicationDescriptor(appName);
-        }
-
         if (deployFiles.size() > 1)
         {
             // TODO need some kind of an InvalidAppFormatException
@@ -90,22 +85,47 @@ public class DefaultAppBloodhound implements AppBloodhound
                             String.format("More than one mule-deploy descriptors found in application '%s'", appName)));
         }
 
-        // lookup the implementation by extension
-        final File descriptorFile = deployFiles.iterator().next();
-        final String ext = FilenameUtils.getExtension(descriptorFile.getName());
-        final DescriptorParser descriptorParser = parserRegistry.get(ext);
+        ApplicationDescriptor desc;
 
-        if (descriptorParser == null)
+        // none found, return defaults
+        if (deployFiles.isEmpty())
         {
-            // TODO need some kind of an InvalidAppFormatException
-            throw new MuleRuntimeException(
-                    MessageFactory.createStaticMessage(
-                            String.format("Unsupported deployment descriptor format for app '%s': %s", appName, ext)));
+            desc = new EmptyApplicationDescriptor(appName);
+        }
+        else
+        {
+            // lookup the implementation by extension
+            final File descriptorFile = deployFiles.iterator().next();
+            final String ext = FilenameUtils.getExtension(descriptorFile.getName());
+            final DescriptorParser descriptorParser = parserRegistry.get(ext);
+
+            if (descriptorParser == null)
+            {
+                // TODO need some kind of an InvalidAppFormatException
+                throw new MuleRuntimeException(
+                        MessageFactory.createStaticMessage(
+                                String.format("Unsupported deployment descriptor format for app '%s': %s", appName, ext)));
+            }
+
+            desc = descriptorParser.parse(descriptorFile);
+            // app name is external to the deployment descriptor
+            desc.setAppName(appName);
         }
 
-        ApplicationDescriptor desc = descriptorParser.parse(descriptorFile);
-        // app name is external to the deployment descriptor
-        desc.setAppName(appName);
+        // get a ref to an optional app props file (right next to the descriptor)
+        final File appPropsFile = new File(appDir, ApplicationDescriptor.DEFAULT_APP_PROPERTIES_RESOURCE);
+        if (appPropsFile.exists() && appPropsFile.canRead())
+        {
+            final Properties props = PropertiesUtils.loadProperties(appPropsFile.toURI().toURL());
+            // ugh, no straightforward way to convert to a map
+            Map<String, String> m = new HashMap<String, String>(props.size());
+            for (Object key : props.keySet())
+            {
+                m.put(key.toString(), props.getProperty(key.toString()));
+            }
+            desc.setAppProperties(m);
+        }
+
         return desc;
 
     }
