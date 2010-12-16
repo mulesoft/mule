@@ -12,22 +12,12 @@ package org.mule.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.construct.FlowConstructAware;
-import org.mule.api.context.MuleContextAware;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.Lifecycle;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 
-public class ResponseMessageProcessorAdapter extends AbstractResponseMessageProcessor implements Lifecycle, FlowConstructAware
+public class ResponseMessageProcessorAdapter extends AbstractResponseMessageProcessor
 {
 
     protected MessageProcessor responseProcessor;
-    protected FlowConstruct flowConstruct;
 
     public ResponseMessageProcessorAdapter()
     {
@@ -56,51 +46,6 @@ public class ResponseMessageProcessorAdapter extends AbstractResponseMessageProc
         {
             return responseProcessor.process(event);
         }
-    }
-
-    public void initialise() throws InitialisationException
-    {
-        if (responseProcessor instanceof MuleContextAware)
-        {
-            ((MuleContextAware) responseProcessor).setMuleContext(muleContext);
-        }
-        if (responseProcessor instanceof FlowConstructAware)
-        {
-            ((FlowConstructAware) responseProcessor).setFlowConstruct(flowConstruct);
-        }
-        if (responseProcessor instanceof Initialisable)
-        {
-            ((Initialisable) responseProcessor).initialise();
-        }
-    }
-
-    public void start() throws MuleException
-    {
-        if (responseProcessor instanceof Startable)
-        {
-            ((Startable) responseProcessor).start();
-        }
-    }
-
-    public void stop() throws MuleException
-    {
-        if (responseProcessor instanceof Stoppable)
-        {
-            ((Stoppable) responseProcessor).stop();
-        }
-    }
-
-    public void dispose()
-    {
-        if (responseProcessor instanceof Disposable)
-        {
-            ((Disposable) responseProcessor).dispose();
-        }
-    }
-
-    public void setFlowConstruct(FlowConstruct flowConstruct)
-    {
-        this.flowConstruct = flowConstruct;
     }
 
 }
