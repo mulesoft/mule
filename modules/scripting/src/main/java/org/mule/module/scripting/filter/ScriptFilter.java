@@ -10,18 +10,26 @@
 
 package org.mule.module.scripting.filter;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.module.scripting.component.Scriptable;
+import org.mule.processor.AbstractFilteringMessageProcessor;
 
 import javax.script.Bindings;
 
-public class ScriptFilter implements Filter
+public class ScriptFilter extends AbstractFilteringMessageProcessor implements Filter
 {
 
     private Scriptable script;
     
     private String name;
+    
+    @Override
+    protected boolean accept(MuleEvent event)
+    {
+        return this.accept(event.getMessage());
+    }
     
     public boolean accept(MuleMessage message)
     {
@@ -31,7 +39,7 @@ public class ScriptFilter implements Filter
         {
             return (Boolean) script.runScript(bindings);
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             return false;
         }
