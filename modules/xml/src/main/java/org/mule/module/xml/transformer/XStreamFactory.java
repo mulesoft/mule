@@ -38,7 +38,7 @@ public class XStreamFactory
     public static final String XSTREAM_XPP_DRIVER = "com.thoughtworks.xstream.io.xml.XppDriver";
 
     private static final Log logger = LogFactory.getLog(XStreamFactory.class);
-    
+
     private final XStream xstream;
 
     public XStreamFactory() throws ClassNotFoundException, InstantiationException, IllegalAccessException
@@ -46,11 +46,11 @@ public class XStreamFactory
         this(XSTREAM_XPP_DRIVER, null, null);
     }
 
-    public XStreamFactory(String driverClassName, Map<String, Class> aliases, Set<Class <? extends Converter>> converters)
+    public XStreamFactory(String driverClassName, Map<String, Class<?>> aliases, Set<Class <? extends Converter>> converters)
         throws ClassNotFoundException, InstantiationException, IllegalAccessException
     {
-        Class driverClass = ClassUtils.loadClass(driverClassName, this.getClass());
-        xstream = new XStream((HierarchicalStreamDriver)driverClass.newInstance());
+        Class<?> driverClass = ClassUtils.loadClass(driverClassName, this.getClass());
+        xstream = new XStream((HierarchicalStreamDriver) driverClass.newInstance());
 
         // We must always register this converter as the Mule Message uses
         // ConcurrentHashMaps, but XStream currently does not support them out of the
@@ -61,11 +61,11 @@ public class XStreamFactory
         registerConverters(converters);
     }
 
-    private void registerAliases(Map<String, Class> aliases)
+    private void registerAliases(Map<String, Class<?>> aliases)
     {
         if (aliases != null)
         {
-            for (Map.Entry<String, Class> entry : aliases.entrySet())
+            for (Map.Entry<String, Class<?>> entry : aliases.entrySet())
             {
                 xstream.alias(entry.getKey(), entry.getValue());
             }
@@ -76,7 +76,7 @@ public class XStreamFactory
     {
         if (converters != null)
         {
-            for (Class converter : converters)
+            for (Class<?> converter : converters)
             {
                 Object converterInstance = converter.newInstance();
                 if (converterInstance instanceof Converter)
@@ -107,6 +107,8 @@ public class XStreamFactory
             super(mapper);
         }
 
+        @Override
+        @SuppressWarnings("rawtypes")
         public boolean canConvert(Class aClass)
         {
             String className = aClass.getName();
