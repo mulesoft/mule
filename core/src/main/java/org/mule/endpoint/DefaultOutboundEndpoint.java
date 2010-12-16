@@ -89,7 +89,7 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
     {
         // Update event endpoint for outbound endpoint
         if ((event.getEndpoint() == null || !event.getEndpoint().equals(this))
-            )
+            && !(event.getEndpoint() instanceof DynamicOutboundEndpoint))
         {
             event = new DefaultMuleEvent(event.getMessage(), this, event.getSession());
         }
