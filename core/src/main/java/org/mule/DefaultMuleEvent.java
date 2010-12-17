@@ -728,7 +728,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     @Deprecated
     public Object transformMessage() throws TransformerException
     {
-        logger.warn("Deprecation warning: MUleEvent.transformMessage does nothing in Mule 3.0.  The message is already transformed before the event reaches a component");
+        logger.warn("Deprecation warning: MuleEvent.transformMessage does nothing in Mule 3.x.  The message is already transformed before the event reaches a component");
         return message.getPayload();
     }
 
