@@ -155,7 +155,8 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                             {
                                 messages[i].setFlag(Flags.Flag.SEEN, false);
                             }
-                       }
+                        }
+
                         routeMessage(message);
                     }
                 }
@@ -248,7 +249,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
      * POP3
      * <p/>
      * message will be deleted from the server
-     * 
+     *
      * @param msg the message to store
      * @throws IOException If a failure happens writing the message
      * @throws MessagingException If a failure happens reading the message
