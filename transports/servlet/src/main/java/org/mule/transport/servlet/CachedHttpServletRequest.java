@@ -9,14 +9,14 @@
  */
 package org.mule.transport.servlet;
 
+import org.mule.util.IOUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-
-import org.apache.log4j.lf5.util.StreamUtils;
 
 public class CachedHttpServletRequest extends HttpServletRequestWrapper
 {
@@ -32,6 +32,7 @@ public class CachedHttpServletRequest extends HttpServletRequestWrapper
         }
         catch (IOException e)
         {
+            throw new RuntimeException(e);
         }
     }
 
@@ -50,19 +51,12 @@ public class CachedHttpServletRequest extends HttpServletRequestWrapper
 
     private static class CachedServletInputStream extends ServletInputStream
     {
-
         private ByteArrayInputStream cachedStream;
 
         public CachedServletInputStream(ServletInputStream servletInputStream)
         {
-            try
-            {
-                byte[] bytes = StreamUtils.getBytes(servletInputStream);
-                this.cachedStream = new ByteArrayInputStream(bytes);
-            }
-            catch (IOException e)
-            {
-            }
+            byte[] bytes = IOUtils.toByteArray(servletInputStream);
+            this.cachedStream = new ByteArrayInputStream(bytes);
         }
 
         @Override
@@ -75,11 +69,6 @@ public class CachedHttpServletRequest extends HttpServletRequestWrapper
         public void close() throws IOException
         {
             this.cachedStream.close();
-        }
-
-        @Override
-        protected void finalize() throws Throwable
-        {
         }
 
         @Override

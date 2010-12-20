@@ -17,14 +17,12 @@ import org.mule.transport.http.HttpConstants;
 import org.mule.util.UUID;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpSession;
 
 import static org.mockito.Mockito.mock;
@@ -267,22 +265,5 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         builder.parameters.put("bar", new String[] { "bar-value" });
 
         return builder.buildRequest();
-    }
-
-    private static class MockServletInputStream extends ServletInputStream
-    {
-        private InputStream input;
-
-        public MockServletInputStream(InputStream dataStream)
-        {
-            super();
-            input = dataStream;
-        }
-
-        @Override
-        public int read() throws IOException
-        {
-            return input.read();
-        }
     }
 }
