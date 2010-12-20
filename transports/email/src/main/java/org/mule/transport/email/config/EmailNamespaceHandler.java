@@ -10,9 +10,9 @@
 package org.mule.transport.email.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
-import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.assembly.configuration.SimplePropertyConfiguration;
 import org.mule.config.spring.parsers.assembly.configuration.ValueMap;
+import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.transport.email.transformers.EmailMessageToString;
 import org.mule.transport.email.transformers.MimeMessageToRfc822ByteArray;
 import org.mule.transport.email.transformers.ObjectToMimeMessage;
@@ -26,10 +26,10 @@ import javax.mail.Flags;
 
 public class EmailNamespaceHandler extends AbstractMuleNamespaceHandler
 {
+    protected static ValueMap DEFAULT_PROCESS_MESSAGE_ACTION;
 
-    static ValueMap DEFAULT_PROCESS_MESSAGE_ACTION;
-    
-    static {
+    static
+    {
         Map<String, Flags.Flag> mapping = new HashMap<String, Flags.Flag>();
         mapping.put("ANSWERED", Flags.Flag.ANSWERED);
         mapping.put("DELETED", Flags.Flag.DELETED);
@@ -40,15 +40,14 @@ public class EmailNamespaceHandler extends AbstractMuleNamespaceHandler
         mapping.put("USER", Flags.Flag.USER);
         mapping.put("NONE", null);
         DEFAULT_PROCESS_MESSAGE_ACTION = new SimplePropertyConfiguration.IndentityMapValueMap(mapping);
-    };
-    
+    }
+
     public void init()
     {
         registerBeanDefinitionParser("email-to-string-transformer", new MessageProcessorDefinitionParser(EmailMessageToString.class));
         registerBeanDefinitionParser("string-to-email-transformer", new MessageProcessorDefinitionParser(StringToEmailMessage.class));
         registerBeanDefinitionParser("object-to-mime-transformer", new MessageProcessorDefinitionParser(ObjectToMimeMessage.class));
         registerBeanDefinitionParser("mime-to-bytes-transformer", new MessageProcessorDefinitionParser(MimeMessageToRfc822ByteArray.class));
-        registerBeanDefinitionParser("bytes-to-mime-transformer", new MessageProcessorDefinitionParser(Rfc822ByteArraytoMimeMessage.class));   
+        registerBeanDefinitionParser("bytes-to-mime-transformer", new MessageProcessorDefinitionParser(Rfc822ByteArraytoMimeMessage.class));
     }
-
 }

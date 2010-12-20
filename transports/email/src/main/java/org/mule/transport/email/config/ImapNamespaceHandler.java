@@ -20,7 +20,6 @@ import org.mule.transport.email.ImapConnector;
  */
 public class ImapNamespaceHandler extends AbstractMuleNamespaceHandler
 {
-
     public void init()
     {
         registerStandardTransportEndpoints(ImapConnector.IMAP, URIBuilder.USERHOST_ATTRIBUTES);
@@ -28,5 +27,4 @@ public class ImapNamespaceHandler extends AbstractMuleNamespaceHandler
         MuleDefinitionParserConfiguration parser = registerConnectorDefinitionParser(ImapConnector.class);
         parser.addMapping("defaultProcessMessageAction", EmailNamespaceHandler.DEFAULT_PROCESS_MESSAGE_ACTION);
     }
-
 }

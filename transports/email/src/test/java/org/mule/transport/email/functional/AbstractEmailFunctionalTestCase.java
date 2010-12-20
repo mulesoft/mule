@@ -52,7 +52,7 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
     private boolean isMimeMessage;
     private int port;
     private String configFile;
-    private GreenMail server;
+    protected GreenMail server;
     private String email;
     private String user;
     private String message;
@@ -240,7 +240,8 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
         server.stop();
     }
 
-    private static String getMessage(Locale locale) {
+    private static String getMessage(Locale locale)
+    {
         return LocaleMessageHandler.getString("test-data", locale, "AbstractEmailFunctionalTestCase.getMessage", new Object[] {});
     }
 

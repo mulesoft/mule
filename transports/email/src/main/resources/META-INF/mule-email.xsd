@@ -14,7 +14,7 @@
                 schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.1/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
-            <xsd:documentation>The email transport supplies various email connectivity options.   
+            <xsd:documentation>The email transport supplies various email connectivity options.
             </xsd:documentation>
             <xsd:appinfo>
                 <schemadoc:short-name>Email</schemadoc:short-name>
@@ -25,7 +25,7 @@
                 </schemadoc:transport-features>
             </xsd:appinfo>
     </xsd:annotation>
-            
+
     <xsd:complexType name="emailDownloadConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
@@ -73,12 +73,24 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="defaultProcessMessageAction" type="xsd:string" default="SEEN">
+                <xsd:attribute name="defaultProcessMessageAction" default="SEEN">
                     <xsd:annotation>
                         <xsd:documentation>
                             The action performed if the deleteReadMessages attribute is set to false.
                         </xsd:documentation>
                     </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="ANSWERED"/>
+                            <xsd:enumeration value="DELETED"/>
+                            <xsd:enumeration value="DRAFT"/>
+                            <xsd:enumeration value="FLAGGED"/>
+                            <xsd:enumeration value="RECENT"/>
+                            <xsd:enumeration value="SEEN"/>
+                            <xsd:enumeration value="USER"/>
+                            <xsd:enumeration value="NONE"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
                 </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
