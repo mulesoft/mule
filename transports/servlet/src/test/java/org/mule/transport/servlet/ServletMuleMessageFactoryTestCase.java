@@ -16,8 +16,6 @@ import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.UUID;
 
-import com.mockobjects.dynamic.Mock;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +26,9 @@ import java.util.Vector;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpSession;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
@@ -137,7 +138,6 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
 
     /**
      * Test for MULE-5101
-     * @throws Exception
      */
     public void testUniqueMessageId() throws Exception
     {
@@ -150,26 +150,25 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertEquals(sessionId, message2.<Object>getInboundProperty(ServletConnector.SESSION_ID_PROPERTY_KEY));
 
         assertFalse(message.getUniqueId().equals(message2.getUniqueId()));
-    }    
-    
-    
+    }
+
     public void testCharacterEncodingFromHttpRequest() throws Exception
     {
         MockHttpServletRequestBuilder builder = new MockHttpServletRequestBuilder();
         builder.characterEncoding = "UTF-21";
         Object payload = builder.buildRequest();
-        
+
         MuleMessage message = factory.create(payload, encoding);
         assertInboundScopedProperty(builder.characterEncoding, message, CHARACTER_ENCODING_PROPERTY_KEY);
     }
-        
+
     public void testRequestPropertiesAreConvertedToMessageProperties() throws Exception
     {
         Object payload = buildGetRequestWithParameterValue("foo-param", "foo-value");
         MuleMessage message = factory.create(payload, encoding);
         assertInboundScopedProperty("foo-value", message, "foo-param");
     }
-    
+
     public void testRequestAttributesAreConvertedToMessageProperties() throws Exception
     {
         Object payload = buildGetRequestWithAttributeValue("foo-attribute", "foo-value");
@@ -184,17 +183,17 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertInboundScopedProperty("foo-value", message, "foo-header");
         assertInboundScopedProperty("MULE_HEADER_VALUE", message, "MULE_HEADER");
         assertInboundScopedProperty("localhost:8080", message, HttpConstants.HEADER_HOST);
-        
+
         Object[] expected = new Object[] { "value-one", "value-two" };
         assertTrue(Arrays.equals(expected, (Object[]) message.getInboundProperty("multi-value")));
     }
-        
+
     private void assertInboundScopedProperty(Object expected, MuleMessage message, String key)
     {
         Object value = message.getInboundProperty(key);
         assertEquals(expected, value);
     }
-    
+
     private void assertRequestParameterProperty(String expected, MuleMessage message, String key)
     {
         String propertyKey = ServletConnector.PARAMETER_PROPERTY_PREFIX + key;
@@ -208,25 +207,24 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         return message.getInboundProperty(key);
     }
 
-    private Object buildGetRequestWithContentType(String contentType)
+    private Object buildGetRequestWithContentType(String contentType) throws Exception
     {
         MockHttpServletRequestBuilder builder = new MockHttpServletRequestBuilder();
         builder.contentType = contentType;
         return builder.buildRequest();
     }
 
-    private Object buildGetRequestWithSession(String sessionId)
+    private Object buildGetRequestWithSession(String sessionId) throws Exception
     {
-        Mock mockSession = new Mock(HttpSession.class);
-        mockSession.expectAndReturn("getId", sessionId);
-        HttpSession session = (HttpSession) mockSession.proxy();
-        
+        HttpSession session = mock(HttpSession.class);
+        when(session.getId()).thenReturn(sessionId);
+
         MockHttpServletRequestBuilder builder = new MockHttpServletRequestBuilder();
         builder.session = session;
         return builder.buildRequest();
     }
-    
-    private Object buildGetRequestWithParameterValue(String key, String value)
+
+    private Object buildGetRequestWithParameterValue(String key, String value) throws Exception
     {
         MockHttpServletRequestBuilder builder = new MockHttpServletRequestBuilder();
         builder.parameters = new HashMap<String, String[]>();
@@ -234,43 +232,43 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         return builder.buildRequest();
     }
 
-    private Object buildGetRequestWithAttributeValue(String key, String value)
+    private Object buildGetRequestWithAttributeValue(String key, String value) throws Exception
     {
         MockHttpServletRequestBuilder builder = new MockHttpServletRequestBuilder();
         builder.attributes.put(key, value);
         return builder.buildRequest();
     }
 
-    private Object buildGetRequestWithHeaders()
+    private Object buildGetRequestWithHeaders() throws Exception
     {
         MockHttpServletRequestBuilder builder = new MockHttpServletRequestBuilder();
         builder.headers.put("foo-header", "foo-value");
         builder.headers.put("X-MULE_HEADER", "MULE_HEADER_VALUE");
         builder.headers.put(HttpConstants.HEADER_HOST, "localhost");
-        
+
         Vector<String> multiValue = new Vector<String>();
         multiValue.add("value-one");
         multiValue.add("value-two");
         builder.headers.put("multi-value", multiValue.elements());
-        
+
         return builder.buildRequest();
     }
 
-    private Object buildPostRequest()
+    private Object buildPostRequest() throws Exception
     {
         MockHttpServletRequestBuilder builder = new MockHttpServletRequestBuilder();
         builder.method = HttpConstants.METHOD_POST;
-        
+
         InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
         builder.inputStream = new MockServletInputStream(stream);
-        
+
         builder.parameters = new HashMap<String, String[]>();
         builder.parameters.put("foo", new String[] { "foo-value" });
         builder.parameters.put("bar", new String[] { "bar-value" });
 
         return builder.buildRequest();
     }
-    
+
     private static class MockServletInputStream extends ServletInputStream
     {
         private InputStream input;

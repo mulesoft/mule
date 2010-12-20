@@ -12,9 +12,6 @@ package org.mule.transport.servlet;
 
 import org.mule.transport.http.HttpConstants;
 
-import com.mockobjects.dynamic.C;
-import com.mockobjects.dynamic.Mock;
-
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -26,6 +23,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.collections.iterators.IteratorEnumeration;
+
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MockHttpServletRequestBuilder
 {
@@ -44,106 +46,108 @@ public class MockHttpServletRequestBuilder
     public Map<String, Object> headers = new HashMap<String, Object>();
     public String host = "localhost";
     public int localPort = 8080;
-    
-    public HttpServletRequest buildRequest()
+
+    public HttpServletRequest buildRequest() throws Exception
     {
-        Mock mockRequest = new Mock(HttpServletRequest.class);
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+        when(mockRequest.getMethod()).thenReturn(method);
 
-        mockRequest.expectAndReturn("getMethod", method);
-        
         Enumeration<?> emptyEnumeration = new Hashtable<Object, Object>().elements();
-        mockRequest.expectAndReturn("getParameterNames", emptyEnumeration);
-        
-        mockRequest.expectAndReturn("getRequestURI", requestUri);
-        mockRequest.expectAndReturn("getQueryString", queryString);
-        mockRequest.expectAndReturn("getInputStream", inputStream);
-        mockRequest.expectAndReturn("getSession", C.ANY_ARGS, session);
-        mockRequest.expectAndReturn("getCharacterEncoding", characterEncoding);
-        mockRequest.expectAndReturn("getLocalPort", localPort);
-        
-        mockRequest.expectAndReturn("getContentType", contentType);
-        mockRequest.expectAndReturn("getContentType", contentType);
+        when(mockRequest.getParameterNames()).thenReturn(emptyEnumeration);
 
-        mockRequest.expectAndReturn("getRemoteAddr", host);
-        
+        when(mockRequest.getRequestURI()).thenReturn(requestUri);
+        when(mockRequest.getQueryString()).thenReturn(queryString);
+        when(mockRequest.getInputStream()).thenReturn(inputStream);
+        when(mockRequest.getSession(anyBoolean())).thenReturn(session);
+        when(mockRequest.getCharacterEncoding()).thenReturn(characterEncoding);
+        when(mockRequest.getLocalPort()).thenReturn(localPort);
+        when(mockRequest.getContentType()).thenReturn(contentType);
+        when(mockRequest.getRemoteAddr()).thenReturn(host);
+        when(mockRequest.getHeader(eq(HttpConstants.HEADER_HOST))).thenReturn(host);
+
         addParameterExpectations(mockRequest);
         addAttributeExpectations(mockRequest);
         addHeaderExpectations(mockRequest);
-        mockRequest.expectAndReturn("getHeader", C.eq(HttpConstants.HEADER_HOST), host);
-        
-        return (HttpServletRequest) mockRequest.proxy();
+
+        return mockRequest;
     }
 
-    private void addParameterExpectations(Mock mockRequest)
+    private void addParameterExpectations(HttpServletRequest mockRequest)
     {
         Enumeration<?> nameEnum = null;
-        
+
         if (parameters != null)
         {
             Set<String> keys = parameters.keySet();
             nameEnum = new IteratorEnumeration(keys.iterator());
-            
+
             for (Map.Entry<String, String[]> entry : parameters.entrySet())
             {
                 String key = entry.getKey();
                 String[] value = entry.getValue();
-                mockRequest.expectAndReturn("getParameterValues", C.eq(key), value);
+                when(mockRequest.getParameterValues(eq(key))).thenReturn(value);
             }
         }
 
-        mockRequest.expectAndReturn("getParameterNames", nameEnum);
-        mockRequest.expectAndReturn("getParameterMap", parameters);
+        when(mockRequest.getParameterNames()).thenReturn(nameEnum);
+        when(mockRequest.getParameterMap()).thenReturn(parameters);
     }
-    
-    private void addAttributeExpectations(Mock mockRequest)
+
+    private void addAttributeExpectations(HttpServletRequest mockRequest)
     {
         Enumeration<?> nameEnum = null;
-        
+
         if (attributes != null)
         {
             nameEnum = keyEnumeration(attributes);
-            
+
             for (Map.Entry<String, String> entry : attributes.entrySet())
             {
                 String key = entry.getKey();
                 String value = entry.getValue();
-                
-                mockRequest.expectAndReturn("getAttribute", C.eq(key), value);
+
+                when(mockRequest.getAttribute(eq(key))).thenReturn(value);
             }
         }
-        
-        mockRequest.expectAndReturn("getAttributeNames", nameEnum);
+
+        when(mockRequest.getAttributeNames()).thenReturn(nameEnum);
     }
 
-    private void addHeaderExpectations(Mock mockRequest)
+    private void addHeaderExpectations(HttpServletRequest mockRequest)
     {
         Enumeration<?> nameEnum = null;
         if (headers != null)
         {
             nameEnum = keyEnumeration(headers);
-            
+
             for (Map.Entry<String, Object> entry : headers.entrySet())
             {
                 String key = entry.getKey();
                 Object value = entry.getValue();
+
+                Enumeration<?> valueAsEnumeration = null;
                 if ((value instanceof Enumeration<?>) == false)
                 {
-                    value = new SingleElementEnumeration(value);
+                    valueAsEnumeration = new SingleElementEnumeration(value);
                 }
-                
-                mockRequest.expectAndReturn("getHeaders", C.eq(key), value);
+                else
+                {
+                    valueAsEnumeration = (Enumeration<?>) value;
+                }
+
+                when(mockRequest.getHeaders(eq(key))).thenReturn(valueAsEnumeration);
             }
         }
-        
-        mockRequest.expectAndReturn("getHeaderNames", nameEnum);
+
+        when(mockRequest.getHeaderNames()).thenReturn(nameEnum);
     }
-        
+
     private Enumeration<?> keyEnumeration(Map<?, ?> map)
     {
         Set<?> keys = map.keySet();
         return new IteratorEnumeration(keys.iterator());
     }
-    
+
     private static class SingleElementEnumeration implements Enumeration<Object>
     {
         private Object element;

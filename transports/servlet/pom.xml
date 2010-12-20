@@ -19,7 +19,7 @@
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_2.4_spec</artifactId>
@@ -47,8 +47,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>mockobjects</groupId>
-            <artifactId>mockobjects-core</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
