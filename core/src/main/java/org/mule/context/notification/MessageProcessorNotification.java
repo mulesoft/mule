@@ -29,7 +29,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
     public static final int MESSAGE_PROCESSOR_POST_INVOKE = MESSAGE_PROCESSOR_EVENT_ACTION_START_RANGE + 2;
 
     private final transient MessageProcessor processor;
-    private final String messageProcessorName;
+    private String messageProcessorName;
 
     static
     {
@@ -48,16 +48,17 @@ public class MessageProcessorNotification extends ServerNotification implements 
         try
         {
             // TODO would love to see MP.getName() in the API. Avoid BeanUtils.getProperty() overhead here
-            final Method method = processor.getClass().getMethod("getName");
-            if (method == null)
+            
+            try
+            {
+                final Method method = processor.getClass().getMethod("getName");
+                // invoke existing getName(), but provide same fallback if it returned nothing
+                messageProcessorName = ObjectUtils.toString(method.invoke(processor), toString(processor));
+            }
+            catch (NoSuchMethodException e)
             {
                 // no such method, fallback to MP class name + NamedObject
                 messageProcessorName = toString(processor);
-            }
-            else
-            {
-                // invoke existing getName(), but provide same fallback if it returned nothing
-                messageProcessorName = ObjectUtils.toString(method.invoke(processor), toString(processor));
             }
         }
         catch (Exception e)
