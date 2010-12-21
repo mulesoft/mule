@@ -23,7 +23,7 @@ import org.mule.module.activiti.transformer.JsonToProcessDefinitions;
 import org.mule.module.activiti.transformer.JsonToTasks;
 
 /**
- * Registers a Bean Definition Parser for handling <code><activiti:connector></code> elements
+ * Registers a Bean Definition Parser for handling <code>&lt;activiti:connector&gt;</code> elements
  * and supporting endpoint elements.
  */
 public class ActivitiNamespaceHandler extends AbstractMuleNamespaceHandler
