@@ -45,15 +45,6 @@
       </includes>
     </fileSet>
 
-    <!-- Copy the USAGE.txt file to the root directory for visibility -->
-    <fileSet>
-      <directory>src/main/resources/bin</directory>
-      <outputDirectory></outputDirectory>
-      <includes>
-          <include>USAGE.txt</include>
-      </includes>
-    </fileSet>
-
     <!-- Copy javadocs (the build must be run with -DperformRelease=true) -->
     <fileSet>
       <directory>../../target/site/apidocs</directory>
