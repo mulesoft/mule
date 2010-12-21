@@ -187,8 +187,8 @@ public class CookieHelper
      * @param cookieHeaderValue the value with the cookie/s to parse.
      * @param spec the spec according to {@link #getCookieSpec(String)} (can be null)
      * @param uri the uri information that will be use to complete Cookie information
-     *            (host, port and path). If null then the default
-     *            {@value #DEFAULT_URI_STRING} will be used.
+     *            (host, port and path). If null then the
+     *            <code>DEFAULT_URI_STRING</code> will be used.
      */
     public static Cookie[] parseCookiesAsAClient(String cookieHeaderValue, String spec, URI uri)
         throws MalformedCookieException
@@ -351,7 +351,6 @@ public class CookieHelper
      *            <code>Cookie[]</code>. It can be null.
      * @param cookieName the new cookie name to be added.
      * @param cookieValue the new cookie value to be added.
-     * @return
      */
     public static Object putAndMergeCookie(Object preExistentCookies, String cookieName, String cookieValue)
     {

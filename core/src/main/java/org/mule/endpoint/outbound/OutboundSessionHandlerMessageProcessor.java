@@ -19,7 +19,7 @@ import org.mule.util.ObjectUtils;
 /**
  * Stores session information on the outbound message.
  *
- * @see {@link SessionHandler}
+ * @see SessionHandler
  */
 public class OutboundSessionHandlerMessageProcessor implements MessageProcessor
 {

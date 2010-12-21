@@ -113,12 +113,9 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
     void setMessageSource(MessageSource messageSource);
 
     /**
-     * Outbound Routers control how events are published by a service once. the
-     * event has been processed. If no router is set. A default will be used that
+     * Outbound message processor controls how events are published by a service once the
+     * event has been processed. If no router is set a default will be used that
      * uses the outboundProvider set on his descriptor to route the event.
-     *
-     * @param router the outbound router for this service
-     * @see OutboundRouterCollection
      */
     void setOutboundMessageProcessor(MessageProcessor processor);
 
