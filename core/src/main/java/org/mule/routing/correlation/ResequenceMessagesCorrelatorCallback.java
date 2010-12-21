@@ -15,26 +15,19 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
+import org.mule.routing.Resequencer;
 
 import java.util.Arrays;
 import java.util.Comparator;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * A Correlator that correlates messages based on Mule correlation settings
  * Note that the {@link #aggregateEvents(org.mule.routing.EventGroup)} method only resequences the events and
  * returns an MuleEvent[] wrapped in a MuleMessage impl.  This means that this callback can ONLY be used with a
- * {@link org.mule.routing.inbound.CorrelationEventResequencer}
+ * {@link Resequencer}
  */
 public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCallback
 {
-    /**
-     * logger used by this class
-     */
-    protected transient final Log logger = LogFactory.getLog(ResequenceMessagesCorrelatorCallback.class);
-
     protected Comparator eventComparator;
     protected MuleContext muleContext;
 
@@ -52,11 +45,11 @@ public class ResequenceMessagesCorrelatorCallback extends CollectionCorrelatorCa
      *
      * @param events the event group for this request
      * @return an aggregated message
-     * @throws org.mule.routing.AggregationException
-     *          if the aggregation fails. in this scenario the
-     *          whole event group is removed and passed to the exception handler
-     *          for this componenet
+     * @throws org.mule.routing.AggregationException if the aggregation fails. in
+     *             this scenario the whole event group is removed and passed to the
+     *             exception handler for this componenet
      */
+    @Override
     public MuleEvent aggregateEvents(EventGroup events) throws AggregationException
     {
         MuleEvent[] results = (events == null) ? new MuleEvent[0] : events.toArray();

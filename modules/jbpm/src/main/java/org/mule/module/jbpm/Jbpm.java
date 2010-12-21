@@ -196,7 +196,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
     /**
      * Advance a process instance one step.
      *
-     * @param processVariables - optional process variables/parameters to set
+     * @param variables - optional process variables/parameters to set
      * @return the updated ProcessInstance
      */
     public Object advanceProcess(Object executionId, Object signalName, Map variables) throws Exception
