@@ -10,10 +10,6 @@
 
 package org.mule.expression;
 
-import static org.mule.expression.ExpressionConstants.ALL_ARGUMENT;
-import static org.mule.expression.ExpressionConstants.DELIM;
-import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.transport.PropertyScope;
@@ -25,6 +21,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.mule.expression.ExpressionConstants.ALL_ARGUMENT;
+import static org.mule.expression.ExpressionConstants.DELIM;
+import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
 
 /**
  * Used by the different header expression evaluators to read message properties, honuouring scope and return type
@@ -38,25 +38,25 @@ public final class ExpressionUtils
 
     /**
      * Gets a property or map/list of properties specific by an expression supporting multiple return types as well as all and optional modifiers
-     * 
+     *
      * Handles scope-aware expressions like "#[header:INBOUND:foo]
      * @param expression the header name to evaluate.  this can be prefixed with a message scope such as INBOUND, OUTBOUND
      * or INVOCATION scope. If no scope is defined the default scope is OUTBOUND
-     * 
+     *
      * @param msg the message to evaluate on
      */
     public static Object getPropertyWithScope(String expression, MuleMessage msg)
     {
         return getPropertyWithScope(expression, msg, Object.class);
     }
-    
+
     /**
      * Gets a property or map/list of properties specific by an expression supporting multiple return types as well as all and optional modifiers
      *
      * Handles scope-aware expressions like "#[header:INBOUND:foo]
      * @param expression the header name to evaluate.  this can be prefixed with a message scope such as INBOUND, OUTBOUND
      * or INVOCATION scope. If no scope is defined the default scope is OUTBOUND
-     * 
+     *
      * @param msg the message to evaluate on
      * @param type the expected return type for this evaluation
      * @return  an object of type 'type' corresponding to the message header requested or null if the header was not on
@@ -66,23 +66,19 @@ public final class ExpressionUtils
     {
         return getPropertyInternal(expression, PropertyScope.OUTBOUND, true, msg, type);
     }
-    
+
     /**
-     * Gets a property or map/list of properties specific by an expression supporting multiple return types as well as all and optional modifiers
-     * 
-     * @param msg the message to evaluate on
-     * @param type the expected return type for this evaluation
-     * @return  an object of type 'type' corresponding to the message header requested or null if the header was not on
-     * the message in the specified scope
+     * Gets a property or map/list of properties specified by an expression supporting
+     * multiple return types as well as all and optional modifiers.
      */
     public static Object getProperty(String expression, PropertyScope scope, MuleMessage msg)
     {
         return getProperty(expression, scope, msg, Object.class);
     }
-    
+
     /**
      * Gets a property or map/list of properties specific by an expression supporting multiple return types as well as all and optional modifiers
-     * 
+     *
      * @param msg the message to evaluate on
      * @param type the expected return type for this evaluation
      * @return  an object of type 'type' corresponding to the message header requested or null if the header was not on
@@ -95,13 +91,13 @@ public final class ExpressionUtils
 
     /**
      * Obtains a property or map/list of properties from a message using an expression that specifies which property or properties to evaluate.
-     * This method can be used  default scope 
+     * This method can be used  default scope
      * @param expression the expression used to evaluator the message
      * @param scope the scope to be used when obtaining a property.  This is the default if parseScopes is true.
      * @param parseScope should scope we parsed from expression string.  When true the scope acts as a default.
      * @param msg the message to be evaluated
      * @param type return type expected
-     * @return property or list/map of evaluated property values 
+     * @return property or list/map of evaluated property values
      */
     @SuppressWarnings("unchecked")
     protected static <T> T getPropertyInternal(String expression, PropertyScope scope, boolean parseScope, MuleMessage msg, Class<T> type)
@@ -116,7 +112,7 @@ public final class ExpressionUtils
                 scope = tempScope;
             }
         }
-        
+
         if (expression.contains(ALL_ARGUMENT))
         {
             WildcardFilter filter = new WildcardFilter(expression);

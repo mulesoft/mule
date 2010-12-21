@@ -25,7 +25,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 
 /**
- * Wraps a {@link MessageProcessorBuilder} and configures it lazily so it can 
+ * Wraps a {@link MessageProcessorBuilder} and configures it lazily so it can
  * be injected with the {@link FlowConstruct}.
  */
 public class FlowConfiguringMessageProcessor implements FlowConstructAware, Lifecycle, InterceptingMessageProcessor
@@ -34,7 +34,7 @@ public class FlowConfiguringMessageProcessor implements FlowConstructAware, Life
     private MessageProcessorBuilder builder;
     private MessageProcessor messageProcessor;
     private MessageProcessor listener;
-    
+
     public FlowConfiguringMessageProcessor(MessageProcessorBuilder builder)
     {
         this.builder = builder;
@@ -52,7 +52,7 @@ public class FlowConfiguringMessageProcessor implements FlowConstructAware, Life
 
     public void start() throws MuleException
     {
-        if (messageProcessor instanceof Startable) 
+        if (messageProcessor instanceof Startable)
         {
             ((Startable) messageProcessor).start();
         }
@@ -60,7 +60,7 @@ public class FlowConfiguringMessageProcessor implements FlowConstructAware, Life
 
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
-        if (builder instanceof FlowConstructAware) 
+        if (builder instanceof FlowConstructAware)
         {
             ((FlowConstructAware) builder).setFlowConstruct(flowConstruct);
         }
@@ -68,7 +68,7 @@ public class FlowConfiguringMessageProcessor implements FlowConstructAware, Life
 
     public void dispose()
     {
-        if (messageProcessor instanceof Disposable) 
+        if (messageProcessor instanceof Disposable)
         {
             ((Disposable) messageProcessor).dispose();
         }
@@ -76,7 +76,7 @@ public class FlowConfiguringMessageProcessor implements FlowConstructAware, Life
 
     public void stop() throws MuleException
     {
-        if (messageProcessor instanceof Stoppable) 
+        if (messageProcessor instanceof Stoppable)
         {
             ((Stoppable) messageProcessor).stop();
         }
@@ -84,11 +84,11 @@ public class FlowConfiguringMessageProcessor implements FlowConstructAware, Life
 
     public void initialise() throws InitialisationException
     {
-        if (builder instanceof Initialisable) 
+        if (builder instanceof Initialisable)
         {
             ((Initialisable) builder).initialise();
         }
-        
+
         try
         {
             messageProcessor = builder.build();
@@ -98,11 +98,11 @@ public class FlowConfiguringMessageProcessor implements FlowConstructAware, Life
             throw new InitialisationException(e, this);
         }
 
-        if (messageProcessor instanceof Initialisable) 
+        if (messageProcessor instanceof Initialisable)
         {
             ((Initialisable) messageProcessor).initialise();
         }
-        
+
         if (messageProcessor instanceof InterceptingMessageProcessor && listener != null)
         {
             ((InterceptingMessageProcessor) messageProcessor).setListener(listener);
@@ -111,7 +111,6 @@ public class FlowConfiguringMessageProcessor implements FlowConstructAware, Life
 
     /**
      * The MessageProcessor that this class built.
-     * @return
      */
     public MessageProcessor getWrappedMessageProcessor()
     {

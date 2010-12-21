@@ -51,7 +51,7 @@ public class WebServiceMessageProcessorBuilder
     extends AbstractInboundMessageProcessorBuilder implements FlowConstructAware
 {
     protected transient Log logger = LogFactory.getLog(getClass());
-    
+
     private List<DataBinding> databinding;
     private String frontend = CxfConstants.JAX_WS_FRONTEND;
     private FlowConstruct flowConstruct;
@@ -75,29 +75,29 @@ public class WebServiceMessageProcessorBuilder
         {
             throw new CreateException(CxfMessages.invalidFrontend(frontend), this);
         }
-        
+
         if (serviceClass == null)
         {
             serviceClass = getTargetClass(muleService);
         }
         sfb.setServiceClass(serviceClass);
-        
+
         logger.info("Built CXF Inbound MessageProcessor for service class " + serviceClass.getName());
-        
+
         // Configure Databinding
         if (databinding != null && databinding.size() > 0)
         {
             // TODO: find a way to make this not a list
             sfb.setDataBinding(databinding.get(0));
         }
-        
+
         if (muleService != null && muleService.getComponent() instanceof JavaComponent)
         {
             sfb.setServiceBean(((JavaComponent) muleService.getComponent()).getObjectFactory().getInstance(muleContext));
         }
         return sfb;
     }
-    
+
     @Override
     protected Invoker createInvoker(CxfInboundMessageProcessor processor)
     {
@@ -111,10 +111,6 @@ public class WebServiceMessageProcessorBuilder
 
     /**
      * Try to determine the target class from the Service.
-     * @param service
-     * @return
-     * @throws MuleException
-     * @throws ClassNotFoundException
      */
     protected Class<?> getTargetClass(Service service) throws MuleException, ClassNotFoundException
     {
@@ -122,13 +118,13 @@ public class WebServiceMessageProcessorBuilder
         {
             throw new DefaultMuleException(CxfMessages.serviceClassRequiredWithPassThrough());
         }
-        
+
         Component component = service.getComponent();
         if (!(component instanceof JavaComponent))
         {
             throw new DefaultMuleException(CxfMessages.serviceClassRequiredWithPassThrough());
         }
-        
+
         try
         {
             return ((JavaComponent) component).getObjectType();
@@ -138,7 +134,7 @@ public class WebServiceMessageProcessorBuilder
             throw new CreateException(e, this);
         }
     }
-    
+
     @Override
     protected String getAddress()
     {
@@ -195,7 +191,7 @@ public class WebServiceMessageProcessorBuilder
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
-        
+
         if (flowConstruct instanceof Service)
         {
             this.muleService = (Service) flowConstruct;

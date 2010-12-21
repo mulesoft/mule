@@ -13,11 +13,13 @@ package org.mule.module.jbpm;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleMessage;
 import org.mule.module.bpm.MessageService;
+import org.mule.module.bpm.ProcessComponent;
 
 import java.util.Map;
 
 /**
- * Proxy for the message-generation service provided by Mule.  The real service gets injected here by the {@link ProcessComponent}.
+ * Proxy for the message-generation service provided by Mule. The real service gets
+ * injected here by the {@link ProcessComponent}.
  */
 public class MuleMessageService implements MessageService
 {

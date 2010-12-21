@@ -18,14 +18,12 @@ import org.mule.api.MuleMessage;
  */
 public interface Matchable
 {
-
     /**
      * Determines if the event should be processed
-     * 
-     * @param event the current event to evaluate
+     *
+     * @param message the current message to evaluate
      * @return true if the event should be processed by this router
      * @throws MuleException if the event cannot be evaluated
      */
     boolean isMatch(MuleMessage message) throws MuleException;
-
 }

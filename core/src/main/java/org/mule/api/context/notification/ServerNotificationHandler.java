@@ -18,10 +18,6 @@ public interface ServerNotificationHandler
     boolean isNotificationDynamic();
 
     /**
-     *
-     * @param listener
-     * @return
-     *
      * @since 3.0
      */
     boolean isListenerRegistered(ServerNotificationListener listener);

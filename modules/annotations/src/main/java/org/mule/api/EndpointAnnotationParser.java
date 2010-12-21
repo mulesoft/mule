@@ -17,8 +17,8 @@ import java.lang.reflect.Member;
 import java.util.Map;
 
 /**
- * An SPI interface that will process an Endpoint annotation. Note that the Annotation must be annotated with the {@link @Endpoint }
- * annotation.
+ * An SPI interface that will process an Endpoint annotation. Note that the
+ * Annotation must be annotated with the <code>@Endpoint</code> annotation.
  */
 public interface EndpointAnnotationParser
 {

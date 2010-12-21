@@ -38,45 +38,53 @@ import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.ServerCookie;
 
 /**
+ * <p>
  * Helper functions for parsing, formatting, storing and retrieving cookie headers.
+ * </p>
  * <p>
  * It is important that all access to Cookie data is done using this class. This will
  * help to prevent ClassCastExceptions and data corruption.
+ * </p>
  * <p>
- * The reasons for such a very complex {@link CookieHelper} class are historical and
- * are related to the fact that cookies are a multivalued property and we store them
- * as a single message property under the name
- * {@link HttpConnector#HTTP_COOKIES_PROPERTY "cookies"}.
+ * The reasons for such a very complex CookieHelper class are historical and are
+ * related to the fact that cookies are a multivalued property and we store them as a
+ * single message property under the name
+ * {@linkplain HttpConnector#HTTP_COOKIES_PROPERTY "cookies"}.
+ * </p>
  * <p>
  * In an HTTP message going from client to server the cookies come on their own
- * {@link HttpConstants#HEADER_COOKIE "Cookie"} header. The HTTP message can have
- * several of these Cookie headers and each of them can store 1 or more cookies. One
- * problem with this is that in Mule we use {@link Map Maps} to store the HTTP
- * headers and this means that we can only have one object with the key
- * {@link HttpConnector#HTTP_COOKIES_PROPERTY "cookies"} (yes, we use that constant
- * instead of {@link HttpConstants#HEADER_COOKIE "Cookie"} when we store the cookies
- * inside a {@link MuleMessage}).
+ * {@linkplain HttpConstants#HEADER_COOKIE "Cookie"} header. The HTTP message can
+ * have several of these Cookie headers and each of them can store 1 or more cookies.
+ * One problem with this is that in Mule we use {@link Map} instances to store the
+ * HTTP headers and this means that we can only have one object with the key
+ * {@linkplain HttpConnector#HTTP_COOKIES_PROPERTY "cookies"} (yes, we use that
+ * constant instead of {@linkplain HttpConstants#HEADER_COOKIE "Cookie"} when we
+ * store the cookies inside a {@link MuleMessage}).
+ * </p>
  * <p>
  * In an HTTP message going from server to client the Cookies go in their own
- * {@link HttpConstants#HEADER_COOKIE_SET "Set-Cookie"} header. But, again,
+ * {@linkplain HttpConstants#HEADER_COOKIE_SET "Set-Cookie"} header. But, again,
  * internally we store all the HTTP headers inside a {@link Map} that maps each HTTP
  * header with a single value. For Cookies it is a special case so have to be able to
  * store many cookies in the value from that map.
+ * </p>
  * <p>
  * With all these layed out one could say that we could just have a
- * {@link Collection} of {@link Cookie Cookies}. But this is not that simple. In some
- * parts of the code the cookies are stored as an array of Cookies ({@link Cookie
- * Cookie[]}) and in some others it is stored as a {@link Map} where each entry
- * corresponds to a cookie's name/value pair (which is not strictly a cookie).
- * Specifically, when parsing cookies from the client (ie, acting as a server), the
- * code stores it as an array of cookies. When the cookies are specified as a
- * property in the endpoint (like <a href=
- * "http://www.mulesoft.org/documentation/display/MULE2USER/HTTP+Transport#HTTPTransport-Cookies"
+ * {@link Collection} of {@link Cookie} instances. But this is not that simple. In
+ * some parts of the code the cookies are stored as an array of Cookies and in some
+ * others it is stored as a {@link Map} where each entry corresponds to a cookie's
+ * name/value pair (which is not strictly a cookie). Specifically, when parsing
+ * cookies from the client (ie, acting as a server), the code stores it as an array
+ * of cookies. When the cookies are specified as a property in the endpoint (like <a
+ * href=
+ * "http://www.mulesoft.org/documentation/display/MULE3USER/HTTP+Transport#HTTPTransport-Cookies"
  * >explained in the docs</a>), they are stored as a {@link Map}.
+ * </p>
  * <p>
  * This class has helper methods that helps making code that is independent of the
  * way the cookies are stored and still keep backward compatibility. It is very
  * hacky, but I think it is better than what we had before.
+ * </p>
  * <p>
  * <b>Know Limitation:</b> because of how cookies are handled in Mule, we don't
  * handle well the host, port and path of a Cookie. We just handle Cookies as if they
@@ -87,16 +95,17 @@ import org.apache.tomcat.util.http.ServerCookie;
  * Furthermore, the same thing will happend on the response: all the returned cookies
  * from service (2) will reach service (1) and then the client will receive them as
  * if they were from service (1).
+ * </p>
  */
 public class CookieHelper
 {
-
     /**
      * This is used as the default {@link URI} for
      * {@link #parseCookiesAsAClient(String, String, URI)} and overloading methods
      * for when the {@link URI} supplied is null.
      */
     private static final String DEFAULT_URI_STRING = "http://localhost:80/";
+
     /**
      * logger used by this class
      */
@@ -111,7 +120,6 @@ public class CookieHelper
     }
 
     /**
-     * @param spec
      * @return the {@link CookieSpec} (defaults to {@link RFC2109Spec} when spec is
      *         null)
      */
@@ -128,7 +136,6 @@ public class CookieHelper
     }
 
     /**
-     * @param spec
      * @return the cookie policy (defaults to {@link CookiePolicy#RFC_2109} when spec
      *         is null).
      */
@@ -172,18 +179,16 @@ public class CookieHelper
     }
 
     /**
-     * This method parses the value of {@link HttpConstants#HEADER_COOKIE_SET
-     * "Set-Cookie"} HTTP header, returning an array with all the {@link Cookie}
+     * This method parses the value of {@linkplain HttpConstants#HEADER_COOKIE_SET
+     * "Set-Cookie"} HTTP header, returning an array with all the {@link Cookie}s
      * found. This method is intended to be used from the client side of the HTTP
      * connection.
-     * 
+     *
      * @param cookieHeaderValue the value with the cookie/s to parse.
      * @param spec the spec according to {@link #getCookieSpec(String)} (can be null)
      * @param uri the uri information that will be use to complete Cookie information
      *            (host, port and path). If null then the default
      *            {@value #DEFAULT_URI_STRING} will be used.
-     * @return
-     * @throws MalformedCookieException
      */
     public static Cookie[] parseCookiesAsAClient(String cookieHeaderValue, String spec, URI uri)
         throws MalformedCookieException
@@ -224,27 +229,25 @@ public class CookieHelper
             }
             else
             {
-                throw new MalformedCookieException(
-                    "The uri ("
-                                    + uri
-                                    + ") does not specify a port and no default is available for its scheme ("
-                                    + scheme + ").");
+                String message = String.format(
+                    "The uri (%1s) does not specify a port and no default is available for its scheme (%2s).",
+                    uri, scheme);
+                throw new MalformedCookieException(message);
             }
         }
         return port;
     }
 
     /**
-     * This method parses the value of an HTTP {@link HttpConstants#HEADER_COOKIE
-     * "Cookie"} header that comes from a client to a server. It returns all the
-     * Cookies present in the header.
-     * 
+     * This method parses the value of an HTTP
+     * {@linkplain HttpConstants#HEADER_COOKIE "Cookie"} header that comes from a
+     * client to a server. It returns all the Cookies present in the header.
+     *
      * @param header the header from which the cookie will be parsed. Please not that
      *            only the {@link Header#getValue() value} of this header will be
      *            used. No validation will be made to make sure that the
-     *            {@link Header#getName() headerName} is actually a
+     *            {@linkplain Header#getName() headerName} is actually a
      *            {@link HttpConstants#HEADER_COOKIE}.
-     * @return
      */
     public static Cookie[] parseCookiesAsAServer(Header header, URI uri)
     {
@@ -252,14 +255,12 @@ public class CookieHelper
     }
 
     /**
-     * This method parses the value of an HTTP {@link HttpConstants#HEADER_COOKIE
+     * This method parses the value of an HTTP {@linkplain HttpConstants#HEADER_COOKIE
      * "Cookie"} header that comes from a client to a server. It returns all the
      * Cookies present in the header.
-     * 
+     *
      * @param headerValue the value of the header from which the cookie will be
      *            parsed.
-     * @param uri
-     * @return
      */
     public static Cookie[] parseCookiesAsAServer(String headerValue, URI uri)
     {
@@ -284,13 +285,10 @@ public class CookieHelper
     }
 
     /**
-     * Transforms a {@link ServerCookie} (from apache tomcat) into a {@link Cookie}
+     * Transforms a {@link ServerCookie} (from Apache Tomcat) into a {@link Cookie}
      * (from commons httpclient). Both types of Cookie hold the same data but the
      * {@link ServerCookie} is the type that you get when parsing cookies as a
      * Server.
-     * 
-     * @param serverCookie
-     * @return
      */
     protected static Cookie transformServerCookieToClientCookie(ServerCookie serverCookie)
     {
@@ -304,10 +302,7 @@ public class CookieHelper
 
     /**
      * This method formats the cookie so it can be send from server to client in a
-     * {@link HttpConstants#HEADER_COOKIE_SET "Set-Cookie"} header.
-     * 
-     * @param cookie
-     * @return
+     * {@linkplain HttpConstants#HEADER_COOKIE_SET "Set-Cookie"} header.
      */
     public static String formatCookieForASetCookieHeader(Cookie cookie)
     {
@@ -320,11 +315,9 @@ public class CookieHelper
 
     /**
      * Adds to the client all the cookies present in the cookiesObject.
-     * 
-     * @param client
+     *
      * @param cookiesObject this must be either a {@link Map Map&lt;String,
      *            String&gt;} or a {@link Cookie Cookie[]}. It can be null.
-     * @param policy
      * @param event this one is used only if the cookies are stored in a {@link Map}
      *            in order to resolve expressions with the {@link ExpressionManager}.
      * @param destinationUri the host, port and path of this {@link URI} will be used
@@ -341,17 +334,21 @@ public class CookieHelper
     }
 
     /**
+     * <p>
      * This method merges a new Cookie (or override the previous one if it exists) to
      * the preExistentCookies. The result (the old cookies with the new one added) is
      * returned. If a cookie with the same name already exists, then it will be
      * overridden.
+     * </p>
      * <p>
      * It is <b>important</b> that you use the returned value of this method because
      * for some implementations of preExistentCookies it is not possible to add new
-     * Cookies (for example, on {@link Cookie Cookie[]}).
-     * 
-     * @param preExistentCookies this must be either a {@link Map Map&lt;String,
-     *            String&gt;} or a {@link Cookie Cookie[]}. It can be null.
+     * Cookies (for example, on Cookie[]).
+     * </p>
+     *
+     * @param preExistentCookies this must be either a
+     *            <code>java.util.Map&lt;String, String&gt;</code> or a
+     *            <code>Cookie[]</code>. It can be null.
      * @param cookieName the new cookie name to be added.
      * @param cookieValue the new cookie value to be added.
      * @return
@@ -363,17 +360,16 @@ public class CookieHelper
     }
 
     /**
+     * <p>
      * Merges all the Cookies in newCookiesArray with the preExistentCookies, adding
      * the new ones and overwriting the existing ones (existing means same cookie
      * name).
+     * </p>
      * <p>
      * It is <b>important</b> that you use the returned value of this method because
      * for some implementations of preExistentCookies it is not possible to add new
-     * Cookies (for example, on {@link Cookie Cookie[]}).
-     * 
-     * @param preExistentCookies
-     * @param newCookiesArray
-     * @return
+     * Cookies (for example, on Cookie[]).
+     * </p>
      */
     public static Object putAndMergeCookie(Object preExistentCookies, Cookie[] newCookiesArray)
     {
@@ -382,17 +378,16 @@ public class CookieHelper
     }
 
     /**
+     * <p>
      * Merges all the Cookies in newCookiesMap with the preExistentCookies, adding
      * the new ones and overwriting the existing ones (existing means same cookie
      * name).
+     * </p>
      * <p>
      * It is <b>important</b> that you use the returned value of this method because
      * for some implementations of preExistentCookies it is not possible to add new
-     * Cookies (for example, on {@link Cookie Cookie[]}).
-     * 
-     * @param preExistentCookies
-     * @param newCookiesMap
-     * @return
+     * Cookies (for example, on Cookie[]).
+     * </p>
      */
     public static Object putAndMergeCookie(Object preExistentCookies, Map<String, String> newCookiesMap)
     {
@@ -402,11 +397,7 @@ public class CookieHelper
 
     /**
      * Searches and return the cookie with the cookieName in the cookiesObject. It
-     * returns null if the cookie is not present.
-     * 
-     * @param cookiesObject
-     * @param cookieName
-     * @return
+     * returns <code>null</code> if the cookie is not present.
      */
     public static String getCookieValueFromCookies(Object cookiesObject, String cookieName)
     {
@@ -416,9 +407,6 @@ public class CookieHelper
 
     /**
      * Returns an array view of the cookiesObject.
-     * 
-     * @param cookiesObject
-     * @return
      */
     public static Cookie[] asArrayOfCookies(Object cookiesObject)
     {
@@ -436,11 +424,14 @@ public class CookieHelper
 enum CookieStorageType
 {
     /**
-     * This corresponds to the storage of cookies as a {@link Cookie Cookie[]}.
+     * <p>
+     * This corresponds to the storage of cookies as a Cookie[].
+     * </p>
      * <p>
      * All the parameters of type {@link Object} in the method of this object are
-     * assumed to be of type {@link Cookie Cookie[]} and won't be checked. They will
-     * be cast to {@link Cookie Cookie[]}.
+     * assumed to be of type Cookie[] and won't be checked. They will be cast to
+     * Cookie[].
+     * </p>
      */
     ARRAY_OF_COOKIES
     {
@@ -606,14 +597,17 @@ enum CookieStorageType
         }
 
     },
+
     /**
-     * This corresponds to the storage of cookies as {@link Map Map<String,String>},
+     * <p>
+     * This corresponds to the storage of cookies as {@link Map<String, String>},
      * where the keys are the cookie names and the values are the cookie values.
+     * </p>
      * <p>
      * All the parameters of type {@link Object} in the method of this object are
-     * assumed to be of type {@link Map Map&lt;String, String&gt;} and won't be
-     * checked. They will be cast to {@link Map} and used as if all the keys and
-     * values are of type {@link String}.
+     * assumed to be of type {@link Map<String, String>} and won't be checked. They
+     * will be cast to {@link Map} and used as if all the keys and values are of type
+     * {@link String}.
      */
     MAP_STRING_STRING
     {
@@ -721,7 +715,7 @@ enum CookieStorageType
 
     /**
      * Resolves the cookiesObject to the appropriate {@link CookieStorageType}.
-     * 
+     *
      * @param cookiesObject
      * @return
      */

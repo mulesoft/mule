@@ -12,6 +12,7 @@ package org.mule.api.annotations;
 
 import org.mule.api.annotations.meta.Channel;
 import org.mule.api.annotations.meta.ChannelType;
+import org.mule.transport.quartz.config.ScheduleConfigBuilder;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -98,12 +99,14 @@ public @interface Schedule
     public abstract String cron() default "";
 
     /**
-     * A reference to a {@link ScheduleConfigBuilder} object used to configure this scheduler job.
-     * <p/>
-     * The scheduler reference can be a reference to a connector in the local registry or a reference
-     * to an object in the Mule service registry. Local configBuilder references can use the "id" value passed into the
-     * {@link org.mule.transport.quartz.config.ScheduleConfigBuilder}.
-     * <p/>
+     * <p>
+     * A reference to a {@link ScheduleConfigBuilder} object used to configure this
+     * scheduler job.
+     * </p>
+     * The scheduler reference can be a reference to a connector in the local
+     * registry or a reference to an object in the Mule service registry. Local
+     * configBuilder references can use the "id" value passed into the
+     * {@link ScheduleConfigBuilder}. </p>
      *
      * @return The scheduler name associated with the schedule action
      */

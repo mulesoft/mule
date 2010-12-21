@@ -28,8 +28,10 @@ import static org.mule.expression.ExpressionConstants.DELIM;
 import static org.mule.expression.ExpressionConstants.OPTIONAL_ARGUMENT;
 
 /**
- * Looks up the attachment(s) on the message using the expression given. The expression can contain a comma-separated list
- * of header names to lookup. A {@link java.util.Map&lt;String, DataHandler&gt;} of key value pairs is returned.
+ * Looks up the attachment(s) on the message using the expression given. The
+ * expression can contain a comma-separated list of header names to lookup. A
+ * <code>java.util.Map&lt;String, DataHandler&gt;</code> of key value pairs is
+ * returned.
  *
  * @see MessageAttachmentsListExpressionEvaluator
  * @see MessageAttachmentExpressionEvaluator

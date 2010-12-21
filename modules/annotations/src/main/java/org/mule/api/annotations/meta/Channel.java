@@ -22,19 +22,18 @@ import java.lang.annotation.Target;
 public @interface Channel
 {
     /**
-     * The short protocol name for the connector. Where the annotation is general purpose, a string ID can be used such as
-     * 'outbound' or 'reply'.
+     * The short protocol name for the connector. Where the annotation is general
+     * purpose, a string ID can be used such as 'outbound' or 'reply'.
      *
      * @return the resource name for the connector
      */
     String identifer();
 
     /**
-     * The endpoint type. {@link ChannelType.Inbound} is used to indicate that
-     * the endpoint annotation is used for receiving messages. {@link ChannelType.Outbound} indicates that the endpoint
-     * will be used for dispatching events.
-     *
-     * @return
+     * The endpoint type. <code>ChannelType.Inbound</code> is used to indicate that
+     * the endpoint annotation is used for receiving messages.
+     * <code>ChannelType.Outbound</code> indicates that the endpoint will be used for
+     * dispatching events.
      */
     ChannelType type();
 }

@@ -39,7 +39,7 @@ public interface ExpressionManager
      * @return the evaluator that was removed. This will be null if the evaluator was not registered
      */
     public ExpressionEvaluator unregisterEvaluator(String name);
-    
+
     public void registerEnricher(ExpressionEnricher enricher);
 
     /**
@@ -106,57 +106,61 @@ public interface ExpressionManager
     public Object evaluate(String expression, String evaluator, MuleMessage message, boolean failIfNull) throws ExpressionRuntimeException;
 
     /**
-     * Evaluates the given expression resolving the result of the evaluation to a boolean.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. 
-     * 
+     * Evaluates the given expression resolving the result of the evaluation to a
+     * boolean. The expression should be a single expression definition with or
+     * without enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]"
+     * are both valid.
+     *
      * @param expression a single expression i.e. header:foo=bar
      * @param evaluator the evaluator to use when executing the expression
      * @param message The current message being processed
-     * @return
-     * @throws ExpressionRuntimeException
      */
     public boolean evaluateBoolean(String expression, String evaluator, MuleMessage message) throws ExpressionRuntimeException;
 
     /**
-     * Evaluates the given expression resolving the result of the evaluation to a boolean.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid.
+     * Evaluates the given expression resolving the result of the evaluation to a
+     * boolean. The expression should be a single expression definition with or
+     * without enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]"
+     * are both valid.
      *
      * @param expression a single expression i.e. header:foo=bar
      * @param message The current message being processed
-     * @return
-     * @throws ExpressionRuntimeException
      */
     public boolean evaluateBoolean(String expression, MuleMessage message) throws ExpressionRuntimeException;
 
     /**
-     * Evaluates the given expression resolving the result of the evaluation to a boolean.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. 
+     * Evaluates the given expression resolving the result of the evaluation to a
+     * boolean. The expression should be a single expression definition with or
+     * without enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]"
+     * are both valid.
      *
      * @param expression a single expression i.e. header:foo=bar
      * @param evaluator the evaluator to use when executing the expression
      * @param message The current message being processed
-     * @param nullReturnsTrue determines if true should be returned if the result of the evaluation is null
-     * @param nonBooleanReturnsTrue determines if true should returned if the result is not null but isn't recognised as a boolean 
-     * @return
-     * @throws ExpressionRuntimeException
+     * @param nullReturnsTrue determines if true should be returned if the result of
+     *            the evaluation is null
+     * @param nonBooleanReturnsTrue determines if true should returned if the result
+     *            is not null but isn't recognised as a boolean
      */
     public boolean evaluateBoolean(String expression, String evaluator, MuleMessage message, boolean nullReturnsTrue, boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException;
 
     /**
-     * Evaluates the given expression resolving the result of the evaluation to a boolean.  The expression should be a single expression definition with or without
-     * enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]" are both valid. 
+     * Evaluates the given expression resolving the result of the evaluation to a
+     * boolean. The expression should be a single expression definition with or
+     * without enclosing braces. i.e. "mule:serviceName" and "#[mule:serviceName]"
+     * are both valid.
      *
      * @param expression a single expression i.e. header:foo=bar
      * @param message The current message being processed
-     * @param nullReturnsTrue determines if true should be returned if the result of the evaluation is null
-     * @param nonBooleanReturnsTrue determines if true should returned if the result is not null but isn't recognised as a boolean 
-     * @return
-     * @throws ExpressionRuntimeException
+     * @param nullReturnsTrue determines if true should be returned if the result of
+     *            the evaluation is null
+     * @param nonBooleanReturnsTrue determines if true should returned if the result
+     *            is not null but isn't recognised as a boolean
      */
     public boolean evaluateBoolean(String expression, MuleMessage message, boolean nullReturnsTrue, boolean nonBooleanReturnsTrue) throws ExpressionRuntimeException;
 
     /**
-     * Enriches the current message using 
+     * Enriches the current message using
      * @param expression a single expression i.e. header://foo that defines how the message shoud be enriched
      * @param message The current message being processed that will be enriched
      * @param object The object that will be used to enrich the message
@@ -171,7 +175,7 @@ public interface ExpressionManager
      * @param object The object that will be used to enrich the message
      */
     public void enrich(String expression, String enricher, MuleMessage message, Object object);
-    
+
     /**
      * Evaluates expressions in a given string. This method will iterate through each expression and evaluate it. If
      * a user needs to evaluate a single expression they can use {@link #evaluate(String,org.mule.api.MuleMessage,boolean)}.
@@ -203,7 +207,7 @@ public interface ExpressionManager
      * Clears all registered evaluators from the manager.
      */
     public void clearEvaluators();
-    
+
     /**
      * Clears all registered enrichers from the manager.
      */

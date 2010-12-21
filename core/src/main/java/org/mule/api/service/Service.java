@@ -33,32 +33,33 @@ import java.io.Serializable;
  * is responsible for managing the interaction of events to and from the service as
  * well as managing pooled resources.
  */
-
 public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedObject
 {
     /**
      * Makes an asynchronous event call to the service.
-     * 
+     *
      * @param event the event to consume
      * @throws MuleException if the event fails to be processed
      * @deprecated
      */
+    @Deprecated
     void dispatchEvent(MuleEvent event) throws MuleException;
 
     /**
      * Makes a synchronous event call to the service. This event will be consumed by
      * the service and a result returned.
-     * 
+     *
      * @param event the event to consume
      * @return a MuleMessage containing the resulting message and properties
      * @throws MuleException if the event fails to be processed
      * @deprecated
      */
+    @Deprecated
     MuleEvent sendEvent(MuleEvent event) throws MuleException;
 
     /**
      * Determines whether this service has been started
-     * 
+     *
      * @return true is the service is started and ready to receive events
      */
     boolean isStarted();
@@ -66,7 +67,7 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
     boolean isStopped();
 
     /**
-     * Pauses event processing for a single Mule Service. Unlike stop(), a paused
+     * Pauses event processing for a single Mule Service. Unlike <code>stop()</code>, a paused
      * service will still consume messages from the underlying transport, but those
      * messages will be queued until the service is resumed.
      */
@@ -79,12 +80,10 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
     void resume() throws MuleException;
 
     /**
-     * True if the service is in a paused state, false otherwise
-     * 
-     * @return True if the service is in a paused state, false otherwise
+     * @return true if the service is in a paused state, false otherwise
      */
     boolean isPaused();
-    
+
     MessageSource getMessageSource();
 
     /**
@@ -134,27 +133,25 @@ public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedOb
 
     /**
      * Returns the Component that is a invoked by a {@link Service} for each incoming
-     * {@link MuleEvent} routed on by the {@link InboundRouterCollection}.
+     * {@link MuleEvent} routed on by the inbound routers.
      */
     Component getComponent();
 
     /**
      * Sets the Component that is a invoked by a {@link Service} for each incoming
-     * {@link MuleEvent} routed on by the {@link InboundRouterCollection}.
-     * 
-     * @param component
+     * {@link MuleEvent} routed on by the inbound routers.
      */
     void setComponent(Component component);
-    
+
     /**
      * Returns the Service statistics.  This provides Service router and component statistics.
      */
     ServiceStatistics getStatistics();
-    
+
     MuleContext getMuleContext();
 
     LifecycleManager getLifecycleManager();
-    
+
     void setAsyncReplyMessageSource(ServiceAsyncReplyCompositeMessageSource asyncReplyMessageSource);
 
     ServiceAsyncReplyCompositeMessageSource getAsyncReplyMessageSource();

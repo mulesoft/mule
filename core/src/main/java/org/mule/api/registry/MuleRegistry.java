@@ -74,9 +74,9 @@ public interface MuleRegistry extends Registry
     EndpointBuilder lookupEndpointBuilder(String name);
 
     /**
-     * @Deprecated use {@link MuleContext#getEndpointFactory()} instead/
-     * @return
+     * @deprecated use {@link MuleContext#getEndpointFactory()} instead/
      */
+    @Deprecated
     EndpointFactory lookupEndpointFactory();
 
     Transformer lookupTransformer(String name);
@@ -84,7 +84,7 @@ public interface MuleRegistry extends Registry
     Service lookupService(String name);
 
     FlowConstruct lookupFlowConstruct(String name);
-    
+
     /**
      * This method will return a list of {@link org.mule.api.transformer.Transformer} objects that accept the given
      * input and return the given output type of object
@@ -94,7 +94,8 @@ public interface MuleRegistry extends Registry
      * @return a list of matching transformers. If there were no matchers an empty list is returned.
      * @deprecated use {@link #lookupTransformers(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead
      */
-    List<Transformer> lookupTransformers(Class input, Class output);
+    @Deprecated
+    List<Transformer> lookupTransformers(Class<?> input, Class<?> output);
 
     /**
      * This method will return a list of {@link org.mule.api.transformer.Transformer} objects that accept the given
@@ -105,7 +106,7 @@ public interface MuleRegistry extends Registry
      * @return a list of matching transformers. If there were no matchers an empty list is returned.
      * @since 3.0.0
      */
-    List<Transformer> lookupTransformers(DataType source, DataType result);
+    List<Transformer> lookupTransformers(DataType<?> source, DataType<?> result);
 
     /**
      * Will find a transformer that is the closest match to the desired input and output.
@@ -116,7 +117,8 @@ public interface MuleRegistry extends Registry
      * @throws TransformerException will be thrown if there is more than one match
      * @deprecated use {@link #lookupTransformer(org.mule.api.transformer.DataType, org.mule.api.transformer.DataType)} instead
      */
-    Transformer lookupTransformer(Class input, Class output) throws TransformerException;
+    @Deprecated
+    Transformer lookupTransformer(Class<?> input, Class<?> output) throws TransformerException;
 
     /**
      * Will find a transformer that is the closest match to the desired input and output.
@@ -127,14 +129,14 @@ public interface MuleRegistry extends Registry
      * @throws TransformerException will be thrown if there is more than one match
      * @since 3.0.0
      */
-    Transformer lookupTransformer(DataType source, DataType result) throws TransformerException;
+    Transformer lookupTransformer(DataType<?> source, DataType<?> result) throws TransformerException;
 
     Collection<Service> lookupServices(String model);
 
     Collection<Service> lookupServices();
 
     Collection<FlowConstruct> lookupFlowConstructs();
-    
+
     Model lookupModel(String name);
 
     Model lookupSystemModel();
@@ -144,26 +146,31 @@ public interface MuleRegistry extends Registry
     /**
      * @deprecated Use lookupModel() instead
      */
+    @Deprecated
     Collection<Model> getModels();
 
     /**
      * @deprecated Use lookupConnector() instead
      */
+    @Deprecated
     Collection<Connector> getConnectors();
 
     /**
      * @deprecated Use {@link org.mule.api.endpoint.EndpointFactory} for creation/lookup of individual endpoints instead
      */
+    @Deprecated
     Collection<ImmutableEndpoint> getEndpoints();
 
     /**
      * @deprecated Use lookupAgent() instead
      */
+    @Deprecated
     Collection<Agent> getAgents();
 
     /**
      * @deprecated Use lookupTransformer() instead
      */
+    @Deprecated
     Collection<Transformer> getTransformers();
 
     // /////////////////////////////////////////////////////////////////////////
@@ -193,7 +200,7 @@ public interface MuleRegistry extends Registry
     void registerFlowConstruct(FlowConstruct flowConstruct) throws MuleException;
 
     void unregisterFlowConstruct(String flowConstructName) throws MuleException;
-    
+
     void registerModel(Model model) throws MuleException;
 
     void unregisterModel(String modelName) throws MuleException;

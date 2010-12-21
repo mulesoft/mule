@@ -16,11 +16,10 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.SessionHandler;
 import org.mule.util.ObjectUtils;
 
-
 /**
  * Stores session information on the outbound message.
- * 
- * @See {@link SessionHandler}
+ *
+ * @see {@link SessionHandler}
  */
 public class OutboundSessionHandlerMessageProcessor implements MessageProcessor
 {

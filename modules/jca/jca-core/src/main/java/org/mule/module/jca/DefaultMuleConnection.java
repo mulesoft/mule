@@ -55,7 +55,7 @@ public class DefaultMuleConnection implements MuleConnection
     /**
      * Dispatches an event asynchronously to a endpointUri via a mule server. the Url
      * determines where to dispathc the event to, this can be in the form of
-     * 
+     *
      * @param url the Mule url used to determine the destination and transport of the
      *            message
      * @param payload the object that is the payload of the event
@@ -79,7 +79,7 @@ public class DefaultMuleConnection implements MuleConnection
         }
         catch (Exception e)
         {
-            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event, 
+            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event,
                 endpoint, e);
         }
     }
@@ -87,7 +87,7 @@ public class DefaultMuleConnection implements MuleConnection
     /**
      * Sends an object (payload) synchronous to the given url and returns a
      * MuleMessage response back.
-     * 
+     *
      * @param url the Mule url used to determine the destination and transport of the
      *            message
      * @param payload the object that is the payload of the event
@@ -121,14 +121,14 @@ public class DefaultMuleConnection implements MuleConnection
         }
         catch (Exception e)
         {
-            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event, 
+            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event,
                 endpoint, e);
         }
     }
 
     /**
      * Will receive an event from an endpointUri determined by the url
-     * 
+     *
      * @param url the Mule url used to determine the destination and transport of the
      *            message
      * @param timeout how long to block waiting to receive the event, if set to 0 the
@@ -150,8 +150,8 @@ public class DefaultMuleConnection implements MuleConnection
             throw new ReceiveException(endpoint, timeout, e);
         }
     }
-    
-    protected OutboundEndpoint getOutboundEndpoint(String uri, MessageExchangePattern exchangePattern) 
+
+    protected OutboundEndpoint getOutboundEndpoint(String uri, MessageExchangePattern exchangePattern)
         throws MuleException
     {
         EndpointBuilder endpointBuilder = muleContext.getRegistry()
@@ -163,12 +163,6 @@ public class DefaultMuleConnection implements MuleConnection
 
     /**
      * Packages a mule event for the current request
-     * 
-     * @param message the event payload
-     * @param uri the destination endpointUri
-     * @param synchronous whether the event will be synchronously processed
-     * @return the MuleEvent
-     * @throws MuleException in case of Mule error
      */
     protected MuleEvent getEvent(MuleMessage message, OutboundEndpoint endpoint)
         throws MuleException
@@ -185,7 +179,7 @@ public class DefaultMuleConnection implements MuleConnection
 
     /**
      * Retrieves a ManagedConnection.
-     * 
+     *
      * @return a ManagedConnection instance representing the physical connection to
      *         the EIS
      */
@@ -213,7 +207,7 @@ public class DefaultMuleConnection implements MuleConnection
 
     /**
      * Associates connection handle with new managed connection.
-     * 
+     *
      * @param newMc new managed connection
      */
 
@@ -229,7 +223,7 @@ public class DefaultMuleConnection implements MuleConnection
 
     /**
      * Checks the validity of the physical connection to the EIS.
-     * 
+     *
      * @throws javax.resource.ResourceException in case of any error
      */
 

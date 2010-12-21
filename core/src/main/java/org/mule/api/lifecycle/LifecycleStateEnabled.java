@@ -9,12 +9,17 @@
  */
 package org.mule.api.lifecycle;
 
+import org.mule.api.service.Service;
+import org.mule.api.transport.Connector;
+
 /**
- * Objects that have an associated lifecycle manager such as {@link Service} or {@link org.mule.api.transport.Connector} should
- * implement this interface so that the registry lifecycle manager can introspect the lifecycle state of an object.
- * This allows objects to have a different lifecycle state to the registry.  Typically objects that ahve their own lifecycle manager
- * can be controlled externally through JMX which means there is no guarantee that the state of the object is in the same
- * lifecycle state of the registry, hence the need to introspect the lifecycle state of an object.
+ * Objects that have an associated lifecycle manager such as {@link Service} or
+ * {@link Connector} should implement this interface so that the registry lifecycle
+ * manager can introspect the lifecycle state of an object. This allows objects to
+ * have a different lifecycle state to the registry. Typically objects that have
+ * their own lifecycle manager can be controlled externally through JMX which means
+ * there is no guarantee that the state of the object is in the same lifecycle state
+ * of the registry, hence the need to introspect the lifecycle state of an object.
  *
  * @since 3.0
  */

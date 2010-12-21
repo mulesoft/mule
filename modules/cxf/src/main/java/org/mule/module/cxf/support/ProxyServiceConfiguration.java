@@ -43,8 +43,6 @@ public class ProxyServiceConfiguration extends DefaultServiceConfiguration
      * match and a CXF Service gets created. See:
      * https://issues.apache.org/jira/browse/CXF-1920
      * http://fisheye6.atlassian.com/changelog/cxf?cs=737994
-     * 
-     * @Override
      */
     @Override
     public QName getEndpointName()
@@ -89,9 +87,6 @@ public class ProxyServiceConfiguration extends DefaultServiceConfiguration
      * This method returns a list of all the services defined in the definition. Its
      * current purpose is only for generating a better error message when the service
      * cannot be found.
-     * 
-     * @param definition
-     * @return
      */
     @SuppressWarnings("unchecked")
     protected List<QName> getAllServices(Definition definition)
@@ -110,9 +105,6 @@ public class ProxyServiceConfiguration extends DefaultServiceConfiguration
      * This method returns the list of services that matches with the local part of
      * the service QName. Its current purpose is only for generating a better error
      * message when the service cannot be found.
-     * 
-     * @param definition
-     * @return
      */
     protected List<QName> getProbableServices(Definition definition)
     {

@@ -13,6 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.annotations.param.Payload;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.MalformedEndpointException;
@@ -30,21 +31,27 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.ibeans.annotation.Call;
+import org.ibeans.annotation.param.HeaderParam;
 import org.ibeans.api.channel.CHANNEL;
 
 /**
- * A dynamic outbound endpoint defined when using the {@link org.ibeans.annotation.Call} annotation.  A CallOutboundEndpoint
- * is generated when the Call method has a one or more payloads defined using {@link org.ibeans.annotation.param.Payload} or {@link org.ibeans.annotation.param.PayloadParam} annotations
- * or one or more headers defined using the {@link org.ibeans.annotation.param.HeaderParam} annotation.
- * annotations.
+ * <p>
+ * A dynamic outbound endpoint defined when using the {@link Call} annotation. A
+ * CallOutboundEndpoint is generated when the call method has a one or more payloads
+ * defined using {@link Payload} annotation or one or more headers defined using the
+ * {@link HeaderParam} annotation. annotations.
  * <p/>
- * The endpoint scheme is the only part of the URI that cannot be replaced at runtime.
+ * <p>
+ * The endpoint scheme is the only part of the URI that cannot be replaced at
+ * runtime.
+ * </p>
  *
  * @see CallRequestEndpoint
  */
 public class CallOutboundEndpoint extends org.mule.endpoint.DynamicOutboundEndpoint
 {
-    public static final String NULL_PARAM = "null.param";    
+    public static final String NULL_PARAM = "null.param";
 
     /**
      * logger used by this class

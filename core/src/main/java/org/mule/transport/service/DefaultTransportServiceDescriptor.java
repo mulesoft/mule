@@ -43,7 +43,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-/** @inheritDocs */
 public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor implements TransportServiceDescriptor
 {
     private String connector;
@@ -92,8 +91,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         endpointBuilder = removeProperty(MuleProperties.CONNECTOR_META_ENDPOINT_BUILDER, props);
         endpointUriBuilder = removeProperty(MuleProperties.CONNECTOR_ENDPOINT_BUILDER, props);
         sessionHandler = removeProperty(MuleProperties.CONNECTOR_SESSION_HANDLER, props);
-        
-        initInboundExchangePatterns(props);        
+
+        initInboundExchangePatterns(props);
         initOutboundExchangePatterns(props);
         defaultExchangePattern = removeProperty(MuleProperties.CONNECTOR_DEFAULT_EXCHANGE_PATTERN, props);
     }
@@ -139,7 +138,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         {
             endpointUriBuilder = temp;
         }
-        
+
         initInboundExchangePatterns(props);
         initOutboundExchangePatterns(props);
         defaultExchangePattern = props.getProperty(MuleProperties.CONNECTOR_DEFAULT_EXCHANGE_PATTERN, null);
@@ -381,7 +380,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         return Collections.emptyList();
     }
-    
+
     @SuppressWarnings("unchecked")
     public List<Transformer> createOutboundTransformers(ImmutableEndpoint endpoint) throws TransportFactoryException
     {
@@ -424,7 +423,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 
     protected Transformer createTransformer(String className, ImmutableEndpoint endpoint) throws Exception
     {
-        Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(className, 
+        Transformer newTransformer = (Transformer) ClassUtils.instanciateClass(className,
             ClassUtils.NO_ARGS, classLoader);
         newTransformer.setMuleContext(muleContext);
         newTransformer.setName(newTransformer.getName() + "#" + newTransformer.hashCode());
@@ -492,7 +491,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         wrappingBuilder.setMuleContext(muleContext);
         return wrappingBuilder;
     }
-    
+
     protected EndpointBuilder createEndpointBuilder(Object[] constructorParams) throws TransportFactoryException
     {
         logger.debug("Loading endpoint builder: " + endpointBuilder);
@@ -505,7 +504,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             throw new TransportFactoryException(CoreMessages.failedToLoad("Endpoint Builder: " + endpointBuilder), e);
         }
     }
-    
+
     public void setExceptionMappings(Properties props)
     {
         this.exceptionMappings = props;
@@ -526,7 +525,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         else
         {
-            String mepsString = 
+            String mepsString =
                 removeProperty(MuleProperties.CONNECTOR_INBOUND_EXCHANGE_PATTERNS, properties);
             inboundExchangePatterns = parseExchangePatterns(mepsString);
         }
@@ -542,7 +541,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         else
         {
-            String mepsString = 
+            String mepsString =
                 removeProperty(MuleProperties.CONNECTOR_OUTBOUND_EXCHANGE_PATTERNS, properties);
             outboundExchangePatterns = parseExchangePatterns(mepsString);
         }
@@ -554,18 +553,18 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         {
             return Collections.emptyList();
         }
-        
+
         List<MessageExchangePattern> mepList = new ArrayList<MessageExchangePattern>();
-        
+
         String[] meps = StringUtils.splitAndTrim(mepsString, ",");
         for (String exchangePattern : meps)
         {
             mepList.add(MessageExchangePattern.fromString(exchangePattern));
         }
-        
+
         return mepList;
     }
-    
+
     public List<MessageExchangePattern> getInboundExchangePatterns() throws TransportServiceException
     {
         if (inboundExchangePatterns == null)
@@ -593,7 +592,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
             throw new TransportServiceException(CoreMessages.objectNotSetInService(
                 MuleProperties.CONNECTOR_DEFAULT_EXCHANGE_PATTERN, getService()));
         }
-        
+
         return MessageExchangePattern.fromString(defaultExchangePattern);
     }
 }
