@@ -38,7 +38,7 @@ public interface ObjectFactory extends Initialisable, Disposable
      * implementation.
      */
     Class<?> getObjectClass();
-    
+
     /**
      * Returns true if the ObjectFactory implementation always returns the same object
      * instance.
@@ -57,10 +57,9 @@ public interface ObjectFactory extends Initialisable, Disposable
      * Return true if the created object should get its dependencies wired from the registry automatically.  Typically
      * Mule object factories would return true for this value, objects managed by DI container such as Spring should
      * set this to false.
-     * @return
      */
     boolean isAutoWireObject();
-    
+
     /**
      * Register a custom initialiser
      */

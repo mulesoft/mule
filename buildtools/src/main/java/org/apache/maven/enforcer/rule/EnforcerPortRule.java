@@ -31,9 +31,6 @@ public class EnforcerPortRule implements EnforcerRule
      * Check port availability. Taken from:
      * http://svn.apache.org/viewvc/mina/trunk/core
      * /src/main/java/org/apache/mina/util/AvailablePortFinder.java?view=markup
-     * 
-     * @param port
-     * @return
      */
     public static boolean available(int port)
     {
@@ -76,7 +73,7 @@ public class EnforcerPortRule implements EnforcerRule
     {
         Log log = helper.getLog();
         log.info("checking availability of port : " + this.port);
-        
+
         // make sure it's > 0
         if (!(this.port > 0))
         {

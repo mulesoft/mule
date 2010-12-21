@@ -30,7 +30,7 @@ public interface RedeliveryHandler
     /**
      * The connector associated with this handler is set before
      * <code>handleRedelivery()</code> is called
-     * 
+     *
      * @param connector the connector associated with this handler
      */
     public void setConnector(JmsConnector connector);
@@ -40,15 +40,15 @@ public interface RedeliveryHandler
      * message, it should be returned. Otherwise the connector should throw a
      * {@link MessageRedeliveredException} to indicate that the message should be
      * handled by the connector's exception handler.
-     * 
+     *
      * @param message the redelivered message
      * @param endpoint from which the message was received
-     * @param flow/service in which the exception occured, this is used to obtain the appropriate exception handler
+     * @param flow in which the exception occured, this is used to obtain the
+     *            appropriate exception handler
      * @throws JMSException if properties cannot be read from the JMSMessage
      * @throws MessageRedeliveredException should be thrown if the message should be
      *             handled by the connection exception handler
-     * @throws MuleException if there is a problem reading or proessing the
-     *             message
+     * @throws MuleException if there is a problem reading or proessing the message
      */
     public void handleRedelivery(Message message, ImmutableEndpoint endpoint, FlowConstruct flow) throws JMSException, MuleException;
 

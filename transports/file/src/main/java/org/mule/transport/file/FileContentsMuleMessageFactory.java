@@ -20,7 +20,7 @@ import java.io.InputStream;
 
 /**
  * <code>FileContentsMuleMessageFactory</code> converts the
- * {@link ReceiverFileInputStream}'s content into a <code>byte[]</code> as payload
+ * {@link InputStream}'s content into a <code>byte[]</code> as payload
  * for the {@link MuleMessage}.
  */
 public class FileContentsMuleMessageFactory extends FileMuleMessageFactory

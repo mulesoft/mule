@@ -16,12 +16,12 @@ import org.mule.api.MuleMessage;
 import org.mule.transport.AbstractMuleMessageFactory;
 
 import java.io.File;
+import java.io.InputStream;
 
 /**
  * <code>FileMuleMessageFactory</code> creates a new {@link MuleMessage} with a
- * {@link File} or {@link ReceiverFileInputStream} payload. Users can obtain the
- * filename and directory in the properties using
- * <code>FileConnector.PROPERTY_FILENAME</code> and
+ * {@link File} or {@link InputStream} payload. Users can obtain the filename and
+ * directory in the properties using <code>FileConnector.PROPERTY_FILENAME</code> and
  * <code>FileConnector.PROPERTY_DIRECTORY</code>.
  */
 public class FileMuleMessageFactory extends AbstractMuleMessageFactory

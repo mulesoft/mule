@@ -35,12 +35,10 @@ public class MetaAnnotationTypeFilter implements AnnotationFilter
     private ClassLoader classLoader;
 
     /**
-     * Creates an Meta Annotation Filter that look for Meta annotation on an annotation class
+     * Creates an Meta Annotation Filter that look for Meta annotation on an
+     * annotation class
+     *
      * @param annotation the annotation class to read
-     * @param basepath the base path of the location of the class. Specifying this will be more
-     * reliable in applications that use Multiple classloaders since ASM uses the system classloader
-     * to read classes and thus ignores child classloaders.  The basepath should also start with a scheme,
-     * usually file: or jar:
      */
     public MetaAnnotationTypeFilter(Class<? extends Annotation> annotation, ClassLoader classLoader)
     {
@@ -69,10 +67,10 @@ public class MetaAnnotationTypeFilter implements AnnotationFilter
                 logger.debug("Failed to load annotation class: " + info);
                 return false;
             }
-            
+
             InputStream classStream = classUrl.openStream();
             ClassReader r = new ClosableClassReader(classStream);
-          
+
             MetaAnnotationScanner scanner = new MetaAnnotationScanner(new AnnotationTypeFilter(annotation));
             r.accept(scanner, 0);
 

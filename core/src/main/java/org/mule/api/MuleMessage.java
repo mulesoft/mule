@@ -31,7 +31,7 @@ public interface MuleMessage extends Serializable
 {
     /**
      * Adds a map of properties to be associated with this message
-     * 
+     *
      * @param properties the properties add to this message
      * @deprecated use {@link #addProperties(java.util.Map, org.mule.api.transport.PropertyScope)} instead
      */
@@ -109,7 +109,7 @@ public interface MuleMessage extends Serializable
      * @param scope The scope at which to set the property at
      * @see PropertyScope
      * @see #setInvocationProperty(String, Object)
-     * @see #setOutboundProperty(String, Object) 
+     * @see #setOutboundProperty(String, Object)
      * @see #setSessionProperty(String, Object)
      */
     void setProperty(String key, Object value, PropertyScope scope);
@@ -126,7 +126,7 @@ public interface MuleMessage extends Serializable
 
     /**
      * Removes a property on this message from the specified scope only.
-     * 
+     *
      * @param key the property key to remove
      * @param scope The scope at which to set the property at
      * @return the removed property value or null if the property did not exist
@@ -149,7 +149,7 @@ public interface MuleMessage extends Serializable
      * @see #getInvocationPropertyNames()
      * @see #getInboundPropertyNames()
      * @see #getOutboundPropertyNames()
-     * @see #getSessionPropertyNames()    
+     * @see #getSessionPropertyNames()
      */
     Set<String> getPropertyNames(PropertyScope scope);
 
@@ -167,7 +167,7 @@ public interface MuleMessage extends Serializable
     /**
      * gets the unique identifier for the message. It's up to the implementation to
      * ensure a unique id
-     * 
+     *
      * @return a unique message id. The Id should never be null. If the underlying
      *         transport does not have the notion of a message Id, one should be
      *         generated. The generated Id should be a UUID.
@@ -176,14 +176,14 @@ public interface MuleMessage extends Serializable
 
     /**
      * Gets a property from the message
-     * 
+     *
      * @param name the name or key of the property. This must be non-null.
      * @param defaultValue a default value if the property doesn't exist in the event. This can be null.
      * @return the property value or the defaultValue if the property does not exist
      * @deprecated use scope-aware methods instead
      * @see #getInboundProperty(String)
      * @see #getOutboundProperty(String)
-     * @see #getInvocationProperty(String) 
+     * @see #getInvocationProperty(String)
      * @see #getSessionProperty(String)
      */
     @Deprecated
@@ -386,7 +386,7 @@ public interface MuleMessage extends Serializable
      * message where it's up to developer to keep the association with the message.
      * For example if the message is serialised to xml the correlationId will be
      * available in the message.
-     * 
+     *
      * @param id the Id reference for this relationship
      */
     void setCorrelationId(String id);
@@ -400,7 +400,7 @@ public interface MuleMessage extends Serializable
      * where it's up to developer to keep the association with the message. For
      * example if the message is serialised to xml the correlationId will be
      * available in the message.
-     * 
+     *
      * @return the correlationId for this message or null if one hasn't been set
      */
     String getCorrelationId();
@@ -408,7 +408,7 @@ public interface MuleMessage extends Serializable
     /**
      * Gets the sequence or ordering number for this message in the the correlation
      * group (as defined by the correlationId)
-     * 
+     *
      * @return the sequence number or -1 if the sequence is not important
      */
     int getCorrelationSequence();
@@ -416,21 +416,21 @@ public interface MuleMessage extends Serializable
     /**
      * Gets the sequence or ordering number for this message in the the correlation
      * group (as defined by the correlationId)
-     * 
+     *
      * @param sequence the sequence number or -1 if the sequence is not important
      */
     void setCorrelationSequence(int sequence);
 
     /**
      * Determines how many messages are in the correlation group
-     * 
+     *
      * @return total messages in this group or -1 if the size is not known
      */
     int getCorrelationGroupSize();
 
     /**
      * Determines how many messages are in the correlation group
-     * 
+     *
      * @param size the total messages in this group or -1 if the size is not known
      */
     void setCorrelationGroupSize(int size);
@@ -440,7 +440,7 @@ public interface MuleMessage extends Serializable
      * environment where the caller doesn't wait for a response and the response
      * needs to be routed somewhere for further processing. The value of this field
      * can be any valid endpointUri url.
-     * 
+     *
      * @param replyTo the endpointUri url to reply to
      */
     void setReplyTo(Object replyTo);
@@ -450,7 +450,7 @@ public interface MuleMessage extends Serializable
      * environment where the caller doesn't wait for a response and the response
      * needs to be routed somewhere for further processing. The value of this field
      * can be any valid endpointUri url.
-     * 
+     *
      * @return the endpointUri url to reply to or null if one has not been set
      */
     Object getReplyTo();
@@ -474,13 +474,18 @@ public interface MuleMessage extends Serializable
     void setExceptionPayload(ExceptionPayload payload);
 
     /**
-     * Allows for arbitrary data attachments to be associated with the Message. These attachments work in the
-     * same way that email attachments work. Attachments can be binary or text
+     * Allows for arbitrary data attachments to be associated with the Message. These
+     * attachments work in the same way that email attachments work. Attachments can
+     * be binary or text
+     *
      * @param name the name to associate with the attachment
-     * @param dataHandler The attachment datahandler to use. This will be used to interact with the attachment data
+     * @param dataHandler The attachment datahandler to use. This will be used to
+     *            interact with the attachment data.
      * @throws Exception if the attachment cannot be added for any reason
      * @see javax.activation.DataHandler
-     * @deprecated use {@link #addOutboundAttachment(javax.activation.DataHandler)} instead
+     * @deprecated use
+     *             {@link #addOutboundAttachment(java.lang.String, javax.activation.DataHandler)}
+     *             instead
      */
     @Deprecated
     void addAttachment(String name, DataHandler dataHandler) throws Exception;
@@ -581,14 +586,14 @@ public interface MuleMessage extends Serializable
      * information with the message, this method should be overriden to expose the
      * transport encoding, otherwise the default encoding in the Mule configuration
      * will be used.
-     * 
+     *
      * @return the encoding for this message. This method must never return null
      */
     String getEncoding();
 
     /**
      * Sets the encoding for this message
-     * 
+     *
      * @param encoding the encoding to use
      */
     void setEncoding(String encoding);
@@ -708,24 +713,24 @@ public interface MuleMessage extends Serializable
      * @return the original payload used to create this message
      */
     Object getOriginalPayload();
-    
+
     /**
      * Get the message payload for logging without throwing exception
-     * Converts the message implementation into a String representation. 
-     * 
+     * Converts the message implementation into a String representation.
+     *
      * @return message payload as object
      */
-    String getPayloadForLogging();      
+    String getPayloadForLogging();
 
     /**
      * Get the message payload for logging without throwing exception
      * Converts the message implementation into a String representation. If encoding
      * is required it will use the encoding set on the message
-     * 
+     *
      * @return message payload as object
      */
-    String getPayloadForLogging(String encoding);      
-    
+    String getPayloadForLogging(String encoding);
+
     MuleContext getMuleContext();
 
     /**

@@ -84,7 +84,7 @@ public class FtpConnector extends AbstractConnector
 
     /** Streaming is off by default until MULE-3192 gets fixed */
     private boolean streaming = false;
-    
+
     private Map<String, ObjectPool> pools;
 
     private String connectionFactoryClass = DEFAULT_FTP_CONNECTION_FACTORY_CLASS;
@@ -93,7 +93,7 @@ public class FtpConnector extends AbstractConnector
     {
         super(context);
     }
-    
+
     public String getProtocol()
     {
         return FTP;
@@ -109,7 +109,7 @@ public class FtpConnector extends AbstractConnector
     protected List getReceiverArguments(Map endpointProperties)
     {
         List args = new ArrayList();
-        
+
         long polling = getPollingFrequency();
         if (endpointProperties != null)
         {
@@ -126,10 +126,10 @@ public class FtpConnector extends AbstractConnector
         }
         logger.debug("set polling frequency to " + polling);
         args.add(polling);
-        
+
         return args;
     }
-    
+
     /**
      * @return Returns the pollingFrequency.
      */
@@ -241,25 +241,25 @@ public class FtpConnector extends AbstractConnector
     {
         GenericObjectPool genericPool = new GenericObjectPool(connectionFactory);
         byte poolExhaustedAction = ThreadingProfile.DEFAULT_POOL_EXHAUST_ACTION;
-        
+
         ThreadingProfile receiverThreadingProfile = this.getReceiverThreadingProfile();
-        if (receiverThreadingProfile != null) 
+        if (receiverThreadingProfile != null)
         {
             int threadingProfilePoolExhaustedAction = receiverThreadingProfile.getPoolExhaustedAction();
-            if (threadingProfilePoolExhaustedAction == ThreadingProfile.WHEN_EXHAUSTED_WAIT) 
+            if (threadingProfilePoolExhaustedAction == ThreadingProfile.WHEN_EXHAUSTED_WAIT)
             {
                 poolExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_BLOCK;
-            } 
-            else if (threadingProfilePoolExhaustedAction == ThreadingProfile.WHEN_EXHAUSTED_ABORT) 
+            }
+            else if (threadingProfilePoolExhaustedAction == ThreadingProfile.WHEN_EXHAUSTED_ABORT)
             {
                 poolExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_FAIL;
-            } 
-            else if (threadingProfilePoolExhaustedAction == ThreadingProfile.WHEN_EXHAUSTED_RUN) 
+            }
+            else if (threadingProfilePoolExhaustedAction == ThreadingProfile.WHEN_EXHAUSTED_RUN)
             {
                 poolExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_GROW;
             }
         }
-        
+
         genericPool.setWhenExhaustedAction(poolExhaustedAction);
         genericPool.setTestOnBorrow(isValidateConnections());
         return genericPool;
@@ -377,7 +377,7 @@ public class FtpConnector extends AbstractConnector
 
     /**
      * Getter for FTP passive mode.
-     * 
+     *
      * @return true if using FTP passive mode
      */
     public boolean isPassive()
@@ -387,7 +387,7 @@ public class FtpConnector extends AbstractConnector
 
     /**
      * Setter for FTP passive mode.
-     * 
+     *
      * @param passive passive mode flag
      */
     public void setPassive(final boolean passive)
@@ -399,7 +399,7 @@ public class FtpConnector extends AbstractConnector
      * Passive mode is OFF by default. The value is taken from the connector
      * settings. In case there are any overriding properties set on the endpoint,
      * those will be used.
-     * 
+     *
      * @see #setPassive(boolean)
      */
     public void enterActiveOrPassiveMode(FTPClient client, ImmutableEndpoint endpoint)
@@ -452,7 +452,7 @@ public class FtpConnector extends AbstractConnector
 
     /**
      * Getter for FTP transfer type.
-     * 
+     *
      * @return true if using FTP binary type
      */
     public boolean isBinary()
@@ -462,7 +462,7 @@ public class FtpConnector extends AbstractConnector
 
     /**
      * Setter for FTP transfer type.
-     * 
+     *
      * @param binary binary type flag
      */
     public void setBinary(final boolean binary)
@@ -474,7 +474,7 @@ public class FtpConnector extends AbstractConnector
      * Transfer type is BINARY by default. The value is taken from the connector
      * settings. In case there are any overriding properties set on the endpoint,
      * those will be used. <p/> The alternative type is ASCII. <p/>
-     * 
+     *
      * @see #setBinary(boolean)
      */
     public void setupFileType(FTPClient client, ImmutableEndpoint endpoint) throws Exception
@@ -534,13 +534,12 @@ public class FtpConnector extends AbstractConnector
      * will be called only when Streaming is being used on an outbound endpoint
      *
      * @param endpoint the endpoint that releates to this Dispatcher
-     * @param message the current message being processed
+     * @param event the current event being processed
      * @return the output stream to use for this request or null if the transport
      *         does not support streaming
-     * @throws org.mule.api.MuleException
      */
-    public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event)
-        throws MuleException
+    @Override
+    public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event) throws MuleException
     {
         try
         {
@@ -556,7 +555,7 @@ public class FtpConnector extends AbstractConnector
             {
                 throw new ConnectException(e, this);
             }
-            
+
             try
             {
                 OutputStream out = client.storeFileStream(filename);
@@ -564,7 +563,7 @@ public class FtpConnector extends AbstractConnector
                 {
                     throw new IOException("FTP operation failed: " + client.getReplyString());
                 }
-                
+
                 return new CallbackOutputStream(out,
                         new CallbackOutputStream.Callback()
                         {
@@ -622,7 +621,7 @@ public class FtpConnector extends AbstractConnector
         }
         return filename;
     }
-    
+
     private String generateFilename(MuleMessage message, String pattern)
     {
         if (pattern == null)
@@ -651,7 +650,7 @@ public class FtpConnector extends AbstractConnector
         {
             path = path.substring(1);
         }
-        
+
         if (!client.changeWorkingDirectory(path))
         {
             throw new IOException(MessageFormat.format("Failed to change working directory to {0}. Ftp error: {1}",

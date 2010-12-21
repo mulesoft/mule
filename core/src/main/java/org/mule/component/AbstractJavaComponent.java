@@ -32,11 +32,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Abstract implementation of JavaComponent adds JavaComponent specific's:
- * {@link EntryPointResolverSet}, {@link org.mule.api.routing.BindingCollection} and
- * {@link ObjectFactory}. Provides default implementations of doOnCall and doOnEvent
- * and defines abstract template methods provided for obtaining and returning the
- * component object instance.
+ * Abstract implementation of JavaComponent adds JavaComponent specifics like
+ * {@link EntryPointResolverSet} and {@link ObjectFactory}.
  */
 public abstract class AbstractJavaComponent extends AbstractComponent implements JavaComponent
 {
@@ -105,7 +102,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
     /**
      * Creates and initialises a new LifecycleAdaptor instance wrapped the component
      * object instance obtained from the configured object factory.
-     * 
+     *
      * @throws MuleException
      * @throws Exception
      */
@@ -118,15 +115,15 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         if (lifecycleAdapterFactory != null)
         {
             // Custom lifecycleAdapterFactory set on component
-            lifecycleAdapter = 
+            lifecycleAdapter =
                 lifecycleAdapterFactory.create(object, this, flowConstruct, entryPointResolverSet, muleContext);
         }
         else if (objectFactory.isExternallyManagedLifecycle())
         {
-            // If no lifecycleAdapterFactory is configured explicitly and object factory returns 
-            // externally managed instance then use NullLifecycleAdapter so that lifecycle 
+            // If no lifecycleAdapterFactory is configured explicitly and object factory returns
+            // externally managed instance then use NullLifecycleAdapter so that lifecycle
             // is not propagated
-            lifecycleAdapter = 
+            lifecycleAdapter =
                 new NullLifecycleAdapter(object, this, flowConstruct, entryPointResolverSet, muleContext);
         }
         else if (flowConstruct instanceof Service)
@@ -210,7 +207,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
     /**
      * Allow for incremental addition of resolvers by for example the spring-config
      * module
-     * 
+     *
      * @param entryPointResolvers Resolvers to add
      */
     public void setEntryPointResolvers(Collection<EntryPointResolver> entryPointResolvers)
@@ -219,7 +216,7 @@ public abstract class AbstractJavaComponent extends AbstractComponent implements
         {
             entryPointResolverSet = new DefaultEntryPointResolverSet();
         }
-        
+
         for (EntryPointResolver resolver : entryPointResolvers)
         {
             entryPointResolverSet.addEntryPointResolver(resolver);

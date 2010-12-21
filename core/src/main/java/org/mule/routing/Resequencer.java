@@ -22,11 +22,11 @@ import org.mule.routing.correlation.ResequenceMessagesCorrelatorCallback;
 import java.util.Comparator;
 
 /**
- * <code>CorrelationEventResequencer</code> is used to resequence events according
- * to their dispatch sequence in the correlation group. When the MessageSplitter
- * router splits an event it assigns a correlation sequence to the individual message
- * parts so that another router such as the <i>CorrelationEventResequencer</i> can
- * receive the parts and reorder or merge them.
+ * <code>Resequencer</code> is used to resequence events according to their dispatch
+ * sequence in the correlation group. When the message splitter router splits an
+ * event it assigns a correlation sequence to the individual message parts so that
+ * another router such as the <i>Resequencer</i> can receive the parts and reorder or
+ * merge them.
  * <p>
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Resequencer.html">http://www.eaipatterns.com/Resequencer.html<a/>
  */
@@ -60,11 +60,12 @@ public class Resequencer extends AbstractAggregator
         this.eventComparator = eventComparator;
     }
 
+    @Override
     protected EventCorrelatorCallback getCorrelatorCallback(MuleContext muleContext)
     {
         return new ResequenceMessagesCorrelatorCallback(getEventComparator(), muleContext);
     }
-    
+
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {

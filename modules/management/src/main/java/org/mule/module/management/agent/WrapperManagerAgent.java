@@ -203,9 +203,9 @@ public class WrapperManagerAgent extends AbstractAgent
      * not present in the {@link WrapperManagerMBean} until version 3.2.3.
      * SpringSource's TC Server uses The wrapper version 3.2.0 so having this method
      * here allows us to be compatible with TC Server.
-     * 
+     *
      * @return The PID of the Java process.
-     * @see http://www.mulesoft.org/jira/browse/MULE-5106
+     * @see <a href="http://www.mulesoft.org/jira/browse/MULE-5106">MULE-5106</a>
      */
     public static int getJavaPID()
     {
@@ -224,9 +224,9 @@ public class WrapperManagerAgent extends AbstractAgent
      * is not present in the {@link WrapperManagerMBean} until version 3.2.3.
      * SpringSource's TC Server uses The wrapper version 3.2.0 so having this method
      * here allows us to be compatible with TC Server.
-     * 
+     *
      * @return The PID of the Wrapper process.
-     * @see http://www.mulesoft.org/jira/browse/MULE-5106
+     * @see <a href="http://www.mulesoft.org/jira/browse/MULE-5106">MULE-5106</a>
      */
     public static int getWrapperPID()
     {

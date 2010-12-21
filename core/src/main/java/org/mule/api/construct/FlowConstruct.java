@@ -17,11 +17,9 @@ import org.mule.api.routing.MessageInfoMapping;
 import org.mule.management.stats.FlowConstructStatistics;
 
 /**
- * <p>
  * A uniquely identified message flow construct who's implementation and
  * configuration defines at a minimum where messages come from and what processing
  * steps should be used to process these messages.
- * <p/>
  */
 public interface FlowConstruct extends LifecycleStateEnabled
 {

@@ -18,34 +18,31 @@ import org.mule.api.processor.MessageProcessor;
 
 public interface InterfaceBinding extends MessageProcessor
 {
-
     /**
-     * This method is responsible for routing the Message via the MuleSession. The logic
-     * for this method will change for each type of router depending on expected
-     * behaviour. For example, a MulticastingRouter might just iterate through the
-     * list of assoaciated endpoints sending the message. Another type of router such
-     * as the ExceptionBasedRouter will hit the first endpoint, if it fails try the
-     * second, and so on. Most router implementations will extends the
+     * This method is responsible for routing the Message via the MuleSession. The
+     * logic for this method will change for each type of router depending on
+     * expected behaviour. For example, a MulticastingRouter might just iterate
+     * through the list of assoaciated endpoints sending the message. Another type of
+     * router such as the ExceptionBasedRouter will hit the first endpoint, if it
+     * fails try the second, and so on. Most router implementations will extends the
      * FilteringOutboundRouter which implements all the common logic need for a
      * router.
      *
-     * @param message the message to send via one or more endpoints on this router
-     * @param session the session used to actually send the event
-     * @return a result message if any from the invocation. If the synchronous flag
-     *         is false a null result will always be returned.
+     * @return a result message if any from the invocation. If the endpoint bound has
+     *         a one-way exchange pattern configured a null result will always be
+     *         returned.
      * @throws MessagingException if any errors occur during the sending of messages
-     * @throws MuleException 
+     * @throws MuleException
      * @see org.mule.routing.outbound.FilteringOutboundRouter
      * @see org.mule.routing.outbound.ExceptionBasedRouter
      * @see org.mule.routing.outbound.MulticastingRouter
-     *
-     * @since 2.1 the synchronous argument has been removed. Instead use the synchronous attribute of the endpoint
-     * you are dispatching to.
+     * @since 2.1 the synchronous argument has been removed. Instead use the
+     *        synchronous attribute of the endpoint you are dispatching to.
      */
     MuleEvent process(MuleEvent event) throws MuleException;
 
     void setEndpoint(ImmutableEndpoint endpoint) throws MuleException;
-    
+
     ImmutableEndpoint getEndpoint();
 
     Class<?> getInterface();
@@ -58,8 +55,6 @@ public interface InterfaceBinding extends MessageProcessor
 
     /**
      * This wires the dynamic proxy to the service object.
-     *
-     * @param target
      */
     Object createProxy(Object target);
 }

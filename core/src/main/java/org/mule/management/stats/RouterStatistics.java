@@ -46,9 +46,6 @@ public class RouterStatistics implements Statistics
     private Map routed;
     private int type;
 
-    /**
-     * @see org.mule.api.management.stats.Statistics#clear()
-     */
     public synchronized void clear()
     {
         notRouted = 0;
@@ -76,9 +73,6 @@ public class RouterStatistics implements Statistics
         printer.print(this);
     }
 
-    /**
-     * @see org.mule.api.management.stats.Statistics#setEnabled(boolean)
-     */
     public synchronized void setEnabled(boolean b)
     {
         enabled = b;

@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
  * The code borrowed from Spring's
  * org.springframework.transaction.jta.WebSphereTransactionManagerFactoryBean. See
  * the apache-2.0.license file in Mule's licenses folder for details.
- * 
+ *
  * @see com.ibm.ws.Transaction.TransactionManagerFactory#getTransactionManager
  * @see com.ibm.ejs.jts.jta.JTSXA#getTransactionManager
  * @see com.ibm.ejs.jts.jta.TransactionManagerFactory#getTransactionManager
@@ -45,11 +45,10 @@ public class WebsphereTransactionManagerLookupFactory implements TransactionMana
     /**
      * This constructor retrieves the WebSphere TransactionManager factory class, so
      * we can get access to the JTA TransactionManager.
-     * @param config
      */
     public TransactionManager create(MuleConfiguration config)
     {
-        Class clazz;
+        Class<?> clazz;
         TransactionManager transactionManager;
         try
         {
@@ -101,5 +100,4 @@ public class WebsphereTransactionManagerLookupFactory implements TransactionMana
 
         return transactionManager;
     }
-
 }

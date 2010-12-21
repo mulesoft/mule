@@ -32,30 +32,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An implementation of Mule's generic {@link BPMS} interface for JBoss jBPM. 
+ * An implementation of Mule's generic {@link BPMS} interface for JBoss jBPM.
  */
 public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
 {
-    /** 
-     * The initialized jBPM ProcessEngine. 
+    /**
+     * The initialized jBPM ProcessEngine.
      */
     protected ProcessEngine processEngine = null;
 
-    /** 
-     * The configuration file for jBPM, default is "jbpm.cfg.xml" if not specified. 
+    /**
+     * The configuration file for jBPM, default is "jbpm.cfg.xml" if not specified.
      */
     private String configurationResource;
-    
-    /** 
-     * Process definitions to be loaded into jBPM at startup. 
+
+    /**
+     * Process definitions to be loaded into jBPM at startup.
      */
     private Properties processDefinitions;
-    
-    /** 
-     * An optional logical name for the BPMS. 
+
+    /**
+     * An optional logical name for the BPMS.
      */
     private String name;
-    
+
     /**
      * Indicates whether jBPM has been instantiated by the connector (false) or was
      * passed in from somewhere else (true).
@@ -63,14 +63,14 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
     protected boolean containerManaged = true;
 
     public static final String PROCESS_ENDED = "Process has ended";
-    
+
     /**
-     * Given the multi-threaded nature of Mule, sometimes a response message will arrive to advance the 
+     * Given the multi-threaded nature of Mule, sometimes a response message will arrive to advance the
      * process before the creation of the process has fully terminated (e.g., during in-memory unit tests).
-     * After this amount of time (in ms), we stop waiting and assume there must be some other problem.  
+     * After this amount of time (in ms), we stop waiting and assume there must be some other problem.
      */
     public static final int PROCESS_CREATION_WAIT = 3000;
-    
+
     protected static final Logger log = LoggerFactory.getLogger(Jbpm.class);
 
     // ///////////////////////////////////////////////////////////////////////////
@@ -98,7 +98,9 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
 
     /**
      * Creates the Mule wrapper for jBPM
-     * @param The already-initialized jBPM ProcessEngine.  This is useful if you use Spring to configure your jBPM instance.
+     *
+     * @param processEngine The already-initialized jBPM ProcessEngine. This is
+     *            useful if you use Spring to configure your jBPM instance.
      */
     public Jbpm(ProcessEngine processEngine, Properties processDefinitions)
     {
@@ -115,7 +117,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
             {
                 config.setResource(configurationResource);
             }
-            setProcessEngine(config.buildProcessEngine());  
+            setProcessEngine(config.buildProcessEngine());
             containerManaged = false;
         }
         if (processDefinitions != null)
@@ -133,7 +135,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
             }
         }
     }
-    
+
     public void dispose()
     {
         if (!containerManaged && processEngine != null)
@@ -155,22 +157,22 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
 
     /**
      * Start a new process.
-     * 
+     *
      * @return the newly-created ProcessInstance
      */
     public Object startProcess(Object processDefinitionKey) throws Exception
     {
         return startProcess(processDefinitionKey, null, null);
     }
-    
+
     /**
      * Start a new process.
-     * 
+     *
      * @return the newly-created ProcessInstance
      */
     public Object startProcess(Object processDefinitionKey, Object signalName, Map variables) throws Exception
     {
-        ProcessInstance processInstance = 
+        ProcessInstance processInstance =
             processEngine.getExecutionService().startProcessInstanceByKey((String) processDefinitionKey, (Map) variables);
 
         if (processInstance == null)
@@ -183,7 +185,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
 
     /**
      * Advance a process instance one step.
-     * 
+     *
      * @return the updated ProcessInstance
      */
     public Object advanceProcess(Object executionId) throws Exception
@@ -193,10 +195,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
 
     /**
      * Advance a process instance one step.
-     * 
-     * @param processId - if no transition value is provided, this is assumed to be
-     *            execution id
-     * @param transition - the state of the execution we're looking for
+     *
      * @param processVariables - optional process variables/parameters to set
      * @return the updated ProcessInstance
      */
@@ -206,8 +205,8 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
         Execution execution = processEngine.getExecutionService().findExecutionById((String) executionId);
         while (execution == null && waitTime < PROCESS_CREATION_WAIT)
         {
-            // Given the multi-threaded nature of Mule, sometimes a response message will arrive to advance the 
-            // process before the creation of the process has fully terminated (e.g., during in-memory unit tests).  
+            // Given the multi-threaded nature of Mule, sometimes a response message will arrive to advance the
+            // process before the creation of the process has fully terminated (e.g., during in-memory unit tests).
             // We delay for awhile to make sure this is not the case before giving up and throwing an exception.
             Thread.sleep(PROCESS_CREATION_WAIT / 10);
             waitTime += (PROCESS_CREATION_WAIT / 10);
@@ -217,7 +216,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
         {
             throw new IllegalArgumentException("No process execution found with id = " + executionId + " (it may have already terminated)");
         }
-        
+
         String processId;
         if (execution.getProcessInstance() != null)
         {
@@ -252,7 +251,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
 
     /**
      * Update the variables for an execution.
-     * 
+     *
      * @return the updated ProcessInstance
      */
     public Object updateProcess(Object executionId, Map variables) throws Exception
@@ -315,14 +314,14 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
     {
         return getState((ProcessInstance) process);
     }
-    
+
     public static String getState(ProcessInstance processInstance) throws Exception
     {
         if (processInstance == null || processInstance.isEnded())
         {
             return ProcessInstance.STATE_ENDED;
         }
-        
+
         Set activities = processInstance.findActiveActivityNames();
         String state = null;
         // Separate concurrent paths of execution with a "/"
@@ -347,7 +346,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
 
     /**
      * Look up an already-running process instance.
-     * 
+     *
      * @return the ProcessInstance
      */
     public Object lookupProcess(Object processId) throws Exception
@@ -377,7 +376,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
     {
         // empty
     }
-    
+
     public void completeTask(Task task)
     {
         completeTask(task, null, null);

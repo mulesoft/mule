@@ -42,7 +42,6 @@ import java.util.List;
  */
 public class ServiceCompositeMessageSource extends StartableCompositeMessageSource implements Initialisable, RouterStatisticsRecorder
 {
-
     protected List<MessageProcessor> processors = new LinkedList<MessageProcessor>();
     protected RouterStatistics statistics;
     protected List<InboundEndpoint> endpoints = new ArrayList<InboundEndpoint>();
@@ -53,7 +52,8 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
     {
         statistics = new RouterStatistics(RouterStatistics.TYPE_INBOUND);
     }
-    
+
+    @Override
     public void initialise() throws InitialisationException
     {
         super.initialise();
@@ -77,7 +77,7 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
         {
             throw new InitialisationException(e, this);
         }
-        
+
         for (MessageProcessor processor : processors)
         {
             if (processor instanceof FlowConstructAware)
@@ -106,7 +106,7 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
         }
         super.dispose();
     }
-    
+
     protected void createMessageProcessorChain() throws MuleException
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(flowConstruct);
@@ -183,7 +183,7 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
             endpoints.remove(source);
         }
     }
-    
+
     @Override
     public void setMessageSources(List<MessageSource> sources) throws MuleException
     {
@@ -208,15 +208,10 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
 
     public void setRouterStatistics(RouterStatistics statistics)
     {
-        this.statistics = statistics;;
+        this.statistics = statistics;
     }
 
-    
-    /**
-     * @param name the Endpoint identifier
-     * @return the Endpoint or <code>null</code> if the endpointUri is not registered
-     * @see org.mule.api.routing.InboundRouterCollection
-     */
+
     public InboundEndpoint getEndpoint(String name)
     {
         for (InboundEndpoint endpoint : endpoints)
@@ -243,7 +238,7 @@ public class ServiceCompositeMessageSource extends StartableCompositeMessageSour
     {
         return catchAllStrategy;
     }
-    
+
     class InternalCatchAllMessageProcessor extends AbstractInterceptingMessageProcessor
     {
         public MuleEvent process(MuleEvent event) throws MuleException

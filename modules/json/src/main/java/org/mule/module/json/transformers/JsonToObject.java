@@ -29,22 +29,18 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
- * A transformer that will convert a JSON encoded object graph to a java object. The object type is
- * determined by the 'returnClass' attribute. Note that this transformers supports Arrays and Lists. For
- * example, to
- * convert a JSON string to an array of org.foo.Person, set the the returnClass=[Lorg.foo.Person;.
- * <p/>
- * The JSON engine can be configured using the jsonConfig attribute. This is an object reference to an
- * instance of: {@link net.sf.json.JsonConfig}. This can be created as a spring bean.
+ * A transformer that will convert a JSON encoded object graph to a java object. The
+ * object type is determined by the 'returnType' attribute. Note that this
+ * transformers supports Arrays and Lists. For example, to convert a JSON string to
+ * an array of org.foo.Person, set the the returnClass=[Lorg.foo.Person;.
  */
 public class JsonToObject extends AbstractJsonTransformer
 {
     private static final DataType<JsonData> JSON_TYPE = DataTypeFactory.create(JsonData.class);
-    
+
     private Map<Class<?>, Class<?>> deserializationMixins = new HashMap<Class<?>, Class<?>>();
-    
+
     public JsonToObject()
     {
         this.registerSourceType(DataTypeFactory.create(Reader.class));
@@ -98,7 +94,7 @@ public class JsonToObject extends AbstractJsonTransformer
             {
                 is = new ByteArrayInputStream((byte[]) src);
             }
-            
+
             if (src instanceof Reader)
             {
                 if (getReturnDataType().equals(JSON_TYPE))

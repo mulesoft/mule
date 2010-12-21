@@ -45,12 +45,16 @@ import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.jetty.servlet.ServletHolder;
 
 /**
- * Creates an 'embedded' Ajax server using Jetty and allows Mule to receiver and send events
- * to browsers. The browser will need to use the <pre>mule.js</pre> class to publish and
- * subscribe events.
+ * Creates an 'embedded' Ajax server using Jetty and allows Mule to receiver and send
+ * events to browsers. The browser will need to use the
  *
- * Note that a {@link @RESOURCE_BASE_PROPERTY} can be set on the ajax endpoint that provides the location of any web application resources such
- * as html pages
+ * <pre>
+ * mule.js
+ * </pre>
+ *
+ * class to publish and subscribe events. Note that a resource base property can be
+ * set on the ajax endpoint that provides the location of any web application
+ * resources such as html pages.
  */
 public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
 {
@@ -207,7 +211,7 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
 
         connector.setPort(serverUrl.getPort());
         connector.setHost(serverUrl.getHost());
-        
+
         getHttpServer().addConnector(connector);
         EndpointBuilder builder = muleContext.getEndpointFactory().getEndpointBuilder(serverUrl.toString());
 

@@ -83,7 +83,7 @@ public class FileConnector extends AbstractConnector
     private String writeToDirectoryName = null;
 
     private String moveToDirectoryName = null;
-    
+
     private String workDirectoryName = null;
 
     private String workFileNamePattern = DEFAULT_WORK_FILENAME_PATTERN;
@@ -337,7 +337,7 @@ public class FileConnector extends AbstractConnector
         this.moveToDirectoryName = dir;
     }
 
-    public void setWorkDirectory(String workDirectoryName) throws IOException 
+    public void setWorkDirectory(String workDirectoryName) throws IOException
     {
         this.workDirectoryName = workDirectoryName;
         if (workDirectoryName != null)
@@ -350,7 +350,7 @@ public class FileConnector extends AbstractConnector
             }
         }
     }
-    
+
     public String getWorkDirectory()
     {
         return workDirectoryName;
@@ -436,7 +436,7 @@ public class FileConnector extends AbstractConnector
             if (!writeToDirectory.canWrite())
             {
                 throw new IOException(
-                        "Error on initialization, " + writeToDirectory 
+                        "Error on initialization, " + writeToDirectory
                         + " does not exist or is not writeable");
             }
         }
@@ -505,13 +505,13 @@ public class FileConnector extends AbstractConnector
      * will be called only when Streaming is being used on an outbound endpoint
      *
      * @param endpoint the endpoint that releates to this Dispatcher
-     * @param message  the current message being processed
+     * @param event  the current event being processed
      * @return the output stream to use for this request or null if the transport
      *         does not support streaming
      * @throws org.mule.api.MuleException
      */
-    public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event)
-            throws MuleException
+    @Override
+    public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event) throws MuleException
     {
         MuleMessage message = event.getMessage();
         String address = endpoint.getEndpointURI().getAddress();
@@ -586,7 +586,7 @@ public class FileConnector extends AbstractConnector
     {
         this.streaming = streaming;
     }
-        
+
     @Override
     public MuleMessageFactory createMuleMessageFactory() throws CreateException
     {

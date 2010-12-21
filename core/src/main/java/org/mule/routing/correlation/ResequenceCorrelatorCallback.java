@@ -15,15 +15,16 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.routing.AggregationException;
 import org.mule.routing.EventGroup;
+import org.mule.routing.Resequencer;
 
 import java.util.Arrays;
 import java.util.Comparator;
 
 /**
- * A Correlator that correlates messages based on Mule correlation settings
- * Note that the {@link #aggregateEvents(org.mule.routing.EventGroup)} method only resequences the events and
- * returns an MuleEvent[] wrapped in a MuleMessage impl.  This means that this callback can ONLY be used with a
- * {@link org.mule.routing.inbound.CorrelationEventResequencer}
+ * A Correlator that correlates messages based on Mule correlation settings. Note
+ * that the {@link #aggregateEvents(org.mule.routing.EventGroup)} method only
+ * resequences the events and returns an MuleEvent[] wrapped in a MuleMessage impl.
+ * This means that this callback can ONLY be used with a {@link Resequencer}
  */
 public class ResequenceCorrelatorCallback extends CollectionCorrelatorCallback
 {

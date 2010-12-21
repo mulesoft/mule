@@ -76,23 +76,20 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
      * endpointUri such as jms.*
      */
     private EndpointURI endpointUri;
-    
+
     protected List<Transformer> defaultInboundTransformers;
     protected List<Transformer> defaultResponseTransformers;
 
     /**
      * Creates the Message Receiver
-     * 
+     *
      * @param connector the endpoint that created this listener
-     * @param service the service to associate with the receiver. When data is
-     *            received the service <code>dispatchEvent</code> or
-     *            <code>sendEvent</code> is used to dispatch the data to the relevant
-     *            Service.
+     * @param flowConstruct the flow construct to associate with the receiver.
      * @param endpoint the provider contains the endpointUri on which the receiver
      *            will listen on. The endpointUri can be anything and is specific to
      *            the receiver implementation i.e. an email address, a directory, a
      *            jms destination or port address.
-     * @see flowConstruct
+     * @see FlowConstruct
      * @see InboundEndpoint
      */
     public AbstractMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
@@ -120,7 +117,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
      * retrying to connect, a <code>RecoverableException</code> should be thrown.
      * There is no guarantee that by throwing a Recoverable exception that the Mule
      * instance will not shut down.
-     * 
+     *
      * @throws org.mule.api.lifecycle.InitialisationException if a fatal error occurs
      *             causing the Mule instance to shutdown
      * @throws org.mule.api.lifecycle.RecoverableException if an error occurs that
@@ -130,10 +127,10 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
     public final void initialise() throws InitialisationException
     {
         endpointUri = endpoint.getEndpointURI();
-        
-        defaultInboundTransformers = connector.getDefaultInboundTransformers(endpoint);       
+
+        defaultInboundTransformers = connector.getDefaultInboundTransformers(endpoint);
         defaultResponseTransformers = connector.getDefaultResponseTransformers(endpoint);
-        
+
         super.initialise();
     }
 
@@ -175,7 +172,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
                         + endpoint.getEndpointURI().getUri().toString()
                         + " is not 'request-response'.  No response will be returned.");
         }
-        
+
         message.removeProperty(MuleProperties.MULE_REMOTE_SYNC_PROPERTY, PropertyScope.INBOUND);
 
         MuleEvent muleEvent = createMuleEvent(message, outputStream);
@@ -183,11 +180,11 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
         if (!endpoint.isDisableTransportTransformer())
         {
-            applyInboundTransformers(muleEvent);            
+            applyInboundTransformers(muleEvent);
         }
         MuleEvent resultEvent = listener.process(muleEvent);
         if (resultEvent != null && resultEvent.getMessage() != null
-            && resultEvent.getMessage().getExceptionPayload() != null 
+            && resultEvent.getMessage().getExceptionPayload() != null
             && resultEvent.getMessage().getExceptionPayload().getException() instanceof FilterUnacceptedException)
         {
             handleUnacceptedFilter(muleEvent.getMessage());
@@ -198,7 +195,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         {
             applyResponseTransformers(resultEvent);
         }
-        
+
         if (connector.isEnableMessageEvents() && endpoint.getExchangePattern().hasResponse())
         {
 			connector.fireNotification(new EndpointMessageNotification(
@@ -206,10 +203,10 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 							.getFlowConstruct().getName(),
 					EndpointMessageNotification.MESSAGE_RESPONSE));
         }
-        
+
         return resultEvent;
     }
-    
+
     protected void applyInboundTransformers(MuleEvent event) throws MuleException
     {
         event.getMessage().applyTransformers(event, defaultInboundTransformers);

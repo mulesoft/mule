@@ -13,6 +13,7 @@ package org.mule.api.config;
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
+import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.ImmutableThreadingProfile;
 import org.mule.config.pool.ThreadPoolFactory;
 
@@ -21,21 +22,26 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
 import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
+
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 
 /**
- * Mule uses a few different pools i.e. for service threads and message dispatchers. This interface
- * makes it easier to configure the pool.  Pools are created via
- * {@link ImmutableThreadingProfile#createPool(String, ThreadingProfile)} (which
- * should really be a separate factory).
- *
- * <p>{@link ImmutableThreadingProfile} is a simple read-only implementation that
- * makes a local copy of any {@link org.mule.api.config.ThreadingProfile} passed to a constructor.</p>
- *
- * <p>{@link org.mule.config.ChainedThreadingProfile} is a mutable implementation that can take
- * default values from an existing {@link org.mule.api.config.ThreadingProfile}.  The default values
- * can be either dynamic (read whenever the value is queried) or static (a local copy of the
- * default is made when the profile is first constructed).</p>
+ * <p>
+ * Mule uses a few different pools i.e. for service threads and message dispatchers.
+ * This interface makes it easier to configure the pool. Pools are created via
+ * {@link ImmutableThreadingProfile#createPool(String)} (which should really be a
+ * separate factory).
+ * </p>
+ * <p>
+ * {@link ImmutableThreadingProfile} is a simple read-only implementation that makes
+ * a local copy of any ThreadingProfile instance passed to a constructor.
+ * </p>
+ * <p>
+ * {@link ChainedThreadingProfile} is a mutable implementation that can take default
+ * values from an existing ThreadingProfile. The default values can be either dynamic
+ * (read whenever the value is queried) or static (a local copy of the default is
+ * made when the profile is first constructed).
+ * </p>
  */
 public interface ThreadingProfile extends MuleContextAware
 {
@@ -181,5 +187,5 @@ public interface ThreadingProfile extends MuleContextAware
 
     MuleContext getMuleContext();
 
-    void setMuleContext(MuleContext muleContext);        
+    void setMuleContext(MuleContext muleContext);
 }

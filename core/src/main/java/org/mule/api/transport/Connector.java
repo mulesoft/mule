@@ -24,6 +24,7 @@ import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
+import org.mule.model.streaming.CallbackOutputStream;
 
 import java.io.OutputStream;
 import java.util.List;
@@ -41,15 +42,15 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
      * received from a specific transport channel and then processed by the endpoint.
      * Only a single listener can be registered for a given endpoints. Attempts to
      * register a listener when one is already registered will fail.
-     * 
+     *
      * @param endpoint defines both the transport and channel/resource uri as well
      *            the processing (transformation/filtering) that should occur when
      *            the endpoint processes a new message from the transport receiver.
      * @param listener the listener that will be invoked when messages are received
      *            on the endpoint.
-     * @param pattern reference to the runtime construct that the listener is part of
-     *            for use as context for logging, notifications and error handling.
-     * @throws Exception
+     * @param flowConstruct reference to the flow construct that the listener is part
+     *            of for use as context for logging, notifications and error
+     *            handling.
      */
     public void registerListener(InboundEndpoint endpoint, MessageProcessor listener, FlowConstruct flowConstruct)
         throws Exception;
@@ -58,9 +59,6 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
      * Unregisters the listener for the given endpoints. This will mean that the
      * listener that was registered for this endpoint will no longer receive any
      * messages.
-     * 
-     * @param endpoint
-     * @throws Exception
      */
     public void unregisterListener(InboundEndpoint endpoint, FlowConstruct flowConstruct) throws Exception;
 
@@ -78,11 +76,11 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
     boolean isDisposed();
 
     /**
-     * Creates a new {@link MuleMessageFactory} using what's defined in the connector's 
-     * transport service descriptor. 
+     * Creates a new {@link MuleMessageFactory} using what's defined in the connector's
+     * transport service descriptor.
      */
     MuleMessageFactory createMuleMessageFactory() throws CreateException;
-    
+
     /**
      * @return the primary protocol name for endpoints of this connector
      */
@@ -101,7 +99,7 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
     /**
      * The dispatcher factory is used to create a message dispatcher of the current
      * request
-     * 
+     *
      * @param factory the factory to use when a dispatcher request is madr
      */
     void setDispatcherFactory(MessageDispatcherFactory factory);
@@ -109,7 +107,7 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
     /**
      * The dispatcher factory is used to create a message dispatcher of the current
      * request
-     * 
+     *
      * @return the factory to use when a dispatcher request is madr
      */
     MessageDispatcherFactory getDispatcherFactory();
@@ -131,7 +129,7 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
     MessageRequesterFactory getRequesterFactory();
 
     boolean isResponseEnabled();
-    
+
     /**
      * Make a specific request to the underlying transport
      *
@@ -163,16 +161,15 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
     MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception;
 
     /**
-     * Will get the output stream for this type of transport. Typically this
-     * will be called only when Streaming is being used on an outbound endpoint.
-     * If Streaming is not supported by this transport an {@link UnsupportedOperationException}
-     * is thrown.   Note that the stream MUST release resources on close.  For help doing so, see
-     * {@link org.mule.model.streaming.CallbackOutputStream}.
+     * Will get the output stream for this type of transport. Typically this will be
+     * called only when Streaming is being used on an outbound endpoint. If Streaming
+     * is not supported by this transport an {@link UnsupportedOperationException} is
+     * thrown. Note that the stream MUST release resources on close. For help doing
+     * so, see {@link CallbackOutputStream}.
      *
      * @param endpoint the endpoint that releates to this Dispatcher
-     * @param message the current message being processed
+     * @param event the current event being processed
      * @return the output stream to use for this request
-     * @throws MuleException
      */
     OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event) throws MuleException;
 
@@ -185,17 +182,17 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
      *         transport's service descriptor.
      */
     MessageExchangePattern getDefaultExchangePattern();
-    
+
     /**
      * @return List of exchange patterns that this connector supports for inbound endpoints.
      */
     List<MessageExchangePattern> getInboundExchangePatterns();
-    
+
     /**
      * @return List of exchange patterns that this connector supports for outbound endpoints.
      */
     List<MessageExchangePattern> getOutboundExchangePatterns();
-    
+
     /**
      * @return The strategy used for reading and writing session information to and from the transport.
      */

@@ -36,7 +36,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
  * <code>RouteableExceptionStrategy</code> allows transforming and routing exceptions
  * to outbound routers. This exception strategy does not take into account any
  * defined endpoints in its instance variable.
- * 
+ *
  * @author estebanroblesluna
  * @since 2.2.6
  */
@@ -50,6 +50,7 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
     /**
      * {@inheritDoc}
      */
+    @Override
     public MuleEvent handleException(Exception e, MuleEvent event)
     {
         int currentRootExceptionHashCode = 0;
@@ -57,7 +58,7 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
         MuleMessage msg = null;
 
         StringBuffer logInfo = new StringBuffer();
-        
+
         try
         {
             logInfo.append("****++******Alternate Exception Strategy******++*******\n");
@@ -144,7 +145,7 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
                 if (st[i].getClassName().equals("org.mule.AlternateExceptionStrategy"))
                 {
                     logger.warn("*#*#*#*#*\n"
-                        + "Recursive error in AlternateExceptionStrategy " 
+                        + "Recursive error in AlternateExceptionStrategy "
                         + e
                         + "\n"
                         + "*#*#*#*#*");
@@ -172,15 +173,13 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
     /**
      * {@inheritDoc}
      */
+    @Override
     public void handleMessagingException(MuleMessage message, Throwable t)
     {
         defaultHandler(message, t);
         routeException(getMessageFromContext(message), (ImmutableEndpoint) null, t);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void handleRoutingException(MuleMessage message, ImmutableEndpoint endpoint, Throwable t)
     {
         defaultHandler(message, t);
@@ -190,6 +189,7 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
     /**
      * {@inheritDoc}
      */
+    @Override
     public void handleLifecycleException(Object component, Throwable t)
     {
         logger.error("The object that failed is: \n" + ObjectUtils.toString(component, "null"));
@@ -199,6 +199,7 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
     /**
      * {@inheritDoc}
      */
+    @Override
     public void handleStandardException(Throwable t)
     {
         handleTransaction(t);
@@ -239,9 +240,6 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected void routeException(MuleMessage msg, ImmutableEndpoint failedEndpoint, Throwable t)
     {
         MuleMessage contextMsg = null;
@@ -293,6 +291,7 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
         this.stopFurtherProcessing = stopFurtherProcessing;
     }
 
+    @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         if (router instanceof FlowConstructAware)
@@ -331,6 +330,7 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
         }
     }
 
+    @Override
     public void stop() throws MuleException
     {
         if (router instanceof Stoppable)
@@ -339,6 +339,7 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
         }
     }
 
+    @Override
     public void start() throws MuleException
     {
         if (router instanceof Stoppable)

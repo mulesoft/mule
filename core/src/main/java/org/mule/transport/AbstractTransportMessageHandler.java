@@ -178,7 +178,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
             {
                 stop();
             }
-            
+
             //Nothing to do when disposing, just transition
             lifecycleManager.fireDisposePhase(new LifecycleCallback<O>() {
                 public void onTransition(String phaseName, O object) throws MuleException
@@ -336,11 +336,11 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
      * behaves.
      * <p/>
      * This method ensures that {@link #doStart()} will be called at most one time
-     * and will return without error if the component is already {@link #started}.
+     * and will return without error if the component is already started.
      */
     public final void start() throws MuleException
     {
-        //We only fire start lifecycle once we are connected, see {@link #callDoStartWhenItIsConnected}
+        //We only fire start lifecycle once we are connected, see callDoStartWhenItIsConnected
         if (!connected.get() && !connecting.get())
         {
             connectAndThenStart();

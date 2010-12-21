@@ -88,26 +88,11 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
         }
     }
 
-    /**
-     * transform the specified message
-     * @param src the data to transform
-     * @param event the event currently being processed
-     * @return
-     * @throws TransformerMessagingException
-     */
     public Object transform(Object src, MuleEvent event) throws TransformerMessagingException
     {
         return transform(src, getEncoding(src), event);
     }
 
-    /**
-     * transform the specified message
-     * @param src the data to transform
-     * @param enc
-     * @param event the event currently being processed
-     * @return
-     * @throws TransformerMessagingException
-     */
     public final Object transform(Object src, String enc, MuleEvent event) throws TransformerMessagingException
     {
         DataType<?> sourceType = DataTypeFactory.create(src.getClass());
@@ -180,10 +165,6 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
 
     /**
      * Check if the return class is supported by this transformer
-     * @param object
-     * @param event
-     * @return
-     * @throws TransformerMessagingException
      */
     protected Object checkReturnClass(Object object, MuleEvent event) throws TransformerMessagingException
     {
@@ -216,10 +197,6 @@ public abstract class AbstractMessageTransformer extends AbstractTransformer imp
 
     /**
      * Transform the message
-     * @param message
-     * @param outputEncoding
-     * @return
-     * @throws TransformerMessagingException
      */
     public abstract Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException;
 }

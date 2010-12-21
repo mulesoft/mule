@@ -55,25 +55,16 @@ public class StatisticsService implements StatisticsServiceMBean
 
     }
 
-    /**
-     * @see org.mule.api.management.stats.Statistics#clear()
-     */
     public void clear()
     {
         stats.clear();
     }
 
-    /**
-     * @see org.mule.api.management.stats.Statistics#isEnabled()
-     */
     public boolean isEnabled()
     {
         return stats.isEnabled();
     }
 
-    /**
-     * @see org.mule.api.management.stats.Statistics#setEnabled(boolean)
-     */
     public void setEnabled(boolean b)
     {
         stats.setEnabled(b);
@@ -84,7 +75,7 @@ public class StatisticsService implements StatisticsServiceMBean
      * @deprecated use #getServiceStatistics
      */
     @Deprecated
-    public Collection getComponentStatistics()
+    public Collection<?> getComponentStatistics()
     {
         return stats.getServiceStatistics();
     }
@@ -123,5 +114,4 @@ public class StatisticsService implements StatisticsServiceMBean
         stats.logSummary(printer);
         return w.toString();
     }
-
 }

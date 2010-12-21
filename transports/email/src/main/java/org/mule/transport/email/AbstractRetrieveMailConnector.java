@@ -50,13 +50,13 @@ public abstract class AbstractRetrieveMailConnector extends AbstractMailConnecto
      * Once a message has been read, should it be deleted
      */
     private volatile boolean deleteReadMessages = true;
-    
+
     /**
      * The action performed if the deleteReadMessages actions is set to false
      */
     private Flags.Flag defaultProcessMessageAction = Flags.Flag.SEEN;
 
-    
+
     protected AbstractRetrieveMailConnector(int defaultPort, MuleContext context)
     {
         super(defaultPort, MAILBOX, context);
@@ -92,9 +92,7 @@ public abstract class AbstractRetrieveMailConnector extends AbstractMailConnecto
         backupFolder = string;
     }
 
-    /**
-     * @see org.mule.api.transport.Connector#registerListener(org.mule.api.service.Service, org.mule.api.endpoint.InboundEndpoint) 
-     */
+    @Override
     public MessageReceiver createReceiver(FlowConstruct flowConstruct, InboundEndpoint endpoint) throws Exception
     {
         Object[] args = {checkFrequency, isBackupEnabled(), backupFolder};

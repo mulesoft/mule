@@ -39,10 +39,10 @@ public class DefaultLoanBroker extends AbstractLoanBroker
         bqr.setCreditProfile(cp);
 
         setLenderList(bqr);
-        
+
         return bqr;
     }
-    
+
     /**
      * Sets the list of lenders on the LoanBrokerQuoteRequest and returns it.
      */
@@ -53,9 +53,6 @@ public class DefaultLoanBroker extends AbstractLoanBroker
         request.setLenders(lenders);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public Bank[] getLenders(CreditProfile creditProfile, Double loanAmount)
     {
         // TODO Add creditProfile info. to the logic below.

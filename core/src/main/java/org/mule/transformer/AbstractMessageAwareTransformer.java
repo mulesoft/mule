@@ -17,6 +17,7 @@ import org.mule.api.transformer.TransformerException;
  * <code>AbstractMessageAwareTransformer</code> is the superclass for pre-MULE 3.0 message transformers.  Newly
  * created message transformers should derive from AbstractMessageTransformer.
  *
+ * @deprecated
  * @see AbstractMessageTransformer
  */
 @Deprecated
@@ -24,10 +25,6 @@ public abstract class AbstractMessageAwareTransformer extends AbstractMessageTra
 {
     /**
      * Transform the message.
-     * @param message
-     * @param outputEncoding
-     * @return
-     * @throws TransformerException
      */
     @Override
     public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
@@ -37,10 +34,6 @@ public abstract class AbstractMessageAwareTransformer extends AbstractMessageTra
 
     /**
      * Subclasses implement this method.
-     * @param message
-     * @param outputEncoding
-     * @return
-     * @throws TransformerException
      */
     public abstract Object transform(MuleMessage message, String outputEncoding) throws TransformerException;
 

@@ -159,14 +159,14 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
 
         Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
         props.put("holder", responseHolder);
-        
+
         // Set custom soap action if set on the event or endpoint
         String soapAction = event.getMessage().getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
         if (soapAction != null)
         {
             soapAction = parseSoapAction(soapAction, new QName(method.getName()), event);
             props.put(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION, soapAction);
-        }   
+        }
 
         clientProxy.getRequestContext().putAll(props);
 
@@ -204,7 +204,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         // Holds the response from the transport
         Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
         props.put("holder", responseHolder);
-        
+
         // Set custom soap action if set on the event or endpoint
         String soapAction = event.getMessage().getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
         if (soapAction != null)
@@ -288,18 +288,17 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     }
 
     /**
+     * <p>
      * This method tries to call
-     * {@link #getBindingOperationFromEndpoint(Endpoint, String)} with the .net
-     * naming convention for .net webservices (method names start with a capital
+     * {@link #getBindingOperationFromEndpoint(Endpoint, String)} with the .NET
+     * naming convention for .NET webservices (method names start with a capital
      * letter).
+     * </p>
      * <p>
      * CXF generates method names compliant with Java naming so if the WSDL operation
      * names starts with uppercase letter, matching with method name does not work -
      * thus the work around.
-     * 
-     * @param opName
-     * @param ep
-     * @return
+     * </p>
      */
     protected BindingOperationInfo tryToGetTheOperationInDotNetNamingConvention(Endpoint ep,
                                                                                 final String opName)
@@ -367,12 +366,12 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         props.put(MuleProperties.MULE_EVENT_PROPERTY, event);
         props.put(CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR, this);
         props.put(org.apache.cxf.message.Message.ENDPOINT_ADDRESS, event.getEndpoint().getEndpointURI().toString());
-        
+
         if (decoupledEndpoint != null)
         {
             props.put(WSAContextUtils.REPLYTO_PROPERTY, decoupledEndpoint);
         }
-        
+
         return props;
     }
 
