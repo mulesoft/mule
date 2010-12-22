@@ -39,7 +39,8 @@ public class EndpointMessageNotification extends ServerNotification
     public static final int MESSAGE_REQUESTED = MESSAGE_EVENT_ACTION_START_RANGE + 4;
     public static final int MESSAGE_RESPONSE = MESSAGE_EVENT_ACTION_START_RANGE + 5;
 
-    static {
+    static
+    {
         registerAction("received", MESSAGE_RECEIVED);
         registerAction("dispatched", MESSAGE_DISPATCHED);
         registerAction("sent", MESSAGE_SENT);
@@ -86,6 +87,7 @@ public class EndpointMessageNotification extends ServerNotification
         return endpoint;
     }
 
+    @Override
     public String getType()
     {
         return TYPE_TRACE;
@@ -96,5 +98,4 @@ public class EndpointMessageNotification extends ServerNotification
     {
         return (MuleMessage) super.getSource();
     }
-
 }

@@ -17,6 +17,7 @@
         <module>atom</module>
         <module>annotations</module>
         <module>acegi</module>
+        <module>activiti</module>
         <module>all-modules</module>
         <module>builders</module>
         <module>boot</module>
