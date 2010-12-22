@@ -30,6 +30,7 @@ import org.mule.transport.servlet.JarResourceServlet;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.transport.servlet.MuleServletContextListener;
 import org.mule.util.IOUtils;
+import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 
 import java.io.InputStream;
@@ -40,14 +41,14 @@ import java.util.List;
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
 import org.mortbay.jetty.Connector;
+import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.xml.XmlConfiguration;
 
 /**
@@ -93,7 +94,19 @@ public class JettyHttpConnector extends AbstractConnector
     @Override
     protected void doInitialise() throws InitialisationException
     {
-        httpServer = new Server();
+        httpServer = new Server()
+        {
+            @Override
+            public void addHandler(Handler handler)
+            {
+                final Connector c = getServer().getConnectors()[0];
+                final String msg = String.format("Deploying a web app at %s:/%s:%d%s",
+                                                 "http", c.getHost(), c.getPort(),
+                                                 ((WebAppContext) handler).getContextPath());
+                logger.info(StringMessageUtils.getBoilerPlate(msg, '*', 70));
+                super.addHandler(handler);
+            }
+        };
         
         if (webappsConfiguration != null)
         {
@@ -104,12 +117,12 @@ public class JettyHttpConnector extends AbstractConnector
             deployer.setServerClasses(webappsConfiguration.getServerClasses());
             deployer.setSystemClasses(webappsConfiguration.getSystemClasses());
 
-            org.mortbay.jetty.AbstractConnector connector = createJettyConnector();
-            connector.setHost(webappsConfiguration.getHost());
-            connector.setPort(webappsConfiguration.getPort());
+            org.mortbay.jetty.AbstractConnector jettyConnector = createJettyConnector();
+            jettyConnector.setHost(webappsConfiguration.getHost());
+            jettyConnector.setPort(webappsConfiguration.getPort());
             deployer.setContexts(httpServer);
 
-            httpServer.addConnector(connector);
+            httpServer.addConnector(jettyConnector);
             httpServer.addLifeCycle(deployer);
         }
         
