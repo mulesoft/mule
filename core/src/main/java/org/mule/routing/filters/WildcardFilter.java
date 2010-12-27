@@ -119,6 +119,21 @@ public class WildcardFilter implements Filter, ObjectFilter
                 {
                     return true;
                 }
+                else if (pattern.endsWith("+") && pattern.length() > 1)
+                {
+                    String className = pattern.substring(0, pattern.length() - 1);
+                    try
+                    {
+                        Class<?> theClass = Class.forName(className);
+                        if (theClass.isInstance(object))
+                        {
+                            return true;
+                        }
+                    }
+                    catch (ClassNotFoundException e)
+                    {
+                    }
+                }
             }
         }
 
