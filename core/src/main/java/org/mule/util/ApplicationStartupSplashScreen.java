@@ -15,6 +15,7 @@ import org.mule.api.agent.Agent;
 import org.mule.config.i18n.CoreMessages;
 
 import java.util.Collection;
+import java.util.StringTokenizer;
 
 public class ApplicationStartupSplashScreen extends SplashScreen
 {
@@ -48,7 +49,20 @@ public class ApplicationStartupSplashScreen extends SplashScreen
             footer.add(CoreMessages.agentsRunning().getMessage());
             for (Agent agent : agents)
             {
-                footer.add("  " + agent.getDescription());
+                String description = agent.getDescription();
+                if (description.startsWith("'''"))
+                {
+                    description = description.substring("'''".length());
+                    // handle multiline descriptions better
+                    for (StringTokenizer st = new StringTokenizer(description, String.format("%n")); st.hasMoreTokens();)
+                    {
+                        footer.add("  " + st.nextToken());
+                    }
+                }
+                else
+                {
+                    footer.add("  " + description);
+                }
             }
         }
     }

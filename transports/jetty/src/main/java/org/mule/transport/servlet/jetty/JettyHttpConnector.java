@@ -104,7 +104,10 @@ public class JettyHttpConnector extends AbstractConnector
                                                  "http", c.getHost(),
                                                  c.getPort() == 80 ? StringUtils.EMPTY : ":" + c.getPort(),
                                                  ((WebAppContext) handler).getContextPath());
-                logger.info(StringMessageUtils.getBoilerPlate(msg, '*', 70));
+                if (logger.isInfoEnabled())
+                {
+                    logger.info(StringMessageUtils.getBoilerPlate(msg, '*', 70));
+                }
                 super.addHandler(handler);
             }
         };
@@ -141,6 +144,9 @@ public class JettyHttpConnector extends AbstractConnector
                         try
                         {
                             start();
+                            // update the agent displaying webapp urls to the user
+                            final JettyWebappServerAgent agent = (JettyWebappServerAgent) muleContext.getRegistry().lookupAgent(JettyWebappServerAgent.NAME);
+                            agent.onJettyConnectorStarted(JettyHttpConnector.this);
                         }
                         catch (MuleException e)
                         {

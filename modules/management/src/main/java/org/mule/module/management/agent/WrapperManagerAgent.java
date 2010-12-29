@@ -29,7 +29,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.tanukisoftware.wrapper.WrapperSystemPropertyUtil;
@@ -239,7 +238,8 @@ public class WrapperManagerAgent extends AbstractAgent
         return WrapperSystemPropertyUtil.getIntProperty("wrapper.pid", 0);
     }
 
-    protected void lazyInitWrapperManager() {
+    protected void lazyInitWrapperManager()
+    {
         WrapperManagerMBean wm = (WrapperManagerMBean) wrapperManagerRef.get();
 
         if (wm != null)
@@ -255,7 +255,8 @@ public class WrapperManagerAgent extends AbstractAgent
      * Unregister all MBeans if there are any left over the old deployment
      */
     protected void unregisterMBeansIfNecessary()
-        throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException {
+            throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException
+    {
         if (mBeanServer == null || wrapperName == null)
         {
             return;
@@ -266,19 +267,4 @@ public class WrapperManagerAgent extends AbstractAgent
         }
     }
 
-    /**
-     * Quietly unregister ourselves.
-     */
-    protected void unregisterMeQuietly()
-    {
-        try
-        {
-            // remove the agent from the list, it's not functional
-            muleContext.getRegistry().unregisterAgent(this.getName());
-        }
-        catch (MuleException e)
-        {
-            // not interested, really
-        }
-    }
 }
