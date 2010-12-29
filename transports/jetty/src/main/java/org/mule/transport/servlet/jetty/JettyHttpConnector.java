@@ -100,7 +100,7 @@ public class JettyHttpConnector extends AbstractConnector
             public void addHandler(Handler handler)
             {
                 final Connector c = getServer().getConnectors()[0];
-                final String msg = String.format("Deploying a web app at %s:/%s%s%s",
+                final String msg = String.format("Will deploy a web app at %s:/%s%s%s",
                                                  "http", c.getHost(),
                                                  c.getPort() == 80 ? StringUtils.EMPTY : ":" + c.getPort(),
                                                  ((WebAppContext) handler).getContextPath());
