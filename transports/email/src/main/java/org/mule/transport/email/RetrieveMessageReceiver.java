@@ -143,7 +143,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
                         }
                         else
                         {
-                            if (this.getEndpoint().getFilter().accept(message))
+                            if (this.getEndpoint().getFilter() != null && this.getEndpoint().getFilter().accept(message))
                             {
                                 Flags.Flag flag = castConnector().getDefaultProcessMessageAction();
                                 if (flag != null)

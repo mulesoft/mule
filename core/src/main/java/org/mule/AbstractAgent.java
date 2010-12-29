@@ -10,6 +10,7 @@
 package org.mule;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.agent.Agent;
 import org.mule.api.context.MuleContextAware;
 
@@ -47,5 +48,21 @@ public abstract class AbstractAgent implements Agent, MuleContextAware
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
+    }
+
+    /**
+     * Quietly unregister ourselves.
+     */
+    protected void unregisterMeQuietly()
+    {
+        try
+        {
+            // remove the agent from the list, it's not functional
+            muleContext.getRegistry().unregisterAgent(this.getName());
+        }
+        catch (MuleException e)
+        {
+            // not interested, really
+        }
     }
 }

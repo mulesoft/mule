@@ -43,7 +43,7 @@
                     <xsd:element minOccurs="0" maxOccurs="1" name="webapps" type="webappsType">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Allows configuring of an directory which contains WAR files to be
+                                Allows configuring of a directory which contains WAR files to be
                                 served out by Jetty.
                             </xsd:documentation>
                         </xsd:annotation>
