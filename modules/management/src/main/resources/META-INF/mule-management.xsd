@@ -213,6 +213,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="jmxAuthenticator-ref" type="xsd:string" >
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to a custom jmxAuthenticator.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

@@ -15,6 +15,7 @@ import org.mule.module.management.agent.JmxAgent;
 import org.mule.module.management.agent.JmxServerNotificationAgent;
 import org.mule.module.management.agent.Log4jAgent;
 import org.mule.module.management.agent.Mx4jAgent;
+import org.mule.module.management.support.SimplePasswordJmxAuthenticator;
 import org.mule.tck.FunctionalTestCase;
 
 public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCase
@@ -35,6 +36,7 @@ public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCas
         assertEquals(false, jmxAgent.isCreateServer());
         assertEquals(true, jmxAgent.isLocateServer());
         assertEquals(true, jmxAgent.isEnableStatistics());
+        assertEquals(SimplePasswordJmxAuthenticator.class, jmxAgent.getJmxAuthenticator().getClass());
 
         agent = muleContext.getRegistry().lookupAgent("jmx-log4j");
         assertNotNull(agent);

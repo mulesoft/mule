@@ -10,6 +10,7 @@
 
 package org.mule.module.management.support;
 
+import org.mule.module.management.agent.ConfigurableJMXAuthenticator;
 import org.mule.module.management.agent.JmxAgent;
 import org.mule.util.StringUtils;
 
@@ -31,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
  * A JMX authenticator for a simple username/password scheme.
  * Passwords are neither encrypted, nor obfuscated.
  */
-public class SimplePasswordJmxAuthenticator implements JMXAuthenticator
+public class SimplePasswordJmxAuthenticator implements JMXAuthenticator, ConfigurableJMXAuthenticator
 {
     /**
      * Logger used by this class.
@@ -86,5 +87,10 @@ public class SimplePasswordJmxAuthenticator implements JMXAuthenticator
         {
             this.credentials.putAll(newCredentials);
         }
+    }
+
+    public void configure(Map newCredentials)
+    {
+        this.setCredentials(newCredentials);
     }
 }
