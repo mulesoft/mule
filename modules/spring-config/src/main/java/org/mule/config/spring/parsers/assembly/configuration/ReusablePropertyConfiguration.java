@@ -18,7 +18,6 @@ import java.util.Map;
  */
 public class ReusablePropertyConfiguration implements PropertyConfiguration
 {
-
     private PropertyConfiguration reference;
     private PropertyConfiguration delegate;
 
@@ -32,7 +31,7 @@ public class ReusablePropertyConfiguration implements PropertyConfiguration
         this.delegate = delegate;
     }
 
-   public void reset()
+    public void reset()
     {
         if (null == reference)
         {

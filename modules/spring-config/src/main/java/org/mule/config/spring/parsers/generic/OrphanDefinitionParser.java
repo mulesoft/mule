@@ -14,21 +14,24 @@ import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.w3c.dom.Element;
 
 /**
- * Contructs a single, standalone bean from an element - it is not injected into any other object.
- * This parser can be configured to automatically set the class of the object, the init and destroy methods
- * and whether this object is a singleton.
- *
- * <p>Typically, you should use {@link MuleOrphanDefinitionParser}
- * instead of this class, since these elements occur in the <mule> top level element.</p>
+ * <p>
+ * Contructs a single, standalone bean from an element - it is not injected into any
+ * other object. This parser can be configured to automatically set the class of the
+ * object, the init and destroy methods and whether this object is a singleton.
+ * </p>
+ * <p>
+ * Typically, you should use {@link MuleOrphanDefinitionParser} instead of this
+ * class, since these elements occur in the <mule> top level element.
+ * </p>
  */
 public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser
 {
-
-    private Class beanClass = null;
+    private Class<?> beanClass = null;
     private boolean dynamicClass = false;
 
     /**
-     * This constructor assumes that the class name will be explicitly specified as an attribute on the element.
+     * This constructor assumes that the class name will be explicitly specified as
+     * an attribute on the element.
      */
     public OrphanDefinitionParser(boolean singleton)
     {
@@ -36,7 +39,7 @@ public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser
         dynamicClass = true;
     }
 
-    public OrphanDefinitionParser(Class beanClass, boolean singleton)
+    public OrphanDefinitionParser(Class<?> beanClass, boolean singleton)
     {
         this.beanClass = beanClass;
         this.singleton = singleton;
@@ -55,9 +58,8 @@ public class OrphanDefinitionParser extends AbstractMuleBeanDefinitionParser
     }
 
     @Override
-    protected Class getBeanClass(Element element)
+    protected Class<?> getBeanClass(Element element)
     {
         return beanClass;
     }
-
 }
