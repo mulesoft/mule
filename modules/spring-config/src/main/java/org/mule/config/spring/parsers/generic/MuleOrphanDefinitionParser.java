@@ -20,20 +20,21 @@ import org.w3c.dom.Element;
  */
 public class MuleOrphanDefinitionParser extends OrphanDefinitionParser
 {
-    
     /**
-     * This constructor assumes that the class name will be explicitly specified as an attribute on the element.
+     * This constructor assumes that the class name will be explicitly specified as
+     * an attribute on the element.
      */
     public MuleOrphanDefinitionParser(boolean singleton)
     {
         super(singleton);
     }
 
-    public MuleOrphanDefinitionParser(Class beanClass, boolean singleton)
+    public MuleOrphanDefinitionParser(Class<?> beanClass, boolean singleton)
     {
         super(beanClass, singleton);
     }
 
+    @Override
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext)
     {
         assertMuleParent(element);
@@ -48,5 +49,4 @@ public class MuleOrphanDefinitionParser extends OrphanDefinitionParser
                     + ROOT_ELEMENT + "> element: " + SpringXMLUtils.elementToString(element));
         }
     }
-
 }
