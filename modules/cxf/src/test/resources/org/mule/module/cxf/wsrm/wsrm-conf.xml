@@ -14,7 +14,7 @@
     <endpoint name="clientEndpoint" 
       address="http://localhost:63081/services/greeter"
       exchange-pattern="request-response">
-        <cxf:simple-client
+        <cxf:jaxws-client
             clientClass="org.apache.hello_world_soap_http.SOAPService"
             port="SoapPort"
             operation="greetMe"
