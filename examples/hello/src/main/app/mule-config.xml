@@ -85,6 +85,9 @@
             <inbound>
                 <vm:inbound-endpoint path="userErrorHandler" responseTransformer-refs="ExceptionToString" exchange-pattern="request-response"/>
             </inbound>
+            <outbound>
+            
+            </outbound>
         </service>
     </model>
 

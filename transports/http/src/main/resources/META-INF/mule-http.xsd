@@ -234,6 +234,31 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+    
+    
+    <xsd:element name="basic-security-filter" type="basicSecurityFilterType" substitutionGroup="mule:abstract-security-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                Authenticate users via Basic authorization using standard HTTP headers.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="basicSecurityFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractSecurityFilterType">
+                <xsd:attribute name="realm" type="xsd:string" use="required"/>
+                <xsd:attribute name="securityProviders" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The delegate-security-provider to use for authenticating. Use this element
+                            in case you have multiple security managers defined in your configuration.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>

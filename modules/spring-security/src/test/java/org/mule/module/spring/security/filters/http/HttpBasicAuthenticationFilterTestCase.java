@@ -23,6 +23,7 @@ import org.mule.api.security.UnauthorisedException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.filters.HttpBasicAuthenticationFilter;
 
 public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleTestCase
 {
