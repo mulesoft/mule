@@ -1121,35 +1121,11 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-        <repository>
-            <id>apache-snapshots</id>
-            <name>Apache Snapshots</name>
-            <url>http://people.apache.org/maven-snapshot-repository</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
         <!-- for activemq -->
         <repository>
             <id>ops4j</id>
             <name>OPS4J Repository</name>
             <url>http://repository.ops4j.org/maven2</url>
-        </repository>
-        <repository>
-            <id>apache.incubating.releases</id>
-            <name>Apache Incubating Release Distribution Repository</name>
-            <url>http://people.apache.org/repo/m2-incubating-repository</url>
-        </repository>
-        <repository>
-            <id>apache.snapshots</id>
-            <name>Apache Development Snapshot Repository</name>
-            <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
         </repository>
         <repository>
             <id>jboss</id>
@@ -1177,33 +1153,6 @@
     </repositories>
 
     <pluginRepositories>
-        <pluginRepository>
-            <!--
-                This is the same as apache-snapshots, but for plugins now.
-                Technically it could've been a different repo, but they
-                put all snapshots in one location at Apache.
-             -->
-            <id>apache-plugin-snapshots</id>
-            <name>Apache Maven Plugins Snapshot Repository</name>
-            <url>http://people.apache.org/maven-snapshot-repository</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </pluginRepository>
-        <pluginRepository>
-            <id>apache-m2-incubator</id>
-            <name>Apache m2 Incubator</name>
-            <url>http://people.apache.org/repo/m2-incubating-repository</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </pluginRepository>
         <pluginRepository>
             <id>mule-deps</id>
             <name>Mule Dependencies</name>
