@@ -1,3 +1,13 @@
+/*
+ * $Id: HttpClientMethodResponseToObject.java 19250 2010-08-30 16:53:14Z dirk.olmes $
+ * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+
 package org.mule.transport.http.transformers;
 
 import org.mule.api.MuleMessage;
@@ -20,23 +30,27 @@ public class FormTransformer extends AbstractMessageTransformer
 {
 
     @Override
-    public Object transformMessage(MuleMessage message, String encoding) throws TransformerException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         try
         {
             String v = message.getPayloadAsString();
-            Map<String, Object> values = new HashMap<String,Object>();
-            
+            Map<String, Object> values = new HashMap<String, Object>();
+
             final StringTokenizer tokenizer = new StringTokenizer(v, "&");
             String token;
-            while (tokenizer.hasMoreTokens()) {
+            while (tokenizer.hasMoreTokens())
+            {
                 token = tokenizer.nextToken();
                 int idx = token.indexOf('=');
-                if (idx < 0) {
-                    add(values, URLDecoder.decode(token, encoding), null);
-                } else if (idx > 0) {
-                    add(values, URLDecoder.decode(token.substring(0, idx), encoding),
-                                URLDecoder.decode(token.substring(idx+1), encoding));
+                if (idx < 0)
+                {
+                    add(values, URLDecoder.decode(token, outputEncoding), null);
+                }
+                else if (idx > 0)
+                {
+                    add(values, URLDecoder.decode(token.substring(0, idx), outputEncoding),
+                        URLDecoder.decode(token.substring(idx + 1), outputEncoding));
                 }
             }
             return values;
@@ -47,6 +61,7 @@ public class FormTransformer extends AbstractMessageTransformer
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void add(Map<String, Object> values, String key, String value)
     {
         Object existingValue = values.get(key);
@@ -56,7 +71,7 @@ public class FormTransformer extends AbstractMessageTransformer
         }
         else if (existingValue instanceof List)
         {
-            List<String> list = (List<String>) existingValue;
+            List<String> list = (List<String>)existingValue;
             list.add(value);
         }
         else if (existingValue instanceof String)
@@ -67,6 +82,4 @@ public class FormTransformer extends AbstractMessageTransformer
             values.put(key, list);
         }
     }
-
-
 }
