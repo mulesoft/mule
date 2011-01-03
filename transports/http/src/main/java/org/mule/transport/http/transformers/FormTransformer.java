@@ -35,18 +35,20 @@ public class FormTransformer extends AbstractMessageTransformer
         try
         {
             String v = message.getPayloadAsString();
-            Map<String, Object> values = new HashMap<String,Object>();
-            
-            final StringTokenizer tokenizer = new StringTokenizer(v, "&");
-            String token;
-            while (tokenizer.hasMoreTokens()) {
-                token = tokenizer.nextToken();
+            Map<String, Object> values = new HashMap<String, Object>();
+
+            for (StringTokenizer st = new StringTokenizer(v, "&"); st.hasMoreTokens();)
+            {
+                String token = st.nextToken();
                 int idx = token.indexOf('=');
-                if (idx < 0) {
+                if (idx < 0)
+                {
                     add(values, URLDecoder.decode(token, encoding), null);
-                } else if (idx > 0) {
+                }
+                else if (idx > 0)
+                {
                     add(values, URLDecoder.decode(token.substring(0, idx), encoding),
-                                URLDecoder.decode(token.substring(idx+1), encoding));
+                        URLDecoder.decode(token.substring(idx + 1), encoding));
                 }
             }
             return values;
@@ -66,13 +68,14 @@ public class FormTransformer extends AbstractMessageTransformer
         }
         else if (existingValue instanceof List)
         {
+            @SuppressWarnings("unchecked")
             List<String> list = (List<String>) existingValue;
             list.add(value);
         }
         else if (existingValue instanceof String)
         {
             List<String> list = new ArrayList<String>();
-            list.add((String)existingValue);
+            list.add((String) existingValue);
             list.add(value);
             values.put(key, list);
         }
