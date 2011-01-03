@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -61,7 +62,8 @@ public class DeploymentService
 
     private ObservableList<Application> applications = new ObservableList<Application>();
     private Map<URL, Long> zombieMap = new HashMap<URL, Long>();
-    private ObservableList<URL> zombieLand = new ObservableList<URL>();
+
+    private List<StartupListener> startupListeners = new ArrayList<StartupListener>();
 
     public DeploymentService()
     {
@@ -156,6 +158,18 @@ public class DeploymentService
             {
                 // TODO logging
                 t.printStackTrace();
+            }
+        }
+
+        for (StartupListener listener : startupListeners)
+        {
+            try
+            {
+                listener.onAfterStartup();
+            }
+            catch (Throwable t)
+            {
+                logger.error(t);
             }
         }
 
@@ -315,6 +329,26 @@ public class DeploymentService
         }
 
         zombieMap.put(appArchiveUrl, lastModified);
+    }
+
+    public void addStartupListener(StartupListener listener)
+    {
+        this.startupListeners.add(listener);
+    }
+
+    public void removeStartupListener(StartupListener listener)
+    {
+        this.startupListeners.remove(listener);
+    }
+
+    public interface StartupListener
+    {
+
+        /**
+         * Invoked after all apps have passed the deployment phase. Any exceptions thrown by implementations
+         * will be ignored.
+         */
+        void onAfterStartup();
     }
 
     /**
