@@ -146,7 +146,10 @@ public class JettyHttpConnector extends AbstractConnector
                             start();
                             // update the agent displaying webapp urls to the user
                             final JettyWebappServerAgent agent = (JettyWebappServerAgent) muleContext.getRegistry().lookupAgent(JettyWebappServerAgent.NAME);
-                            agent.onJettyConnectorStarted(JettyHttpConnector.this);
+                            if (agent != null)
+                            {
+                                agent.onJettyConnectorStarted(JettyHttpConnector.this);
+                            }
                         }
                         catch (MuleException e)
                         {
