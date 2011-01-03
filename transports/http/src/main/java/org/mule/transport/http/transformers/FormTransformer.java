@@ -1,5 +1,5 @@
 /*
- * $Id: HttpClientMethodResponseToObject.java 19250 2010-08-30 16:53:14Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
