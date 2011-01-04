@@ -72,6 +72,12 @@ jackson-core-asl-1.3.1
 jackson-jaxrs-1.3.1
 jackson-mapper-asl-1.3.1
 javassist-3.7.ga
+el-api-6.0.29
+jasper-6.0.29
+jasper-el-6.0.29
+jasper-jdt-6.0.29
+jsp-api-6.0.29
+juli-6.0.29
 jaxb-api-2.1-osgi
 jaxb-impl-2.1.9-osgi
 jaxb-xjc-2.1.9-osgi
