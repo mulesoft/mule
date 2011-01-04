@@ -145,6 +145,7 @@
         <springSecurityVersion>3.0.3.RELEASE</springSecurityVersion>
         <staxUtilsVersion>20080702</staxUtilsVersion>
         <sxcVersion>0.7.3</sxcVersion>
+        <tomcatVersion>6.0.29</tomcatVersion>
         <woodstoxVersion>4.0.8</woodstoxVersion>
         <wrapperVersion>3.2.3</wrapperVersion>
         <xalanVersion>2.7.1</xalanVersion>
@@ -266,25 +267,6 @@
                     <exclusion>
                         <groupId>org.springframework</groupId>
                         <artifactId>spring-support</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-dao</artifactId>
-                <version>${springVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>aopalliance</groupId>
-                        <artifactId>aopalliance</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.aopalliance</groupId>
-                        <artifactId>com.springsource.org.aopalliance</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -559,7 +541,6 @@
                 <version>${javaActivationVersion}-osgi</version>
             </dependency>
             <dependency>
-                <!-- OSGi-ready -->
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
                 <version>${javaMailVersion}</version>
@@ -926,11 +907,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>cgilib</groupId>
-                <artifactId>cgilib-nodep</artifactId>
-                <version>${cgilibVersion}-osgi</version>
-            </dependency>
-            <dependency>
                 <groupId>jaxen</groupId>
                 <artifactId>jaxen</artifactId>
                 <version>${jaxenVersion}-osgi</version>
@@ -1014,17 +990,6 @@
                 <version>${asmVersion}-osgi</version>
             </dependency>
             <dependency>
-                <groupId>org.jbpm</groupId>
-                <artifactId>jbpm-jpdl</artifactId>
-                <version>${jbpmVersion}-osgi</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>org.beanshell</groupId>
                 <artifactId>bsh</artifactId>
                 <version>${bshVersion}-osgi</version>
@@ -1062,6 +1027,91 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bctsp-jdk15</artifactId>
                 <version>${bouncycastleVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>jasper-el</artifactId>
+                <version>${tomcatVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>jasper</artifactId>
+                <version>${tomcatVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>jsp-api</artifactId>
+                <version>${tomcatVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>juli</artifactId>
+                <version>${tomcatVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jbpm.jbpm4</groupId>
+                <artifactId>jbpm-jpdl</artifactId>
+                <version>${jbpmVersion}</version>
+                <exclusions>
+                    <!-- Mule uses a newer version -->
+                    <exclusion>
+                        <groupId>javax.mail</groupId>
+                        <artifactId>mail</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>javassist</groupId>
+                        <artifactId>javassist</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-jdk14</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jbpm.jbpm4</groupId>
+                <artifactId>jbpm-pvm</artifactId>
+                <version>${jbpmVersion}</version>
+                <exclusions>
+                    <!-- Mule uses a newer version -->
+                    <exclusion>
+                        <groupId>javassist</groupId>
+                        <artifactId>javassist</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-jdk14</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <!-- JSP EL API already bundled with the jetty transport -->
+                        <groupId>juel</groupId>
+                        <artifactId>juel-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${hibernateVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.transaction</groupId>
+                        <artifactId>jta</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javassistVersion}</version>
             </dependency>
 
         </dependencies>
