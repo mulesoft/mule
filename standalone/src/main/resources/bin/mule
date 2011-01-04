@@ -64,8 +64,9 @@ REALDIR=`pwd`
 
 # Check for MULE_HOME
 if [ -z "$MULE_HOME" ] ; then
-	MULE_HOME="${REALDIR}/.."
-	echo "MULE_HOME is set to ${MULE_HOME}"
+    # REALDIR points to $MULE_HOME/bin now, strip off the bin part so
+    # we get a proper MULE_HOME instead of a relative path
+    MULE_HOME="`dirname ${REALDIR}`"
 fi
 
 # strip a potential trailing slash in MULE_HOME. This is required to build a
@@ -73,6 +74,7 @@ fi
 # command
 MULE_HOME=`echo ${MULE_HOME} | sed -e 's/\/$//'`
 export MULE_HOME
+echo "MULE_HOME is set to ${MULE_HOME}"
 
 # If MULE_BASE is not set, set it to MULE_HOME
 if [ -z "$MULE_BASE" ] ; then
