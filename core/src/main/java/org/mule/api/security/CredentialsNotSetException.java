@@ -35,8 +35,14 @@ public class CredentialsNotSetException extends UnauthorisedException
         super(message, event, cause);
     }
 
+    public CredentialsNotSetException(MuleEvent event, SecurityContext context, SecurityFilter filter)
+    {
+        super(event, context, filter);
+    }
+    
+    @Deprecated
     public CredentialsNotSetException(MuleEvent event, SecurityContext context,
-        ImmutableEndpoint endpoint, EndpointSecurityFilter filter)
+        ImmutableEndpoint endpoint, SecurityFilter filter)
     {
         super(event, context, endpoint, filter);
     }

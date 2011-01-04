@@ -20,7 +20,7 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.security.EndpointSecurityFilter;
+import org.mule.api.security.SecurityFilter;
 import org.mule.api.service.Service;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transport.MessageReceiver;
@@ -401,7 +401,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         serviceEndpointbuilder.addMessageProcessor(new MessageFilter(receiver.getEndpoint().getFilter()));
         // set the Security filter on the axis endpoint on the real receiver
         // endpoint
-        EndpointSecurityFilter securityFilter = receiver.getEndpoint().getSecurityFilter();
+        SecurityFilter securityFilter = receiver.getEndpoint().getSecurityFilter();
         if (securityFilter != null)
         {
             serviceEndpointbuilder.addMessageProcessor(new SecurityFilterMessageProcessor(securityFilter));

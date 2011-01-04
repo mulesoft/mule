@@ -22,6 +22,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
+import org.mule.api.security.SecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
@@ -38,6 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.emory.mathcs.backport.java.util.Collections;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -417,7 +419,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable
         {
             if (mp instanceof SecurityFilterMessageProcessor)
             {
-                return ((SecurityFilterMessageProcessor)mp).getFilter();
+                SecurityFilter filter = ((SecurityFilterMessageProcessor)mp).getFilter();
+                if (filter instanceof EndpointSecurityFilter)
+                {
+                    return (EndpointSecurityFilter) filter;
+                }
             }
         }
 

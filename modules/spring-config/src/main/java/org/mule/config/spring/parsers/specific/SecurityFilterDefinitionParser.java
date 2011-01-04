@@ -10,7 +10,7 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.api.security.EndpointSecurityFilter;
+import org.mule.api.security.SecurityFilter;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
@@ -35,7 +35,7 @@ public class SecurityFilterDefinitionParser extends ParentContextDefinitionParse
         super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new OrphanDefinitionParser(filter, false));
         otherwise(
             new WrappingChildDefinitionParser(
-                "messageProcessor", filter, EndpointSecurityFilter.class, false, SecurityFilterMessageProcessor.class,
+                "messageProcessor", filter, SecurityFilter.class, false, SecurityFilterMessageProcessor.class,
                 SECURITY_FILTER, SECURITY_FILTER, this));
         addIgnored(ATTRIBUTE_NAME);
     }
@@ -45,7 +45,7 @@ public class SecurityFilterDefinitionParser extends ParentContextDefinitionParse
         super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new OrphanDefinitionParser(false));
         otherwise(
             new WrappingChildDefinitionParser(
-                "messageProcessor", null, EndpointSecurityFilter.class, true, SecurityFilterMessageProcessor.class,
+                "messageProcessor", null, SecurityFilter.class, true, SecurityFilterMessageProcessor.class,
                 SECURITY_FILTER, SECURITY_FILTER, this));
         addIgnored(ATTRIBUTE_NAME);
     }

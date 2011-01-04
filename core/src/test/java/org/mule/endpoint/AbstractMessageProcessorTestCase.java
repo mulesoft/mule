@@ -31,6 +31,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
+import org.mule.api.security.SecurityFilter;
 import org.mule.api.service.Service;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
@@ -86,7 +87,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
     }
 
     protected InboundEndpoint createTestInboundEndpoint(Filter filter,
-                                                        EndpointSecurityFilter securityFilter,
+                                                        SecurityFilter securityFilter,
                                                         MessageExchangePattern exchangePattern,
                                                         TransactionConfig txConfig)
         throws InitialisationException, EndpointException
@@ -95,7 +96,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
     }
 
     protected InboundEndpoint createTestInboundEndpoint(Filter filter,
-                                                        EndpointSecurityFilter securityFilter,
+                                                        SecurityFilter securityFilter,
                                                         Transformer transformer,
                                                         Transformer responseTransformer,
                                                         MessageExchangePattern exchangePattern,
@@ -162,7 +163,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
         return createTestOutboundEndpoint("test://test", filter, securityFilter, transformer, responseTransformer, exchangePattern, txConfig);
     }
     protected OutboundEndpoint createTestOutboundEndpoint(String uri, Filter filter,
-                                                          EndpointSecurityFilter securityFilter,
+                                                          SecurityFilter securityFilter,
                                                           Transformer transformer,
                                                           Transformer responseTransformer,
                                                           MessageExchangePattern exchangePattern,

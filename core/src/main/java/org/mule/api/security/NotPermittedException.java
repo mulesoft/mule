@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: UnauthorisedException.java 19739 2010-09-27 14:28:40Z tcarlson $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
@@ -17,49 +17,43 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 
 /**
- * <code>UnauthorisedException</code> is thrown if authentication fails
+ * <code>NotPermittedException</code> is thrown if the user isn't authorized
+ * to perform an action.
  */
-
-public class UnauthorisedException extends SecurityException
+public class NotPermittedException extends SecurityException
 {
     /**
      * Serial version
      */
     private static final long serialVersionUID = -6664384216189042673L;
 
-    public UnauthorisedException(Message message)
+    public NotPermittedException(Message message)
     {
         super(message, RequestContext.getEvent());
     }
 
-    public UnauthorisedException(Message message, Throwable cause)
+    public NotPermittedException(Message message, Throwable cause)
     {
         super(message, RequestContext.getEvent(), cause);
     }
 
-    public UnauthorisedException(Message message, MuleEvent event)
+    public NotPermittedException(Message message, MuleEvent event)
     {
         super(message, event);
     }
 
-    public UnauthorisedException(Message message, MuleEvent event, Throwable cause)
+    public NotPermittedException(Message message, MuleEvent event, Throwable cause)
     {
         super(message, event, cause);
     }
 
-    public UnauthorisedException(MuleEvent event, SecurityContext context, SecurityFilter filter)
+    public NotPermittedException(MuleEvent event, SecurityContext context,SecurityFilter filter)
     {
         super(constructMessage(context, event.getEndpoint(), filter), event);
     }
 
-    @Deprecated
-    public UnauthorisedException(MuleEvent event, SecurityContext context, 
-        ImmutableEndpoint endpoint, SecurityFilter filter)
-    {
-        super(constructMessage(context, endpoint, filter), event);
-    }
-
-    private static Message constructMessage(SecurityContext context, ImmutableEndpoint endpoint,
+    private static Message constructMessage(SecurityContext context, 
+                                            ImmutableEndpoint endpoint,
                                             SecurityFilter filter)
     {
 
@@ -72,7 +66,7 @@ public class UnauthorisedException extends SecurityException
         {
             m = CoreMessages.authFailedForUser(context.getAuthentication().getPrincipal());
         }
-        m.setNextMessage(CoreMessages.authDeniedOnEndpoint(endpoint.getEndpointURI()));
+        m.setNextMessage(CoreMessages.authorizationDeniedOnEndpoint(endpoint.getEndpointURI()));
         return m;
     }
 }

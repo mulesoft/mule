@@ -16,7 +16,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.processor.SecurityFilterMessageProcessor;
-import org.mule.security.AbstractEndpointSecurityFilter;
+import org.mule.security.AbstractAuthenticationFilter;
 import org.mule.security.filters.MuleEncryptionEndpointSecurityFilter;
 import org.mule.tck.FunctionalTestCase;
 
@@ -73,7 +73,7 @@ public class SecurityFilterTestCase extends FunctionalTestCase
     /**
      * Custom security filter class that does nothing at all
      */
-    public static class CustomSecurityFilter extends AbstractEndpointSecurityFilter
+    public static class CustomSecurityFilter extends AbstractAuthenticationFilter
     {
         @Override
         protected void authenticateInbound(MuleEvent event)

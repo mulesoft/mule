@@ -44,8 +44,7 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
         String userHeader = (String) getCredentialsAccessor().getCredentials(event);
         if (userHeader == null)
         {
-            throw new CredentialsNotSetException(event, event.getSession().getSecurityContext(),
-                event.getEndpoint(), this);
+            throw new CredentialsNotSetException(event, event.getSession().getSecurityContext(), this);
         }
 
         Credentials user = new MuleCredentials(userHeader, getSecurityManager());

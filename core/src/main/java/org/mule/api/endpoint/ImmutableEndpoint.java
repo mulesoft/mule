@@ -170,6 +170,7 @@ public interface ImmutableEndpoint extends Serializable
      *         via this endpoint.
      * @see EndpointSecurityFilter
      */
+    @Deprecated
     EndpointSecurityFilter getSecurityFilter();
 
     EndpointMessageProcessorChainFactory getMessageProcessorsFactory();

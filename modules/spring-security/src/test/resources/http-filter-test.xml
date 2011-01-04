@@ -26,16 +26,18 @@
     <mule-ss:security-manager>
         <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
     </mule-ss:security-manager>
-
-    <model name="http secured test model">
-        <service name="SecureUMO">
-            <inbound>
-                <inbound-endpoint address="http://localhost:4567" exchange-pattern="one-way">
-                    <http:basic-security-filter realm="mule-realm"/>
-                </inbound-endpoint>
-            </inbound>
-            <component class="org.mule.component.simple.EchoComponent"/>
-        </service>
-    </model>
-
+   
+    <flow name="authenticate">
+        <inbound-endpoint address="http://localhost:4567/authenticate" exchange-pattern="request-response"/>
+        <http:basic-security-filter realm="mule-realm"/>
+        <component class="org.mule.component.simple.EchoComponent"/>
+    </flow>
+    
+    <flow name="authorize">
+        <inbound-endpoint address="http://localhost:4567/authorize" exchange-pattern="request-response"/>
+        <http:basic-security-filter realm="mule-realm"/>
+        <mule-ss:authorization-filter requiredAuthorities="ROLE_ADMIN"/>
+        <component class="org.mule.component.simple.EchoComponent"/>
+    </flow>
+   
 </mule>

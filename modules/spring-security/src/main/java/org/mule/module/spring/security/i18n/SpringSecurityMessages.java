@@ -28,6 +28,16 @@ public class SpringSecurityMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 2);
     }
+
+    public static Message noGrantedAuthority(String authority)
+    {
+        return factory.createMessage(BUNDLE_PATH, 3, authority);
+    }
+
+    public static Message springAuthenticationRequired()
+    {
+        return factory.createMessage(BUNDLE_PATH, 4);
+    }
 }
 
 

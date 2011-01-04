@@ -157,8 +157,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         else if (header == null)
         {
             setUnauthenticated(event);
-            throw new UnauthorisedException(event, event.getSession().getSecurityContext(),
-                getEndpoint(), this);
+            throw new UnauthorisedException(event, event.getSession().getSecurityContext(), this);
         }
         else
         {

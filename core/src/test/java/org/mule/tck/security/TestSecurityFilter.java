@@ -18,9 +18,9 @@ import org.mule.api.security.SecurityException;
 import org.mule.api.security.SecurityProviderNotFoundException;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
-import org.mule.security.AbstractEndpointSecurityFilter;
+import org.mule.security.AbstractAuthenticationFilter;
 
-public class TestSecurityFilter extends AbstractEndpointSecurityFilter
+public class TestSecurityFilter extends AbstractAuthenticationFilter
 {
     private boolean accept;
     private boolean called;
