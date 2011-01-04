@@ -230,7 +230,7 @@ public class Validator extends AbstractFlowConstruct
          */
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            final MuleEvent result = RequestContext.cloneAndUpdateEventEndpoint(event, this);
+            final MuleEvent result = RequestContext.setEvent(event);
 
             try
             {

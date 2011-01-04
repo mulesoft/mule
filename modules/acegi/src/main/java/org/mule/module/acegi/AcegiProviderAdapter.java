@@ -47,6 +47,7 @@ public class AcegiProviderAdapter extends AbstractSecurityProvider implements Au
         this.delegate = delegate;
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         setSecurityContextFactory(new AcegiSecurityContextFactory());

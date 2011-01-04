@@ -13,6 +13,7 @@ package org.mule.config.spring.parsers.endpoint;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.service.ServiceCompositeMessageSource;
@@ -41,7 +42,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         processors = endpoint.getResponseMessageProcessors();
         assertNotNull(processors);
         assertEquals(1, processors.size());
-        assertTrue(processors.get(0) instanceof TestMessageProcessor);
+        assertTrue(processors.get(0) instanceof MessageProcessorChain);
     }
 
     public void testGlobalEndpoint2() throws MuleException
@@ -56,11 +57,14 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
 
         processors = endpoint.getResponseMessageProcessors();
         assertNotNull(processors);
-        assertEquals(2, processors.size());
-        assertEquals("3", ((TestMessageProcessor) processors.get(0)).getLabel());
-        assertEquals("4", ((TestMessageProcessor) processors.get(1)).getLabel());
-}
 
+        assertEquals(1, processors.size());
+        assertTrue(processors.get(0) instanceof MessageProcessorChain);
+        MessageProcessorChain chain = (MessageProcessorChain) processors.get(0);
+        assertEquals("3", ((TestMessageProcessor) chain.getMessageProcessors().get(0)).getLabel());
+        assertEquals("4", ((TestMessageProcessor) chain.getMessageProcessors().get(1)).getLabel());
+    }
+    
     public void testLocalEndpoints() throws MuleException
     {
         ImmutableEndpoint endpoint = 
@@ -74,9 +78,12 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
 
         processors = endpoint.getResponseMessageProcessors();
         assertNotNull(processors);
-        assertEquals(2, processors.size());
-        assertEquals("C", ((TestMessageProcessor) processors.get(0)).getLabel());
-        assertEquals("D", ((TestMessageProcessor) processors.get(1)).getLabel());
+        assertEquals(1, processors.size());
+        assertTrue(processors.get(0) instanceof MessageProcessorChain);
+        MessageProcessorChain chain = (MessageProcessorChain) processors.get(0);
+        assertEquals(2, chain.getMessageProcessors().size());
+        assertEquals("C", ((TestMessageProcessor) chain.getMessageProcessors().get(0)).getLabel());
+        assertEquals("D", ((TestMessageProcessor) chain.getMessageProcessors().get(1)).getLabel());
 
         MessageProcessor mp =
             ((OutboundPassThroughRouter) ((OutboundRouterCollection)muleContext.getRegistry().lookupService("localEndpoints").
@@ -91,8 +98,11 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
 
         processors = endpoint.getResponseMessageProcessors();
         assertNotNull(processors);
-        assertEquals(2, processors.size());
-        assertEquals("G", ((TestMessageProcessor) processors.get(0)).getLabel());
-        assertEquals("H", ((TestMessageProcessor) processors.get(1)).getLabel());
+        assertEquals(1, processors.size());
+        assertTrue(processors.get(0) instanceof MessageProcessorChain);
+        chain = (MessageProcessorChain) processors.get(0);
+        assertEquals(2, chain.getMessageProcessors().size());
+        assertEquals("G", ((TestMessageProcessor) chain.getMessageProcessors().get(0)).getLabel());
+        assertEquals("H", ((TestMessageProcessor) chain.getMessageProcessors().get(1)).getLabel());
     }
 }

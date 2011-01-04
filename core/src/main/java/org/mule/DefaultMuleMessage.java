@@ -1318,13 +1318,19 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
                     if (result instanceof MuleMessage)
                     {
-                        synchronized (this)
+                        if (!result.equals(this))
                         {
-                            MuleMessage resultMessage = (MuleMessage) result;
-                            setPayload(resultMessage.getPayload());
-                            originalPayload = resultMessage.getOriginalPayload();
-                            copyMessageProperties(resultMessage);
-                            copyAttachments(resultMessage);
+                            // Only copy the payload and properties of mule message
+                            // transformer result if the message is a different
+                            // instance
+                            synchronized (this)
+                            {
+                                MuleMessage resultMessage = (MuleMessage) result;
+                                setPayload(resultMessage.getPayload());
+                                originalPayload = resultMessage.getOriginalPayload();
+                                copyMessageProperties(resultMessage);
+                                copyAttachments(resultMessage);
+                            }
                         }
                     }
                     else

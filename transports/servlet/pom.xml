@@ -19,7 +19,7 @@
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_2.4_spec</artifactId>
@@ -46,6 +46,16 @@
             <version>${version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!--
+            Although this module does not depend on mockobjects any more it subclasses
+            abstract test classes that do :-( Bring back the dependency for now until
+            we remove the mockobjects dependency from core, too.
+        -->
         <dependency>
             <groupId>mockobjects</groupId>
             <artifactId>mockobjects-core</artifactId>

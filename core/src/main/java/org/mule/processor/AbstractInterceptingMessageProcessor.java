@@ -10,13 +10,11 @@
 
 package org.mule.processor;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.notification.ServerNotificationHandler;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.context.notification.MessageProcessorNotification;
@@ -36,7 +34,7 @@ public abstract class AbstractInterceptingMessageProcessor implements Intercepti
 
     protected ServerNotificationHandler notificationHandler;
 
-    private MuleContext muleContext;
+    protected MuleContext muleContext;
 
     public void setMuleContext(MuleContext context)
     {
@@ -67,11 +65,6 @@ public abstract class AbstractInterceptingMessageProcessor implements Intercepti
             // note that we're firing event for the next in chain, not this MP
             fireNotification(event, next, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
 
-            // If the next message processor is an outbound router then create outbound event
-            if (next instanceof OutboundEndpoint)
-            {
-                event = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint) next, event.getSession());
-            }
             final MuleEvent result = next.process(event);
 
             fireNotification(event, next, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);

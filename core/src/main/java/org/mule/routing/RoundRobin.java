@@ -10,17 +10,16 @@
 
 package org.mule.routing;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
 import org.mule.routing.outbound.AbstractOutboundRouter;
+
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -44,14 +43,9 @@ public class RoundRobin extends AbstractOutboundRouter implements MessageProcess
             throw new CouldNotRouteOutboundMessageException(event, this);
         }
         MessageProcessor mp = routes.get(index);
-        MuleEvent toProcess = event;
-        if (mp instanceof OutboundEndpoint)
-        {
-            toProcess = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint)mp, event.getSession());
-        }
         try
         {
-            return mp.process(toProcess);
+            return mp.process(event);
         }
         catch (MuleException ex)
         {

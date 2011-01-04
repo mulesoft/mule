@@ -26,12 +26,14 @@ import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.testmodels.fruit.Apple;
+import org.mule.transport.email.AbstractMailConnector;
 import org.mule.transport.email.MailProperties;
 import org.mule.transport.email.SmtpConnector;
 import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 
 import com.icegreen.greenmail.util.ServerSetup;
 
+import javax.mail.URLName;
 import javax.mail.internet.MimeMessage;
 
 /**
@@ -132,5 +134,18 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         c.start();
         assertFalse(c.isDisposed());
         assertTrue(c.isStarted());
+    }
+
+    public void testNullUsernameAndPassword() throws Exception
+    {
+        OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint("smtp://localhost:23");
+        URLName name = ((AbstractMailConnector)getConnector()).urlFromEndpoint(endpoint);
+        assertNull(name.getUsername());
+        assertNull(name.getPassword());
+
+        endpoint = muleContext.getEndpointFactory().getOutboundEndpoint("smtp://george@localhost:23");
+        name = ((AbstractMailConnector)getConnector()).urlFromEndpoint(endpoint);
+        assertEquals("george", name.getUsername());
+        assertNull(name.getPassword());
     }
 }

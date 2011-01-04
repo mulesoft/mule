@@ -21,7 +21,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
@@ -468,8 +467,7 @@ public abstract class AbstractOutboundRouter extends AbstractMessageProcessorOwn
      */
     protected MuleEvent createEventToRoute(MuleEvent routedEvent, MuleMessage message, MessageProcessor route)
     {
-        ImmutableEndpoint endpoint = (route instanceof ImmutableEndpoint) ? (ImmutableEndpoint) route : routedEvent.getEndpoint();
-        MuleEvent event = new DefaultMuleEvent(message, endpoint, routedEvent.getSession(), routedEvent.getProcessingTime());
+        MuleEvent event = new DefaultMuleEvent(message, routedEvent.getEndpoint(), routedEvent.getSession(), routedEvent.getProcessingTime());
         return event;
     }
 

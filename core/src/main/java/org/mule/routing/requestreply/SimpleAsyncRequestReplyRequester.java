@@ -10,7 +10,6 @@
 
 package org.mule.routing.requestreply;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -18,7 +17,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.Startable;
@@ -36,11 +34,6 @@ public class SimpleAsyncRequestReplyRequester extends AbstractAsyncRequestReplyR
     protected void sendAsyncRequest(MuleEvent event) throws MuleException
     {
         setAsyncReplyProperties(event);
-        if (requestMessageProcessor instanceof OutboundEndpoint)
-        {
-            event = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint) requestMessageProcessor,
-                event.getSession());
-        }
         requestMessageProcessor.process(event);
     }
 

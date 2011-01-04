@@ -10,19 +10,20 @@
 
 package org.mule.config.spring.parsers.specific;
 
+import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.factories.ResponseMessageProcessorsFactoryBean;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
-import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 
 public class ResponseDefinitionParser extends ParentContextDefinitionParser
 {
 
     public ResponseDefinitionParser()
     {
-        super("flow", new ChildDefinitionParser("messageProcessor",
-            ResponseMessageProcessorsFactoryBean.class));
-        otherwise(new ParentDefinitionParser());
+        super("endpoint", new ChildDefinitionParser("responseMessageProcessor", MessageProcessorChainFactoryBean.class));
+        and("inbound-endpoint", new ChildDefinitionParser("responseMessageProcessor", MessageProcessorChainFactoryBean.class));
+        and("outbound-endpoint", new ChildDefinitionParser("responseMessageProcessor", MessageProcessorChainFactoryBean.class));
+        otherwise(new ChildDefinitionParser("messageProcessor", ResponseMessageProcessorsFactoryBean.class));
     }
 
 }

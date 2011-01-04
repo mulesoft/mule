@@ -13,6 +13,7 @@ package org.mule.config.spring.parsers.endpoint;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
@@ -212,7 +213,8 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
         processors = endpoint.getResponseMessageProcessors();
         assertNotNull(processors);
         assertEquals(2, processors.size());
-        assertTrue(processors.get(0) instanceof StringAppendTransformer);
+        assertTrue(processors.get(0) instanceof MessageProcessorChain);
+        assertTrue(((MessageProcessorChain)processors.get(0)).getMessageProcessors().get(0) instanceof StringAppendTransformer);
         assertTrue(processors.get(1) instanceof TestResponseTransformer);
 
         endpoint = (ImmutableEndpoint) ((OutboundPassThroughRouter) ((OutboundRouterCollection) service.getOutboundMessageProcessor()).getRoutes()
@@ -227,7 +229,8 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
         processors = endpoint.getResponseMessageProcessors();
         assertNotNull(processors);
         assertEquals(2, processors.size());
-        assertTrue(processors.get(0) instanceof MessagePropertiesTransformer);
+        assertTrue(processors.get(0) instanceof MessageProcessorChain);
+        assertTrue(((MessageProcessorChain)processors.get(0)).getMessageProcessors().get(0) instanceof MessagePropertiesTransformer);
         assertTrue(processors.get(1) instanceof TestResponseTransformer);
     }
 

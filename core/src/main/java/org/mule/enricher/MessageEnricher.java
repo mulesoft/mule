@@ -33,8 +33,8 @@ public class MessageEnricher extends AbstractMessageProcessorOwner implements Me
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
-        MuleMessage enrichmentMessage = enrichmentProcessor.process(
-            RequestContext.cloneAndUpdateEventEndpoint(event, enrichmentProcessor)).getMessage();
+        MuleMessage enrichmentMessage = enrichmentProcessor.process(RequestContext.setEvent(event))
+            .getMessage();
 
         if (enrichmentMessage != null)
         {

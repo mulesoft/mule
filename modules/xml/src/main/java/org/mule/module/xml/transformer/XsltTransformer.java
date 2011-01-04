@@ -176,7 +176,7 @@ public class XsltTransformer extends AbstractXmlTransformer
 
             // If we still don't have a result type, lets fall back to using a DelayedResult
             // as it is the most efficient.
-            if (holder == null || DelayedResult.class.equals(returnType))
+            if (holder == null || DelayedResult.class.equals(returnType.getType()))
             {
                 return getDelayedResult(message, encoding, sourceDoc);
             }

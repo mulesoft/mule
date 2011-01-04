@@ -60,7 +60,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         setUpFakeDispatcher(endpoint);
         MuleEvent result = endpoint.process(testOutboundEvent);
 
-        assertMessageSentSame(true);
+        assertMessageSentEqual(true);
 
         // Response message is not the same because we rewrite the response event and
         // this change the properties
@@ -90,7 +90,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         MuleEvent result = endpoint.process(testOutboundEvent);
 
         dispacher.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
-        assertMessageSentSame(false);
+        assertMessageSentEqual(false);
         assertNull(result);
     }
 
@@ -109,7 +109,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         setUpFakeDispatcher(endpoint);
         MuleEvent result = endpoint.process(testOutboundEvent);
 
-        assertMessageSentSame(true);
+        assertMessageSentEqual(true);
 
         // Response message is not the same because we rewrite the response event and
         // this change the properties
@@ -284,14 +284,9 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         return event;
     }
 
-    protected MuleEvent assertMessageSentSame(boolean sync) throws MuleException
+    protected MuleEvent assertMessageSentEqual(boolean sync) throws MuleException
     {
         MuleEvent event = assertMessageSent(sync);
-        if (sync)
-        {
-            // We can't assert this for async because event gets rewritten
-            assertEquals(testOutboundEvent, event);
-        }
         assertEquals(TEST_MESSAGE, event.getMessageAsString());
         assertEquals("value1", event.getMessage().getOutboundProperty("prop1"));
         return event;

@@ -19,6 +19,7 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
@@ -254,15 +255,7 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable
     /** @deprecated use getMessageProcessors() */
     public List<Transformer> getTransformers()
     {
-        List transformers = new LinkedList();
-        for (MessageProcessor processor : messageProcessors)
-        {
-            if (processor instanceof Transformer)
-            {
-                transformers.add(processor);
-            }
-        }
-        return transformers;
+        return getTransformersFromProcessorList(messageProcessors);
     }
 
     public Map getProperties()
@@ -459,12 +452,21 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable
     /** @deprecated use getResponseMessageProcessors() */
     public List<Transformer> getResponseTransformers()
     {
-        List transformers = new LinkedList();
-        for (MessageProcessor processor : responseMessageProcessors)
+        return getTransformersFromProcessorList(responseMessageProcessors);
+    }
+
+    private List<Transformer> getTransformersFromProcessorList(List<MessageProcessor> processors)
+    {
+        List<Transformer> transformers = new LinkedList<Transformer>();
+        for (MessageProcessor processor : processors)
         {
             if (processor instanceof Transformer)
             {
-                transformers.add(processor);
+                transformers.add((Transformer) processor);
+            }
+            else if (processor instanceof MessageProcessorChain)
+            {
+                transformers.addAll(getTransformersFromProcessorList(((MessageProcessorChain) processor).getMessageProcessors()));
             }
         }
         return transformers;

@@ -30,7 +30,7 @@ public class FormTransformer extends AbstractMessageTransformer
 {
 
     @Override
-    public Object transformMessage(MuleMessage message, String encoding) throws TransformerException
+    public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
     {
         try
         {
@@ -43,12 +43,12 @@ public class FormTransformer extends AbstractMessageTransformer
                 int idx = token.indexOf('=');
                 if (idx < 0)
                 {
-                    add(values, URLDecoder.decode(token, encoding), null);
+                    add(values, URLDecoder.decode(token, outputEncoding), null);
                 }
                 else if (idx > 0)
                 {
-                    add(values, URLDecoder.decode(token.substring(0, idx), encoding),
-                        URLDecoder.decode(token.substring(idx + 1), encoding));
+                    add(values, URLDecoder.decode(token.substring(0, idx), outputEncoding),
+                        URLDecoder.decode(token.substring(idx + 1), outputEncoding));
                 }
             }
             return values;
@@ -59,6 +59,7 @@ public class FormTransformer extends AbstractMessageTransformer
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void add(Map<String, Object> values, String key, String value)
     {
         Object existingValue = values.get(key);
@@ -80,6 +81,4 @@ public class FormTransformer extends AbstractMessageTransformer
             values.put(key, list);
         }
     }
-
-
 }

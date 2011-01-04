@@ -24,7 +24,6 @@ public class MessageProcessorDefinitionParser extends ParentContextDefinitionPar
     public MessageProcessorDefinitionParser(Class messageProcessor)
     {
         super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(messageProcessor, false));
-        and("response", new ChildDefinitionParser("responseMessageProcessor", messageProcessor));
         otherwise(new ChildDefinitionParser("messageProcessor", messageProcessor));
     }
 
@@ -34,7 +33,6 @@ public class MessageProcessorDefinitionParser extends ParentContextDefinitionPar
     public MessageProcessorDefinitionParser()
     {
         super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(false));
-        and("response", new ChildDefinitionParser("responseMessageProcessor"));
         otherwise(new ChildDefinitionParser("messageProcessor"));
     }
 

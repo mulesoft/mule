@@ -19,11 +19,11 @@ import org.mule.processor.AbstractFilteringMessageProcessor;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.util.ObjectUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.util.Collections;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The <code>WireTap</code> MessageProcessor allows inspection of messages in a flow.
@@ -58,7 +58,7 @@ public class WireTap extends AbstractMessageProcessorOwner implements MessagePro
         {
             // Do we need this?
             RequestContext.setEvent(null);
-            filteredTap.process(RequestContext.cloneAndUpdateEventEndpoint(event, tap));
+            filteredTap.process(RequestContext.setEvent(event));
         }
         catch (MuleException e)
         {

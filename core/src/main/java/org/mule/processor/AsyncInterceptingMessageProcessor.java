@@ -10,7 +10,6 @@
 
 package org.mule.processor;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -18,7 +17,6 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
@@ -116,11 +114,6 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
             if (logger.isTraceEnabled())
             {
                 logger.trace("Invoking next MessageProcessor: '" + next.getClass().getName() + "' ");
-            }
-            // If the next message processor is an outbound router then create outbound event
-            if (next instanceof OutboundEndpoint)
-            {
-                event = new DefaultMuleEvent(event.getMessage(), (OutboundEndpoint) next, event.getSession());
             }
 
             MuleEvent response;

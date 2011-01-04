@@ -15,6 +15,8 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -137,6 +139,12 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
     @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
+        // Update event endpoint for outbound endpoint
+        if (event.getEndpoint() == null || !event.getEndpoint().equals(this))
+        {
+            event = new DefaultMuleEvent(event.getMessage(), this, event.getSession());
+        }
+        
         final EndpointURI uri = getEndpointURIForMessage(event);
         if (endpoint instanceof NullOutboundEndpoint)
         {

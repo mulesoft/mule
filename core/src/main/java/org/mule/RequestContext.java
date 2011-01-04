@@ -15,9 +15,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.processor.MessageProcessor;
 
 /**
  * <code>RequestContext</code> is a thread context where components can get the
@@ -129,23 +126,6 @@ public final class RequestContext
     public static MuleMessage safeMessageCopy(MuleMessage message)
     {
         return newMessage(message, SAFE);
-    }
-
-    public static MuleEvent cloneAndUpdateEventEndpoint(MuleEvent event, MessageProcessor target)
-    {
-        return updateEventEndpoint(newEvent(event, SAFE), target);
-    }
-    
-    public static MuleEvent updateEventEndpoint(MuleEvent event, MessageProcessor target)
-    {
-        if (target instanceof OutboundEndpoint)
-        {
-            return new DefaultMuleEvent(event.getMessage(), (ImmutableEndpoint) target, event.getSession());
-        }
-        else
-        {
-            return event;
-        }
     }
 
     protected static MuleEvent newEvent(MuleEvent event, boolean safe)

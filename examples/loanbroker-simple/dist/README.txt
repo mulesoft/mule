@@ -27,6 +27,8 @@ Now, modify the loan amount requested, and see different banks responding:
 Try different amounts (100, 10000, 20000). Also try invalid numbers to see the 
 error handling in action.
 
+For more information, refer to http://www.mulesoft.org/documentation/display/MULE3INTRO/Loan+Broker+Simple+Example
+
 +----------------------+
 | Building the example |
 +----------------------+

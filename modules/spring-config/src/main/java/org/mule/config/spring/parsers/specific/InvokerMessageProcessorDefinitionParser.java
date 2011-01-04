@@ -40,7 +40,7 @@ public class InvokerMessageProcessorDefinitionParser extends ChildDefinitionPars
     }
 
     @Override
-    protected Class getBeanClass(Element element)
+    protected Class<?> getBeanClass(Element element)
     {
         return InvokerMessageProcessor.class;
     }
