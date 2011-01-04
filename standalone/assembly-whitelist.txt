@@ -96,7 +96,6 @@ joda-time-1.6
 jsr181-api-1.0-MR1
 jsr250-api-1.0
 jsr311-api-1.1.1
-juel-api-2.2.1
 juel-engine-2.1.0
 juel-impl-2.2.1
 jug-2.0.0-asl
