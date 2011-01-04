@@ -342,6 +342,17 @@
                 <version>${jettyServletApiVersion}</version>
             </dependency>
             <dependency>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty-annotations</artifactId>
+                <version>${jettyVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>geronimo-spec</groupId>
+                        <artifactId>geronimo-spec-jta</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
                 <groupId>com.yourkit</groupId>
                 <artifactId>yjp-controller-api-redist</artifactId>
                 <version>9.0.8</version>
@@ -1063,6 +1074,12 @@
                         <artifactId>servlet-api</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tomcat</groupId>
+                <artifactId>annotations-api</artifactId>
+                <version>${tomcatVersion}</version>
             </dependency>
 
             <dependency>
