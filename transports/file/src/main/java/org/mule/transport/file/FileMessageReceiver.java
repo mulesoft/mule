@@ -208,6 +208,14 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             }
         }
 
+        String sourceFileOriginalName = sourceFile.getName();
+
+        // Perform some quick checks to make sure file can be processed
+        if (!(sourceFile.canRead() && sourceFile.exists() && sourceFile.isFile()))
+        {
+            throw new DefaultMuleException(FileMessages.fileDoesNotExist(sourceFileOriginalName));
+        }
+
         // don't process a file that is locked by another process (probably still being written)
         if (!attemptFileLock(sourceFile))
         {
@@ -216,14 +224,6 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         else if(logger.isInfoEnabled())
         {
             logger.info("Lock obtained on file: " + sourceFile.getAbsolutePath());
-        }
-
-        String sourceFileOriginalName = sourceFile.getName();
-
-        // Perform some quick checks to make sure file can be processed
-        if (!(sourceFile.canRead() && sourceFile.exists() && sourceFile.isFile()))
-        {
-            throw new DefaultMuleException(FileMessages.fileDoesNotExist(sourceFileOriginalName));
         }
 
         // This isn't nice but is needed as MuleMessage is required to resolve
@@ -386,7 +386,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
      * @param sourceFile file to check
      * @return <code>true</code> if the file can be locked
      */
-    protected boolean attemptFileLock(final File sourceFile)
+    protected boolean attemptFileLock(final File sourceFile) throws MuleException
     {
         // check if the file can be processed, be sure that it's not still being
         // written
@@ -405,7 +405,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (FileNotFoundException fnfe)
         {
-            logger.warn("Unable to open " + sourceFile.getAbsolutePath(), fnfe);
+            throw new DefaultMuleException(FileMessages.fileDoesNotExist(sourceFile.getName()));
         }
         catch (IOException e)
         {
