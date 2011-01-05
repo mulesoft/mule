@@ -2,7 +2,7 @@
  * SwitchVersion
  *
  * Finds recursively all pom.xml files and switches <old version> to <new version>.
- * 
+ *
  * $Id$
  */
 
@@ -46,7 +46,11 @@ root.eachFileRecurse()
         else if (file.name == 'install.xml')
         {
             // MULE-2659: take care of the installer configuration file as well
-            switchAppVersion(file)
+            switchInstallerConfigFile(file)
+        }
+        else if (file.name == 'setup.xml')
+        {
+            switchSetupXmlFile(file)
         }
     }
 }
@@ -58,50 +62,51 @@ def process(input)
     println("processing " + input)
 
     def outputFile = new File(input.getParent(), "pom.xml.new")
-    def output = new BufferedWriter(new FileWriter(outputFile))
 
     def processingParentElement = false
     def versionProcessed = false
 
-    input.eachLine
-    { line ->
+    outputFile.withWriter
+    { output ->
 
-        if (line.indexOf("<parent>") > -1)
-        {
-            processingParentElement = true
-        }
-        else if (line.indexOf("</parent>") > -1)
-        {
-            processingParentElement = false
-        }
-        def versionMatch = versionPattern.matcher(line).matches();
+        input.eachLine
+        { line ->
 
-        if (processingParentElement && versionMatch)
-        {
-            outputLine(output, switchVersion(line, "version", oldVersion, newVersion))
-        }
-        else
-        {
-            if ((versionProcessed == false) && versionMatch)
+            if (line.indexOf("<parent>") > -1)
             {
-                versionProcessed = true
+                processingParentElement = true
+            }
+            else if (line.indexOf("</parent>") > -1)
+            {
+                processingParentElement = false
+            }
+            def versionMatch = versionPattern.matcher(line).matches();
+
+            if (processingParentElement && versionMatch)
+            {
                 outputLine(output, switchVersion(line, "version", oldVersion, newVersion))
             }
             else
             {
-                if (line.indexOf("<muleVersion>") > -1)
+                if ((versionProcessed == false) && versionMatch)
                 {
-                    outputLine(output, switchVersion(line, "muleVersion", oldVersion, newVersion))
+                    versionProcessed = true
+                    outputLine(output, switchVersion(line, "version", oldVersion, newVersion))
                 }
                 else
                 {
-                    outputLine(output, line)
+                    if (line.indexOf("<muleVersion>") > -1)
+                    {
+                        outputLine(output, switchVersion(line, "muleVersion", oldVersion, newVersion))
+                    }
+                    else
+                    {
+                        outputLine(output, line)
+                    }
                 }
             }
         }
     }
-
-    output.close()
 
     // rename the new pom back to 'pom.xml'
     def backupFile = new File(input.getParent(), "pom.xml.orig")
@@ -114,33 +119,57 @@ def process(input)
 }
 
 //-----------------------------------------------------------------------------
-def switchAppVersion(installerConfigFile)
+def switchInstallerConfigFile(installerConfigFile)
 //-----------------------------------------------------------------------------
 {
     println("processing " + installerConfigFile)
 
     def outputFile = new File(installerConfigFile.getParent(), "install.xml.new")
-    def output = new BufferedWriter(new FileWriter(outputFile))
+    outputFile.withWriter
+    { output ->
 
-    installerConfigFile.eachLine
-    { line ->
+        installerConfigFile.eachLine
+        { line ->
 
-        if (line.indexOf("<appversion>") > -1)
-        {
-            outputLine(output, switchVersion(line, "appversion", oldVersion, newVersion))
-        }
-        else
-        {
-            outputLine(output, line)
+            if (line.indexOf("<appversion>") > -1)
+            {
+                outputLine(output, switchVersion(line, "appversion", oldVersion, newVersion))
+            }
+            else
+            {
+                outputLine(output, line)
+            }
         }
     }
 
-    output.close()
+    replaceFile(installerConfigFile, outputFile)
+}
 
-    def backupFile = new File(installerConfigFile.getParent(), "install.xml.orig")
-    installerConfigFile.renameTo(backupFile)
-    outputFile.renameTo(installerConfigFile)
-    backupFile.delete()
+//-----------------------------------------------------------------------------
+def switchSetupXmlFile(file)
+//-----------------------------------------------------------------------------
+{
+    println("processing " + file)
+
+    def outputFile = new File(file.getParent(), "setup.xml.new")
+    outputFile.withWriter
+    { output ->
+
+        file.eachLine
+        { line ->
+
+            if (line.indexOf("<version>") > -1)
+            {
+                outputLine(output, switchVersion(line, "version", oldVersion, newVersion))
+            }
+            else
+            {
+                outputLine(output, line)
+            }
+        }
+    }
+
+    replaceFile(file, outputFile)
 }
 
 //-----------------------------------------------------------------------------
@@ -173,4 +202,16 @@ def outputLine(output, line)
 {
     output.write(line)
     output.newLine()
+}
+
+//-----------------------------------------------------------------------------
+def replaceFile(originalFile, newFile)
+//-----------------------------------------------------------------------------
+{
+    String backupFilename = "${originalFile.name}.orig"
+    File backupFile = new File(originalFile.getParent(), backupFilename)
+
+    originalFile.renameTo(backupFile)
+    newFile.renameTo(originalFile)
+    backupFile.delete()
 }
