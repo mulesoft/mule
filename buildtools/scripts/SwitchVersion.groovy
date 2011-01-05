@@ -2,7 +2,7 @@
  * SwitchVersion
  *
  * Finds recursively all pom.xml files and switches <old version> to <new version>.
- * 
+ *
  * $Id$
  */
 
@@ -46,7 +46,11 @@ root.eachFileRecurse()
         else if (file.name == 'install.xml')
         {
             // MULE-2659: take care of the installer configuration file as well
-            switchAppVersion(file)
+            switchInstallerConfigFile(file)
+        }
+        else if (file.name == 'setup.xml')
+        {
+            switchSetupXmlFile(file)
         }
     }
 }
@@ -114,7 +118,7 @@ def process(input)
 }
 
 //-----------------------------------------------------------------------------
-def switchAppVersion(installerConfigFile)
+def switchInstallerConfigFile(installerConfigFile)
 //-----------------------------------------------------------------------------
 {
     println("processing " + installerConfigFile)
@@ -134,13 +138,35 @@ def switchAppVersion(installerConfigFile)
             outputLine(output, line)
         }
     }
-
     output.close()
 
-    def backupFile = new File(installerConfigFile.getParent(), "install.xml.orig")
-    installerConfigFile.renameTo(backupFile)
-    outputFile.renameTo(installerConfigFile)
-    backupFile.delete()
+    replaceFile(installerConfigFile, outputFile)
+}
+
+//-----------------------------------------------------------------------------
+def switchSetupXmlFile(file)
+//-----------------------------------------------------------------------------
+{
+    println("processing " + file)
+
+    def outputFile = new File(file.getParent(), "setup.xml.new")
+    def output = new BufferedWriter(new FileWriter(outputFile))
+
+    file.eachLine
+    { line ->
+
+        if (line.indexOf("<version>") > -1)
+        {
+            outputLine(output, switchVersion(line, "version", oldVersion, newVersion))
+        }
+        else
+        {
+            outputLine(output, line)
+        }
+    }
+    output.close()
+
+    replaceFile(file, outputFile)
 }
 
 //-----------------------------------------------------------------------------
@@ -173,4 +199,16 @@ def outputLine(output, line)
 {
     output.write(line)
     output.newLine()
+}
+
+//-----------------------------------------------------------------------------
+def replaceFile(originalFile, newFile)
+//-----------------------------------------------------------------------------
+{
+    String backupFilename = "${originalFile.name}.orig"
+    File backupFile = new File(originalFile.getParent(), backupFilename)
+
+    originalFile.renameTo(backupFile)
+    newFile.renameTo(originalFile)
+    backupFile.delete()
 }
