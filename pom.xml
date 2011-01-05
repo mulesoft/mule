@@ -1058,6 +1058,12 @@
 
             <dependency>
                 <groupId>org.apache.tomcat</groupId>
+                <artifactId>el-api</artifactId>
+                <version>${tomcatVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tomcat</groupId>
                 <artifactId>jasper</artifactId>
                 <version>${tomcatVersion}</version>
                 <exclusions>
