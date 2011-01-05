@@ -10,9 +10,9 @@
 
 package org.mule.module.launcher;
 
+import org.mule.config.Preferred;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.descriptor.DescriptorParser;
-import org.mule.module.launcher.descriptor.Preferred;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.io.File;

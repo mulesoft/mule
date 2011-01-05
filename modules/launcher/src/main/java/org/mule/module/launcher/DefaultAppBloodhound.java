@@ -11,11 +11,11 @@
 package org.mule.module.launcher;
 
 import org.mule.api.MuleRuntimeException;
+import org.mule.config.PreferredObjectSelector;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.descriptor.DescriptorParser;
 import org.mule.module.launcher.descriptor.EmptyApplicationDescriptor;
-import org.mule.module.launcher.descriptor.Preferred;
 import org.mule.module.launcher.descriptor.PropertiesDescriptorParser;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
@@ -24,10 +24,7 @@ import org.mule.util.PropertiesUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -137,48 +134,17 @@ public class DefaultAppBloodhound implements AppBloodhound
      */
     protected void mergeParserOverrides(MultiMap overrides)
     {
-        // for each key in default parser registry
+        PreferredObjectSelector<DescriptorParser> selector = new PreferredObjectSelector<DescriptorParser>();
+
         for (Map.Entry<String, DescriptorParser> entry : parserRegistry.entrySet())
         {
             @SuppressWarnings("unchecked")
             final Collection<DescriptorParser> candidates = (Collection<DescriptorParser>) overrides.get(entry.getKey());
 
-            if (candidates == null)
+            if (candidates != null)
             {
-                continue;
+                parserRegistry.put(entry.getKey(), selector.select(candidates.iterator()));
             }
-            // if any override candidates found, sort by weight reverse
-            final ArrayList<DescriptorParser> sorted = new ArrayList<DescriptorParser>(candidates);
-            final Comparator<DescriptorParser> annotationComparator = new Comparator<DescriptorParser>()
-            {
-                public int compare(DescriptorParser p1, DescriptorParser p2)
-                {
-                    final Preferred ann1 = p1.getClass().getAnnotation(Preferred.class);
-                    final Preferred ann2 = p2.getClass().getAnnotation(Preferred.class);
-
-                    if (ann1 == null && ann2 == null)
-                    {
-                        return 0;
-                    }
-
-                    if (ann1 != null && ann2 == null)
-                    {
-                        return 1;
-                    }
-
-                    if (ann1 == null)
-                    {
-                        return -1;
-                    }
-
-                    // else compare annotation weights
-                    return new Integer(ann1.weight()).compareTo(ann2.weight());
-                }
-            };
-            Collections.sort(sorted, Collections.reverseOrder(annotationComparator));
-
-            // put the top one in the registry
-            parserRegistry.put(entry.getKey(), sorted.get(0));
         }
 
     }
