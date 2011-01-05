@@ -108,14 +108,7 @@ def process(input)
         }
     }
 
-    // rename the new pom back to 'pom.xml'
-    def backupFile = new File(input.getParent(), "pom.xml.orig")
-    input.renameTo(backupFile)
-
-    outputFile.renameTo(input)
-
-    // remove the backup file
-    backupFile.delete()
+    replaceFile(input, outputFile)
 }
 
 //-----------------------------------------------------------------------------
