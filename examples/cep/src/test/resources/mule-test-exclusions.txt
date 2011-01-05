@@ -1,0 +1,5 @@
+#
+# Test cases listed in this file are not run.
+#
+
+org.mule.example.cep.BrokerTestCase

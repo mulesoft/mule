@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm"
+      xmlns:quartz="http://www.mulesoft.org/schema/mule/quartz"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+       http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/3.1/mule-bpm.xsd
+       http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.1/mule-quartz.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd">
+
+	<spring:bean name="companies" class="org.mule.example.cep.CompanyRegistry" factory-method="getCompanies" />
+
+    <bpm:drools />
+
+    <!-- In the real world, this might be an ATOM feed -->
+    <vm:endpoint name="stockTick" path="stock.tick" />
+
+    <!-- In the real world, this might be a JMS queue or IM/SMS alerts -->
+    <vm:endpoint name="alerts" path="stock.alerts" />
+    
+    <flow name="stockTickGenerator">
+	    <quartz:inbound-endpoint jobName="eventTimer" repeatInterval="1000">
+	        <quartz:event-generator-job>
+	        	<quartz:payload>tick-tock</quartz:payload>
+	        </quartz:event-generator-job>
+	    </quartz:inbound-endpoint>
+        <component>
+        	<singleton-object class="org.mule.example.cep.TickFeed" />
+       	</component>
+        <outbound-endpoint ref="stockTick" />
+    </flow>
+
+    <flow name="rulesEngine">
+        <inbound-endpoint ref="stockTick" />
+        <bpm:rules rulesDefinition="broker.drl" cepMode="true" entryPoint="StockTick stream" initialFacts-ref="companies" />
+    </flow>
+
+    <flow name="rulesAlerts">
+        <inbound-endpoint ref="alerts" />
+        <log-component />
+    </flow>
+</mule>

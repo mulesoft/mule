@@ -15,6 +15,7 @@
     <modules>
         <module>all-examples</module>
         <module>bookstore</module>
+        <module>cep</module>
         <module>echo</module>
         <module>errorhandler</module>
         <module>geomail</module>
