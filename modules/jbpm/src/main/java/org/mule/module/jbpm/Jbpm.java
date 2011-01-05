@@ -10,7 +10,6 @@
 
 package org.mule.module.jbpm;
 
-import org.mule.api.NamedObject;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.module.bpm.BPMS;
@@ -34,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * An implementation of Mule's generic {@link BPMS} interface for JBoss jBPM.
  */
-public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
+public class Jbpm implements BPMS, Initialisable, Disposable
 {
     /**
      * The initialized jBPM ProcessEngine.
@@ -57,7 +56,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable, NamedObject
     private String name;
 
     /**
-     * Indicates whether jBPM has been instantiated by the connector (false) or was
+     * Indicates whether jBPM has been instantiated by Mule (false) or was
      * passed in from somewhere else (true).
      */
     protected boolean containerManaged = true;
