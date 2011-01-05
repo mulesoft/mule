@@ -41,6 +41,11 @@
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
         </dependency>
+        <dependency>
+            <!-- Use this one, already bundled with Mule, juel-api duplicates it and is excluded -->
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>el-api</artifactId>
+        </dependency>
         <!-- Needed for org.mule.module.jbpm.MuleSendActivity -->
         <dependency>
             <groupId>commons-jxpath</groupId>
