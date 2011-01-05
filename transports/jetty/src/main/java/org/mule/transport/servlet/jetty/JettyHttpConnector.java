@@ -135,7 +135,7 @@ public class JettyHttpConnector extends AbstractConnector
             {
                 // configures webapp's classloader as a child of a Mule app classloader
                 WebInfConfiguration.class.getName(),
-                // just to get jetty going, we don't need java ee bindings
+                // just to get jetty going, we don't need java ee bindings. inherits annotation processing
                 DummyJndiConfiguration.class.getName()
             };
             deployer.setConfigurationClasses(confClasses);
