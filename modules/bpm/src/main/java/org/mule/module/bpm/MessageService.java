@@ -16,8 +16,7 @@ import java.util.Map;
 
 /**
  * A message-generation service provided by Mule.  Any BPMS may call this service from
- * its own processes in order to generate Mule messages.  The generated messages will 
- * be received by the "bpm://processName" endpoint within your Mule config.
+ * its own processes in order to generate Mule messages.  
  */
 public interface MessageService 
 {

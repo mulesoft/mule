@@ -82,7 +82,7 @@ public class ProcessComponent extends AbstractComponent
     @Override
     protected Object doInvoke(MuleEvent event) throws Exception
     {
-        return process.processAction(event);
+        return process.handleEvent(event);
     }
 
     protected Process getProcess()

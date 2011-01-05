@@ -91,4 +91,14 @@ public class TestBpms implements BPMS
     {
         // nop
     }
+
+    public String getName()
+    {
+        return null;
+    }
+
+    public void setName(String name)
+    {
+        // nop
+    }
 }

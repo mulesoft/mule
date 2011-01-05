@@ -84,7 +84,7 @@ public class Process implements Initialisable, Disposable, MessageService
     public static final String PROCESS_VARIABLE_INCOMING_SOURCE = "incomingSource";
     public static final String PROCESS_VARIABLE_DATA = "data";
 
-    protected transient Log logger = LogFactory.getLog(getClass());
+    protected static final Log logger = LogFactory.getLog(Process.class);
 
     public Process(BPMS bpms, String name, String resource, FlowConstruct flowConstruct, MuleContext muleContext)
     {
@@ -125,7 +125,7 @@ public class Process implements Initialisable, Disposable, MessageService
         }
     }
 
-    protected Object processAction(MuleEvent event) throws Exception
+    protected Object handleEvent(MuleEvent event) throws Exception
     {
         // An object representing the new state of the process
         Object process;
@@ -256,6 +256,7 @@ public class Process implements Initialisable, Disposable, MessageService
         }
     }
 
+    // TODO This method should probably use the LocalMuleClient instead of re-inventing the wheel
     public MuleMessage generateMessage(String endpoint, Object payload, Map messageProperties, MessageExchangePattern exchangePattern) throws MuleException
     {
         MuleMessage message;

@@ -10,17 +10,17 @@
 
 package org.mule.module.bpm;
 
+import org.mule.api.NamedObject;
+
 import java.util.Map;
 
 /**
- * A generic interface for any Process Engine.  
- * 
- * Theoretically, any Process Engine can be "plugged into" Mule via the BPM connector
- * if it implements this interface.  
+ * A generic interface for any Process Engine.  Theoretically, any Process Engine can be "plugged into" 
+ * Mule if it implements this interface.  
  * 
  * @see MessageService
  */
-public interface BPMS
+public interface BPMS extends NamedObject
 {
     /**
      * {@link MessageService} contains a callback method used to generate Mule messages from your process.
