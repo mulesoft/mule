@@ -2,22 +2,24 @@ GETTING STARTED WITH MULE
 =========================
 
 This file describes the basics of how to get started using Mule.
-For full deta ils,see the Mule Getting Started Guide at:
+For full details, see the Getting Started Guide at:
 http://www.mulesoft.org/documentation/display/MULE3INTRO/Home
 
 
 Setting Up Your Environment
 ===========================
 
-Before you can use Mule, you must create the MULE_HOME environment
-variable and set it to the location of your Mule installation
-(Throughout the Mule documentation, this directory is referred
-to as MULE_HOME). You must also add the location of your
-MULE_HOME/bin directory to your path. If you are using Windows,
-you can use the System utility in the Control Panel to add the
-MULE_HOME variable and edit your path. Alternatively, you can
-use the export or set commands (depending on your operating system)
-at the command prompt, as shown in the following examples:
+Mule uses the MULE_HOME environment variable to point to the
+location of your Mule installation.  It is a good practice to
+set this variable in your environment.  However, if it is not
+set at startup, Mule will temporarily set it based on the location 
+of the startup script.   
+You may also want to add the MULE_HOME/bin directory to your path. 
+If you are using Windows, you can use the System utility in the 
+Control Panel to add the MULE_HOME variable and edit your path. 
+Alternatively, you can use the export or set commands (depending 
+on your operating system) at the command prompt, as shown in the 
+following examples:
 
 Linux/Unix:
     export MULE_HOME=/opt/mule
@@ -48,7 +50,6 @@ The Mule distribution contains the following directories and files:
                 files to this directory.
 /licenses       License information for all libraries shipped with Mule
 /logs           Log file output when running in background mode
-/sbin           Internal scripts (not to be run by the user)
 /src            The source code for all Mule modules
 LICENSE.txt     License agreement for Mule
 README.txt      The Getting Started document you are reading
