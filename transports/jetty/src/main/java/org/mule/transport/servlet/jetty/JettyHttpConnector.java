@@ -44,11 +44,13 @@ import javax.servlet.http.HttpServlet;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.annotations.Configuration;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.webapp.WebAppContext;
+import org.mortbay.jetty.webapp.WebInfConfiguration;
 import org.mortbay.xml.XmlConfiguration;
 
 /**
@@ -100,13 +102,17 @@ public class JettyHttpConnector extends AbstractConnector
             public void addHandler(Handler handler)
             {
                 final Connector c = getServer().getConnectors()[0];
-                final String msg = String.format("Will deploy a web app at %s:/%s%s%s",
-                                                 "http", c.getHost(),
-                                                 c.getPort() == 80 ? StringUtils.EMPTY : ":" + c.getPort(),
-                                                 ((WebAppContext) handler).getContextPath());
-                if (logger.isInfoEnabled())
+                if (handler instanceof WebAppContext)
                 {
-                    logger.info(StringMessageUtils.getBoilerPlate(msg, '*', 70));
+                    final String msg = String.format("Will deploy a web app at %s:/%s%s%s",
+                                                     "http", c.getHost(),
+                                                     c.getPort() == 80 ? StringUtils.EMPTY : ":" + c.getPort(),
+                                                     ((WebAppContext) handler).getContextPath());
+
+                    if (logger.isInfoEnabled())
+                    {
+                        logger.info(StringMessageUtils.getBoilerPlate(msg, '*', 70));
+                    }
                 }
                 super.addHandler(handler);
             }
@@ -125,6 +131,14 @@ public class JettyHttpConnector extends AbstractConnector
             jettyConnector.setHost(webappsConfiguration.getHost());
             jettyConnector.setPort(webappsConfiguration.getPort());
             deployer.setContexts(httpServer);
+            String[] confClasses = new String[]
+            {
+                // configures webapp's classloader as a child of a Mule app classloader
+                WebInfConfiguration.class.getName(),
+                // just to get jetty going, we don't need java ee bindings. inherits annotation processing
+                DummyJndiConfiguration.class.getName()
+            };
+            deployer.setConfigurationClasses(confClasses);
 
             httpServer.addConnector(jettyConnector);
             httpServer.addLifeCycle(deployer);
@@ -146,7 +160,10 @@ public class JettyHttpConnector extends AbstractConnector
                             start();
                             // update the agent displaying webapp urls to the user
                             final JettyWebappServerAgent agent = (JettyWebappServerAgent) muleContext.getRegistry().lookupAgent(JettyWebappServerAgent.NAME);
-                            agent.onJettyConnectorStarted(JettyHttpConnector.this);
+                            if (agent != null)
+                            {
+                                agent.onJettyConnectorStarted(JettyHttpConnector.this);
+                            }
                         }
                         catch (MuleException e)
                         {
@@ -514,5 +531,28 @@ public class JettyHttpConnector extends AbstractConnector
     public void setWebappsConfiguration(WebappsConfiguration webappsConfiguration)
     {
         this.webappsConfiguration = webappsConfiguration;
+    }
+
+    /**
+     * A helper class to let jetty startup, we don't bind java ee objects like java:comp/UserTransaction.
+     */
+    public static class DummyJndiConfiguration extends Configuration
+    {
+
+        public DummyJndiConfiguration() throws ClassNotFoundException
+        {
+        }
+
+        @Override
+        public void bindUserTransaction() throws Exception
+        {
+            // no-op
+        }
+
+        @Override
+        protected void lockCompEnv() throws Exception
+        {
+            // no-op
+        }
     }
 }

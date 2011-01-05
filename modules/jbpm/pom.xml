@@ -23,60 +23,23 @@
         <dependency>
             <groupId>org.jbpm.jbpm4</groupId>
             <artifactId>jbpm-jpdl</artifactId>
-            <version>${jbpmVersion}</version>
-            <exclusions>
-                <!-- Mule uses a newer version -->	
-                <exclusion>
-                    <groupId>javax.mail</groupId>
-                    <artifactId>mail</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javassist</groupId>
-                    <artifactId>javassist</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-jdk14</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jbpm.jbpm4</groupId>
             <artifactId>jbpm-pvm</artifactId>
-            <version>${jbpmVersion}</version>
-            <exclusions>
-                <!-- Mule uses a newer version -->	
-                <exclusion>
-                    <groupId>javassist</groupId>
-                    <artifactId>javassist</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-jdk14</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!-- Hibernate and dependencies -->
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>${hibernateVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.transaction</groupId>
-                    <artifactId>jta</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>jboss</groupId>
             <artifactId>javassist</artifactId>
-            <version>${javassistVersion}</version>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-            <version>${javaMailVersion}</version>
         </dependency>
         <!-- Needed for org.mule.module.jbpm.MuleSendActivity -->
         <dependency>
