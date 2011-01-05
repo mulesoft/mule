@@ -1,5 +1,10 @@
-Common Public Attribution License Version 1.0 (CPAL)
+Mule ESB is distributed under the terms of the Common Public Attribution 
+License (CPAL), whose definition follows below.  For information on the license
+type for each third-party software product used by Mule, refer to 
+http://www.mulesoft.org/documentation/display/MULE3INTRO/Third-party+Software+in+Mule 
 
+
+Common Public Attribution License Version 1.0 (CPAL)
 
 
 1. "Definitions"

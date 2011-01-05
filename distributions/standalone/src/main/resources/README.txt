@@ -48,7 +48,6 @@ The Mule distribution contains the following directories and files:
                 /lib/mule on the classpath and can be used to patch the
                 distributed Mule classes. You must restart Mule after adding
                 files to this directory.
-/licenses       License information for all libraries shipped with Mule
 /logs           Log file output when running in background mode
 /src            The source code for all Mule modules
 LICENSE.txt     License agreement for Mule
