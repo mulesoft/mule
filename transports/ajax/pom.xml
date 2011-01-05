@@ -34,12 +34,10 @@
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>cometd-server</artifactId>
-            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>cometd-client</artifactId>
-            <version>${jettyVersion}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
