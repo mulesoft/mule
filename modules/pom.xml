@@ -23,6 +23,7 @@
         <module>boot</module>
         <module>bpm</module>
         <module>cxf</module>
+        <module>drools</module>
         <module>launcher</module>
         <module>client</module>
         <module>guice</module>

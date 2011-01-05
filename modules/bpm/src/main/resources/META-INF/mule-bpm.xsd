@@ -41,7 +41,7 @@
                 <xsd:attribute name="bpms-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A reference to the underlying BPMS, which must implement the {javadoc:mule/transport/bpm|BPMS}org.mule.transport.bpm.BPMS{javadoc} interface to exchange messages through Mule. 
+                            A reference to the underlying BPMS. 
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -69,6 +69,114 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="jbpm" type="jbpmType" substitutionGroup="mule:abstract-extension" />
+ 
+    <xsd:complexType name="jbpmType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                 <xsd:sequence>
+                    <xsd:element name="process-definition" type="processDefinitionType" minOccurs="0" maxOccurs="unbounded">
+                      <xsd:annotation>
+                          <xsd:documentation>
+                            A process definition to be loaded into jBPM at startup.
+                          </xsd:documentation>
+                      </xsd:annotation>
+                  </xsd:element>
+                 </xsd:sequence>
+                 <xsd:attribute name="name" type="mule:substitutableName">
+                     <xsd:annotation>
+                         <xsd:documentation>
+                             An optional name for this BPMS.  Refer to this from the "bpms-ref" field of your component in case you have more than one BPMS configured.
+                         </xsd:documentation>
+                     </xsd:annotation>
+                 </xsd:attribute>
+                 <xsd:attribute name="configurationResource" type="xsd:string">
+                     <xsd:annotation>
+                         <xsd:documentation>
+                             The configuration file for jBPM, default is "jbpm.cfg.xml" if not specified.
+                         </xsd:documentation>
+                     </xsd:annotation>
+                 </xsd:attribute>
+                 <xsd:attribute name="processEngine-ref" type="xsd:string">
+                     <xsd:annotation>
+                         <xsd:documentation>
+                             A reference to the already-initialized jBPM ProcessEngine.  This is useful if you use Spring to configure your jBPM instance.  Note that the "configurationResource" attribute will be ignored.
+                         </xsd:documentation>
+                     </xsd:annotation>
+                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="rules" type="rulesComponentType" substitutionGroup="mule:abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                A service backed by a rules engine such as Drools.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="rulesComponentType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractComponentType">
+                <xsd:attribute name="rulesEngine-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to the underlying Rules Engine. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="rulesDefinition" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The resource containing the rules definition.  This will be used to deploy the ruleset to the Rules Engine.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="initialFacts-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to a collection of initial facts to be asserted at startup. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="cepMode" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Are we using the knowledge base for CEP (Complex Event Processing)? (default = false)
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="entryPoint" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Entry point for event stream (used by CEP).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="drools" type="droolsType" substitutionGroup="mule:abstract-extension" />
+ 
+    <xsd:complexType name="droolsType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                 <xsd:attribute name="name" type="mule:substitutableName">
+                     <xsd:annotation>
+                         <xsd:documentation>
+                             An optional name for this Rules Engine.  Refer to this from the "rulesEngine-ref" field of your component in case you have more than one Rules Engine configured.
+                         </xsd:documentation>
+                     </xsd:annotation>
+                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!-- ******************************************************* -->
+    <!-- Deprecated elements left in for backwards-compatibility -->
+    <!-- ******************************************************* -->
 
     <xsd:element name="connector" type="bpmConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
@@ -122,45 +230,6 @@
             </xsd:extension>
         </xsd:complexContent>
    </xsd:complexType>
-
-    <xsd:element name="jbpm" type="jbpmType" substitutionGroup="mule:abstract-extension" />
- 
-    <xsd:complexType name="jbpmType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:abstractExtensionType">
-		         <xsd:sequence>
-		         	<xsd:element name="process-definition" type="processDefinitionType" minOccurs="0" maxOccurs="unbounded">
-		              <xsd:annotation>
-		                  <xsd:documentation>
-		                  	A process definition to be loaded into jBPM at startup.
-		                  </xsd:documentation>
-		              </xsd:annotation>
-		          </xsd:element>
-		         </xsd:sequence>
-		         <xsd:attribute name="name" type="mule:substitutableName">
-		             <xsd:annotation>
-		                 <xsd:documentation>
-		                 	 An optional name for this BPMS.  Refer to this from the "bpms-ref" field of your component in case you have more than one BPMS configured.
-		                 </xsd:documentation>
-		             </xsd:annotation>
-		         </xsd:attribute>
-		         <xsd:attribute name="configurationResource" type="xsd:string">
-		             <xsd:annotation>
-		                 <xsd:documentation>
-		                     The configuration file for jBPM, default is "jbpm.cfg.xml" if not specified.
-		                 </xsd:documentation>
-		             </xsd:annotation>
-		         </xsd:attribute>
-		         <xsd:attribute name="processEngine-ref" type="xsd:string">
-		             <xsd:annotation>
-		                 <xsd:documentation>
-		                     A reference to the already-initialized jBPM ProcessEngine.  This is useful if you use Spring to configure your jBPM instance.  Note that the "configurationResource" attribute will be ignored.
-		                 </xsd:documentation>
-		             </xsd:annotation>
-		         </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:element name="jbpm-connector" type="jBpmConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
