@@ -1015,19 +1015,6 @@
                 <artifactId>bsh</artifactId>
                 <version>${bshVersion}-osgi</version>
             </dependency>
-            <dependency>
-                <groupId>org.ibeans</groupId>
-                <artifactId>ibeans-support</artifactId>
-                <version>${ibeansVersion}</version>
-                <exclusions>
-                    <!-- we like slf4j -->
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
             <!-- BouncyCastle deps -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
