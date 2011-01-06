@@ -10,11 +10,8 @@
 
 package org.mule.config;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Selects a preferred object from a collection of instances of the same type
@@ -23,6 +20,24 @@ import java.util.List;
  */
 public class PreferredObjectSelector<T>
 {
+
+    private final Comparator<T> comparator;
+
+    public PreferredObjectSelector()
+    {
+        comparator = new Comparator<T>()
+        {
+            private PreferredComparator preferredComparator = new PreferredComparator();
+
+            public int compare(T threadPoolFactory, T threadPoolFactory1)
+            {
+                final Preferred preferred = threadPoolFactory.getClass().getAnnotation(Preferred.class);
+                final Preferred preferred1 = threadPoolFactory1.getClass().getAnnotation(Preferred.class);
+
+                return preferredComparator.compare(preferred, preferred1);
+            }
+        };
+    }
 
     /**
      * Selects a preferred object from instances returned by an {@link Iterator}.
@@ -36,41 +51,23 @@ public class PreferredObjectSelector<T>
      */
     public T select(Iterator<T> iterator)
     {
-        List<T> candidates = new LinkedList<T>();
+        T preferred = null;
 
-        while (iterator.hasNext())
+        if (iterator.hasNext())
         {
-            candidates.add(iterator.next());
+            preferred = iterator.next();
+
+            while (iterator.hasNext())
+            {
+                T current = iterator.next();
+
+                if (comparator.compare(preferred, current) == -1)
+                {
+                    preferred = current;
+                }
+            }
         }
 
-        return select(candidates);
-    }
-
-    /**
-     * Selects a preferred object from instances contained in a {@link List}.
-     * <p/>
-     * The preferred instance will be the instance annotated with {@link Preferred}
-     * annotation with the highest weight attribute if there is any, or a non
-     * annotated class otherwise.
-     *
-     * @param candidates contains the objects to select from
-     * @return the preferred instance
-     */
-    public T select(List<T> candidates)
-    {
-        Collections.sort(candidates, new Comparator<T>()
-        {
-            private PreferredComparator preferredComparator = new PreferredComparator();
-
-            public int compare(T threadPoolFactory, T threadPoolFactory1)
-            {
-                final Preferred preferred = threadPoolFactory.getClass().getAnnotation(Preferred.class);
-                final Preferred preferred1 = threadPoolFactory1.getClass().getAnnotation(Preferred.class);
-
-                return preferredComparator.compare(preferred, preferred1);
-            }
-        });
-
-        return candidates.get(candidates.size() - 1);
+        return preferred;
     }
 }
