@@ -223,7 +223,7 @@ public class JmxAgent extends AbstractAgent
 
     protected void initRMI() throws Exception
     {
-        String connectUri = (connectorServerUrl != null ? connectorServerUrl : DEFAULT_REMOTING_URI);
+        String connectUri = (connectorServerUrl != null ? connectorServerUrl : "");
         if (connectUri.contains("jmx:rmi"))
         {
             int i = connectUri.lastIndexOf("rmi://");
