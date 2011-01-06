@@ -10,6 +10,9 @@
 
 package org.mule.module.activiti.action;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -35,10 +38,29 @@ public class CreateProcessAction extends AbstractOutboundActivitiAction<PostMeth
     @Override
     protected void prepareMethod(PostMethod method, MuleMessage message) throws Exception
     {
-        String value = message.getPayloadAsString();
-        String json = "{"
-            + "\"processDefinitionId\":\"" + value + "\""
-            + "}";
+        Object payload = message.getPayload();
+        String json = "";
+        if (payload instanceof Map)
+        {
+            Map map = (Map) payload;
+            StringBuffer buffer = new StringBuffer();
+            buffer.append("{");
+            for (Object entryObject : map.entrySet())
+            {
+                Entry entry = (Entry) entryObject;
+                buffer.append(entry.getKey());
+                buffer.append(" : \"");
+                buffer.append(entry.getValue());
+                buffer.append("\",");
+            }
+            buffer.append("}");
+            json = buffer.toString();
+        }
+        else
+        {
+            String processDefinitionId = message.getPayloadAsString();
+            json = "{" + "\"processDefinitionId\":\"" + processDefinitionId + "\"," + "}";
+        }
         
         RequestEntity requestEntity = new StringRequestEntity(json, "application/json", "UTF-8");
         method.setRequestEntity(requestEntity);
