@@ -1,0 +1,38 @@
+<assembly>
+    <id>server</id>
+    <formats>
+        <format>zip</format>
+        <format>tar.gz</format>
+    </formats>
+
+    <fileSets>
+        <!-- Copy standard CE distro, excluding a few things -->
+        <fileSet>
+            <directory>target/ce-distribution/${communityArtifact}-${version}</directory>
+            <outputDirectory></outputDirectory>
+            <excludes>
+                <exclude>examples/**</exclude>
+                <exclude>docs/**</exclude>
+                <exclude>src/**</exclude>
+            </excludes>
+        </fileSet>
+
+        <!-- Make binary files executable. -->
+        <fileSet>
+            <directory>target/ce-distribution/${communityArtifact}-${version}/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <fileMode>755</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>target/ce-distribution/${communityArtifact}-${version}/lib/boot/exec</directory>
+            <outputDirectory>lib/boot/exec</outputDirectory>
+            <fileMode>755</fileMode>
+        </fileSet>
+
+		<!-- Override any files here -->
+        <fileSet>
+            <directory>src/main/resources</directory>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>
