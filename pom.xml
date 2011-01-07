@@ -1208,12 +1208,6 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-        <!-- for activemq -->
-        <repository>
-            <id>ops4j</id>
-            <name>OPS4J Repository</name>
-            <url>http://repository.ops4j.org/maven2</url>
-        </repository>
         <repository>
             <id>jboss</id>
             <name>JBoss Repository</name>
@@ -1227,16 +1221,6 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-        <!--
-        <repository>
-            <id>semanticweb</id>
-            <name>Semantic Web Repo</name>
-            <url>http://semweb4j.org/repo</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        -->
     </repositories>
 
     <pluginRepositories>
