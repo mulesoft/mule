@@ -12,6 +12,10 @@
     <name>BPM Support: JBoss Rules (Drools)</name>
     <description>Classes which allow Mule to integrate with Drools via the BPM Module.</description>
 
+    <properties>
+        <droolsVersion>5.0.1</droolsVersion>
+    </properties>
+
     <dependencies>
         <!-- Generic BPM Support -->
         <dependency>
@@ -20,16 +24,16 @@
             <version>${version}</version>
         </dependency>
         <!-- Drools -->
-	    <dependency>
-	      <groupId>org.drools</groupId>
-	      <artifactId>drools-core</artifactId>
-          <version>5.0.1</version>
-	    </dependency>
-	    <dependency>
-	      <groupId>org.drools</groupId>
-	      <artifactId>drools-compiler</artifactId>
-          <version>5.0.1</version>
-	    </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+            <version>${droolsVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-compiler</artifactId>
+            <version>${droolsVersion}</version>
+        </dependency>
 
         <!-- Unit tests only -->
         <dependency>
