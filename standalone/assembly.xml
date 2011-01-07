@@ -83,121 +83,58 @@
             <exclude>**/*.iml</exclude>
             <exclude>**/*.ipr</exclude>
             <exclude>**/*.iws</exclude>
-			<!-- Exclude this example until someone gets it working -->
-			<exclude>geomail/**</exclude>
+            <!-- Exclude this example until someone gets it working -->
+            <exclude>geomail/**</exclude>
             <!-- Legacy LoanBroker example, used for testing only -->
             <exclude>loanbroker-legacy/**</exclude>
         </excludes>
     </fileSet>
 
-    <!--
-    ============================
-        Mule Examples: Echo
-    ============================
-    -->
+    <fileSet>
+        <directory>../../examples/cep/dist</directory>
+        <outputDirectory>examples/cep</outputDirectory>
+    </fileSet>
     <fileSet>
         <directory>../../examples/echo/dist</directory>
         <outputDirectory>examples/echo</outputDirectory>
     </fileSet>
-
-    <!--
-    ==================================
-        Mule Examples: Error Handler
-    ==================================
-    -->
     <fileSet>
         <directory>../../examples/errorhandler/dist</directory>
         <outputDirectory>examples/errorhandler</outputDirectory>
     </fileSet>
-
     <!--
-    ============================
-        Mule Examples: Geomail
-    ============================
     <fileSet>
         <directory>../../examples/geomail/dist</directory>
         <outputDirectory>examples/geomail</outputDirectory>
     </fileSet>
     -->
-
-    <!--
-    ============================
-        Mule Examples: GPS walker
-    ============================
-    -->
     <fileSet>
         <directory>../../examples/gpswalker/dist</directory>
         <outputDirectory>examples/gpswalker</outputDirectory>
     </fileSet>
-
-    <!--
-    ============================
-        Mule Examples: Hello
-    ============================
-    -->
     <fileSet>
         <directory>../../examples/hello/dist</directory>
         <outputDirectory>examples/hello</outputDirectory>
     </fileSet>
-
-    <!--
-    ===============================
-        Mule Examples: Loan Broker Simple
-    ===============================
-    -->
     <fileSet>
         <directory>../../examples/loanbroker-simple/dist</directory>
         <outputDirectory>examples/loanbroker-simple</outputDirectory>
     </fileSet>
-
-    <!--
-    ===============================
-        Mule Examples: Loan Broker BPM
-    ===============================
-    -->
     <fileSet>
         <directory>../../examples/loanbroker-bpm/dist</directory>
         <outputDirectory>examples/loanbroker-bpm</outputDirectory>
     </fileSet>
-
-    <!--
-    =============================
-        Mule Examples: Notifications
-    =============================
-    -->
     <fileSet>
         <directory>../../examples/notifications/dist</directory>
         <outputDirectory>examples/notifications</outputDirectory>
     </fileSet>
-
-    <!--
-    =============================
-        Mule Examples: Scripting
-    =============================
-    -->
     <fileSet>
         <directory>../../examples/scripting/dist</directory>
         <outputDirectory>examples/scripting</outputDirectory>
     </fileSet>
-
-    <!--
-    ===============================
-        Mule Examples: Stock Quote
-    ===============================
-    -->
     <fileSet>
         <directory>../../examples/stockquote/dist</directory>
         <outputDirectory>examples/stockquote</outputDirectory>
-    </fileSet>
-
-    <!--
-    ============================
-      Mule Examples: Bookstore
-    ============================
-    -->
-    <fileSet>
-        <directory>../../examples/bookstore/dist</directory>
-        <outputDirectory>examples/bookstore</outputDirectory>
     </fileSet>
   </fileSets>
 
@@ -347,6 +284,8 @@
         <exclude>org.mule.modules:mule-module-ws</exclude>
         <exclude>org.mule.modules:mule-module-xml</exclude>
         <exclude>org.mule.examples:mule-examples-all</exclude>
+        <exclude>org.mule.examples:mule-example-bookstore</exclude>
+        <exclude>org.mule.examples:mule-example-cep</exclude>
         <exclude>org.mule.examples:mule-example-echo</exclude>
         <exclude>org.mule.examples:mule-example-errorhandler</exclude>
         <exclude>org.mule.examples:mule-example-gpswalker</exclude>
@@ -360,7 +299,6 @@
         <exclude>org.mule.examples:mule-example-notifications</exclude>
         <exclude>org.mule.examples:mule-example-scripting</exclude>
         <exclude>org.mule.examples:mule-example-stockquote</exclude>
-        <exclude>org.mule.examples:mule-example-bookstore</exclude>
 
         <!-- lib/user -->
         <exclude>junit:junit</exclude>
@@ -420,6 +358,12 @@
       <outputDirectory>examples/bookstore</outputDirectory>
       <includes>
         <include>org.mule.examples:mule-example-bookstore</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>examples/cep</outputDirectory>
+      <includes>
+        <include>org.mule.examples:mule-example-cep</include>
       </includes>
     </dependencySet>
     <dependencySet>
