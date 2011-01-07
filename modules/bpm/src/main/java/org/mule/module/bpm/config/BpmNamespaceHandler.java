@@ -43,7 +43,7 @@ public class BpmNamespaceHandler extends AbstractMuleNamespaceHandler
         }
         catch (ClassNotFoundException e)
         {
-            logger.warn(e.getMessage());
+            logger.debug("Element <bpm:jbpm> will not available because " + JBPM_WRAPPER_CLASS + " is not on the classpath");
         }
 
         registerBeanDefinitionParser("rules", new RulesComponentDefinitionParser());
@@ -53,7 +53,7 @@ public class BpmNamespaceHandler extends AbstractMuleNamespaceHandler
         }
         catch (ClassNotFoundException e)
         {
-            logger.warn(e.getMessage());
+            logger.debug("Element <drools> will not available in the bpm: namespace because it is not on the classpath");
         }
     }
     

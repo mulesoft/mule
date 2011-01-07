@@ -80,6 +80,7 @@
         <acegiVersion>1.0.7</acegiVersion>
         <activemqVersion>4.1.2</activemqVersion>
         <antVersion>1.6.5</antVersion>
+        <antlrVersion>3.1.1</antlrVersion>
         <asmVersion>3.1</asmVersion>
         <backportUtilConcurrentVersion>3.1</backportUtilConcurrentVersion>
         <bshVersion>2.0b4</bshVersion>

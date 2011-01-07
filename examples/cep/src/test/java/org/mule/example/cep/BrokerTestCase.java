@@ -17,7 +17,7 @@ public class BrokerTestCase extends FunctionalTestCase
     @Override
     protected String getConfigResources()
     {
-        return "broker-config.xml";
+        return "mule-config.xml";
     }
 
     public void testBroker() throws Exception

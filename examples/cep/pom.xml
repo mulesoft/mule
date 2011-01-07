@@ -8,6 +8,7 @@
     </parent>
     <artifactId>mule-example-cep</artifactId>
     <name>CEP Example</name>
+    <packaging>mule</packaging>
     <description>This example is an adaptation of the Drools Stock Tick example to run inside Mule.</description>
 
     <dependencies>
