@@ -19,4 +19,4 @@ org.mule.transport.soap.axis.AxisConnectorLifecycleTestCase
 org.mule.transport.soap.axis.functional.AxisSoapHeadersTestCase
 
 # Fix test case after BL-165
-# org.mule.transport.soap.axis.AxisServletWithSecurityTestCase
+org.mule.transport.soap.axis.AxisServletWithSecurityTestCase
