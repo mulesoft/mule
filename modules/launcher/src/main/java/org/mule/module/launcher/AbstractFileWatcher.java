@@ -33,15 +33,23 @@ public abstract class AbstractFileWatcher implements Runnable
     
     public final void run()
     {
+        long lastTimeStamp = timeStamp;
+        File latestFile = null;
+        
         for (File file : files)
         {
-            long timeStamp = file.lastModified();
-    
-            if (this.timeStamp < timeStamp)
+            long timestamp = file.lastModified();
+            if (timestamp > lastTimeStamp)
             {
-                this.timeStamp = timeStamp;
-                onChange(file);
+                lastTimeStamp = timeStamp;
+                latestFile = file;
             }
+        }
+        
+        if (latestFile != null)
+        {
+            this.timeStamp = lastTimeStamp;
+            onChange(latestFile);
         }
     }
 
