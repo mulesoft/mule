@@ -15,18 +15,18 @@
     
     <xsd:annotation>
         <xsd:documentation>
-            BPM integration allows process engines to send and receive messages through Mule. 
+            Support for BPM allows you to send/receive messages to/from a running process. A message from Mule can start or advance a process, the message can be stored as a process variable, and a running process can send messages to any endpoint in your Mule application.
         </xsd:documentation>
         <xsd:appinfo>
             <schemadoc:short-name>BPM</schemadoc:short-name>
-            <schemadoc:page-title>BPM Integration</schemadoc:page-title>
+            <schemadoc:page-title>BPM Support</schemadoc:page-title>
         </xsd:appinfo>
     </xsd:annotation>
 
     <xsd:element name="process" type="processComponentType" substitutionGroup="mule:abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                A service backed by a process engine such as jBPM.
+                A process backed by a BPMS such as jBPM.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -36,7 +36,7 @@
                 <xsd:attribute name="bpms-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A reference to the underlying BPMS, which must implement the {javadoc:mule/transport/bpm|BPMS}org.mule.transport.bpm.BPMS{javadoc} interface to exchange messages through Mule. 
+                            An optional reference to the underlying BPMS.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -57,7 +57,7 @@
                 <xsd:attribute name="processIdField" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            This field will be used to correlate messages with processes.
+                            This field will be used to correlate Mule messages with running processes.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -73,7 +73,7 @@
                  <xsd:attribute name="name" type="mule:substitutableName">
                      <xsd:annotation>
                          <xsd:documentation>
-                              An optional name for this BPMS.  Refer to this from the "bpms-ref" field of your component in case you have more than one BPMS configured.
+                              An optional name for this BPMS.  Refer to this from the "bpms-ref" field of your process in case you have more than one BPMS available.
                          </xsd:documentation>
                      </xsd:annotation>
                  </xsd:attribute>
@@ -87,7 +87,7 @@
                  <xsd:attribute name="processEngine-ref" type="xsd:string">
                      <xsd:annotation>
                          <xsd:documentation>
-                             A reference to the already-initialized jBPM ProcessEngine.  This is useful if you use Spring to configure your jBPM instance.  Note that the "configurationResource" attribute will be ignored.
+                             A reference to the already-initialized jBPM ProcessEngine.  This is useful if you use Spring to configure your jBPM instance.  Note that the "configurationResource" attribute will be ignored in this case.
                          </xsd:documentation>
                      </xsd:annotation>
                  </xsd:attribute>
