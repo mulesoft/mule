@@ -20,11 +20,6 @@
         <xsd:appinfo>
             <schemadoc:short-name>BPM</schemadoc:short-name>
             <schemadoc:page-title>BPM Integration</schemadoc:page-title>
-            <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
-                                          requestEvents="false"
-                                          transactions="false" streaming="false">
-                <schemadoc:MEPs supported="one-way, request-response" default="one-way"/>
-            </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>
 
@@ -70,73 +65,11 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="connector" type="bpmConnectorType" substitutionGroup="mule:abstract-connector">
-        <xsd:annotation>
-            <xsd:documentation>
-                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    
-    <xsd:complexType name="abstractBpmConnectorType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexContent>
-            <xsd:extension base="mule:connectorType">
-                <xsd:attribute name="allowGlobalReceiver" type="mule:substitutableBoolean" default="false">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The global receiver allows an endpoint of type "bpm://*" to receive any incoming message to the BPMS, regardless of the process. If this is false, the process name must be specified for each endpoint. For example, "bpm://MyProcess" will only receive messages for the process "MyProcess".
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="processIdField" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            This field will be used to correlate messages with processes.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-   </xsd:complexType>
- 
-    <xsd:complexType name="bpmConnectorType">
-        <xsd:annotation>
-            <xsd:documentation>
-                Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexContent>
-            <xsd:extension base="abstractBpmConnectorType">
-                <xsd:attribute name="bpms-ref" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            A reference to the underlying BPMS, which must implement the {javadoc:mule/transport/bpm|BPMS}org.mule.transport.bpm.BPMS{javadoc} interface to exchange messages through Mule using the BPM transport. 
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-   </xsd:complexType>
-
     <xsd:element name="jbpm" type="jbpmType" substitutionGroup="mule:abstract-extension" />
  
     <xsd:complexType name="jbpmType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractExtensionType">
-                 <xsd:sequence>
-                     <xsd:element name="process-definition" type="processDefinitionType" minOccurs="0" maxOccurs="unbounded">
-                      <xsd:annotation>
-                          <xsd:documentation>
-                              A process definition to be loaded into jBPM at startup.
-                          </xsd:documentation>
-                      </xsd:annotation>
-                  </xsd:element>
-                 </xsd:sequence>
                  <xsd:attribute name="name" type="mule:substitutableName">
                      <xsd:annotation>
                          <xsd:documentation>
@@ -161,34 +94,4 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:complexType name="processDefinitionType">
-        <xsd:complexContent mixed="true">
-            <xsd:extension base="mule:abstractExtensionType">
-                <!--
-                <xsd:sequence>
-                    <xsd:element name="text" type="xsd:string" minOccurs="0">
-                        <xsd:annotation>
-                            <xsd:documentation>Used for embedding the process definition inside the XML. This is useful for simple processes where you are just mocking up a quick application.
-                            </xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:element>
-                </xsd:sequence>
-                -->
-                <xsd:attribute name="name" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>The process definition file. The file can be on the classpath or local file system.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="resource" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>The process definition file. The file can be on the classpath or local file system.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
 </xsd:schema>
