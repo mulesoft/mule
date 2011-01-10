@@ -11,27 +11,37 @@
 package org.mule.module.launcher;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
 
 public abstract class AbstractFileWatcher implements Runnable
 {
 
     private long timeStamp;
-    private File file;
+    private Collection<File> files;
 
     public AbstractFileWatcher(File file)
     {
-        this.file = file;
-        this.timeStamp = file.lastModified();
+        this(Arrays.asList(file));
     }
 
+    public AbstractFileWatcher(Collection<File> files)
+    {
+        this.files = files;
+        this.timeStamp = System.currentTimeMillis();
+    }
+    
     public final void run()
     {
-        long timeStamp = file.lastModified();
-
-        if (this.timeStamp != timeStamp)
+        for (File file : files)
         {
-            this.timeStamp = timeStamp;
-            onChange(file);
+            long timeStamp = file.lastModified();
+    
+            if (this.timeStamp < timeStamp)
+            {
+                this.timeStamp = timeStamp;
+                onChange(file);
+            }
         }
     }
 
