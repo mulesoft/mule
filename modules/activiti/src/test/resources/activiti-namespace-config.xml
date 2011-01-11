@@ -3,8 +3,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:activiti="http://www.mulesoft.org/schema/mule/activiti"
     xsi:schemaLocation="
-    	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
-    	http://www.mulesoft.org/schema/mule/activiti http://www.mulesoft.org/schema/mule/activiti/3.1/mule-activiti.xsd">
+    	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+    	http://www.mulesoft.org/schema/mule/activiti http://www.mulesoft.org/schema/mule/activiti/3.2/mule-activiti.xsd">
 
     <activiti:connector name="actServer" activitiServerURL="http://localhost:8080/activiti-rest/service/" 
             username="kermit" password="kermit2" />

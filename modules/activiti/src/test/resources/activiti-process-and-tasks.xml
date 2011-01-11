@@ -4,10 +4,10 @@
     xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
     xsi:schemaLocation="
-    	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
-    	http://www.mulesoft.org/schema/mule/activiti http://www.mulesoft.org/schema/mule/activiti/3.1/mule-activiti.xsd
-        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.1/mule-scripting.xsd
-        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd">
+    	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+    	http://www.mulesoft.org/schema/mule/activiti http://www.mulesoft.org/schema/mule/activiti/3.2/mule-activiti.xsd
+        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
 
     <vm:connector name="asynchVm" />
 

@@ -5,9 +5,9 @@
       xmlns:json="http://www.mulesoft.org/schema/mule/json"
       xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
       xsi:schemaLocation="
-        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.0/mule-json.xsd
-        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.0/mule-ajax.xsd
-        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.0/mule.xsd">
+        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.2/mule-json.xsd
+        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.2/mule-ajax.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 
     <ajax:connector name="ajaxServer" jsonCommented="false" serverUrl="http://0.0.0.0:18082/examples" resourceBase="${app.home}/docroot"/>
 

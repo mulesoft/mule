@@ -5,9 +5,9 @@
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
 
       xsi:schemaLocation="
-               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
-               http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/3.1/mule-atom.xsd
-               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.1/mule-test.xsd">
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+               http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/3.2/mule-atom.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
     
     <flow name="feedConsumer">
         <atom:inbound-endpoint address="http://rossmason.blogspot.com/feeds/posts/default" splitFeed="false">
