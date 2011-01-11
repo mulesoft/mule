@@ -236,6 +236,41 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertEquals("Wrong URL tagged as zombie.", "app%20with%20spaces.zip", new File(zombie.getKey().getFile()).getName());
         assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
     }
+    
+    public void testConfigurableWorkingDirectoryApp() throws Exception
+    {
+        final URL url1 = getClass().getResource("/configurableApp.zip");
+        assertNotNull("Test app file not found " + url1, url1);
+        addAppArchive(url1);
+        
+        final URL url2 = getClass().getResource("/dummy-app.zip");
+        assertNotNull("Test app file not found " + url2, url2);
+        addAppArchive(url2);
+
+        deploymentService.start();
+
+        assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+
+        assertAppsDir(NONE, new String[] {"configurableApp", "dummy-app"}, true);
+
+        // just assert no priviledged entries were put in the registry
+        final Application configurableApp = findApp("configurableApp", 2);
+        final Application dummyApp = findApp("dummy-app", 2);
+        
+        final MuleRegistry registry1 = configurableApp.getMuleContext().getRegistry();
+        final Object obj1 = registry1.lookupObject(PriviledgedMuleApplication.REGISTRY_KEY_DEPLOYMENT_SERVICE);
+        assertNull(obj1);
+        assertFalse(((ApplicationWrapper) configurableApp).getDelegate() instanceof PriviledgedMuleApplication);
+        assertEquals("mule-app.properties should have been loaded.", "someValue", registry1.get("myCustomProp"));
+        assertTrue(configurableApp.getMuleContext().getConfiguration().getWorkingDirectory().endsWith(".appT/configurableApp"));
+
+        final MuleRegistry registry2 = dummyApp.getMuleContext().getRegistry();
+        final Object obj2 = registry2.lookupObject(PriviledgedMuleApplication.REGISTRY_KEY_DEPLOYMENT_SERVICE);
+        assertNull(obj2);
+        assertFalse(((ApplicationWrapper) dummyApp).getDelegate() instanceof PriviledgedMuleApplication);
+        assertEquals("mule-app.properties should have been loaded.", "someValue", registry2.get("myCustomProp"));
+        assertTrue(dummyApp.getMuleContext().getConfiguration().getWorkingDirectory().endsWith(".mule/dummy-app"));
+    }
 
     /**
      * Find a deployed app, performing some basic assertions.

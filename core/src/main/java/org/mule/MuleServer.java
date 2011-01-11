@@ -15,9 +15,11 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.StartupContext;
 import org.mule.config.builders.SimpleConfigurationBuilder;
+import org.mule.config.PropertiesMuleConfigurationFactory;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.context.DefaultMuleContextBuilder;
@@ -47,6 +49,7 @@ public class MuleServer implements Runnable
     public static final String CLI_OPTIONS[][] = {
         {"builder", "true", "Configuration Builder Type"},
         {"config", "true", "Configuration File"},
+        {"appconfig", "true", "Application configuration File"},
         {"idle", "false", "Whether to run in idle (unconfigured) mode"},
         {"main", "true", "Main Class"},
         {"mode", "true", "Run Mode"},
@@ -84,12 +87,16 @@ public class MuleServer implements Runnable
     private static final Log logger = LogFactory.getLog(MuleServer.class);
 
     public static final String DEFAULT_CONFIGURATION = "mule-config.xml";
+    
+    public static final String DEFAULT_APP_CONFIGURATION = "mule-app.properties";
 
     /**
      * one or more configuration urls or filenames separated by commas
      */
     private String configurationResources = null;
 
+    private String appConfigurationResource = null;
+    
     /**
      * A FQN of the #configBuilder class, required in case MuleServer is
      * reinitialised.
@@ -188,6 +195,9 @@ public class MuleServer implements Runnable
         {
             setConfigurationResources(config);
         }
+        
+        String appconfig = (String) commandlineOptions.get("appconfig");
+        this.appConfigurationResource = appconfig;
 
         // Configuration builder
         String cfgBuilderClassName = (String) commandlineOptions.get("builder");
@@ -374,7 +384,11 @@ public class MuleServer implements Runnable
             builders.add(cfgBuilder);
 
             DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-            muleContext = muleContextFactory.createMuleContext(builders, new DefaultMuleContextBuilder());
+            String muleAppConfig = this.appConfigurationResource == null
+                ? PropertiesMuleConfigurationFactory.getMuleAppConfiguration(this.configurationResources)
+                : this.appConfigurationResource;
+            MuleConfiguration configuration = new PropertiesMuleConfigurationFactory(muleAppConfig).createConfiguration();
+            muleContext = muleContextFactory.createMuleContext(cfgBuilder, new Properties(), configuration);
         }
     }
 

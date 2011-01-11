@@ -11,6 +11,7 @@
 package org.mule;
 
 import org.mule.api.MuleContext;
+import org.mule.config.StartupContext;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.ClassUtils;
 
@@ -22,7 +23,13 @@ public class MuleServerTestCase extends AbstractMuleTestCase
     {
         return null;
     }
-
+    
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        super.doTearDown();
+    }
+    
     public void testMuleServer() throws Exception
     {
         MuleServer muleServer = new MuleServer();
@@ -77,5 +84,15 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         assertEquals("org.mule.config.spring.SpringXmlConfigurationBuilder", MuleServer.getConfigBuilderClassName());
         muleServer.initialize();
     }
-
+    
+    public void testMuleServerAppConfig() throws Exception
+    {
+        MuleServer muleServer = new MuleServer(new String[]{
+            "-config",
+            "mule-config.xml",
+            "-appconfig",
+            "org/mule/test/spring/config1/test-app-config.properties"});
+        muleServer.initialize();
+        assertTrue(MuleServer.muleContext.getConfiguration().getWorkingDirectory().endsWith("tests/functional/target/.appT"));
+    }
 }
