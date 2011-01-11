@@ -19,6 +19,7 @@ import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.PropertiesMuleConfigurationFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
@@ -53,6 +54,8 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
      * One or more Mule config files.
      */
     public static final String INIT_PARAMETER_MULE_CONFIG = "org.mule.config";
+
+    public static final String INIT_PARAMETER_MULE_APP_CONFIG = "org.mule.app.config";
 
     protected MuleContext muleContext;
 
@@ -117,7 +120,11 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
         WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context, configResource);
         MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
 
-        DefaultMuleConfiguration muleConfiguration = new DefaultMuleConfiguration();
+        String muleAppConfig = context.getInitParameter(INIT_PARAMETER_MULE_APP_CONFIG) != null
+            ? context.getInitParameter(INIT_PARAMETER_MULE_APP_CONFIG)
+            : PropertiesMuleConfigurationFactory.getMuleAppConfiguration(configResource);
+        
+        DefaultMuleConfiguration muleConfiguration = new PropertiesMuleConfigurationFactory(muleAppConfig).createConfiguration();
         if (serverId != null)
         {
             muleConfiguration.setId(serverId);

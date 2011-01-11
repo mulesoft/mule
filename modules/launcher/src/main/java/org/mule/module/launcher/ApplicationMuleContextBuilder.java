@@ -12,6 +12,7 @@ package org.mule.module.launcher;
 
 import org.mule.api.config.ThreadingProfile;
 import org.mule.config.DefaultMuleConfiguration;
+import org.mule.config.PropertiesMuleConfigurationFactory;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.util.StringUtils;
@@ -33,6 +34,7 @@ public class ApplicationMuleContextBuilder extends DefaultMuleContextBuilder
     protected DefaultMuleConfiguration createMuleConfiguration()
     {
         final DefaultMuleConfiguration configuration = new DefaultMuleConfiguration(true);
+        PropertiesMuleConfigurationFactory.initializeFromProperties(configuration, desc.getAppProperties());
         configuration.setId(desc.getAppName());
         final String encoding = desc.getEncoding();
         if (StringUtils.isNotBlank(encoding))

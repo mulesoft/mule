@@ -14,9 +14,11 @@ import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
+import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.builders.DefaultsConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
@@ -161,8 +163,30 @@ public class DefaultMuleContextFactory implements MuleContextFactory
     public MuleContext createMuleContext(ConfigurationBuilder configurationBuilder, Properties properties)
         throws InitialisationException, ConfigurationException
     {
+        return createMuleContext(configurationBuilder, properties, new DefaultMuleConfiguration());
+    }
+    
+    /**
+     * Creates a new MuleContext using the given configurationBuilder and configuration. Properties if
+     * provided are used to replace "property placeholder" value in configuration
+     * files.
+     * 
+     * @param configurationBuilder
+     * @param properties
+     * @param configuration
+     * @return
+     * @throws InitialisationException
+     * @throws ConfigurationException
+     */
+    public MuleContext createMuleContext(ConfigurationBuilder configurationBuilder,
+                                         Properties properties,
+                                         MuleConfiguration configuration)
+        throws InitialisationException, ConfigurationException
+    {
         // Create MuleContext
-        MuleContext muleContext = doCreateMuleContext(new DefaultMuleContextBuilder());
+        DefaultMuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
+        contextBuilder.setMuleConfiguration(configuration);
+        MuleContext muleContext = doCreateMuleContext(contextBuilder);
 
         // Configure with startup properties
         if (properties != null && !properties.isEmpty())
@@ -192,5 +216,4 @@ public class DefaultMuleContextFactory implements MuleContextFactory
     {
         return muleContextBuilder.buildMuleContext();
     }
-
 }
