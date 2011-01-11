@@ -193,6 +193,8 @@ public class DefaultMuleApplication implements Application
                 appProperties.put(MuleProperties.APP_HOME_DIRECTORY_PROPERTY,
                         new File(MuleContainerBootstrapUtils.getMuleAppsDir(), getAppName()).getAbsolutePath());
 
+                appProperties.put(MuleProperties.APP_NAME_PROPERTY, getAppName());
+
                 builders.add(new SimpleConfigurationBuilder(appProperties));
 
                 // If the annotations module is on the classpath, add the annotations config builder to the list
