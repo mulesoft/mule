@@ -27,6 +27,8 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
@@ -383,8 +385,16 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     {
         if (verifyContextNotInitialized())
         {
-            // fix windows backslashes in absolute paths, convert them to forward ones
-            this.workingDirectory = FileUtils.newFile(workingDirectory).getAbsolutePath().replaceAll("\\\\", "/");
+            try
+            {
+                File canonicalFile = FileUtils.openDirectory(workingDirectory);
+                this.workingDirectory = canonicalFile.getCanonicalPath();
+            }
+            catch (IOException e)
+            {
+                throw new IllegalArgumentException(CoreMessages.initialisationFailure(
+                    "Invalid working directory").getMessage(), e);
+            }
         }
     }
 

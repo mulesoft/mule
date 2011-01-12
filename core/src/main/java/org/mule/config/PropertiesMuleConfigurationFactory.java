@@ -13,19 +13,19 @@ package org.mule.config;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.MuleServer;
-import org.mule.api.config.MuleProperties;
+import org.mule.util.BeanUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.FilenameUtils;
-import org.mule.util.NumberUtils;
 
 public class PropertiesMuleConfigurationFactory
 {
@@ -85,77 +85,33 @@ public class PropertiesMuleConfigurationFactory
     
     public static void initializeFromProperties(DefaultMuleConfiguration configuration, Map properties)
     {
-        String p;
+        for (Object entryObject : properties.entrySet())
+        {
+            Entry entry = (Entry) entryObject;
+            String key = (String) entry.getKey();
+            String value = (String) entry.getValue();
 
-        p = (String) properties.get(MuleProperties.SYSTEM_PROPERTY_PREFIX + "encoding");
-        if (p != null)
-        {
-            configuration.setDefaultEncoding(p);
-        }
-        p = (String) properties.get(MuleProperties.SYSTEM_PROPERTY_PREFIX + "endpoints.synchronous");
-        if (p != null)
-        {
-            configuration.setDefaultSynchronousEndpoints(BooleanUtils.toBoolean(p));
-        }
-        p = (String) properties.get(MuleProperties.SYSTEM_PROPERTY_PREFIX + "systemModelType");
-        if (p != null)
-        {
-            configuration.setSystemModelType(p);
-        }
-        p = (String) properties.get(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.synchronous");
-        if (p != null)
-        {
-            configuration.setDefaultResponseTimeout(NumberUtils.toInt(p));
-        }
-        p = (String) properties.get(MuleProperties.SYSTEM_PROPERTY_PREFIX + "timeout.transaction");
-        if (p != null)
-        {
-            configuration.setDefaultTransactionTimeout(NumberUtils.toInt(p));
-        }
-        p = (String) properties.get(MuleProperties.SYSTEM_PROPERTY_PREFIX + "workingDirectory");
-        if (p != null)
-        {
-            configuration.setWorkingDirectory(p);
-        }
-        p = (String) properties.get(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clientMode");
-        if (p != null)
-        {
-            configuration.setClientMode(BooleanUtils.toBoolean(p));
-        }
-        p = (String) properties.get(MuleProperties.SYSTEM_PROPERTY_PREFIX + "serverId");
-        if (p != null)
-        {
-            configuration.setId(p);
-        }
-        p = (String) properties.get(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clusterId");
-        if (p != null)
-        {
-            configuration.setClusterId(p);
-        }
-        p = (String) properties.get(MuleProperties.SYSTEM_PROPERTY_PREFIX + "domainId");
-        if (p != null)
-        {
-            configuration.setDomainId(p);
-        }
-        p = (String) properties.get(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheBytes");
-        if (p != null)
-        {
-            configuration.setCacheMessageAsBytes(BooleanUtils.toBoolean(p));
-        }
-        p = (String) properties.get(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal");
-        if (p != null)
-        {
-            configuration.setCacheMessageOriginalPayload(BooleanUtils.toBoolean(p));
-        }
-        p = (String) properties.get(MuleProperties.SYSTEM_PROPERTY_PREFIX + "streaming.enable");
-        if (p != null)
-        {
-            configuration.setEnableStreaming(BooleanUtils.toBoolean(p));
-        }
-        p = (String) properties.get(MuleProperties.SYSTEM_PROPERTY_PREFIX + "transform.autoWrap");
-        if (p != null)
-        {
-            configuration.setAutoWrapMessageAwareTransform(BooleanUtils.toBoolean(p));
+            if (key.startsWith("sys."))
+            {
+                String systemProperty = key.substring(4);
+                System.setProperty(systemProperty, value);
+            }
+            else if (key.startsWith("mule.config."))
+            {
+                String configProperty = key.substring(12);
+                try
+                {
+                    BeanUtils.setProperty(configuration, configProperty, value);
+                }
+                catch (IllegalAccessException e)
+                {
+                    logger.error(e);
+                }
+                catch (InvocationTargetException e)
+                {
+                    logger.error(e);
+                }
+            }
         }
     }
 }
