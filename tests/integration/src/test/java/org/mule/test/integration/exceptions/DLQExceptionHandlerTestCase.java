@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.usecases.dlq;
+package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -21,7 +21,7 @@ public class DLQExceptionHandlerTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
-        return "org/mule/test/usecases/dlq/exception-dlq.xml";
+        return "org/mule/test/integration/exceptions/exception-dlq.xml";
     }
 
     public void testDLQ() throws Exception
