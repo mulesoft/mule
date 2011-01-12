@@ -36,7 +36,7 @@
                 <xsd:attribute name="bpms-ref" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            An optional reference to the underlying BPMS.
+                            An optional reference to the underlying BPMS.  This is used to disambiguate in the case where more than one BPMS is available.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
