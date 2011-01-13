@@ -50,11 +50,13 @@
 
     <xsl:template match="xsd:complexType" mode="table">
         <xsl:param name="name"/>
+        <!--
         <xsl:if test="(count(.//xsd:attribute) +  count(.//xsd:attributeGroup)) > 0">
+        -->
         h3.Attributes of &lt;<xsl:value-of select="$name"/>...&gt;
         ||Name||Type||Required||Default||Description||
         <xsl:apply-templates select="." mode="attributes"/>
-        </xsl:if>
+        <!-- </xsl:if> -->
 
         <!--
         <xsl:if test="(count(.//xsd:element) + count(.//xsd:choice)) > 0 ">
