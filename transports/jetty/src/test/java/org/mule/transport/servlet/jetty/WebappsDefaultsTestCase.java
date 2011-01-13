@@ -44,8 +44,6 @@ public class WebappsDefaultsTestCase extends FunctionalTestCase
         FileUtils.deleteDirectory(webapps);
         webapps.mkdir();
 
-        System.out.printf("%n%nalsdkjfaafkaslfdjlasdkhfkashdfkjh");
-
         FileUtils.copyFile(new File(url.getFile(), "../../src/test/resources/test.war"),
                            new File(webapps, "test.war"));
 
