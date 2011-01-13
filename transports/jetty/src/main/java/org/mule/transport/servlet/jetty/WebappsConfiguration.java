@@ -12,9 +12,14 @@ package org.mule.transport.servlet.jetty;
 
 public class WebappsConfiguration
 {
-    private String host;
-    private String directory;
-    private int port;
+
+    public static final String DEFAULT_HOST = "localhost";
+    public static final String DEFAULT_DIRECTORY = "webapps";
+    public static final int DEFAULT_PORT = 8585;
+
+    private String host = DEFAULT_HOST;
+    private String directory = DEFAULT_DIRECTORY;
+    private int port = DEFAULT_PORT;
     private String[] systemClasses;
     private String[] serverClasses;
 
