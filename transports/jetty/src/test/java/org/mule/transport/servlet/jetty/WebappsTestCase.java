@@ -15,8 +15,10 @@ import org.mule.api.MuleMessage;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
+import org.mule.util.ClassUtils;
 
 import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,13 +29,14 @@ public class WebappsTestCase extends FunctionalTestCase
 
     public WebappsTestCase() throws Exception
     {
-        File webapps = new File("target/webapps");
+        final URL url = ClassUtils.getClassPathRoot(getClass());
+        File webapps = new File(url.getFile(), "../webapps");
         FileUtils.deleteDirectory(webapps);
         webapps.mkdir();
-        
-        FileUtils.copyFile(new File("src/test/resources/test.war"), new File(webapps, "test.war"));
-    }
-    
+
+        FileUtils.copyFile(new File(url.getFile(), "../../src/test/resources/test.war"), new File(webapps, "test.war"));
+}
+
     public void testWebapps() throws Exception
     {
         Map<String,Object> props = new HashMap<String,Object>();
