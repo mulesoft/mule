@@ -9,12 +9,16 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 
+    <security-manager>
+        <password-encryption-strategy name="PBE" password="mule"/>
+    </security-manager>
+
     <!-- needs testing since the :factory-class" is an alias for "class" making this a special case -->
     <endpoint name="testEndpoint1" address="test://test1" exchange-pattern="request-response">
         <custom-security-filter class="org.mule.test.config.SecurityFilterTestCase$CustomSecurityFilter"/>
     </endpoint>
 
     <endpoint name="testEndpoint2" address="test://test2" exchange-pattern="request-response">
-        <encryption-security-filter/>
+        <encryption-security-filter strategy-ref="PBE"/>
     </endpoint>
 </mule>
