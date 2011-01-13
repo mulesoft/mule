@@ -78,21 +78,21 @@
         <xsd:attribute name="port" type="xsd:integer">
             <xsd:annotation>
                 <xsd:documentation>
-                    The port of the Jetty instance.
+                    The port of the Jetty instance. Default: 8585
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="host" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The host of the Jetty instance.
+                    The host of the Jetty instance. Default: localhost
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="directory" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The directory where webapps can be found.
+                    The directory where webapps can be found. Default: webapps
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
