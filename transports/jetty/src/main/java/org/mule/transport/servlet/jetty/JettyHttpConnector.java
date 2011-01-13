@@ -33,6 +33,7 @@ import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,10 +105,16 @@ public class JettyHttpConnector extends AbstractConnector
                 final Connector c = getServer().getConnectors()[0];
                 if (handler instanceof WebAppContext)
                 {
+                    final WebAppContext webapp = (WebAppContext) handler;
                     final String msg = String.format("Will deploy a web app at %s:/%s%s%s",
                                                      "http", c.getHost(),
                                                      c.getPort() == 80 ? StringUtils.EMPTY : ":" + c.getPort(),
-                                                     ((WebAppContext) handler).getContextPath());
+                                                     webapp.getContextPath());
+
+                    final File workDir = new File(muleContext.getConfiguration().getWorkingDirectory(),
+                                                  "_exploded_wars" + webapp.getContextPath());
+                    workDir.mkdirs();
+                    webapp.setTempDirectory(workDir);
 
                     if (logger.isInfoEnabled())
                     {
