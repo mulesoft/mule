@@ -67,7 +67,7 @@ public class SpringProviderAdapter extends AbstractSecurityProvider implements A
 
         }
         auth = delegate.authenticate(auth);
-        return new SpringAuthenticationAdapter(auth, getSecurityProperties());
+        return new SpringAuthenticationAdapter(auth, getSecurityProperties(), authentication.getEvent());
     }
 
     public org.springframework.security.core.Authentication authenticate(org.springframework.security.core.Authentication authentication) throws AuthenticationException    

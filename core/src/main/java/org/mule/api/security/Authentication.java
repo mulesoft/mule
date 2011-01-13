@@ -10,6 +10,8 @@
 
 package org.mule.api.security;
 
+import org.mule.api.MuleEvent;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -30,4 +32,6 @@ public interface Authentication extends Serializable
     Map getProperties();
 
     void setProperties(Map properties);
+    
+    MuleEvent getEvent();
 }

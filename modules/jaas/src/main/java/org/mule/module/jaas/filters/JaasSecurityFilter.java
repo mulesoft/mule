@@ -49,7 +49,8 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
 
         Credentials user = new MuleCredentials(userHeader, getSecurityManager());
         Authentication authResult;
-        Authentication authentication = new JaasAuthentication(user);
+        JaasAuthentication authentication = new JaasAuthentication(user);
+        authentication.setEvent(event);
         try
         {
             authResult = getSecurityManager().authenticate(authentication);

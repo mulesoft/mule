@@ -211,6 +211,7 @@ public class JaasSimpleAuthenticationProvider extends AbstractSecurityProvider
         Subject subject = loginContext.getSubject();
         JaasAuthentication finalAuth = new JaasAuthentication(auth.getPrincipal(), auth.getCredentials(),subject);
         finalAuth.setAuthenticated(true);
+        finalAuth.setEvent(authentication.getEvent());
 
         return finalAuth;
     }

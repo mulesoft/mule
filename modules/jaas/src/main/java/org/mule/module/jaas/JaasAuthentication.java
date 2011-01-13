@@ -10,6 +10,7 @@
 
 package org.mule.module.jaas;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.Credentials;
 
@@ -24,7 +25,8 @@ public class JaasAuthentication implements Authentication
     private String user;
     private Map properties;
     private Subject subject;
-  
+    private MuleEvent event;
+    
     public JaasAuthentication(Credentials credentials)
     {
         this.user = credentials.getUsername();
@@ -38,6 +40,16 @@ public class JaasAuthentication implements Authentication
         this.subject = subject;
     }
 
+    public MuleEvent getEvent()
+    {
+        return event;
+    }
+
+    public void setEvent(MuleEvent muleEvent)
+    {
+        this.event = muleEvent;
+    }
+    
     public void setAuthenticated(boolean b)
     {
         authenticated = b;

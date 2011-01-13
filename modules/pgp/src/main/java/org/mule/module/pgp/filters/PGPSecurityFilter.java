@@ -70,7 +70,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         Authentication authentication;
         try
         {
-            authentication = new PGPAuthentication(userId, decodeMsgRaw(creds));
+            authentication = new PGPAuthentication(userId, decodeMsgRaw(creds), event);
         }
         catch (Exception e1)
         {

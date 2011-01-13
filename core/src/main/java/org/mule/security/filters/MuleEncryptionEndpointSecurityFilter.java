@@ -58,7 +58,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
         Authentication authentication;
         try
         {
-            authentication = getSecurityManager().authenticate(new DefaultMuleAuthentication(user));
+            authentication = getSecurityManager().authenticate(new DefaultMuleAuthentication(user, event));
         }
         catch (Exception e)
         {

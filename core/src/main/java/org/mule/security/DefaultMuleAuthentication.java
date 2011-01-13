@@ -10,6 +10,7 @@
 
 package org.mule.security;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.Credentials;
 
@@ -21,11 +22,28 @@ public class DefaultMuleAuthentication implements Authentication
     private char[] credentials;
     private String user;
     private Map properties;
-
+    private MuleEvent event;
+    
     public DefaultMuleAuthentication(Credentials credentials)
     {
+        this(credentials, null);
+    }
+    
+    public DefaultMuleAuthentication(Credentials credentials, MuleEvent event)
+    {
+        this.event = event;
         this.user = credentials.getUsername();
         this.credentials = credentials.getPassword();
+    }
+
+    public MuleEvent getEvent()
+    {
+        return event;
+    }
+
+    public void setEvent(MuleEvent muleEvent)
+    {
+        this.event = muleEvent;
     }
 
     public void setAuthenticated(boolean b)

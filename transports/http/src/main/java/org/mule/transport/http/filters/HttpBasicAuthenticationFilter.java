@@ -169,7 +169,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
 
     protected Authentication createAuthentication(String username, String password, MuleEvent event)
     {
-        return new DefaultMuleAuthentication(new MuleCredentials(username, password.toCharArray()));
+        return new DefaultMuleAuthentication(new MuleCredentials(username, password.toCharArray()), event);
     }
 
     protected void setUnauthenticated(MuleEvent event)

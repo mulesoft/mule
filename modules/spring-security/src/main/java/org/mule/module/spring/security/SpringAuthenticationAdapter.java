@@ -10,6 +10,7 @@
 
 package org.mule.module.spring.security;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.security.Authentication;
 
 import java.util.Map;
@@ -25,16 +26,23 @@ public class SpringAuthenticationAdapter implements Authentication
 
     private org.springframework.security.core.Authentication delegate;    
     private Map properties;
-
+    private MuleEvent event;
+    
     public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication)    
     {
-        this.delegate = authentication;
+        this(authentication, null);
     }
 
     public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication, Map properties)    
     {
+        this(authentication, properties, null);
+    }
+
+    public SpringAuthenticationAdapter(org.springframework.security.core.Authentication authentication, Map properties, MuleEvent event)    
+    {
         this.delegate = authentication;
         this.properties = properties;
+        this.event = event;
     }
 
     public void setAuthenticated(boolean b)
@@ -95,5 +103,15 @@ public class SpringAuthenticationAdapter implements Authentication
     public void setProperties(Map properties)
     {
         this.properties = properties;
+    }
+
+    public MuleEvent getEvent()
+    {
+        return event;
+    }
+
+    public void setEvent(MuleEvent muleEvent)
+    {
+        this.event = muleEvent;
     }
 }

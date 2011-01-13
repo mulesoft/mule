@@ -10,6 +10,7 @@
 
 package org.mule.module.acegi;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.security.Authentication;
 
 import java.util.Map;
@@ -23,18 +24,35 @@ public class AcegiAuthenticationAdapter implements Authentication
 {
     private org.acegisecurity.Authentication delegate;
     private Map properties;
-
+    private MuleEvent event;
+    
     public AcegiAuthenticationAdapter(org.acegisecurity.Authentication authentication)
     {
-        this.delegate = authentication;
+        this(authentication, null);
     }
 
     public AcegiAuthenticationAdapter(org.acegisecurity.Authentication authentication, Map properties)
     {
-        this.delegate = authentication;
-        this.properties = properties;
+        this(authentication, properties, null);
     }
 
+    public AcegiAuthenticationAdapter(org.acegisecurity.Authentication authentication, Map properties, MuleEvent event)
+    {
+        this.delegate = authentication;
+        this.properties = properties;
+        this.event = event;
+    }
+
+    public MuleEvent getEvent()
+    {
+        return event;
+    }
+
+    public void setEvent(MuleEvent muleEvent)
+    {
+        this.event = muleEvent;
+    }
+    
     public void setAuthenticated(boolean b)
     {
         delegate.setAuthenticated(b);

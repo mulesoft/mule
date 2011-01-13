@@ -10,6 +10,7 @@
 
 package org.mule.module.pgp;
 
+import org.mule.api.MuleEvent;
 import org.mule.api.security.Authentication;
 
 import java.util.Map;
@@ -22,8 +23,14 @@ public class PGPAuthentication implements Authentication
     private String userName;
     private Message message;
     private PGPPublicKey publicKey;
-
+    private MuleEvent event;
+    
     public PGPAuthentication(String userName, Message message)
+    {
+        this(userName, message, null);
+    }
+
+    public PGPAuthentication(String userName, Message message, MuleEvent event)
     {
         this.authenticated = false;
         this.userName = userName;
@@ -70,5 +77,15 @@ public class PGPAuthentication implements Authentication
     {
         // TODO
 
+    }
+
+    public MuleEvent getEvent()
+    {
+        return event;
+    }
+
+    public void setEvent(MuleEvent muleEvent)
+    {
+        this.event = muleEvent;
     }
 }
