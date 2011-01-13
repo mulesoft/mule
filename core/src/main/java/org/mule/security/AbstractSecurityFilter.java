@@ -84,6 +84,12 @@ public abstract class AbstractSecurityFilter implements MuleContextAware, Securi
             }
             securityManager = localManager;
         }
+        
+        doInitialise();
+    }
+
+    protected void doInitialise() throws InitialisationException
+    {
     }
 
     /** @param manager  */

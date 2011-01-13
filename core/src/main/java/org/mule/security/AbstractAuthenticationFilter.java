@@ -82,6 +82,4 @@ public abstract class AbstractAuthenticationFilter extends AbstractSecurityFilte
     protected abstract void authenticateOutbound(MuleEvent event)
             throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException;
 
-    protected abstract void doInitialise() throws InitialisationException;
-
 }
