@@ -245,11 +245,23 @@ public class MuleMessageToHttpResponse extends AbstractMessageTransformer
                 {
                     cookiesObject = msg.getInboundProperty(headerName);
                 }
-                Cookie[] arrayOfCookies = CookieHelper.asArrayOfCookies(cookiesObject);
-                for (Cookie cookie : arrayOfCookies)
+                if (cookiesObject == null)
                 {
-                    response.addHeader(new Header(headerName,
-                        CookieHelper.formatCookieForASetCookieHeader(cookie)));
+                    continue;
+                }
+                
+                if (!(cookiesObject instanceof Cookie[]))
+                {
+                    response.addHeader(new Header(headerName, cookiesObject.toString()));
+                }
+                else
+                {
+                    Cookie[] arrayOfCookies = CookieHelper.asArrayOfCookies(cookiesObject);
+                    for (Cookie cookie : arrayOfCookies)
+                    {
+                        response.addHeader(new Header(headerName,
+                            CookieHelper.formatCookieForASetCookieHeader(cookie)));
+                    }
                 }
             }
             else

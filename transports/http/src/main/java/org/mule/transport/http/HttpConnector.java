@@ -92,6 +92,9 @@ public class HttpConnector extends TcpConnector
      */
     public static final String HTTP_CONTEXT_PATH_PROPERTY = HTTP_PREFIX + "context.path";
 
+    public static final String HTTP_SERVLET_REQUEST_PROPERTY = HTTP_PREFIX + "servlet.request";
+    public static final String HTTP_SERVLET_RESPONSE_PROPERTY = HTTP_PREFIX + "servlet.response";
+
     /**
      * Allows the user to set a {@link org.apache.commons.httpclient.params.HttpMethodParams} object in the client
      * request to be set on the HttpMethod request object
