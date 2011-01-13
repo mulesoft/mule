@@ -7,6 +7,7 @@
 
     <!-- the base path mapping for snippet URLS.  These are configured in the Confluence Snippet macro -->
     <xsl:param name="snippetBase"/>
+    <xsl:param name="style" select="'h2. '"/>
 
     <xsl:variable name="defaultSnippetBase">mule-2-current</xsl:variable>
 
@@ -22,7 +23,7 @@
         <xsl:variable name="temp" select="translate(@name, '-', ' ')"/>
         <xsl:variable name="t" select="concat( translate( substring( $temp, 1, 1 ),'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ), substring( $temp, 2, string-length( $temp )))"/>
 
-        h1. <xsl:value-of select="$t"/>
+        <xsl:value-of select="$style"/> <xsl:value-of select="$t"/>
         <xsl:value-of select="xsd:annotation/xsd:documentation"/>
 
         <xsl:variable name="type"><xsl:value-of select="@type"/> </xsl:variable>
@@ -62,7 +63,7 @@
     <!-- TRANSFORMERS -->
     <xsl:template name="transformers">
 
-        h2. Transformers
+        <xsl:value-of select="$style"/> Transformers
         These are transformers specific to this transport. Note that these are added automatically to the Mule registry
         at start up. When doing automatic transformations these will be included when searching for the correct
         transformers.
@@ -79,7 +80,7 @@
     <!-- FILTERS -->
     <xsl:template name="filters">
 
-        h2. Filters
+        <xsl:value-of select="$style"/> Filters
         Filters can be used on inbound endpoints to control which data is received by a service.
 
         ||Name||Description||
