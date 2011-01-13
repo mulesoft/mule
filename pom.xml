@@ -45,8 +45,8 @@
 
     <!-- Build -->
     <scm>
-        <connection>scm:svn:http://svn.codehaus.org/mule/branches/mule-2.x</connection>
-        <developerConnection>scm:svn:https://svn.codehaus.org/mule/branches/mule-2.x</developerConnection>
+        <connection>scm:svn:http://svn.codehaus.org/mule/branches/mule-3.x</connection>
+        <developerConnection>scm:svn:https://svn.codehaus.org/mule/branches/mule-3.x</developerConnection>
         <url>http://svn.mule.codehaus.org</url>
     </scm>
 
