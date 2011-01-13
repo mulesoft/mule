@@ -28,6 +28,13 @@ public class WebappsTestCase extends FunctionalTestCase
 {
 
     @Override
+    protected boolean isStartContext()
+    {
+        // prepare the test webapp before starting Mule
+        return false;
+    }
+
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -39,6 +46,8 @@ public class WebappsTestCase extends FunctionalTestCase
 
         FileUtils.copyFile(new File(url.getFile(), "../../src/test/resources/test.war"),
                            new File(webapps, "test.war"));
+
+        muleContext.start();
     }
 
     public void testWebapps() throws Exception
