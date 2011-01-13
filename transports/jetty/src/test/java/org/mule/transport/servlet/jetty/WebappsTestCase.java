@@ -27,15 +27,28 @@ import org.apache.commons.io.FileUtils;
 public class WebappsTestCase extends FunctionalTestCase
 {
 
-    public WebappsTestCase() throws Exception
+    @Override
+    protected boolean isStartContext()
     {
+        // prepare the test webapp before starting Mule
+        return false;
+    }
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+
         final URL url = ClassUtils.getClassPathRoot(getClass());
         File webapps = new File(url.getFile(), "../webapps");
         FileUtils.deleteDirectory(webapps);
         webapps.mkdir();
 
-        FileUtils.copyFile(new File(url.getFile(), "../../src/test/resources/test.war"), new File(webapps, "test.war"));
-}
+        FileUtils.copyFile(new File(url.getFile(), "../../src/test/resources/test.war"),
+                           new File(webapps, "test.war"));
+
+        muleContext.start();
+    }
 
     public void testWebapps() throws Exception
     {
