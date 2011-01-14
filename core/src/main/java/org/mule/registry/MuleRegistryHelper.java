@@ -502,7 +502,8 @@ public class MuleRegistryHelper implements MuleRegistry
             throw new ServiceException(CoreMessages.failedToLoad(type + " " + scheme));
         }
 
-        return ServiceDescriptorFactory.create(type, name, props, overrides, muleContext, null);
+        return ServiceDescriptorFactory.create(type, name, props, overrides, muleContext,
+                                               muleContext.getExecutionClassLoader());
     }
 
     /**
