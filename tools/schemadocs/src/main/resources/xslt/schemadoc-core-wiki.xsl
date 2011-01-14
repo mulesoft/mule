@@ -20,7 +20,7 @@
         <xsl:choose>
             <xsl:when test="$parentSchemaBase">
                 <xsl:value-of 
-                     select="concat($parentSchemaBase, '/modules/spring-config/mule.xsd')"/>
+                     select="concat($parentSchemaBase, '/modules/spring-config/src/main/resources/META-INF/mule.xsd')"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="''"/>
