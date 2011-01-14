@@ -8,13 +8,69 @@
     <!-- the base path mapping for snippet URLS.  These are configured in the Confluence Snippet macro -->
     <xsl:param name="snippetBase"/>
     <xsl:param name="topstylelevel" select="2"/>
-    <xsl:variable name="topstyle" select="concat('h', $topstylelevel, '. ')"/>
-    <xsl:variable name="nextstyle" select="concat('h', $topstylelevel + 1, '. ')"/>
+    <xsl:variable name="topstyle" select="concat('&#10;h', $topstylelevel, '. ')"/>
+    <xsl:variable name="nextstyle" select="concat('&#10;h', $topstylelevel + 1, '. ')"/>
+    <xsl:param name="parentSchemaBase"/>
     <xsl:param name="parentSchema1"/>
     <xsl:param name="parentSchema2"/>
     <xsl:param name="parentSchema3"/>
     <xsl:param name="parentSchema4"/>
     <xsl:param name="parentSchema5"/>
+    <xsl:variable name="fullParentSchema1">
+        <xsl:choose>
+            <xsl:when test="$parentSchemaBase and $parentSchema1">
+                <xsl:value-of 
+                     select="concat($parentSchemaBase, '/', $parentSchema1)"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$parentSchema1"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="fullParentSchema2">
+        <xsl:choose>
+            <xsl:when test="$parentSchemaBase and $parentSchema2">
+                <xsl:value-of 
+                     select="concat($parentSchemaBase, '/', $parentSchema2)"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$parentSchema2"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="fullParentSchema3">
+        <xsl:choose>
+            <xsl:when test="$parentSchemaBase and $parentSchema3">
+                <xsl:value-of 
+                     select="concat($parentSchemaBase, '/', $parentSchema3)"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$parentSchema3"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="fullParentSchema4">
+        <xsl:choose>
+            <xsl:when test="$parentSchemaBase and $parentSchema4">
+                <xsl:value-of 
+                     select="concat($parentSchemaBase, '/', $parentSchema4)"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$parentSchema4"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="fullParentSchema5">
+        <xsl:choose>
+            <xsl:when test="$parentSchemaBase and $parentSchema5">
+                <xsl:value-of 
+                     select="concat($parentSchemaBase, '/', $parentSchema5)"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$parentSchema5"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
 
     <xsl:variable name="defaultSnippetBase">mule-2-current</xsl:variable>
 
@@ -26,6 +82,16 @@
     <xsl:output method="text" standalone="yes" indent="no"/>
 
     <xsl:template match="xsd:element" mode="single-element">
+
+        <xsl:value-of select=
+          "concat('topStyle= ', $topstyle, ' nextstyle= ', $nextstyle,
+                ' fullParentSchema1= ', $fullParentSchema1, 
+                ' fullParentSchema2= ', $fullParentSchema2,
+                ' fullParentSchema3= ', $fullParentSchema3, 
+                ' fullParentSchema4= ', $fullParentSchema4,
+                ' fullParentSchema5= ', $fullParentSchema5)"/>
+        <!--
+        -->
 
         <xsl:variable name="temp" select="translate(@name, '-', ' ')"/>
         <xsl:variable name="t" select="concat( translate( substring( $temp, 1, 1 ),'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' ), substring( $temp, 2, string-length( $temp )))"/>
@@ -349,27 +415,27 @@
             <xsl:apply-templates select="/xsd:schema/xsd:complexType[@name=$base]" mode="attributes"/>
         </xsl:if>
         <xsl:call-template name ="attributes-from-parent-schema">
-            <xsl:with-param name="parentSchema" select="$parentSchema1"/> 
+            <xsl:with-param name="parentSchema" select="$fullParentSchema1"/> 
             <xsl:with-param name="typeLocalName" select="$local"/> 
             <xsl:with-param name="typeNamespace" select="$itemNs"/> 
         </xsl:call-template>
         <xsl:call-template name ="attributes-from-parent-schema">
-            <xsl:with-param name="parentSchema" select="$parentSchema2"/> 
+            <xsl:with-param name="parentSchema" select="$fullParentSchema2"/> 
             <xsl:with-param name="typeLocalName" select="$local"/> 
             <xsl:with-param name="typeNamespace" select="$itemNs"/> 
         </xsl:call-template>
         <xsl:call-template name ="attributes-from-parent-schema">
-            <xsl:with-param name="parentSchema" select="$parentSchema3"/> 
+            <xsl:with-param name="parentSchema" select="$fullParentSchema3"/> 
             <xsl:with-param name="typeLocalName" select="$local"/> 
             <xsl:with-param name="typeNamespace" select="$itemNs"/> 
         </xsl:call-template>
         <xsl:call-template name ="attributes-from-parent-schema">
-            <xsl:with-param name="parentSchema" select="$parentSchema4"/> 
+            <xsl:with-param name="parentSchema" select="$fullParentSchema4"/> 
             <xsl:with-param name="typeLocalName" select="$local"/> 
             <xsl:with-param name="typeNamespace" select="$itemNs"/> 
         </xsl:call-template>
         <xsl:call-template name ="attributes-from-parent-schema">
-            <xsl:with-param name="parentSchema" select="$parentSchema5"/> 
+            <xsl:with-param name="parentSchema" select="$fullParentSchema5"/> 
             <xsl:with-param name="typeLocalName" select="$local"/> 
             <xsl:with-param name="typeNamespace" select="$itemNs"/> 
         </xsl:call-template>
@@ -572,27 +638,27 @@
             <xsl:apply-templates select="/xsd:schema/xsd:complexType[@name=$base]" mode="elements"/>
         </xsl:if>
         <xsl:call-template name ="elements-from-parent-schema">
-            <xsl:with-param name="parentSchema" select="$parentSchema1"/> 
+            <xsl:with-param name="parentSchema" select="$fullParentSchema1"/> 
             <xsl:with-param name="typeLocalName" select="$local"/> 
             <xsl:with-param name="typeNamespace" select="$itemNs"/> 
         </xsl:call-template>
         <xsl:call-template name ="elements-from-parent-schema">
-            <xsl:with-param name="parentSchema" select="$parentSchema2"/> 
+            <xsl:with-param name="parentSchema" select="$fullParentSchema2"/> 
             <xsl:with-param name="typeLocalName" select="$local"/> 
             <xsl:with-param name="typeNamespace" select="$itemNs"/> 
         </xsl:call-template>
         <xsl:call-template name ="elements-from-parent-schema">
-            <xsl:with-param name="parentSchema" select="$parentSchema3"/> 
+            <xsl:with-param name="parentSchema" select="$fullParentSchema3"/> 
             <xsl:with-param name="typeLocalName" select="$local"/> 
             <xsl:with-param name="typeNamespace" select="$itemNs"/> 
         </xsl:call-template>
         <xsl:call-template name ="elements-from-parent-schema">
-            <xsl:with-param name="parentSchema" select="$parentSchema4"/> 
+            <xsl:with-param name="parentSchema" select="$fullParentSchema4"/> 
             <xsl:with-param name="typeLocalName" select="$local"/> 
             <xsl:with-param name="typeNamespace" select="$itemNs"/> 
         </xsl:call-template>
         <xsl:call-template name ="elements-from-parent-schema">
-            <xsl:with-param name="parentSchema" select="$parentSchema5"/> 
+            <xsl:with-param name="parentSchema" select="$fullParentSchema5"/> 
             <xsl:with-param name="typeLocalName" select="$local"/> 
             <xsl:with-param name="typeNamespace" select="$itemNs"/> 
         </xsl:call-template>
