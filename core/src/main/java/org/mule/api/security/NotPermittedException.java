@@ -1,5 +1,5 @@
 /*
- * $Id: UnauthorisedException.java 19739 2010-09-27 14:28:40Z tcarlson $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
