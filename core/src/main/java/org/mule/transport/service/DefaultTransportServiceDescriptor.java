@@ -163,7 +163,7 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
         }
         catch (Exception e)
         {
-            throw new TransportServiceException(CoreMessages.failedToCreate("Message Factory"));
+            throw new TransportServiceException(CoreMessages.failedToCreate("Message Factory"), e);
         }
     }
 
