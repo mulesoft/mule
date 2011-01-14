@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -27,17 +26,15 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mortbay.util.StringUtil;
-
 /**
  * THIS CLASS IS UNSUPPORTED AND THE IMPLEMENTATION DOES NOT CONFORM TO THE SERVLET SPECIFICATION!
  */
 public class MuleHttpServletResponse implements HttpServletResponse
 {
-    private static String[] DAYS =
-    { "Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-    private static String[] MONTHS =
-    { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"};
+//    private static String[] DAYS =
+//    { "Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+//    private static String[] MONTHS =
+//    { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"};
 
     private MuleEvent event;
     private MuleMessage message;
@@ -199,57 +196,57 @@ public class MuleHttpServletResponse implements HttpServletResponse
         setDateHeader(name, date);
     }
 
-    /**
-     * Format HTTP date "EEE, dd MMM yyyy HH:mm:ss 'GMT'" or "EEE, dd-MMM-yy HH:mm:ss 'GMT'"for
-     * cookies
-     */
-    public static void formatDate(StringBuffer buf, Calendar calendar, boolean cookie)
-    {
-        // "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
-        // "EEE, dd-MMM-yy HH:mm:ss 'GMT'", cookie
-
-        int day_of_week = calendar.get(Calendar.DAY_OF_WEEK);
-        int day_of_month = calendar.get(Calendar.DAY_OF_MONTH);
-        int month = calendar.get(Calendar.MONTH);
-        int year = calendar.get(Calendar.YEAR);
-        int century = year / 100;
-        year = year % 100;
-
-        int epoch = (int) ((calendar.getTimeInMillis() / 1000) % (60 * 60 * 24));
-        int seconds = epoch % 60;
-        epoch = epoch / 60;
-        int minutes = epoch % 60;
-        int hours = epoch / 60;
-
-        buf.append(DAYS[day_of_week]);
-        buf.append(',');
-        buf.append(' ');
-        StringUtil.append2digits(buf, day_of_month);
-
-        if (cookie)
-        {
-            buf.append('-');
-            buf.append(MONTHS[month]);
-            buf.append('-');
-            StringUtil.append2digits(buf, century);
-            StringUtil.append2digits(buf, year);
-        }
-        else
-        {
-            buf.append(' ');
-            buf.append(MONTHS[month]);
-            buf.append(' ');
-            StringUtil.append2digits(buf, century);
-            StringUtil.append2digits(buf, year);
-        }
-        buf.append(' ');
-        StringUtil.append2digits(buf, hours);
-        buf.append(':');
-        StringUtil.append2digits(buf, minutes);
-        buf.append(':');
-        StringUtil.append2digits(buf, seconds);
-        buf.append(" GMT");
-    }
+//    /**
+//     * Format HTTP date "EEE, dd MMM yyyy HH:mm:ss 'GMT'" or "EEE, dd-MMM-yy HH:mm:ss 'GMT'"for
+//     * cookies
+//     */
+//    public static void formatDate(StringBuffer buf, Calendar calendar, boolean cookie)
+//    {
+//        // "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
+//        // "EEE, dd-MMM-yy HH:mm:ss 'GMT'", cookie
+//
+//        int day_of_week = calendar.get(Calendar.DAY_OF_WEEK);
+//        int day_of_month = calendar.get(Calendar.DAY_OF_MONTH);
+//        int month = calendar.get(Calendar.MONTH);
+//        int year = calendar.get(Calendar.YEAR);
+//        int century = year / 100;
+//        year = year % 100;
+//
+//        int epoch = (int) ((calendar.getTimeInMillis() / 1000) % (60 * 60 * 24));
+//        int seconds = epoch % 60;
+//        epoch = epoch / 60;
+//        int minutes = epoch % 60;
+//        int hours = epoch / 60;
+//
+//        buf.append(DAYS[day_of_week]);
+//        buf.append(',');
+//        buf.append(' ');
+//        StringUtil.append2digits(buf, day_of_month);
+//
+//        if (cookie)
+//        {
+//            buf.append('-');
+//            buf.append(MONTHS[month]);
+//            buf.append('-');
+//            StringUtil.append2digits(buf, century);
+//            StringUtil.append2digits(buf, year);
+//        }
+//        else
+//        {
+//            buf.append(' ');
+//            buf.append(MONTHS[month]);
+//            buf.append(' ');
+//            StringUtil.append2digits(buf, century);
+//            StringUtil.append2digits(buf, year);
+//        }
+//        buf.append(' ');
+//        StringUtil.append2digits(buf, hours);
+//        buf.append(':');
+//        StringUtil.append2digits(buf, minutes);
+//        buf.append(':');
+//        StringUtil.append2digits(buf, seconds);
+//        buf.append(" GMT");
+//    }
 
     public void setHeader(String name, String value)
     {
