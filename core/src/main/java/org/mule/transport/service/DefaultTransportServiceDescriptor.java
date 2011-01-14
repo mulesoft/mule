@@ -159,7 +159,8 @@ public class DefaultTransportServiceDescriptor extends AbstractServiceDescriptor
 
         try
         {
-            return (MuleMessageFactory) ClassUtils.instanciateClass(messageFactory, muleContext);
+            final Object[] args = new Object[] { muleContext };
+            return (MuleMessageFactory) ClassUtils.instanciateClass(messageFactory, args, classLoader);
         }
         catch (Exception e)
         {
