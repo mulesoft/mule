@@ -24,8 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Will filter a feed who's update date has changed since the last time it was read.  Some feeds to no update
- * this value so {@link #setAcceptWithoutUpdateDate(boolean)} can be set to always consume the feed
+ * Will filter a feed who's update date has changed since the last time it was read.
+ * Some feeds to no update this value so {@link #setAcceptWithoutUpdateDate(boolean)}
+ * can be set to always consume the feed.
  */
 public class EntryLastUpdatedFilter implements Filter
 {
@@ -33,6 +34,7 @@ public class EntryLastUpdatedFilter implements Filter
      * logger used by this class
      */
     private final transient Log logger = LogFactory.getLog(EntryLastUpdatedFilter.class);
+
     private Date lastUpdate;
 
     private boolean acceptWithoutUpdateDate = true;
@@ -49,15 +51,7 @@ public class EntryLastUpdatedFilter implements Filter
 
     public boolean accept(MuleMessage message)
     {
-        SyndEntry feed;
-        try
-        {
-            feed = message.getPayload(DataTypeFactory.create(SyndEntry.class));
-        }
-        catch (TransformerException e)
-        {
-            throw new MuleRuntimeException(CoreMessages.failedToReadPayload(), e);
-        }
+        SyndEntry feed = transformToSyndEntry(message);
 
         Date updated = feed.getPublishedDate();
         if (updated == null)
@@ -91,9 +85,21 @@ public class EntryLastUpdatedFilter implements Filter
                 return false;
             }
         }
+
         lastUpdate = updated;
         return true;
+    }
 
+    protected SyndEntry transformToSyndEntry(MuleMessage message)
+    {
+        try
+        {
+            return message.getPayload(DataTypeFactory.create(SyndEntry.class));
+        }
+        catch (TransformerException e)
+        {
+            throw new MuleRuntimeException(CoreMessages.failedToReadPayload(), e);
+        }
     }
 
     public boolean isAcceptWithoutUpdateDate()
