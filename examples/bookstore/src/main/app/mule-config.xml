@@ -3,7 +3,6 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
       xsi:schemaLocation="
-        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/3.2/mule-jetty.xsd">
 
@@ -13,7 +12,9 @@
         Mule config is started through a servlet context listener in the bookstore-admin web
         context.
     </description>
-    
-    <jetty:connector name="jettyConnector" configFile="${app.home}/jetty/jetty-config.xml"/>
+
+    <jetty:connector name="jettyConnector">
+        <jetty:webapps directory="${app.home}/webapps" port="8083"/>
+    </jetty:connector>
 
 </mule>

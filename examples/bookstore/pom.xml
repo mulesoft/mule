@@ -15,13 +15,13 @@
 
     <build>
         <plugins>
-            <!-- Run mvn war:war to build the bookstore-admin webapp as a deployable .WAR archive -->	
+            <!-- Run mvn war:war to build the bookstore-admin webapp as a deployable .WAR archive -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <warName>bookstore-admin</warName>	
-                    <warSourceDirectory>src/main/app/bookstore-admin</warSourceDirectory>
+                    <warName>bookstore-admin</warName>
+                    <warSourceDirectory>src/main/app/webapps/bookstore-admin</warSourceDirectory>
                 </configuration>
             </plugin>
         </plugins>
