@@ -90,10 +90,10 @@
 
 <br/>
 <%
-	String host = request.getServerName();
-	int port = request.getServerPort();
-	String contextPath = request.getContextPath();
-	String url = "http://" + host + ":" + port + contextPath;
+    String host = request.getServerName();
+    int port = request.getServerPort();
+    String contextPath = request.getContextPath();
+    String url = "http://" + host + ":" + port + contextPath;
 %>
 <a href="<%=url%>">Return to Home Page</a>
 </body>
