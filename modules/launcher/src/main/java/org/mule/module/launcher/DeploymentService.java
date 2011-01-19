@@ -280,14 +280,14 @@ public class DeploymentService
             logger.info("================== Request to Undeploy Application: " + app.getAppName());
         }
 
+        applications.remove(app);
         deployer.undeploy(app);
     }
 
     public void undeploy(String appName)
     {
         Application app = (Application) CollectionUtils.find(applications, new BeanPropertyValueEqualsPredicate("appName", appName));
-        applications.remove(app);
-        deployer.undeploy(app);
+        undeploy(app);
     }
 
     public void deploy(URL appArchiveUrl) throws IOException
