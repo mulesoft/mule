@@ -60,23 +60,6 @@
             <artifactId>mule-transport-jetty</artifactId>
             <version>${version}</version>
         </dependency>
-        <!-- CXF assumes you have an XSLT engine available -->
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
-            <version>${xalanVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>xalan</groupId>
-            <artifactId>serializer</artifactId>
-            <version>${xalanVersion}</version>
-        </dependency>
-        <!-- for Jetty's JSP support -->
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jsp-2.1-jetty</artifactId>
-            <version>${jettyVersion}</version>
-        </dependency>
 
         <!-- Unit tests -->
         <dependency>
