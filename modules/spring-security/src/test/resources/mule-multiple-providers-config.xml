@@ -61,11 +61,6 @@
                         securityProviders="daoAuthenticationSecurityProvider1"/>
                 </http:inbound-endpoint>
             </inbound>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="vmtest" exchange-pattern="request-response"/>
-                </pass-through-router>    
-            </outbound>
         </service>
         
         <service name="flow2">
@@ -75,11 +70,6 @@
                         securityProviders="daoAuthenticationSecurityProvider2"/>
                 </http:inbound-endpoint>
             </inbound>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="vmtest" exchange-pattern="request-response"/>
-                </pass-through-router>    
-            </outbound>
         </service>
         
         <service name="flow3">
@@ -89,20 +79,6 @@
                         securityProviders="daoAuthenticationSecurityProvider2,daoAuthenticationSecurityProvider1"/>
                 </http:inbound-endpoint>
             </inbound>
-            <outbound>
-                <pass-through-router>
-                    <vm:outbound-endpoint path="vmtest" exchange-pattern="request-response"/>
-                </pass-through-router>    
-            </outbound>
-        </service>
-    </model>
-    
-    <model name="vm-model">
-        <service name="vm-service">
-            <inbound>
-                <vm:inbound-endpoint path="vmtest" exchange-pattern="request-response"/>
-            </inbound>
-            <echo-component/>
         </service>
     </model>
 </mule>
