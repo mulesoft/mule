@@ -92,7 +92,7 @@
         <xsd:attribute name="directory" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The directory where webapps can be found. Default: webapps
+                    The directory where webapps can be found. Default: ${app.home}/webapps
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

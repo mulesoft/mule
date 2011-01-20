@@ -128,7 +128,15 @@ public class JettyHttpConnector extends AbstractConnector
         if (webappsConfiguration != null)
         {
             deployer = new WebAppDeployer();
-            deployer.setWebAppDir(webappsConfiguration.getDirectory());
+            String webAppDir = webappsConfiguration.getDirectory();
+            if (StringUtils.isBlank(webAppDir))
+            {
+                // if none specified, resolve defaults dynamically
+                final String appDir = muleContext.getRegistry().get(MuleProperties.APP_HOME_DIRECTORY_PROPERTY);
+                webAppDir = appDir + "/webapps";
+            }
+
+            deployer.setWebAppDir(webAppDir);
             deployer.setExtract(true);
             deployer.setParentLoaderPriority(false);
             deployer.setServerClasses(webappsConfiguration.getServerClasses());

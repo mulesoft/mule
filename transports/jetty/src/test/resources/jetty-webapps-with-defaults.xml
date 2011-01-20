@@ -9,7 +9,7 @@
 
     <jetty:connector name="jettyConnector">
         <!--
-            Directory defaults to 'webapps', but we have to change it for the maven test here
+            Directory defaults to '${app.home}/webapps', but we have to change it for the maven test here
         -->
         <jetty:webapps directory="target/webapps"/>
     </jetty:connector>
