@@ -10,6 +10,7 @@
 
     <properties>
         <muleVersion>3.2.0-SNAPSHOT</muleVersion>
+        <jaxbVersion>2.1.9-osgi</jaxbVersion>
     </properties>
 
     <dependencies>
@@ -53,6 +54,18 @@
             <version>${muleVersion}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${jaxbVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>        
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-xjc</artifactId>
+            <version>${jaxbVersion}</version>
+            <scope>test</scope>
+        </dependency> 
     </dependencies>
 
     <repositories>
@@ -74,6 +87,11 @@
             <releases>
                 <enabled>false</enabled>
             </releases>
+        </repository>
+        <repository>
+            <id>mule-deps</id>
+            <name>Mule Dependencies</name>
+            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
         </repository>
     </repositories>
 
