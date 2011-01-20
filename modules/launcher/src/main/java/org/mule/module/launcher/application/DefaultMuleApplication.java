@@ -350,7 +350,11 @@ public class DefaultMuleApplication implements Application
                         scheduleConfigMonitor(watcher);
                         break;
                     case MuleContextNotification.CONTEXT_STOPPING:
-                        watchTimer.shutdownNow();
+                        if (watchTimer != null)
+                        {
+                            // edge case when app startup was interrupted and we haven't started monitoring it yet
+                            watchTimer.shutdownNow();
+                        }
                         muleContext.unregisterListener(this);
                         break;
                 }
