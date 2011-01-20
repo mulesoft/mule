@@ -40,7 +40,7 @@ public class DefaultLifecycleState implements LifecycleState
 
     public boolean isStarted()
     {
-        return lifecycleManager.isPhaseComplete(Startable.PHASE_NAME);
+        return Startable.PHASE_NAME.equals(lifecycleManager.getCurrentPhase());
     }
 
     public boolean isStarting()
@@ -50,7 +50,7 @@ public class DefaultLifecycleState implements LifecycleState
 
     public boolean isStopped()
     {
-        return lifecycleManager.isPhaseComplete(Stoppable.PHASE_NAME);
+        return Stoppable.PHASE_NAME.equals(lifecycleManager.getCurrentPhase());
     }
 
     public boolean isStopping()

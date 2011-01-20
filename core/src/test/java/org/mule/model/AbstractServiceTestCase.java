@@ -50,12 +50,14 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
     {
         assertFalse(getService().isStarted());
         assertFalse(getService().isPaused());
+        assertFalse(getService().isStopped());
 
         getService().initialise();
 
         // Pausing a service that is not started does not throw an exception
         assertFalse(getService().isStarted());
         assertFalse(getService().isPaused());
+        assertFalse(getService().isStopped());
         try
         {
             getService().resume();
@@ -69,8 +71,11 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
         getService().start();
         assertTrue(getService().isStarted());
         assertFalse(getService().isPaused());
+        assertFalse(getService().isStopped());
         getService().pause();
         assertTrue(getService().isPaused());
+        assertFalse(getService().isStarted());
+        assertFalse(getService().isStopped());
         try
         {
             getService().pause();
