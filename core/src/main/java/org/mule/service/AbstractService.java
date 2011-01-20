@@ -264,7 +264,7 @@ public abstract class AbstractService implements Service, MessageProcessor
 
         try
         {
-            if(isStarted())
+            if (isStarted() || isPaused())
             {
                 stop();
             }

@@ -35,6 +35,7 @@ public class ServiceStateTestCase extends FunctionalTestCase
         // Service initially started
         assertTrue(c.isStarted());
         assertFalse(c.isPaused());
+        assertFalse(c.isStopped());
 
         // The listeners should be registered and started.
         AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.0");
@@ -52,6 +53,8 @@ public class ServiceStateTestCase extends FunctionalTestCase
         assertEquals("stopped", c.getInitialState());
         // Service initially stopped
         assertFalse(c.isStarted());
+        assertTrue(c.isStopped());
+        assertFalse(c.isPaused());
 
         // The connector should be started, but with no listeners registered.
         AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.0");
@@ -63,6 +66,8 @@ public class ServiceStateTestCase extends FunctionalTestCase
         // Start the service.
         c.start();
         assertTrue(c.isStarted());
+        assertFalse(c.isStopped());
+        assertFalse(c.isPaused());
 
         // The listeners should now be registered and started.
         assertTrue(connector.isStarted());
@@ -76,6 +81,8 @@ public class ServiceStateTestCase extends FunctionalTestCase
     {
         Service c = muleContext.getRegistry().lookupService("startedComponent");
         assertTrue(c.isStarted());
+        assertFalse(c.isStopped());
+        assertFalse(c.isPaused());
 
         // The listeners should be registered and started.
         AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.0");
@@ -88,6 +95,8 @@ public class ServiceStateTestCase extends FunctionalTestCase
         // Stop service
         c.stop();
         assertFalse(c.isStarted());
+        assertFalse(c.isPaused());
+        assertTrue(c.isStopped());
 
         // Connector is still started, but no more receivers.
         assertTrue(connector.isStarted());
@@ -100,6 +109,8 @@ public class ServiceStateTestCase extends FunctionalTestCase
         Service c = muleContext.getRegistry().lookupService("stoppedComponent");
         // Service initially stopped
         assertFalse(c.isStarted());
+        assertFalse(c.isPaused());
+        assertTrue(c.isStopped());
 
         try
         {
@@ -126,8 +137,9 @@ public class ServiceStateTestCase extends FunctionalTestCase
     {
         Service c = muleContext.getRegistry().lookupService("pausedComponent");
         // Service initially started but paused.
-        assertTrue(c.isStarted());
+        assertFalse(c.isStarted());
         assertTrue(c.isPaused());
+        assertFalse(c.isStopped());
 
         // The listeners should be registered and started.
         AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.0");
@@ -143,9 +155,13 @@ public class ServiceStateTestCase extends FunctionalTestCase
         // TODO MULE-1995
         final Service c = muleContext.getRegistry().lookupService("startedComponent");
         assertTrue(c.isStarted());
+        assertFalse(c.isPaused());
+        assertFalse(c.isStopped());
         
         c.pause();
         assertTrue(c.isPaused());
+        assertFalse(c.isStopped());
+        assertFalse(c.isStarted());
         
         new Thread(new Runnable()
         {
