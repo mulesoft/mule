@@ -541,6 +541,14 @@ public class JettyHttpConnector extends AbstractConnector
     }
 
     /**
+     * A helper method to differentiate between jetty-based connectors which can host full wars and ones which can't.
+     */
+    public boolean canHostFullWars()
+    {
+        return true;
+    }
+
+    /**
      * A helper class to let jetty startup, we don't bind java ee objects like java:comp/UserTransaction.
      */
     public static class DummyJndiConfiguration extends Configuration

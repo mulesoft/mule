@@ -61,6 +61,16 @@ public class JettyWebappServerAgent extends AbstractAgent
             // no target web servers configured, nothing to do.
             unregisterMeQuietly();
         }
+
+        // special handling for ajax connector, it inherits jetty one, but is not hosting full webapps
+        for (JettyHttpConnector c : connectorMap.values())
+        {
+            if (!c.canHostFullWars())
+            {
+                unregisterMeQuietly();
+                break;
+            }
+        }
     }
 
     public void stop() throws MuleException
