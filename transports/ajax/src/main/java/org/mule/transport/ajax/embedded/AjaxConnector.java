@@ -408,4 +408,11 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
     {
         this.refsThreshold = refsThreshold;
     }
+
+    @Override
+    public boolean canHostFullWars()
+    {
+        // ajax connector doesn't host full wars, flag this to Mule
+        return false;
+    }
 }
