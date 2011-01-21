@@ -19,8 +19,8 @@ import org.mule.api.lifecycle.Lifecycle;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.ObjectUtils;
@@ -192,9 +192,18 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         assertEquals(
             "InterceptingMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessor",
             restul.getMessageAsString());
-
     }
 
+    public void testMixStaticFactoryt() throws Exception
+    {
+        MessageProcessorChain chain = DefaultMessageProcessorChain.from(new TestIntercepting(), new TestNonIntercepting(), new TestNonIntercepting(),
+            new TestIntercepting(), new TestNonIntercepting(), new TestNonIntercepting());
+        MuleEvent restul = chain.process(getTestEvent(""));
+        assertEquals(
+            "InterceptingMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessor",
+            restul.getMessageAsString());
+    }
+    
     public void testMix2() throws Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
@@ -204,9 +213,18 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         assertEquals(
             "MessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessor",
             restul.getMessageAsString());
-
     }
 
+    public void testMix2StaticFactory() throws Exception
+    {
+        MessageProcessorChain chain = DefaultMessageProcessorChain.from(new TestNonIntercepting(), new TestIntercepting(), new TestNonIntercepting(),
+            new TestNonIntercepting(), new TestNonIntercepting(), new TestIntercepting());
+        MuleEvent restul = chain.process(getTestEvent(""));
+        assertEquals(
+            "MessageProcessorInterceptingMessageProcessorMessageProcessorMessageProcessorMessageProcessorInterceptingMessageProcessor",
+            restul.getMessageAsString());
+    }
+    
     static class TestNonIntercepting implements MessageProcessor
     {
         public MuleEvent process(MuleEvent event) throws MuleException

@@ -25,6 +25,6 @@ public class MessageProcessors
 
     public static MessageProcessorChain singletonChain(MessageProcessor mp)
     {
-        return new DefaultMessageProcessorChain(mp);
+        return DefaultMessageProcessorChain.from(mp);
     }
 }
