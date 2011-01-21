@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.construct.SimpleFlowConstruct;
 
 import java.util.Arrays;
@@ -23,26 +24,41 @@ import java.util.List;
 public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
 {
 
-    public DefaultMessageProcessorChain(List<MessageProcessor> processors)
-    {
+    protected DefaultMessageProcessorChain(List<MessageProcessor> processors)
+    {   
         super(null, processors);
     }
 
-    public DefaultMessageProcessorChain(MessageProcessor... processors)
+    protected DefaultMessageProcessorChain(MessageProcessor... processors)
     {
         super(null, Arrays.asList(processors));
     }
 
-    public DefaultMessageProcessorChain(String name, List<MessageProcessor> processors)
+    protected DefaultMessageProcessorChain(String name, List<MessageProcessor> processors)
     {
         super(name, processors);
     }
 
-    public DefaultMessageProcessorChain(String name, MessageProcessor... processors)
+    protected DefaultMessageProcessorChain(String name, MessageProcessor... processors)
     {
         super(name, Arrays.asList(processors));
     }
 
+    public static MessageProcessorChain from(MessageProcessor messageProcessor)
+    {
+        return new DefaultMessageProcessorChain(messageProcessor);
+    }
+
+    public static MessageProcessorChain from(MessageProcessor... messageProcessors) throws MuleException
+    {
+        return new DefaultMessageProcessorChainBuilder().chain(messageProcessors).build();
+    }
+
+    public static MessageProcessorChain from(List<MessageProcessor> messageProcessors) throws MuleException
+    {
+        return new DefaultMessageProcessorChainBuilder().chain(messageProcessors).build();
+    }
+    
     protected MuleEvent doProcess(MuleEvent event) throws MuleException
     {
         FlowConstruct flowConstruct = event.getFlowConstruct();
