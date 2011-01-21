@@ -84,16 +84,13 @@ public class XmppMessageDispatcher extends AbstractMessageDispatcher
 
     protected void sendMessage(MuleEvent event) throws Exception
     {
-        Object payload = event.getMessage().getPayload();
-        
-        Message jabberMessage = (Message) event.getMessage().getPayload(DataTypeFactory.create(Message.class));
-
+        Message jabberMessage = event.getMessage().getPayload(DataTypeFactory.create(Message.class));
         conversation.dispatch(jabberMessage);
-        
+
         if (logger.isDebugEnabled())
         {
             String recipient = XmppConnector.getRecipient(endpoint);
-            logger.debug("Message \"" + jabberMessage.getBody() 
+            logger.debug("Message \"" + jabberMessage.getBody()
                 + "\" successfully sent to " + recipient);
         }
     }

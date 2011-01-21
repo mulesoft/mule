@@ -15,6 +15,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
+import org.mule.api.transformer.TransformerException;
 import org.mule.module.rss.transformers.ObjectToRssFeed;
 import org.mule.routing.AbstractSplitter;
 
@@ -31,34 +32,34 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Will split the feed into entries.  This router also filters out any entries that are older than the last one read
- * The filter can be configured with a date from which to accept feed entries
+ * Will split the feed into entries. This message processor also filters out any entries that
+ * are older than the last one read. The filter can be configured with a date from
+ * which to accept feed entries
  */
 public class FeedSplitter extends AbstractSplitter
 {
+    public static final String FEED_PROPERTY = "feed.object";
+
     /**
      * logger used by this class
      */
     protected transient final Log logger = LogFactory.getLog(FeedSplitter.class);
 
-    public static final String FEED_PROPERTY = "feed.object";
     private Filter entryFilter;
     private ObjectToRssFeed objectToFeed = new ObjectToRssFeed();
 
     public FeedSplitter()
     {
-        //By default set the filter so that entries are only read once
+        // By default set the filter so that entries are only read once
         entryFilter = new EntryLastUpdatedFilter(null);
     }
 
     @Override
     protected List<MuleMessage> splitMessage(MuleEvent event) throws MuleException
     {
-        //TODO MULE-5048, should not need to set this manually
-        setMuleContext(event.getMuleContext());
-
         List<MuleMessage> messages = new ArrayList<MuleMessage>();
-        if(event.getMessage().getInboundProperty("Content-Length", -1) == 0)
+
+        if (event.getMessage().getInboundProperty("Content-Length", -1) == 0)
         {
             logger.info("Feed has no content, ignoring");
             return messages;
@@ -66,37 +67,40 @@ public class FeedSplitter extends AbstractSplitter
 
         try
         {
-            Object payload = event.getMessage().getPayload();
-            
-            SyndFeed feed;
-            if (payload instanceof SyndFeed)
-            {
-                feed = (SyndFeed) payload;
-            }
-            else
-            {
-                feed = (SyndFeed) objectToFeed.transform(event.getMessage().getPayload());
-            }
-            
+            SyndFeed feed = transformToFeed(event);
+
             Set<SyndEntry> entries = new TreeSet<SyndEntry>(new EntryComparator());
             entries.addAll(feed.getEntries());
 
             for (SyndEntry entry : entries)
             {
-                MuleMessage m = new DefaultMuleMessage(entry, event.getMuleContext());
-                if (entryFilter != null && !entryFilter.accept(m))
+                MuleMessage entryMessage = new DefaultMuleMessage(entry, event.getMuleContext());
+                if ((entryFilter != null) && !entryFilter.accept(entryMessage))
                 {
                     continue;
                 }
-                m.setInvocationProperty(FEED_PROPERTY, feed);
-                messages.add(m);
+
+                entryMessage.setInvocationProperty(FEED_PROPERTY, feed);
+                messages.add(entryMessage);
             }
             return messages;
-
         }
         catch (MuleException e)
         {
             throw new MessagingException(e.getI18nMessage(), event, e);
+        }
+    }
+
+    protected SyndFeed transformToFeed(MuleEvent event) throws TransformerException
+    {
+        Object payload = event.getMessage().getPayload();
+        if (payload instanceof SyndFeed)
+        {
+            return (SyndFeed) payload;
+        }
+        else
+        {
+            return (SyndFeed) objectToFeed.transform(payload);
         }
     }
 
@@ -109,8 +113,8 @@ public class FeedSplitter extends AbstractSplitter
     {
         this.entryFilter = entryFilter;
     }
-    
-    class EntryComparator implements Comparator<SyndEntry>
+
+    static class EntryComparator implements Comparator<SyndEntry>
     {
         public int compare(SyndEntry e1, SyndEntry e2)
         {
