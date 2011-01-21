@@ -11,7 +11,7 @@
 package org.mule.transport.email.transformers;
 
 import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.AbstractDiscoverableTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
 import javax.mail.Message;
@@ -21,7 +21,7 @@ import javax.mail.internet.MimeMultipart;
  * <code>EmailMessageToString</code> extracts a java mail Message contents and
  * returns a string.
  */
-public class EmailMessageToString extends AbstractTransformer
+public class EmailMessageToString extends AbstractDiscoverableTransformer
 {
 
     public EmailMessageToString()
@@ -49,10 +49,16 @@ public class EmailMessageToString extends AbstractTransformer
             }
             else
             {
-                // very simplisitic, only gets first part
-                MimeMultipart part = (MimeMultipart)result;
-                String transMsg = (String) part.getBodyPart(0).getContent();
-                return transMsg;
+                // very simplistic, only gets first part and assume the first
+                MimeMultipart part = (MimeMultipart) result;
+                if (part.getBodyPart(0) != null && part.getBodyPart(0).getContentType().startsWith("text/"))
+                {
+                    return (String) part.getBodyPart(0).getContent();
+                }
+                else
+                {
+                    return "";
+                }
             }
         }
         catch (Exception e)
@@ -60,4 +66,5 @@ public class EmailMessageToString extends AbstractTransformer
             throw new TransformerException(this, e);
         }
     }
+
 }
