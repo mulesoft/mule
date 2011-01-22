@@ -25,10 +25,10 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * A Simple object store that stores String objects by key to a text file. This store is only suitable for storing
- * simple key value pair strings.
- *
- * This store is backed by an in-memory store and supports the ability to expire and apply TTL to objects in the store.
+ * A Simple object store that stores String objects by key to a text file. This store
+ * is only suitable for storing simple key value pair strings. This store is backed
+ * by an in-memory store and supports the ability to expire and apply TTL to objects
+ * in the store.
  */
 public class TextFileObjectStore extends InMemoryObjectStore<String>
 {
@@ -71,7 +71,7 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
     {
         Properties props = new Properties();
         props.load(new FileInputStream(fileStore));
-        
+
         for (Map.Entry<Object, Object> entry : props.entrySet())
         {
             super.store(entry.getKey().toString(), entry.getValue().toString());
@@ -121,14 +121,13 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public synchronized void dispose()
     {
         Properties props = new Properties();
 
         for (Iterator<?> iterator = super.store.values().iterator(); iterator.hasNext();)
         {
-            StoredObject storedObject = (StoredObject) iterator.next();
+            StoredObject<?> storedObject = (StoredObject<?>) iterator.next();
             props.put(storedObject.getId(), storedObject.getItem());
         }
 
@@ -145,11 +144,11 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
                 logger.error(e.getMessage(), e);
             }
         }
-        else 
+        else
         {
             IOUtils.closeQuietly(output);
         }
-        
+
         super.dispose();
     }
 }
