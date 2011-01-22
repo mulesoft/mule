@@ -2,17 +2,20 @@
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:rss="http://www.mulesoft.org/schema/mule/rss"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
-               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-               http://www.mulesoft.org/schema/mule/rss http://www.mulesoft.org/schema/mule/rss/3.2/mule-rss.xsd
-               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+        http://www.mulesoft.org/schema/mule/rss http://www.mulesoft.org/schema/mule/rss/3.2/mule-rss.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
+
+    <http:polling-connector name="httpPoll" pollingFrequency="1000"/>
 
     <flow name="feedConsumer">
-        <rss:inbound-endpoint address="http://feeds.feedburner.com/muleblog?format=xml" splitFeed="false">
-            <rss:feed-splitter/>            
-        </rss:inbound-endpoint>
-
+        <http:inbound-endpoint address="http://feeds.feedburner.com/muleblog?format=xml">
+            <rss:feed-splitter/>
+        </http:inbound-endpoint>
         <test:component/>
     </flow>
 </mule>

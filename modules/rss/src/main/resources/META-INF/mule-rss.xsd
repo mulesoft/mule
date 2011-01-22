@@ -25,12 +25,6 @@
         <xsd:appinfo>
             <schemadoc:short-name>RSS</schemadoc:short-name>
             <schemadoc:page-title>RSS Module</schemadoc:page-title>
-
-            <schemadoc:transport-features receiveEvents="true" dispatchEvents="false"
-                                          requestEvents="true"
-                                          transactions="false" streaming="true">
-                <schemadoc:MEPs supported="one-way" default="one-way"/>
-            </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>
 
@@ -53,7 +47,6 @@
             <xsd:documentation>
                 Will filter RSS entry objects based on their last update date. This is useful for filtering older
                 entries from the feed. This filter works only on RSS SyndEntry objects not SyndFeed objects.
-                Typically it is better to set the lastUpdated attribute on an inbound ATOM endpoint rather than use this filter, however, this filter can be used elsewhere in a flow.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -89,9 +82,7 @@
                  substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-                Will filter the whole RSS Feed based on its last update date. This is useful for processing a feed that has not been updated since a specific date.
-                This filter works only on RSS SyndFeed objects.
-                Typically it is better to set the lastUpdated attribute on an inbound ATOM endpoint with splitFeed=false rather than use this filter, however, this filter can be used elsewhere in a flow.
+                Will filter the whole RSS Feed based on its last update date. This is useful for processing a feed that has not been updated since a specific date. This filter works only on RSS SyndFeed objects.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -122,55 +113,4 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
-    <xsd:complexType name="inboundEndpointType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:inboundEndpointType">
-                <xsd:attribute name="splitFeed" type="xsd:boolean" default="true">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether the feed entries should be split before routing the data. If split the service
-                            component will be invoked for each entry in the feed. Otherwise the feed itself will be used
-                            as the data for the message.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="lastUpdate" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Allows the endpoint to filter out any feed entries before the given date/time. This is only
-                            used if the feed
-                            is split. the format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25
-                            13:00:00. If only the date
-                            is important you can omit the time part
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="pollingFrequency" type="xsd:long">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The frequency in milliseconds to check the feed for new entries.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-
-    <!--<xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>-->
-    <!--<xsd:complexType name="outboundEndpointType">-->
-    <!--<xsd:complexContent>-->
-    <!--<xsd:extension base="mule:outboundEndpointType">-->
-    <!--<xsd:attribute name="feedType" type="xsd:string" default="rss_2.0"/>-->
-    <!--<xsd:attribute name="title" type="xsd:string"/>-->
-    <!--<xsd:attribute name="description" type="xsd:string"/>-->
-    <!--<xsd:attribute name="link" type="xsd:string"/>-->
-    <!--<xsd:attribute name="copyright" type="xsd:string"/>-->
-    <!--<xsd:attribute name="authors" type="xsd:string"/>-->
-    <!--<xsd:attribute name="categories" type="xsd:string"/>-->
-    <!--</xsd:extension>-->
-    <!--</xsd:complexContent>-->
-    <!--</xsd:complexType>-->
-
 </xsd:schema>

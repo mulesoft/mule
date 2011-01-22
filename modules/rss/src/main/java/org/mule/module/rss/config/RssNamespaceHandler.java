@@ -11,8 +11,6 @@ package org.mule.module.rss.config;
 
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
-import org.mule.module.rss.endpoint.RssInboundEndpointFactoryBean;
 import org.mule.module.rss.routing.EntryLastUpdatedFilter;
 import org.mule.module.rss.routing.FeedLastUpdatedFilter;
 import org.mule.module.rss.routing.FeedSplitter;
@@ -24,7 +22,6 @@ public class RssNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser("rss", true, RssInboundEndpointFactoryBean.class, new String[]{"lastUpdate", "splitFeed", "acceptedMimeTypes", "pollingFrequency"}, new String[][]{}, new String[][]{}));
         registerBeanDefinitionParser("feed-splitter", new RouterDefinitionParser(FeedSplitter.class));
         registerBeanDefinitionParser("entry-last-updated-filter", new FilterDefinitionParser(EntryLastUpdatedFilter.class));
         registerBeanDefinitionParser("feed-last-updated-filter", new FilterDefinitionParser(FeedLastUpdatedFilter.class));

@@ -11,36 +11,21 @@ package org.mule.module.rss;
 
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.service.Service;
 import org.mule.construct.SimpleFlowConstruct;
-import org.mule.module.rss.endpoint.RssInboundEndpoint;
 import org.mule.module.rss.routing.EntryLastUpdatedFilter;
 import org.mule.module.rss.routing.FeedLastUpdatedFilter;
 import org.mule.module.rss.routing.FeedSplitter;
 import org.mule.routing.MessageFilter;
-import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.tck.FunctionalTestCase;
 
 import java.text.SimpleDateFormat;
 
 public class NamespaceTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "namespace-config.xml";
-    }
-
-    public void testEndpointConfig() throws Exception
-    {
-        Service service = muleContext.getRegistry().lookupService("test");
-        assertNotNull(service);
-        assertTrue(((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0) instanceof RssInboundEndpoint);
-        RssInboundEndpoint ep = (RssInboundEndpoint) ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
-        assertEquals(FeedSplitter.class, ep.getMessageProcessors().get(0).getClass());
-        assertNotNull(ep.getLastUpdate());
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-        assertEquals(sdf.parse("2009-10-01"), ep.getLastUpdate());
     }
 
     public void testFlowConfig() throws Exception
@@ -60,7 +45,8 @@ public class NamespaceTestCase extends FunctionalTestCase
         assertEquals(sdf.parse("2009-10-01"), ((EntryLastUpdatedFilter)((MessageFilter)mp).getFilter()).getLastUpdate());
     }
 
-    public void testGlobalFilterConfig() throws Exception {
+    public void testGlobalFilterConfig() throws Exception
+    {
         FeedLastUpdatedFilter filter = muleContext.getRegistry().lookupObject("feedFilter");
         assertNotNull(filter);
 
@@ -68,6 +54,5 @@ public class NamespaceTestCase extends FunctionalTestCase
 
         assertEquals(sdf.parse("2009-10-01 13:00:00"), filter.getLastUpdate());
         assertFalse(filter.isAcceptWithoutUpdateDate());
-
     }
 }
