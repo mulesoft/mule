@@ -42,7 +42,7 @@ if (options.e)
     base = "http://www.mulesoft.org/schema/mule/ee/"
 }
 
-schemaVersion = "3.1"
+schemaVersion = "3.2"
 if (options.s)
 {
     schemaVersion = options.s
