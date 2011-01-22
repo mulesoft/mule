@@ -19,6 +19,7 @@
             <xsd:appinfo>
                 <schemadoc:short-name>Email</schemadoc:short-name>
                 <schemadoc:page-title>Email Transport</schemadoc:page-title>
+                <schemadoc:artifact-name>email</schemadoc:artifact-name>
                 <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
     requestEvents="true" transactions="false" streaming="false">
                     <schemadoc:MEPs supported="one-way" default="one-way"/>

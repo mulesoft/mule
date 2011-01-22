@@ -24,6 +24,7 @@
         <xsd:appinfo>
             <schemadoc:short-name>POP3S</schemadoc:short-name>
             <schemadoc:page-title>POP3S Transport</schemadoc:page-title>
+            <schemadoc:artifact-name>email</schemadoc:artifact-name>
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="false"
                                           requestEvents="true"
                                           transactions="false" streaming="false">

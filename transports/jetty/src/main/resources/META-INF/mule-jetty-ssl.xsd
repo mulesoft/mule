@@ -23,6 +23,7 @@
         <xsd:appinfo>
             <schemadoc:short-name>Jetty SSL</schemadoc:short-name>
             <schemadoc:page-title>Jetty SSL Transport</schemadoc:page-title>
+            <schemadoc:artifact-name>jetty</schemadoc:artifact-name>
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="false"
                                           requestEvents="true" transactions="false" streaming="true">
                 <schemadoc:MEPs supported="one-way, request-response" default="request-response"/>

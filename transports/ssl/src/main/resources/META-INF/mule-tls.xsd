@@ -25,7 +25,7 @@
     <xsd:appinfo>
         <schemadoc:short-name>TLS</schemadoc:short-name>
         <schemadoc:page-title>TLS Connector</schemadoc:page-title>
-
+        <schemadoc:artifact-name>ssl</schemadoc:artifact-name>
         <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
                                           requestEvents="true"
                                           transactions="false" streaming="true">
