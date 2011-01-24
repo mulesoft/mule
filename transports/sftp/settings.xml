@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+  <servers>
+    <server>
+      <id>muleforge.webdav.releases</id>
+      <username>xx</username>
+      <password>yy</password>
+    </server>
+    <server>
+      <id>muleforge.webdav.snapshots</id>
+      <username>xx</username>
+      <password>yy</password>
+    </server>
+    <server>
+      <id>muleforge.webdav.sites</id>
+      <username>xx</username>
+      <password>yy</password>
+    </server>
+  </servers>
+</settings>
+

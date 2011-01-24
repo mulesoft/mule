@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.mule.transports</groupId>
+	<artifactId>mule-transport-sftp</artifactId>
+	<packaging>jar</packaging>
+	<name>Mule SFTP Transport</name>
+	<version>3.1.1-SNAPSHOT</version>
+	<description>SFTP connectivity</description>
+
+	<properties>
+		<mule.version>${version}</mule.version>
+	</properties>
+
+	<!-- Mule Forge Configuration -->
+	<issueManagement>
+		<system>Jira</system>
+		<url>http://mule.mulesource.org/jira/browse/SFTP</url>
+	</issueManagement>
+	<scm>
+		<connection>scm:svn:http://svn.muleforge.org/mule-transport-sftp/trunk</connection>
+		<developerConnection>scm:svn:https://svn.muleforge.org/mule-transport-sftp/</developerConnection>
+
+		<url>http://svn.mule-transport-sftp.muleforge.org/trunk</url>
+	</scm>
+	<ciManagement>
+		<system>Bamboo</system>
+		<url>http://bamboo.muleforge.org/browse/SFTP-FORGE</url>
+		<notifiers/>
+	</ciManagement>
+
+
+	<distributionManagement>
+		<repository>
+			<id>muleforge.webdav.releases</id>
+			<url>dav:https://dav.muleforge.org/repository/${artifactId}/</url>
+		</repository>
+		<snapshotRepository>
+			<id>muleforge.webdav.snapshots</id>
+			<url>dav:https://dav.muleforge.org/snapshots.repository/${artifactId}/</url>
+		</snapshotRepository>
+		<site>
+			<id>muleforge.webdav.sites</id>
+			<url>dav:https://dav.muleforge.org/${artifactId}/maven</url>
+		</site>
+	</distributionManagement>
+
+	<repositories>
+		<repository>
+			<id>ch-dep</id>
+			<name>Codehaus Dependencies</name>
+			<url>http://dist.codehaus.org/mule/dependencies/maven2</url>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<!-- local repository for this transport. Users can upload dependencies here when the artifact
+							is not available on any other repository. Its the users' responsibility to make sure that no
+							licenses are violated by uploading dependencies to this location
+					   -->
+			<id>sftp-deps</id>
+			<name>Sftp Dependencies</name>
+			<url>http://dist.muleforge.org/${artifactId}/dependencies/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+        <repository>
+            <name>jsch</name>
+            <url>http://jsch.sourceforge.net/maven2/</url>
+            <id>jsch</id>
+        </repository>
+	</repositories>
+
+	<build>
+        <defaultGoal>install</defaultGoal>	
+		<!--
+			 Ensure that variables, like ${SFTP_HOST} is replace with a real host.
+		     The variables is a workaround for not having an embedded SFTP server
+		     Every developer/tester should be able to configure users, hosts & password etc
+		 -->
+		<filters>
+			<filter>src/test/resources/sftp-settings.properties</filter>
+		</filters>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-webdav</artifactId>
+				<version>1.0-beta-2</version>
+			</extension>
+		</extensions>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<finalName>${artifactId}-${version}</finalName>
+					<descriptors>
+						<descriptor>assembly.xml</descriptor>
+					</descriptors>
+					<appendAssemblyId>false</appendAssemblyId>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<arguments>-Dmaven.test.skip.exec=true</arguments>
+					<useReleaseProfile>false</useReleaseProfile>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.3</version>
+			</plugin>
+
+			<!-- Display the error in the console...-->
+			<!--
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<useFile>false</useFile>
+				</configuration>
+			</plugin>
+			-->
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.2</version>
+        <executions>
+					<execution>
+						<goals>
+							<goal>jar</goal>
+              <!-- ensure that test-jar is created and installed as well -->
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+      </plugin>
+
+			<plugin>
+				<!-- ensure that source jar files are created and installed as well -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+	<dependencies>
+
+		<dependency>
+			<groupId>org.mule.transports</groupId>
+			<artifactId>mule-transport-vm</artifactId>
+			<version>${mule.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.transports</groupId>
+			<artifactId>mule-transport-tcp</artifactId>
+			<version>${mule.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.transports</groupId>
+			<artifactId>mule-transport-file</artifactId>
+			<version>${mule.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.transports</groupId>
+			<artifactId>mule-transport-quartz</artifactId>
+			<version>${mule.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-module-client</artifactId>
+			<version>${mule.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.tests</groupId>
+			<artifactId>mule-tests-functional</artifactId>
+			<version>${mule.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>mockobjects</groupId>
+			<artifactId>mockobjects-core</artifactId>
+			<version>0.09</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mule</groupId>
+			<artifactId>mule-core</artifactId>
+			<version>${mule.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.44</version>
+		</dependency>
+	</dependencies>
+
+	<profiles>
+		<!--
+			A profile that can be used to run all tests with pooling enabled
+		-->
+		<profile>
+			<id>pooling</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>2.4.3</version>
+						<configuration>
+							<systemProperties>
+								<property>
+									<name>mule.test.timeoutSecs</name>
+									<value>300</value>
+								</property>
+								<property>
+									<!-- Always pooling for ALL tests! (simple way to ensure that all tests works with pooling) -->
+									<name>mule.sftp.transport.maxConnectionPoolSize</name>
+									<value>3</value>
+								</property>
+							</systemProperties>
+							<excludes>
+								<!-- These test cases test the pooling functionality, and since the tests uses another settings than the
+								     above (overridden) settings we can't run them. For example the test that one connector has no pooling
+								     and thus the command useConnectionPool() returns false - with the overridden value it will return true,
+								     thus an error should have occurred. -->
+								<exclude>**/SftpPoolingFunctionalTestCase.java</exclude>
+								<exclude>**/SftpNamespaceHandlerTestCase.java</exclude>
+							</excludes>
+							<useFile>false</useFile>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

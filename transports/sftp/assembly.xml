@@ -1,0 +1,55 @@
+<!--
+Assembly descriptor for the full SFTP distribution.
+-->
+<assembly>
+  <id>sftp</id>
+  <formats>
+    <format>tar.bz2</format>
+    <format>tar.gz</format>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>.</directory>
+      <outputDirectory></outputDirectory>
+          <excludes>
+              <exclude>target/**</exclude>
+              <exclude>dist/**</exclude>
+              <exclude>README</exclude>
+              <exclude>.project</exclude>
+              <exclude>.classpath</exclude>
+              <exclude>.mule</exclude>
+              <exclude>.idea/**</exclude>
+              <exclude>*.iml</exclude>
+          </excludes>
+    </fileSet>
+    <fileSet>
+      <directory>target</directory>
+      <outputDirectory></outputDirectory>
+          <includes>
+              <include>*.jar</include>
+          </includes>
+    </fileSet>
+  </fileSets>
+  <dependencySets>
+    <!-- Mule libraries -->
+
+    <dependencySet>
+      <outputDirectory>lib/user</outputDirectory>
+      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
+      <scope>test</scope>
+      <includes>
+        <include>org.mule.tests:mule-tests-functional</include>
+      </includes>
+    </dependencySet>
+    <!-- Non-Mule libraries -->
+    <dependencySet>
+      <outputDirectory>lib/opt</outputDirectory>
+      <scope>runtime</scope>
+      <includes>
+        <!-- Libraries -->
+        <include>com.jcraft:jsch</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+</assembly>
