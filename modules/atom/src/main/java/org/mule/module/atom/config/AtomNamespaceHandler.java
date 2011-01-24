@@ -14,10 +14,8 @@ import org.mule.config.spring.parsers.specific.ComponentDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
-import org.mule.config.spring.parsers.specific.endpoint.TransportEndpointDefinitionParser;
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.module.atom.AbderaServiceComponent;
-import org.mule.module.atom.endpoint.AtomInboundEndpointFactoryBean;
 import org.mule.module.atom.routing.EntryLastUpdatedFilter;
 import org.mule.module.atom.routing.FeedLastUpdatedFilter;
 import org.mule.module.atom.routing.FeedSplitter;
@@ -30,8 +28,6 @@ public class AtomNamespaceHandler extends NamespaceHandlerSupport
 {
     public void init()
     {
-        registerBeanDefinitionParser("inbound-endpoint", new TransportEndpointDefinitionParser("atom", true, AtomInboundEndpointFactoryBean.class, new String[]{"lastUpdate", "splitFeed", "acceptedMimeTypes", "pollingFrequency"}, new String[][]{}, new String[][]{}));
-
         FilterDefinitionParser routeFilter = new FilterDefinitionParser(URIRouteFilter.class);
         registerBeanDefinitionParser("route-filter", routeFilter);
         registerBeanDefinitionParser("entry-last-updated-filter", new FilterDefinitionParser(EntryLastUpdatedFilter.class));
@@ -40,7 +36,6 @@ public class AtomNamespaceHandler extends NamespaceHandlerSupport
         registerBeanDefinitionParser("component", new ComponentDefinitionParser(AbderaServiceComponent.class));
         registerBeanDefinitionParser("entry-builder-transformer", new MessageProcessorDefinitionParser(AtomEntryBuilderTransformer.class));
         registerBeanDefinitionParser("entry-property", new ChildDefinitionParser("argument", ExpressionArgument.class));
-
     }
 }
 

@@ -10,15 +10,6 @@
 
     <atom:feed-last-updated-filter lastUpdate="2009-10-01 13:00:00" acceptWithoutUpdateDate="false" name="feedFilter"/>
 
-    <model>
-        <service name="test">
-            <inbound>
-                <atom:inbound-endpoint address="http://foo.com" lastUpdate="2009-10-01" exchange-pattern="one-way"/>
-            </inbound>
-            <echo-component/>
-        </service>
-    </model>
-
     <flow name="flowTest">
         <vm:inbound-endpoint path="feed.in">
             <atom:feed-splitter/>

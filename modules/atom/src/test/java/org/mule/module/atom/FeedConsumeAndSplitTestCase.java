@@ -30,14 +30,13 @@ public class FeedConsumeAndSplitTestCase extends FunctionalTestCase
         comp.setEventCallback(counter);
     }
 
-    public void testConsume() throws Exception {
-
+    public void testConsume() throws Exception
+    {
         Thread.sleep(4000);
         int count = counter.getCallbackCount();
         assertTrue(count > 0);
         Thread.sleep(3000);
         //We should only receive entries once
         assertEquals(count, counter.getCallbackCount());
-
     }
 }

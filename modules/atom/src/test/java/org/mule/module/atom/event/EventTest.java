@@ -25,13 +25,33 @@ import org.apache.abdera.protocol.client.ClientResponse;
 
 public class EventTest extends DynamicPortTestCase
 {
-
     private Repository repository;
+
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        EntryReceiver component = (EntryReceiver)getComponent("eventConsumer");
+        component.getReceivedEntries().set(0);
+    }
 
     @Override
     protected String getConfigResources()
     {
         return "eventqueue-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
+    }
+
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        clearJcrRepository();
+        super.doTearDown();
     }
 
     public void testCustomerProvider() throws Exception
@@ -54,22 +74,6 @@ public class EventTest extends DynamicPortTestCase
         EntryReceiver component = (EntryReceiver)getComponent("eventConsumer");
 
         assertTrue(component.getCount() > 0);
-    }
-
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        EntryReceiver component = (EntryReceiver)getComponent("eventConsumer");
-        component.getReceivedEntries().set(0);
-    }
-
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        clearJcrRepository();
-
-        super.doTearDown();
     }
 
     private void clearJcrRepository()
@@ -97,17 +101,11 @@ public class EventTest extends DynamicPortTestCase
         }
         catch (PathNotFoundException t)
         {
+            // do nothing
         }
         catch (Throwable t)
         {
-            t.printStackTrace();
+            // do nothing
         }
     }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
 }
