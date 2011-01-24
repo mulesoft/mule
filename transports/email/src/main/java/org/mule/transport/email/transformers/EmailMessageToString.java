@@ -14,12 +14,13 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractDiscoverableTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.internet.MimeMultipart;
 
 /**
- * <code>EmailMessageToString</code> extracts a java mail Message contents and
- * returns a string.
+ * <code>EmailMessageToString</code> extracts the text body of java mail Message and
+ * returns a string. If there is no text body then an empty string is returned.
  */
 public class EmailMessageToString extends AbstractDiscoverableTransformer
 {
@@ -47,19 +48,22 @@ public class EmailMessageToString extends AbstractDiscoverableTransformer
             {
                 return result;
             }
-            else
+            else if (result instanceof MimeMultipart)
             {
-                // very simplistic, only gets first part and assume the first
-                MimeMultipart part = (MimeMultipart) result;
-                if (part.getBodyPart(0) != null && part.getBodyPart(0).getContentType().startsWith("text/"))
+                // very simplistic, only gets first part
+                BodyPart firstBodyPart = ((MimeMultipart) result).getBodyPart(0);
+                if (firstBodyPart != null && firstBodyPart.getContentType().startsWith("text/"))
                 {
-                    return (String) part.getBodyPart(0).getContent();
-                }
-                else
-                {
-                    return "";
+                    Object content = firstBodyPart.getContent();
+                    if (content instanceof String)
+                    {
+                        return content;
+                    }
                 }
             }
+            // No text content found either in message or in first body part of
+            // MultiPart content
+            return "";
         }
         catch (Exception e)
         {
