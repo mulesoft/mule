@@ -23,7 +23,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class MuleXmlBuilderContextListenerTest
+public class MuleXmlBuilderContextListenerTestCase
 {
     private MuleXmlBuilderContextListener listener;
     private ServletContext context;
