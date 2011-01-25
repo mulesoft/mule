@@ -10,36 +10,39 @@
 
 package org.mule.config.builders;
 
+import javax.servlet.ServletContext;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.web.context.WebApplicationContext;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import javax.servlet.ServletContext;
-
-import junit.framework.TestCase;
-
-import org.springframework.web.context.WebApplicationContext;
-
-public class MuleXmlBuilderContextListenerTest extends TestCase
+public class MuleXmlBuilderContextListenerTest
 {
-
     private MuleXmlBuilderContextListener listener;
     private ServletContext context;
 
+    @Before
     public void setUp() throws Exception
     {
-        super.setUp();
         listener = new MuleXmlBuilderContextListener();
         context = mock(ServletContext.class);
     }
 
+    @After
     public void tearDown() throws Exception
     {
-        super.tearDown();
         listener.muleContext.stop();
     }
 
-    public void testNoMuleAppProperties()
+    @Test
+    public void noMuleAppProperties()
     {
         when(context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG))
             .thenReturn("mule-config.xml");
@@ -50,11 +53,12 @@ public class MuleXmlBuilderContextListenerTest extends TestCase
 
         verify(context).getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
         verify(context).getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
-
+        
         assertEquals("./.mule", listener.muleContext.getConfiguration().getWorkingDirectory());
     }
 
-    public void testWithImplicitMuleAppProperties()
+    @Test
+    public void withImplicitMuleAppProperties()
     {
         when(context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG))
             .thenReturn("org/mule/config/builders/mule-config.xml");
@@ -66,11 +70,11 @@ public class MuleXmlBuilderContextListenerTest extends TestCase
         verify(context).getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
         verify(context).getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
 
-        assertTrue(listener.muleContext.getConfiguration().getWorkingDirectory().endsWith(
-            "target/.appTmp"));
+        assertWorkingDirectoryEndsWith("target/.appTmp");
     }
 
-    public void testWithExplicitMuleAppProperties()
+    @Test
+    public void withExplicitMuleAppProperties()
     {
         when(context.getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG))
             .thenReturn("org/mule/config/builders/mule-config.xml");
@@ -84,7 +88,12 @@ public class MuleXmlBuilderContextListenerTest extends TestCase
         verify(context).getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
         verify(context).getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
 
-        assertTrue(listener.muleContext.getConfiguration().getWorkingDirectory().endsWith(
-            "target/.appTmp2"));
+        assertWorkingDirectoryEndsWith("target/.appTmp2");
+    }
+
+    private void assertWorkingDirectoryEndsWith(String expected)
+    {
+        String workingDirectory = listener.muleContext.getConfiguration().getWorkingDirectory();
+        assertTrue(workingDirectory.endsWith(expected));
     }
 }
