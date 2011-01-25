@@ -107,8 +107,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="feed-last-updated-filter" type="feedLastUpdateFilterType"
-                 substitutionGroup="mule:abstract-filter">
+    <xsd:element name="feed-last-updated-filter" type="feedLastUpdateFilterType" substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
                 Will filter the whole ATOM Feed based on its last update date. This is useful for processing a feed that has not been updated since a specific date.
@@ -144,6 +143,14 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    <xsd:element name="object-to-feed-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Transforms the payload of the message to a {{org.apache.abdera.model.Feed}} instance.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:element name="component" type="atomComponentType" substitutionGroup="mule:abstract-component">
         <xsd:annotation>
