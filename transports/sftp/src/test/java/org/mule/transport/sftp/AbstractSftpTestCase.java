@@ -33,6 +33,7 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.transport.sftp.util.ValueHolder;
+import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 
 import com.jcraft.jsch.ChannelSftp;
@@ -1251,5 +1252,25 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
             Map.Entry<String, Model> pairs = (Map.Entry<String, Model>) it.next();
             assertTrue(pairs.getKey() + " is not started", pairs.getValue().getLifecycleState().isStarted());
         }
+    }
+    
+    /**
+     * Look for the sftp test properties file in our environment.
+     * If it's not found, don't run these tests 
+     */
+    @Override
+    protected boolean isDisabledInThisEnvironment()
+    {
+
+        try
+        {
+            IOUtils.getResourceAsString("sftp-settings.properties", this.getClass());
+        }
+        catch (IOException e)
+        {
+            return true;
+        }
+        
+        return false;
     }
 }

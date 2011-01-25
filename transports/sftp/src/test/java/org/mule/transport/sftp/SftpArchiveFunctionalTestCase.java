@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
-import org.mule.api.MuleException;
 import org.mule.module.client.MuleClient;
 
 /**
@@ -47,14 +46,6 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
     private String archive = null;
     private String archiveCanonicalPath = null;
 
-    public SftpArchiveFunctionalTestCase() throws Exception
-    {
-
-        ResourceBundle rb = ResourceBundle.getBundle("sftp-settings");
-        archive = rb.getString("ARCHIVE");
-        archiveCanonicalPath = new File(archive).getCanonicalPath();
-    }
-
     protected String getConfigResources()
     {
         return "mule-sftp-archive-test-config.xml";
@@ -65,6 +56,13 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
     {
         super.doSetUp();
 
+        // this block moved from the constructor to allow this test to be skipped if
+        // the resource isn't found via
+        // AbstractMuleTestCase.isDisabledInThisEnvironment 
+        ResourceBundle rb = ResourceBundle.getBundle("sftp-settings");
+        archive = rb.getString("ARCHIVE");
+        archiveCanonicalPath = new File(archive).getCanonicalPath();        
+        
         recursiveDeleteInLocalFilesystem(new File(archive));
         initEndpointDirectories(new String[]{"receiving1", "receiving2", "receiving3", "receiving4"},
             new String[]{INBOUND_ENDPOINT1, INBOUND_ENDPOINT2, INBOUND_ENDPOINT3, INBOUND_ENDPOINT4});

@@ -129,6 +129,7 @@
         <jsr181Version>1.0-MR1</jsr181Version>
         <jsr250AnnotationVerson>1.0</jsr250AnnotationVerson>
         <log4jVersion>1.2.14</log4jVersion>
+        <mockobjectsVersion>0.09</mockobjectsVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <!-- TODO EE-1395 -->
         <mqSeriesVersion>6.0</mqSeriesVersion>
@@ -519,7 +520,7 @@
             <dependency>
                 <groupId>mockobjects</groupId>
                 <artifactId>mockobjects-core</artifactId>
-                <version>0.09</version>
+                <version>${mockobjectsVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>

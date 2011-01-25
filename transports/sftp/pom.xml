@@ -35,56 +35,33 @@
 
     <build>
         <defaultGoal>install</defaultGoal>
-        <!-- Ensure that variables, like ${SFTP_HOST} is replace with a real 
-            host. The variables is a workaround for not having an embedded SFTP server 
-            Every developer/tester should be able to configure users, hosts & password 
-            etc -->
-        <filters>
-            <filter>src/test/resources/sftp-settings.properties</filter>
-        </filters>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-            </testResource>
-        </testResources>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <finalName>${artifactId}-${version}</finalName>
-                    <descriptors>
-                        <descriptor>assembly.xml</descriptor>
-                    </descriptors>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <arguments>-Dmaven.test.skip.exec=true</arguments>
-                    <useReleaseProfile>false</useReleaseProfile>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>add-test-resource</id>
+                        <phase>generate-test-sources</phase>
                         <goals>
-                            <goal>jar</goal>
-                            <!-- ensure that test-jar is created and installed 
-                                as well -->
-                            <goal>test-jar</goal>
+                            <goal>add-test-resource</goal>
                         </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}</directory>
+                                    <includes>
+                                        <include>sftp-settings.properties</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
-                <!-- ensure that source jar files are created and installed 
-                    as well -->
+                <!-- ensure that source jar files are created and installed as 
+                    well -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
@@ -96,13 +73,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skipTests>true</skipTests>
-                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -148,6 +118,12 @@
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
             <version>${jschVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>mockobjects</groupId>
+            <artifactId>mockobjects-core</artifactId>
+            <version>${mockobjectsVersion}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
