@@ -24,10 +24,10 @@
                                           requestEvents="true"
                                           transactions="false" streaming="false">
                 <schemadoc:MEPs supported="one-way, request-response" default="one-way"/>
-
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>
+
     <xsd:element name="connector" type="xmppConnectorType" substitutionGroup="mule:abstract-connector">
         <xsd:annotation>
             <xsd:documentation>
@@ -35,7 +35,7 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
     <xsd:complexType name="xmppConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
@@ -91,7 +91,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint">
         <xsd:annotation>
             <xsd:documentation>
@@ -116,7 +116,7 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:outboundEndpointType">
@@ -129,11 +129,11 @@
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint">
         <xsd:annotation>
             <xsd:documentation>
-                An endpoint "template" that can be used to construct an inbound or outbound endpoint elsewhere in the configuration by referencing the endpoint name. 
+                An endpoint "template" that can be used to construct an inbound or outbound endpoint elsewhere in the configuration by referencing the endpoint name.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:globalEndpointType">
