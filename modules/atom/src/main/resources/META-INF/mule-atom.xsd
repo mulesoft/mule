@@ -232,44 +232,4 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
-
-    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
-    <xsd:complexType name="inboundEndpointType">
-        <xsd:complexContent>
-            <xsd:extension base="mule:inboundEndpointType">
-                <xsd:attribute name="splitFeed" type="xsd:boolean" default="true">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Whether the feed entries should be split before routing the data. If split the service
-                            component will be invoked for each entry in the feed. Otherwise the feed itself will be used
-                            as the
-                            data for the message.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="lastUpdate" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Allows the endpoint to filter out any feed entries before the given date/time. This is only
-                            used if the feed is split.
-                            The format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25
-                            13:00:00. If only the date is important you can omit the time part
-                            You can set the value to 'now' to set the date and time that the server is started
-
-                            Do not set this attribute if you want to receive all available entries then any new entries going forward.
-                            This is the default behaviour and suitable for many scenarios.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="pollingFrequency" type="xsd:long">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The frequency in milliseconds to check the feed for new entries.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 </xsd:schema>
