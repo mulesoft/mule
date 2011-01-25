@@ -17,13 +17,12 @@ import java.net.URI;
 import java.util.Properties;
 
 /**
- * <code>UrlEndpointBuilder</code> is the default endpointUri strategy suitable for
+ * <code>UrlEndpointURIBuilder</code> is the default endpointUri strategy suitable for
  * most connectors
  */
-
 public class UrlEndpointURIBuilder extends AbstractEndpointURIBuilder
 {
-
+    @Override
     protected void setEndpoint(URI uri, Properties props) throws MalformedEndpointException
     {
         address = "";

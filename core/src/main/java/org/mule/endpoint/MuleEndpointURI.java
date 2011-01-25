@@ -11,6 +11,7 @@
 package org.mule.endpoint;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.EndpointURIBuilder;
@@ -160,13 +161,13 @@ public class MuleEndpointURI implements EndpointURI
         }
     }
 
-    private String convertExpressionDelimiters(String uri, String startChar)
+    private String convertExpressionDelimiters(String uriString, String startChar)
     {
         //Allow Expressions to be embedded
-        int uriLength = uri.length();
+        int uriLength = uriString.length();
         for (int index = 0; index < uriLength; )
         {
-            index = uri.indexOf(startChar + "{", index);
+            index = uriString.indexOf(startChar + "{", index);
             if (index < 0)
             {
                 break;
@@ -174,7 +175,7 @@ public class MuleEndpointURI implements EndpointURI
             int braceCount = 1;
             for (int seek = index + 2; seek < uriLength; seek++)
             {
-                char c = uri.charAt(seek);
+                char c = uriString.charAt(seek);
                 if (c == '{')
                 {
                     braceCount++;
@@ -183,29 +184,29 @@ public class MuleEndpointURI implements EndpointURI
                 {
                     if (--braceCount == 0)
                     {
-                        uri = uri.substring(0, index) + startChar + "[" + uri.substring(index + 2, seek) + "]" + uri.substring(seek+1);
+                        uriString = uriString.substring(0, index) + startChar + "[" + uriString.substring(index + 2, seek) + "]" + uriString.substring(seek+1);
                         break;
                     }
                 }
             }
             index += 2;
         }
-        return uri;
+        return uriString;
     }
 
-    protected String preprocessUri(String uri) throws MalformedEndpointException
+    protected String preprocessUri(String uriString) throws MalformedEndpointException
     {
-        uri = uri.trim().replaceAll(" ", "%20");
-        if (!validateUrl(uri))
+        uriString = uriString.trim().replaceAll(" ", "%20");
+        if (!validateUrl(uriString))
         {
-            throw new MalformedEndpointException(uri);
+            throw new MalformedEndpointException(uriString);
         }
-        schemeMetaInfo = retrieveSchemeMetaInfo(uri);
+        schemeMetaInfo = retrieveSchemeMetaInfo(uriString);
         if (schemeMetaInfo != null)
         {
-            uri = uri.replaceFirst(schemeMetaInfo + ":", "");
+            uriString = uriString.replaceFirst(schemeMetaInfo + ":", "");
         }
-        return uri;
+        return uriString;
     }
 
     public void initialise() throws InitialisationException
@@ -426,13 +427,37 @@ public class MuleEndpointURI implements EndpointURI
     @Override
     public String toString()
     {
+        URI printableUri = uri;
+        
         if (StringUtils.isNotEmpty(userInfo) && (userInfo.indexOf(":") > 0))
         {
-            // Mask passwords in the logs
-            String maskinfo = userInfo.substring(0, userInfo.indexOf(":")) + ":****";
-            return uri.toASCIIString().replace(userInfo, maskinfo);
+            printableUri = createUriWithPasswordMasked();
         }
-        return uri.toASCIIString();
+        return printableUri.toASCIIString();
+    }
+    
+    protected URI createUriWithPasswordMasked()
+    {
+        try
+        {
+            // we use uri.getUserInfo() on purpose as it returns the decoded user info.
+            String username = uri.getUserInfo();
+            int index = username.indexOf(":");
+            if (index > -1)
+            {
+                username = username.substring(0, index);
+            }
+            
+            String maskedUserInfo = username + ":****";
+            return new URI(uri.getScheme(), maskedUserInfo, uri.getHost(), uri.getPort(), 
+                uri.getPath(), uri.getQuery(), uri.getFragment());
+        }
+        catch (URISyntaxException use)
+        {
+            // this may actually never happen as the URI we're creating this from was properly
+            // parsed before.
+            throw new MuleRuntimeException(use);
+        }
     }
 
     public String getTransformers()
