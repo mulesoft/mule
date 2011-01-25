@@ -41,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  * <br/>
  * The protocol can be any of any connector registered with Mule. The endpoint name if specified 
  * must be the name of a registered global endpoint. The endpointUri can be any endpointUri
- * recognised by the endpoint type.
+ * recognized by the endpoint type.
  */
 public class MuleEndpointURI implements EndpointURI
 {
@@ -431,35 +431,33 @@ public class MuleEndpointURI implements EndpointURI
         
         if (StringUtils.isNotEmpty(userInfo) && (userInfo.indexOf(":") > 0))
         {
-            printableUri = createUriWithPasswordMasked();
+            return createUriStringWithPasswordMasked();
         }
         return printableUri.toASCIIString();
     }
     
-    protected URI createUriWithPasswordMasked()
+    protected String createUriStringWithPasswordMasked()
     {
-        try
+        //  uri.getRawUserInfo() returns null for jms endpoints with passwords, so use already constructed userInfo if it's null
+        String username =  uri.getRawUserInfo();
+        String maskedUserInfo = null;
+        
+        if(StringUtils.isBlank(username))
         {
-            // we use uri.getUserInfo() on purpose as it returns the decoded user info.
-            String username = uri.getUserInfo();
-            int index = username.indexOf(":");
-            if (index > -1)
-            {
-                username = username.substring(0, index);
-            }
-            
-            String maskedUserInfo = username + ":****";
-            return new URI(uri.getScheme(), maskedUserInfo, uri.getHost(), uri.getPort(), 
-                uri.getPath(), uri.getQuery(), uri.getFragment());
-        }
-        catch (URISyntaxException use)
+            username = userInfo;
+        }        
+        
+        int index = username.indexOf(":");
+        if (index > -1)
         {
-            // this may actually never happen as the URI we're creating this from was properly
-            // parsed before.
-            throw new MuleRuntimeException(use);
+            maskedUserInfo = username.substring(0, index);
         }
-    }
-
+        
+        maskedUserInfo = maskedUserInfo + ":****";
+        // we do this instead of constructing a new URI object since it causes issues with jms endpoints with passwords
+        return uri.toASCIIString().replace(username, maskedUserInfo);
+    }    
+    
     public String getTransformers()
     {
         return transformers;
