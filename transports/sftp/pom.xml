@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -8,33 +7,12 @@
         <artifactId>mule-transports</artifactId>
         <version>3.1.1-SNAPSHOT</version>
     </parent>
-
-    <groupId>org.mule.transports</groupId>
     <artifactId>mule-transport-sftp</artifactId>
     <packaging>jar</packaging>
     <name>SFTP Transport</name>
     <description>A Mule transport for SFTP connectivity</description>
 
-    <properties>
-        <mule.version>${version}</mule.version>
-    </properties>
-
-    <repositories>
-        <repository>
-            <id>ch-dep</id>
-            <name>Codehaus Dependencies</name>
-            <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <name>jsch</name>
-            <url>http://jsch.sourceforge.net/maven2/</url>
-            <id>jsch</id>
-        </repository>
-    </repositories>
-
     <build>
-        <defaultGoal>install</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -60,8 +38,7 @@
                 </executions>
             </plugin>
             <plugin>
-                <!-- ensure that source jar files are created and installed as 
-                    well -->
+                <!-- ensure that source jar files are created and installed as well -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
@@ -78,46 +55,33 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-vm</artifactId>
-            <version>${mule.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-tcp</artifactId>
-            <version>${mule.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-file</artifactId>
-            <version>${mule.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.transports</groupId>
-            <artifactId>mule-transport-quartz</artifactId>
-            <version>${mule.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-client</artifactId>
-            <version>${mule.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-functional</artifactId>
-            <version>${mule.version}</version>
-            <scope>test</scope>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>${jschVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${mule.version}</version>
+            <version>${version}</version>
         </dependency>
         <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
-            <version>${jschVersion}</version>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-file</artifactId>
+            <version>${version}</version>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-client</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-functional</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>mockobjects</groupId>
@@ -125,7 +89,27 @@
             <version>${mockobjectsVersion}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-quartz</artifactId>
+            <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <name>jsch</name>
+            <url>http://jsch.sourceforge.net/maven2/</url>
+            <id>jsch</id>
+        </repository>
+    </repositories>
 
     <profiles>
         <!-- A profile that can be used to run all tests with pooling enabled -->
@@ -149,10 +133,10 @@
                                 </property>
                             </systemProperties>
                             <excludes>
-                                <!-- These test cases test the pooling functionality, 
-                                    and since the tests uses another settings than the above (overridden) settings 
-                                    we can't run them. For example the test that one connector has no pooling 
-                                    and thus the command useConnectionPool() returns false - with the overridden 
+                                <!-- These test cases test the pooling functionality,
+                                    and since the tests uses another settings than the above (overridden) settings
+                                    we can't run them. For example the test that one connector has no pooling
+                                    and thus the command useConnectionPool() returns false - with the overridden
                                     value it will return true, thus an error should have occurred. -->
                                 <exclude>**/SftpPoolingFunctionalTestCase.java</exclude>
                                 <exclude>**/SftpNamespaceHandlerTestCase.java</exclude>
