@@ -10,6 +10,8 @@
 
     <rss:feed-last-updated-filter lastUpdate="2009-10-01 13:00:00" acceptWithoutUpdateDate="false" name="feedFilter"/>
 
+    <rss:object-to-feed-transformer name="ObjectToFeed"/>
+
     <model>
         <service name="test">
             <inbound>
