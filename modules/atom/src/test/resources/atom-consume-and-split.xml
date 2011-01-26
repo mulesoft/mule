@@ -10,15 +10,10 @@
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
 
-    <http:polling-connector name="poller" pollingFrequency="1000"/>
-
     <flow name="feedConsumer">
-        <!-- MULE-5364 -->
-<!--        <poll frequency="1000000">-->
-<!--            <http:outbound-endpoint address="http://rossmason.blogspot.com/feeds/posts/default"/>-->
-<!--        </poll>-->
-
-        <http:inbound-endpoint address="http://rossmason.blogspot.com/feeds/posts/default"/>
+        <poll frequency="1000">
+            <http:outbound-endpoint address="http://rossmason.blogspot.com/feeds/posts/default" method="GET"/>
+        </poll>
         <atom:feed-splitter/>
         <test:component/>
     </flow>
