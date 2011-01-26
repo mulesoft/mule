@@ -105,6 +105,7 @@ jetty-util5-6.1.26
 jetty-annotations-6.1.26
 jetty-plus-6.1.26
 joda-time-1.6
+jsch-0.1.44
 jsr181-api-1.0-MR1
 jsr250-api-1.0
 jsr311-api-1.1.1
@@ -162,6 +163,7 @@ mule-transport-multicast
 mule-transport-quartz
 mule-transport-rmi
 mule-transport-servlet
+mule-transport-sftp
 mule-transport-ssl
 mule-transport-stdio
 mule-transport-tcp
