@@ -24,7 +24,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.apache.abdera.model.Feed;
 
-public class FeedConsumeAndTransformTestCase extends FunctionalTestCase
+public class AtomFeedConsumeAndTransformTestCase extends FunctionalTestCase
 {
     private Latch receiveLatch = new Latch();
     private MuleMessage message = null;
