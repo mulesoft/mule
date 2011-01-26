@@ -55,14 +55,14 @@
                 <xsd:attribute name="processDefinition" type="xsd:string" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The resource containing the process definition.  This will be used to deploy the process to the BPMS.
+                            The resource containing the process definition, this will be used to deploy the process to the BPMS.  The resource type depends on the BPMS being used. 
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="processIdField" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            This field will be used to correlate messages with processes.
+                            This field will be used to correlate Mule messages with processes.  If not specified, it will default to MULE_BPM_PROCESS_ID.  
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

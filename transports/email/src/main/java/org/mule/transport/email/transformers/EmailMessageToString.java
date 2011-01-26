@@ -11,17 +11,18 @@
 package org.mule.transport.email.transformers;
 
 import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.AbstractDiscoverableTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.internet.MimeMultipart;
 
 /**
- * <code>EmailMessageToString</code> extracts a java mail Message contents and
- * returns a string.
+ * <code>EmailMessageToString</code> extracts the text body of java mail Message and
+ * returns a string. If there is no text body then an empty string is returned.
  */
-public class EmailMessageToString extends AbstractTransformer
+public class EmailMessageToString extends AbstractDiscoverableTransformer
 {
 
     public EmailMessageToString()
@@ -47,17 +48,27 @@ public class EmailMessageToString extends AbstractTransformer
             {
                 return result;
             }
-            else
+            else if (result instanceof MimeMultipart)
             {
-                // very simplisitic, only gets first part
-                MimeMultipart part = (MimeMultipart)result;
-                String transMsg = (String) part.getBodyPart(0).getContent();
-                return transMsg;
+                // very simplistic, only gets first part
+                BodyPart firstBodyPart = ((MimeMultipart) result).getBodyPart(0);
+                if (firstBodyPart != null && firstBodyPart.getContentType().startsWith("text/"))
+                {
+                    Object content = firstBodyPart.getContent();
+                    if (content instanceof String)
+                    {
+                        return content;
+                    }
+                }
             }
+            // No text content found either in message or in first body part of
+            // MultiPart content
+            return "";
         }
         catch (Exception e)
         {
             throw new TransformerException(this, e);
         }
     }
+
 }
