@@ -95,7 +95,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
@@ -399,10 +398,6 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     public final synchronized void start() throws MuleException
     {
-        if (isStarted() || isStarting())
-        {
-            return;
-        }
         if (isInitialStateStopped())
         {
             logger.info("Connector not started because 'initialStateStopped' is true");
@@ -581,11 +576,6 @@ public abstract class AbstractConnector implements Connector, WorkListener
     public final boolean isStarted()
     {
         return lifecycleManager.getState().isStarted();
-    }
-
-    public final boolean isStarting()
-    {
-        return lifecycleManager.getState().isStarting();
     }
 
     public boolean isInitialised()
@@ -1588,58 +1578,50 @@ public abstract class AbstractConnector implements Connector, WorkListener
     {
         startOnConnect = isStarted();
 
-        if (receivers != null)
+        try
         {
-            for (MessageReceiver receiver : receivers.values())
+            if (receivers != null)
             {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Disconnecting receiver on endpoint: "
-                            + receiver.getEndpoint().getEndpointURI());
-                }
-                try
-                {
-                    receiver.disconnect();
-                }
-                catch (Exception e)
-                {
-                    logger.error(e.getMessage(), e);
-                }
-                
-                // TODO MULE-3969
-                if (receiver instanceof AbstractMessageReceiver
-                        && ((AbstractMessageReceiver) receiver).isStarted())
+                for (MessageReceiver receiver : receivers.values())
                 {
                     if (logger.isDebugEnabled())
                     {
-                        logger.debug("Stopping receiver on endpoint: "
+                        logger.debug("Disconnecting receiver on endpoint: "
                                 + receiver.getEndpoint().getEndpointURI());
                     }
-                    try
-                    {
-                        receiver.stop();
-                    }
-                    catch (Exception e)
-                    {
-                        logger.error(e.getMessage(), e);
-                    }
-                }                
+                    receiver.disconnect();
+                }
             }
-        }
-        try
-        {
             this.doDisconnect();
         }
         finally
         {
-            connected.set(false);
-            if (logger.isInfoEnabled())
+            if (receivers != null)
             {
-                logger.info("Disconnected: " + this.getConnectionDescription());
+                for (MessageReceiver receiver : receivers.values())
+                {
+                    // TODO MULE-3969
+                    if (receiver instanceof AbstractMessageReceiver
+                            && ((AbstractMessageReceiver) receiver).isStarted())
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Stopping receiver on endpoint: "
+                                    + receiver.getEndpoint().getEndpointURI());
+                        }
+                        receiver.stop();
+                    }
+                }
             }
-            this.fireNotification(new ConnectionNotification(this, getConnectEventId(),
-                    ConnectionNotification.CONNECTION_DISCONNECTED));
         }
+
+        connected.set(false);
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Disconnected: " + this.getConnectionDescription());
+        }
+        this.fireNotification(new ConnectionNotification(this, getConnectEventId(),
+                ConnectionNotification.CONNECTION_DISCONNECTED));
     }
 
     public String getConnectionDescription()

@@ -23,7 +23,6 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
 import org.mule.api.lifecycle.StartException;
-import org.mule.api.lifecycle.Startable;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
@@ -341,10 +340,6 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
      */
     public final void start() throws MuleException
     {
-        if (isStarted() || isStarting())
-        {
-            return;
-        }
         //We only fire start lifecycle once we are connected, see callDoStartWhenItIsConnected
         if (!connected.get() && !connecting.get())
         {
@@ -425,10 +420,6 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
                 {
                     try
                     {
-                        if (isStarted() || isStarting())
-                        {
-                            return;
-                        }
                         lifecycleManager.fireStartPhase(new LifecycleCallback<O>()
                         {
                             public void onTransition(String phaseName, O object) throws MuleException
@@ -547,13 +538,6 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     public boolean isStarted()
     {
         return getLifecycleState().isStarted();
-    }
-
-    public boolean isStarting()
-    {
-        // TODO This should just be the following but it doesn't give the same result for some reason:
-        //   return getLifecycleState().isStarted();
-        return Startable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase());
     }
 
     /**
