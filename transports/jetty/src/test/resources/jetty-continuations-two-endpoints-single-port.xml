@@ -15,7 +15,7 @@
 
         <service name="mycomponent1">
             <inbound>
-                <jetty:inbound-endpoint address="http://localhost:60211/mycomponent1" exchange-pattern="request-response"/>
+                <jetty:inbound-endpoint address="http://localhost:${port1}/mycomponent1" exchange-pattern="request-response"/>
             </inbound>
             <test:component>
                 <test:return-data>mycomponent1</test:return-data>
@@ -25,7 +25,7 @@
 
         <service name="mycomponent2">
             <inbound>
-                <jetty:inbound-endpoint address="http://localhost:60211/mycomponent2" exchange-pattern="request-response"/>
+                <jetty:inbound-endpoint address="http://localhost:${port1}/mycomponent2" exchange-pattern="request-response"/>
             </inbound>
             <test:component>
                 <test:return-data>mycomponent2</test:return-data>

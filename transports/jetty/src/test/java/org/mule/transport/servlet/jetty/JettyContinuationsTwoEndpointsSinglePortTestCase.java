@@ -14,13 +14,13 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.util.SystemUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class JettyContinuationsTwoEndpointsSinglePortTestCase extends FunctionalTestCase
+public class JettyContinuationsTwoEndpointsSinglePortTestCase extends DynamicPortTestCase
 {
 
     /**
@@ -39,8 +39,8 @@ public class JettyContinuationsTwoEndpointsSinglePortTestCase extends Functional
 
     public void testSendToEach() throws Exception
     {
-        sendWithResponse("http://localhost:60211/mycomponent1", "test", "mycomponent1", 10);
-        sendWithResponse("http://localhost:60211/mycomponent2", "test", "mycomponent2", 10);
+        sendWithResponse("http://localhost:" + getPorts().get(0) + "/mycomponent1", "test", "mycomponent1", 10);
+        sendWithResponse("http://localhost:" + getPorts().get(0) + "/mycomponent2", "test", "mycomponent2", 10);
     }
 
     public void testSendToEachWithBadEndpoint() throws Exception
@@ -48,10 +48,10 @@ public class JettyContinuationsTwoEndpointsSinglePortTestCase extends Functional
 
         MuleClient client = new MuleClient(muleContext);
 
-        sendWithResponse("http://localhost:60211/mycomponent1", "test", "mycomponent1", 5);
-        sendWithResponse("http://localhost:60211/mycomponent2", "test", "mycomponent2", 5);
+        sendWithResponse("http://localhost:" + getPorts().get(0) + "/mycomponent1", "test", "mycomponent1", 5);
+        sendWithResponse("http://localhost:" + getPorts().get(0) + "/mycomponent2", "test", "mycomponent2", 5);
 
-        MuleMessage result = client.send("http://localhost:60211/mycomponent-notfound", "test", null);
+        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/mycomponent-notfound", "test", null);
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
         final int status = result.getOutboundProperty("http.status", 0);
@@ -77,5 +77,11 @@ public class JettyContinuationsTwoEndpointsSinglePortTestCase extends Functional
         {
             assertEquals(response, new String((byte[])results.get(i)));
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }
