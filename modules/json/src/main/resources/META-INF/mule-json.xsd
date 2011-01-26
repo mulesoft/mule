@@ -15,7 +15,7 @@
 
     <xsd:annotation>
         <xsd:documentation>
-            The JSON module contains a number of tools to help you read, transform, and write JSO.
+            The JSON module contains a number of tools to help you read, transform, and write JSON.
         </xsd:documentation>
 
         <xsd:appinfo>
