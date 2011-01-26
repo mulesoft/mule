@@ -106,6 +106,7 @@ public abstract class AbstractEndpointURIBuilder implements EndpointURIBuilder
         {
             responseTransformers = responseTransformers.replaceAll(" ", ",");
         }
+        
         userInfo = uri.getUserInfo();
         return properties;
     }
