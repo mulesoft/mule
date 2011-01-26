@@ -11,7 +11,6 @@
 package org.mule.endpoint;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.EndpointURIBuilder;
@@ -33,13 +32,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>MuleEndpointURI</code> is used to determine how a message is sent or received. The url 
- * defines the protocol, the endpointUri destination of the message and optionally the endpoint to 
- * use when dispatching the event. Mule urls take the form of - 
+ * <code>MuleEndpointURI</code> is used to determine how a message is sent or received. The url
+ * defines the protocol, the endpointUri destination of the message and optionally the endpoint to
+ * use when dispatching the event. Mule urls take the form of -
  * protocol://[host]:[port]/[provider]/endpointUri or
- * protocol://[host]:[port]/endpointUri i.e. vm:///my.object 
+ * protocol://[host]:[port]/endpointUri i.e. vm:///my.object
  * <br/>
- * The protocol can be any of any connector registered with Mule. The endpoint name if specified 
+ * The protocol can be any of any connector registered with Mule. The endpoint name if specified
  * must be the name of a registered global endpoint. The endpointUri can be any endpointUri
  * recognized by the endpoint type.
  */
@@ -127,7 +126,7 @@ public class MuleEndpointURI implements EndpointURI
 
     public MuleEndpointURI(String uri, MuleContext muleContext) throws EndpointException
     {
-        this(uri, null, muleContext);       
+        this(uri, null, muleContext);
     }
 
     /**
@@ -427,37 +426,34 @@ public class MuleEndpointURI implements EndpointURI
     @Override
     public String toString()
     {
-        URI printableUri = uri;
-        
         if (StringUtils.isNotEmpty(userInfo) && (userInfo.indexOf(":") > 0))
         {
             return createUriStringWithPasswordMasked();
         }
-        return printableUri.toASCIIString();
+        return uri.toASCIIString();
     }
-    
+
     protected String createUriStringWithPasswordMasked()
     {
-        //  uri.getRawUserInfo() returns null for jms endpoints with passwords, so use already constructed userInfo if it's null
-        String username =  uri.getRawUserInfo();
-        String maskedUserInfo = null;
-        
-        if(StringUtils.isBlank(username))
+        String rawUserInfo =  uri.getRawUserInfo();
+        // uri.getRawUserInfo() returns null for JMS endpoints with passwords, so use the userInfo
+        // from this instance instead
+        if (StringUtils.isBlank(rawUserInfo))
         {
-            username = userInfo;
-        }        
-        
-        int index = username.indexOf(":");
+            rawUserInfo = userInfo;
+        }
+
+        String maskedUserInfo = null;
+        int index = rawUserInfo.indexOf(":");
         if (index > -1)
         {
-            maskedUserInfo = username.substring(0, index);
+            maskedUserInfo = rawUserInfo.substring(0, index);
         }
-        
+
         maskedUserInfo = maskedUserInfo + ":****";
-        // we do this instead of constructing a new URI object since it causes issues with jms endpoints with passwords
-        return uri.toASCIIString().replace(username, maskedUserInfo);
-    }    
-    
+        return uri.toASCIIString().replace(rawUserInfo, maskedUserInfo);
+    }
+
     public String getTransformers()
     {
         return transformers;
