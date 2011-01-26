@@ -82,6 +82,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-sftp</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-ssl</artifactId>
             <version>${version}</version>
         </dependency>

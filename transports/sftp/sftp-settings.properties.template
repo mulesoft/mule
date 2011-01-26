@@ -1,0 +1,13 @@
+# This file is used when testing. The below user and identityFiles etc must be correct
+# for all tests to pass.
+#
+# If the below values are changed, please do not commit them...
+#
+USER1_NAME=muletest1
+USER1_PASSWORD=muletest1
+USER1_IDENTITYFILE=/PATH/TO/THE/FILE/id_rsa-muletest1
+USER1_IDENTITYFILE_PASSPHRASE=muletest1
+SFTP_HOST=localhost
+ARCHIVE=/PATH/TO/THE/test-archive
+
+
