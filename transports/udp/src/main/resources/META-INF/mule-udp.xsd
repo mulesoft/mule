@@ -40,10 +40,24 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="timeout" type="mule:substitutableLong">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The amount of time after which a Send or Receive call will time out.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="receiveTimeout" type="mule:substitutableLong">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The amount of time after which a Receive call will time out.
+                            Deprecated -- use timeout.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="sendTimeout" type="mule:substitutableLong">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Deprecated -- use timeout.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -51,20 +65,6 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The size of the sending buffer for the socket.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="sendTimeout" type="mule:substitutableLong">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The amount of time after which a Send call will time out.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="socketLinger" type="mule:substitutableLong">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The amount of time the socket will remain open after a closesocket call. 
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

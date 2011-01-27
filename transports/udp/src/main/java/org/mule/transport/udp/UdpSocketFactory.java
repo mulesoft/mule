@@ -78,10 +78,10 @@ public class UdpSocketFactory implements KeyedPoolableObjectFactory
         {
             socket.setSendBufferSize(connector.getSendBufferSize());
         }
-        if (connector.getReceiveTimeout() != Connector.INT_VALUE_NOT_SET
-            && socket.getSoTimeout() != connector.getReceiveTimeout())
+        if (connector.getTimeout() != Connector.INT_VALUE_NOT_SET
+            && socket.getSoTimeout() != connector.getTimeout())
         {
-            socket.setSoTimeout(connector.getSendTimeout());
+            socket.setSoTimeout(connector.getTimeout());
         }
         socket.setBroadcast(connector.isBroadcast());
         return socket;
