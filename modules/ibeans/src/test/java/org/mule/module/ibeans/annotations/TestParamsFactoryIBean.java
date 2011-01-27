@@ -64,7 +64,7 @@ public interface TestParamsFactoryIBean extends ExceptionListenerAware
     @Template("Foo")
     public Response doTestHeadersWithNoParamsAndResponse() throws CallException;
 
-@Template("Value is: {foo}")
+    @Template("Value is: {foo}")
     public Response doHeaderParamAndResponse(@UriParam("foo") String foo) throws CallException;
 
     @Template("Value is: {foo}")
@@ -72,7 +72,4 @@ public interface TestParamsFactoryIBean extends ExceptionListenerAware
 
     @Template("Value is: {foo}")
     public Response doMethodPropertyParamAndResponse(@UriParam("foo") String foo, @PropertyParam("customProperty") String prop, @HeaderParam("propHeader") ReversePropertyParamFactory factory) throws CallException;
-
-
-
 }
