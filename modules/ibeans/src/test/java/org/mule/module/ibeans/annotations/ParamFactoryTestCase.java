@@ -17,7 +17,6 @@ import org.junit.Test;
 
 public class ParamFactoryTestCase extends AbstractIBeansTestCase
 {
-    @SuppressWarnings("unused")
     @IntegrationBean
     private TestParamsFactoryIBean testIBean;
 
@@ -135,5 +134,4 @@ public class ParamFactoryTestCase extends AbstractIBeansTestCase
         assertNotNull(result);
         assertEquals("shhh", result.getHeader("header1"));
     }
-
 }
