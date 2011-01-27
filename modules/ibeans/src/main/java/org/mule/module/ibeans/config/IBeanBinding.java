@@ -47,7 +47,6 @@ import org.ibeans.annotation.param.BodyParam;
 import org.ibeans.annotation.param.HeaderParam;
 import org.ibeans.api.IBeanInvoker;
 import org.ibeans.api.IBeansException;
-import org.ibeans.api.channel.HTTP;
 import org.ibeans.impl.IntegrationBeanInvocationHandler;
 import org.ibeans.impl.InvokeAnnotationHandler;
 import org.ibeans.impl.TemplateAnnotationHandler;
@@ -189,27 +188,6 @@ public class IBeanBinding implements InterfaceBinding
                                 InboundEndpoint endpoint = parser.parseInboundEndpoint(metaData.getAnnotation(), Collections.EMPTY_MAP);
                                 binding = new DynamicRequestInterfaceBinding();
                                 binding.setEndpoint(endpoint);
-                            }
-                            //We need to differenciate between GET and POST
-                            //TODO Consider making this explicit since an iBeans is really a service interaction definition
-                            if (http)
-                            {
-                                List<AnnotationMetaData> temp = AnnotationUtils.getParamAnnotations(method);
-                                boolean post = false;
-                                for (AnnotationMetaData data : temp)
-                                {
-                                    if (data.getAnnotation().annotationType().equals(Body.class) ||
-                                            data.getAnnotation().annotationType().equals(BodyParam.class))
-                                    {
-                                        post = true;
-                                        break;
-                                    }
-                                }
-                                //By default Mule will post if no method is set
-                                if (!post && binding.getEndpoint().getProperties().get(HTTP.METHOD_KEY) == null)
-                                {
-                                    binding.getEndpoint().getProperties().put(HTTP.METHOD_KEY, "GET");
-                                }
                             }
 
                             binding.setInterface(getInterface());
