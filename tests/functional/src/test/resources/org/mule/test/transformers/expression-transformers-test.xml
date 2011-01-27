@@ -24,5 +24,11 @@
         <bean-property property-name="segments" evaluator="mule" expression="message.header(SEGMENTS)" optional="true"/>
         <bean-property property-name="radius" evaluator="mule" expression="message.header(RADIUS)"/>
     </bean-builder-transformer>
-
+    
+    <expression-transformer name="testTransformer4" evaluator="headers-list" expression="foo,bar"/>
+    
+    <flow name="et">
+    	<expression-transformer name="testTransformer5" evaluator="headers-list" expression="foo,bar"/>
+    </flow>
+    
 </mule>

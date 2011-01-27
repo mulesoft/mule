@@ -54,6 +54,7 @@ import org.mule.config.spring.parsers.specific.ConfigurationDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultNameMuleOrphanDefinitionParser;
 import org.mule.config.spring.parsers.specific.DefaultThreadingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.ExceptionTXFilterDefinitionParser;
+import org.mule.config.spring.parsers.specific.ExpressionTransformerDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.FilterRefDefinitionParser;
 import org.mule.config.spring.parsers.specific.FlowDefinitionParser;
@@ -237,7 +238,9 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("auto-transformer", new MessageProcessorDefinitionParser(AutoTransformer.class));
         registerBeanDefinitionParser("message-properties-transformer", new MessagePropertiesTransformerDefinitionParser());
 
-        registerBeanDefinitionParser("expression-transformer", new MessageProcessorDefinitionParser(ExpressionTransformer.class));
+        registerMuleBeanDefinitionParser("expression-transformer", new ExpressionTransformerDefinitionParser(
+            ExpressionTransformer.class));
+
         registerBeanDefinitionParser("return-argument", new ChildDefinitionParser("argument", ExpressionArgument.class));
 
         registerBeanDefinitionParser("bean-builder-transformer", new MessageProcessorDefinitionParser(BeanBuilderTransformer.class));
