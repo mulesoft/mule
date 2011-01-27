@@ -36,6 +36,7 @@
     <xsl:param name="transport"/>
 
     <xsl:param name="artifactName"/>
+    <xsl:param name="version" select="/index/@version"/>
 
     <xsl:template match="/index">
         <table class="confluenceTable">
@@ -62,8 +63,10 @@
     <xsl:template match="transport">
         <xsl:choose>
             <xsl:when test="@dist = 'ee'">
+                <xsl:variable name="schemaLocation" select="concat('http://www.mulesoft.org/schema/mule/ee/',. , '/', $version, '/mule-', ., '-ee.xsd')"/>
+
                 <xsl:apply-templates
-                        select="document(concat('http://www.mulesource.org/schema/mule/ee/',. ,'$version', '/mule-', ., '-ee.xsd'))"/>
+                        select="document($schemaLocation)"/>
             </xsl:when>
             <xsl:when test="@dist = 'mf'">
                 <xsl:variable name="schemaLocation">

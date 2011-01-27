@@ -1,5 +1,6 @@
 <index version="3.1">
-    <transport dist="ce">bpm</transport>
+    <transport dist="ce">ajax</transport>
+    <transport dist="ce">axis</transport>
     <transport dist="ce">ejb</transport>
     <transport dist="ce" artifactName="email">smtp</transport>
     <transport dist="ce" artifactName="email">smtps</transport>
@@ -9,9 +10,9 @@
     <transport dist="ce" artifactName="email">pop3s</transport>
     <transport dist="ce">file</transport>
     <transport dist="ce">ftp</transport>
+    <transport dist="ce">sftp</transport>
     <transport dist="ce">http</transport>
     <transport dist="ce" artifactName="http">https</transport>
-    <transport dist="ce">jbpm</transport>
     <transport dist="ce">jdbc</transport>
     <transport dist="ce">jetty</transport>
     <transport dist="ce" artifactName="jetty">jetty-ssl</transport>
@@ -28,8 +29,10 @@
     <transport dist="ce">udp</transport>
     <transport dist="ce">vm</transport>
     <transport dist="ce">xmpp</transport>
-    <transport dist="ee">jdbc-ee</transport>
+    <transport dist="ee">jdbc</transport>
     <transport dist="ee">wmq</transport>
+    <!--<transport dist="ee">msmq</transport>-->
+    <transport dist="ee">ftp</transport>
     <!--todo test make this work with Mule Forge transports-->
     <transport dist="mf">jcr</transport>
 </index>
