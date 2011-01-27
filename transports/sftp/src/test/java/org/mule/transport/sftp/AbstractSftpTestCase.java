@@ -374,7 +374,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                 }
             });
 
-            if (serviceName != null && !serviceName.isEmpty())
+            if (serviceName != null && !(serviceName.length() == 0))
             {
                 muleContext.getRegistry().lookupService(serviceName).setExceptionListener(
                     new MessagingExceptionHandler()
@@ -814,7 +814,6 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
 
     protected void recursiveDeleteInLocalFilesystem(File parent) throws IOException
     {
-
         // If this file is a directory then first delete all its children
         if (parent.isDirectory())
         {
@@ -828,7 +827,8 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
         File parentParent = parent.getParentFile();
         if (!parentParent.canWrite())
         {
-            if (!parentParent.setWritable(true))
+            // setWritable is only available on JDK6 and beyond
+//            if (!parentParent.setWritable(true))
                 throw new IOException("Failed to set readonly-folder: " + parentParent + " to writeable");
         }
         if (parent.exists())

@@ -2,33 +2,31 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
-      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xsi:schemaLocation="
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
-               http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.1/mule-sftp.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd">
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+        http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/3.1/mule-sftp.xsd">
 
     <spring:beans>
         <spring:import resource="sftp-properties.xml"/>
     </spring:beans>
 
     <sftp:connector name="sftpCustomConnector" pollingFrequency="500" autoDelete="true" outputPattern="#[header:originalFilename]"
-					identityFile="${USER1_IDENTITYFILE}" passphrase="${USER1_IDENTITYFILE_PASSPHRASE}"/>
+                    identityFile="${USER1_IDENTITYFILE}" passphrase="${USER1_IDENTITYFILE_PASSPHRASE}"/>
 
     <sftp:connector name="sftpCustomConnectorTempDirOutbound" outputPattern="#[header:originalFilename]"
                     identityFile="${USER1_IDENTITYFILE}" passphrase="${USER1_IDENTITYFILE_PASSPHRASE}"
                     tempDirOutbound="uploading"/>
 
-	<sftp:connector name="sftpCustomConnectorTempDirInbound" outputPattern="#[header:originalFilename]"
+    <sftp:connector name="sftpCustomConnectorTempDirInbound" outputPattern="#[header:originalFilename]"
                     identityFile="${USER1_IDENTITYFILE}" passphrase="${USER1_IDENTITYFILE_PASSPHRASE}"
                     tempDirInbound="uploading"/>
 
-	<spring:bean name="endpointMessageNotificationLogger" class="org.mule.transport.sftp.notification.EndpointMessageNotificationTestListener"/>
-	<notifications>
-		<notification event="ENDPOINT-MESSAGE"/>
-		<notification-listener ref="endpointMessageNotificationLogger"/>
-	</notifications>
+    <spring:bean name="endpointMessageNotificationLogger" class="org.mule.transport.sftp.notification.EndpointMessageNotificationTestListener"/>
+    <notifications>
+        <notification event="ENDPOINT-MESSAGE"/>
+        <notification-listener ref="endpointMessageNotificationLogger"/>
+    </notifications>
 
     <model name="mainOutbound">
         <service name="testComponentOutbound">
@@ -49,25 +47,22 @@
         </service>
     </model>
 
-	<model name="mainInbound">
-		<service name="testComponentInbound">
-			<inbound>
-				<sftp:inbound-endpoint address="sftp://${USER1_NAME}@${SFTP_HOST}/~/tempdir2-test-inbound"
-									   connector-ref="sftpCustomConnectorTempDirInbound"
-									   name="inboundEndpoint2"/>
-			</inbound>
+    <model name="mainInbound">
+        <service name="testComponentInbound">
+            <inbound>
+                <sftp:inbound-endpoint address="sftp://${USER1_NAME}@${SFTP_HOST}/~/tempdir2-test-inbound"
+                                       connector-ref="sftpCustomConnectorTempDirInbound"
+                                       name="inboundEndpoint2"/>
+            </inbound>
 
-			<outbound>
-				<pass-through-router>
-					<sftp:outbound-endpoint address="sftp://${USER1_NAME}@${SFTP_HOST}/~/tempdir2-test-outbound"
-											connector-ref="sftpCustomConnector"
-											name="outboundEndpoint2">
-					</sftp:outbound-endpoint>
-				</pass-through-router>
-			</outbound>
-		</service>
-	</model>
+            <outbound>
+                <pass-through-router>
+                    <sftp:outbound-endpoint address="sftp://${USER1_NAME}@${SFTP_HOST}/~/tempdir2-test-outbound"
+                                            connector-ref="sftpCustomConnector"
+                                            name="outboundEndpoint2">
+                    </sftp:outbound-endpoint>
+                </pass-through-router>
+            </outbound>
+        </service>
+    </model>
 </mule>
-
-
-
