@@ -2,14 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+    <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
         <version>3.2.0-SNAPSHOT</version>
     </parent>
-
-    <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.modules</groupId>
     <artifactId>mule-module-ibeans</artifactId>
     <packaging>jar</packaging>
@@ -23,7 +21,7 @@
         <dependency>
             <groupId>org.ibeans</groupId>
             <artifactId>ibeans-support</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
             <exclusions>
                 <!-- we like slf4j -->
                 <exclusion>
