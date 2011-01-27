@@ -4351,6 +4351,19 @@
         </xsd:complexType>
     </xsd:element>
     
+    <xsd:element name="map-splitter" substitutionGroup="abstract-intercepting-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                The map splitter accepts a map of objects and splits the collection invoking the next message processor with each item in the collection in sequence. 
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="baseSplitterType"/>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
     <xsd:element name="message-chunk-splitter" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>

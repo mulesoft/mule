@@ -77,6 +77,17 @@
         <vm:outbound-endpoint path="split-aggregate-list-out" exchange-pattern="one-way" />
     </flow>
 
+    <flow name="split-map">
+        <vm:inbound-endpoint path="split-aggregate-map-in" exchange-pattern="request-response" />
+        <map-splitter enableCorrelation="IF_NOT_SET" />
+        <script:transformer>
+            <script:script engine="groovy">
+                ((org.mule.tck.testmodels.fruit.Fruit)payload).bite();
+                return payload;
+            </script:script>
+        </script:transformer>
+    </flow>
+
     <flow name="split-filter-aggregate">
         <vm:inbound-endpoint path="split-filter-aggregate-in" exchange-pattern="one-way" />
         <splitter evaluator="bean" expression="fruit" enableCorrelation="ALWAYS" />
