@@ -13,7 +13,7 @@
     <model name="main">
         <service name="testComponent">
             <inbound>
-                <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:60198" 
+                <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}" 
                     binary="true" passive="true" connector-ref="ftpConnector"/>                
             </inbound>
             <component>

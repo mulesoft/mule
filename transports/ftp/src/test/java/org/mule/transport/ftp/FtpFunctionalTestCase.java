@@ -22,26 +22,11 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
 {
-    private static int PORT = 60198;
-
-    public FtpFunctionalTestCase()
-    {
-        super(PORT);
-    }
-
     protected String getConfigResources()
     {
         return "ftp-functional-test.xml";
     }
-
-    /**
-     * Used by subclasses (in EE)
-     */
-    public int getPort()
-    {
-        return PORT;
-    }
-    
+   
     public void testSendAndRequest() throws Exception
     {
         CountDownLatch latch = new CountDownLatch(1);

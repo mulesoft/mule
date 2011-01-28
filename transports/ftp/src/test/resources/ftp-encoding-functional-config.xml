@@ -22,7 +22,7 @@
     <model name="main">
         <service name="testInput">
             <inbound>
-                <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:60200"
+                <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}"
                                       binary="true" passive="true" connector-ref="ftpConnector"
                                       encoding="EUC-JP"/>
             </inbound>
