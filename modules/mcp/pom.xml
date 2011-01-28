@@ -6,11 +6,11 @@
         <artifactId>mule-modules</artifactId>
         <version>3.1.1-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-module-ws</artifactId>
+    <artifactId>mule-module-mcp</artifactId>
     <packaging>jar</packaging>
-    <name>Web Services</name>
+    <name>Configuration Patterns</name>
     <description>
-        Mule Utilities for Web Services.
+        Mule Configuration Patterns
     </description>
 
     <dependencies>

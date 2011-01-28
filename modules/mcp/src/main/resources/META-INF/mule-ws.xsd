@@ -30,7 +30,7 @@
     <xsd:element name="proxy" type="proxyType" substitutionGroup="mule:abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                A simple web-service proxy, which handles WSDL rewriting.
+                Deprecated.  Use mcp:web-service-proxy
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

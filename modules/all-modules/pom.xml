@@ -142,7 +142,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-ws</artifactId>
+            <artifactId>mule-module-mcp</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>

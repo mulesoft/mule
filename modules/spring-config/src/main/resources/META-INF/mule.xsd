@@ -147,6 +147,7 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
     </xsd:complexType>
 
     <!-- Agents -->
@@ -1716,7 +1717,7 @@
     <xsd:element name="simple-service" type="simpleServiceType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                A simple request-response service, with no outbound router.
+                Deprecated.  Use mcp:simple-service
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1829,7 +1830,7 @@
     <xsd:element name="bridge" type="bridgeType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                A bridge with a single inbound endpoint and a single outbound endpoint.
+                Deprecated.  Use mcp:bridge-service
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1916,7 +1917,7 @@
     <xsd:element name="validator" type="validatorType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                A validator with a single request-response inbound endpoint and a single outbound endpoint.
+                Deprecated.  Use mcp:validator
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -3534,7 +3535,7 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="abstractTransformerType">
-                    <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:sequence minOccurs="1" maxOccurs="unbounded">
                         <xsd:element name="return-argument">
                             <xsd:annotation>
                                 <xsd:documentation>
@@ -3552,7 +3553,6 @@
                             </xsd:complexType>
                         </xsd:element>
                     </xsd:sequence>
-                    <xsd:attributeGroup ref="optionalExpressionAttributes"/>
                     <xsd:attribute name="returnSourceIfNull" type="xsd:boolean" use="optional">
                         <xsd:annotation>
                             <xsd:documentation>If all expressions return null on this transformer, this flag will cause the source payload to be returned without modification.
@@ -3618,27 +3618,6 @@
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="custom-evaluator" type="substitutableName" use="optional">
-            <xsd:annotation>
-                <xsd:documentation>The name of the custom evaluator to use. This attribute is only used when the 'evaluator' attribute is set to "custom". You can plug in your own expression evaluators by registering them with the ExpressionEvaluatorManager.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:attributeGroup>
-
-    <xsd:attributeGroup name="optionalExpressionAttributes">
-        <xsd:attribute name="evaluator" type="standardExpressionEvaluators">
-            <xsd:annotation>
-                <xsd:documentation>The expression evaluator to use. Expression evaluators must be registered with the ExpressionEvaluatorManager before they can be used. Using the custom evaluator allows you to define your own evaluator with the 'custom-evaluator' attribute. Note that some evaluators such as xpath, groovy, and bean are loaded from other Mule modules (XML and Scripting, respectively). These modules must be on your classpath before the evaluator can be used.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="expression" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation>The expression to evaluate. The syntax of this attribute changes depending on the evaluator being used.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="custom-evaluator" type="substitutableName">
             <xsd:annotation>
                 <xsd:documentation>The name of the custom evaluator to use. This attribute is only used when the 'evaluator' attribute is set to "custom". You can plug in your own expression evaluators by registering them with the ExpressionEvaluatorManager.
                 </xsd:documentation>
@@ -4351,19 +4330,6 @@
         </xsd:complexType>
     </xsd:element>
     
-    <xsd:element name="map-splitter" substitutionGroup="abstract-intercepting-message-processor">
-        <xsd:annotation>
-            <xsd:documentation>
-                The map splitter accepts a map of objects and splits the collection invoking the next message processor with each item in the collection in sequence. 
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="baseSplitterType"/>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
-
     <xsd:element name="message-chunk-splitter" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>

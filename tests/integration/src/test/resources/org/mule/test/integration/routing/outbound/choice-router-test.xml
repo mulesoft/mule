@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+  xmlns:mcp="http://www.mulesoft.org/schema/mule/mcp"
   xmlns:test="http://www.mulesoft.org/schema/mule/test"
   xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.1/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/mcp http://www.mulesoft.org/schema/mule/mcp/3.1/mule-mcp.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd">
 
@@ -49,12 +51,12 @@
     <append-string-transformer message=":default" />
   </vm:endpoint>
   
-  <simple-service name="fruit-service" endpoint-ref="fruit-channel"
+  <mcp:simple-service name="fruit-service" endpoint-ref="fruit-channel"
     component-class="org.mule.component.simple.EchoComponent" />
 
-  <simple-service name="veggie-service" endpoint-ref="veggie-channel"
+  <mcp:simple-service name="veggie-service" endpoint-ref="veggie-channel"
     component-class="org.mule.component.simple.EchoComponent" />
 
-  <simple-service name="default-service" endpoint-ref="default-channel"
+  <mcp:simple-service name="default-service" endpoint-ref="default-channel"
     component-class="org.mule.component.simple.EchoComponent"/>
 </mule>
