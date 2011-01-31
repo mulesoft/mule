@@ -11,7 +11,7 @@
     <model name="BasicCxfTest">
         <service name="echoService">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/Echo" exchange-pattern="request-response">
+                <inbound-endpoint address="http://localhost:${port1}/services/Echo" exchange-pattern="request-response" name="httpInbound">
                     <cxf:simple-service>
                         <cxf:databinding>
                             <spring:bean class="org.apache.cxf.aegis.databinding.AegisDatabinding">

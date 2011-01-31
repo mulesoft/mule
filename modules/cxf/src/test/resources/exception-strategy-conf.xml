@@ -12,7 +12,8 @@
     <service name="CxfWithExceptionStrategy">
       <inbound>
         <inbound-endpoint
-          address="http://localhost:63181/services/CxfWithExceptionStrategy" 
+          address="http://localhost:${port1}/services/CxfWithExceptionStrategy" 
+          name="cxfExceptionStrategyInbound"
           exchange-pattern="request-response">
           <cxf:simple-service/>
         </inbound-endpoint>
@@ -25,7 +26,8 @@
     <service name="CxfDefault">
       <inbound>
         <inbound-endpoint
-          address="http://localhost:63181/services/CxfDefault"
+          address="http://localhost:${port1}/services/CxfDefault"
+          name="cxfDefaultInbound"
           exchange-pattern="request-response">
           <cxf:simple-service />
         </inbound-endpoint>

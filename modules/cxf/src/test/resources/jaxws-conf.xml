@@ -17,7 +17,7 @@
     <model name="TestCxfModel">
         <service name="echoService">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/Echo"
+                <inbound-endpoint address="http://localhost:${port1}/services/Echo"
                     exchange-pattern="request-response">
                     <cxf:jaxws-service>
                         <cxf:features>
@@ -33,7 +33,7 @@
         
         <service name="asyncService">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/async"
+                <inbound-endpoint address="http://localhost:${port1}/services/async"
                     exchange-pattern="request-response">
                     <cxf:jaxws-service />
                 </inbound-endpoint>

@@ -12,12 +12,12 @@ package org.mule.module.cxf.wsa;
 
 import org.mule.example.employee.EmployeeDirectory;
 import org.mule.example.employee.EmployeeDirectory_Service;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.AddressingFeature;
 
-public class WSATest extends FunctionalTestCase
+public class WSATest extends DynamicPortTestCase
 {
     public void testWSA() throws Exception
     {
@@ -26,7 +26,7 @@ public class WSATest extends FunctionalTestCase
         EmployeeDirectory port = svc.getEmployeeDirectoryPort(new AddressingFeature());
         BindingProvider bp = (BindingProvider) port;
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-            "http://localhost:63081/services/employee");
+            "http://localhost:" + getPorts().get(0) + "/services/employee");
         
         System.out.println(port.getEmployees());
         
@@ -36,6 +36,12 @@ public class WSATest extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "wsa-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

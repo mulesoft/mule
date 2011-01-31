@@ -9,12 +9,12 @@
  */
 
 package org.mule.module.cxf.wssec;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-public class UsernameTokenTestCase extends FunctionalTestCase
+public class UsernameTokenTestCase extends DynamicPortTestCase
 {
     private Latch greetLatch;
     
@@ -42,6 +42,12 @@ public class UsernameTokenTestCase extends FunctionalTestCase
     {
         Object instance = getComponent("greeterService");
         return (GreeterWithLatch) instance;
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }
 

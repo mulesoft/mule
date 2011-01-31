@@ -41,7 +41,7 @@
         <service name="SecureUMO">
             <inbound>
                 <inbound-endpoint 
-                    address="https://localhost:60444/services/Echo"
+                    address="https://localhost:${port2}/services/Echo"
                     exchange-pattern="request-response">
                     <acegi:http-security-filter realm="mule-realm"/>
                     <cxf:simple-service/>
@@ -52,7 +52,7 @@
         <service name="AnotherSecureUMO">
             <inbound>
                 <inbound-endpoint 
-                    address="http://localhost:60443/services/Echo"
+                    address="http://localhost:${port1}/services/Echo"
                     exchange-pattern="request-response">
                     <acegi:http-security-filter realm="mule-realm"/>
                     <cxf:simple-service/>

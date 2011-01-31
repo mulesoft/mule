@@ -17,7 +17,7 @@
                <inbound>
                     <vm:inbound-endpoint path="testin" exchange-pattern="request-response"/>
                </inbound>
-               <cxf:wrapper-component address="http://localhost:65081/services/TestUMO?method=onReceive"/>
+               <cxf:wrapper-component address="http://localhost:${port1}/services/TestUMO?method=onReceive"/>
           </service>
 
           <service name="WebServiceSample2">
@@ -29,7 +29,7 @@
 
           <service name="TestUMO">
                <inbound>
-                    <inbound-endpoint address="http://localhost:65081/services/TestUMO" 
+                    <inbound-endpoint address="http://localhost:${port1}/services/TestUMO" 
                                       exchange-pattern="request-response">
                         <cxf:simple-service serviceClass="org.mule.tck.functional.Receiveable"/>
                     </inbound-endpoint>

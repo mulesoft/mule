@@ -33,14 +33,14 @@
     </acegi:security-manager>
     
     <endpoint name="cxfOutbound" 
-        address="cxf:http://admin:admin@localhost:61080/services/Echo?method=echo"
+        address="cxf:http://admin:admin@localhost:${port1}/services/Echo?method=echo"
         exchange-pattern="request-response"/>
     
     <model name="test">
         <service name="mycomponent">
             <inbound>
                 <inbound-endpoint 
-                   address="http://localhost:61080/services/Echo"
+                   address="http://localhost:${port1}/services/Echo"
                    exchange-pattern="request-response">
                    <acegi:http-security-filter realm="mule-realm"/>
                    <cxf:simple-service />
@@ -52,7 +52,7 @@
         <service name="secure">
             <inbound>
                 <inbound-endpoint 
-                   address="https://localhost:60443/services/Echo"
+                   address="https://localhost:${port2}/services/Echo"
                    connector-ref="httpConnector"
                    exchange-pattern="request-response">
                    <acegi:http-security-filter realm="mule-realm"/>

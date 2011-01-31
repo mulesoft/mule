@@ -12,18 +12,18 @@ package org.mule.module.cxf.jaxws;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.transport.NullPayload;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 
-public class CxfJaxWsTestCase extends FunctionalTestCase
+public class CxfJaxWsTestCase extends DynamicPortTestCase
 {
     public void testEchoService() throws Exception
     {
-        String url = "cxf:http://localhost:63081/services/Echo?method=echo";
+        String url = "cxf:http://localhost:" + getPorts().get(0) + "/services/Echo?method=echo";
 
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send(url, "Hello!", null);
@@ -32,7 +32,7 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
 
     public void testOneWay() throws Exception
     {
-        String url = "cxf:http://localhost:63081/services/async?method=send";
+        String url = "cxf:http://localhost:" + getPorts().get(0) + "/services/async?method=send";
 
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send(url, "Hello!", null);
@@ -46,7 +46,7 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
         // http://host/service/OPERATION/PARAM_NAME/PARAM_VALUE
         // In this case: http://localhost:63081/Echo/echo/text/hello
         // (service: Echo corresponds to the name in the mule config file: TC-HTTP-CALL.xml)
-        HttpMethod httpMethod = new GetMethod("http://localhost:63081/services/Echo/echo/text/hello");
+        HttpMethod httpMethod = new GetMethod("http://localhost:" + getPorts().get(0) + "/services/Echo/echo/text/hello");
         // Http Status Code 200 means OK, the request has succeeded. (500 would indicate an error)
         assertEquals(200, client.executeMethod(httpMethod));
         // By default the class package - in its other way round - is used for the namespace:
@@ -64,7 +64,7 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
 
     public void testWebServiceContext() throws Exception
     {
-        String url = "cxf:http://localhost:63081/services/Echo?method=ensureWebSerivceContextIsSet";
+        String url = "cxf:http://localhost:" + getPorts().get(0) + "/services/Echo?method=ensureWebSerivceContextIsSet";
 
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send(url, TEST_MESSAGE, null);
@@ -75,5 +75,11 @@ public class CxfJaxWsTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "jaxws-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

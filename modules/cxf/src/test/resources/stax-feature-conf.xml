@@ -23,7 +23,7 @@
     <model name="BasicCxfTest">
         <service name="echoService">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/Echo"
+                <inbound-endpoint address="http://localhost:${port1}/services/Echo"
                                   exchange-pattern="request-response">
                     <cxf:simple-service />                  
                 </inbound-endpoint>

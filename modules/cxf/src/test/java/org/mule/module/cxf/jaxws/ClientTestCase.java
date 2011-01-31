@@ -12,14 +12,14 @@ package org.mule.module.cxf.jaxws;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.hello_world_soap_http.GreeterImpl;
 
-public class ClientTestCase extends FunctionalTestCase
+public class ClientTestCase extends DynamicPortTestCase
 {
     public void testGeneratedClientWithQuartz() throws Exception
     {
@@ -55,6 +55,12 @@ public class ClientTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "jaxws-client-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

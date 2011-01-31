@@ -10,7 +10,7 @@
 
 package org.mule.module.cxf;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -20,7 +20,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 
-public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
+public class HttpSecurityFilterFunctionalTestCase extends DynamicPortTestCase
 {
     
     private static String soapRequest = 
@@ -45,14 +45,14 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
      */
     public void testAuthenticationFailureBadCredentialsGetHttps() throws Exception
     {
-        doGet(null, "localhost", "anonX", "anonX", "https://localhost:60444/services/Echo", true, true, 401);
+        doGet(null, "localhost", "anonX", "anonX", "https://localhost:" + getPorts().get(1) + "/services/Echo", true, true, 401);
     }
 
     public void testAuthenticationFailureNoContextGet() throws Exception
     {
         HttpClient client = new HttpClient();
         client.getParams().setAuthenticationPreemptive(true);
-        GetMethod get = new GetMethod("http://localhost:60443/services/Echo");
+        GetMethod get = new GetMethod("http://localhost:" + getPorts().get(0) + "/services/Echo");
 
         get.setDoAuthentication(false);
 
@@ -63,7 +63,7 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
             assertEquals(
                 "Registered authentication is set to org.mule.module.acegi.filters.http.HttpBasicAuthenticationFilter "
                                 + "but there was no security context on the session. Authentication denied on "
-                                + "endpoint http://localhost:60443/services/Echo. Message payload is of type: "
+                                + "endpoint http://localhost:" + getPorts().get(0) + "/services/Echo. Message payload is of type: "
                                 + "String", get.getResponseBodyAsString());
         }
         finally
@@ -76,7 +76,7 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
     {
         HttpClient client = new HttpClient();
         client.getParams().setAuthenticationPreemptive(true);
-        PostMethod post = new PostMethod("http://localhost:60443/services/Echo");
+        PostMethod post = new PostMethod("http://localhost:" + getPorts().get(0) + "/services/Echo");
 
         post.setDoAuthentication(false);
 
@@ -90,7 +90,7 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
             assertEquals(
                 "Registered authentication is set to org.mule.module.acegi.filters.http.HttpBasicAuthenticationFilter "
                                 + "but there was no security context on the session. Authentication denied on "
-                                + "endpoint http://localhost:60443/services/Echo. Message payload is of type: "
+                                + "endpoint http://localhost:" + getPorts().get(0) + "/services/Echo. Message payload is of type: "
                                 + "ContentLengthInputStream",   post.getResponseBodyAsString());
         }
         finally
@@ -101,68 +101,68 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
 
     public void testAuthenticationFailureBadCredentialsGet() throws Exception
     {
-        doGet(null, "localhost", "anonX", "anonX", "http://localhost:60443/services/Echo/echo/echo/hello", true, true, 401);
+        doGet(null, "localhost", "anonX", "anonX", "http://localhost:" + getPorts().get(0) + "/services/Echo/echo/echo/hello", true, true, 401);
     }
 
     public void testAuthenticationFailureBadCredentialsPost() throws Exception
     {
-        doPost(null, "localhost", "anonX", "anonX", "http://localhost:60443/services/Echo", true, true, 401);
+        doPost(null, "localhost", "anonX", "anonX", "http://localhost:" + getPorts().get(0) + "/services/Echo", true, true, 401);
     }
 
     public void testAuthenticationFailureBadCredentialsPostHttps() throws Exception
     {
-        doPost(null, "localhost", "anonX", "anonX", "https://localhost:60444/services/Echo", true, true, 401);
+        doPost(null, "localhost", "anonX", "anonX", "https://localhost:" + getPorts().get(1) + "/services/Echo", true, true, 401);
     }
 
     public void testAuthenticationAuthorisedGet() throws Exception
     {
-        doGet(null, "localhost", "anon", "anon", "http://localhost:60443/services/Echo/echo/echo/hello", false, true, 200);
+        doGet(null, "localhost", "anon", "anon", "http://localhost:" + getPorts().get(0) + "/services/Echo/echo/echo/hello", false, true, 200);
     }
 
     public void testAuthenticationAuthorisedGetHttps() throws Exception
     {
-        doGet(null, "localhost", "anon", "anon", "https://localhost:60444/services/Echo/echo/echo/hello", false, true, 200);
+        doGet(null, "localhost", "anon", "anon", "https://localhost:" + getPorts().get(1) + "/services/Echo/echo/echo/hello", false, true, 200);
     }
 
     public void testAuthenticationAuthorisedPost() throws Exception
     {
-        doPost(null, "localhost", "anon", "anon", "http://localhost:60443/services/Echo", false, true, 200);
+        doPost(null, "localhost", "anon", "anon", "http://localhost:" + getPorts().get(0) + "/services/Echo", false, true, 200);
     }
 
     public void testAuthenticationAuthorisedPostHttps() throws Exception
     {
-        doPost(null, "localhost", "anon", "anon", "https://localhost:60444/services/Echo", false, true, 200);
+        doPost(null, "localhost", "anon", "anon", "https://localhost:" + getPorts().get(1) + "/services/Echo", false, true, 200);
     }
 
     public void testAuthenticationAuthorisedWithHandshakeGet() throws Exception
     {
-        doGet(null, "localhost", "anon", "anon", "http://localhost:60443/services/Echo/echo/echo/hello", true, false, 200);
+        doGet(null, "localhost", "anon", "anon", "http://localhost:" + getPorts().get(0) + "/services/Echo/echo/echo/hello", true, false, 200);
     }
 
     public void testAuthenticationAuthorisedWithHandshakePost() throws Exception
     {
-        doPost(null, "localhost", "anon", "anon", "http://localhost:60443/services/Echo", true, false, 200);
+        doPost(null, "localhost", "anon", "anon", "http://localhost:" + getPorts().get(0) + "/services/Echo", true, false, 200);
     }
 
     public void testAuthenticationAuthorisedWithHandshakeAndBadRealmGet() throws Exception
     {
-        doGet("blah", "localhost", "anon", "anon", "http://localhost:60443/services/Echo/echo/echo/hello", true, false, 401);
+        doGet("blah", "localhost", "anon", "anon", "http://localhost:" + getPorts().get(0) + "/services/Echo/echo/echo/hello", true, false, 401);
     }
 
     public void testAuthenticationAuthorisedWithHandshakeAndBadRealmPost() throws Exception
     {
-        doPost("blah", "localhost", "anon", "anon", "http://localhost:60443/services/Echo", true, false, 401);
+        doPost("blah", "localhost", "anon", "anon", "http://localhost:" + getPorts().get(0) + "/services/Echo", true, false, 401);
     }
 
     public void testAuthenticationAuthorisedWithHandshakeAndRealmGet() throws Exception
     {
-        doGet("mule-realm", "localhost", "ross", "ross", "http://localhost:60443/services/Echo/echo/echo/hello", true, false,
+        doGet("mule-realm", "localhost", "ross", "ross", "http://localhost:" + getPorts().get(0) + "/services/Echo/echo/echo/hello", true, false,
             200);
     }
 
     public void testAuthenticationAuthorisedWithHandshakeAndRealmPost() throws Exception
     {
-        doPost("mule-realm", "localhost", "ross", "ross", "http://localhost:60443/services/Echo", true,
+        doPost("mule-realm", "localhost", "ross", "ross", "http://localhost:" + getPorts().get(0) + "/services/Echo", true,
             false, 200);
     }
 
@@ -220,6 +220,12 @@ public class HttpSecurityFilterFunctionalTestCase extends FunctionalTestCase
         {
             post.releaseConnection();
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 
 }

@@ -11,22 +11,24 @@
 package org.mule.module.cxf;
 
 import org.mule.api.MessagingException;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.client.MuleClient;
 import org.mule.module.cxf.testmodels.CustomFault;
 import org.mule.module.cxf.testmodels.CxfEnabledFaultMessage;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.interceptor.Fault;
 
-public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
+public class CxfComponentExceptionStrategyTestCase extends DynamicPortTestCase
 {
     public void testDefaultComponentExceptionStrategy() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         try
         {
-            client.send("cxf:http://localhost:63181/services/CxfDefault?method=testCxfException", "TEST", null);
+            client.send("cxf:" + ((InboundEndpoint) client.getMuleContext().getRegistry()
+                            .lookupObject("cxfDefaultInbound")).getAddress() + "?method=testCxfException", "TEST", null);
             fail("Exception expected");
         }
         catch (MessagingException e)
@@ -46,7 +48,8 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
 
         try
         {
-            client.send("cxf:http://localhost:63181/services/CxfWithExceptionStrategy?method=testCxfException", "TEST", null);
+            client.send("cxf:" + ((InboundEndpoint) client.getMuleContext().getRegistry()
+                            .lookupObject("cxfExceptionStrategyInbound")).getAddress() + "?method=testCxfException", "TEST", null);
             fail("Exception expected");
         }
         catch (MessagingException e)
@@ -64,7 +67,8 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         try
         {
-            client.send("cxf:http://localhost:63181/services/CxfWithExceptionStrategy?method=testNonCxfException", "TEST", null);
+            client.send("cxf:" + ((InboundEndpoint) client.getMuleContext().getRegistry()
+                            .lookupObject("cxfExceptionStrategyInbound")).getAddress() + "?method=testNonCxfException", "TEST", null);
             fail("Exception expected");
         }
         catch (MessagingException e)
@@ -76,5 +80,11 @@ public class CxfComponentExceptionStrategyTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "exception-strategy-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

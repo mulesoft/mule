@@ -10,9 +10,9 @@
 
 package org.mule.module.cxf.employee;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
-public class MtomClientTestCase extends FunctionalTestCase
+public class MtomClientTestCase extends DynamicPortTestCase
 {
 
     public void testEchoService() throws Exception
@@ -34,6 +34,12 @@ public class MtomClientTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "mtom-client-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }
