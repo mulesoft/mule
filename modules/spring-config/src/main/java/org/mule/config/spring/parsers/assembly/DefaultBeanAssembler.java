@@ -96,15 +96,22 @@ public class DefaultBeanAssembler implements BeanAssembler
      */
     public void extendBean(Attr attribute)
     {
-        String oldName = SpringXMLUtils.attributeName(attribute);
-        if (!beanConfig.isIgnored(oldName))
+        if (attribute.getNamespaceURI() == null)
         {
-            logger.debug(attribute + " for " + bean.getBeanDefinition().getBeanClassName());
-            String oldValue = attribute.getNodeValue();
-            String newName = bestGuessName(beanConfig, oldName, bean.getBeanDefinition().getBeanClassName());
-            Object newValue = beanConfig.translateValue(oldName, oldValue);
-            addPropertyWithReference(bean.getBeanDefinition().getPropertyValues(),
+            String oldName = SpringXMLUtils.attributeName(attribute);
+            if (!beanConfig.isIgnored(oldName))
+            {
+                logger.debug(attribute + " for " + bean.getBeanDefinition().getBeanClassName());
+                String oldValue = attribute.getNodeValue();
+                String newName = bestGuessName(beanConfig, oldName, bean.getBeanDefinition().getBeanClassName());
+                Object newValue = beanConfig.translateValue(oldName, oldValue);
+                addPropertyWithReference(bean.getBeanDefinition().getPropertyValues(),
                     beanConfig.getSingleProperty(oldName), newName, newValue);
+            }
+        }
+        else
+        {
+            logger.debug("ignoring global attribute " + attribute.getName());   
         }
     }
 
