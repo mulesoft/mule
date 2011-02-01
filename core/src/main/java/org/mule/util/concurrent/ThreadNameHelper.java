@@ -58,7 +58,7 @@ public class ThreadNameHelper
     /**
      * Generate a generic thread name prefix for this context.
      * @param muleContext context to generate the name prefix for
-     * @return "[appName]." if Mule is running as a container, otherwise "Mule."
+     * @return "[appName]." if Mule is running as a container, otherwise empty string
      */
     public static String getPrefix(MuleContext muleContext)
     {
