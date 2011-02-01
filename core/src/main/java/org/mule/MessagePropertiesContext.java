@@ -117,7 +117,7 @@ public class MessagePropertiesContext implements Serializable
     {
         if (scope == null)
         {
-            return (T) getProperty(key, PropertyScope.OUTBOUND);
+            scope = PropertyScope.OUTBOUND;
         }
 
         T value = null;
