@@ -59,6 +59,11 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
     private String password;
     private String charset;
     private boolean addAttachments;
+    protected ServerSetup setup = null;
+    // for tests which need to send emails in addition to receiving them
+    protected ServerSetup smtpSetup = null;
+    private int smtpPort;
+    private boolean addSmtp = false;
 
     protected AbstractEmailFunctionalTestCase(boolean isMimeMessage, String protocol)
     {
@@ -75,6 +80,12 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
         this(isMimeMessage, protocol, configFile, null, null);
     }
 
+    protected AbstractEmailFunctionalTestCase(boolean isMimeMessage, String protocol, String configFile, boolean addSmtp)
+    {
+        this(isMimeMessage, protocol, configFile, null, null);
+        this.addSmtp = addSmtp;
+    }    
+    
     protected AbstractEmailFunctionalTestCase(boolean isMimeMessage, String protocol, String configFile, Locale locale, String charset)
     {
         this(isMimeMessage, protocol, configFile,
@@ -104,6 +115,7 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
     protected void suitePreSetUp() throws Exception
     {
         this.port = getPorts().get(0);
+        this.smtpPort = getPorts().get(1);
         startServer();
         initDefaultCommandMap();
     }
@@ -223,8 +235,17 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
     private void startServer() throws Exception
     {
         logger.debug("starting server on port " + port);
-        ServerSetup setup = new ServerSetup(port, null, protocol);
-        server = new GreenMail(setup);
+        
+        setup = new ServerSetup(port, null, protocol);
+        if(addSmtp)
+        {
+            smtpSetup = new ServerSetup(smtpPort, null, "smtp");
+            server = new GreenMail(new ServerSetup[]{setup, smtpSetup});
+        }
+        else
+        {
+            server = new GreenMail(setup);
+        }                
         server.start();
         if (protocol.startsWith(Pop3Connector.POP3) || protocol.startsWith(ImapConnector.IMAP))
         {
@@ -248,7 +269,8 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
     @Override
     protected int getNumPortsToFind()
     {
-        return 1;
+        // add extra port in case we need to add an smtp server as wll 
+        return 2;
     }
 
     public void setAddAttachments(boolean addAttachments)

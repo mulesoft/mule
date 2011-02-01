@@ -12,18 +12,18 @@
     <cxf:configuration configurationLocation="org/mule/module/cxf/wsrm/cxf-wsrm.xml"/>
   
     <endpoint name="clientEndpoint" 
-      address="http://localhost:63081/services/greeter"
+      address="http://localhost:${port1}/services/greeter"
       exchange-pattern="request-response">
         <cxf:jaxws-client
             clientClass="org.apache.hello_world_soap_http.SOAPService"
             port="SoapPort"
             operation="greetMe"
             wsdlLocation="classpath:/wsdl/hello_world.wsdl"
-            decoupledEndpoint="http://localhost:63082/response"/>
+            decoupledEndpoint="http://localhost:${port2}/response"/>
     </endpoint>
 
     <flow name="Greeter">
-        <inbound-endpoint address="http://localhost:63081/services/greeter"
+        <inbound-endpoint address="http://localhost:${port1}/services/greeter"
             exchange-pattern="request-response"/>
         <cxf:jaxws-service serviceClass="org.apache.hello_world_soap_http.GreeterImpl" />
         <component>

@@ -11,8 +11,6 @@
 package org.mule.module.cxf.payload;
 
 
-import org.mule.tck.FunctionalTestCase;
-
 import static org.mule.module.cxf.payload.PayloadTestConstants.emptyOjbectArrayPayload;
 import static org.mule.module.cxf.payload.PayloadTestConstants.greetMeOutEndpointName;
 import static org.mule.module.cxf.payload.PayloadTestConstants.nullPayload;
@@ -23,11 +21,13 @@ import static org.mule.module.cxf.payload.PayloadTestConstants.strArrayPayloadRe
 import static org.mule.module.cxf.payload.PayloadTestConstants.strPayload;
 import static org.mule.module.cxf.payload.PayloadTestConstants.strPayloadResult;
 
+import org.mule.tck.DynamicPortTestCase;
+
 /**
  * This tests the payloadToArguments attribute on the cxf outbound endpoints for the
  * case it is supplied with value nullPayloadAsVoid.
  */
-public class TreatNullPayloadAsVoidTestCase extends FunctionalTestCase
+public class TreatNullPayloadAsVoidTestCase extends DynamicPortTestCase
 {
     public void testRunAllScenarios() throws Exception
     {
@@ -57,6 +57,12 @@ public class TreatNullPayloadAsVoidTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "messagedispatcher/null-payload-add-as-void.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

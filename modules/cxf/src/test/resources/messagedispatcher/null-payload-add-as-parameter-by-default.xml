@@ -10,13 +10,13 @@
                http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd">
 
     <cxf:endpoint name="greetMeOutboundEndpoint"
-        address="http://localhost:63081/services/greeter" clientClass="org.apache.hello_world_soap_http.SOAPService"
+        address="http://localhost:${port1}/services/greeter" clientClass="org.apache.hello_world_soap_http.SOAPService"
         wsdlPort="SoapPort" wsdlLocation="classpath:/wsdl/hello_world.wsdl"
         operation="greetMe" exchange-pattern="request-response">
     </cxf:endpoint>
 
     <cxf:endpoint name="sayHiOutboundEndpoint"
-        address="http://localhost:63081/services/greeter" clientClass="org.apache.hello_world_soap_http.SOAPService"
+        address="http://localhost:${port1}/services/greeter" clientClass="org.apache.hello_world_soap_http.SOAPService"
         wsdlPort="SoapPort" wsdlLocation="classpath:/wsdl/hello_world.wsdl"
         operation="sayHi" exchange-pattern="request-response">
     </cxf:endpoint>

@@ -7,7 +7,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd">
 
-    <endpoint name="clientEndpoint" address="http://localhost:63081/services/greeter"
+    <endpoint name="clientEndpoint" address="http://localhost:${port1}/services/greeter"
         exchange-pattern="request-response">
         <cxf:jaxws-client 
             clientClass="org.apache.hello_world_soap_http.SOAPService"
@@ -19,7 +19,7 @@
 
         <service name="greeterService">
             <inbound>
-                <inbound-endpoint address="jetty://localhost:63081/services/greeter"
+                <inbound-endpoint address="jetty://localhost:${port1}/services/greeter"
                     exchange-pattern="request-response">
                     <cxf:jaxws-service />    
                 </inbound-endpoint>

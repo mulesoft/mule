@@ -39,7 +39,7 @@
               <pass-through-router>
                   <outbound-endpoint 
                       name="outboundEmployeeDirectoryEndpoint" 
-                      address="http://localhost:63081/services/employeeDirectory"
+                      address="http://localhost:${port1}/services/employeeDirectory"
                       exchange-pattern="request-response">
                       <cxf:jaxws-client clientClass="org.mule.example.employee.EmployeeDirectory_Service"
                           operation="addEmployee"
@@ -58,7 +58,7 @@
         <service name="employeeDirectoryService">
           <inbound>
             <inbound-endpoint 
-                address="http://localhost:63081/services/employeeDirectory"
+                address="http://localhost:${port1}/services/employeeDirectory"
                 exchange-pattern="request-response">
                 <cxf:jaxws-service mtomEnabled="true"/>
             </inbound-endpoint>

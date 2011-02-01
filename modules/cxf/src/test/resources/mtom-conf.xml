@@ -13,7 +13,7 @@
     <model name="test">
         <service name="mycomponent">
             <inbound>
-               <inbound-endpoint address="http://localhost:63081/services/mtom" exchange-pattern="request-response">
+               <inbound-endpoint address="http://localhost:${port1}/services/mtom" exchange-pattern="request-response">
                    <cxf:jaxws-service mtomEnabled="true" />
                </inbound-endpoint>
             </inbound>

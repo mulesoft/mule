@@ -12,9 +12,9 @@ package org.mule.module.cxf;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
-public class ClientSimpleFrontendTestCase extends FunctionalTestCase
+public class ClientSimpleFrontendTestCase extends DynamicPortTestCase
 {
 
     public void testEchoWsdl() throws Exception
@@ -30,6 +30,12 @@ public class ClientSimpleFrontendTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "aegis-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

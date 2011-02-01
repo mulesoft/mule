@@ -10,13 +10,11 @@
 
 package org.mule.module.cxf;
 
-import org.mule.module.cxf.CxfConfiguration;
-import org.mule.module.cxf.CxfConstants;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import org.apache.cxf.Bus;
 
-public class StaxFeatureTestCase extends FunctionalTestCase
+public class StaxFeatureTestCase extends DynamicPortTestCase
 {
     public void testEchoService() throws Exception
     {
@@ -37,6 +35,12 @@ public class StaxFeatureTestCase extends FunctionalTestCase
     protected String getConfigResources() 
     {
         return "stax-feature-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }
 

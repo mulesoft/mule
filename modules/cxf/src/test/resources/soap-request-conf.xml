@@ -16,7 +16,7 @@
     <service name="TestComponent">
       <inbound>
         <inbound-endpoint
-          address="http://localhost:63381/services/TestComponent" exchange-pattern="request-response">
+          address="http://localhost:${port1}/services/TestComponent" exchange-pattern="request-response" name="httpInbound">
           <cxf:simple-service />
         </inbound-endpoint>
       </inbound>

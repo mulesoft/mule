@@ -12,13 +12,13 @@ package org.mule.module.cxf;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Http10TestCase extends FunctionalTestCase
+public class Http10TestCase extends DynamicPortTestCase
 {
     public Http10TestCase()
     {
@@ -52,5 +52,11 @@ public class Http10TestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "http-10-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

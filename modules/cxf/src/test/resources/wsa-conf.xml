@@ -14,7 +14,7 @@
   <model name="TestCxfModel">
     <service name="echoService">
       <inbound>
-          <inbound-endpoint address="http://localhost:63081/services/employee" exchange-pattern="request-response">
+          <inbound-endpoint address="http://localhost:${port1}/services/employee" exchange-pattern="request-response">
               <cxf:jaxws-service mtomEnabled="false">
                 <cxf:features>
                   <wsa:addressing />

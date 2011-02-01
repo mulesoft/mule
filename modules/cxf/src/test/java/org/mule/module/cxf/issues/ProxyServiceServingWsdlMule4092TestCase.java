@@ -10,7 +10,7 @@
 
 package org.mule.module.cxf.issues;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.util.IOUtils;
 import org.mule.util.SystemUtils;
 
@@ -19,17 +19,17 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.custommonkey.xmlunit.XMLUnit;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
+public class ProxyServiceServingWsdlMule4092TestCase extends DynamicPortTestCase
 {
     private String expectedWsdlFileName;
 
@@ -79,7 +79,7 @@ public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
     {
         String expected = getXML("issues/" + expectedWsdlFileName);
 
-        URL url = new URL("http://localhost:8777/services/onlinestore?wsdl");
+        URL url = new URL("http://localhost:" + getPorts().get(0) + "/services/onlinestore?wsdl");
         String wsdlFromService = IOUtils.toString(url.openStream());
 
         // The exact string representation may differ, so we'll spot check the WSDL contents
@@ -150,5 +150,11 @@ public class ProxyServiceServingWsdlMule4092TestCase extends FunctionalTestCase
         DocumentBuilder builder = factory.newDocumentBuilder();
         InputSource source = new InputSource(new StringReader(xmlString));
         return builder.parse(source);
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

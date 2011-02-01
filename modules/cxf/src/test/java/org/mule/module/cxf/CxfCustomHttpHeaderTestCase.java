@@ -16,15 +16,15 @@ import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.tck.DynamicPortTestCase;
 
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 
-public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements EndpointMessageNotificationListener
+public class CxfCustomHttpHeaderTestCase extends DynamicPortTestCase implements EndpointMessageNotificationListener
 {
-    protected static final String endpointAddress = "http://localhost:63181/services/TestComponent?method=onReceive";
-
+    protected String endpointAddress = null;
     private MuleMessage notificationMsg = null;
     private CountDownLatch latch = null;
 
@@ -32,6 +32,9 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements E
     {
         latch = new CountDownLatch(1);
         muleContext.registerListener(this);
+        MuleClient client = new MuleClient(muleContext);
+        endpointAddress = ((InboundEndpoint) client.getMuleContext().getRegistry()
+                        .lookupObject("cxfInbound")).getAddress() + "?method=onReceive";
     }
 
     protected void doTearDown() throws Exception
@@ -92,6 +95,12 @@ public class CxfCustomHttpHeaderTestCase extends FunctionalTestCase implements E
     protected String getConfigResources()
     {
         return "headers-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

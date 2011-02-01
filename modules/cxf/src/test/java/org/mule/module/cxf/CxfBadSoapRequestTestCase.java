@@ -13,7 +13,7 @@ package org.mule.module.cxf;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
 
@@ -23,7 +23,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
-public class CxfBadSoapRequestTestCase extends FunctionalTestCase
+public class CxfBadSoapRequestTestCase extends DynamicPortTestCase
 {
 
     protected String getConfigResources()
@@ -42,7 +42,7 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase
                              + "</ssss>"
                              + "</soap:Body>" + "</soap:Envelope>";
 
-        MuleMessage reply = client.send("http://localhost:63381/services/TestComponent", new DefaultMuleMessage(
+        MuleMessage reply = client.send("http://localhost:" + getPorts().get(0) + "/services/TestComponent", new DefaultMuleMessage(
             soapRequest, muleContext));
 
         assertNotNull(reply);
@@ -64,6 +64,12 @@ public class CxfBadSoapRequestTestCase extends FunctionalTestCase
         Element faultStringElement = (Element) fault.get(0);
         assertEquals("Message part {http://www.muleumo.org}ssss was not recognized.  (Does it exist in service WSDL?)",
             faultStringElement.getStringValue());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

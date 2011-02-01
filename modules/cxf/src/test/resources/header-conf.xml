@@ -11,7 +11,7 @@
   
   <endpoint
       name="clientEndpoint" 
-      address="http://localhost:63081/services/greeter"
+      address="http://localhost:${port1}/services/greeter"
       exchange-pattern="request-response">
       <cxf:jaxws-client 
           clientClass="org.apache.hello_world_soap_http.SOAPService" 
@@ -30,7 +30,7 @@
   
     <service name="greeterService">
       <inbound>
-          <inbound-endpoint address="http://localhost:63081/services/greeter" 
+          <inbound-endpoint address="http://localhost:${port1}/services/greeter" 
               exchange-pattern="request-response">
               <cxf:jaxws-service />
           </inbound-endpoint>

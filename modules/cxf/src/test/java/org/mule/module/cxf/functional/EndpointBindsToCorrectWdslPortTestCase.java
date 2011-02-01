@@ -17,6 +17,7 @@ import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.service.ServiceCompositeMessageSource;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.List;
@@ -24,7 +25,7 @@ import java.util.List;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.service.model.EndpointInfo;
 
-public class EndpointBindsToCorrectWdslPortTestCase extends FunctionalTestCase
+public class EndpointBindsToCorrectWdslPortTestCase extends DynamicPortTestCase
 {
 
     @Override
@@ -49,5 +50,11 @@ public class EndpointBindsToCorrectWdslPortTestCase extends FunctionalTestCase
         assertEquals(
             "The local part of the endpoing name must be the one supplied as the endpointName parameter on the cxf:inbound-endpoint",
             "ListsSoap", endpointInfo.getName().getLocalPart());
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }

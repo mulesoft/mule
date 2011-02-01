@@ -16,7 +16,8 @@
     <model name="TestCxfHeaders">
         <service name="TestComponent">
             <inbound>
-                <inbound-endpoint address="http://localhost:63181/services/TestComponent"
+                <inbound-endpoint address="http://localhost:${port1}/services/TestComponent"
+                    name="cxfInbound"
                     exchange-pattern="request-response">
                     <cxf:simple-service serviceClass="org.mule.tck.functional.Receiveable"/>
                 </inbound-endpoint>

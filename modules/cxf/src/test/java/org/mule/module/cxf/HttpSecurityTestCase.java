@@ -11,7 +11,7 @@ package org.mule.module.cxf;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.transport.http.HttpConnector;
 
 import org.apache.commons.httpclient.Credentials;
@@ -22,7 +22,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 
 
-public class HttpSecurityTestCase extends FunctionalTestCase 
+public class HttpSecurityTestCase extends DynamicPortTestCase 
 {
     
     private static String soapRequest = 
@@ -46,7 +46,7 @@ public class HttpSecurityTestCase extends FunctionalTestCase
         client.getState().setCredentials(AuthScope.ANY, credentials);
         client.getParams().setAuthenticationPreemptive(true);
 
-        PostMethod method = new PostMethod("https://localhost:60443/services/Echo");
+        PostMethod method = new PostMethod("https://localhost:" + getPorts().get(1) + "/services/Echo");
         method.setDoAuthentication(true);
         StringRequestEntity requestEntity = new StringRequestEntity(soapRequest, "text/plain", "UTF-8");
         method.setRequestEntity(requestEntity);
@@ -69,7 +69,7 @@ public class HttpSecurityTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient(muleContext);
 
-        MuleMessage result = client.send("cxf:http://admin:admin@localhost:61080/services/Echo?method=echo", "Hello", null);
+        MuleMessage result = client.send("cxf:http://admin:admin@localhost:" + getPorts().get(0) + "/services/Echo?method=echo", "Hello", null);
 
         final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(200, status);
@@ -79,6 +79,12 @@ public class HttpSecurityTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "http-security-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }   
     
 }   

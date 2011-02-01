@@ -16,7 +16,7 @@
 
     <service name="echoService">
       <inbound>
-        <http:inbound-endpoint address="http://localhost:63081/services/Echo" exchange-pattern="request-response">
+        <http:inbound-endpoint address="http://localhost:${port1}/services/Echo" exchange-pattern="request-response" name="httpInbound">
             <cxf:simple-service/>
         </http:inbound-endpoint>
       </inbound>

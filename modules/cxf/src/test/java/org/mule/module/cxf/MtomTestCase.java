@@ -10,7 +10,7 @@
 
 package org.mule.module.cxf;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,7 +27,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.TestMtomService;
 
-public class MtomTestCase extends FunctionalTestCase
+public class MtomTestCase extends DynamicPortTestCase
 {
 
     public void testEchoService() throws Exception
@@ -40,7 +40,7 @@ public class MtomTestCase extends FunctionalTestCase
         
         BindingProvider bp = ((BindingProvider) port);
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-            "http://localhost:63081/services/mtom");
+            "http://localhost:" + getPorts().get(0) + "/services/mtom");
         ((SOAPBinding) bp.getBinding()).setMTOMEnabled(true);
 //        Client client = ClientProxy.getClient(port);
 //        new LoggingFeature().initialize(client, null);
@@ -65,6 +65,13 @@ public class MtomTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "mtom-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        // TODO Auto-generated method stub
+        return 1;
     }
 
 }

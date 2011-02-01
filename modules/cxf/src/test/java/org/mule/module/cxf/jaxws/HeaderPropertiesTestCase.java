@@ -13,7 +13,7 @@ package org.mule.module.cxf.jaxws;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.apache.hello_world_soap_http.GreeterImpl;
 
-public class HeaderPropertiesTestCase extends FunctionalTestCase
+public class HeaderPropertiesTestCase extends DynamicPortTestCase
 {
 
     private GreeterImpl getGreeter() throws Exception
@@ -61,6 +61,12 @@ public class HeaderPropertiesTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "header-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

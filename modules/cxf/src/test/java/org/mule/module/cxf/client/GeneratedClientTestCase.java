@@ -12,9 +12,9 @@ package org.mule.module.cxf.client;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
-public class GeneratedClientTestCase extends FunctionalTestCase
+public class GeneratedClientTestCase extends DynamicPortTestCase
 {
     public void testEchoService() throws Exception
     {
@@ -27,7 +27,7 @@ public class GeneratedClientTestCase extends FunctionalTestCase
                      + "<soap:Body>" + "<test> foo </test>" + "</soap:Body>" + "</soap:Envelope>";
 
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("http://localhost:63081/services/Echo", msg, null);
+        MuleMessage result = client.send("http://localhost:" + getPorts().get(0) + "/services/Echo", msg, null);
         byte[] res = (byte[]) result.getPayload();
         String resString = new String(res);
 
@@ -37,6 +37,12 @@ public class GeneratedClientTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "proxy-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

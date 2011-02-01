@@ -16,14 +16,14 @@
     
         <service name="routeBasedOnSoapAction">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/mtom" 
+                <inbound-endpoint address="http://localhost:${port1}/services/mtom" 
                                      exchange-pattern="request-response">
                     <cxf:proxy-service mtomEnabled="true"/>
                 </inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="http://localhost:63081/services/mtom2"  
+                    <outbound-endpoint address="http://localhost:${port1}/services/mtom2"  
                                        exchange-pattern="request-response">
                         <cxf:proxy-client mtomEnabled="true"/>              
                     </outbound-endpoint>
@@ -33,7 +33,7 @@
         
         <service name="mycomponent">
             <inbound>
-               <inbound-endpoint address="http://localhost:63081/services/mtom2" 
+               <inbound-endpoint address="http://localhost:${port1}/services/mtom2" 
                                  exchange-pattern="request-response">
                    <cxf:jaxws-service mtomEnabled="true"/>
                </inbound-endpoint>

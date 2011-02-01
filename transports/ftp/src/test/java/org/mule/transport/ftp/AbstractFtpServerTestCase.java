@@ -10,27 +10,26 @@
 
 package org.mule.transport.ftp;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.ftp.server.FTPTestClient;
-import org.mule.transport.ftp.server.MuleFtplet;
-import org.mule.transport.ftp.server.Server;
-import org.mule.util.FileUtils;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
 import org.apache.ftpserver.ftplet.Ftplet;
+import org.mule.tck.DynamicPortTestCase;
+import org.mule.transport.ftp.server.FTPTestClient;
+import org.mule.transport.ftp.server.MuleFtplet;
+import org.mule.transport.ftp.server.Server;
+import org.mule.util.FileUtils;
 
 /**
  * Abstract FTP test class. Sets up the ftp server and starts/stops it during the
  * test lifecycle.
  */
-public abstract class AbstractFtpServerTestCase extends FunctionalTestCase 
+public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase 
     implements MuleFtplet.Callback
 {
-    public static final String TEST_MESSAGE = "Test FTP message";
+	public static final String TEST_MESSAGE = "Test FTP message";
     
     private static final String DEFAULT_FTP_HOST = "localhost";
     private static int DEFAULT_TIMEOUT = 10000;
@@ -55,22 +54,21 @@ public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
      */
     protected Ftplet ftplet = new MuleFtplet(this);
     
-    public AbstractFtpServerTestCase(String ftpHost, int port, int timeout)
+    public AbstractFtpServerTestCase(String ftpHost, int timeout)
     {        
+    	super();
         this.ftpHost = ftpHost;
-        this.ftpPort = port;
         this.timeout = timeout;
-        ftpClient = new FTPTestClient(this.ftpHost, this.ftpPort, this.ftpUser, this.ftpPassword);
     }
     
-    public AbstractFtpServerTestCase(int port, int timeout)
+    public AbstractFtpServerTestCase(int timeout)
     {
-        this(DEFAULT_FTP_HOST, port, timeout);
+        this(DEFAULT_FTP_HOST, timeout);
     }
 
-    public AbstractFtpServerTestCase(int port)
+    public AbstractFtpServerTestCase()
     {
-        this(port, DEFAULT_TIMEOUT);
+        this(DEFAULT_TIMEOUT);
     }
 
     protected void startServer() throws Exception
@@ -97,7 +95,8 @@ public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-
+        this.ftpPort = getPorts().get(0);
+        ftpClient = new FTPTestClient(this.ftpHost, this.ftpPort, this.ftpUser, this.ftpPassword);
         // make sure we start out with a clean ftp server base
         createFtpServerBaseDir();
 
@@ -172,4 +171,9 @@ public abstract class AbstractFtpServerTestCase extends FunctionalTestCase
     {
         // subclasses can override this method
     }
+    
+    @Override
+	protected int getNumPortsToFind() {
+		return 1;
+	}
 }

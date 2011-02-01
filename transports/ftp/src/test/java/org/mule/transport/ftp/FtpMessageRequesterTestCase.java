@@ -15,13 +15,6 @@ import org.mule.module.client.MuleClient;
 
 public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
 {   
-    private static final int PORT = 60199;
-    
-    public FtpMessageRequesterTestCase()
-    {
-        super(PORT);
-    }
-
     @Override
     protected String getConfigResources()
     {

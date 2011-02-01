@@ -12,7 +12,7 @@ package org.mule.module.cxf;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
@@ -20,10 +20,10 @@ import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServletTestCase extends FunctionalTestCase
+public class ServletTestCase extends DynamicPortTestCase
 {
 
-    public static final int HTTP_PORT = 63088;
+    public int HTTP_PORT = -1;
 
     private EmbeddedJettyServer httpServer;
 
@@ -37,7 +37,7 @@ public class ServletTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-
+        HTTP_PORT = getPorts().get(0);
         httpServer = new EmbeddedJettyServer(HTTP_PORT, getContextPath(), "/services/*", new MuleReceiverServlet(), muleContext);
         httpServer.start();
     }
@@ -88,6 +88,12 @@ public class ServletTestCase extends FunctionalTestCase
                 + getContextPath() + "/services/mycomponent/echo/text/Test String", "", props);
         String res = result.getPayloadAsString();
         assertTrue(res.indexOf("Test String") != -1);
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }
 

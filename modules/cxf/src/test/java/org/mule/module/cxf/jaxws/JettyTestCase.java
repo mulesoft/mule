@@ -12,6 +12,7 @@ package org.mule.module.cxf.jaxws;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.HashMap;
@@ -20,7 +21,7 @@ import java.util.Map;
 import org.apache.cxf.BusFactory;
 import org.apache.hello_world_soap_http.GreeterImpl;
 
-public class JettyTestCase extends FunctionalTestCase
+public class JettyTestCase extends DynamicPortTestCase
 {
 
     @Override
@@ -55,6 +56,12 @@ public class JettyTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "jetty-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
 }

@@ -14,9 +14,9 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.client.DefaultLocalMuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
-public class WSRMTest extends FunctionalTestCase
+public class WSRMTest extends DynamicPortTestCase
 {
     public void testWSRM() throws Exception
     {
@@ -29,6 +29,12 @@ public class WSRMTest extends FunctionalTestCase
     protected String getConfigResources()
     {
         return "org/mule/module/cxf/wsrm/wsrm-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 
 }

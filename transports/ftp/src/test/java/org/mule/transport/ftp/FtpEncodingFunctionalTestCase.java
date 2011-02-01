@@ -22,14 +22,8 @@ public class FtpEncodingFunctionalTestCase extends AbstractFtpServerTestCase
     private static final String TEST_MESSAGE_EUC_JP_ENCODED = "\u3053";
     private static final int FIVE_SECONDS_TIMEOUT = 5000;
     private static final String ENCODING = "EUC-JP";
-    private static final int FTP_SERVER_PORT = 60200;
 
     private File testDataFile;
-
-    public FtpEncodingFunctionalTestCase()
-    {
-        super(FTP_SERVER_PORT);
-    }
 
     @Override
     protected String getConfigResources()

@@ -14,7 +14,7 @@
     <model name="Proxy_Test">
         <service name="WebService">
             <inbound>
-                <inbound-endpoint address="http://localhost:6065" exchange-pattern="request-response">
+                <inbound-endpoint address="http://localhost:${port1}" exchange-pattern="request-response">
                     <cxf:simple-service />
                 </inbound-endpoint>
             </inbound>
@@ -23,13 +23,13 @@
         
         <service name="webServiceProxy">
             <inbound>
-                <inbound-endpoint address="http://localhost:6070/webServiceProxy"
+                <inbound-endpoint address="http://localhost:${port2}/webServiceProxy"
                     exchange-pattern="request-response"/>
             </inbound>
             <component class="org.mule.module.cxf.WSProxyService"/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="http://localhost:6065/WebService"
+                    <outbound-endpoint address="http://localhost:${port1}/WebService"
                         exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>
@@ -37,7 +37,7 @@
 
         <service name="webServiceProxyWithWsdlFromFile">
             <inbound>
-                <inbound-endpoint address="http://localhost:6075/webServiceProxy" 
+                <inbound-endpoint address="http://localhost:${port3}/webServiceProxy" 
                     exchange-pattern="request-response"/>
             </inbound>
             <component>
@@ -45,7 +45,7 @@
             </component>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="http://localhost:6065/WebService"
+                    <outbound-endpoint address="http://localhost:${port1}/WebService"
                         exchange-pattern="request-response"/>
                 </pass-through-router>
             </outbound>

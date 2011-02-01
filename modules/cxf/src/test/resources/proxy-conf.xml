@@ -20,7 +20,7 @@
 
     <flow name="serverClientProxyEnvelopeWithValidation">
         <inbound-endpoint
-            address="http://localhost:63081/services/proxyEnvelopeWithValidation"
+            address="http://localhost:${port1}/services/proxyEnvelopeWithValidation"
             exchange-pattern="request-response">
         </inbound-endpoint>
         <cxf:proxy-service 
@@ -37,7 +37,7 @@
     
     <flow name="serverClientProxyBodyWithValidation">
         <inbound-endpoint
-            address="http://localhost:63081/services/proxyBodyWithValidation"
+            address="http://localhost:${port1}/services/proxyBodyWithValidation"
             exchange-pattern="request-response">
         </inbound-endpoint>
         <cxf:proxy-service 
@@ -56,7 +56,7 @@
     
         <service name="jaxwsProxy">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/greeterProxy"
+                <inbound-endpoint address="http://localhost:${port1}/services/greeterProxy"
                     exchange-pattern="request-response">
                     <cxf:jaxws-service serviceClass="org.apache.hello_world_soap_http.GreeterImpl"/>
                 </inbound-endpoint>
@@ -64,7 +64,7 @@
             <outbound>
                 <pass-through-router>
                     <outbound-endpoint
-                            address="http://localhost:63081/services/greeter"
+                            address="http://localhost:${port1}/services/greeter"
                             exchange-pattern="request-response">
                         <cxf:jaxws-client
                             clientClass="org.apache.hello_world_soap_http.SOAPService"
@@ -78,7 +78,7 @@
         
         <service name="proxyWithTransform">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/transform-proxy" 
+                <inbound-endpoint address="http://localhost:${port1}/services/transform-proxy" 
                                   exchange-pattern="request-response">
                     <!-- we're just ensuring that cxf proxies can handle non XMLStreamReader types here -->
                     <mule-xml:xml-to-dom-transformer returnClass="org.w3c.dom.Document"/>
@@ -90,7 +90,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="http://localhost:63081/services/greeter" 
+                    <outbound-endpoint address="http://localhost:${port1}/services/greeter" 
                                        exchange-pattern="request-response">
                         <cxf:proxy-client />
                     </outbound-endpoint>
@@ -100,14 +100,14 @@
         
         <service name="greeter-proxy">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/greeter-proxy" 
+                <inbound-endpoint address="http://localhost:${port1}/services/greeter-proxy" 
                                   exchange-pattern="request-response">
                     <cxf:proxy-service/>
                 </inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="http://localhost:63081/services/greeter" 
+                    <outbound-endpoint address="http://localhost:${port1}/services/greeter" 
                                        exchange-pattern="request-response">
                         <cxf:proxy-client />
                     </outbound-endpoint>
@@ -117,7 +117,7 @@
         
         <service name="greeter">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/greeter"
+                <inbound-endpoint address="http://localhost:${port1}/services/greeter"
                                   exchange-pattern="request-response">
                      <cxf:jaxws-service/>
                 </inbound-endpoint>
@@ -129,7 +129,7 @@
         
         <service name="serverEcho">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/Echo" 
+                <inbound-endpoint address="http://localhost:${port1}/services/Echo" 
                                   exchange-pattern="request-response">
                     <cxf:proxy-service/>
                 </inbound-endpoint>
@@ -150,7 +150,7 @@
         
         <service name="serverClientProxy">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/proxy" 
+                <inbound-endpoint address="http://localhost:${port1}/services/proxy" 
                                       exchange-pattern="request-response">
                     <cxf:proxy-service>
                         <cxf:inInterceptors>
@@ -164,7 +164,7 @@
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="http://localhost:63081/services/Echo" 
+                    <outbound-endpoint address="http://localhost:${port1}/services/Echo" 
                                        exchange-pattern="request-response">
                         <cxf:proxy-client />
                     </outbound-endpoint>
@@ -174,14 +174,14 @@
         
         <service name="serverClientProxyEnvelope">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/envelope-proxy" 
+                <inbound-endpoint address="http://localhost:${port1}/services/envelope-proxy" 
                     exchange-pattern="request-response">
                     <cxf:proxy-service payload="envelope" />
                 </inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="http://localhost:63081/services/Echo" 
+                    <outbound-endpoint address="http://localhost:${port1}/services/Echo" 
                                        exchange-pattern="request-response">
                         <cxf:proxy-client payload="envelope"/>
                     </outbound-endpoint>
@@ -191,7 +191,7 @@
         
         <service name="serverClientProxyWithWsdl">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/proxyWithWsdl" 
+                <inbound-endpoint address="http://localhost:${port1}/services/proxyWithWsdl" 
                                   exchange-pattern="request-response">
                     <cxf:proxy-service
                         service="WebService"
@@ -202,7 +202,7 @@
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="http://localhost:63081/services/Echo" 
+                    <outbound-endpoint address="http://localhost:${port1}/services/Echo" 
                                        exchange-pattern="request-response">
                         <cxf:proxy-client />
                     </outbound-endpoint>
@@ -212,7 +212,7 @@
         
         <service name="serverClientProxyWithWsdl2">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/proxyWithWsdl2" 
+                <inbound-endpoint address="http://localhost:${port1}/services/proxyWithWsdl2" 
                                   exchange-pattern="request-response">
                     <cxf:proxy-service
                         service="WebService2"
@@ -224,7 +224,7 @@
             <test:component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="http://localhost:63081/services/Echo" 
+                    <outbound-endpoint address="http://localhost:${port1}/services/Echo" 
                                        exchange-pattern="request-response">
                         <cxf:proxy-client />
                     </outbound-endpoint>
@@ -234,14 +234,14 @@
        
         <service name="serverClientProxyWithTransform">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/proxyWithTransform" 
+                <inbound-endpoint address="http://localhost:${port1}/services/proxyWithTransform" 
                                   exchange-pattern="request-response">
                     <cxf:proxy-service />
                 </inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="http://localhost:63081/services/Echo" 
+                    <outbound-endpoint address="http://localhost:${port1}/services/Echo" 
                                        exchange-pattern="request-response">
                         <cxf:proxy-client />    
                         <response>
@@ -254,7 +254,7 @@
                 
         <service name="routeBasedOnSoapAction">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/routeBasedOnSoapAction" 
+                <inbound-endpoint address="http://localhost:${port1}/services/routeBasedOnSoapAction" 
                                   exchange-pattern="request-response">
                     <cxf:proxy-service>
                         <cxf:features>
@@ -262,7 +262,7 @@
                         </cxf:features>
                     </cxf:proxy-service>
                 </inbound-endpoint>
-                <inbound-endpoint address="http://localhost:63081/services/routeBasedOnSoapActionAsync" 
+                <inbound-endpoint address="http://localhost:${port1}/services/routeBasedOnSoapActionAsync" 
                                   exchange-pattern="one-way">
                     <cxf:proxy-service>
                         <cxf:features>
@@ -273,14 +273,14 @@
             </inbound>
             <outbound>
                 <filtering-router>
-                    <outbound-endpoint address="http://localhost:63081/services/Echo" 
+                    <outbound-endpoint address="http://localhost:${port1}/services/Echo" 
                                        exchange-pattern="request-response">
                         <cxf:proxy-client />
                     </outbound-endpoint>
                     <message-property-filter pattern="SOAPAction=http://acme.com/no-transform" scope="inbound"/>
                 </filtering-router>
                 <filtering-router>
-                    <outbound-endpoint address="http://localhost:63081/services/Echo" 
+                    <outbound-endpoint address="http://localhost:${port1}/services/Echo" 
                                        exchange-pattern="request-response">
                          <cxf:proxy-client />    
                          <response>
@@ -290,7 +290,7 @@
                     <message-property-filter pattern="SOAPAction=http://acme.com/transform" scope="inbound"/>
                 </filtering-router>
                 <filtering-router>
-                    <outbound-endpoint address="http://localhost:63081/services/oneway" 
+                    <outbound-endpoint address="http://localhost:${port1}/services/oneway" 
                                        exchange-pattern="request-response"
                                        responseTimeout="2000">
                         <cxf:proxy-client />
@@ -302,7 +302,7 @@
         
         <service name="asyncService">
             <inbound>
-                <inbound-endpoint address="http://localhost:63081/services/oneway"
+                <inbound-endpoint address="http://localhost:${port1}/services/oneway"
                     exchange-pattern="request-response">
                     <cxf:jaxws-service />
                 </inbound-endpoint>

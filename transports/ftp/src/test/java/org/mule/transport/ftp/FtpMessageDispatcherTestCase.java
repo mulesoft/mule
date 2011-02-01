@@ -19,14 +19,12 @@ import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
-{
-    private static final int PORT = 61099;
-    
+{  
     private CountDownLatch latch;
     
     public FtpMessageDispatcherTestCase()
     {
-        super(PORT);        
+        super();        
         latch = new CountDownLatch(1);
     }
 
