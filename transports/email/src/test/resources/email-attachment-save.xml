@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:imap="http://www.mulesoft.org/schema/mule/imap" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.1/mule-file.xsd
+       http://www.mulesoft.org/schema/mule/imap http://www.mulesoft.org/schema/mule/imap/3.1/mule-imap.xsd">
+
+    <flow name="incoming-orders">
+        <imap:inbound-endpoint user="${mail.user}"
+            password="${mail.password}" host="${mail.host}" port="${port1}" />
+        <expression-transformer evaluator="attachments-list" expression="*" />
+        
+        <collection-splitter />
+        <file:outbound-endpoint path="${mail.save.dir}"
+                outputPattern="#[groovy:payload.getName()]"/>
+    </flow>
+</mule>
