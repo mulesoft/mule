@@ -629,11 +629,39 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      *
      * Note that e.g. a WAR-embedded Mule will run in container mode, but will still be considerd embedded
      * for management purposes.
+     *
+     * @see #isEmbedded()
      */
     public boolean isContainerMode()
     {
         return this.containerMode;
     }
+
+    /**
+     * The setting is only editable before the context has been initialized, change requests ignored afterwards.
+     */
+    public void setContainerMode(boolean containerMode)
+    {
+        if (verifyContextNotInitialized())
+        {
+            this.containerMode = containerMode;
+        }
+    }
+
+    /**
+     * Try to guess if we're embedded. If "mule.home" JVM property has been set, then we've been
+     * started via Mule script and can assume we're running standalone. Otherwise (no property set), Mule
+     * has been started via a different mechanism.
+     *
+     * @see #isContainerMode()
+     */
+    public boolean isEmbedded()
+    {
+        // this is our best guess
+        return getMuleHomeDirectory() == null;
+    }
+
+
 
     public Map<String, String> getExtendedProperties() {
         return extendedProperties;

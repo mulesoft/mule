@@ -145,6 +145,13 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
             : PropertiesMuleConfigurationFactory.getMuleAppConfiguration(configResource);
         
         DefaultMuleConfiguration muleConfiguration = new PropertiesMuleConfigurationFactory(muleAppConfig).createConfiguration();
+
+        /*
+            We deliberately enable container mode here to allow for multi-tenant environment (multiple WARs
+            embedding Mule instance each). See property javadocs for more info.
+         */
+        muleConfiguration.setContainerMode(true);
+
         if (serverId != null)
         {
             muleConfiguration.setId(serverId);
