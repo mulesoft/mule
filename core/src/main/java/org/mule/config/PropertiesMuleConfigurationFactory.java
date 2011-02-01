@@ -10,22 +10,24 @@
 
 package org.mule.config;
 
+import org.mule.MuleServer;
+import org.mule.api.config.MuleConfiguration;
+import org.mule.util.BeanUtils;
+import org.mule.util.ClassUtils;
+import org.mule.util.FilenameUtils;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.MuleServer;
-import org.mule.util.BeanUtils;
-import org.mule.util.ClassUtils;
-import org.mule.util.FilenameUtils;
 
 public class PropertiesMuleConfigurationFactory
 {
@@ -78,12 +80,12 @@ public class PropertiesMuleConfigurationFactory
         return configuration;
     }
 
-    private void initializeFromProperties(DefaultMuleConfiguration configuration)
+    private void initializeFromProperties(MuleConfiguration configuration)
     {
         initializeFromProperties(configuration, this.properties);
     }
     
-    public static void initializeFromProperties(DefaultMuleConfiguration configuration, Map properties)
+    public static void initializeFromProperties(MuleConfiguration configuration, Map properties)
     {
         for (Object entryObject : properties.entrySet())
         {
