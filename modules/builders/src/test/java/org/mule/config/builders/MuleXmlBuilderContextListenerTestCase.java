@@ -10,6 +10,10 @@
 
 package org.mule.config.builders;
 
+import org.mule.util.FilenameUtils;
+
+import java.io.File;
+
 import javax.servlet.ServletContext;
 
 import org.junit.After;
@@ -48,6 +52,8 @@ public class MuleXmlBuilderContextListenerTestCase
             .thenReturn("mule-config.xml");
         when(context.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))
             .thenReturn(null);
+        when(context.getAttribute(MuleXmlBuilderContextListener.ATTR_JAVAX_SERVLET_CONTEXT_TEMPDIR))
+            .thenReturn(new File(".mule/testWeb"));
 
         listener.initialize(context);
 
@@ -64,6 +70,8 @@ public class MuleXmlBuilderContextListenerTestCase
             .thenReturn("org/mule/config/builders/mule-config.xml");
         when(context.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))
             .thenReturn(null);
+        when(context.getAttribute(MuleXmlBuilderContextListener.ATTR_JAVAX_SERVLET_CONTEXT_TEMPDIR))
+                .thenReturn(new File(".mule/testWeb"));
 
         listener.initialize(context);
 
@@ -82,6 +90,8 @@ public class MuleXmlBuilderContextListenerTestCase
         .thenReturn("org/mule/config/builders/mule-app-ppp.properties");
         when(context.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))
             .thenReturn(null);
+        when(context.getAttribute(MuleXmlBuilderContextListener.ATTR_JAVAX_SERVLET_CONTEXT_TEMPDIR))
+                .thenReturn(new File(".mule/testWeb"));
 
         listener.initialize(context);
 
@@ -94,6 +104,7 @@ public class MuleXmlBuilderContextListenerTestCase
     private void assertWorkingDirectoryEndsWith(String expected)
     {
         String workingDirectory = listener.muleContext.getConfiguration().getWorkingDirectory();
+        workingDirectory = FilenameUtils.separatorsToUnix(workingDirectory);
         assertTrue(workingDirectory.endsWith(expected));
     }
 }
