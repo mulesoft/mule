@@ -35,6 +35,14 @@ public class AjaxFunctionalTestCase extends DynamicPortTestCase
     private HttpClient httpClient;
     private BayeuxClient bayeuxClient;
 
+    public AjaxFunctionalTestCase()
+    {
+        super();
+        // start the embedded servers before starting mule to try and avoid
+        // intermittent failures in testClientPublishWithString        
+        setStartContext(false);
+    }
+
     @Override
     protected String getConfigResources()
     {
@@ -55,11 +63,17 @@ public class AjaxFunctionalTestCase extends DynamicPortTestCase
         
         assertTrue("httpClient is not running", httpClient.isRunning());
         assertTrue("bayeuxClient is not running", bayeuxClient.isRunning());
+        muleContext.start();
     }
 
     @Override
     protected void doTearDown() throws Exception
     {
+        if(muleContext.isStarted())
+        {
+            muleContext.stop();
+        }
+        
         if (httpClient.isRunning())
         {
             httpClient.stop();
