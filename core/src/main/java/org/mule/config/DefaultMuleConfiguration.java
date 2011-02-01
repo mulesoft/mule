@@ -619,6 +619,17 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
+    /**
+     * A container mode implies multiple Mule apps running. When true, Mule changes behavior in some areas, e.g.:
+     * <ul>
+     *     <li>Splash screens</li>
+     *     <li>Thread names have app name in the prefix to guarantee uniqueness</li>
+     * </ul>
+     * etc.
+     *
+     * Note that e.g. a WAR-embedded Mule will run in container mode, but will still be considerd embedded
+     * for management purposes.
+     */
     public boolean isContainerMode()
     {
         return this.containerMode;
