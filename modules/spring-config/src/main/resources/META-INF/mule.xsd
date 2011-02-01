@@ -121,8 +121,6 @@
             <xsd:element ref="abstract-transaction-manager"/>
             <xsd:element ref="abstract-connector"/>
             <xsd:element ref="abstract-global-endpoint"/>
-            <xsd:element ref="abstract-transformer"/>
-            <xsd:element ref="abstract-filter"/>
             <xsd:element ref="abstract-flow-construct" />
             <xsd:element ref="flow" />
             <xsd:element ref="abstract-model"/>
@@ -1785,7 +1783,7 @@
     <xsd:element name="simple-service" type="simpleServiceType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                Deprecated.  Use mcp:simple-servicve instead.
+                Deprecated.  Use mcp:simple-service instead.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
