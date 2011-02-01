@@ -220,7 +220,12 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder
 
     protected MuleWorkManager createWorkManager()
     {
-        return new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, "MuleServer", getMuleConfiguration().getShutdownTimeout());
+        final MuleConfiguration config = getMuleConfiguration();
+        // still can be embedded, but in container mode, e.g. in a WAR
+        final String threadPrefix = config.isContainerMode()
+                ? String.format("[%s].Mule", config.getId())
+                : "MuleServer";
+        return new MuleWorkManager(ThreadingProfile.DEFAULT_THREADING_PROFILE, threadPrefix, config.getShutdownTimeout());
     }
 
     protected DefaultWorkListener createWorkListener()
