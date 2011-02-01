@@ -520,10 +520,10 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="level" use="optional" default="DEBUG">
+                <xsd:attribute name="level" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The logging level to be used.
+                            The logging level to be used. Default is DEBUG.
                         </xsd:documentation>
                     </xsd:annotation>
                     <xsd:simpleType>
