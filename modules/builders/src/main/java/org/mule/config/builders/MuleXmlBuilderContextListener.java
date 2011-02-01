@@ -23,7 +23,10 @@ import org.mule.config.PropertiesMuleConfigurationFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
+import org.mule.util.FilenameUtils;
 import org.mule.util.StringUtils;
+
+import java.io.File;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -56,6 +59,11 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
     public static final String INIT_PARAMETER_MULE_CONFIG = "org.mule.config";
 
     public static final String INIT_PARAMETER_MULE_APP_CONFIG = "org.mule.app.config";
+
+    /**
+     * Name of the temp dir param as per the servlet spec. The object will be a java.io.File.
+     */
+    public static final String ATTR_JAVAX_SERVLET_CONTEXT_TEMPDIR = "javax.servlet.context.tempdir";
 
     protected MuleContext muleContext;
 
@@ -113,18 +121,37 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
      * Creates the MuleContext based on the configuration resource(s) and possibly 
      * init parameters for the Servlet.
      */
-    protected MuleContext createMuleContext(String configResource, ServletContext context)
+    protected MuleContext createMuleContext(String configResource, ServletContext servletContext)
         throws ConfigurationException, InitialisationException
     {
-        final String serverId = StringUtils.defaultIfEmpty(context.getInitParameter("mule.serverId"), null);
-        WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(context, configResource);
+        String serverId = StringUtils.defaultIfEmpty(servletContext.getInitParameter("mule.serverId"), null);
+
+        // serverId will be used as a sub-folder in Mule working directory (.mule)
+
+        if (serverId == null)
+        {
+            // guess this app's context name from the temp/work dir the container created us
+            // Servlet 2.5 has servletContext.getContextPath(), but we can't force users to upgrade yet
+            final File tempDir = (File) servletContext.getAttribute(ATTR_JAVAX_SERVLET_CONTEXT_TEMPDIR);
+            final String contextName = FilenameUtils.getBaseName(tempDir.toString());
+            serverId = contextName;
+        }
+
+        WebappMuleXmlConfigurationBuilder builder = new WebappMuleXmlConfigurationBuilder(servletContext, configResource);
         MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
 
-        String muleAppConfig = context.getInitParameter(INIT_PARAMETER_MULE_APP_CONFIG) != null
-            ? context.getInitParameter(INIT_PARAMETER_MULE_APP_CONFIG)
+        String muleAppConfig = servletContext.getInitParameter(INIT_PARAMETER_MULE_APP_CONFIG) != null
+            ? servletContext.getInitParameter(INIT_PARAMETER_MULE_APP_CONFIG)
             : PropertiesMuleConfigurationFactory.getMuleAppConfiguration(configResource);
         
         DefaultMuleConfiguration muleConfiguration = new PropertiesMuleConfigurationFactory(muleAppConfig).createConfiguration();
+
+        /*
+            We deliberately enable container mode here to allow for multi-tenant environment (multiple WARs
+            embedding Mule instance each). See property javadocs for more info.
+         */
+        muleConfiguration.setContainerMode(true);
+
         if (serverId != null)
         {
             muleConfiguration.setId(serverId);
@@ -133,7 +160,7 @@ public class MuleXmlBuilderContextListener implements ServletContextListener
         muleContextBuilder.setMuleConfiguration(muleConfiguration);
 
         // Support Spring-first configuration in webapps
-        final ApplicationContext parentContext = (ApplicationContext) context.getAttribute(
+        final ApplicationContext parentContext = (ApplicationContext) servletContext.getAttribute(
                                                         WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
         if (parentContext != null)
         {

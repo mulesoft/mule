@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.SAXParserFactory;
 
@@ -146,6 +148,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
      */
     private boolean validateExpressions = true;
 
+    /**
+     * Generic string/string map of properties in addition to standard Mule props.
+     * Used as an extension point e.g. in MMC.
+     */
+    private Map<String, String> extendedProperties = new HashMap<String, String>();
 
     public DefaultMuleConfiguration()
     {
@@ -200,7 +207,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         {
             final String muleHome = System.getProperty("mule.home");
             // in container mode the id is the app name, have each app isolate its work dir
-            if (StringUtils.isBlank(muleHome)) {
+            if (!isStandalone()) {
                 // fallback to current dir as a parent
                 this.workingDirectory = String.format("%s/%s", getWorkingDirectory(), getId());
             }
@@ -208,6 +215,10 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
             {
                 this.workingDirectory = String.format("%s/%s/%s", muleHome.trim(), getWorkingDirectory(), getId());
             }
+        }
+        else if (isStandalone())
+        {
+            this.workingDirectory = String.format("%s/%s", getWorkingDirectory(), getId());
         }
     }
 
@@ -611,6 +622,44 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     public boolean isContainerMode()
     {
         return this.containerMode;
+    }
+
+    /**
+     * The setting is only editable before the context has been initialized, change requests ignored afterwards.
+     */
+    public void setContainerMode(boolean containerMode)
+    {
+        if (verifyContextNotInitialized())
+        {
+            this.containerMode = containerMode;
+        }
+    }
+
+    public boolean isStandalone()
+    {
+        // this is our best guess
+        return getMuleHomeDirectory() != null;
+    }
+
+
+
+    public Map<String, String> getExtendedProperties() {
+        return extendedProperties;
+    }
+
+    public void setExtendedProperties(Map<String, String> extendedProperties)
+    {
+        this.extendedProperties = extendedProperties;
+    }
+
+    public void setExtendedProperty(String name, String value)
+    {
+        this.extendedProperties.put(name, value);
+    }
+
+    public String getExtendedProperty(String name)
+    {
+        return this.extendedProperties.get(name);
     }
 
     @Override
