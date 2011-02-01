@@ -60,7 +60,7 @@ public class MuleXmlBuilderContextListenerTestCase
         verify(context).getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
         verify(context).getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
         
-        assertEquals("./.mule", listener.muleContext.getConfiguration().getWorkingDirectory());
+        assertEquals("./.mule/testWeb", listener.muleContext.getConfiguration().getWorkingDirectory());
     }
 
     @Test
@@ -78,7 +78,9 @@ public class MuleXmlBuilderContextListenerTestCase
         verify(context).getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
         verify(context).getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
 
-        assertWorkingDirectoryEndsWith("target/.appTmp");
+        // TODO don't like this convention, the whole mule-app.properties WAR support in Mule 3 is redundant
+        // and should go away
+        assertWorkingDirectoryEndsWith("target/.appTmp/testWeb");
     }
 
     @Test
@@ -98,7 +100,9 @@ public class MuleXmlBuilderContextListenerTestCase
         verify(context).getInitParameter(MuleXmlBuilderContextListener.INIT_PARAMETER_MULE_CONFIG);
         verify(context).getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
 
-        assertWorkingDirectoryEndsWith("target/.appTmp2");
+        // TODO don't like this convention, the whole mule-app.properties WAR support in Mule 3 is redundant
+        // and should go away
+        assertWorkingDirectoryEndsWith("target/.appTmp2/testWeb");
     }
 
     private void assertWorkingDirectoryEndsWith(String expected)
