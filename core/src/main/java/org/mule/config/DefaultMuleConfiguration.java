@@ -216,6 +216,10 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
                 this.workingDirectory = String.format("%s/%s/%s", muleHome.trim(), getWorkingDirectory(), getId());
             }
         }
+        else
+        {
+            this.workingDirectory = String.format("%s/%s", getWorkingDirectory(), getId());
+        }
     }
 
     /**
@@ -624,15 +628,18 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         return extendedProperties;
     }
 
-    public void setExtendedProperties(Map<String, String> extendedProperties) {
+    public void setExtendedProperties(Map<String, String> extendedProperties)
+    {
         this.extendedProperties = extendedProperties;
     }
 
-    public void setExtendedProperty(String name, String value) {
+    public void setExtendedProperty(String name, String value)
+    {
         this.extendedProperties.put(name, value);
     }
 
-    public String getExtendedProperty(String name) {
+    public String getExtendedProperty(String name)
+    {
         return this.extendedProperties.get(name);
     }
 
