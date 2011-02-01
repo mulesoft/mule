@@ -10,9 +10,12 @@
 
 package org.mule.transformers.simple;
 
+import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
+import org.mule.construct.SimpleFlowConstruct;
 import org.mule.expression.transformers.BeanBuilderTransformer;
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.expression.transformers.ExpressionTransformer;
@@ -149,6 +152,46 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
         assertTrue(list.contains("mar"));
     }
 
+    public void testTransformerConfigWithSingleArgumentShortcutConfig() throws Exception
+    {
+        ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer4");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("foo", "moo");
+        props.put("bar", "mar");
+
+        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props, muleContext);
+
+        Object result = transformer.transform(message);
+        assertNotNull(result);
+        assertFalse(result.getClass().isArray());
+        assertTrue(result instanceof List<?>);
+        List<?> list = (List<?>) result;
+        assertTrue(list.contains("moo"));
+        assertTrue(list.contains("mar"));
+    }
+
+    public void testTransformerConfigWithSingleArgumentShortcutConfigInFlow() throws Exception
+    {
+        SimpleFlowConstruct flow = (SimpleFlowConstruct) muleContext.getRegistry().lookupFlowConstruct("et");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("foo", "moo");
+        props.put("bar", "mar");
+
+        MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), props,
+            muleContext);
+
+        MuleEvent resultEvent = flow.process(new DefaultMuleEvent(message, getTestInboundEndpoint(""),
+            getTestSession(getTestService(), muleContext)));
+        assertNotNull(resultEvent);
+        assertNotNull(resultEvent.getMessage().getPayload());
+        Object payload = resultEvent.getMessage().getPayload();
+        assertFalse(payload.getClass().isArray());
+        assertTrue(payload instanceof List<?>);
+        List<?> list = (List<?>) payload;
+        assertTrue(list.contains("moo"));
+        assertTrue(list.contains("mar"));
+    }
+    
     public void testExecutionWithInCorrectMessage() throws Exception
     {
         ExpressionTransformer transformer = (ExpressionTransformer) muleContext.getRegistry().lookupTransformer("testTransformer2");
