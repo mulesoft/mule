@@ -635,10 +635,10 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
-    public boolean isEmbedded()
+    public boolean isStandalone()
     {
         // this is our best guess
-        return getMuleHomeDirectory() == null;
+        return getMuleHomeDirectory() != null;
     }
 
 

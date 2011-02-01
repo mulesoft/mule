@@ -63,7 +63,7 @@ public interface MuleConfiguration
      * Note that e.g. a WAR-embedded Mule will run in container mode, but will still be considerd embedded
      * for management purposes.
      *
-     * @see #isEmbedded()
+     * @see #isStandalone()
      */
     boolean isContainerMode();
 
@@ -71,8 +71,10 @@ public interface MuleConfiguration
      * Try to guess if we're embedded. If "mule.home" JVM property has been set, then we've been
      * started via Mule script and can assume we're running standalone. Otherwise (no property set), Mule
      * has been started via a different mechanism.
+     * <p/>
+     * A standalone Mule is always considered running in 'container' mode.
      *
      * @see #isContainerMode()
      */
-    boolean isEmbedded();
+    boolean isStandalone();
 }
