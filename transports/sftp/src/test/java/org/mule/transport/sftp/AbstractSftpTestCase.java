@@ -33,6 +33,7 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.transport.sftp.util.ValueHolder;
+import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 
@@ -825,14 +826,44 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
 
         // Now delete this file, but first check write permissions on its parent...
         File parentParent = parent.getParentFile();
+
         if (!parentParent.canWrite())
         {
             // setWritable is only available on JDK6 and beyond
-//            if (!parentParent.setWritable(true))
+            //if (!parentParent.setWritable(true))
+                //throw new IOException("Failed to set readonly-folder: " + parentParent + " to writeable");
+            // FIXME DZ: since setWritable doesnt exist on jdk5, need to detect os to make dir writable
+            String os = System.getProperty("os.name").toLowerCase();
+            if(os.indexOf( "win" ) >= 0)
+            {
+                Runtime.getRuntime().exec("attrib -r /D" + parentParent.getAbsolutePath());
+            }
+            else if(os.indexOf( "nix" ) >= 0 || os.indexOf( "nux" ) >= 0)
+            {
+                Runtime.getRuntime().exec("chmod +w " + parentParent.getAbsolutePath());
+            }
+            else
+            {
                 throw new IOException("Failed to set readonly-folder: " + parentParent + " to writeable");
+            }
         }
+
         if (parent.exists())
         {
+            // FIXME DZ: since setWritable doesnt exist on jdk5, need to detect os to make dir writable
+            String os = System.getProperty("os.name").toLowerCase();
+            if(os.indexOf( "win" ) >= 0)
+            {
+                Runtime.getRuntime().exec("attrib -r /D" + parent.getAbsolutePath());
+            }
+            else if(os.indexOf( "nix" ) >= 0 || os.indexOf( "nux" ) >= 0)
+            {
+                Runtime.getRuntime().exec("chmod +w " + parent.getAbsolutePath());
+            }
+            else
+            {
+                throw new IOException("Failed to set readonly-folder: " + parent + " to writeable");
+            }
             if (!parent.delete()) throw new IOException("Failed to delete folder: " + parent);
         }
     }
