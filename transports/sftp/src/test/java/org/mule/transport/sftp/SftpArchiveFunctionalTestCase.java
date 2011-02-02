@@ -289,11 +289,15 @@ public class SftpArchiveFunctionalTestCase extends AbstractSftpTestCase
         File folder = new File(folderName);
         if (!folder.exists())
         {
-            if (!folder.mkdirs()) throw new IOException("Failed to create folder: " + folderName);
+            if (!folder.mkdirs())
+            {
+                throw new IOException("Failed to create folder: " + folderName);
+            }
         }
-        // setWritable is available only on JDK6 and beyond
-//        if (!folder.setWritable(false))
+        if (!folder.setReadOnly())
+        {
             throw new IOException("Failed to make folder readonly: " + folderName);
+        }
     }
 
 }
