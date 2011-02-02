@@ -15,6 +15,7 @@ import org.mule.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 public abstract class AbstractSchemaValidationTestCase extends AbstractMuleTestCase
 {
@@ -59,10 +61,19 @@ public abstract class AbstractSchemaValidationTestCase extends AbstractMuleTestC
 
     protected void doTest(String config) throws SAXException, IOException
     {
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", true);
-        Schema schema = schemaFactory.newSchema(getSchemasAsSources());
-        schema.newValidator().validate(load(config));
+        try
+        {
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            schemaFactory.setFeature("http://apache.org/xml/features/validation/schema-full-checking", true);
+            Schema schema = schemaFactory.newSchema(getSchemasAsSources());
+            schema.newValidator().validate(load(config));
+        }
+        catch (SAXParseException ex)
+        {
+            System.err.println(MessageFormat.format("SAX parsing exception occurs at line {0}, column {1}",
+                ex.getLineNumber(), ex.getColumnNumber()));
+            throw ex;
+        }
     }
 
     protected Source load(String name) throws IOException

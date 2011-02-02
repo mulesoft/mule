@@ -76,7 +76,7 @@ org.mule.test.integration.service.ServiceInFlightMessagesJMSTestCase
 org.mule.context.notification.ServerNotificationManagerTestCase
 
 # abstract-transformer and abstract-message-processor violate "Unique Particle Attribution"
-org.mule.config.spring.RootSchemaValidationTestCase
+# org.mule.config.spring.RootSchemaValidationTestCase
 
 # These tests have a property propagation / MEPs issue
 org.mule.routing.outbound.ChainingRouterPropertyPropagationTestCase

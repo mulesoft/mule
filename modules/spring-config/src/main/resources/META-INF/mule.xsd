@@ -4489,13 +4489,9 @@
       <xsd:complexContent>
         <xsd:extension base="abstractMessageProcessorFilterPairType">
           <xsd:sequence>
-            <xsd:element ref="abstract-filter" minOccurs="0" maxOccurs="1">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        The condition to use to decide if the message processor can be used. Can't be used if an expression attribute has been defined on the when element. 
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
+            <!-- if the first message processor is a filter, it determines
+                 whether this when clause is chosen or not.  This is only allowed when
+                 no expression is specified -->
             <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded" />
           </xsd:sequence>
           <xsd:attribute name="evaluator" use="optional" type="standardExpressionEvaluators">
