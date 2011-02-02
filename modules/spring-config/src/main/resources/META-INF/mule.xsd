@@ -22,6 +22,16 @@
          global properties).  We then provide some implementations below.  Other modules
          can provide other implementations. -->
 
+    <xsd:complexType name="annotatedType">
+        <xsd:anyAttribute namespace="##other" processContents="lax">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Allow any third-parties to annotate these elements with global attributes
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:anyAttribute>
+    </xsd:complexType>
+
     <xsd:element name="mule" type="muleType">
         <xsd:annotation>
             <xsd:documentation>
@@ -30,19 +40,23 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="muleType">
-        <xsd:sequence>
-            <xsd:element name="description" type="descriptionType" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        Holds any kind of documentation that accompanies this configuration file. It is intended to be "human readable" only and is not used by the system.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <xsd:choice minOccurs="0" maxOccurs="unbounded">
-                <xsd:group ref="springRootElements"/>
-                <xsd:group ref="muleRootElements"/>
-            </xsd:choice>
-        </xsd:sequence>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:sequence>
+                    <xsd:element name="description" type="descriptionType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Holds any kind of documentation that accompanies this configuration file. It is intended to be "human readable" only and is not used by the system.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                        <xsd:group ref="springRootElements"/>
+                        <xsd:group ref="muleRootElements"/>
+                    </xsd:choice>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:group name="springRootElements">
@@ -107,8 +121,6 @@
             <xsd:element ref="abstract-transaction-manager"/>
             <xsd:element ref="abstract-connector"/>
             <xsd:element ref="abstract-global-endpoint"/>
-            <xsd:element ref="abstract-transformer"/>
-            <xsd:element ref="abstract-filter"/>
             <xsd:element ref="abstract-flow-construct" />
             <xsd:element ref="flow" />
             <xsd:element ref="abstract-model"/>
@@ -130,7 +142,11 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractExtensionType"/>
+    <xsd:complexType name="abstractExtensionType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="abstract-connector" abstract="true" type="abstractConnectorType">
         <xsd:annotation>
@@ -140,13 +156,17 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractConnectorType">
-        <xsd:attribute name="name" type="substitutableName" use="required">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Identifies the connector so that other elements can reference it.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="name" type="substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the connector so that other elements can reference it.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <!-- Agents -->
@@ -159,6 +179,9 @@
     </xsd:element>
 
     <xsd:complexType name="abstractAgentType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
     </xsd:complexType>
 
      <xsd:element name="custom-agent" type="customAgentType" substitutionGroup="abstract-agent"/>
@@ -188,13 +211,17 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractGlobalEndpointType">
-        <xsd:attribute name="name" type="substitutableName" use="required">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Identifies the endpoint so that other elements can reference it. This name can also be referenced in the MuleClient.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="name" type="substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the endpoint so that other elements can reference it. This name can also be referenced in the MuleClient.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="abstract-inbound-endpoint" abstract="true" type="abstractInboundEndpointType">
@@ -205,13 +232,17 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractInboundEndpointType">
-        <xsd:attribute name="name" type="substitutableName">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Identifies the endpoint in the registry. There is no need to set the 'name' attribute on inbound or outbound endpoints, only on global endpoints. 
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="name" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the endpoint in the registry. There is no need to set the 'name' attribute on inbound or outbound endpoints, only on global endpoints.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="abstract-outbound-endpoint" abstract="true" type="abstractOutboundEndpointType">
@@ -222,13 +253,17 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractOutboundEndpointType">
-        <xsd:attribute name="name" type="substitutableName">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Identifies the endpoint in the registry. There is not need to set the 'name' attribute on inbound or outbound endpoints, only on global endpoints.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="name" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the endpoint in the registry. There is not need to set the 'name' attribute on inbound or outbound endpoints, only on global endpoints.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <!-- Message Processors -->
@@ -239,7 +274,11 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractMessageProcessorType" />
+    <xsd:complexType name="abstractMessageProcessorType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:group name="messageProcessorOrOutboundEndpoint">
         <xsd:choice>
@@ -592,7 +631,11 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractMessageSourceType" />
+    <xsd:complexType name="abstractMessageSourceType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
     
     <!--  TODO MULE-4987
     <xsd:element name="custom-source" type="customMessageSourceType" substitutionGroup="abstract-message-source"/>
@@ -735,7 +778,11 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractInboundRouterType"/>
+    <xsd:complexType name="abstractInboundRouterType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="abstract-filter" abstract="true" type="abstractFilterType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
@@ -779,7 +826,11 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:complexType name="abstractOutboundRouterType"/>
+    <xsd:complexType name="abstractOutboundRouterType">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="abstract-transaction-manager" abstract="true" type="abstractTransactionManagerType">
         <xsd:annotation>
@@ -993,18 +1044,22 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractModelType">
-        <xsd:sequence>
-            <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-            <xsd:group ref="entryPointResolvers"/>
-            <xsd:element ref="abstract-service" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:sequence>
-        <xsd:attribute name="name" type="nonBlankString">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The name used to identify this model.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:group ref="entryPointResolvers"/>
+                    <xsd:element ref="abstract-service" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="nonBlankString">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name used to identify this model.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="seda-model" type="sedaModelType" substitutionGroup="abstract-model">
@@ -1325,13 +1380,17 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractServiceType">
-        <xsd:attribute name="name" type="nonBlankString" use="required">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The name used to identify this service.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="name" type="nonBlankString" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name used to identify this service.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="baseServiceType">
@@ -1590,27 +1649,31 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="abstractFlowConstructType">
-        <xsd:attribute name="name" type="nonBlankString" use="required">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The name used to identify this flow construct.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="abstract" type="xsd:boolean" use="optional" default="false">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Determines if the flow construct is abstract (ie a parent that will be inherited in concrete constructs).
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="parent" type="xsd:NMTOKEN" use="optional">
-            <xsd:annotation>
-                <xsd:documentation>
-                    Determines if the flow construct inherits part of its configuration from a parent construct.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:attribute name="name" type="nonBlankString" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name used to identify this flow construct.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="abstract" type="xsd:boolean" use="optional" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Determines if the flow construct is abstract (ie a parent that will be inherited in concrete constructs).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="parent" type="xsd:NMTOKEN" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Determines if the flow construct inherits part of its configuration from a parent construct.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:complexType name="baseFlowConstructType">
@@ -1642,62 +1705,66 @@
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="flowType">
-        <xsd:annotation>
-            <xsd:documentation>
-                A flexible flow..
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:sequence>
-            <xsd:element name="description" type="descriptionType" minOccurs="0">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
                 <xsd:annotation>
                     <xsd:documentation>
-                        This can hold any kind of documentation related to the flow construct. It is intended to be "human readable" only and is not used by the system.
+                        A flexible flow..
                     </xsd:documentation>
                 </xsd:annotation>
-            </xsd:element>
-            <xsd:choice>
-                <xsd:element ref="composite-source" minOccurs="0"
-                    maxOccurs="1">
+                <xsd:sequence>
+                    <xsd:element name="description" type="descriptionType" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                This can hold any kind of documentation related to the flow construct. It is intended to be "human readable" only and is not used by the system.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:choice>
+                        <xsd:element ref="composite-source" minOccurs="0"
+                                     maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    The source of new messages for this flow
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                        <xsd:element ref="abstract-inbound-endpoint" minOccurs="1"
+                                     maxOccurs="1">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    The inbound endpoint for this flow
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:choice>
+                    <xsd:choice minOccurs="1" maxOccurs="unbounded">
+                        <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
+                        <xsd:element name="response">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    An outbound endpoint
+                                </xsd:documentation>
+                            </xsd:annotation>
+                            <xsd:complexType>
+                                <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:choice>
+                    <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
+                    <xsd:element ref="threading-profile" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="name" type="nonBlankString" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The source of new messages for this flow
+                            The name used to identify this flow construct.
                         </xsd:documentation>
                     </xsd:annotation>
-                </xsd:element>
-                <xsd:element ref="abstract-inbound-endpoint" minOccurs="1"
-                    maxOccurs="1">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The inbound endpoint for this flow
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-            </xsd:choice> 
-            <xsd:choice minOccurs="1" maxOccurs="unbounded">
-                <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
-                <xsd:element name="response">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            An outbound endpoint
-                        </xsd:documentation>
-                    </xsd:annotation>
-                    <xsd:complexType>
-                        <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
-                    </xsd:complexType>
-                </xsd:element>
-            </xsd:choice>
-            <xsd:element ref="abstract-exception-strategy" minOccurs="0"/>
-            <xsd:element ref="threading-profile" minOccurs="0"/>                    
-        </xsd:sequence>
-        <xsd:attribute name="name" type="nonBlankString" use="required">
-            <xsd:annotation>
-                <xsd:documentation>
-                    The name used to identify this flow construct.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:complexType>   
-    
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:element name="flow-ref" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -1716,7 +1783,7 @@
     <xsd:element name="simple-service" type="simpleServiceType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                A simple request-response service, with no outbound router.
+                Deprecated.  Use mcp:simple-service instead.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1829,7 +1896,7 @@
     <xsd:element name="bridge" type="bridgeType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                A bridge with a single inbound endpoint and a single outbound endpoint.
+                Deprecated. Use mcp:bridge instead
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1916,7 +1983,7 @@
     <xsd:element name="validator" type="validatorType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                A validator with a single request-response inbound endpoint and a single outbound endpoint.
+                Deprecated.  Use mcp:validator instead
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -4409,13 +4476,9 @@
       <xsd:complexContent>
         <xsd:extension base="abstractMessageProcessorFilterPairType">
           <xsd:sequence>
-            <xsd:element ref="abstract-filter" minOccurs="0" maxOccurs="1">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        The condition to use to decide if the message processor can be used. Can't be used if an expression attribute has been defined on the when element. 
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
+            <!-- if the first message processor is a filter, it determines
+                 whether this when clause is chosen or not.  This is only allowed when
+                 no expression is specified -->
             <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="unbounded" />
           </xsd:sequence>
           <xsd:attribute name="evaluator" use="optional" type="standardExpressionEvaluators">

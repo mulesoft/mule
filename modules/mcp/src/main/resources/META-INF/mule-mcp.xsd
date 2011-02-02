@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/mcp"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
+            xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
+            targetNamespace="http://www.mulesoft.org/schema/mule/mcp"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd" />
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/ws"
+                schemaLocation="http://www.mulesoft.org/schema/mule/ws/3.2/mule-ws.xsd" />
+    <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
+                schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.2/mule-schemadoc.xsd"/>
+
+    <xsd:annotation>
+        <xsd:documentation>
+            Mule Configuration Patterns.
+        </xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>MCP</schemadoc:short-name>
+            <schemadoc:page-title>MCP Module</schemadoc:page-title>
+        </xsd:appinfo>
+    </xsd:annotation>
+    
+    <!--==============================================================-->
+    <!--   Flow Constructs                                            -->
+    <!--==============================================================-->
+    
+    <xsd:element name="web-service-proxy" type="ws:proxyType" substitutionGroup="mule:abstract-flow-construct">
+        <xsd:annotation>
+            <xsd:documentation>
+                A simple web-service proxy, which handles WSDL rewriting.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="simple-service" type="mule:simpleServiceType" substitutionGroup="mule:abstract-flow-construct">
+        <xsd:annotation>
+            <xsd:documentation>
+                A simple request-response service, with no outbound router.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="bridge" type="mule:bridgeType" substitutionGroup="mule:abstract-flow-construct">
+        <xsd:annotation>
+            <xsd:documentation>
+                A bridge with a single inbound endpoint and a single outbound endpoint.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="validator" type="mule:validatorType" substitutionGroup="mule:abstract-flow-construct">
+        <xsd:annotation>
+            <xsd:documentation>
+                A validator with a single request-response inbound endpoint and a single outbound endpoint.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+</xsd:schema>

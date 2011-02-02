@@ -10,9 +10,8 @@
 
     <udp:connector name="udpConnector"
                    receiveBufferSize="1234"
-                   receiveTimeout="2345"
+                   timeout="2345"
                    sendBufferSize="3456"
-                   sendTimeout="4567"
                    broadcast="true"
                    keepSendSocketOpen="false"
             />

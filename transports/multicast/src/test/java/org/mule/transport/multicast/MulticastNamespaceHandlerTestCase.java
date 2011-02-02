@@ -28,9 +28,8 @@ public class MulticastNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(c);
 
         assertEquals(1234, c.getReceiveBufferSize());
-        assertEquals(2345, c.getReceiveTimeout());
+        assertEquals(2345, c.getTimeout());
         assertEquals(3456, c.getSendBufferSize());
-        assertEquals(4567, c.getSendTimeout());
         assertEquals(5678, c.getTimeToLive());
         assertEquals(true, c.isBroadcast());
         assertEquals(true, c.isLoopback());

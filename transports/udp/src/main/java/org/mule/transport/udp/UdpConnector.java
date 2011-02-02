@@ -34,8 +34,7 @@ public class UdpConnector extends AbstractConnector
     public static final String ADDRESS_PROPERTY = "packet.address";
     public static final String PORT_PROPERTY = "packet.port";
 
-    protected int sendTimeout = DEFAULT_SOCKET_TIMEOUT;
-    protected int receiveTimeout = DEFAULT_SOCKET_TIMEOUT;
+    protected int timeout = DEFAULT_SOCKET_TIMEOUT;
     protected int sendBufferSize = DEFAULT_BUFFER_SIZE;
     protected int receiveBufferSize = DEFAULT_BUFFER_SIZE;
     protected boolean keepSendSocketOpen = true;
@@ -101,32 +100,38 @@ public class UdpConnector extends AbstractConnector
         return UDP;
     }
 
-    public int getSendTimeout()
+    public int getTimeout()
     {
-        return this.sendTimeout;
+        return this.timeout;
     }
 
+    /** For compatibility with older schemas.  Remove this for 3.2 */
     public void setSendTimeout(int timeout)
     {
         if (timeout < 0)
         {
             timeout = DEFAULT_SOCKET_TIMEOUT;
         }
-        this.sendTimeout = timeout;
+        this.timeout = timeout;
     }
 
-    public int getReceiveTimeout()
-    {
-        return receiveTimeout;
-    }
-
+    /** For compatibility with older schemas.  Remove this for 3.2 */
     public void setReceiveTimeout(int timeout)
     {
         if (timeout < 0)
         {
             timeout = DEFAULT_SOCKET_TIMEOUT;
         }
-        this.receiveTimeout = timeout;
+        this.timeout = timeout;
+    }
+
+    public void setTimeout(int timeout)
+    {
+        if (timeout < 0)
+        {
+            timeout = DEFAULT_SOCKET_TIMEOUT;
+        }
+        this.timeout = timeout;
     }
 
     public int getSendBufferSize()

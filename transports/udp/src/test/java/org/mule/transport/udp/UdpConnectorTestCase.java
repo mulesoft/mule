@@ -69,8 +69,8 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
         connector.setReceiveBufferSize(0);
         assertEquals(UdpConnector.DEFAULT_BUFFER_SIZE, connector.getReceiveBufferSize());
 
-        connector.setReceiveTimeout(-1);
-        assertEquals(UdpConnector.DEFAULT_SOCKET_TIMEOUT, connector.getReceiveTimeout());
+        connector.setTimeout(-1);
+        assertEquals(UdpConnector.DEFAULT_SOCKET_TIMEOUT, connector.getTimeout());
     }
 
 }
