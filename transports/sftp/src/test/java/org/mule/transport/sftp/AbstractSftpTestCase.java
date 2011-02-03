@@ -55,6 +55,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -833,18 +834,17 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
             //if (!parentParent.setWritable(true))
                 //throw new IOException("Failed to set readonly-folder: " + parentParent + " to writeable");
             // FIXME DZ: since setWritable doesnt exist on jdk5, need to detect os to make dir writable
-            String os = System.getProperty("os.name").toLowerCase();
-            if(os.indexOf( "win" ) >= 0)
+            if(SystemUtils.IS_OS_WINDOWS)
             {
                 Runtime.getRuntime().exec("attrib -r /D" + parentParent.getAbsolutePath());
             }
-            else if(os.indexOf( "nix" ) >= 0 || os.indexOf( "nux" ) >= 0)
+            else if(SystemUtils.IS_OS_UNIX || SystemUtils.IS_OS_LINUX)
             {
                 Runtime.getRuntime().exec("chmod +w " + parentParent.getAbsolutePath());
             }
             else
             {
-                throw new IOException("Failed to set readonly-folder: " + parentParent + " to writeable");
+                throw new IOException("This test is not supported on your detected platform : " + SystemUtils.OS_NAME);
             }
         }
 
@@ -852,17 +852,17 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
         {
             // FIXME DZ: since setWritable doesnt exist on jdk5, need to detect os to make dir writable
             String os = System.getProperty("os.name").toLowerCase();
-            if(os.indexOf( "win" ) >= 0)
+            if(SystemUtils.IS_OS_WINDOWS)
             {
                 Runtime.getRuntime().exec("attrib -r /D" + parent.getAbsolutePath());
             }
-            else if(os.indexOf( "nix" ) >= 0 || os.indexOf( "nux" ) >= 0)
+            else if(SystemUtils.IS_OS_UNIX || SystemUtils.IS_OS_LINUX)
             {
                 Runtime.getRuntime().exec("chmod +w " + parent.getAbsolutePath());
             }
             else
             {
-                throw new IOException("Failed to set readonly-folder: " + parent + " to writeable");
+                throw new IOException("This test is not supported on your detected platform : " + SystemUtils.OS_NAME);
             }
             if (!parent.delete()) throw new IOException("Failed to delete folder: " + parent);
         }
