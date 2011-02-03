@@ -122,17 +122,17 @@
                   address="vm://ftc1.in">
     <test:component />
   </mcp:simple-service>
-  
-  <mcp:simple-service abstract="true"
-                  name="abstract-functional-test-component-service">
-    <test:component />
-  </mcp:simple-service>
-  
-  <mcp:simple-service name="functional-test-component-2"
-                  parent="abstract-functional-test-component-service"
-                  address="vm://ftc2.in" />
-  
-  <mcp:simple-service name="functional-test-component-3"
-                  parent="abstract-functional-test-component-service"
-                  address="vm://ftc3.in" />
+
+	<mcp:simple-service abstract="true" name="abstract-service" component-class="org.mule.test.integration.tck.WeatherReportConsumer">
+		<inbound-endpoint address="test://in" exchange-pattern="request-response">
+			<property key="competingConsumers" value="true"/>
+		</inbound-endpoint>
+		<custom-exception-strategy
+			class="org.mule.test.integration.exceptions.TestExceptionStrategy" />
+	</mcp:simple-service>
+
+	<mcp:simple-service name="child-service-1" parent="abstract-service" />
+
+	<mcp:simple-service name="child-service-2" parent="abstract-service" />
+	
 </mule>

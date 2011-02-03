@@ -14,6 +14,7 @@ import org.mule.config.spring.factories.SimpleServiceFactoryBean;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributesAndChildren;
 import org.mule.util.StringUtils;
+
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -22,6 +23,8 @@ public class SimpleServiceDefinitionParser extends AbstractFlowConstructDefiniti
 {
     private static final String COMPONENT_CLASS_ATTRIBUTE = "component-class";
     private static final String COMPONENT_REF_ATTRIBUTE = "component-ref";
+    private static final String COMPONENT_CHILD_TYPE = "componentType";
+    private static final String ABSTRACT_ATTRIBUTE = "abstract";
 
     public SimpleServiceDefinitionParser()
     {
@@ -36,6 +39,11 @@ public class SimpleServiceDefinitionParser extends AbstractFlowConstructDefiniti
         super.registerPreProcessor(new CheckExclusiveAttributesAndChildren(new String[]{
             ENDPOINT_REF_ATTRIBUTE, ADDRESS_ATTRIBUTE, TRANSFORMER_REFS_ATTRIBUTE,
             RESPONSE_TRANSFORMER_REFS_ATTRIBUTE}, new String[]{INBOUND_ENDPOINT_CHILD}));
+
+        // We cannot support component element inheritance because components are singletons
+        super.registerPreProcessor(new CheckExclusiveAttributesAndChildren(new String[]{
+            ABSTRACT_ATTRIBUTE}, new String[]{COMPONENT_CHILD_TYPE}));
+
     }
 
     @Override
