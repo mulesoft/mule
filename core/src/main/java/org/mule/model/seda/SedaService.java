@@ -175,12 +175,6 @@ public class SedaService extends AbstractService
     protected void doStop() throws MuleException
     {
         super.doStop();
-    }
-    
-    @Override
-    public void stop() throws MuleException
-    {
-        super.stop();
         workManager.dispose();
     }
 
