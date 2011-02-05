@@ -154,7 +154,11 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         sfb.getOutInterceptors().add(new MuleProtocolHeadersOutInterceptor());
         sfb.getOutFaultInterceptors().add(new MuleProtocolHeadersOutInterceptor());
         
-        sfb.setAddress(getAddress()); // dummy URL for CXF
+        String address = getAddress();
+      //hack for CXF to work correctly with servlet and jetty urls
+        address = address.replace("servlet://", "http://localhost/"); 
+        address = address.replace("jetty://", "http://localhost/"); 
+        sfb.setAddress(address); // dummy URL for CXF
 
         if (wsdlLocation != null)
         {

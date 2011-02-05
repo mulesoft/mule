@@ -13,7 +13,6 @@ package org.mule.module.cxf.jaxws;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
