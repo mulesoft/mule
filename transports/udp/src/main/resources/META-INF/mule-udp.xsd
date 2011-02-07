@@ -27,7 +27,7 @@
             </schemadoc:transport-features>
             </xsd:appinfo>
     </xsd:annotation>
-            
+
     <xsd:element name="connector" type="udpConnectorType" substitutionGroup="mule:abstract-connector"/>
 
     <xsd:complexType name="udpConnectorType">
@@ -47,20 +47,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="receiveTimeout" type="mule:substitutableLong">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Deprecated -- use timeout.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="sendTimeout" type="mule:substitutableLong">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Deprecated -- use timeout.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="sendBufferSize" type="mule:substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -71,14 +57,14 @@
                 <xsd:attribute name="broadcast" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether to enable the socket to send broadcast data. 
+                            Whether to enable the socket to send broadcast data.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="keepSendSocketOpen" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether to keep the Sending socket open. 
+                            Whether to keep the Sending socket open.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
