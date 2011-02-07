@@ -46,7 +46,7 @@ public class UdpConnector extends AbstractConnector
     {
         super(context);
     }
-    
+
     @Override
     protected void doInitialise() throws InitialisationException
     {
@@ -105,7 +105,11 @@ public class UdpConnector extends AbstractConnector
         return this.timeout;
     }
 
-    /** For compatibility with older schemas.  Remove this for 3.2 */
+    /**
+     * @deprecated use #setTimeout(int) instead. This method is kept for
+     *             compatibility with older schemas. Remove this for 3.2
+     */
+    @Deprecated
     public void setSendTimeout(int timeout)
     {
         if (timeout < 0)
@@ -115,7 +119,11 @@ public class UdpConnector extends AbstractConnector
         this.timeout = timeout;
     }
 
-    /** For compatibility with older schemas.  Remove this for 3.2 */
+    /**
+     * @deprecated use #setTimeout(int) instead. This method is kept for
+     *             compatibility with older schemas. Remove this for 3.2
+     */
+    @Deprecated
     public void setReceiveTimeout(int timeout)
     {
         if (timeout < 0)
@@ -198,7 +206,7 @@ public class UdpConnector extends AbstractConnector
     {
         return (DatagramSocket) socketFactory.makeObject(endpoint);
     }
-    
+
     void releaseSocket(DatagramSocket socket, ImmutableEndpoint endpoint) throws Exception
     {
         // Sockets can't be recycled if we close them at the end...
