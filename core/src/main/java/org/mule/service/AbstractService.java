@@ -35,6 +35,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.routing.MessageInfoMapping;
+import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.routing.RouterStatisticsRecorder;
 import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
@@ -383,7 +384,17 @@ public abstract class AbstractService implements Service, MessageProcessor
         stats = createStatistics();
         stats.setEnabled(muleContext.getStatistics().isEnabled());
         muleContext.getStatistics().add(stats);
-        RouterStatistics routerStatistics = new RouterStatistics(RouterStatistics.TYPE_OUTBOUND);
+        RouterStatistics routerStatistics = null;
+
+        // If the router collection already has router statistics, keep using them.
+        if (outboundRouter instanceof OutboundRouterCollection)
+        {
+            routerStatistics = ((OutboundRouterCollection)outboundRouter).getRouterStatistics();
+        }
+        if (routerStatistics == null)
+        {
+            routerStatistics = new RouterStatistics(RouterStatistics.TYPE_OUTBOUND);
+        }
         stats.setOutboundRouterStat(routerStatistics);
         if (outboundRouter != null && outboundRouter instanceof RouterStatisticsRecorder)
         {
