@@ -85,7 +85,7 @@
         <xsd:attribute name="host" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
-                    The host of the Jetty instance. Default: localhost
+                    The host of the Jetty instance. Default: 0.0.0.0 (all network interfaces)
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
