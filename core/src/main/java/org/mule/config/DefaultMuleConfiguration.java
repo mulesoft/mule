@@ -23,10 +23,6 @@ import org.mule.util.NumberUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -36,6 +32,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.SAXParserFactory;
+
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Configuration info. which can be set when creating the MuleContext but becomes
@@ -641,9 +641,8 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         return getMuleHomeDirectory() != null;
     }
 
-
-
-    public Map<String, String> getExtendedProperties() {
+    public Map<String, String> getExtendedProperties()
+    {
         return extendedProperties;
     }
 
