@@ -83,5 +83,11 @@
             <version>${version}</version>
             <type>zip</type>
         </dependency>
+        <dependency>
+            <groupId>org.mule.examples</groupId>
+            <artifactId>mule-example-launcher</artifactId>
+            <version>${version}</version>
+            <type>zip</type>
+        </dependency>
     </dependencies>
 </project>

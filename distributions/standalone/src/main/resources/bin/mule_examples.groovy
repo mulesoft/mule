@@ -1,0 +1,175 @@
+/*
+ * $Id$
+ * --------------------------------------------------------------------------------------
+ *
+ * (c) 2003-2010 MuleSoft, Inc. This software is protected under international copyright
+ * law. All use of this software is subject to MuleSoft's Master Subscription Agreement
+ * (or other master license agreement) separately entered into in writing between you and
+ * MuleSoft. If such an agreement is not in place, you may not use the software.
+ */
+
+import org.mule.util.SystemUtils
+
+//------------------------------------------
+// Configuration parameters
+// Update if necessary
+//------------------------------------------
+
+// default value
+exampleLauncherAppUrl = "http://localhost:18082/examples/"
+
+// list of examples that should be deployed as part of the launcher example application
+enabledExamples = ['mule-example-launcher', 'hello', 'echo', 'loanbroker-simple', 'errorhandler', 'stockquote', 'scripting', 'bookstore', 'loanbroker-bpm', 'notifications', 'gpswalker']
+
+//------------------------------------------
+
+muleHome = SystemUtils.getenv()['MULE_HOME']
+exampleAppsBaseDir = new File("${muleHome}/examples")
+deployDir = new File("${muleHome}/apps")
+
+LF_CR = System.getProperty("line.separator")
+TAB = "   "
+
+// validate command line arguments & directories
+if(args?.size() > 1)
+{
+    usage()
+    System.exit(1)	
+}
+else if(args?.size() == 1)
+{
+	exampleLauncherAppUrl = args[0]
+}
+
+if (!exampleAppsBaseDir.isDirectory())
+{
+	println "${muleHome} is not a valid MULE_HOME or missing required folder ${exampleAppsBaseDir}."
+	System.exit(2)
+}
+
+// deploy examples
+def files = exampleAppsBaseDir.listFiles()
+for(currentFile in files)
+{
+	// examples are organized in directories
+	if(currentFile.isDirectory())
+	{
+		deployExample(currentFile)
+	}
+}
+
+// start Mule
+splash "Starting Mule ESB..."
+
+def command = SystemUtils.IS_OS_WINDOWS ? "${muleHome}/bin/mule.bat start" : "${muleHome}/bin/mule start"
+def proc = command.execute()
+proc.waitFor()
+println proc.text
+
+
+// wait for the example launcher application to be started
+splash "Waiting for example applications to become ready..."
+def i = 0
+def timeoutInMs = 120000 // 2 minutes
+def waitIntervalInMs = 3000
+def loops = timeoutInMs / waitIntervalInMs
+
+while(!isExampleLauncherApplicationReady() && i < loops)
+{
+	print "."
+	sleep(waitIntervalInMs)
+	i++
+}
+
+print LF_CR
+
+if(i < loops)
+{
+	// launch browser
+	splash "Example launcher application is up and running.${LF_CR}${TAB}${TAB}Goto ${exampleLauncherAppUrl} to launch examples!"
+	System.exit(0)	
+}
+else
+{
+   // timeout waiting for example launcher application to be ready
+   splash "Timeout waiting for Mule ESB to be ready.${LF_CR}${TAB}${TAB}Goto ${exampleLauncherAppUrl} to launch examples!"
+   System.exit(3)
+}
+
+
+
+/**
+    Print usage information.
+*/
+def usage()
+{
+    println '''
+
+Start Mule ESB with example applications deployed and ready to try
+
+Usage: mule_examples [example launcher index URL]
+
+'''
+}
+
+/**
+    Checks if the example should be deployed and if so, deploy it
+*/
+def deployExample(exampleDir)
+{
+	if(enabledExamples.contains(exampleDir.name))
+	{
+		def exampleFiles = exampleDir.listFiles().grep(~/.*zip$/)
+		// this should be really one
+		for(exampleFile in exampleFiles)
+		{
+			if(exampleFile.isFile() && !isExampleDeployed(exampleFile))
+			{
+				// deploy (copy) application file to apps directory
+				splash "Deploying ${exampleFile.name}"
+				(new AntBuilder()).copy(file: exampleFile.getCanonicalPath(), tofile: "${deployDir}/${exampleFile.name}")
+			}
+		}
+	}
+}
+
+/**
+    Checks if the example represented by the file is already deployed
+*/
+def isExampleDeployed(exampleFile)
+{
+	def applicationName = exampleFile?.name?.lastIndexOf('.') >= 0 ? exampleFile.name[0 .. exampleFile?.name?.lastIndexOf('.') - 1] : exampleFile?.name
+	
+	return (new File("${deployDir}/${applicationName}")).exists()
+}
+
+/**
+    Checks if the example launcher application is up and ready to handle requests
+*/
+def isExampleLauncherApplicationReady()
+{
+    try
+    {
+        def urlInfo = exampleLauncherAppUrl.toURL()
+        def connection = urlInfo.openConnection()
+        // connection is lazy... forcing connection
+        connection.responseCode
+
+        return true
+    }
+    catch(ConnectException ce)
+    {
+    	// jetty is still down
+	    return false	
+    }
+}
+
+/**
+    A helper splash message method.
+*/
+def splash(text) {
+    println()
+    println '=' * 62
+    println "${TAB}$text"
+    println '=' * 62
+}

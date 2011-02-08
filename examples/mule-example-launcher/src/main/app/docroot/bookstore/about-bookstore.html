@@ -1,0 +1,26 @@
+<p>
+The bookstore example demonstrates how to:
+
+<ul>
+    <li>Run Mule ESB as a web application inside a servlet container (using the Jetty connector)</li>
+    <li>Use Mule with the Servlet transport</li>
+    <li>Use Mule with CXF web services</li>
+</ul>
+
+The bookstore example includes the following:
+
+<ul>
+    <li>A bookstore catalog service with a public interface for browsing the catalog and an admin interface for adding books to the catalog</li>
+    <li>An order service that allows customers to order books</li>
+    <li>An email notification service that sends an email when an order has been placed</li>
+    <li>A data warehouse service that tracks statistics on the books, such as the number of books sold, total revenue, and best sellers</li>
+</ul>
+
+The example bundles two web apps:
+<ul>
+    <li>The Admin webapp includes the Mule configuration file and the service definitions. This module is hosted behind the firewall</li>
+    <li>The Bookstore webapp includes the JSPs for displaying the catalog to customers outside of the firewall</li>
+</ul>
+
+In order to make the example easily deployable, both web apps are bundled together in a singe Mule application.</p>
+
