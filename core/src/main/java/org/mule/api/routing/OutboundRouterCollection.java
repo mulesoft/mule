@@ -13,6 +13,7 @@ package org.mule.api.routing;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
+import org.mule.management.stats.RouterStatistics;
 
 import java.util.List;
 
@@ -41,4 +42,6 @@ public interface OutboundRouterCollection
      * Determines if any targets have been set on this router.
      */
     boolean hasEndpoints();
+
+    RouterStatistics getRouterStatistics();
 }
