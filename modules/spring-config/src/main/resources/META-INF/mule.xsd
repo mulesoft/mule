@@ -130,6 +130,7 @@
             <xsd:element ref="processor-chain"/>
             <xsd:element ref="custom-processor"/>
             <xsd:element ref="invoke"/>
+            <xsd:element ref="message-filter"/>
         </xsd:choice>
     </xsd:group>
 
