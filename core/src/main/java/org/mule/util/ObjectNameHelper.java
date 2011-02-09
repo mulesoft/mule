@@ -24,7 +24,7 @@ public final class ObjectNameHelper
     //public static final char HASH = '#';
     public static final String CONNECTOR_PREFIX = "connector";
     public static final String ENDPOINT_PREFIX = "endpoint";
-    public static final String DEFAULT = "mule-default";
+    public static final String DEFAULT = "mule.default";
 
     private MuleContext muleContext;
 
