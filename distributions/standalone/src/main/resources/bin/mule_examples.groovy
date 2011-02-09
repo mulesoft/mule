@@ -1,11 +1,11 @@
 /*
  * $Id$
  * --------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
- * (c) 2003-2010 MuleSoft, Inc. This software is protected under international copyright
- * law. All use of this software is subject to MuleSoft's Master Subscription Agreement
- * (or other master license agreement) separately entered into in writing between you and
- * MuleSoft. If such an agreement is not in place, you may not use the software.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
 
 import org.mule.util.SystemUtils
@@ -148,11 +148,13 @@ def isExampleDeployed(exampleFile)
 */
 def isExampleLauncherApplicationReady()
 {
+	def connection
     try
     {
         def urlInfo = exampleLauncherAppUrl.toURL()
-        def connection = urlInfo.openConnection()
-        // connection is lazy... forcing connection
+        connection = urlInfo.openConnection()
+
+        // connection object is lazy... forcing connection
         connection.responseCode
 
         return true
@@ -161,6 +163,10 @@ def isExampleLauncherApplicationReady()
     {
     	// jetty is still down
 	    return false	
+    }
+    finally
+    {
+    	connection?.disconnect()
     }
 }
 
