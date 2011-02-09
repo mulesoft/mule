@@ -9,15 +9,14 @@
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd" />
-	<xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
-				schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.1/mule-schemadoc.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
+                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.1/mule-schemadoc.xsd"/>
 
     <xsd:appinfo>
-	    <schemadoc:short-name>jaas</schemadoc:short-name>
-		<schemadoc:page-title>JAAS Module</schemadoc:page-title>
-	</xsd:appinfo>
+        <schemadoc:short-name>jaas</schemadoc:short-name>
+        <schemadoc:page-title>JAAS Module</schemadoc:page-title>
+    </xsd:appinfo>
 
-   
     <xsd:element name="security-manager" type="securityManagerType" substitutionGroup="mule:abstract-security-manager">
         <xsd:annotation>
             <xsd:documentation>
@@ -25,7 +24,6 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-
 
     <xsd:complexType name="securityManagerType">
         <xsd:complexContent>
@@ -37,7 +35,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <!-- jaas provider -->
     <xsd:element name="security-provider" type="jaasSecurityProviderType">
         <xsd:annotation>
@@ -71,5 +69,4 @@
             <xsd:extension base="mule:abstractSecurityFilterType"/>
         </xsd:complexContent>
     </xsd:complexType>
-
 </xsd:schema>
