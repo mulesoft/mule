@@ -9,48 +9,14 @@
  */
 package org.mule.test.construct;
 
-import org.mule.api.ExceptionPayload;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.module.client.RemoteDispatcher;
-import org.mule.tck.FunctionalTestCase;
-
 /**
- * Test remote dispatcher using serialization wire format
+ * Test remote dispatcher using xml wire format
  */
-public class RemoteDispatcherXmlTestCase extends FunctionalTestCase
+public class RemoteDispatcherXmlTestCase extends RemoteDispatcherTestCase
 {
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/construct/remote-dispatcher-xml.xml";
-    }
-
-    public void testRemoting() throws Exception
-    {
-        String[] targets = {"service1", "nosuch", "vmConnector", "flow1"};
-        String expectedResponses[] = { "Hellogoodbye", null, null, "Helloaloha"};
-
-        MuleClient client = new MuleClient(muleContext);
-        RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:10081");
-        for (int i = 0; i < targets.length; i++)
-        {
-            String construct = targets[i];
-            String expected = expectedResponses[i];
-
-            MuleMessage result = dispatcher.sendToRemoteComponent(construct, "Hello", null);
-
-            assertNotNull(result);
-            if (expected != null)
-            {
-                assertEquals(expected, result.getPayload());
-            }
-            else
-            {
-                ExceptionPayload payload = result.getExceptionPayload();
-                assertNotNull(payload);
-                assertTrue(payload.getException().getMessage().contains(construct));
-            }
-        }
     }
 }

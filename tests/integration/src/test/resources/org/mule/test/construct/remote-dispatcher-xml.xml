@@ -16,7 +16,7 @@
     <vm:connector name="vmConnector"/>
 
     <client:remote-dispatcher-agent>
-        <client:remote-endpoint address="http://localhost:10081" exchange-pattern="request-response" responseTimeout="10000"/>
+        <client:remote-endpoint address="http://localhost:${port1}" exchange-pattern="request-response" responseTimeout="10000"/>
         <client:xml-wire-format/>
     </client:remote-dispatcher-agent>
 
