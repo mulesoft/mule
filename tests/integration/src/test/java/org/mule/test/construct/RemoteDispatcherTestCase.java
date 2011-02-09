@@ -13,17 +13,23 @@ import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
 /**
  * Test remote dispatcher using serialization wire format
  */
-public class RemoteDispatcherTestCase extends FunctionalTestCase
+public class RemoteDispatcherTestCase extends DynamicPortTestCase
 {
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/construct/remote-dispatcher.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;  
     }
 
     public void testRemoting() throws Exception
@@ -32,7 +38,7 @@ public class RemoteDispatcherTestCase extends FunctionalTestCase
         String expectedResponses[] = { "Hellogoodbye", null, null, "Helloaloha"};
 
         MuleClient client = new MuleClient(muleContext);
-        RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:10081");
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:" + getPorts().get(0));
         for (int i = 0; i < targets.length; i++)
         {
             String construct = targets[i];
