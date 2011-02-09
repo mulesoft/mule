@@ -125,7 +125,11 @@
             <xsd:element ref="flow" />
             <xsd:element ref="abstract-model"/>
             <xsd:element ref="abstract-interceptor-stack"/>
-            <xsd:element ref="abstract-message-processor"/>
+            <xsd:element ref="abstract-filter"/>
+            <xsd:element ref="abstract-transformer"/>
+            <xsd:element ref="processor-chain"/>
+            <xsd:element ref="custom-processor"/>
+            <xsd:element ref="invoke"/>
         </xsd:choice>
     </xsd:group>
 
