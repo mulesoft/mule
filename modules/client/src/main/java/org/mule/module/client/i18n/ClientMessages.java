@@ -48,6 +48,11 @@ public class ClientMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 6);
     }
+
+    public static Message noSuchFlowConstruct(String name)
+    {
+        return factory.createMessage(BUNDLE_PATH, 7, name);
+    }
 }
 
 
