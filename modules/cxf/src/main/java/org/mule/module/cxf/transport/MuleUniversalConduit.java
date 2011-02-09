@@ -168,6 +168,7 @@ public class MuleUniversalConduit extends AbstractConduit
             {
                 throw new Fault(e);
             }
+            message.getExchange().put(CxfConstants.MULE_EVENT, event);
             event.setTimeout(MuleEvent.TIMEOUT_NOT_SET_VALUE);
             RequestContext.setEvent(event);
         }

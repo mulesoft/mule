@@ -23,6 +23,10 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
 
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.TestMtomService;
@@ -34,6 +38,12 @@ public class MtomTestCase extends DynamicPortTestCase
     {
         URL wsdl = getClass().getResource("/wsdl/mtom_xop.wsdl");
         assertNotNull(wsdl);
+        
+        CxfConfiguration clientConfig = new CxfConfiguration();
+        clientConfig.setMuleContext(muleContext);
+        clientConfig.initialise();
+        BusFactory.setThreadDefaultBus(clientConfig.getCxfBus());
+        
         TestMtomService svc = new TestMtomService(wsdl);
         
         TestMtom port = svc.getTestMtomPort();
@@ -42,8 +52,8 @@ public class MtomTestCase extends DynamicPortTestCase
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
             "http://localhost:" + getPorts().get(0) + "/services/mtom");
         ((SOAPBinding) bp.getBinding()).setMTOMEnabled(true);
-//        Client client = ClientProxy.getClient(port);
-//        new LoggingFeature().initialize(client, null);
+        // Client client = ClientProxy.getClient(port);
+        // new LoggingFeature().initialize(client, null);
         
         File file = new File("src/test/resources/mtom-conf.xml");
         DataHandler dh = new DataHandler(new FileDataSource(file));

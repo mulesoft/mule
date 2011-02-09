@@ -25,7 +25,6 @@ import org.mule.module.cxf.MuleInvoker;
 import org.mule.module.cxf.support.CxfUtils;
 import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
-import org.mule.module.cxf.support.MuleProtocolHeadersOutInterceptor;
 import org.mule.module.cxf.support.MuleServiceConfiguration;
 import org.mule.util.ClassUtils;
 
@@ -144,15 +143,13 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
             sfb.getOutFaultInterceptors().addAll((Collection<? extends Interceptor<? extends Message>>) outFaultInterceptors);
         }
         
-        if (enableMuleSoapHeaders)
+        if (enableMuleSoapHeaders && !configuration.isEnableMuleSoapHeaders())
         {
             sfb.getInInterceptors().add(new MuleHeadersInInterceptor());
             sfb.getInFaultInterceptors().add(new MuleHeadersInInterceptor());
             sfb.getOutInterceptors().add(new MuleHeadersOutInterceptor());
             sfb.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
         }
-        sfb.getOutInterceptors().add(new MuleProtocolHeadersOutInterceptor());
-        sfb.getOutFaultInterceptors().add(new MuleProtocolHeadersOutInterceptor());
         
         String address = getAddress();
       //hack for CXF to work correctly with servlet and jetty urls
