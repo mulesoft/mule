@@ -73,7 +73,6 @@ import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.ThreadNameHelper;
-import org.mule.util.concurrent.WaitableBoolean;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -264,7 +263,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     protected ConnectorLifecycleManager lifecycleManager;
 
     // TODO connect and disconnect are not part of lifecycle management right now
-    private WaitableBoolean connected = new WaitableBoolean(false);
+    private AtomicBoolean connected = new AtomicBoolean(false);
 
     /** Is this connector currently undergoing a reconnection strategy? */
     private AtomicBoolean reconnecting = new AtomicBoolean(false);
@@ -1678,11 +1677,6 @@ public abstract class AbstractConnector implements Connector, WorkListener
     public final void setConnected(boolean flag)
     {
         connected.set(flag);
-    }
-
-    public void waitUntilConnected() throws InterruptedException
-    {
-        connected.whenTrue(null);
     }
 
     public final void setReconnecting(boolean flag)
