@@ -38,7 +38,7 @@ public class ServiceStateTestCase extends FunctionalTestCase
         assertFalse(c.isStopped());
 
         // The listeners should be registered and started.
-        AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.0");
+        AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.mule.default");
         assertNotNull(connector);
         assertTrue(connector.isStarted());
         MessageReceiver[] receivers = connector.getReceivers("*default*");
@@ -57,7 +57,7 @@ public class ServiceStateTestCase extends FunctionalTestCase
         assertFalse(c.isPaused());
 
         // The connector should be started, but with no listeners registered.
-        AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.0");
+        AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.mule.default");
         assertNotNull(connector);
         assertTrue(connector.isStarted());
         MessageReceiver[] receivers = connector.getReceivers("*stopped*");
@@ -85,7 +85,7 @@ public class ServiceStateTestCase extends FunctionalTestCase
         assertFalse(c.isPaused());
 
         // The listeners should be registered and started.
-        AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.0");
+        AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.mule.default");
         assertNotNull(connector);
         assertTrue(connector.isStarted());
         MessageReceiver[] receivers = connector.getReceivers("*started*");
@@ -142,7 +142,7 @@ public class ServiceStateTestCase extends FunctionalTestCase
         assertFalse(c.isStopped());
 
         // The listeners should be registered and started.
-        AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.0");
+        AbstractConnector connector = (AbstractConnector)muleContext.getRegistry().lookupConnector("connector.test.mule.default");
         assertNotNull(connector);
         assertTrue(connector.isStarted());
         MessageReceiver[] receivers = connector.getReceivers("*paused*");
