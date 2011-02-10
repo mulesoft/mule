@@ -10,10 +10,8 @@
 
 package org.mule.module.cxf.support;
 
-import org.apache.cxf.message.Exchange;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -24,6 +22,7 @@ import java.util.Map;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -41,16 +40,12 @@ public class MuleProtocolHeadersOutInterceptor
     public void handleMessage(Message message) throws Fault
     {
         MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
-        if (event == null) 
-        {
-            event = (MuleEvent)message.get(MuleProperties.MULE_EVENT_PROPERTY);
-        }
         
         if (event == null) 
         {
             return;
         }
-        
+
         MuleMessage muleMsg = event.getMessage();
         
         if (muleMsg == null)

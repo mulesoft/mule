@@ -87,7 +87,7 @@ public class MuleHeadersInInterceptor extends AbstractMuleHeaderInterceptor
         }
         
 
-        MuleMessage reqMsg = ((MuleEvent) message.get(CxfConstants.MULE_EVENT)).getMessage();
+        MuleMessage reqMsg = ((MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT)).getMessage();
         
         // Copy correlation headers nto message
         String replyTo = (String) message.get(MuleProperties.MULE_REPLY_TO_PROPERTY);

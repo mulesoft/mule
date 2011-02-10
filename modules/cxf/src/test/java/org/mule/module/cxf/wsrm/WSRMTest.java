@@ -18,11 +18,18 @@ import org.mule.tck.DynamicPortTestCase;
 
 public class WSRMTest extends DynamicPortTestCase
 {
-    public void testWSRM() throws Exception
+    public void testAnonymous() throws Exception
     {
         MuleClient client = new DefaultLocalMuleClient(muleContext);
-        MuleMessage result = client.send("clientEndpoint", new DefaultMuleMessage("test", muleContext));        
-        System.out.println(result);
+        MuleMessage result = client.send("anonymousReplyClientEndpoint", new DefaultMuleMessage("test", muleContext));        
+        assertEquals("Hello test", result.getPayloadAsString());
+    }
+
+    public void testDecoupled() throws Exception
+    {
+        MuleClient client = new DefaultLocalMuleClient(muleContext);
+        MuleMessage result = client.send("decoupledClientEndpoint", new DefaultMuleMessage("test", muleContext));        
+        assertEquals("Hello test", result.getPayloadAsString());
     }
     
     @Override

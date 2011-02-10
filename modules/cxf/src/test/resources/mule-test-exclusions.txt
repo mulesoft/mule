@@ -31,5 +31,3 @@ org.mule.module.cxf.wsa.WSATest
 org.mule.module.cxf.ClientSimpleFrontendTestCase
 
 org.mule.module.cxf.StaxFeatureTestCase
-
-org.mule.module.cxf.wsrm.WSRMTest

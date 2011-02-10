@@ -11,7 +11,6 @@
 package org.mule.module.cxf.transport;
 
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
-import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
@@ -28,7 +27,6 @@ import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.support.DelegatingOutputStream;
-import org.mule.module.cxf.support.MuleProtocolHeadersOutInterceptor;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
@@ -149,8 +147,11 @@ public class MuleUniversalConduit extends AbstractConduit
             }
         };
 
-        MuleEvent event = (MuleEvent) message.getExchange().get(MULE_EVENT_PROPERTY);
-        if (event == null)
+        MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+        // are we sending an out of band response for a server side request?
+        boolean decoupled = event != null && message.getExchange().getInMessage() != null;
+        
+        if (event == null || decoupled)
         {
             // we've got an out of band WS-RM message or a message from a standalone client
             MuleContext muleContext = configuration.getMuleContext();
@@ -168,15 +169,18 @@ public class MuleUniversalConduit extends AbstractConduit
             {
                 throw new Fault(e);
             }
-            message.getExchange().put(CxfConstants.MULE_EVENT, event);
             event.setTimeout(MuleEvent.TIMEOUT_NOT_SET_VALUE);
-            RequestContext.setEvent(event);
         }
         else 
         {
             event.getMessage().setPayload(handler);
+        }
+
+        if (!decoupled)
+        {
             message.getExchange().put(CxfConstants.MULE_EVENT, event);
         }
+        message.put(CxfConstants.MULE_EVENT, event);
         
         final MuleEvent finalEvent = event;
         AbstractPhaseInterceptor<Message> i = new AbstractPhaseInterceptor<Message>(Phase.PRE_STREAM)
@@ -193,7 +197,6 @@ public class MuleUniversalConduit extends AbstractConduit
                 }
             }
         };
-        i.getAfter().add(MuleProtocolHeadersOutInterceptor.class.getName());
         message.getInterceptorChain().add(i);
     }
 
@@ -267,7 +270,6 @@ public class MuleUniversalConduit extends AbstractConduit
                     contentType += "; charset=" + result.getEncoding();
                 }
                 inMessage.put(Message.CONTENT_TYPE, contentType);
-                inMessage.put(CxfConstants.MULE_EVENT, resEvent);
                 inMessage.setContent(InputStream.class, is);
                 inMessage.setExchange(m.getExchange());
                 getMessageObserver().onMessage(inMessage);
@@ -340,6 +342,7 @@ public class MuleUniversalConduit extends AbstractConduit
         {
             // we're sending from a CXF client, not from mule
             OutboundEndpoint ep = (OutboundEndpoint) event.getEndpoint();
+            RequestContext.setEvent(event);
             response = ep.process(event);
         }
         else

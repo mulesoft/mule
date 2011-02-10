@@ -363,7 +363,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     private Map<String, Object> getInovcationProperties(MuleEvent event)
     {
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(MuleProperties.MULE_EVENT_PROPERTY, event);
+        props.put(CxfConstants.MULE_EVENT, event);
         props.put(CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR, this);
         props.put(org.apache.cxf.message.Message.ENDPOINT_ADDRESS, event.getEndpoint().getEndpointURI().toString());
 

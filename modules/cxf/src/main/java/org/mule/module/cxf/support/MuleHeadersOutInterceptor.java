@@ -11,6 +11,7 @@
 package org.mule.module.cxf.support;
 
 import org.mule.api.MuleEvent;
+import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.MuleSoapHeaders;
 
 import javax.xml.namespace.QName;
@@ -52,7 +53,7 @@ public class MuleHeadersOutInterceptor extends AbstractMuleHeaderInterceptor
         }
 
         SoapMessage message = (SoapMessage) m;
-        MuleEvent event = (MuleEvent) message.getExchange().get(MULE_EVENT_PROPERTY);
+        MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
 
         if (event == null)
         {

@@ -10,13 +10,11 @@
 
 package org.mule.module.cxf;
 
-import org.mule.RequestContext;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointNotFoundException;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.InitialisationException;
@@ -276,12 +274,10 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
             // Set up a listener for the response
             m.put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
-            m.put(MuleProperties.MULE_EVENT_PROPERTY, RequestContext.getEvent());
             m.setDestination(d);
 
             ExchangeImpl exchange = new ExchangeImpl();
             exchange.setInMessage(m);
-            m.put(CxfConstants.MULE_EVENT, event);
 
             // if there is a fault, then we need an event in here because we won't
             // have a responseEvent from the MuleInvoker
@@ -364,7 +360,10 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                 }
 
                 DelegatingOutputStream delegate = contentMsg.getContent(DelegatingOutputStream.class);
-                out.write(((ByteArrayOutputStream) delegate.getOutputStream()).toByteArray());
+                if (delegate.getOutputStream() instanceof ByteArrayOutputStream)
+                {
+                    out.write(((ByteArrayOutputStream) delegate.getOutputStream()).toByteArray());
+                }
                 delegate.setOutputStream(out);
 
                 out.flush();

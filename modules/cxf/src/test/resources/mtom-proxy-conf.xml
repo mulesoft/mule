@@ -21,8 +21,6 @@
     <flow name="mycomponent">
         <inbound-endpoint address="http://localhost:${port1}/services/mtom2"
             exchange-pattern="request-response" />
-        <logger level="ERROR" />
-        <logger message="#[payload]" level="ERROR" />
         <cxf:jaxws-service mtomEnabled="true" serviceClass="org.mule.module.cxf.testmodels.TestMtomImpl" />
         <component>
             <singleton-object class="org.mule.module.cxf.testmodels.TestMtomImpl" />
