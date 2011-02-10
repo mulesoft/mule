@@ -115,6 +115,8 @@ public class JettyHttpConnector extends AbstractConnector
                                                   "_exploded_wars" + webapp.getContextPath());
                     workDir.mkdirs();
                     webapp.setTempDirectory(workDir);
+                    // TODO extract to a better constant
+                    webapp.setAttribute("muleContext", muleContext);
 
                     if (logger.isInfoEnabled())
                     {
