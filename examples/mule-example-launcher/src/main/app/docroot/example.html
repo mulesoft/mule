@@ -87,12 +87,12 @@
 
 	function handleExampleOverviewResponse(data, textStatus, xmlHttpRequest)
 	{
-		$("#overview-tab").html(data);
+		$("#overview-tab").html('<div style="height:450px;width:100%;overflow:scroll;">' + data + '</div>');
 	}
 
 	function handleExampleDemoResponse(data, textStatus, xmlHttpRequest)
 	{
-		$("#runit-tab").html(data);
+		$("#runit-tab").html('<div style="height:450px;width:100%;overflow:scroll;">' + data + '</div>');
 	}
 		
 	function setExampleOverView(exampleName)

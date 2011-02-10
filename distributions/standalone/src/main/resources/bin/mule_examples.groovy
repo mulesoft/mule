@@ -70,7 +70,7 @@ println proc.text
 // wait for the example launcher application to be started
 splash "Waiting for example applications to become ready..."
 def i = 0
-def timeoutInMs = 120000 // 2 minutes
+def timeoutInMs = 180000 // 3 minutes
 def waitIntervalInMs = 3000
 def loops = timeoutInMs / waitIntervalInMs
 

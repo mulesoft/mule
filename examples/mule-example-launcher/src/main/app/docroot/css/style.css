@@ -335,7 +335,21 @@ color:#333; font-size:14px; float:left; font-weight:normal;
 	-moz-border-radius: 3px; -webkit-border-radius: 3px;
 }
 
+.example-title {
+	font-size: 16px;
+	color: #016c96;
+	font-weight: bold;
+	padding:.5em 0 .5em;
+}
 
+.example-text {
+	font-size: 12px;
+}
+
+.example-strong-text {
+	font-size: 12px;
+	font-weight: bold;
+}
 
 #demo-header { float:left; width:100%; border-bottom:1px solid #eee; }
 .normal #demo-header h2, .normal #demo-header h4 { float:left; width:100%; }
