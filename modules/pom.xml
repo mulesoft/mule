@@ -33,7 +33,6 @@
         <module>jca</module>
         <module>json</module>
         <module>management</module>
-        <module>mcp</module>
         <module>ognl</module>
         <module>pgp</module>
         <module>reboot</module>
@@ -44,6 +43,7 @@
         <module>spring-security</module>
         <module>sxc</module>
         <module>tomcat</module>
+        <module>ws</module>
         <module>xml</module>
     </modules>
 

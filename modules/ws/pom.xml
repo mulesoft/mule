@@ -4,13 +4,13 @@
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>3.1.2-SNAPSHOT</version>
+        <version>3.1.1-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-module-mcp</artifactId>
+    <artifactId>mule-module-ws</artifactId>
     <packaging>jar</packaging>
-    <name>Configuration Patterns</name>
+    <name>Web Services</name>
     <description>
-        Mule Configuration Patterns
+        Mule Utilities for Web Services.
     </description>
 
     <dependencies>

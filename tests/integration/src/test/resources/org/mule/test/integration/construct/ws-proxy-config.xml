@@ -2,7 +2,6 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:http="http://www.mulesoft.org/schema/mule/http"
-  xmlns:mcp="http://www.mulesoft.org/schema/mule/mcp"
   xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
   xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
   xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
@@ -11,22 +10,21 @@
   xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.1/mule-http.xsd
-       http://www.mulesoft.org/schema/mule/mcp http://www.mulesoft.org/schema/mule/mcp/3.1/mule-mcp.xsd
        http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/3.1/mule-ws.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.1/mule-cxf.xsd
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.1/mule-scripting.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-  <mcp:web-service-proxy name="weather-forecast-ws-proxy"
+  <ws:proxy name="weather-forecast-ws-proxy"
             inboundAddress="http://localhost:8090/weather-forecast/0"
             outboundAddress="http://localhost:6090/weather-forecast" />
 
-  <mcp:web-service-proxy name="weather-forecast-ws-proxy-fixed-wsdl-file"
+  <ws:proxy name="weather-forecast-ws-proxy-fixed-wsdl-file"
             inboundAddress="http://localhost:8090/weather-forecast/1"
             outboundAddress="http://localhost:6090/weather-forecast"
             wsdlFile="org/mule/test/integration/construct/weather-forecaster.wsdl" />
 
-  <mcp:web-service-proxy name="weather-forecast-ws-proxy-fixed-wsdl-url"
+  <ws:proxy name="weather-forecast-ws-proxy-fixed-wsdl-url"
             inboundAddress="http://localhost:8090/weather-forecast/2"
             outboundAddress="http://localhost:6090/weather-forecast"
             wsdlLocation="http://localhost:6090/weather-forecast?wsdl" />
@@ -37,43 +35,43 @@
   <http:endpoint name="target-ws-endpoint"
                  address="http://localhost:6090/weather-forecast" />
 
-  <mcp:web-service-proxy name="weather-forecast-ws-proxy-endpoints"
+  <ws:proxy name="weather-forecast-ws-proxy-endpoints"
             inboundEndpoint-ref="local-proxy-endpoint"
             outboundEndpoint-ref="target-ws-endpoint" />
 
-  <mcp:web-service-proxy name="weather-forecast-ws-proxy-transformers"
+  <ws:proxy name="weather-forecast-ws-proxy-transformers"
             inboundAddress="http://localhost:8090/weather-forecast/4"
             transformer-refs="object-to-string-transformer zip-code-changer-1"
             responseTransformer-refs="object-to-string-transformer zip-code-changer-2"
             outboundEndpoint-ref="target-ws-endpoint" />
 
-  <mcp:web-service-proxy name="weather-forecast-ws-proxy-exception-strategy"
+  <ws:proxy name="weather-forecast-ws-proxy-exception-strategy"
             inboundAddress="http://localhost:8090/weather-forecast/5"
             outboundEndpoint-ref="target-ws-endpoint">
     <default-exception-strategy />
-  </mcp:web-service-proxy>
+  </ws:proxy>
   
-  <mcp:web-service-proxy name="weather-forecast-ws-proxy-abstract-parent"
+  <ws:proxy name="weather-forecast-ws-proxy-abstract-parent"
             abstract="true"
             transformer-refs="object-to-string-transformer zip-code-changer-1"
             responseTransformer-refs="object-to-string-transformer zip-code-changer-2"
             outboundEndpoint-ref="target-ws-endpoint" />
 
-  <mcp:web-service-proxy name="weather-forecast-ws-proxy-concrete-child"
+  <ws:proxy name="weather-forecast-ws-proxy-concrete-child"
             parent="weather-forecast-ws-proxy-abstract-parent"
             inboundAddress="http://localhost:8090/weather-forecast/6" />
             
-  <mcp:web-service-proxy name="weather-forecast-ws-proxy-child-endpoints">
+  <ws:proxy name="weather-forecast-ws-proxy-child-endpoints">
     <http:inbound-endpoint address="http://localhost:8090/weather-forecast/7" />
     <http:outbound-endpoint address="http://localhost:6090/weather-forecast" />
-  </mcp:web-service-proxy>
+  </ws:proxy>
             
-  <mcp:web-service-proxy name="weather-forecast-ws-proxy-concrete-child-endpoints"
+  <ws:proxy name="weather-forecast-ws-proxy-concrete-child-endpoints"
             parent="weather-forecast-ws-proxy-abstract-parent">
     <http:inbound-endpoint address="http://localhost:8090/weather-forecast/8" />
-  </mcp:web-service-proxy>
+  </ws:proxy>
   
-  <mcp:web-service-proxy name="weather-forecast-ws-proxy-expression"
+  <ws:proxy name="weather-forecast-ws-proxy-expression"
             inboundAddress="http://localhost:8090/weather-forecast/9"
             outboundAddress="http://localhost:6090/#[string:weather-forecast]" />
 
@@ -92,7 +90,7 @@
     </script:script>
   </script:transformer>
   
-  <mcp:simple-service name="weather-forecaster-ws"
+  <simple-service name="weather-forecaster-ws"
                   address="http://localhost:6090/weather-forecast"
                   component-class="org.mule.test.integration.tck.WeatherForecaster"
                   type="jax-ws" />

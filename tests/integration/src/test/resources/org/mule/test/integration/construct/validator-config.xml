@@ -2,27 +2,25 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-  xmlns:mcp="http://www.mulesoft.org/schema/mule/mcp"
   xmlns:test="http://www.mulesoft.org/schema/mule/test"
   xmlns:spring="http://www.springframework.org/schema/beans"
   xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.1/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/mcp http://www.mulesoft.org/schema/mule/mcp/3.1/mule-mcp.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
   <vm:endpoint name="test-service-channel"
                path="test-service.in"
                exchange-pattern="one-way" />
 
-  <mcp:validator name="validator"
+  <validator name="validator"
              inboundAddress="vm://validator.in"
              ackExpression="#[string:GOOD:#[message:payload]@#[context:serviceName]]"
              nackExpression="#[string:BAD:#[message:payload]@#[context:serviceName]]"
              outboundAddress="vm://test-service.in">
     <payload-type-filter expectedType="java.lang.Integer"/>
-  </mcp:validator>
+  </validator>
 
   <payload-type-filter name="int-payload-filter" expectedType="java.lang.Integer" />
     
@@ -30,23 +28,23 @@
                path="validator-with-refs.in"
                exchange-pattern="one-way" />
 
-  <mcp:validator name="validator-with-refs"
+  <validator name="validator-with-refs"
              inboundEndpoint-ref="validator-with-refs-channel"
              ackExpression="#[string:GOOD:#[message:payload]@#[context:serviceName]]"
              nackExpression="#[string:BAD:#[message:payload]@#[context:serviceName]]"
              validationFilter-ref="int-payload-filter"
              outboundEndpoint-ref="test-service-channel" />
 
-  <mcp:validator name="validator-with-child-endpoints"
+  <validator name="validator-with-child-endpoints"
              ackExpression="#[string:GOOD:#[message:payload]@#[context:serviceName]]"
              nackExpression="#[string:BAD:#[message:payload]@#[context:serviceName]]"
              validationFilter-ref="int-payload-filter">
     <vm:inbound-endpoint path="validator-with-child-endpoints.in"
                          exchange-pattern="request-response" />
     <outbound-endpoint ref="test-service-channel" />
-  </mcp:validator>
+  </validator>
 
-  <mcp:validator name="validator-with-exception-strategy"
+  <validator name="validator-with-exception-strategy"
              inboundAddress="vm://validator-with-exception-strategy.in"
              ackExpression="#[string:GOOD:#[message:payload]@#[context:serviceName]]"
              nackExpression="#[message:_invalid]"
@@ -54,21 +52,21 @@
              outboundEndpoint-ref="test-service-channel">
     <custom-exception-strategy
              class="org.mule.test.integration.exceptions.TestExceptionStrategy" />
-  </mcp:validator>
+  </validator>
              
-  <mcp:validator name="abstract-parent-validator"
+  <validator name="abstract-parent-validator"
              abstract="true"
              ackExpression="#[string:GOOD:#[message:payload]@#[context:serviceName]]"
              nackExpression="#[string:BAD:#[message:payload]@#[context:serviceName]]" />
 
-  <mcp:validator name="concrete-validator"
+  <validator name="concrete-validator"
              parent="abstract-parent-validator"
              inboundAddress="vm://concrete-validator.in"
              outboundAddress="vm://test-service.in">
     <payload-type-filter expectedType="java.lang.Integer"/>
-  </mcp:validator>
+  </validator>
 
-  <mcp:validator name="dispatch-error"
+  <validator name="dispatch-error"
              inboundAddress="vm://dispatch-error.in"
              ackExpression="#[string:GOOD:#[message:payload]@#[context:serviceName]]"
              nackExpression="#[string:BAD:#[message:payload]@#[context:serviceName]]"
@@ -86,7 +84,7 @@
     <test:component />
   </flow>
   
-  <mcp:simple-service name="error-service" address="http://localhost:8091/error">
+  <simple-service name="error-service" address="http://localhost:8091/error">
     <test:component throwException="true" />
-  </mcp:simple-service>
+  </simple-service>
 </mule>

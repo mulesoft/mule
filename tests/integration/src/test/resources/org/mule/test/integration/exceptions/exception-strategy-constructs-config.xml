@@ -3,14 +3,12 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-      xmlns:mcp="http://www.mulesoft.org/schema/mule/mcp"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.1/mule-test.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
-        http://www.mulesoft.org/schema/mule/mcp http://www.mulesoft.org/schema/mule/mcp/3.1/mule-mcp.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd">
 
     <vm:connector name="vmConnector"/>
@@ -42,19 +40,19 @@
     </model>
 
 
-    <mcp:simple-service name="testSS1"
+    <simple-service name="testSS1"
                     address="vm://inss1">
         <test:component throwException="true" />
         <default-exception-strategy>
             <vm:outbound-endpoint path="ss1out" exchange-pattern="one-way"
                                   connector-ref="vmConnector"/>
         </default-exception-strategy>
-    </mcp:simple-service>
+    </simple-service>
 
-    <mcp:simple-service name="testSS2"
+    <simple-service name="testSS2"
                     address="vm://inss2">
         <test:component throwException="true" />
-    </mcp:simple-service>
+    </simple-service>
 
     <flow name="testflow1">
         <vm:inbound-endpoint path="inflow1" exchange-pattern="one-way"/>

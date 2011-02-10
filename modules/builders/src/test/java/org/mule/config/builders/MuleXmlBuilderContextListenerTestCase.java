@@ -107,8 +107,7 @@ public class MuleXmlBuilderContextListenerTestCase
 
     private void assertWorkingDirectoryEndsWith(String expected)
     {
-        // handle Windows filenames, just in case
-        String workingDirectory = listener.muleContext.getConfiguration().getWorkingDirectory().replace('\\', '/');
+        String workingDirectory = listener.muleContext.getConfiguration().getWorkingDirectory();
         workingDirectory = FilenameUtils.separatorsToUnix(workingDirectory);
         assertTrue(workingDirectory.endsWith(expected));
     }
