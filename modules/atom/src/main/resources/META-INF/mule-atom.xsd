@@ -38,30 +38,23 @@
         <xsd:annotation>
             <xsd:documentation>
                 Allows ATOM requests to be filtered by request path and HTTP verb.
-                The route attribute defines a type of URI Template loosely based on Ruby on Rails style Routes. For example:
-                "feed" or ":feed/:entry".
-                For reference, see the Ruby On Rails routing http://guides.rubyonrails.org/routing.html
             </xsd:documentation>
         </xsd:annotation>
-                 </xsd:element>
+    </xsd:element>
     <xsd:complexType name="routeFilterType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractFilterType">
                 <xsd:attribute name="route" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The URI request path made for an ATOM request.  This matches against the path of the request URL.
-                            The route attribute defines a type of URI Template loosely based on Ruby on Rails style Routes. For example:
-                            "feed" or ":feed/:entry".
-                            For reference, see the Ruby On Rails routing http://guides.rubyonrails.org/routing.html
+                            The URI request path made for an ATOM request. This matches against the path of the request URL. The route attribute defines a type of URI Template loosely based on Ruby on Rails style Routes. For example: "feed" or ":feed/:entry". For reference, see the Ruby On Rails routing http://guides.rubyonrails.org/routing.html
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="verbs" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            A comma-separated list of HTTP verbs that will be accepted by this filter. By default all
-                            verbs are accepted.
+                            A comma-separated list of HTTP verbs that will be accepted by this filter. By default all verbs are accepted.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -73,9 +66,7 @@
                  substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-                Will filter ATOM entry objects based on their last update date. This is useful for filtering older
-                entries from the feed. This filter works only on Atom Entry objects not Feed objects.
-                Typically it is better to set the lastUpdated attribute on an inbound ATOM endpoint rather than use this filter, however, this filter can be used elsewhere in a flow.
+                Will filter ATOM entry objects based on their last update date. This is useful for filtering older entries from the feed. This filter works only on Atom Entry objects not Feed objects.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -86,13 +77,7 @@
                 <xsd:attribute name="lastUpdate" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The date from which to filter events from.  Any entries that were last updated before this date will not be accepted. The date format is
-                            The format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25 13:00:00.
-                            If only the date is important you can omit the time part.
-                            You can set the value to 'now' to set the date and time that the server is started.
-
-                            Do not set this attribute if you want to receive all available entries then any new entries going forward.
-                            This is the default behaviour and suitable for many scenarios.
+                            The date from which to filter events from. Any entries that were last updated before this date will not be accepted. The date format is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25 13:00:00. If only the date is important you can omit the time part. You can set the value to 'now' to set the date and time that the server is started. Do not set this attribute if you want to receive all available entries then any new entries going forward. This is the default behaviour and suitable for many scenarios.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -145,23 +130,18 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="component" type="atomComponentType" substitutionGroup="mule:abstract-component">
+    <xsd:element name="object-to-feed-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                Represents an Abdera component.
+                Transforms the payload of the message to a {{org.apache.abdera.model.Feed}} instance.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="feed-splitter" type="mule:baseSplitterType"
-                 substitutionGroup="mule:abstract-intercepting-message-processor">
+    <xsd:element name="component" type="atomComponentType" substitutionGroup="mule:abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                Will split the entries of a feed into single entry objects. Each entry will be a separate message in
-                Mule. By default the inbound endpoint will split the feed automatically. The only time this splitter
-                will be useful is when you explicitly request that the feed is not split, but then you want to split it
-                later in the flow or if the endpoint serving the feed is not an Atom endpoint, for example receiving a
-                feed over JMS.
+                Represents an Abdera component.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -175,15 +155,29 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="componentAttributes">
-        <xsd:attribute name="provider-ref" type="xsd:string"/>
+        <xsd:attribute name="provider-ref" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The id of the Atom provider that is defined as Spring bean.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
+
+    <xsd:element name="feed-splitter" type="mule:baseSplitterType"
+                 substitutionGroup="mule:abstract-intercepting-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Will split the entries of a feed into single entry objects. Each entry will be a separate message in Mule.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:element name="entry-builder-transformer" type="entryBuilderTransformerType"
                  substitutionGroup="mule:abstract-transformer">
         <xsd:annotation>
             <xsd:documentation>
-                A transformer that uses expressions to configure an Atom Entry. The user can specify one more
-                expressions that are used to configure properties on the bean.
+                A transformer that uses expressions to configure an Atom Entry. The user can specify one or more expressions that are used to configure properties on the bean.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -221,8 +215,7 @@
                             <xsd:attributeGroup ref="mule:expressionAttributes"/>
                             <xsd:attribute name="optional" type="mule:substitutableBoolean" use="optional">
                                 <xsd:annotation>
-                                    <xsd:documentation>An optional expression means that if the expression evaluates
-                                        to null, it will continue to the next expression without error.
+                                    <xsd:documentation>An optional expression means that if the expression evaluates to null, it will continue to the next expression without error.
                                     </xsd:documentation>
                                 </xsd:annotation>
                             </xsd:attribute>

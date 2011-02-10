@@ -80,9 +80,9 @@
     </xsd:element>
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
-            <!-- 
-                The only valid exchange-pattern is one-way which is the default. No need to make 
-                the exchange-pattern attribute configurable.  
+            <!--
+                The only valid exchange-pattern is one-way which is the default. No need to make
+                the exchange-pattern attribute configurable.
             -->
             <xsd:extension base="mule:outboundEndpointTypeWithoutExchangePattern">
                 <xsd:sequence>
@@ -102,9 +102,9 @@
     </xsd:element>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <!-- 
-                The only valid exchange-pattern is one-way which is the default. No need to make 
-                the exchange-pattern attribute configurable.  
+            <!--
+                The only valid exchange-pattern is one-way which is the default. No need to make
+                the exchange-pattern attribute configurable.
             -->
             <xsd:extension base="mule:inboundEndpointTypeWithoutExchangePattern">
                 <xsd:sequence>
@@ -124,9 +124,9 @@
     </xsd:element>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <!-- 
-                The only valid exchange-pattern is one-way which is the default. No need to make 
-                the exchange-pattern attribute configurable.  
+            <!--
+                The only valid exchange-pattern is one-way which is the default. No need to make
+                the exchange-pattern attribute configurable.
             -->
             <xsd:extension base="mule:globalEndpointTypeWithoutExchangePattern">
                 <xsd:sequence>
@@ -168,12 +168,6 @@
             <xsd:documentation>
                 An inbound endpoint job that will trigger a new event for the service according to the schedule on the endpoint. This is useful for periodically triggering a service without the need for an external event to occur.
             </xsd:documentation>
-            <xsd:appinfo>
-                <schemadoc:snippet lang="xml" id="example-1"
-                                   sourcePath="transports/quartz/src/test/resources/quartz-namespace-config.xml"/>
-                <schemadoc:snippet lang="xml" id="example-2"
-                                   sourcePath="transports/quartz/src/test/resources/quartz-namespace-config.xml"/>
-            </xsd:appinfo>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="eventGenerateJobType">
@@ -197,10 +191,6 @@
             <xsd:documentation>
                 An inbound endpoint job that can be used to periodically read from an external source (via another endpoint). This can be useful for triggering time-based events from sources that do not support polling or for simply controlling the rate in which events are received from the source.
             </xsd:documentation>
-            <xsd:appinfo>
-                <schemadoc:snippet lang="xml" id="example-5"
-                                   sourcePath="transports/quartz/src/test/resources/quartz-namespace-config.xml"/>
-            </xsd:appinfo>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="endpointPollingJobType">
@@ -224,10 +214,6 @@
             <xsd:documentation>
                 An outbound job that will schedule a job for dispatch at a later time/date. The event will get dispatched using the configured endpoint reference.
             </xsd:documentation>
-            <xsd:appinfo>
-                <schemadoc:snippet lang="xml" id="example-6"
-                                   sourcePath="transports/quartz/src/test/resources/quartz-namespace-config.xml"/>
-            </xsd:appinfo>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="scheduledDispatchJobType">
@@ -249,11 +235,6 @@
             <xsd:documentation>
                 A custom job can be configured on inbound or outbound endpoints. You can create and configure your own job implementation and use it on a Quartz endpoint. A custom job can be configured as a bean in the XML configuration and referenced using this job.
             </xsd:documentation>
-            <xsd:appinfo>
-                <schemadoc:snippet lang="xml" id="example-4"
-                                   sourcePath="transports/quartz/src/test/resources/quartz-namespace-config.xml"/>
-
-            </xsd:appinfo>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="customJobType">
@@ -275,10 +256,6 @@
             <xsd:documentation>
                 Allows a job to be stored on the current message. This can only be used on outbound endpoints. When the message is received, the job is read and the job is added to the scheduler with the current message. This allows for custom scheduling behavior determined by the message itself. Usually the service or a transformer would create the job on the message based on application-specific logic. Any Mule-supported expressions can be used to read the job from the message. Typically, you add the job as a header, but an attachment could also be used.
             </xsd:documentation>
-            <xsd:appinfo>
-                <schemadoc:snippet lang="xml" id="example-3"
-                                   sourcePath="transports/quartz/src/test/resources/quartz-namespace-config.xml"/>
-            </xsd:appinfo>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="customFromMessageJobType">

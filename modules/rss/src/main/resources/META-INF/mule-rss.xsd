@@ -12,7 +12,6 @@
                 schemaLocation="http://www.springframework.org/schema/beans"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd"/>
-
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
                 schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.2/mule-schemadoc.xsd"/>
 
@@ -32,11 +31,7 @@
                  substitutionGroup="mule:abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Will split the entries of a feed into single entry objects. Each entry will be a separate message in
-                Mule. By default the inbound endpoint will split the feed automatically. The only time this splitter
-                will be useful is when you explicitly request that the feed is not split, but then you want to split it
-                later in the flow or if the endpoint serving the feed is not an Rss endpoint, for example receiving a
-                feed over JMS.
+                Will split the entries of a feed into single entry objects. Each entry will be a separate message in Mule.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -45,8 +40,7 @@
                  substitutionGroup="mule:abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
-                Will filter RSS entry objects based on their last update date. This is useful for filtering older
-                entries from the feed. This filter works only on RSS SyndEntry objects not SyndFeed objects.
+                Will filter RSS entry objects based on their last update date. This is useful for filtering older entries from the feed. This filter works only on RSS SyndEntry objects not SyndFeed objects.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -57,13 +51,7 @@
                 <xsd:attribute name="lastUpdate" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The date from which to filter events from.  Any entries that were last updated before this date will not be accepted. The date format is
-                            The format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25 13:00:00.
-                            If only the date is important you can omit the time part.
-                            You can set the value to 'now' to set the date and time that the server is started.
-
-                            Do not set this attribute if you want to receive all available entries then any new entries going forward.
-                            This is the default behaviour and suitable for many scenarios.
+                            The date from which to filter events from. Any entries that were last updated before this date will not be accepted. The date format is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25 13:00:00. If only the date is important you can omit the time part. You can set the value to 'now' to set the date and time that the server is started. Do not set this attribute if you want to receive all available entries then any new entries going forward. This is the default behaviour and suitable for many scenarios.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -93,13 +81,7 @@
                 <xsd:attribute name="lastUpdate" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            The date from which to filter events from.  Any entries that were last updated before this date will not be accepted. The date format is
-                            The format for the date is is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25 13:00:00.
-                            If only the date is important you can omit the time part.
-                            You can set the value to 'now' to set the date and time that the server is started.
-
-                            Do not set this attribute if you want to receive all available entries then any new entries going forward.
-                            This is the default behaviour and suitable for many scenarios.
+                            The date from which to filter events from. Any feeds that were last updated before this date will not be accepted. The date format is: yyyy-MM-dd hh:mm:ss, for example 2008-12-25 13:00:00. If only the date is important you can omit the time part. You can set the value to 'now' to set the date and time that the server is started. Do not set this attribute if you want to receive all available entries then any new entries going forward. This is the default behaviour and suitable for many scenarios.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -113,4 +95,12 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="object-to-feed-transformer" type="mule:abstractTransformerType" substitutionGroup="mule:abstract-transformer">
+        <xsd:annotation>
+            <xsd:documentation>
+                Transforms the payload of the message to a {{com.sun.syndication.feed.synd.SyndFeed}} instance.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 </xsd:schema>
