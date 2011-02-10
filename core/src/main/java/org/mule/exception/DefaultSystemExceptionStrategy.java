@@ -13,9 +13,9 @@ package org.mule.exception;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.api.transport.Connectable;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.message.DefaultExceptionPayload;
+import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -42,7 +42,7 @@ public class DefaultSystemExceptionStrategy extends AbstractExceptionListener im
 
     public void handleException(Exception e)
     {
-        Connectable connectable = null;
+        AbstractConnector connector = null;
 
         // unwrap any exception caused by using reflection apis, but only the top layer
         if (e instanceof InvocationTargetException)
@@ -57,14 +57,17 @@ public class DefaultSystemExceptionStrategy extends AbstractExceptionListener im
             fireNotification(new ExceptionNotification(e));
         }
 
-        if (e instanceof ConnectException)
+        if (e instanceof ConnectException &&
+            // Make sure the connector is not already being reconnected by another receiver thread
+            ((AbstractConnector) ((ConnectException) e).getFailed()).isReconnecting() == false)
         {
             logger.info("Exception caught is a ConnectException, attempting to reconnect...");
-            connectable = ((ConnectException) e).getFailed();
+            connector = (AbstractConnector) ((ConnectException) e).getFailed();
+            connector.setReconnecting(true);
             try
             {
-                logger.debug("Disconnecting " + connectable.getClass().getName());
-                connectable.disconnect();
+                logger.debug("Disconnecting " + connector.getName());
+                connector.disconnect();
             }
             catch (Exception e1)
             {
@@ -81,13 +84,14 @@ public class DefaultSystemExceptionStrategy extends AbstractExceptionListener im
             RequestContext.setExceptionPayload(new DefaultExceptionPayload(e));
         }
         
-        if (connectable != null)
+        if (connector != null)
         {
             // Reconnect (retry policy will go into effect here if configured)
             try
             {
-                logger.debug("Reconnecting " + connectable.getClass().getName());
-                connectable.connect();
+                logger.debug("Reconnecting " + connector.getName());
+                connector.connect();
+                connector.setReconnecting(false);
             }
             catch (Exception e2)
             {

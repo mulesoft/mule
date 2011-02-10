@@ -73,6 +73,7 @@ import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.ThreadNameHelper;
+import org.mule.util.concurrent.WaitableBoolean;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -263,7 +264,10 @@ public abstract class AbstractConnector implements Connector, WorkListener
     protected ConnectorLifecycleManager lifecycleManager;
 
     // TODO connect and disconnect are not part of lifecycle management right now
-    protected AtomicBoolean connected = new AtomicBoolean(false);
+    private WaitableBoolean connected = new WaitableBoolean(false);
+
+    /** Is this connector currently undergoing a reconnection strategy? */
+    private AtomicBoolean reconnecting = new AtomicBoolean(false);
 
     /**
      * Indicates whether the connector should start upon connecting. This is
@@ -397,6 +401,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
+    // Start (but we might not be connected yet).
     public final synchronized void start() throws MuleException
     {
         if (isInitialStateStopped())
@@ -405,100 +410,101 @@ public abstract class AbstractConnector implements Connector, WorkListener
             return;
         }
 
-        lifecycleManager.fireStartPhase(new LifecycleCallback<Connector>()
+        if (!isConnected())
         {
-            public void onTransition(String phaseName, Connector object) throws MuleException
+            try
             {
-
-
-                if (!isConnected())
-                {
-                    startOnConnect = true;
-
-                    // Make sure we are connected
-                    try
-                    {
-                        connect();
-                    }
-                    catch (Exception e)
-                    {
-                        throw new LifecycleException(e, this);
-                    }
-                }
-                else
-                {
-                    //Do start called in this method
-                    startAfterConnect();
-                }
+                // startAfterConnect() will get called from the connect() method once connected.
+                // This is necessary for reconnection strategies.
+                startOnConnect = true;
+                connect();
             }
-        });
-
+            catch (MuleException me)
+            {
+                throw me;
+            }
+            catch (Exception e)
+            {
+                throw new ConnectException(e, this);
+            }
+        }
+        else
+        {        
+            startAfterConnect();
+        }
     }
 
+    // Start now that we're sure we're connected.
     protected synchronized void startAfterConnect() throws MuleException
     {
+        // Reset this flag if it was set
+        startOnConnect = false;
+        
+        // This breaks ConnectorLifecycleTestCase.testDoubleStartConnector()
+        //if (isStarted())
+        //{
+        //    return;
+        //}
+        
         if (logger.isInfoEnabled())
         {
             logger.info("Starting: " + this);
         }
 
-        // the scheduler is recreated after stop()
-        scheduler = createScheduler();
-
-        try
+        lifecycleManager.fireStartPhase(new LifecycleCallback<Connector>()
         {
-            initWorkManagers();
-        }
-        catch (MuleException e)
-        {
-            throw new InitialisationException(e, this);
-        }
-
-        if (!isStarted())
-        {
-            doStart();
-        }
-
-        if (receivers != null)
-        {
-            for (MessageReceiver receiver : receivers.values())
+            public void onTransition(String phaseName, Connector object) throws MuleException
             {
-                final List<MuleException> errors = new ArrayList<MuleException>();
-                try
+                initWorkManagers();        
+                scheduler = createScheduler();
+                doStart();
+                
+                if (receivers != null)
                 {
-                    if (logger.isDebugEnabled())
+                    for (MessageReceiver receiver : receivers.values())
                     {
-                        logger.debug("Starting receiver on endpoint: "
-                                + receiver.getEndpoint().getEndpointURI());
-                    }
-                    if (receiver.getFlowConstruct().getLifecycleState().isStarted())
-                    {
-                        receiver.start();
-                    }
-                }
-                catch (MuleException e)
-                {
-                    logger.error(e);
-                    errors.add(e);
-                }
+                        final List<MuleException> errors = new ArrayList<MuleException>();
+                        try
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("Starting receiver on endpoint: "
+                                        + receiver.getEndpoint().getEndpointURI());
+                            }
+                            if (receiver.getFlowConstruct().getLifecycleState().isStarted())
+                            {
+                                receiver.start();
+                            }
+                        }
+                        catch (MuleException e)
+                        {
+                            logger.error(e);
+                            errors.add(e);
+                        }
 
-                if (!errors.isEmpty())
-                {
-                    // throw the first one in order not to break the reconnection
-                    // strategy logic,
-                    // every exception has been logged above already
-                    // api needs refactoring to support the multi-cause exception
-                    // here
-                    throw errors.get(0);
-                }
+                        if (!errors.isEmpty())
+                        {
+                            // throw the first one in order not to break the reconnection
+                            // strategy logic,
+                            // every exception has been logged above already
+                            // api needs refactoring to support the multi-cause exception
+                            // here
+                            throw errors.get(0);
+                        }
+                    }
+                }                
             }
-        }
-
+        });
     }
-
 
     public final synchronized void stop() throws MuleException
     {
+        // This breaks ConnectorLifecycleTestCase.testDoubleStopConnector()
+        //if (isStopped() || isStopping())
+        //{
+        //    return;
+        //}
+        
         lifecycleManager.fireStopPhase(new LifecycleCallback<Connector>()
         {
             public void onTransition(String phaseName, Connector object) throws MuleException
@@ -508,8 +514,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
                 doStop();
 
-                // Stop all the receivers on this connector (this will cause them to
-                // disconnect too)
+                // Stop all the receivers on this connector
                 if (receivers != null)
                 {
                     for (MessageReceiver receiver : receivers.values())
@@ -519,21 +524,6 @@ public abstract class AbstractConnector implements Connector, WorkListener
                             logger.debug("Stopping receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
                         }
                         receiver.stop();
-                    }
-                }
-
-                if (isConnected())
-                {
-                    try
-                    {
-                        disconnect();
-                    }
-                    catch (Exception e)
-                    {
-                        //TODO We only log here since we need to make sure we stop with
-                        //a consistent state. Another option would be to collect exceptions
-                        //and handle them at the end of this message
-                        logger.error("Failed to disconnect: " + e.getMessage(), e);
                     }
                 }
 
@@ -555,10 +545,22 @@ public abstract class AbstractConnector implements Connector, WorkListener
     {
         try
         {
-            if (lifecycleManager.getState().isStarted())
+            if (isStarted())
             {
                 stop();
             }
+            if (isConnected())
+            {
+                disconnect();
+            }
+        }
+        catch (Exception e)
+        {
+            logger.warn(e.getMessage(), e);
+        }
+        
+        try
+        {
             lifecycleManager.fireDisposePhase(new LifecycleCallback<Connector>()
             {
                 public void onTransition(String phaseName, Connector object) throws MuleException
@@ -570,7 +572,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
         catch (MuleException e)
         {
-            logger.warn("Failed to dispose connector: " + name, e);
+            logger.warn(e.getMessage(), e);
         }
     }
 
@@ -592,6 +594,11 @@ public abstract class AbstractConnector implements Connector, WorkListener
     public boolean isStopped()
     {
         return lifecycleManager.getState().isStopped();
+    }
+
+    public boolean isStopping()
+    {
+        return lifecycleManager.getState().isStopping();
     }
 
 
@@ -1546,11 +1553,42 @@ public abstract class AbstractConnector implements Connector, WorkListener
                     }
                 }
                 doConnect();
+
+                if (receivers != null)
+                {
+                    for (MessageReceiver receiver : receivers.values())
+                    {
+                        final List<MuleException> errors = new ArrayList<MuleException>();
+                        try
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("Connecting receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
+                            }
+                            receiver.connect();
+                        }
+                        catch (MuleException e)
+                        {
+                            logger.error(e);
+                            errors.add(e);
+                        }
+
+                        if (!errors.isEmpty())
+                        {
+                            // throw the first one in order not to break the reconnection
+                            // strategy logic,
+                            // every exception has been logged above already
+                            // api needs refactoring to support the multi-cause exception
+                            // here
+                            throw errors.get(0);
+                        }
+                    }
+                }
+                
                 setConnected(true);
-
                 logger.info("Connected: " + getWorkDescription());
-
-                if (startOnConnect)
+                
+                if (startOnConnect && !isStarted() && !isStarting())
                 {
                     startAfterConnect();
                 }
@@ -1582,7 +1620,11 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     public void disconnect() throws Exception
     {
-        startOnConnect = isStarted();
+        if (isStarted())
+        {
+            startOnConnect = true;
+            stop();
+        }
 
         if (receivers != null)
         {
@@ -1600,41 +1642,26 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 catch (Exception e)
                 {
                     logger.error(e.getMessage(), e);
-                }
-                
-                // TODO MULE-3969
-                if (receiver instanceof AbstractMessageReceiver
-                        && ((AbstractMessageReceiver) receiver).isStarted())
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("Stopping receiver on endpoint: "
-                                + receiver.getEndpoint().getEndpointURI());
-                    }
-                    try
-                    {
-                        receiver.stop();
-                    }
-                    catch (Exception e)
-                    {
-                        logger.error(e.getMessage(), e);
-                    }
                 }                
             }
         }
         try
         {
             this.doDisconnect();
-        }
-        finally
-        {
-            connected.set(false);
             if (logger.isInfoEnabled())
             {
                 logger.info("Disconnected: " + this.getConnectionDescription());
             }
             this.fireNotification(new ConnectionNotification(this, getConnectEventId(),
                     ConnectionNotification.CONNECTION_DISCONNECTED));
+        }
+        catch (Exception e)
+        {
+            logger.error(e.getMessage());
+        }                
+        finally
+        {
+            connected.set(false);
         }
     }
 
@@ -1651,6 +1678,21 @@ public abstract class AbstractConnector implements Connector, WorkListener
     public final void setConnected(boolean flag)
     {
         connected.set(flag);
+    }
+
+    public void waitUntilConnected() throws InterruptedException
+    {
+        connected.whenTrue(null);
+    }
+
+    public final void setReconnecting(boolean flag)
+    {
+        reconnecting.set(flag);
+    }
+
+    public final boolean isReconnecting()
+    {
+        return reconnecting.get();
     }
 
     /**
