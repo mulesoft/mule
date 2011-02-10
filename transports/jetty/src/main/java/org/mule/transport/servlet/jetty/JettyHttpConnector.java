@@ -29,18 +29,10 @@ import org.mule.transport.AbstractConnector;
 import org.mule.transport.servlet.JarResourceServlet;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.transport.servlet.MuleServletContextListener;
+import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
-
-import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.Servlet;
-import javax.servlet.http.HttpServlet;
 
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
@@ -53,6 +45,16 @@ import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.jetty.webapp.WebInfConfiguration;
 import org.mortbay.xml.XmlConfiguration;
+
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.Servlet;
+import javax.servlet.http.HttpServlet;
 
 /**
  * The <code>JettyConnector</code> can be using to embed a Jetty server to receive requests on an
@@ -115,6 +117,8 @@ public class JettyHttpConnector extends AbstractConnector
                                                   "_exploded_wars" + webapp.getContextPath());
                     workDir.mkdirs();
                     webapp.setTempDirectory(workDir);
+                    // TODO extract to a better constant
+                    webapp.setAttribute("muleContext", muleContext);
 
                     if (logger.isInfoEnabled())
                     {
@@ -136,6 +140,13 @@ public class JettyHttpConnector extends AbstractConnector
                 webAppDir = appDir + "/webapps";
             }
 
+            if (configFile == null)
+            {
+                // override only if user hasn't specified one (turn off file-mapped buffer for
+                // static files to avoid resource locking, makes webapp resources editable on the fly)
+                final URL muleDefaults = ClassUtils.getResource("org/mule/transport/jetty/webdefault.xml", getClass());
+                deployer.setDefaultsDescriptor(muleDefaults.getFile());
+            }
             deployer.setWebAppDir(webAppDir);
             deployer.setExtract(true);
             deployer.setParentLoaderPriority(false);
@@ -197,32 +208,33 @@ public class JettyHttpConnector extends AbstractConnector
     @SuppressWarnings("unchecked")
     protected void initialiseFromConfigFile() throws InitialisationException
     {
-        if (configFile != null)
+        if (configFile == null)
         {
-            try
-            {
-                InputStream is = IOUtils.getResourceAsStream(configFile, getClass());
-                XmlConfiguration config = new XmlConfiguration(is);
+            return;
+        }
+        try
+        {
+            InputStream is = IOUtils.getResourceAsStream(configFile, getClass());
+            XmlConfiguration config = new XmlConfiguration(is);
 
-                String appHome =
-                    muleContext.getRegistry().lookupObject(MuleProperties.APP_HOME_DIRECTORY_PROPERTY);
-                if (appHome == null)
-                {
-                    // Mule IDE sets app.home as part of the launch config it creates
-                    appHome = System.getProperty(MuleProperties.APP_HOME_DIRECTORY_PROPERTY);
-                }
-
-                if (appHome != null)
-                {
-                    config.getProperties().put(MuleProperties.APP_HOME_DIRECTORY_PROPERTY, appHome);
-                }
-                
-                config.configure(httpServer);
-            }
-            catch (Exception e)
+            String appHome =
+                muleContext.getRegistry().lookupObject(MuleProperties.APP_HOME_DIRECTORY_PROPERTY);
+            if (appHome == null)
             {
-                throw new InitialisationException(e, this);
+                // Mule IDE sets app.home as part of the launch config it creates
+                appHome = System.getProperty(MuleProperties.APP_HOME_DIRECTORY_PROPERTY);
             }
+
+            if (appHome != null)
+            {
+                config.getProperties().put(MuleProperties.APP_HOME_DIRECTORY_PROPERTY, appHome);
+            }
+
+            config.configure(httpServer);
+        }
+        catch (Exception e)
+        {
+            throw new InitialisationException(e, this);
         }
     }
 

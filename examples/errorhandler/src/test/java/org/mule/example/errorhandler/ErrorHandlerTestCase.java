@@ -10,6 +10,7 @@
 
 package org.mule.example.errorhandler;
 
+import org.mule.api.config.MuleProperties;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.SystemUtils;
 
@@ -21,7 +22,7 @@ public class ErrorHandlerTestCase extends FunctionalTestCase
     protected Properties getStartUpProperties()
     {
         Properties startupProps = new Properties();
-        startupProps.put("app.home", SystemUtils.JAVA_IO_TMPDIR);
+        startupProps.put(MuleProperties.APP_HOME_DIRECTORY_PROPERTY, SystemUtils.JAVA_IO_TMPDIR);
         return  startupProps;
     }
 

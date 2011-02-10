@@ -12,7 +12,7 @@ package org.mule.transport.servlet.jetty;
 
 public class WebappsConfiguration
 {
-    public static final String DEFAULT_HOST = "localhost";
+    public static final String DEFAULT_HOST = "0.0.0.0";
     public static final int DEFAULT_PORT = 8585;
 
     private String host = DEFAULT_HOST;
