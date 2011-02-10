@@ -620,10 +620,6 @@ dump() {
     fi
 }
 
-examples() {
-    $MULE_HOME/bin/mule_examples
-}
-
 checkAdditionalJvmParams() {
     $MULE_HOME/bin/launcher $MULE_HOME/bin/additional.groovy $WRAPPER_CONF "$JPDA_OPTS" "$MULE_ENDORSED" $@
 }
@@ -661,11 +657,6 @@ case "$1" in
     'dump')
         checkUser "" $1
         dump
-        ;;
-
-    'examples')
-        checkUser "" $1
-        examples 
         ;;
 
     *)
