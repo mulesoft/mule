@@ -71,7 +71,7 @@ public class ActiveMQJmsConnector extends JmsConnector
     /**
      * Will additionally try to cleanup the ActiveMq connection, otherwise there's a deadlock on shutdown.
      */
-    protected void doDisconnect() throws ConnectException
+    protected void doDisconnect() throws Exception
     {
         try
         {
@@ -109,7 +109,7 @@ public class ActiveMQJmsConnector extends JmsConnector
             }
             catch (InvocationTargetException ex)
             {
-                logger.warn("Exception cleaning up JMS connection", ex);        
+                logger.warn("Exception cleaning up JMS connection: " + ex.getMessage());        
             }
             finally
             {
@@ -119,7 +119,7 @@ public class ActiveMQJmsConnector extends JmsConnector
                 }
                 catch (JMSException ex)
                 {
-                    logger.warn("Exception closing JMS connection", ex);
+                    logger.warn("Exception closing JMS connection: " + ex.getMessage());
                 }
             }
         }
