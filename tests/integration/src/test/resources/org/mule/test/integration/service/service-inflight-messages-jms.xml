@@ -12,11 +12,13 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
         http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.1/mule-jms.xsd">
 
-    <test:connector name="testConnector"/>
+	<configuration>
+		<default-threading-profile maxThreadsActive="4"/>
+	</configuration>
 
-    <jms:activemq-connector name="jmsConnector" persistentDelivery="true"/>
+    <jms:activemq-connector name="outPersistentConnector" persistentDelivery="true"/>
 
-    <jms:endpoint name="out" queue="out" connector-ref="jmsConnector" exchange-pattern="one-way"/>
+    <jms:endpoint name="out" queue="out" connector-ref="outPersistentConnector" exchange-pattern="one-way"/>
 
     <model name="TestModel">
 

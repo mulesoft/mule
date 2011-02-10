@@ -12,12 +12,8 @@ package org.mule.model.seda;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
-import org.mule.api.context.WorkManager;
-import org.mule.api.context.WorkManagerSource;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.config.ChainedThreadingProfile;
@@ -35,7 +31,6 @@ import org.mule.service.processor.ServiceOutboundMessageProcessor;
 import org.mule.service.processor.ServiceOutboundStatisticsMessageProcessor;
 import org.mule.service.processor.ServiceSetEventRequestContextMessageProcessor;
 import org.mule.service.processor.ServiceStatisticsMessageProcessor;
-import org.mule.util.concurrent.ThreadNameHelper;
 
 /**
  * A Seda service runs inside a Seda Model and is responsible for managing a Seda
@@ -66,7 +61,7 @@ public class SedaService extends AbstractService
      */
     protected QueueProfile queueProfile;
 
-    protected WorkManager workManager;
+    protected SedaStageInterceptingMessageProcessor sedaStage;
 
     public SedaService(MuleContext muleContext)
     {
@@ -87,14 +82,9 @@ public class SedaService extends AbstractService
         builder.chain(new ServiceSetEventRequestContextMessageProcessor());
         if (getThreadingProfile().isDoThreading())
         {
-            builder.chain(new SedaStageInterceptingMessageProcessor(getName(), queueProfile, queueTimeout,
-                new WorkManagerSource()
-                {
-                    public WorkManager getWorkManager() throws MuleException
-                    {
-                        return workManager;
-                    }
-                }, lifecycleManager.getState(), stats, muleContext));
+            sedaStage = new SedaStageInterceptingMessageProcessor(getName(), queueProfile, queueTimeout,
+                threadingProfile, stats, muleContext);
+            builder.chain(sedaStage);
         }
         builder.chain(new ServiceInternalMessageProcessor(this));
         if (asyncReplyMessageSource.getEndpoints().size() > 0)
@@ -129,10 +119,6 @@ public class SedaService extends AbstractService
         // TODO it would be nicer if the shutdown value was encapsulated in the
         // Threading profile, but it is more difficult than it seems
 
-        final MuleConfiguration config = muleContext.getConfiguration();
-        final String threadPrefix = ThreadNameHelper.sedaService(muleContext, getName());
-        workManager = threadingProfile.createWorkManager(threadPrefix, config.getShutdownTimeout());
-
         if (queueProfile == null && model != null)
         {
             queueProfile = ((SedaModel) model).getQueueProfile();
@@ -141,7 +127,7 @@ public class SedaService extends AbstractService
         {
             setQueueTimeout(((SedaModel) model).getQueueTimeout());
         }
-
+        
         try
         {
             if (name == null)
@@ -155,43 +141,6 @@ public class SedaService extends AbstractService
             throw new InitialisationException(CoreMessages.objectFailedToInitialise("Service Queue"), e, this);
         }
         super.doInitialise();
-    }
-
-    @Override
-    protected void doStart() throws MuleException
-    {
-        try
-        {
-            workManager.start();
-        }
-        catch (Exception e)
-        {
-            throw new LifecycleException(CoreMessages.failedToStart("Service: " + getName()), e, this);
-        }
-        super.doStart();
-    }
-
-    @Override
-    protected void doStop() throws MuleException
-    {
-        super.doStop();
-        workManager.dispose();
-    }
-
-    @Override
-    protected void doForceStop() throws MuleException
-    {
-        doStop();
-    }
-
-    @Override
-    protected void doDispose()
-    {
-        super.doDispose();
-        if (workManager != null)
-        {
-            workManager.dispose();
-        }
     }
 
     @Override
@@ -228,6 +177,20 @@ public class SedaService extends AbstractService
     public void setThreadingProfile(ThreadingProfile threadingProfile)
     {
         this.threadingProfile = threadingProfile;
+    }
+
+    @Override
+    protected void doPause() throws MuleException
+    {
+        super.doPause();
+        sedaStage.pause();
+    }
+
+    @Override
+    protected void doResume() throws MuleException
+    {
+        sedaStage.resume();
+        super.doResume();
     }
 
 }
