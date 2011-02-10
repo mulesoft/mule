@@ -7,20 +7,22 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.module.atom;
+package org.mule.module.atom.config;
 
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.transformer.Transformer;
 import org.mule.construct.SimpleFlowConstruct;
 import org.mule.module.atom.routing.EntryLastUpdatedFilter;
 import org.mule.module.atom.routing.FeedLastUpdatedFilter;
 import org.mule.module.atom.routing.FeedSplitter;
+import org.mule.module.atom.transformers.ObjectToFeed;
 import org.mule.routing.MessageFilter;
 import org.mule.tck.FunctionalTestCase;
 
 import java.text.SimpleDateFormat;
 
-public class NamespaceTestCase extends FunctionalTestCase
+public class AtomNamespaceHandlerTestCase extends FunctionalTestCase
 {
     @Override
     protected String getConfigResources()
@@ -54,5 +56,12 @@ public class NamespaceTestCase extends FunctionalTestCase
 
         assertEquals(sdf.parse("2009-10-01 13:00:00"), filter.getLastUpdate());
         assertFalse(filter.isAcceptWithoutUpdateDate());
+    }
+
+    public void testObjectToFeedTransformer() throws Exception
+    {
+        Transformer transformer = muleContext.getRegistry().lookupTransformer("ObjectToFeed");
+        assertNotNull(transformer);
+        assertTrue(transformer instanceof ObjectToFeed);
     }
 }

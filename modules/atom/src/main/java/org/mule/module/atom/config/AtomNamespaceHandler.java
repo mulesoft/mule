@@ -21,6 +21,7 @@ import org.mule.module.atom.routing.FeedLastUpdatedFilter;
 import org.mule.module.atom.routing.FeedSplitter;
 import org.mule.module.atom.routing.URIRouteFilter;
 import org.mule.module.atom.transformers.AtomEntryBuilderTransformer;
+import org.mule.module.atom.transformers.ObjectToFeed;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
@@ -30,13 +31,13 @@ public class AtomNamespaceHandler extends NamespaceHandlerSupport
     {
         FilterDefinitionParser routeFilter = new FilterDefinitionParser(URIRouteFilter.class);
         registerBeanDefinitionParser("route-filter", routeFilter);
+
         registerBeanDefinitionParser("entry-last-updated-filter", new FilterDefinitionParser(EntryLastUpdatedFilter.class));
         registerBeanDefinitionParser("feed-last-updated-filter", new FilterDefinitionParser(FeedLastUpdatedFilter.class));
         registerBeanDefinitionParser("feed-splitter", new RouterDefinitionParser(FeedSplitter.class));
         registerBeanDefinitionParser("component", new ComponentDefinitionParser(AbderaServiceComponent.class));
         registerBeanDefinitionParser("entry-builder-transformer", new MessageProcessorDefinitionParser(AtomEntryBuilderTransformer.class));
         registerBeanDefinitionParser("entry-property", new ChildDefinitionParser("argument", ExpressionArgument.class));
+        registerBeanDefinitionParser("object-to-feed-transformer", new MessageProcessorDefinitionParser(ObjectToFeed.class));
     }
 }
-
-
