@@ -12,14 +12,19 @@ package org.mule.transport;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.LifecycleCallback;
+import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
+import org.mule.api.lifecycle.StartException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.transport.Connectable;
@@ -30,8 +35,7 @@ import org.mule.config.i18n.Message;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.util.ClassUtils;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import org.mule.util.concurrent.WaitableBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,10 +52,18 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     protected RetryPolicyTemplate retryTemplate;
     protected MuleMessageFactory muleMessageFactory = null;
 
+    protected final WaitableBoolean connected = new WaitableBoolean(false);
+    protected final WaitableBoolean connecting = new WaitableBoolean(false);
+
+    /**
+     * Indicates whether the receiver/dispatcher/requester should start upon connecting.
+     * This is necessary to support asynchronous retry policies, otherwise the start()
+     * method would block until connection is successful.
+     */
+    protected volatile boolean startOnConnect = false;
+
     protected ConnectableLifecycleManager<O> lifecycleManager;
-    // TODO This state info. needs to be incorporated into the ConnectableLifecycleManager
-    protected final AtomicBoolean connected = new AtomicBoolean(false);
-    
+
     public AbstractTransportMessageHandler(ImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
@@ -155,31 +167,28 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     {
         try
         {
+            try
+            {
+                disconnect();
+            }
+            catch (Exception e)
+            {
+                logger.warn(e.getMessage(), e);
+            }
             if (isStarted())
             {
                 stop();
             }
-            if (isConnected())
-            {
-                disconnect();
-            }
-        }
-        catch (Exception e)
-        {
-            logger.warn(e.getMessage(), e);
-        }
 
-        try
-        {
-            lifecycleManager.fireDisposePhase(new LifecycleCallback<O>() 
-            {
+            //Nothing to do when disposing, just transition
+            lifecycleManager.fireDisposePhase(new LifecycleCallback<O>() {
                 public void onTransition(String phaseName, O object) throws MuleException
                 {
                     doDispose();
                 }
             });
         }
-        catch (MuleException e)
+        catch (Exception e)
         {
             logger.warn(e.getMessage(), e);
         }
@@ -199,7 +208,7 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     {
         // This method may be called to ensure transport is connected, if it is
         // already connected then just return.
-        if (connected.get())
+        if (connected.get() || connecting.get())
         {
             return;
         }
@@ -210,18 +219,57 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
                     "Requester/dispatcher has been disposed; cannot connect to resource:" + this);
         }
 
+        if (!connecting.compareAndSet(false, true))
+        {
+            return;
+        }
+
         if (logger.isDebugEnabled())
         {
             logger.debug("Connecting: " + this);
         }
 
-        doConnect();
-        connected.set(true);
+        retryTemplate.execute(
+                new RetryCallback()
+                {
+                    public void doWork(RetryContext context) throws Exception
+                    {
+                        try
+                        {
+                            doConnect();
+                            connected.set(true);
+                            connecting.set(false);
 
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Connected: " + getConnectionDescription());
-        }
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("Connected: " + getWorkDescription());
+                            }
+                            // TODO Make this work somehow inside the RetryTemplate
+                            //connector.fireNotification(new ConnectionNotification(this, getConnectEventId(endpoint),
+                            //    ConnectionNotification.CONNECTION_CONNECTED));
+
+                            if (startOnConnect)
+                            {
+                                start();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("exception in doWork", e);
+                            }
+                            throw e;
+                        }
+                    }
+
+                    public String getWorkDescription()
+                    {
+                        return getConnectionDescription();
+                    }
+                },
+                getWorkManager()
+        );
     }
 
     public RetryContext validateConnection(RetryContext retryContext)
@@ -232,17 +280,17 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
 
     public final synchronized void disconnect() throws Exception
     {
-        if (isStarted())
+        if (!connected.get())
         {
-            stop();
+            return;
         }
-        
+
         if (logger.isDebugEnabled())
         {
             logger.debug("Disconnecting: " + this);
         }
 
-        doDisconnect();
+        this.doDisconnect();
         connected.set(false);
 
         if (logger.isDebugEnabled())
@@ -261,6 +309,11 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     public final boolean isConnected()
     {
         return connected.get();
+    }
+
+    public final boolean isConnecting()
+    {
+        return connecting.get();
     }
 
     protected boolean isDoThreading()
@@ -292,34 +345,133 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
         {
             return;
         }
-
-        if (!isConnected())
+        //We only fire start lifecycle once we are connected, see callDoStartWhenItIsConnected
+        if (!connected.get() && !connecting.get())
+        {
+            connectAndThenStart();
+        }
+        else if (connecting.get() && isDoStartMustFollowDoConnect())
         {
             try
             {
-                connect();
+                callDoStartWhenItIsConnected();
             }
-            catch (MuleException me)
+            catch (InterruptedException e)
             {
-                throw me;
+                throw new StartException(CoreMessages.failedToStart("Connectable: " + this), e, this);
+            }
+        }
+        else
+        {
+            try
+            {
+                lifecycleManager.fireStartPhase(new LifecycleCallback<O>()
+                {
+                    public void onTransition(String phaseName, O object) throws MuleException
+                    {
+                        doStart();
+                    }
+                });
+            }
+            catch (MuleException e)
+            {
+                throw e;
             }
             catch (Exception e)
             {
-                throw new ConnectException(e, this);
+                throw new StartException(CoreMessages.failedToStart("Connectable: " + this), e, this);
             }
         }
+    }
 
-        lifecycleManager.fireStartPhase(new LifecycleCallback<O>()
+    /**
+     * This method will call {@link #connect()} after setting {@link #startOnConnect}
+     * in true. This will make the {@link #connect()} method call {@link #start()}
+     * after finishing establishing connection.
+     *
+     * @throws LifecycleException
+     */
+    protected void connectAndThenStart() throws LifecycleException
+    {
+        startOnConnect = true;
+
+        // Make sure we are connected
+        try
         {
-            public void onTransition(String phaseName, O object) throws MuleException
+            connect();
+        }
+        catch (Exception e)
+        {
+            throw new LifecycleException(e, this);
+        }
+    }
+
+    /**
+     * This method will block until {@link #connected} is true and then will call
+     * {@link #doStart()}.
+     *
+     * @throws InterruptedException if the thread is interrupted while waiting for
+     *                              {@link #connected} to be true.
+     * @throws MuleException        this is just a propagation of any {@link MuleException}
+     *                              that {@link #doStart()} may throw.
+     */
+    protected void callDoStartWhenItIsConnected() throws InterruptedException, MuleException
+    {
+        try
+        {
+            connected.whenTrue(new Runnable()
             {
-                doStart();
+                public void run()
+                {
+                    try
+                    {
+                        if (isStarted() || isStarting())
+                        {
+                            return;
+                        }
+                        lifecycleManager.fireStartPhase(new LifecycleCallback<O>()
+                        {
+                            public void onTransition(String phaseName, O object) throws MuleException
+                            {
+                                doStart();
+                            }
+                        });
+                    }
+                    catch (MuleException e)
+                    {
+                        throw new MuleRuntimeException(
+                                CoreMessages.createStaticMessage("wrapper exception for a MuleException"), e);
+                    }
+                }
+            });
+        }
+        catch (MuleRuntimeException e)
+        {
+            if (e.getCause() instanceof MuleException)
+            {
+                throw (MuleException) e.getCause();
             }
-        });
+            else
+            {
+                throw e;
+            }
+        }
     }
 
     public final void stop() throws MuleException
     {
+        try
+        {
+            if (connected.get())
+            {
+                disconnect();
+            }
+        }
+        catch (Exception e)
+        {
+            logger.error(e.getMessage(), e);
+        }
+
         lifecycleManager.fireStopPhase(new LifecycleCallback<O>()
         {
             public void onTransition(String phaseName, O object) throws MuleException
@@ -399,7 +551,9 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
 
     public boolean isStarting()
     {
-        return getLifecycleState().isStarting();
+        // TODO This should just be the following but it doesn't give the same result for some reason:
+        //   return getLifecycleState().isStarted();
+        return Startable.PHASE_NAME.equals(lifecycleManager.getExecutingPhase());
     }
 
     /**
@@ -466,5 +620,13 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
     protected MuleMessage createNullMuleMessage() throws MuleException
     {
         return createMuleMessage(null);
+    }
+
+    /**
+     * @return true if doStart() must come strictly after the completion of doConnect()
+     */
+    protected boolean isDoStartMustFollowDoConnect()
+    {
+        return false;
     }
 }

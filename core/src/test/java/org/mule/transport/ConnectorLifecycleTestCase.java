@@ -135,13 +135,13 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
         assertTrue(connector.isStarted());
 
-        // Stopping the connector should stop but not disconnect it.
+        // Stopping the connector should stop and disconnect it.
         connector.stop();
         assertEquals(1, connector.getInitialiseCount());
         assertEquals(1, connector.getConnectCount());
         assertEquals(1, connector.getStartCount());
         assertEquals(1, connector.getStopCount());
-        assertEquals(0, connector.getDisconnectCount());
+        assertEquals(1, connector.getDisconnectCount());
         assertEquals(0, connector.getDisposeCount());
 
 
@@ -154,8 +154,6 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         {
             //expected
         }
-        
-        connector.disconnect();
         assertEquals(1, connector.getInitialiseCount());
         assertEquals(1, connector.getConnectCount());
         assertEquals(1, connector.getStartCount());
@@ -302,15 +300,10 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
         connector.stop();
         assertEquals(2, connector.receivers.size());
-        assertTrue(( connector.receivers.get("in")).isConnected());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
-        assertTrue(( connector.receivers.get("in2")).isConnected());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in2")).isStarted());
-
-        connector.disconnect();
-        assertEquals(2, connector.receivers.size());
         assertFalse(( connector.receivers.get("in")).isConnected());
+        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
         assertFalse(( connector.receivers.get("in2")).isConnected());
+        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in2")).isStarted());
 
         connector.start();
         assertEquals(2, connector.receivers.size());
@@ -343,12 +336,8 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
         connector.stop();
         assertEquals(1, connector.receivers.size());
-        assertTrue(( connector.receivers.get("in")).isConnected());
-        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
-
-        connector.disconnect();
-        assertEquals(1, connector.receivers.size());
         assertFalse(( connector.receivers.get("in")).isConnected());
+        assertFalse(((AbstractMessageReceiver) connector.receivers.get("in")).isStarted());
 
         connector.start();
         assertEquals(1, connector.receivers.size());

@@ -160,6 +160,12 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         logger.debug("doDispose()");
     }
 
+    @Override
+    protected boolean isDoStartMustFollowDoConnect()
+    {
+        return true;
+    }
+
     private class SubReceiver implements MessageListener
     {
         private final Log subLogger = LogFactory.getLog(getClass());
