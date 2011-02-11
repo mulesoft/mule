@@ -14,6 +14,7 @@
                 <exclude>examples/**</exclude>
                 <exclude>docs/**</exclude>
                 <exclude>src/**</exclude>
+                <exclude>bin/mule_examples*</exclude>
             </excludes>
         </fileSet>
 
@@ -22,6 +23,9 @@
             <directory>target/ce-distribution/${communityArtifact}-${version}/bin</directory>
             <outputDirectory>bin</outputDirectory>
             <fileMode>755</fileMode>
+            <excludes>
+                <exclude>mule_examples*</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <directory>target/ce-distribution/${communityArtifact}-${version}/lib/boot/exec</directory>
