@@ -275,7 +275,8 @@ color:#333; font-size:14px; float:left; font-weight:normal;
 .left-nav .demos-nav ul, 
 .left-nav .demos-nav li {
 	margin: 0;
-	padding: 0
+	padding: 0;
+	white-space: nowrap;
 }
 
 .left-nav .demos-nav {
