@@ -27,6 +27,8 @@ muleHome = SystemUtils.getenv()['MULE_HOME']
 exampleAppsBaseDir = new File("${muleHome}/examples")
 deployDir = new File("${muleHome}/apps")
 
+antBuilder = new AntBuilder()
+
 LF_CR = System.getProperty("line.separator")
 TAB = "   "
 
@@ -127,7 +129,7 @@ def deployExample(exampleDir)
 			{
 				// deploy (copy) application file to apps directory
 				splash "Deploying ${exampleFile.name}"
-				(new AntBuilder()).copy(file: exampleFile.getCanonicalPath(), tofile: "${deployDir}/${exampleFile.name}")
+				antBuilder.copy(file: exampleFile.getCanonicalPath(), tofile: "${deployDir}/${exampleFile.name}")
 			}
 		}
 	}
