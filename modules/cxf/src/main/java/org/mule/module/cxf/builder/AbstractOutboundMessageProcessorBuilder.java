@@ -25,7 +25,6 @@ import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.module.cxf.CxfPayloadToArguments;
 import org.mule.module.cxf.support.MuleHeadersInInterceptor;
 import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
-import org.mule.module.cxf.support.MuleProtocolHeadersOutInterceptor;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.feature.AbstractFeature;
@@ -76,6 +76,10 @@ public abstract class AbstractOutboundMessageProcessorBuilder
         {
             configuration = CxfConfiguration.getConfiguration(muleContext);
         }
+        
+        // set the thread default bus so the JAX-WS Service implementation (or other bits of CXF code
+        // which I don't know about, but may depend on it) can use it when creating a Client -- DD
+        BusFactory.setThreadDefaultBus(getBus());
         
         try
         {
@@ -194,15 +198,14 @@ public abstract class AbstractOutboundMessageProcessorBuilder
 
     protected void addMuleInterceptors()
     {
-        if (enableMuleSoapHeaders)
+
+        if (enableMuleSoapHeaders && !configuration.isEnableMuleSoapHeaders())
         {
             client.getInInterceptors().add(new MuleHeadersInInterceptor());
             client.getInFaultInterceptors().add(new MuleHeadersInInterceptor());
             client.getOutInterceptors().add(new MuleHeadersOutInterceptor());
             client.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
         }
-        client.getOutInterceptors().add(new MuleProtocolHeadersOutInterceptor());
-        client.getOutFaultInterceptors().add(new MuleProtocolHeadersOutInterceptor());
     }
     
     public String getOperation()

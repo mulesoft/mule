@@ -50,7 +50,7 @@ public class MuleInvoker implements Invoker
     public Object invoke(Exchange exchange, Object o)
     {
         // this is the original request. Keep it to copy all the message properties from it
-        MuleEvent event = (MuleEvent) exchange.getInMessage().get(CxfConstants.MULE_EVENT);
+        MuleEvent event = (MuleEvent) exchange.get(CxfConstants.MULE_EVENT);
         MuleEvent responseEvent = null;
         try
         {

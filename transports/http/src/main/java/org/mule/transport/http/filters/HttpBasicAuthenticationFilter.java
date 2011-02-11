@@ -8,11 +8,10 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.acegi.filters.http;
+package org.mule.transport.http.filters;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
@@ -22,16 +21,17 @@ import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.api.security.UnsupportedAuthenticationSchemeException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.module.acegi.AcegiAuthenticationAdapter;
-import org.mule.module.acegi.i18n.AcegiMessages;
 import org.mule.security.AbstractEndpointSecurityFilter;
+import org.mule.security.DefaultMuleAuthentication;
+import org.mule.security.MuleCredentials;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
+import org.mule.transport.http.i18n.HttpMessages;
 
-import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 
 /**
  * <code>HttpBasicAuthenticationFilter</code> TODO
@@ -64,7 +64,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         {
             if (isRealmRequired())
             {
-                throw new InitialisationException(AcegiMessages.authRealmMustBeSetOnFilter(), this);
+                throw new InitialisationException(HttpMessages.authRealmMustBeSetOnFilter(), this);
             }
             else
             {
@@ -125,14 +125,9 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
                 username = token.substring(0, delim);
                 password = token.substring(delim + 1);
             }
-
-            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
-                username, password);
-            authRequest.setDetails(event.getMessage().getInboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY));
-
+            
             Authentication authResult;
-
-            Authentication authentication = new AcegiAuthenticationAdapter(authRequest);
+            Authentication authentication = createAuthentication(username, password, event);
 
             try
             {
@@ -168,8 +163,13 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
         {
             setUnauthenticated(event);
             throw new UnsupportedAuthenticationSchemeException(
-                AcegiMessages.basicFilterCannotHandleHeader(header),event);
+                HttpMessages.basicFilterCannotHandleHeader(header), event);
         }
+    }
+
+    protected Authentication createAuthentication(String username, String password, MuleEvent event)
+    {
+        return new DefaultMuleAuthentication(new MuleCredentials(username, password.toCharArray()));
     }
 
     protected void setUnauthenticated(MuleEvent event)

@@ -13,6 +13,7 @@ package org.mule.transport.soap.axis;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
 import org.mule.transport.http.HttpConnector;
@@ -77,6 +78,9 @@ public class AxisServletWithSecurityTestCase extends DynamicPortTestCase
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("http://ross:ross@localhost:" + HTTP_PORT
                                         + "/services/mycomponent?method=echo", "test", props);
+        
+        String status = result.getProperty(HttpConnector.HTTP_STATUS_PROPERTY, PropertyScope.INBOUND);
+        assertEquals(401, new Integer(status).intValue());
         
         MessagingExceptionHandler exceptionListener = 
             muleContext.getRegistry().lookupService("mycomponent").getExceptionListener();

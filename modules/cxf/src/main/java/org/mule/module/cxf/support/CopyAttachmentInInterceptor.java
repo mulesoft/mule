@@ -23,8 +23,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
-import static org.mule.api.config.MuleProperties.MULE_EVENT_PROPERTY;
-
 public class CopyAttachmentInInterceptor extends AbstractPhaseInterceptor
 {
     public CopyAttachmentInInterceptor()
@@ -34,18 +32,12 @@ public class CopyAttachmentInInterceptor extends AbstractPhaseInterceptor
 
     public void handleMessage(Message message) throws Fault
     {
-        MuleEvent event = (MuleEvent) message.get(MULE_EVENT_PROPERTY);
-        MuleMessage muleMsg;
-        if (event == null) 
-        {
-            event = (MuleEvent) message.get(CxfConstants.MULE_EVENT);
-        } 
-        
-        muleMsg = event.getMessage();
+        MuleEvent event = (MuleEvent) message.getExchange().get(CxfConstants.MULE_EVENT);
+        MuleMessage muleMsg = event.getMessage();
         Collection<Attachment> atts = message.getAttachments();
         if (atts != null)
         {
-            muleMsg.setOutboundProperty(CxfConstants.ATTACHMENTS, atts);
+            muleMsg.setInvocationProperty(CxfConstants.ATTACHMENTS, atts);
             muleMsg.setOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, muleMsg.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE));
         }
     }

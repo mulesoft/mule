@@ -19,7 +19,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.security.EndpointSecurityFilter;
+import org.mule.api.security.SecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
@@ -291,7 +291,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
     }
 
     protected OutboundEndpoint createOutboundEndpoint(String uri, Filter filter,
-                                                      EndpointSecurityFilter securityFilter,
+                                                      SecurityFilter securityFilter,
                                                       Transformer in,
                                                       Transformer response,
                                                       MessageExchangePattern exchangePattern,
@@ -315,7 +315,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
     }
 
     protected OutboundEndpoint createOutboundEndpoint(Filter filter,
-                                                      EndpointSecurityFilter securityFilter,
+                                                      SecurityFilter securityFilter,
                                                       Transformer in,
                                                       Transformer response,
                                                       MessageExchangePattern exchangePattern,

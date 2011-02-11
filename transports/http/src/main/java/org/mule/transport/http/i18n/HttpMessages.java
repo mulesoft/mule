@@ -95,6 +95,16 @@ public class HttpMessages extends MessageFactory
     {
         return factory.createMessage(BUNDLE_PATH, 21);
     }
+
+    public static Message basicFilterCannotHandleHeader(String header)
+    {
+        return factory.createMessage(BUNDLE_PATH, 22, header);
+    }
+
+    public static Message authRealmMustBeSetOnFilter()
+    {
+        return factory.createMessage(BUNDLE_PATH, 23);
+    }
 }
 
 

@@ -13,8 +13,8 @@ package org.mule.processor;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.security.SecurityException;
+import org.mule.api.security.SecurityFilter;
 import org.mule.config.ExceptionHelper;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.endpoint.EndpointAware;
@@ -22,30 +22,30 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.AbstractConnector;
 
 /**
- * Filters the flow using the {@link EndpointSecurityFilter} configured on
- * the endpoint. If unauthorised the flow is stopped and therefore the
+ * Filters the flow using the specified {@link SecurityFilter}. 
+ * If unauthorised the flow is stopped and therefore the
  * message is not send or dispatched by the transport. When unauthorised the request
  * message is returned as the response.
  */
 public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageProcessor implements EndpointAware
 {
-    private EndpointSecurityFilter filter;
+    private SecurityFilter filter;
 
     /**
      * For IoC only
-     * @deprecated Use SecurityFilterMessageProcessor(EndpointSecurityFilter filter) instead
+     * @deprecated Use SecurityFilterMessageProcessor(SecurityFilter filter) instead
      */
     public SecurityFilterMessageProcessor()
     {
         super();
     }
 
-    public SecurityFilterMessageProcessor(EndpointSecurityFilter filter)
+    public SecurityFilterMessageProcessor(SecurityFilter filter)
     {
         this.filter = filter;
     }
 
-    public EndpointSecurityFilter getFilter()
+    public SecurityFilter getFilter()
     {
         return filter;
     }
@@ -56,7 +56,7 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
         {
             try
             {
-                filter.authenticate(event);
+                filter.doFilter(event);
             }
             catch (SecurityException e)
             {
@@ -77,13 +77,16 @@ public class SecurityFilterMessageProcessor extends AbstractInterceptingMessageP
         return processNext(event);
     }
 
-    public void setFilter(EndpointSecurityFilter filter)
+    public void setFilter(SecurityFilter filter)
     {
         this.filter = filter;
     }
 
     public void setEndpoint(ImmutableEndpoint ep)
     {
-        filter.setEndpoint(ep);
+        if (filter instanceof EndpointAware)
+        {
+            ((EndpointAware) filter).setEndpoint(ep);
+        }
     }
 }

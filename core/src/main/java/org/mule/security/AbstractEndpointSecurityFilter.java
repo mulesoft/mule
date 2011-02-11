@@ -10,156 +10,24 @@
 
 package org.mule.security;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.CredentialsAccessor;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.api.security.EncryptionStrategyNotFoundException;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.security.SecurityException;
-import org.mule.api.security.SecurityManager;
-import org.mule.api.security.SecurityProvider;
 import org.mule.api.security.SecurityProviderNotFoundException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.transformer.TransformerTemplate;
-import org.mule.util.StringUtils;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractEndpointSecurityFilter</code> provides basic initialisation for
  * all security filters, namely configuring the SecurityManager for this instance
  */
-
-public abstract class AbstractEndpointSecurityFilter implements EndpointSecurityFilter, MuleContextAware
+@Deprecated
+public abstract class AbstractEndpointSecurityFilter extends AbstractAuthenticationFilter implements EndpointSecurityFilter
 {
-
-    protected transient Log logger = LogFactory.getLog(getClass());
-
-    protected SecurityManager securityManager;
-    private String securityProviders;
     protected ImmutableEndpoint endpoint;
-    private boolean inbound = false;
-    private boolean authenticate;
-    private CredentialsAccessor credentialsAccessor;
-    private boolean isInitialised = false;
-
-    protected MuleContext muleContext;
-
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
-
-    public final void initialise() throws InitialisationException
-    {
-        if (securityManager == null)
-        {
-            securityManager = muleContext.getSecurityManager();
-        }
-        if (securityManager == null)
-        {
-            throw new InitialisationException(CoreMessages.authSecurityManagerNotSet(), this);
-        }
-
-        // This filter may only allow authentication on a subset of registered
-        // security providers
-        if (securityProviders != null)
-        {
-            SecurityManager localManager = new MuleSecurityManager();
-            String[] securityProviders = StringUtils.splitAndTrim(this.securityProviders, ",");
-            for (String sp : securityProviders)
-            {
-                SecurityProvider provider = securityManager.getProvider(sp);
-                if (provider != null)
-                {
-                    localManager.addProvider(provider);
-                }
-                else
-                {
-                    throw new InitialisationException(
-                            CoreMessages.objectNotRegistered(
-                                    "Security Provider", sp), this);
-                }
-            }
-            securityManager = localManager;
-        }
-    }
-
-    protected final synchronized void lazyInit(ImmutableEndpoint endpoint) throws InitialisationException
-    {
-        if (!isInitialised)
-        {
-            initialiseEndpoint(endpoint);
-            isInitialised = true;
-        }
-    }
-
-    protected final void initialiseEndpoint(ImmutableEndpoint endpoint) throws InitialisationException
-    {
-        if (endpoint != null)
-        {
-            this.endpoint = endpoint;
-        }
-        else
-        {
-            throw new InitialisationException(CoreMessages.objectIsNull("Endpoint"), this);
-        }
-
-        if (endpoint instanceof InboundEndpoint)
-        {
-            inbound = true;
-        }
-        else if (endpoint instanceof OutboundEndpoint)
-        {
-            inbound = false;
-        }
-        else
-        {
-            throw new InitialisationException(CoreMessages.authEndpointMustSendOrReceive(), this);
-        }
-        doInitialise();
-    }
-
-    public boolean isAuthenticate()
-    {
-        return authenticate;
-    }
-
-    public void setAuthenticate(boolean authenticate)
-    {
-        this.authenticate = authenticate;
-    }
-
-    /** @param manager  */
-    public void setSecurityManager(SecurityManager manager)
-    {
-        securityManager = manager;
-    }
-
-    public SecurityManager getSecurityManager()
-    {
-        return securityManager;
-    }
-
-    public String getSecurityProviders()
-    {
-        return securityProviders;
-    }
-
-    public void setSecurityProviders(String providers)
-    {
-        securityProviders = providers;
-    }
 
     public ImmutableEndpoint getEndpoint()
     {
@@ -169,55 +37,20 @@ public abstract class AbstractEndpointSecurityFilter implements EndpointSecurity
     public synchronized void setEndpoint(ImmutableEndpoint endpoint)
     {
         this.endpoint = endpoint;
-        isInitialised = false;
     }
 
-    public void authenticate(MuleEvent event)
-            throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
-            SecurityProviderNotFoundException, EncryptionStrategyNotFoundException,
-            InitialisationException
+    @Override
+    public void doFilter(MuleEvent event)
+        throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+        SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException
     {
-        lazyInit(event.getEndpoint());
-        if (inbound)
+        // lazy init the endpoint
+        if (endpoint == null)
         {
-            authenticateInbound(event);
+            endpoint = event.getEndpoint();
         }
-        else
-        {
-            authenticateOutbound(event);
-        }
+        
+        super.doFilter(event);
     }
-
-    public CredentialsAccessor getCredentialsAccessor()
-    {
-        return credentialsAccessor;
-    }
-
-    public void setCredentialsAccessor(CredentialsAccessor credentialsAccessor)
-    {
-        this.credentialsAccessor = credentialsAccessor;
-    }
-
-    protected void updatePayload(MuleMessage message, final Object payload, MuleEvent event) throws MuleException
-    {
-        TransformerTemplate trans = new TransformerTemplate(new TransformerTemplate.TransformerCallback()
-        {
-            public Object doTransform(MuleMessage message) throws Exception
-            {
-                return payload;
-            }
-        });
-
-        message.applyTransformers(event, trans);
-    }
-
-    protected abstract void authenticateInbound(MuleEvent event)
-            throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
-            EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException;
-
-    protected abstract void authenticateOutbound(MuleEvent event)
-            throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException;
-
-    protected abstract void doInitialise() throws InitialisationException;
 
 }

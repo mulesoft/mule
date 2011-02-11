@@ -49,7 +49,7 @@ public class SpringAuthenticationAdapter implements Authentication
 
     public org.springframework.security.core.GrantedAuthority[] getAuthorities()    
     {
-        return (GrantedAuthority[]) delegate.getAuthorities().toArray();        
+        return (GrantedAuthority[]) delegate.getAuthorities().toArray(new GrantedAuthority[delegate.getAuthorities().size()]);        
     }
 
     public Object getCredentials()

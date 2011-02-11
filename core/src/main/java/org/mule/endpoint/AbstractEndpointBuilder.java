@@ -29,6 +29,7 @@ import org.mule.api.registry.ServiceException;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.security.EndpointSecurityFilter;
+import org.mule.api.security.SecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
@@ -384,7 +385,7 @@ public abstract class AbstractEndpointBuilder implements EndpointBuilder
         return new MuleTransactionConfig();
     }
 
-    protected EndpointSecurityFilter getSecurityFilter()
+    protected SecurityFilter getSecurityFilter()
     {
         for (MessageProcessor mp : messageProcessors)
         {

@@ -17,6 +17,9 @@ import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.spring.SpringRegistry;
+import org.mule.module.cxf.support.MuleHeadersInInterceptor;
+import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
+import org.mule.module.cxf.support.MuleProtocolHeadersOutInterceptor;
 import org.mule.module.cxf.transport.MuleUniversalTransport;
 
 import java.lang.reflect.Field;
@@ -49,8 +52,9 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
     // The CXF Bus object
     private Bus bus;
     private String configurationLocation;
-    private boolean initializeStaticBusInstance = true;
+    private boolean initializeStaticBusInstance;
     private MuleContext muleContext;
+    private boolean enableMuleSoapHeaders = true;
     
     public void initialise() throws InitialisationException
     {
@@ -105,6 +109,17 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
         extension.registerConduitInitiator("http://cxf.apache.org/bindings/xformat", transport);
         extension.registerConduitInitiator("http://cxf.apache.org/transports/jms", transport);
         extension.registerConduitInitiator(MuleUniversalTransport.TRANSPORT_ID, transport);
+        
+        bus.getOutInterceptors().add(new MuleProtocolHeadersOutInterceptor());
+        bus.getOutFaultInterceptors().add(new MuleProtocolHeadersOutInterceptor());
+
+        if (enableMuleSoapHeaders)
+        {
+            bus.getInInterceptors().add(new MuleHeadersInInterceptor());
+            bus.getInFaultInterceptors().add(new MuleHeadersInInterceptor());
+            bus.getOutInterceptors().add(new MuleHeadersOutInterceptor());
+            bus.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
+        }
     }
 
     public void dispose()
@@ -180,5 +195,15 @@ public class CxfConfiguration implements Initialisable, Disposable, MuleContextA
         }
         return configuration;
     }
-    
+
+    public boolean isEnableMuleSoapHeaders()
+    {
+        return enableMuleSoapHeaders;
+    }
+
+    public void setEnableMuleSoapHeaders(boolean enableMuleSoapHeaders)
+    {
+        this.enableMuleSoapHeaders = enableMuleSoapHeaders;
+    }
+
 }

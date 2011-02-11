@@ -23,6 +23,7 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
+import org.mule.api.security.SecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
@@ -411,7 +412,11 @@ public abstract class AbstractEndpoint implements ImmutableEndpoint, Disposable
         {
             if (mp instanceof SecurityFilterMessageProcessor)
             {
-                return ((SecurityFilterMessageProcessor)mp).getFilter();
+                SecurityFilter filter = ((SecurityFilterMessageProcessor)mp).getFilter();
+                if (filter instanceof EndpointSecurityFilter)
+                {
+                    return (EndpointSecurityFilter) filter;
+                }
             }
         }
 
