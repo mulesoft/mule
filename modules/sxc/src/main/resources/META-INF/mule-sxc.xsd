@@ -2,6 +2,7 @@
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/sxc"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
             xmlns:mule-xml="http://www.mulesoft.org/schema/mule/xml"
             targetNamespace="http://www.mulesoft.org/schema/mule/sxc"
             elementFormDefault="qualified"
@@ -14,7 +15,18 @@
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd" />
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/xml"
                 schemaLocation="http://www.mulesoft.org/schema/mule/xml/3.1/mule-xml.xsd" />
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
+                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.1/mule-schemadoc.xsd"/>
 
+    <xsd:annotation>
+        <xsd:documentation>
+            The SXC module contains an outbound router and a filter that use the SXC project for streaming XPath routing.
+        </xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>SXC</schemadoc:short-name>
+            <schemadoc:page-title>SXC Client</schemadoc:page-title>
+        </xsd:appinfo>
+    </xsd:annotation>
 
     <xsd:element name="filter" type="sxcFilterType" substitutionGroup="mule:abstract-filter"/>
     <xsd:complexType name="sxcFilterType">
