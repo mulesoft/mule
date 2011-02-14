@@ -19,9 +19,6 @@ URI in your browser:
 +----------------------+
 | Building the example |
 +----------------------+
-First, make sure you have set the MULE_HOME environment variable as recommended
-in Mule's README.txt
-
 Depending on the build tool you are using (Ant or Maven), you can  build the 
 example by simply running "ant" or "mvn".  This will compile the example classes
 and produce a zip file that can be copied into the application folder 
