@@ -34,6 +34,16 @@ import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.StringUtils;
 
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.Servlet;
+import javax.servlet.http.HttpServlet;
+
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
@@ -45,16 +55,6 @@ import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.jetty.webapp.WebInfConfiguration;
 import org.mortbay.xml.XmlConfiguration;
-
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.Servlet;
-import javax.servlet.http.HttpServlet;
 
 /**
  * The <code>JettyConnector</code> can be using to embed a Jetty server to receive requests on an
@@ -145,7 +145,7 @@ public class JettyHttpConnector extends AbstractConnector
                 // override only if user hasn't specified one (turn off file-mapped buffer for
                 // static files to avoid resource locking, makes webapp resources editable on the fly)
                 final URL muleDefaults = ClassUtils.getResource("org/mule/transport/jetty/webdefault.xml", getClass());
-                deployer.setDefaultsDescriptor(muleDefaults.getFile());
+                deployer.setDefaultsDescriptor(muleDefaults.toExternalForm());
             }
             deployer.setWebAppDir(webAppDir);
             deployer.setExtract(true);
