@@ -13,15 +13,15 @@
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
                 schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.1/mule-schemadoc.xsd"/>
 
-<xsd:annotation>
-    <xsd:documentation>
-		OGNL is a simple yet very powerful expression language for plain Java objects. Similar to JXPath, it works on object graphs, and thus the corresponding filter enables simple and efficient content routing for payloads.
-    </xsd:documentation>
-    <xsd:appinfo>
-        <schemadoc:short-name>OGNL</schemadoc:short-name>
-        <schemadoc:page-title>OGNL Module</schemadoc:page-title>
-    </xsd:appinfo>
-</xsd:annotation>
+    <xsd:annotation>
+        <xsd:documentation>
+            OGNL is a simple yet very powerful expression language for plain Java objects. Similar to JXPath, it works on object graphs, and thus the corresponding filter enables simple and efficient content routing for payloads.
+        </xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>OGNL</schemadoc:short-name>
+            <schemadoc:page-title>OGNL Module</schemadoc:page-title>
+        </xsd:appinfo>
+    </xsd:annotation>
 
     <xsd:element name="filter" type="OGNLComplexType" substitutionGroup="mule:abstract-filter"/>
 
@@ -40,5 +40,4 @@
             <xsd:extension base="xsd:string"/>
         </xsd:simpleContent>
     </xsd:complexType>
-
 </xsd:schema>

@@ -13,16 +13,15 @@
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
                 schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.1/mule-schemadoc.xsd"/>
 
-
-<xsd:annotation>
-    <xsd:documentation>
-Acegi provides a number of authentication and authorization providers such as JAAS, LDAP, CAS (Yale Central Authentication service), and DAO. The Mule Acegi security manager implementation delegates to Acegi to provide authorization and authentication functions.
-    </xsd:documentation>
-    <xsd:appinfo>
-        <schemadoc:short-name>Acegi</schemadoc:short-name>
-        <schemadoc:page-title>Acegi Module</schemadoc:page-title>
-    </xsd:appinfo>
-</xsd:annotation>
+    <xsd:annotation>
+        <xsd:documentation>
+            Acegi provides a number of authentication and authorization providers such as JAAS, LDAP, CAS (Yale Central Authentication service), and DAO. The Mule Acegi security manager implementation delegates to Acegi to provide authorization and authentication functions.
+        </xsd:documentation>
+        <xsd:appinfo>
+            <schemadoc:short-name>Acegi</schemadoc:short-name>
+            <schemadoc:page-title>Acegi Module</schemadoc:page-title>
+        </xsd:appinfo>
+    </xsd:annotation>
 
     <xsd:element name="security-manager" type="securityManagerType" substitutionGroup="mule:abstract-security-manager"/>
     <xsd:complexType name="securityManagerType">
