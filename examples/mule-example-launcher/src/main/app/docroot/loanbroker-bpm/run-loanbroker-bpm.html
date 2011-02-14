@@ -4,7 +4,7 @@ var urlPrefix = "http://localhost:12081/";
 
 function doGetLoanBrokerBPM() {
     var data = new Object();
-    data.url = urlPrefix + '?amount=' + document.loanBrokerBPMForm.amount.value;
+    data.url = urlPrefix + '?amount=' + escape(document.loanBrokerBPMForm.amount.value);
     data.method = 'GET';
     mule.rpc("/examples/ajaxproxy", data, rpcGetLoanBrokerBPMResponse);
 }

@@ -4,7 +4,7 @@ var urlPrefix = "http://localhost:48309/stockquote";
 
 function doGetQuote() {
     var data = new Object();
-    data.url = urlPrefix + '?symbol=' + document.getQuoteForm.symbol.value + '&method=' + getCheckedValue(document.getQuoteForm.method);
+    data.url = urlPrefix + '?symbol=' + escape(document.getQuoteForm.symbol.value) + '&method=' + escape(getCheckedValue(document.getQuoteForm.method));
     data.method = 'GET';
     mule.rpc("/examples/ajaxproxy", data, rpcGetQuoteResponse);
 }

@@ -4,7 +4,7 @@ var urlPrefix = "http://localhost:47493/change-machine";
 
 function doChangeMachine() {
     var data = new Object();
-    data.url = urlPrefix + '?amount=' + document.changeMachineForm.amount.value + '&currency=' + getCheckedValue(document.changeMachineForm.currency);
+    data.url = urlPrefix + '?amount=' + escape(document.changeMachineForm.amount.value) + '&currency=' + escape(getCheckedValue(document.changeMachineForm.currency));
     data.method = 'GET';
     mule.rpc("/examples/ajaxproxy", data, rpcChangeMachineResponse);
 }

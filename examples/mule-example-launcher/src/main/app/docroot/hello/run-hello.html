@@ -1,7 +1,7 @@
 <script type="text/javascript">
 	function doHelloWorld() {
 	    var data = new Object();
-	    data.url = 'http://localhost:8888/?name=' + document.getElementById('name').value;
+	    data.url = 'http://localhost:8888/?name=' + escape(document.getElementById('name').value);
 	    data.method = 'GET';
 	    mule.rpc("/examples/ajaxproxy", data, rpcHelloWorldResponse);
 	}
