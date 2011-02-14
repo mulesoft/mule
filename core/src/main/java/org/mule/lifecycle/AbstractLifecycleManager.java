@@ -9,6 +9,7 @@
  */
 package org.mule.lifecycle;
 
+import org.mule.api.MuleContext;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.LifecycleCallback;
@@ -18,6 +19,8 @@ import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.transport.AbstractConnector;
+import org.mule.transport.ConnectException;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -138,9 +141,15 @@ public abstract class AbstractLifecycleManager<O> implements LifecycleManager
             callback.onTransition(phase, object);
             setCurrentPhase(phase);
         }
-        catch (LifecycleException e)
+        // In the case of a connection exception, trigger the reconnection strategy.
+        catch (ConnectException ce)
         {
-            throw e;
+            MuleContext muleContext = ((AbstractConnector) ce.getFailed()).getMuleContext();
+            muleContext.getExceptionListener().handleException(ce);
+        }
+        catch (LifecycleException le)
+        {
+            throw le;
         }
         catch (Exception e)
         {

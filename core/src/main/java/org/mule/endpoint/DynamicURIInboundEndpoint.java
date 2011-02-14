@@ -27,6 +27,7 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.ConnectException;
 
 import java.util.List;
 import java.util.Map;
@@ -276,6 +277,11 @@ public class DynamicURIInboundEndpoint implements InboundEndpoint
         try
         {
             getConnector().registerListener(this, listener, flowConstruct);
+        }
+        // Let connection exceptions bubble up to trigger the reconnection strategy.
+        catch (ConnectException ce)
+        {
+            throw ce;
         }
         catch (Exception e)
         {

@@ -30,6 +30,7 @@ import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transport.Connector;
 import org.mule.config.MuleManifest;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.ConnectException;
 import org.mule.transport.polling.MessageProcessorPollingMessageReceiver;
 
 import java.beans.ExceptionListener;
@@ -104,6 +105,11 @@ public class DefaultInboundEndpoint extends AbstractEndpoint implements InboundE
             {
                  ((Startable)polledMp).start();
             }
+        }
+        // Let connection exceptions bubble up to trigger the reconnection strategy.
+        catch (ConnectException ce)
+        {
+            throw ce;
         }
         catch (Exception e)
         {
