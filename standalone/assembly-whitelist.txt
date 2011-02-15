@@ -144,8 +144,8 @@ mule-module-spring-extras
 mule-module-spring-security
 mule-module-sxc
 mule-module-tomcat
-mule-module-ws
 mule-module-xml
+mule-pattern-core
 mule-tests-functional
 mule-transport-ajax
 mule-transport-ejb
