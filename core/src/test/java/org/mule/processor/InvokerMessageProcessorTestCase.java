@@ -36,6 +36,13 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         invoker.setMuleContext(muleContext);
     }
 
+    public void testMethodWithNoArgs() throws MuleException, Exception
+    {
+        invoker.setMethodName("testNoArgs");
+        invoker.initialise();
+        invoker.process(getTestEvent(""));
+    }
+
     public void testMethodFound() throws MuleException, Exception
     {
         invoker.setMethodName("testMethod");
@@ -211,6 +218,10 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
                                Boolean arg9,
                                boolean arg10,
                                String arg11)
+        {
+        }
+
+        public void testNoArgs()
         {
         }
 
