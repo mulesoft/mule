@@ -222,6 +222,7 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
             {
                 DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder(
                     flowConstruct);
+                chainBuilder.setName("Component interceptor processor chain for :" + getName());
                 for (Interceptor interceptor : interceptors)
                 {
                     chainBuilder.chain(interceptor);
@@ -235,6 +236,10 @@ public abstract class AbstractComponent implements Component, MuleContextAware, 
                 });
 
                 interceptorChain = chainBuilder.build();
+                if (interceptorChain instanceof MuleContextAware)
+                {
+                    ((MuleContextAware) interceptorChain).setMuleContext(muleContext);
+                }
                 if (interceptorChain instanceof Initialisable)
                 {
                     ((Initialisable) interceptorChain).initialise();

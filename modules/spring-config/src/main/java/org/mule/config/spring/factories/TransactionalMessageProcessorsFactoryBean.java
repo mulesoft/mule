@@ -39,6 +39,7 @@ public class TransactionalMessageProcessorsFactoryBean implements FactoryBean
     public Object getObject() throws Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+        builder.setName("'transaction' child processor chain");
         TransactionalInterceptingMessageProcessor txProcessor = 
             new TransactionalInterceptingMessageProcessor(transactionConfig);
         builder.chain(txProcessor);

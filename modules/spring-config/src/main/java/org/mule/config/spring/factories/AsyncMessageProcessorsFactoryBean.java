@@ -57,6 +57,7 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
         }
 
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+        builder.setName("'async' child chain");
         final MuleConfiguration config = muleContext.getConfiguration();
         final String threadPrefix = ThreadNameHelper.asyncProcessor(muleContext, name);
 

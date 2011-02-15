@@ -37,6 +37,7 @@ public class ResponseMessageProcessorsFactoryBean implements FactoryBean
     public Object getObject() throws Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+        builder.setName("'response' child processor chain");
         for (Object processor : messageProcessors)
         {
             if (processor instanceof MessageProcessor)
