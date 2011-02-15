@@ -198,16 +198,6 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
         </xsd:complexContent>
     </xsd:complexType>
 
-  <xsd:element name="schema-validation-transformer" type="schemaValidationTransformerType" substitutionGroup="mule:abstract-transformer"/>
-  <xsd:complexType name="schemaValidationTransformerType">
-    <xsd:complexContent>
-      <xsd:extension base="mule:abstractTransformerType">
-        <xsd:attribute name="schemaFile" type="xsd:string"/>
-        <xsd:attribute name="schemaLanguage" type="xsd:string"/>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-
     <!-- xml outbound routers -->
 
     <xsd:complexType name="messageSplitterType">
