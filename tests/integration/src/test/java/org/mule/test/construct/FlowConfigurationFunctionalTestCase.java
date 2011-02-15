@@ -397,7 +397,13 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         // ensure multiple arguments work
         muleContext.getClient().send("vm://invoke3-in", new DefaultMuleMessage("0", muleContext));
     }
-    
+
+    public void testInvoke4() throws MuleException, Exception
+    {
+        // ensure no arguments work
+        muleContext.getClient().send("vm://invoke4-in", new DefaultMuleMessage("0", muleContext));
+    }
+   
     public void testEnrichWithAttributes() throws MuleException, Exception
     {
         MuleMessage message = new DefaultMuleMessage("0", muleContext);
@@ -430,6 +436,11 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     static class Pojo
     {
 
+        public void method()
+        {
+
+        }
+        
         public void method(Object arg1, Object arg2)
         {
 

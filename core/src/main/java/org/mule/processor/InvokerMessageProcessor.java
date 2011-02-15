@@ -63,7 +63,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
     protected Object object;
     protected Class<?> objectType;
     protected String methodName;
-    protected List<?> arguments;
+    protected List<?> arguments = new ArrayList<Object>();;
     protected Class<?>[] argumentTypes;
     protected String name;
     protected PatternInfo patternInfo = TemplateParser.createMuleStyleParser().getStyle();
