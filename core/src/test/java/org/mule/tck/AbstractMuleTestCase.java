@@ -93,7 +93,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     /**
      * Default test watchdog timeout in seconds.
      */
-    public static final int DEFAULT_MULE_TEST_TIMEOUT_SECS = 60000000;
+    public static final int DEFAULT_MULE_TEST_TIMEOUT_SECS = 60;
 
     /**
      * If the annotations module is on the classpath, also enable annotations config builder
