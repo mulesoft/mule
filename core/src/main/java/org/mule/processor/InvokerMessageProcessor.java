@@ -98,10 +98,11 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
         else
         {
             List<Method> matchingMethods = new ArrayList<Method>();
+            int argSize = arguments != null ? arguments.size() : 0;
             for (Method methodCandidate : object.getClass().getMethods())
             {
                 if (methodCandidate.getName().equals(methodName)
-                    && methodCandidate.getParameterTypes().length == arguments.size())
+                    && methodCandidate.getParameterTypes().length == argSize)
                     matchingMethods.add(methodCandidate);
             }
             if (matchingMethods.size() == 1)
@@ -179,7 +180,8 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
     protected Object[] evaluateArguments(MuleEvent event, List<?> argumentTemplates)
         throws MessagingException
     {
-        Object[] args = new Object[argumentTemplates.size()];
+        int argSize = argumentTemplates != null ? argumentTemplates.size() : 0;
+        Object[] args = new Object[argSize];
         MuleMessage message = event.getMessage();
         try
         {
