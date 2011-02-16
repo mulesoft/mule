@@ -93,8 +93,8 @@ fi
 
 # MAC
 if [ -n "`which open`" ]; then
-	open "${URL}"
-	exit 0
+    open "${URL}"
+    exit 0
 fi
 
 # Linux Browsers
