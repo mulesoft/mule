@@ -166,6 +166,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         initServiceFactory(svcFac);
 
         CxfInboundMessageProcessor processor = new CxfInboundMessageProcessor();
+        processor.setMuleContext(muleContext);
         configureMessageProcessor(sfb, processor);
         sfb.setStart(false);
 

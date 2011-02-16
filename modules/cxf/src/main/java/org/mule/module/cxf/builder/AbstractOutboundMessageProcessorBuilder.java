@@ -144,6 +144,7 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     protected CxfOutboundMessageProcessor createMessageProcessor()
     {
         CxfOutboundMessageProcessor processor = new CxfOutboundMessageProcessor(client);
+        processor.setMuleContext(muleContext);
         return processor;
     }
 
