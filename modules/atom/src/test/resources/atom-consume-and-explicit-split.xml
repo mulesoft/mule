@@ -20,7 +20,7 @@
     -->
     <!-- limit to our sample atom file for the test -->
         <file:inbound-endpoint  path="./target/test-classes" pollingFrequency="1000" >
-            <file:filename-wildcard-filter pattern="sample-feed.atom"/>
+            <file:filename-wildcard-filter pattern="sample-consume-feed.atom"/>
             <atom:feed-splitter/>
         </file:inbound-endpoint>
         <test:component/>
