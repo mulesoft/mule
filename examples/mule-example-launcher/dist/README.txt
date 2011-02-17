@@ -9,9 +9,12 @@ the example.
 This example application is meant to be used together with other examples that ship with
 Mule ESB. The correct way to use it is by launching mule with the following command:
 
-$MULE_HOME/bin/mule examples
+$MULE_HOME/bin/mule_examples
 
 This command will deploy the examples required by the Example Launcher. 
+
+For more information visit:
+http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples
 
 +---------------------+
 | Running the example |
