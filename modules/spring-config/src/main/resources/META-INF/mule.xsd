@@ -1788,7 +1788,7 @@
     <xsd:element name="simple-service" type="simpleServiceType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                A simple request-response service, with no outbound router.
+                Deprecated. Use pattern:simple-service instead
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1901,7 +1901,7 @@
     <xsd:element name="bridge" type="bridgeType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                Deprecated. Use mcp:bridge instead
+                Deprecated. Use pattern:bridge instead
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -1988,7 +1988,7 @@
     <xsd:element name="validator" type="validatorType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                A validator with a single request-response inbound endpoint and a single outbound endpoint.
+                Deprecated. Use pattern:validator instead
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

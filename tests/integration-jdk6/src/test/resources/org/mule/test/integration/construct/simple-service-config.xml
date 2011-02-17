@@ -2,12 +2,14 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:spring="http://www.springframework.org/schema/beans"
+  xmlns:pattern="http://www.mulesoft.org/schema/mule/pattern"
   xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+       http://www.mulesoft.org/schema/mule/pattern http://www.mulesoft.org/schema/mule/pattern/3.1/mule-pattern.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
   
   <!-- JAX-RS service -->
-  <simple-service name="weather-report-rsc"
+  <pattern:simple-service name="weather-report-rsc"
                   address="http://localhost:6099/rest"
                   component-class="org.mule.test.integration.tck.WeatherReportResource"
                   type="jax-rs" />

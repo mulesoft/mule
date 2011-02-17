@@ -53,7 +53,7 @@ def base = "http://www.mulesoft.org/schema/mule/"
 def corexsd = /.*(\/|\\)spring-config(\/|\\).*(\/|\\)mule\.xsd/
 def servicexsd = /.*(\/|\\)spring-config(\/|\\).*(\/|\\)mule-(.*)\.xsd/
 def testxsd = /.*(\/|\\)tests(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-test\.xsd/
-def otherxsd = /.*(\/|\\)(transports|modules)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-(.*)\.xsd/
+def otherxsd = /.*(\/|\\)(transports|modules|patterns)(\/|\\)([^\/]+)(\/|\\).*(\/|\\)mule-(.*)\.xsd/
 
 def parseArguments(def arguments)
 {

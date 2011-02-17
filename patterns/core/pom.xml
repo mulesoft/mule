@@ -2,15 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule.modules</groupId>
-        <artifactId>mule-modules</artifactId>
+        <groupId>org.mule.patterns</groupId>
+        <artifactId>mule-patterns</artifactId>
         <version>3.1.2-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-module-ws</artifactId>
+    <artifactId>mule-pattern-core</artifactId>
     <packaging>jar</packaging>
-    <name>Web Services</name>
+    <name>Core Configuration Patterns</name>
     <description>
-        Mule Utilities for Web Services.
+        Mule Core Configuration Patterns.
     </description>
 
     <dependencies>

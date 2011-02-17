@@ -23,6 +23,11 @@
             <version>${version}</version>
         </dependency>
         <dependency>
+            <groupId>org.mule.patterns</groupId>
+            <artifactId>mule-pattern-core</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
             <version>${version}</version>
