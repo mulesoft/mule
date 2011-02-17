@@ -90,9 +90,29 @@ fi
 ######################################################################
 # Open broweser and launch application
 ######################################################################
+# Resolve the os
+DIST_OS=`uname -s | tr [:upper:] [:lower:] | tr -d [:blank:]`
+case "$DIST_OS" in
+    'sunos')
+        DIST_OS="solaris"
+        ;;
+    'hp-ux' | 'hp-ux64')
+        DIST_OS="hpux"
+        ;;
+    'darwin')
+        DIST_OS="macosx"
+        ;;
+    'unix_sv')
+        DIST_OS="unixware"
+        ;;
+    'aix')
+        DIST_OS="aix"
+        ;;
+esac
 
 # MAC
-if [ -n "`which open`" ]; then
+type -P open
+if [ "$DIST_OS" = "macosx" ]; then
     open "${URL}"
     exit 0
 fi
@@ -100,7 +120,7 @@ fi
 # Linux Browsers
 for B in "firefox" "opera" "konqueror" "epiphany" "mozilla" "netscape"
 do
-if [ -n "`which $B`" ]; then
+if [ -n "`which $B 2>/dev/null`" ]; then
         $B "${URL}"
         exit 0
 fi
