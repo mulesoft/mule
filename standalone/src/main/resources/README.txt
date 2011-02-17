@@ -107,6 +107,9 @@ http://www.mulesoft.org/documentation/display/MULE3USER/Home. You will need to
 register to view these pages, but registration is free and only takes a few
 moments.
 
+- If you want to run the examples you can launch Mule ESB with the command:
+$MULE_HOME/bin/mule_examples
+
 - If you need assistance and are a Mule Enterprise customer,
 see the support page at:
 http://www.mulesoft.com/enterprise-subscriptions-and-support
