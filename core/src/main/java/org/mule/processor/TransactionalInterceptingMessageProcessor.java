@@ -46,7 +46,7 @@ public class TransactionalInterceptingMessageProcessor extends AbstractIntercept
             {
                 public MuleEvent doInTransaction() throws Exception
                 {
-                    return next.process(event);
+                    return processNext(event);
                 }
             };
 
