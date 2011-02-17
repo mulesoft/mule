@@ -127,6 +127,19 @@ public class TestConnector extends AbstractConnector
     {
         this.someProperty = someProperty;
     }
+    
+    @Override
+    protected Object getReceiverKey(FlowConstruct flowConstruct, InboundEndpoint endpoint)
+    {
+        if (endpoint.getProperty("competingConsumers") != null)
+        {
+            return flowConstruct.getName() + "~" + endpoint.getEndpointURI().getAddress();
+        }
+        else
+        {
+            return super.getReceiverKey(flowConstruct, endpoint);
+        }
+    }
 
     @Override
     public MessageReceiver createReceiver(FlowConstruct flowConstuct, InboundEndpoint endpoint) throws Exception

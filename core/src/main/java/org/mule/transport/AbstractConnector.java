@@ -2390,6 +2390,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         else
         {
             DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
+            builder.setName("dispatcher processor chain for '" + endpoint.getAddress() + "'");
             builder.chain(new OptionalAsyncInterceptingMessageProcessor(new WorkManagerSource()
             {
                 public WorkManager getWorkManager() throws MuleException

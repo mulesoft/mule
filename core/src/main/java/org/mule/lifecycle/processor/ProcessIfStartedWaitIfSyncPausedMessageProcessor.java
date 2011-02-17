@@ -10,10 +10,12 @@
 
 package org.mule.lifecycle.processor;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.Startable;
+import org.mule.config.i18n.CoreMessages;
 
 public class ProcessIfStartedWaitIfSyncPausedMessageProcessor extends
     ProcessIfStartedWaitIfPausedMessageProcessor
@@ -24,17 +26,38 @@ public class ProcessIfStartedWaitIfSyncPausedMessageProcessor extends
         super(startable, lifecycleState);
     }
 
+    // TODO DF This needs refactoring. This is to ensure processNext()
+    // is used and not next.process()
     @Override
-    protected MuleEvent processNext(MuleEvent event) throws MuleException
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
-        if (event.getEndpoint().getExchangePattern().hasResponse())
+        if (accept(event))
         {
-            return super.processNext(event);
+            if (isPaused() && event.getEndpoint().getExchangePattern().hasResponse())
+            {
+                try
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug(startable.getClass().getName() + " " + getStartableName(startable)
+                                     + " is paused. Blocking call until resumd");
+                    }
+                    while (isPaused())
+                    {
+                        Thread.sleep(500);
+                    }
+                }
+                catch (InterruptedException e)
+                {
+                    throw new MessagingException(
+                        CoreMessages.interruptedWaitingForPaused(getStartableName(startable)), event, e);
+                }
+            }
+            return processNext(event);
         }
         else
         {
-            return next.process(event);
+            return handleUnaccepted(event);
         }
     }
-
 }

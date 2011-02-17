@@ -10,18 +10,23 @@
 
 package org.mule.test.integration.service;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.service.Service;
+import org.mule.config.DefaultMuleConfiguration;
+import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.queue.FilePersistenceStrategy;
-import org.mule.util.queue.Queue;
-import org.mule.util.queue.QueueSession;
+import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
-import org.mule.util.xa.ResourceManagerSystemException;
+
+import java.io.File;
+
+import org.apache.commons.io.FileUtils;
 
 public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
 {
-    private static final int WAIT_TIME_MILLIS = 500;
+    protected static final int WAIT_TIME_MILLIS = 500;
     protected static final int NUM_MESSAGES = 500;
 
     @Override
@@ -30,12 +35,28 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         return "org/mule/test/integration/service/service-inflight-messages.xml";
     }
 
-    public void testInFlightMessages() throws Exception
+    @Override
+    protected MuleContext createMuleContext() throws Exception
+    {
+        // Use a graceful shutdown but not the full 5s default
+        MuleContext muleContext = super.createMuleContext();
+        ((DefaultMuleConfiguration) muleContext.getConfiguration()).setShutdownTimeout(WAIT_TIME_MILLIS);
+        return muleContext;
+    }
+
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        FileUtils.deleteDirectory(new File(muleContext.getConfiguration().getWorkingDirectory()));
+        super.doTearDown();
+    }
+
+    public void testInFlightMessagesWhenServiceStopped() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("TestService");
         populateSedaQueue(service, NUM_MESSAGES);
 
-        muleContext.stop();
+        stopService(service);
 
         assertNoLostMessages(NUM_MESSAGES, service);
         // Seda queue is empty because queue is not persistent and therefore is
@@ -43,113 +64,112 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         assertSedaQueueEmpty(service);
     }
 
-    public void testInFlightMessagesPausedService() throws Exception
+    public void testInFlightMessagesPausedServiceWhenServiceStopped() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("PausedTestService");
         populateSedaQueue(service, NUM_MESSAGES);
 
-        muleContext.stop();
+        stopService(service);
 
-        // All message were lost so both queues are empty.
-        assertSedaQueueEmpty(service);
+        // The service is paused so no message get processed. Because the service is
+        // stopped messages aren't lost. If Mule was disposed then messages would be
+        // lost
+        assertNoLostMessages(NUM_MESSAGES, service);
 
-        // TODO Enable the following assertion once MULE-4072 is fixed
-        // assertOutboundVMQueueEmpty();
+        assertOutboundEmpty();
     }
 
-    public void testInFlightStopPersistentMessages() throws Exception
+    public void testInFlightMessagesPersistentQueueServiceWhenServiceStopped() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");
+
         populateSedaQueue(service, NUM_MESSAGES);
 
-        Thread.sleep(WAIT_TIME_MILLIS);
-        muleContext.stop();
-        Thread.sleep(WAIT_TIME_MILLIS);
-
+        stopService(service);
 
         assertNoLostMessages(NUM_MESSAGES, service);
-        // Persistent queue is being used so seda queue is not emptied when service
-        // is stopped
-        assertSedaQueueNotEmpty(service);
 
         // Start, process some messages, stop and make sure no messages get lost.
-        muleContext.start();
-        Thread.sleep(WAIT_TIME_MILLIS);
-        muleContext.stop();
+        startService(service);
+        Thread.sleep(WAIT_TIME_MILLIS * 2);
+        stopService(service);
 
         assertNoLostMessages(NUM_MESSAGES, service);
 
         // Let mule finish up with the rest of the messages until seda queue is empty
-        muleContext.start();
-        Thread.sleep(WAIT_TIME_MILLIS * 8);
-        muleContext.stop();
+        startService(service);
+        Thread.sleep(WAIT_TIME_MILLIS * 10);
+        stopService(service);
 
         assertNoLostMessages(NUM_MESSAGES, service);
         assertSedaQueueEmpty(service);
     }
 
-    public void testInFlightStopPersistentMessagesPausedService() throws Exception
+    public void testInFlightMessagesPausedPersistentQueueServiceWhenServiceStopped() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("PausedTestPersistentQueueService");
         populateSedaQueue(service, NUM_MESSAGES);
 
-        muleContext.stop();
+        stopService(service);
 
         // Paused service does not process messages before or during stop().
-        // TODO Enable the following assertion once MULE-4072 is fixed
-        // assertOutboundVMQueueEmpty();
+        assertOutboundEmpty();
         assertNoLostMessages(NUM_MESSAGES, service);
 
         // Start, process some messages, stop and make sure no messages get lost.
-        muleContext.start();
+        startService(service);
         service.resume();
-        Thread.sleep(WAIT_TIME_MILLIS);
-        muleContext.stop();
-
-        Thread.sleep(WAIT_TIME_MILLIS);
+        Thread.sleep(WAIT_TIME_MILLIS * 2);
+        stopService(service);
 
         assertNoLostMessages(NUM_MESSAGES, service);
 
         // Let mule finish up with the rest of the messages until seda queue is empty
-        muleContext.start();
-        Thread.sleep(WAIT_TIME_MILLIS * 14);
-        muleContext.stop();
+        startService(service);
+        service.resume();
+        Thread.sleep(WAIT_TIME_MILLIS * 10);
+        stopService(service);
 
         assertNoLostMessages(NUM_MESSAGES, service);
         assertSedaQueueEmpty(service);
     }
 
-    public void testInFlightDisposePersistentMessages() throws Exception
+    public void testInFlightMessagesPersistentQueueServiceWhenMuleDisposed() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("TestPersistentQueueService");
         populateSedaQueue(service, NUM_MESSAGES);
 
-        muleContext.stop();
+        muleContext.dispose();
+
         assertNoLostMessages(NUM_MESSAGES, service);
 
-        // Dispose and restart Mule and let it run for a short while
-        muleContext.dispose();
-        muleContext = createMuleContext();
-        muleContext.start();
+        recreateAndStartMuleContext();
         Thread.sleep(WAIT_TIME_MILLIS);
-        muleContext.stop();
+        muleContext.dispose();
 
         assertNoLostMessages(NUM_MESSAGES, service);
 
         // Let mule finish up with the rest of the messages until seda queue is empty
-        muleContext.start();
-        Thread.sleep(WAIT_TIME_MILLIS * 8);
-        muleContext.stop();
+        recreateAndStartMuleContext();
+        Thread.sleep(WAIT_TIME_MILLIS * 10);
+        muleContext.dispose();
 
         assertNoLostMessages(NUM_MESSAGES, service);
         assertSedaQueueEmpty(service);
+    }
+
+    protected void recreateAndStartMuleContext() throws Exception, MuleException
+    {
+        muleContext = createMuleContext();
+        muleContext.start();
     }
 
     protected void populateSedaQueue(Service service, int numMessages) throws MuleException, Exception
     {
         for (int i = 0; i < numMessages; i++)
         {
-            service.dispatchEvent(getTestEvent("test", service, getTestInboundEndpoint("test://test")));
+            service.dispatchEvent(getTestEvent("test", service, muleContext.getEndpointFactory()
+                .getInboundEndpoint("test://test")));
         }
     }
 
@@ -157,56 +177,83 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
      * After each run the following should total 500 events: 1) Event still in SEDA
      * queue 2) Events dispatched to outbound vm endpooint 3) Events that were unable
      * to be sent to stopped service and raised exceptions
+     * 
+     * @throws Exception
      */
-    private synchronized void assertNoLostMessages(int numMessages, Service service)
-        throws ResourceManagerSystemException
+    protected synchronized void assertNoLostMessages(int numMessages, Service service) throws Exception
     {
-        QueueSession queueSession = getTestQueueSession();
-        
-        int outQueueSize = queueSession.getQueue("out").size();
-        
-        String serviceName = service.getName() + ".service";
-        int serviceQueueSize = queueSession.getQueue(serviceName).size();
-        
-        logger.info("SEDA Queue: " + outQueueSize + ", Outbound endpoint vm queue: " + serviceQueueSize);
-        assertEquals(numMessages, outQueueSize + serviceQueueSize);
+        logger.info("SEDA Queue: " + getSedaQueueSize(service) + ", Outbound endpoint: "
+                    + getOutSize());
+        assertEquals(numMessages, getOutSize() + getSedaQueueSize(service));
     }
 
-    protected synchronized void assertSedaQueueEmpty(Service service) throws ResourceManagerSystemException
+    protected synchronized void assertSedaQueueEmpty(Service service) throws MuleException
     {
-        QueueSession queueSession = getTestQueueSession();
-        assertEquals(0, queueSession.getQueue(service.getName() + ".service").size());
+        assertEquals(0, getSedaQueueSize(service));
     }
 
-    protected synchronized void assertSedaQueueNotEmpty(Service service)
-        throws ResourceManagerSystemException
+    protected synchronized void assertSedaQueueNotEmpty(Service service) throws MuleException
     {
-        QueueSession queueSession = getTestQueueSession();
-        final int size = queueSession.getQueue(service.getName() + ".service").size();
-        assertTrue(String.format("Seda queue for service '%s' is empty", service.getName()), size > 0);
+        assertTrue(String.format("Seda queue for service '%s' is empty", service.getName()),
+            getSedaQueueSize(service) > 0);
     }
 
-    protected synchronized void assertOutboundVMQueueEmpty() throws ResourceManagerSystemException
+    protected synchronized void assertOutboundEmpty() throws Exception
     {
-        QueueSession queueSession = getTestQueueSession();
-        assertEquals(0, queueSession.getQueue("out").size());
+        assertEquals(0, getOutSize());
     }
 
-    protected synchronized void assertOutboundVMQueueNotEmpty() throws ResourceManagerSystemException
+    protected synchronized void assertOutboundNotEmpty() throws Exception
     {
-        QueueSession queueSession = getTestQueueSession();
-        final Queue queue = queueSession.getQueue("out");
-        assertTrue(String.format("Qeueu '%s' is empty", queue.getName()), queue.size() > 0);
+        assertTrue("VM Out queue is empty", getOutSize() > 0);
     }
 
-    protected QueueSession getTestQueueSession() throws ResourceManagerSystemException
+    protected int getSedaQueueSize(Service service) throws MuleException
     {
-        TransactionalQueueManager tqm = new TransactionalQueueManager();
-        FilePersistenceStrategy fps = new FilePersistenceStrategy();
-        fps.setMuleContext(muleContext);
-        tqm.setPersistenceStrategy(fps);
-        tqm.start();
-        QueueSession queueSession = tqm.getQueueSession();
-        return queueSession;
+        return getQueueSize(getSedaQueueName(service));
     }
+
+    protected String getSedaQueueName(Service service)
+    {
+        return "seda.queue(" + service.getName() + ")";
+    }
+
+    protected int getOutSize() throws Exception
+    {
+        return getQueueSize("out");
+    }
+
+    protected int getQueueSize(String name) throws MuleException
+    {
+        if (muleContext != null && muleContext.isStarted())
+        {
+            return muleContext.getQueueManager().getQueueSession().getQueue(name).size();
+        }
+        else
+        {
+            MuleContext localMuleContext = new DefaultMuleContextBuilder().buildMuleContext();
+            QueueManager queueManager = new TransactionalQueueManager();
+            FilePersistenceStrategy persistenceStrategy = new FilePersistenceStrategy();
+            persistenceStrategy.setMuleContext(localMuleContext);
+            queueManager.setPersistenceStrategy(persistenceStrategy);
+            queueManager.start();
+            int size = queueManager.getQueueSession().getQueue(name).size();
+            queueManager.stop();
+            localMuleContext = null;
+            return size;
+        }
+    }
+
+    protected void stopService(Service service) throws Exception
+    {
+        service.stop();
+        muleContext.getRegistry().lookupConnector("outPersistentConnector").stop();
+    }
+
+    protected void startService(Service service) throws Exception
+    {
+        muleContext.getRegistry().lookupConnector("outPersistentConnector").start();
+        service.start();
+    }
+
 }

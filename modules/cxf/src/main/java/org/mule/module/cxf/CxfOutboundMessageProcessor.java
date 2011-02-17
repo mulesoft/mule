@@ -148,7 +148,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     @Override
     public MuleEvent processNext(MuleEvent event) throws MuleException
     {
-        return next.process(event);
+        return super.processNext(event);
     }
 
     protected MuleEvent doSendWithProxy(MuleEvent event) throws Exception

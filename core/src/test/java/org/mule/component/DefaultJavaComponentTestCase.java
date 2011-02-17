@@ -75,6 +75,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
         DefaultComponentLifecycleAdapter lifecycleAdapter = (DefaultComponentLifecycleAdapter) 
             component.borrowComponentLifecycleAdaptor();
         component.returnComponentLifecycleAdaptor(lifecycleAdapter);
+        component.stop();
         component.dispose();
 
         assertNull(lifecycleAdapter.componentObject);

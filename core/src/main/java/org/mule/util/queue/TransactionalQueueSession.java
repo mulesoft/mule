@@ -95,7 +95,22 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
 
         public void untake(Object item) throws InterruptedException
         {
-            queue.untake(item);
+            if (localContext != null)
+            {
+                ((TransactionalQueueManager.QueueTransactionContext) localContext).untake(queue, item);
+            }
+            else
+            {
+                try
+                {
+                    Object id = queueManager.doStore(queue, item);
+                    queue.untake(id);
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
         }
 
         public Object poll(long timeout) throws InterruptedException

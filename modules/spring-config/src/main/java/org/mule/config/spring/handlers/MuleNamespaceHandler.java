@@ -124,6 +124,7 @@ import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.IdempotentMessageFilter;
 import org.mule.routing.IdempotentSecureHashMessageFilter;
 import org.mule.routing.LoggingCatchAllStrategy;
+import org.mule.routing.MapSplitter;
 import org.mule.routing.MessageChunkAggregator;
 import org.mule.routing.MessageChunkSplitter;
 import org.mule.routing.MessageFilter;
@@ -435,6 +436,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("resequencer", new InboundRouterDefinitionParser(Resequencer.class));
         registerBeanDefinitionParser("splitter", new SplitterDefinitionParser(ExpressionSplitter.class));
         registerBeanDefinitionParser("collection-splitter", new SplitterDefinitionParser(CollectionSplitter.class));
+        registerBeanDefinitionParser("map-splitter", new SplitterDefinitionParser(MapSplitter.class));
         registerBeanDefinitionParser("message-chunk-splitter", new SplitterDefinitionParser(MessageChunkSplitter.class));
         registerBeanDefinitionParser("custom-splitter", new SplitterDefinitionParser());
 

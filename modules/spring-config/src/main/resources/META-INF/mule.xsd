@@ -125,7 +125,12 @@
             <xsd:element ref="flow" />
             <xsd:element ref="abstract-model"/>
             <xsd:element ref="abstract-interceptor-stack"/>
-            <xsd:element ref="abstract-message-processor"/>
+            <xsd:element ref="abstract-filter"/>
+            <xsd:element ref="abstract-transformer"/>
+            <xsd:element ref="processor-chain"/>
+            <xsd:element ref="custom-processor"/>
+            <xsd:element ref="invoke"/>
+            <xsd:element ref="message-filter"/>
         </xsd:choice>
     </xsd:group>
 
@@ -4418,6 +4423,19 @@
         </xsd:complexType>
     </xsd:element>
     
+    <xsd:element name="map-splitter" substitutionGroup="abstract-intercepting-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                The map splitter accepts a map of objects and splits the collection invoking the next message processor with each item in the collection in sequence. 
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="baseSplitterType"/>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
     <xsd:element name="message-chunk-splitter" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>

@@ -10,7 +10,6 @@
 
 package org.mule.processor.chain;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -147,17 +146,6 @@ public abstract class AbstractMessageProcessorChain extends AbstractIntercepting
             if (processor instanceof FlowConstructAware)
             {
                 ((FlowConstructAware) processor).setFlowConstruct(flowConstruct);
-            }
-        }
-    }
-
-    public void setMuleContext(MuleContext context)
-    {
-        for (MessageProcessor processor : processors)
-        {
-            if (processor instanceof MuleContextAware)
-            {
-                ((MuleContextAware) processor).setMuleContext(context);
             }
         }
     }

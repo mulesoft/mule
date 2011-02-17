@@ -13,11 +13,14 @@ package org.mule.processor;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.notification.ServerNotificationHandler;
 import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.context.notification.MessageProcessorNotification;
+import org.mule.processor.chain.DefaultMessageProcessorChain;
 import org.mule.util.ObjectUtils;
 
 import org.apache.commons.logging.Log;
@@ -28,7 +31,8 @@ import org.apache.commons.logging.LogFactory;
  * provides an implementation of setNext and holds the next message processor as an
  * attribute.
  */
-public abstract class AbstractInterceptingMessageProcessor implements InterceptingMessageProcessor, MuleContextAware
+public abstract class AbstractInterceptingMessageProcessor
+    implements InterceptingMessageProcessor, MuleContextAware
 {
     protected Log logger = LogFactory.getLog(getClass());
 
@@ -40,6 +44,10 @@ public abstract class AbstractInterceptingMessageProcessor implements Intercepti
     {
         this.muleContext = context;
         notificationHandler = muleContext.getNotificationManager();
+        if (next instanceof DefaultMessageProcessorChain)
+        {
+            ((DefaultMessageProcessorChain) next).setMuleContext(context);
+        }
     }
 
     public void setListener(MessageProcessor next)
@@ -62,13 +70,20 @@ public abstract class AbstractInterceptingMessageProcessor implements Intercepti
                 logger.trace("Invoking next MessageProcessor: '" + next.getClass().getName() + "' ");
             }
 
-            // note that we're firing event for the next in chain, not this MP
-            fireNotification(event, next, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+            boolean fireNotification = !(next instanceof MessageProcessorChain);
 
+            if (fireNotification)
+            {
+                // note that we're firing event for the next in chain, not this MP
+                fireNotification(event.getFlowConstruct(), event, next,
+                    MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+            }
             final MuleEvent result = next.process(event);
-
-            fireNotification(event, next, MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
-
+            if (fireNotification)
+            {
+                fireNotification(event.getFlowConstruct(), result, next,
+                    MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+            }
             return result;
         }
     }
@@ -84,11 +99,12 @@ public abstract class AbstractInterceptingMessageProcessor implements Intercepti
         return ObjectUtils.toString(this);
     }
 
-    protected void fireNotification(MuleEvent event, MessageProcessor processor, int action)
+    protected void fireNotification(FlowConstruct flowConstruct, MuleEvent event, MessageProcessor processor, int action)
     {
-        if (notificationHandler != null && notificationHandler.isNotificationEnabled(MessageProcessorNotification.class))
+        if (notificationHandler != null
+            && notificationHandler.isNotificationEnabled(MessageProcessorNotification.class))
         {
-            notificationHandler.fireNotification(new MessageProcessorNotification(event, processor, action));
+            notificationHandler.fireNotification(new MessageProcessorNotification(flowConstruct, event, processor, action));
         }
     }
 

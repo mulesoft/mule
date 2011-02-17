@@ -27,30 +27,36 @@ public class ProcessIfStartedWaitIfPausedMessageProcessor extends ProcessIfStart
     }
 
     @Override
-    protected MuleEvent processNext(MuleEvent event) throws MuleException
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
-        if (isPaused())
+        if (accept(event))
         {
-            try
+            if (isPaused())
             {
-                if (logger.isDebugEnabled())
+                try
                 {
-                    logger.debug(startable.getClass().getName() + " " + getStartableName(startable)
-                                 + " is paused. Blocking call until resumd");
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug(startable.getClass().getName() + " " + getStartableName(startable)
+                                     + " is paused. Blocking call until resumd");
+                    }
+                    while (isPaused())
+                    {
+                        Thread.sleep(500);
+                    }
                 }
-                while (isPaused())
+                catch (InterruptedException e)
                 {
-                    Thread.sleep(500);
+                    throw new MessagingException(
+                        CoreMessages.interruptedWaitingForPaused(getStartableName(startable)), event, e);
                 }
             }
-            catch (InterruptedException e)
-            {
-                throw new MessagingException(
-                    CoreMessages.interruptedWaitingForPaused(getStartableName(startable)),
-                    event, e);
-            }
+            return processNext(event);
         }
-        return super.processNext(event);
+        else
+        {
+            return handleUnaccepted(event);
+        }
     }
 
     @Override

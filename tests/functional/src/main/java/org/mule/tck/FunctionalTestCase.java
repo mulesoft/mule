@@ -122,6 +122,11 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
         return (FunctionalTestComponent) getComponent(serviceName);
     }
 
+    protected FlowConstruct getFlowConstruct(String name) throws Exception
+    {
+        return muleContext.getRegistry().lookupFlowConstruct(name);
+    }
+    
     protected String loadResourceAsString(String name) throws IOException
     {
         return IOUtils.getResourceAsString(name, getClass());

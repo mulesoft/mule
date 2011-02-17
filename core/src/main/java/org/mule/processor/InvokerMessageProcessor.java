@@ -63,7 +63,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
     protected Object object;
     protected Class<?> objectType;
     protected String methodName;
-    protected List<?> arguments;
+    protected List<?> arguments = new ArrayList<Object>();;
     protected Class<?>[] argumentTypes;
     protected String name;
     protected PatternInfo patternInfo = TemplateParser.createMuleStyleParser().getStyle();
@@ -218,12 +218,14 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
         }
         else if (expressionCandidate instanceof Map<?, ?>)
         {
-            Map<Object, Object> map = (Map<Object, Object>) expressionCandidate;
-            for (Entry<Object, Object> entry : map.entrySet())
+            Map<Object, Object> mapTemplate = (Map<Object, Object>) expressionCandidate;
+            Map<Object, Object> newMap = new HashMap<Object, Object>();
+            for (Entry<Object, Object> entry : mapTemplate.entrySet())
             {
-                map.put(entry.getKey(), evaluateExpressionCandidate(entry.getValue(), message));
+                newMap.put(evaluateExpressionCandidate(entry.getKey(), message), evaluateExpressionCandidate(
+                    entry.getValue(), message));
             }
-            return map;
+            return newMap;
         }
         else if (expressionCandidate instanceof String[])
         {

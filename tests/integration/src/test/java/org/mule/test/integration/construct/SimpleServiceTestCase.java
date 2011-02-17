@@ -16,6 +16,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleException;
 import org.mule.api.client.LocalMuleClient;
+import org.mule.construct.SimpleService;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.tck.WeatherForecaster;
 import org.mule.util.StringUtils;
@@ -120,15 +121,6 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         doTestFunctionalTestComponent("vm://ftc1.in", "functional-test-component-1");
     }
 
-    public void testInheritedFunctionalTestComponents() throws Exception
-    {
-        doTestFunctionalTestComponent("vm://ftc2.in", "functional-test-component-2");
-        doTestFunctionalTestComponent("vm://ftc3.in", "functional-test-component-3");
-
-        assertSame(getFunctionalTestComponent("functional-test-component-2"),
-            getFunctionalTestComponent("functional-test-component-3"));
-    }
-
     public void testInheritedType() throws Exception
     {
         doTestJaxWsService(6098);
@@ -171,4 +163,14 @@ public class SimpleServiceTestCase extends FunctionalTestCase
 
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
     }
+    
+    public void testInheritedElementsUnique() throws Exception
+    {
+        SimpleService child1 = (SimpleService) getFlowConstruct("child-service-1");
+        SimpleService child2 = (SimpleService) getFlowConstruct("child-service-2");
+        assertNotSame(child1.getMessageSource(), child2.getMessageSource());
+        assertNotSame(child1.getComponent(), child2.getComponent());
+        assertNotSame(child1.getExceptionListener(), child2.getExceptionListener());
+    }
+
 }

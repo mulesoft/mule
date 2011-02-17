@@ -68,10 +68,6 @@ org.mule.test.integration.client.MuleClientRemotingHttpTestCase
 # MULE-4485
 org.mule.test.integration.routing.inbound.InboundRouterSyncAsyncClientTestCase
 
-#MULE-4387
-org.mule.test.integration.service.ServiceInFlightMessagesTestCase
-org.mule.test.integration.service.ServiceInFlightMessagesJMSTestCase
-
 #TODO
 org.mule.context.notification.ServerNotificationManagerTestCase
 

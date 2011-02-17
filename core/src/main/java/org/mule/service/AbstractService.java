@@ -348,18 +348,18 @@ public abstract class AbstractService implements Service, MessageProcessor
         stopIfStoppable(messageSource);
         asyncReplyMessageSource.stop();
 
+        stopIfStoppable(messageProcessorChain);
         // Component is not in chain
         stopIfStoppable(component);
-        stopIfStoppable(messageProcessorChain);
         stopIfStoppable(exceptionListener);
     }
 
     protected void doStart() throws MuleException
     {
         // Component is not in chain
+        startIfStartable(exceptionListener);
         startIfStartable(component);
         startIfStartable(messageProcessorChain);
-        startIfStartable(exceptionListener);
 
         startIfStartable(messageSource);
         if (asyncReplyMessageSource.getEndpoints().size() > 0)
@@ -426,10 +426,10 @@ public abstract class AbstractService implements Service, MessageProcessor
             }
         });
 
+        initialiseIfInitialisable(exceptionListener);
         initialiseIfInitialisable(component);
         initialiseIfInitialisable(messageProcessorChain);
         initialiseIfInitialisable(messageSource);
-        initialiseIfInitialisable(exceptionListener);
         
         if (asyncReplyMessageSource.getEndpoints().size() > 0)
         {
@@ -708,6 +708,22 @@ public abstract class AbstractService implements Service, MessageProcessor
         if (candidate instanceof Disposable)
         {
             ((Disposable) candidate).dispose();
+        }
+    }
+
+    protected void pauseIfPausable(Object candidate) throws MuleException
+    {
+        if (candidate instanceof Pausable)
+        {
+            ((Pausable) candidate).pause();
+        }
+    }
+
+    protected void resumeIfResumable(Object candidate) throws MuleException
+    {
+        if (candidate instanceof Resumable)
+        {
+            ((Resumable) candidate).resume();
         }
     }
 }

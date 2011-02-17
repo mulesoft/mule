@@ -13,6 +13,7 @@ package org.mule.context.notification;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.NamedObject;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.processor.MessageProcessor;
@@ -38,9 +39,9 @@ public class MessageProcessorNotification extends ServerNotification implements 
     }
 
 
-    public MessageProcessorNotification(MuleEvent event, MessageProcessor processor, int action)
+    public MessageProcessorNotification(FlowConstruct flowConstruct, MuleEvent event, MessageProcessor processor, int action)
     {
-        super(event, action, event.getFlowConstruct() != null ? event.getFlowConstruct().getName() : null);
+        super(event, action, flowConstruct != null ? flowConstruct.getName() : null);
 
         this.processor = processor;
 
@@ -70,6 +71,10 @@ public class MessageProcessorNotification extends ServerNotification implements 
     @Override
     public MuleEvent getSource()
     {
+        if (source instanceof String)
+        {
+            return null;
+        }
         return (MuleEvent) super.getSource();
     }
 

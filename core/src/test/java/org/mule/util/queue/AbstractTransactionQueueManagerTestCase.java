@@ -97,6 +97,63 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
     }
+    
+    public void testPutTakeUntake() throws Exception
+    {
+        final TransactionalQueueManager mgr = createQueueManager();
+        mgr.start();
+
+        final Latch latch = new Latch();
+
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    latch.countDown();
+                    Thread.sleep(200);
+                    QueueSession s = mgr.getQueueSession();
+                    Queue q = s.getQueue("queue1");
+                    assertEquals("Queue size", 0, q.size());
+                    q.put("String1");
+                    q.put("String2");
+                }
+                catch (Exception e)
+                {
+                    // ignore, let test fail
+                }
+            }
+        };
+        t.start();
+        latch.await();
+        long t0 = System.currentTimeMillis();
+        QueueSession s = mgr.getQueueSession();
+        Queue q = s.getQueue("queue1");
+        assertEquals("Queue size", 0, q.size());
+        Object o = q.take();
+        long t1 = System.currentTimeMillis();
+        t.join();
+        assertNotNull(o);
+        assertEquals("Queue content", "String1", o);
+        assertEquals("Queue size", 1, q.size());
+        assertTrue(t1 - t0 > 100);
+
+        // Same as put/take until now, but now we do an untake
+        q.untake(o);
+        // Ensure queue size is now 2
+        assertEquals("Queue size", 2, q.size());
+        // Take to ensure order is correct
+        Object o2 = q.take();
+        assertEquals("Queue content", "String1", o2);
+        assertEquals("Queue size", 1, q.size());
+        
+        purgeQueue(q);
+        
+        mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+
+    }
 
     public void testTakePutRollbackPut() throws Exception
     {
@@ -141,6 +198,69 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         t.join();
         assertNotNull(o);
         assertEquals("Queue content", "String2", o);
+        assertEquals("Queue size", 0, q.size());
+        assertTrue(t1 - t0 > 100);
+
+        purgeQueue(q);
+        
+        mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
+    }
+
+    public void testPutTakeUntakeRollbackUntake() throws Exception
+    {
+        final TransactionalQueueManager mgr = createQueueManager();
+        mgr.start();
+
+        final Latch latch = new Latch();
+
+        final Object object1 = "string1";
+        final Object object2 = "string2";
+        
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    latch.countDown();
+                    Thread.sleep(200);
+                    QueueSession s = mgr.getQueueSession();
+                    Queue q = s.getQueue("queue1");
+                    assertEquals("Queue size", 0, q.size());
+                    
+                    s.begin();
+                    q.put(object1);
+                    q.put(object2);
+                    q.take();
+                    q.take();
+                    s.commit();
+
+                    s.begin();
+                    q.untake(object1);
+                    s.commit();
+                    
+                    s.begin();
+                    q.untake(object2);
+                    s.rollback();
+                }
+                catch (Exception e)
+                {
+                    // ignore, let test fail
+                }
+            }
+        };
+        t.start();
+        latch.await();
+        long t0 = System.currentTimeMillis();
+        QueueSession s = mgr.getQueueSession();
+        Queue q = s.getQueue("queue1");
+        assertEquals("Queue size", 0, q.size());
+        Object o = q.take();
+        long t1 = System.currentTimeMillis();
+        t.join();
+        assertNotNull(o);
+        assertEquals("Queue content", object1, o);
         assertEquals("Queue size", 0, q.size());
         assertTrue(t1 - t0 > 100);
 

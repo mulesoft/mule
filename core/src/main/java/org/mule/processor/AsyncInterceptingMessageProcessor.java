@@ -123,7 +123,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
             }
             else
             {
-                response = next.process(event);
+                response = processNext(event);
             }
             return response;
         }

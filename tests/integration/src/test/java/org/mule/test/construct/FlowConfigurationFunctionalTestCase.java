@@ -11,6 +11,7 @@
 package org.mule.test.construct;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
@@ -23,10 +24,13 @@ import org.mule.source.StartableCompositeMessageSource;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
+import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 {
@@ -146,6 +150,34 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertTrue(results.contains(orange));
     }
 
+    public void testSplitAggregateMapFlow() throws MuleException, Exception
+    {
+        Map map = new HashMap<String, Fruit>();
+        final Apple apple = new Apple();
+        final Banana banana = new Banana();
+        final Orange orange = new Orange();
+        map.put("apple", apple);
+        map.put("banana", banana);
+        map.put("orange", orange);
+
+        MuleEvent result = ((SimpleFlowConstruct) muleContext.getRegistry().lookupFlowConstruct("split-map")).process(getTestEvent(map));
+
+        assertNotNull(result);
+        assertTrue(result.getMessage() instanceof MuleMessageCollection);
+
+        final MuleMessageCollection coll = (MuleMessageCollection) result.getMessage();
+        assertEquals(3, coll.size());
+        final MuleMessage[] results = coll.getMessagesAsArray();
+
+        assertTrue(apple.isBitten());
+        assertTrue(banana.isBitten());
+        assertTrue(orange.isBitten());
+
+        assertNotNull(results[0].getProperty("key", PropertyScope.INVOCATION));
+        assertNotNull(results[1].getProperty("key", PropertyScope.INVOCATION));
+        assertNotNull(results[2].getProperty("key", PropertyScope.INVOCATION));
+    }
+    
     public void testSplitFilterAggregateFlow() throws MuleException, Exception
     {
         final Apple apple = new Apple();
@@ -365,7 +397,13 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         // ensure multiple arguments work
         muleContext.getClient().send("vm://invoke3-in", new DefaultMuleMessage("0", muleContext));
     }
-    
+
+    public void testInvoke4() throws MuleException, Exception
+    {
+        // ensure no arguments work
+        muleContext.getClient().send("vm://invoke4-in", new DefaultMuleMessage("0", muleContext));
+    }
+   
     public void testEnrichWithAttributes() throws MuleException, Exception
     {
         MuleMessage message = new DefaultMuleMessage("0", muleContext);
@@ -398,6 +436,11 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
     static class Pojo
     {
 
+        public void method()
+        {
+
+        }
+        
         public void method(Object arg1, Object arg2)
         {
 

@@ -16,21 +16,23 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.NamedObject;
+import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
-import org.mule.api.context.WorkManagerSource;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.FailedToQueueEventException;
 import org.mule.config.QueueProfile;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.management.stats.QueueStatistics;
 import org.mule.service.Pausable;
+import org.mule.service.Resumable;
 import org.mule.util.concurrent.WaitableBoolean;
 import org.mule.util.queue.Queue;
 import org.mule.util.queue.QueueSession;
@@ -45,53 +47,36 @@ import javax.resource.spi.work.WorkListener;
 
 /**
  * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to
- * schedule asynchronous processing of the next {@link MessageProcessor}. 
+ * schedule asynchronous processing of the next {@link MessageProcessor}.
  */
 public class SedaStageInterceptingMessageProcessor extends OptionalAsyncInterceptingMessageProcessor
-    implements WorkListener, Work, Lifecycle
+    implements WorkListener, Work, Lifecycle, Pausable, Resumable
 {
     protected static final String QUEUE_NAME_PREFIX = "seda.queue";
 
     protected QueueProfile queueProfile;
     protected int queueTimeout;
-    protected LifecycleState lifecycleState;
     protected QueueStatistics queueStatistics;
     protected MuleContext muleContext;
     protected String name;
-
     protected Queue queue;
-    private WaitableBoolean queueDraining = new WaitableBoolean(false);
+    private WaitableBoolean running = new WaitableBoolean(false);;
+    protected SedaStageLifecycleManager lifecycleManager;
 
     public SedaStageInterceptingMessageProcessor(String name,
                                                  QueueProfile queueProfile,
                                                  int queueTimeout,
-                                                 WorkManagerSource workManagerSource,
-                                                 LifecycleState lifecycleState,
+                                                 ThreadingProfile threadingProfile,
                                                  QueueStatistics queueStatistics,
                                                  MuleContext muleContext)
     {
-        super(workManagerSource);
+        super(threadingProfile, "seda." + name, muleContext.getConfiguration().getShutdownTimeout());
         this.name = name;
         this.queueProfile = queueProfile;
         this.queueTimeout = queueTimeout;
-        this.lifecycleState = lifecycleState;
         this.queueStatistics = queueStatistics;
         this.muleContext = muleContext;
-    }
-    
-    @Deprecated
-    public SedaStageInterceptingMessageProcessor(String name,
-                                                 QueueProfile queueProfile,
-                                                 int queueTimeout,
-                                                 WorkManagerSource workManagerSource,
-                                                 boolean doThreading,
-                                                 LifecycleState lifecycleState,
-                                                 QueueStatistics queueStatistics,
-                                                 MuleContext muleContext)
-    {
-        this(name, queueProfile, queueTimeout, workManagerSource, lifecycleState, queueStatistics,
-            muleContext);
-        this.doThreading = doThreading;
+        lifecycleManager = new SedaStageLifecycleManager(name, this);
     }
 
     @Override
@@ -144,10 +129,11 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
                 getStageDescription(), queueTimeout));
         }
 
-        MuleEvent event = (MuleEvent)queue.poll(queueTimeout);
-        //If the service has been paused why the poll was waiting for an event to arrive on the queue,
-        //we put the object back on the queue
-        if(event!=null && lifecycleState.isPhaseComplete(Pausable.PHASE_NAME))
+        MuleEvent event = (MuleEvent) queue.poll(queueTimeout);
+        // If the service has been paused why the poll was waiting for an event to
+        // arrive on the queue,
+        // we put the object back on the queue
+        if (event != null && lifecycleManager.isPhaseComplete(Pausable.PHASE_NAME))
         {
             queue.untake(event);
             return null;
@@ -192,22 +178,22 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
      */
     public void run()
     {
-        DefaultMuleEvent event = null; 
+        DefaultMuleEvent event = null;
         QueueSession queueSession = muleContext.getQueueManager().getQueueSession();
 
-        while (!lifecycleState.isStopped())
+        running.set(true);
+        while (!lifecycleManager.getState().isStopped())
         {
             try
             {
                 // Wait if the service is paused
-                if (lifecycleState.isPhaseComplete(Pausable.PHASE_NAME))
+                if (lifecycleManager.isPhaseComplete(Pausable.PHASE_NAME))
                 {
                     waitIfPaused();
 
                     // If service is resumed as part of stopping
-                    if (lifecycleState.isStopping())
+                    if (lifecycleManager.getState().isStopping())
                     {
-                        queueDraining.set(true);
                         if (!isQueuePersistent() && (queueSession != null && getQueueSize() > 0))
                         {
                             // Any messages in a non-persistent queue went paused
@@ -215,18 +201,16 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
                             logger.warn(CoreMessages.stopPausedSedaStageNonPeristentQueueMessageLoss(
                                 getQueueSize(), getQueueName()));
                         }
-                        queueDraining.set(false);
                         break;
                     }
                 }
 
                 // If we're doing a draining stop, read all events from the queue
                 // before stopping
-                if (lifecycleState.isStopping())
+                if (lifecycleManager.getState().isStopping())
                 {
                     if (isQueuePersistent() || queueSession == null || getQueueSize() <= 0)
                     {
-                        queueDraining.set(false);
                         break;
                     }
                 }
@@ -235,7 +219,6 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
             }
             catch (InterruptedException ie)
             {
-                queueDraining.set(false);
                 break;
             }
             catch (Exception e)
@@ -248,8 +231,7 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
                 else
                 {
                     exceptionListener.handleException(new MessagingException(
-                        CoreMessages.eventProcessingFailedFor(getStageDescription()),
-                        event, e));
+                        CoreMessages.eventProcessingFailedFor(getStageDescription()), event, e));
                 }
             }
 
@@ -284,6 +266,7 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
                 }
             }
         }
+        running.set(false);
     }
 
     /** Are the events in the SEDA queue persistent? */
@@ -325,74 +308,116 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
 
     protected void waitIfPaused() throws InterruptedException
     {
-        if (logger.isDebugEnabled() && lifecycleState.isPhaseComplete(Pausable.PHASE_NAME))
+        if (logger.isDebugEnabled() && lifecycleManager.isPhaseComplete(Pausable.PHASE_NAME))
         {
             logger.debug(getStageDescription() + " is paused. Polling halted until resumed is called");
         }
-        while (lifecycleState.isPhaseComplete(Pausable.PHASE_NAME) && !lifecycleState.isStopping())
+        while (lifecycleManager.isPhaseComplete(Pausable.PHASE_NAME)
+               && !lifecycleManager.getState().isStopping())
         {
-            Thread.sleep(500);
+            Thread.sleep(50);
         }
     }
 
     public void release()
     {
-        queueDraining.set(false);
+        running.set(false);
     }
 
     public void initialise() throws InitialisationException
     {
-        if (next == null)
+        lifecycleManager.fireInitialisePhase(new LifecycleCallback<SedaStageInterceptingMessageProcessor>()
         {
-            throw new IllegalStateException(
-                "Next message processor cannot be null with this InterceptingMessageProcessor");
-        }
-        // Setup event Queue
-        queueProfile.configureQueue(getQueueName(), muleContext.getQueueManager());
-        queue = muleContext.getQueueManager().getQueueSession().getQueue(getQueueName());
-        if (queue == null)
-        {
-            throw new InitialisationException(MessageFactory.createStaticMessage("Queue not created for "
-                                                                                 + getStageDescription()),
-                this);
-        }
+            public void onTransition(String phaseName, SedaStageInterceptingMessageProcessor object)
+                throws MuleException
+            {
+                if (next == null)
+                {
+                    throw new IllegalStateException(
+                        "Next message processor cannot be null with this InterceptingMessageProcessor");
+                }
+                // Setup event Queue
+                queueProfile.configureQueue(getQueueName(), muleContext.getQueueManager());
+                queue = muleContext.getQueueManager().getQueueSession().getQueue(getQueueName());
+                if (queue == null)
+                {
+                    throw new InitialisationException(
+                        MessageFactory.createStaticMessage("Queue not created for " + getStageDescription()),
+                        SedaStageInterceptingMessageProcessor.this);
+                }
+            }
+        });
     }
 
+    @Override
     public void start() throws MuleException
     {
-        if (queue == null)
+        lifecycleManager.fireStartPhase(new LifecycleCallback<SedaStageInterceptingMessageProcessor>()
         {
-            throw new IllegalStateException("Not initialised");
-        }
-        try
-        {
-            workManagerSource.getWorkManager().scheduleWork(this, WorkManager.INDEFINITE, null, this);
-        }
-        catch (WorkException e)
-        {
-            throw new LifecycleException(CoreMessages.failedToStart(getStageDescription()), e, this);
+            public void onTransition(String phaseName, SedaStageInterceptingMessageProcessor object)
+                throws MuleException
+            {
+                if (queue == null)
+                {
+                    throw new IllegalStateException("Not initialised");
+                }
+                SedaStageInterceptingMessageProcessor.super.start();
+                try
+                {
+                    workManagerSource.getWorkManager().scheduleWork(
+                        SedaStageInterceptingMessageProcessor.this, WorkManager.INDEFINITE, null,
+                        SedaStageInterceptingMessageProcessor.this);
+                }
+                catch (WorkException e)
+                {
+                    throw new LifecycleException(CoreMessages.failedToStart(getStageDescription()), e, this);
 
-        }
+                }
+            }
+        });
     }
 
+    @Override
     public void stop() throws MuleException
     {
-        if (queue != null && queue.size() > 0)
+        lifecycleManager.fireStopPhase(new LifecycleCallback<SedaStageInterceptingMessageProcessor>()
         {
-            try
+            public void onTransition(String phaseName, SedaStageInterceptingMessageProcessor object)
+                throws MuleException
             {
-                queueDraining.whenFalse(null);
+                try
+                {
+                    running.whenFalse(null);
+                }
+                catch (InterruptedException e)
+                {
+                    // we can ignore this
+                }
+                SedaStageInterceptingMessageProcessor.super.stop();
             }
-            catch (InterruptedException e)
-            {
-                // we can ignore this
-            }
-        }
+        });
     }
 
     public void dispose()
     {
-        queue = null;
+        lifecycleManager.fireDisposePhase(new LifecycleCallback<SedaStageInterceptingMessageProcessor>()
+        {
+            public void onTransition(String phaseName, SedaStageInterceptingMessageProcessor object)
+                throws MuleException
+            {
+                queue = null;
+            }
+        });
+    }
+
+    public void pause() throws MuleException
+    {
+        lifecycleManager.firePausePhase(new EmptyLifecycleCallback<SedaStageInterceptingMessageProcessor>());
+    }
+
+    public void resume() throws MuleException
+    {
+        lifecycleManager.fireResumePhase(new EmptyLifecycleCallback<SedaStageInterceptingMessageProcessor>());
     }
 
 }

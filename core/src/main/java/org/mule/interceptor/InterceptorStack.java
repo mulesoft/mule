@@ -60,6 +60,7 @@ public class InterceptorStack extends AbstractInterceptingMessageProcessor
     public void initialise() throws InitialisationException
     {
         DefaultMessageProcessorChainBuilder chainBuilder = new DefaultMessageProcessorChainBuilder();
+        chainBuilder.setName("interceptor stack");
         for (Interceptor interceptor : interceptors)
         {
             if (interceptor instanceof Initialisable)

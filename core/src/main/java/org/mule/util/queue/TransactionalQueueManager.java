@@ -296,6 +296,23 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         }
 
         @SuppressWarnings("unchecked")
+        public void untake(QueueInfo queue, Object item) throws InterruptedException
+        {
+            readOnly = false;
+            if (added == null)
+            {
+                added = new HashMap();
+            }
+            List queueAdded = (List) added.get(queue);
+            if (queueAdded == null)
+            {
+                queueAdded = new ArrayList();
+                added.put(queue, queueAdded);
+            }
+            queueAdded.add(item);
+        }
+        
+        @SuppressWarnings("unchecked")
         public Object poll(QueueInfo queue, long timeout) throws IOException, InterruptedException
         {
             readOnly = false;

@@ -17,6 +17,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.construct.SimpleFlowConstruct;
+import org.mule.context.notification.MessageProcessorNotification;
 
 import java.util.Arrays;
 import java.util.List;
@@ -66,7 +67,13 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
         MuleEvent resultEvent;
         for (MessageProcessor processor : processors)
         {
+            fireNotification(event.getFlowConstruct(), event, processor, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+
             resultEvent = processor.process(currentEvent);
+
+            fireNotification(event.getFlowConstruct(), resultEvent, processor,
+                MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE);
+
             if (resultEvent != null)
             {
                 currentEvent = resultEvent;
