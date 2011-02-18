@@ -343,4 +343,13 @@
         <logger level="ERROR" message="#[payload]"/>
     </flow>
 
+    <flow name="customRouter">
+        <vm:inbound-endpoint path="customRouter-in" exchange-pattern="request-response"/>
+        <custom-router class="org.mule.routing.outbound.ChainingRouter">
+            <append-string-transformer message="a" />
+            <append-string-transformer message="b" />
+            <append-string-transformer message="c" />
+        </custom-router>
+    </flow>
+
 </mule>

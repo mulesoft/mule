@@ -4567,7 +4567,18 @@
         </xsd:complexContent>
     </xsd:complexType>
     
-    
+    <xsd:element name="custom-router" substitutionGroup="abstract-routing-message-processor">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="baseMultipleRoutesRoutingMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="substitutableClass" use="required"/>
+                </xsd:extension>            
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
 
     <xsd:complexType name="selectiveOutboundRouterType">
         <xsd:complexContent>
