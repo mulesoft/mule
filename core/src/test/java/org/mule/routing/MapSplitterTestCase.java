@@ -1,3 +1,12 @@
+/*
+ * $Id$
+ * -------------------------------------------------------------------------------------
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ *
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
 
 package org.mule.routing;
 
@@ -14,10 +23,9 @@ import java.util.Map;
 
 public class MapSplitterTestCase extends AbstractMuleTestCase
 {
-
     private MapSplitter mapSplitter;
     private List<String> splitPayloads = new ArrayList<String>();
-    private List<String> splitKeyProperties = new ArrayList<String>();;
+    private List<String> splitKeyProperties = new ArrayList<String>();
 
     @Override
     protected void doSetUp() throws Exception
@@ -27,7 +35,6 @@ public class MapSplitterTestCase extends AbstractMuleTestCase
         mapSplitter.setMuleContext(muleContext);
         mapSplitter.setListener(new MessageProcessor()
         {
-
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 splitPayloads.add(event.getMessageAsString());
@@ -56,6 +63,5 @@ public class MapSplitterTestCase extends AbstractMuleTestCase
         assertEquals("1", splitKeyProperties.get(splitPayloads.indexOf("one")));
         assertEquals("2", splitKeyProperties.get(splitPayloads.indexOf("two")));
         assertEquals("3", splitKeyProperties.get(splitPayloads.indexOf("three")));
-
     }
 }
