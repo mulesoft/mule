@@ -19,7 +19,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.EndpointCache;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
@@ -27,25 +27,22 @@ import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.transport.ReceiveException;
+import org.mule.endpoint.SimpleEndpointCache;
 import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.session.DefaultMuleSession;
 
 import java.util.Map;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
-
 public class DefaultLocalMuleClient implements LocalMuleClient
-{
-
-    protected MuleContext muleContext;
-    private ConcurrentMap inboundEndpointCache = new ConcurrentHashMap();
-    private ConcurrentMap outboundEndpointCache = new ConcurrentHashMap();
-
+{    
+    protected final MuleContext muleContext;
+    private final EndpointCache endpointCache;
+    
     public DefaultLocalMuleClient(MuleContext muleContext)
     {
         this.muleContext = muleContext;
+        this.endpointCache = new SimpleEndpointCache(muleContext);
     }
 
     public MuleMessage process(OutboundEndpoint endpoint,
@@ -87,7 +84,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
     public MuleMessage send(String url, MuleMessage message) throws MuleException
     {
-        OutboundEndpoint endpoint = getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, null);
+        OutboundEndpoint endpoint = endpointCache.getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, null);
         return returnMessage(endpoint.process(createMuleEvent(message, endpoint)));
     }
 
@@ -100,19 +97,19 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
     public MuleMessage send(String url, MuleMessage message, long timeout) throws MuleException
     {
-        OutboundEndpoint endpoint = getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, timeout);
+        OutboundEndpoint endpoint = endpointCache.getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, timeout);
         return returnMessage(endpoint.process(createMuleEvent(message, endpoint)));
     }
 
     public void dispatch(String url, MuleMessage message) throws MuleException
     {
-        OutboundEndpoint endpoint = getOutboundEndpoint(url, MessageExchangePattern.ONE_WAY, null);
+        OutboundEndpoint endpoint = endpointCache.getOutboundEndpoint(url, MessageExchangePattern.ONE_WAY, null);
         endpoint.process(createMuleEvent(message, endpoint));
     }
 
     public MuleMessage request(String url, long timeout) throws MuleException
     {
-        InboundEndpoint endpoint = getInboundEndpoint(url, MessageExchangePattern.ONE_WAY);
+        InboundEndpoint endpoint = endpointCache.getInboundEndpoint(url, MessageExchangePattern.ONE_WAY);
         try
         {
             return endpoint.request(timeout);
@@ -134,7 +131,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
     public MuleMessage process(String uri, MessageExchangePattern mep, MuleMessage message)
         throws MuleException
     {
-        OutboundEndpoint endpoint = getOutboundEndpoint(uri, mep, null);
+        OutboundEndpoint endpoint = endpointCache.getOutboundEndpoint(uri, mep, null);
         return returnMessage(endpoint.process(createMuleEvent(message, endpoint)));
     }
 
@@ -156,51 +153,9 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         }
     }
 
-    protected OutboundEndpoint getOutboundEndpoint(String uri,
-                                                   MessageExchangePattern mep,
-                                                   Long responseTimeout) throws MuleException
+    public EndpointCache getEndpointCache()
     {
-        OutboundEndpoint endpoint = (OutboundEndpoint) outboundEndpointCache.get(uri + ":" + mep.toString()
-                                                                                 + ":" + responseTimeout);
-        if (endpoint == null)
-        {
-            EndpointBuilder endpointBuilder = muleContext.getRegistry()
-                .lookupEndpointFactory()
-                .getEndpointBuilder(uri);
-            endpointBuilder.setExchangePattern(mep);
-            if (responseTimeout != null && responseTimeout > 0)
-            {
-                endpointBuilder.setResponseTimeout(responseTimeout.intValue());
-            }
-            endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
-            OutboundEndpoint concurrentlyAddedEndpoint = (OutboundEndpoint) outboundEndpointCache.putIfAbsent(
-                uri + ":" + mep.toString() + ":" + responseTimeout, endpoint);
-            if (concurrentlyAddedEndpoint != null)
-            {
-                return concurrentlyAddedEndpoint;
-            }
-        }
-        return endpoint;
-    }
-
-    protected InboundEndpoint getInboundEndpoint(String uri, MessageExchangePattern mep) throws MuleException
-    {
-        InboundEndpoint endpoint = (InboundEndpoint) inboundEndpointCache.get(uri + ":" + mep.toString());
-        if (endpoint == null)
-        {
-            EndpointBuilder endpointBuilder = muleContext.getRegistry()
-                .lookupEndpointFactory()
-                .getEndpointBuilder(uri);
-            endpointBuilder.setExchangePattern(mep);
-            endpoint = muleContext.getEndpointFactory().getInboundEndpoint(endpointBuilder);
-            InboundEndpoint concurrentlyAddedEndpoint = (InboundEndpoint) inboundEndpointCache.putIfAbsent(
-                uri + ":" + mep.toString(), endpoint);
-            if (concurrentlyAddedEndpoint != null)
-            {
-                return concurrentlyAddedEndpoint;
-            }
-        }
-        return endpoint;
+        return endpointCache;
     }
 
     /**

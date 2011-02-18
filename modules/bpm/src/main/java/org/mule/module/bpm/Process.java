@@ -20,13 +20,14 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.EndpointCache;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.PropertyScope;
+import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transport.NullPayload;
@@ -270,15 +271,13 @@ public class Process implements Initialisable, Disposable, MessageService
         message.addProperties(messageProperties, PropertyScope.INBOUND);
         message.addProperties(messageProperties, PropertyScope.INVOCATION);
 
-        //TODO should probably cache this
-        EndpointBuilder endpointBuilder = muleContext.getEndpointFactory().getEndpointBuilder(endpoint);
-        endpointBuilder.setExchangePattern(exchangePattern);
-        OutboundEndpoint ep = endpointBuilder.buildOutboundEndpoint();
-       
+        // Use the endpoint cache from the LocalMuleClient to prevent memory leaks (see MULE-5422)
+        EndpointCache endpointCache = ((DefaultLocalMuleClient) muleContext.getClient()).getEndpointCache();
+        OutboundEndpoint ep = endpointCache.getOutboundEndpoint(endpoint, exchangePattern, null);
         DefaultMuleEvent event = new DefaultMuleEvent(message, ep, new DefaultMuleSession(flowConstruct, muleContext));
+        RequestContext.setEvent(event);
 
         // Set correlation properties in SESSION scope so that they get propagated to response messages.
-        RequestContext.setEvent(event);
         if (messageProperties.get(PROPERTY_PROCESS_TYPE) != null)
         {
             event.getMessage().setSessionProperty(PROPERTY_PROCESS_TYPE, messageProperties.get(PROPERTY_PROCESS_TYPE));
