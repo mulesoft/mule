@@ -20,6 +20,8 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
+        // Note that this file contains global attributes, which the configuration-building
+        // process will ignore (MULE-5375)
         return "encryption-test.xml";
     }
 
