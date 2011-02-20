@@ -133,7 +133,7 @@
         <xsd:attribute name="maxRedelivery" type="mule:substitutableInt">
             <xsd:annotation>
                 <xsd:documentation>
-                    The maximum number of times to try to redeliver a message.
+                    The maximum number of times to try to redeliver a message. Use -1 to accept messages with any redelivery count.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -147,7 +147,7 @@
         <xsd:attribute name="eagerConsumer" type="mule:substitutableBoolean">
             <xsd:annotation>
                 <xsd:documentation>
-                    Whether to create a consumer right when the connection is created instead of using lazy instantiation in the poll loop. 
+                    Whether to create a consumer right when the connection is created instead of using lazy instantiation in the poll loop.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
