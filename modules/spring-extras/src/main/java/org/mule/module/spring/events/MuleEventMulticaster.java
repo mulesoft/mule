@@ -59,6 +59,7 @@ import java.util.Set;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArraySet;
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -112,7 +113,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * &lt;/bean&gt;
  * <p/>
  * </code>
- * 
+ *
  * @see MuleEventListener
  * @see MuleSubscriptionEventListener
  * @see ApplicationEventMulticaster
@@ -203,7 +204,7 @@ public class MuleEventMulticaster
      * listener will be initialised with a threadpool. The configuration for the
      * threadpool can be set on this multicaster or inherited from the MuleManager
      * configuration, which is good for most cases.
-     * 
+     *
      * @param listener the ApplicationListener to register with this Multicaster
      * @see AsynchronousEventListener
      * @see ThreadingProfile
@@ -222,7 +223,7 @@ public class MuleEventMulticaster
 
     /**
      * Removes a listener from the multicaster
-     * 
+     *
      * @param listener the listener to remove
      */
     public void removeApplicationListener(ApplicationListener listener)
@@ -295,7 +296,7 @@ public class MuleEventMulticaster
      * and will be dispatched by Mule. If the event does have a source event attached
      * to it, it is assumed that the event was dispatched by Mule and will be
      * delivered to any listeners subscribed to the event.
-     * 
+     *
      * @param e the application event received by the context
      */
     public void multicastEvent(ApplicationEvent e)
@@ -410,7 +411,7 @@ public class MuleEventMulticaster
 
     /**
      * Matches a subscription to the current event endpointUri
-     * 
+     *
      * @param endpoint endpoint
      * @param subscriptions subscriptions
      * @return true if there's a match
@@ -449,7 +450,7 @@ public class MuleEventMulticaster
 
     /**
      * Determines whether events will be processed asynchronously
-     * 
+     *
      * @return tru if asynchronous. The default is false
      */
     public boolean isAsynchronous()
@@ -459,7 +460,7 @@ public class MuleEventMulticaster
 
     /**
      * Determines whether events will be processed asynchronously
-     * 
+     *
      * @param asynchronous true if aysnchronous
      */
     public void setAsynchronous(boolean asynchronous)
@@ -470,7 +471,7 @@ public class MuleEventMulticaster
     /**
      * This is the callback method used by Mule to give Mule events to this
      * Multicaster
-     * 
+     *
      * @param context the context received by Mule
      */
     public Object onCall(MuleEventContext context) throws TransformerException, MalformedEndpointException
@@ -482,7 +483,7 @@ public class MuleEventMulticaster
 
     /**
      * Will dispatch an application event through Mule
-     * 
+     *
      * @param applicationEvent the Spring event to be dispatched
      * @throws ApplicationEventException if the event cannot be dispatched i.e. if
      *             the underlying transport throws an exception
@@ -547,7 +548,7 @@ public class MuleEventMulticaster
 
     /**
      * Set the current Spring application context
-     * 
+     *
      * @param applicationContext application context
      * @throws BeansException
      */
@@ -744,7 +745,7 @@ public class MuleEventMulticaster
             {
                 String subscription = subscriptions[i];
 
-                EndpointFactory endpointFactory = muleContext.getRegistry().lookupEndpointFactory();
+                EndpointFactory endpointFactory = muleContext.getEndpointFactory();
                 EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(subscription);
                 endpointBuilder.setExchangePattern(MessageExchangePattern.fromSyncFlag(!asynchronous));
                 InboundEndpoint endpoint = endpointFactory.getInboundEndpoint(endpointBuilder);
@@ -777,7 +778,7 @@ public class MuleEventMulticaster
 
     /**
      * the type of filter used to filter subscriptions
-     * 
+     *
      * @return the class of the filter to use. The default is WildcardFilter
      * @see WildcardFilter
      */
@@ -788,7 +789,7 @@ public class MuleEventMulticaster
 
     /**
      * sets the type of filter used to filter subscriptions
-     * 
+     *
      * @param subscriptionFilter the class of the filter to use.
      */
     public void setSubscriptionFilter(Class subscriptionFilter)
@@ -802,7 +803,7 @@ public class MuleEventMulticaster
      * endpoints are ignored and the ones on the Mule Descriptor are used. These are
      * here for convenience, the event multicaster will use these to create a default
      * MuleDescriptor for itself at runtime
-     * 
+     *
      * @return endpoints List being listened on
      */
     public String[] getSubscriptions()
@@ -816,7 +817,7 @@ public class MuleEventMulticaster
      * endpoints are ignored and the ones on the Mule Descriptor are used. These are
      * here for convenience, the event multicaster will use these to create a default
      * MuleDescriptor for itself at runtime
-     * 
+     *
      * @param subscriptions a list of enpoints to listen on
      */
     public void setSubscriptions(String[] subscriptions)
@@ -842,7 +843,7 @@ public class MuleEventMulticaster
         {
             super();
         }
-        
+
         public void exceptionThrown(Exception e)
         {
             logger.error(e.getMessage(), e);

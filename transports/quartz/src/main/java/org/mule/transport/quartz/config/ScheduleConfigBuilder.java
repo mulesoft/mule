@@ -32,13 +32,14 @@ public class ScheduleConfigBuilder implements NamedObject
     {
         super();
         this.scheduleId = scheduleId;
-            endpointBuilder = muleContext.getRegistry().lookupEndpointFactory()
-                    .getEndpointBuilder("quartz://" + scheduleId);
-            endpointBuilder.setMuleContext(muleContext);
-            endpointBuilder.setName(scheduleId);
 
-            connector = new QuartzConnector(muleContext);
+        endpointBuilder = muleContext.getEndpointFactory().getEndpointBuilder("quartz://" + scheduleId);
+        endpointBuilder.setMuleContext(muleContext);
+        endpointBuilder.setName(scheduleId);
+
+        connector = new QuartzConnector(muleContext);
         connector.setName(scheduleId);
+
         endpointBuilder.setConnector(connector);
         endpointBuilder.setExchangePattern(MessageExchangePattern.ONE_WAY);
     }

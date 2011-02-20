@@ -153,6 +153,50 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         }
     }
 
+    protected OutboundEndpoint getOutboundEndpoint(String uri,
+                                                   MessageExchangePattern mep,
+                                                   Long responseTimeout) throws MuleException
+    {
+        OutboundEndpoint endpoint = (OutboundEndpoint) outboundEndpointCache.get(uri + ":" + mep.toString()
+                                                                                 + ":" + responseTimeout);
+        if (endpoint == null)
+        {
+            EndpointBuilder endpointBuilder = muleContext.getEndpointFactory().getEndpointBuilder(uri);
+            endpointBuilder.setExchangePattern(mep);
+            if (responseTimeout != null && responseTimeout > 0)
+            {
+                endpointBuilder.setResponseTimeout(responseTimeout.intValue());
+            }
+            endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
+            OutboundEndpoint concurrentlyAddedEndpoint = (OutboundEndpoint) outboundEndpointCache.putIfAbsent(
+                uri + ":" + mep.toString() + ":" + responseTimeout, endpoint);
+            if (concurrentlyAddedEndpoint != null)
+            {
+                return concurrentlyAddedEndpoint;
+            }
+        }
+        return endpoint;
+    }
+
+    protected InboundEndpoint getInboundEndpoint(String uri, MessageExchangePattern mep) throws MuleException
+    {
+        InboundEndpoint endpoint = (InboundEndpoint) inboundEndpointCache.get(uri + ":" + mep.toString());
+        if (endpoint == null)
+        {
+            EndpointBuilder endpointBuilder = muleContext.getEndpointFactory().getEndpointBuilder(uri);
+            endpointBuilder.setExchangePattern(mep);
+
+            endpoint = muleContext.getEndpointFactory().getInboundEndpoint(endpointBuilder);
+            InboundEndpoint concurrentlyAddedEndpoint = (InboundEndpoint) inboundEndpointCache.putIfAbsent(
+                uri + ":" + mep.toString(), endpoint);
+            if (concurrentlyAddedEndpoint != null)
+            {
+                return concurrentlyAddedEndpoint;
+            }
+        }
+        return endpoint;
+    }
+
     /**
      * Placeholder class which makes the default exception handler available.
      */

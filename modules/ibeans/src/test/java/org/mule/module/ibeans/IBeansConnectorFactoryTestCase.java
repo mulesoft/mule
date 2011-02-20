@@ -16,20 +16,16 @@ import org.mule.transport.ibean.IBeansConnector;
 
 public class IBeansConnectorFactoryTestCase extends AbstractMuleTestCase
 {
-    /* For general guidelines on writing transports see
-       http://www.mulesoft.org/documentation/display/MULE3USER/Creating+Transports */
-
     public void testCreateFromFactory() throws Exception
     {
-        InboundEndpoint endpoint = muleContext.getRegistry()
-                .lookupEndpointFactory().getInboundEndpoint(getEndpointURI());
+        InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(getEndpointURI());
         assertNotNull(endpoint);
         assertNotNull(endpoint.getConnector());
         assertTrue(endpoint.getConnector() instanceof IBeansConnector);
         assertEquals(getEndpointURI(), endpoint.getEndpointURI().toString());
     }
 
-    public String getEndpointURI() 
+    public String getEndpointURI()
     {
         return "ibean://hostip.getHostInfo";
     }

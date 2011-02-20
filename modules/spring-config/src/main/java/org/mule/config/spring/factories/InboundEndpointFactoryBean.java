@@ -32,15 +32,16 @@ public class InboundEndpointFactoryBean extends AbstractEndpointFactoryBean
     {
         super();
     }
-    
-    public Class getObjectType()
+
+    public Class<?> getObjectType()
     {
         return InboundEndpoint.class;
     }
 
+    @Override
     public Object doGetObject() throws Exception
     {
-        EndpointFactory ef = muleContext.getRegistry().lookupEndpointFactory();
+        EndpointFactory ef = muleContext.getEndpointFactory();
         if (ef != null)
         {
             return ef.getInboundEndpoint(this);

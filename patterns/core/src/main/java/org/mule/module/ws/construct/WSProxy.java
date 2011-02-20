@@ -239,7 +239,7 @@ public class WSProxy extends AbstractFlowConstruct
         /**
          * Instantiates a request processor that returns a static WSDL contents when
          * the proxy receives a WSDL request.
-         * 
+         *
          * @param wsdlContents the WSDL contents to use.
          * @throws FlowConstructInvalidException
          */
@@ -279,7 +279,7 @@ public class WSProxy extends AbstractFlowConstruct
         /**
          * Instantiates a request processor that fetches and rewrites addresses of a
          * remote WSDL when the proxy receives a WSDL request.
-         * 
+         *
          * @param wsdlUri the URI to fetch the WSDL from.
          * @throws FlowConstructInvalidException
          */
@@ -307,7 +307,7 @@ public class WSProxy extends AbstractFlowConstruct
         /**
          * Instantiates a request processor that fetches and rewrites addresses of a
          * remote WSDL when the proxy receives a WSDL request.
-         * 
+         *
          * @param outboundEndpoint the endpoint to fetch the WSDL from.
          * @throws FlowConstructInvalidException
          */
@@ -365,9 +365,8 @@ public class WSProxy extends AbstractFlowConstruct
             String wsdlString;
 
             final MuleContext muleContext = event.getMuleContext();
-            final InboundEndpoint webServiceEndpoint = muleContext.getRegistry()
-                .lookupEndpointFactory()
-                .getInboundEndpoint(wsdlAddress);
+            final InboundEndpoint webServiceEndpoint =
+                muleContext.getEndpointFactory().getInboundEndpoint(wsdlAddress);
 
             if (logger.isDebugEnabled())
             {

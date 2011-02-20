@@ -22,7 +22,7 @@ public class RssEndpointTestCase extends AbstractMuleTestCase
     public void testHttpInboundEndpointCreation() throws Exception
     {
         String uri = "rss:http://blog.com/rss";
-        EndpointFactory factory = muleContext.getRegistry().lookupEndpointFactory();
+        EndpointFactory factory = muleContext.getEndpointFactory();
         InboundEndpoint in = factory.getEndpointBuilder(uri).buildInboundEndpoint();
         assertNotNull(in);
         assertEquals("rss:http", in.getEndpointURI().getFullScheme());
@@ -34,7 +34,7 @@ public class RssEndpointTestCase extends AbstractMuleTestCase
     public void testHttpOutboundEndpointCreation() throws Exception
     {
         String uri = "rss:http://blog.com/rss";
-        EndpointFactory factory = muleContext.getRegistry().lookupEndpointFactory();
+        EndpointFactory factory = muleContext.getEndpointFactory();
         try
         {
             factory.getEndpointBuilder(uri).buildOutboundEndpoint();
@@ -49,7 +49,7 @@ public class RssEndpointTestCase extends AbstractMuleTestCase
     public void testFileInboundEndpointCreation() throws Exception
     {
         String uri = "rss:file://./src/foo";
-        EndpointFactory factory = muleContext.getRegistry().lookupEndpointFactory();
+        EndpointFactory factory = muleContext.getEndpointFactory();
         InboundEndpoint in = factory.getEndpointBuilder(uri).buildInboundEndpoint();
         assertNotNull(in);
         assertEquals("rss:file", in.getEndpointURI().getFullScheme());
@@ -61,7 +61,7 @@ public class RssEndpointTestCase extends AbstractMuleTestCase
     public void testFileOutboundEndpointCreation() throws Exception
     {
         String uri = "rss:file://./src/foo";
-        EndpointFactory factory = muleContext.getRegistry().lookupEndpointFactory();
+        EndpointFactory factory = muleContext.getEndpointFactory();
         try
         {
             factory.getEndpointBuilder(uri).buildOutboundEndpoint();
@@ -76,7 +76,7 @@ public class RssEndpointTestCase extends AbstractMuleTestCase
     public void testXXInboundEndpointCreation() throws Exception
     {
         String uri = "rss:xxx://./src/foo";
-        EndpointFactory factory = muleContext.getRegistry().lookupEndpointFactory();
+        EndpointFactory factory = muleContext.getEndpointFactory();
         try
         {
             factory.getEndpointBuilder(uri).buildInboundEndpoint();

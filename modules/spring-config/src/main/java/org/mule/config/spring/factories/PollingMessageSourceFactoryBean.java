@@ -24,12 +24,15 @@ public class PollingMessageSourceFactoryBean extends InboundEndpointFactoryBean
     protected MessageProcessor messageProcessor;
     protected Long frequency;
 
+    @Override
     public Object doGetObject() throws Exception
     {
         uriBuilder = new URIBuilder("polling://" + hashCode(), muleContext);
+
         properties.put(MessageProcessorPollingMessageReceiver.SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME, messageProcessor);
         properties.put(AbstractConnector.PROPERTY_POLLING_FREQUENCY, frequency);
-        EndpointFactory ef = muleContext.getRegistry().lookupEndpointFactory();
+
+        EndpointFactory ef = muleContext.getEndpointFactory();
         if (ef != null)
         {
             return ef.getInboundEndpoint(this);

@@ -70,7 +70,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
 
     /** This is an internal semaphore, not a property */
     private boolean lazyInit = true;
-    
+
     protected static transient Log logger = LogFactory.getLog(WSProxyService.class);
 
     /**
@@ -112,7 +112,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
         {
             initialise();
         }
-        
+
         // retrieve the message
         MuleMessage message = eventContext.getMessage();
 
@@ -135,9 +135,8 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
                 return wsdlFileContents;
             }
             MuleContext muleContext = eventContext.getMuleContext();
-            InboundEndpoint webServiceEndpoint = muleContext.getRegistry()
-                .lookupEndpointFactory()
-                .getInboundEndpoint(this.wsdlEndpoint);
+            InboundEndpoint webServiceEndpoint =
+                muleContext.getEndpointFactory().getInboundEndpoint(this.wsdlEndpoint);
 
             MuleMessage replyWSDL = eventContext.requestEvent(webServiceEndpoint, eventContext.getTimeout());
 
@@ -146,13 +145,13 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
             // create a new mule message with the new WSDL
             String realWSDLURI = wsdlEndpoint.split("\\?")[0];
             String proxyWSDLURI = eventContext.getEndpointURI().toString();
-            
+
             wsdlString = wsdlString.replaceAll(realWSDLURI, proxyWSDLURI);
             if (wsdlString.indexOf("localhost") > -1)
             {
                 wsdlString = wsdlString.replaceAll("localhost", InetAddress.getLocalHost().getHostName());
             }
-            
+
             DefaultMuleMessage modifiedWsdl = new DefaultMuleMessage(wsdlString, muleContext);
             logger.debug("WSDL retrieved successfully");
 
@@ -197,21 +196,21 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
             }
             ImmutableEndpoint endpoint = (ImmutableEndpoint) router.getRoutes().get(0);
             this.urlWebservice = endpoint.getEndpointURI().getAddress();
-    
+
             // remove any params from the url
             int paramIndex;
             if ((paramIndex = this.urlWebservice.indexOf("?")) != -1)
             {
                 this.urlWebservice = this.urlWebservice.substring(0, paramIndex);
             }
-    
+
             // if the wsdlFile property is not empty, the onCall() will use this file for WSDL requests
             if (StringUtils.isNotBlank(this.wsdlFile))
             {
                 try
                 {
                     this.wsdlFileContents = IOUtils.getResourceAsString(this.wsdlFile, getClass());
-    
+
                     if (StringUtils.isNotBlank(this.wsdlFileContents))
                     {
                         this.useFile = true;
@@ -223,7 +222,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
                     throw new InitialisationException(CoreMessages.failedToLoad(this.wsdlFile), this);
                 }
             }
-    
+
             if (!this.useFile)
             {
                 // if no wsdl property is set, create one which will include the original
@@ -252,7 +251,7 @@ public class WSProxyService implements Callable, ServiceAware, Initialisable
         else
         {
             // We're already in lazy init and the service is still not set, so throw an exception.
-            throw new InitialisationException(MessageFactory.createStaticMessage("Service not set, this service has not been initialized properly."), this);                        
+            throw new InitialisationException(MessageFactory.createStaticMessage("Service not set, this service has not been initialized properly."), this);
         }
     }
 }
