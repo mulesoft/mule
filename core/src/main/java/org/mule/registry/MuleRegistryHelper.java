@@ -291,7 +291,7 @@ public class MuleRegistryHelper implements MuleRegistry
         }
 
         results = new ArrayList<Transformer>(2);
-        Collection<Transformer> transformers = getTransformers();
+        Collection<Transformer> transformers = registry.lookupObjects(Transformer.class);
         for (Transformer t : transformers)
         {
             // The transformer must have the DiscoveryTransformer interface if we are
@@ -657,7 +657,7 @@ public class MuleRegistryHelper implements MuleRegistry
 
     public Object applyLifecycle(Object object, String phase) throws MuleException
     {
-        return registry.getTransientRegistry().applyLifecycle(object, phase);        
+        return registry.getTransientRegistry().applyLifecycle(object, phase);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -693,7 +693,7 @@ public class MuleRegistryHelper implements MuleRegistry
     {
         return registry.lookupObjectsForLifecycle(type);
     }
-    
+
     @SuppressWarnings("unchecked")
     public <T> T get(String key)
     {
@@ -793,7 +793,7 @@ public class MuleRegistryHelper implements MuleRegistry
     {
         return false;
     }
-    
+
     private String getDataTypeSourceResultPairHash(DataType<?> source, DataType<?> result)
     {
         return source.getClass().getName() + source.hashCode() + ":" + result.getClass().getName()
