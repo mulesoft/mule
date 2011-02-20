@@ -153,51 +153,6 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         }
     }
 
-    protected OutboundEndpoint getOutboundEndpoint(String uri,
-                                                   MessageExchangePattern mep,
-                                                   Long responseTimeout) throws MuleException
-    {
-        String key = uri + ":" + mep.toString() + ":" + responseTimeout;
-        OutboundEndpoint endpoint = (OutboundEndpoint) outboundEndpointCache.get(key);
-        if (endpoint == null)
-        {
-            EndpointBuilder endpointBuilder = muleContext.getEndpointFactory().getEndpointBuilder(uri);
-            endpointBuilder.setExchangePattern(mep);
-            if (responseTimeout != null && responseTimeout > 0)
-            {
-                endpointBuilder.setResponseTimeout(responseTimeout.intValue());
-            }
-            endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
-            OutboundEndpoint concurrentlyAddedEndpoint =
-                (OutboundEndpoint) outboundEndpointCache.putIfAbsent(key, endpoint);
-            if (concurrentlyAddedEndpoint != null)
-            {
-                return concurrentlyAddedEndpoint;
-            }
-        }
-        return endpoint;
-    }
-
-    protected InboundEndpoint getInboundEndpoint(String uri, MessageExchangePattern mep) throws MuleException
-    {
-        String key = uri + ":" + mep.name();
-        InboundEndpoint endpoint = (InboundEndpoint) inboundEndpointCache.get(key);
-        if (endpoint == null)
-        {
-            EndpointBuilder endpointBuilder = muleContext.getEndpointFactory().getEndpointBuilder(uri);
-            endpointBuilder.setExchangePattern(mep);
-
-            endpoint = muleContext.getEndpointFactory().getInboundEndpoint(endpointBuilder);
-            InboundEndpoint concurrentlyAddedEndpoint =
-                (InboundEndpoint) inboundEndpointCache.putIfAbsent(key, endpoint);
-            if (concurrentlyAddedEndpoint != null)
-            {
-                return concurrentlyAddedEndpoint;
-            }
-        }
-        return endpoint;
-    }
-
     /**
      * Placeholder class which makes the default exception handler available.
      */
