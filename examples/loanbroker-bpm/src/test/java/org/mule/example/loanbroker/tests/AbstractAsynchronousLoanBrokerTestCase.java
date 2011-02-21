@@ -67,6 +67,7 @@ public abstract class AbstractAsynchronousLoanBrokerTestCase extends AbstractLoa
         assertTrue("Result should be LoanQuote but is " + result.getPayload().getClass().getName(),
                 result.getPayload() instanceof LoanQuote);
         LoanQuote quote = (LoanQuote) result.getPayload();
+        assertNotNull(quote.getBankName());
         assertTrue(quote.getInterestRate() > 0);
     }
 

@@ -67,6 +67,7 @@ public class JBpmFunctionalTestCase extends AbstractAsynchronousLoanBrokerTestCa
                     result.getPayload() instanceof LoanQuote);
             LoanQuote quote = (LoanQuote) result.getPayload();
             assertTrue(quote.getInterestRate() > 0);
+            assertNotNull(quote.getBankName());
         }
     }
 }
