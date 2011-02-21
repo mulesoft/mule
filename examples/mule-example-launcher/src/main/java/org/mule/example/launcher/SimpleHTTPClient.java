@@ -125,8 +125,6 @@ public class SimpleHTTPClient
 		try
 		{
 		    // Construct data
-		    //String data = URLEncoder.encode("key1", "UTF-8") + "=" + URLEncoder.encode("value1", "UTF-8");
-		    //data += "&" + URLEncoder.encode("key2", "UTF-8") + "=" + URLEncoder.encode("value2", "UTF-8");
 			String data = "";
 			
 		    // Send data
