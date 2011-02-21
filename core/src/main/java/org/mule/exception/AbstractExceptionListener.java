@@ -12,38 +12,26 @@ package org.mule.exception;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
-import org.mule.RequestContext;
-import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.routing.OutboundRouter;
-import org.mule.api.service.Service;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
-import org.mule.api.transport.DispatchException;
 import org.mule.api.util.StreamCloserService;
 import org.mule.config.ExceptionHelper;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.message.ExceptionMessage;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.outbound.MulticastingRouter;
-import org.mule.session.DefaultMuleSession;
 import org.mule.transaction.TransactionCoordination;
-import org.mule.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -54,7 +42,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * <code>AbstractExceptionListener</code> is a base implementation that custom
  * Exception Listeners can override. It provides template methods for handling the
- * for base types of exceptions plus allows multimple targets to be associated with
+ * for base types of exceptions plus allows multiple targets to be associated with
  * this exception listener and provides an implementation for dispatching exception
  * events from this Listener.
  */
@@ -208,128 +196,44 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
      * @param t the exception thrown. This will be sent with the ExceptionMessage
      * @see ExceptionMessage
      */
-    protected void routeException(MuleMessage message, MessageProcessor target, Throwable t)
+    protected void routeException(MuleEvent event, MessageProcessor target, Throwable t)
     {
-        List endpoints = getMessageProcessors(t);
-        if (CollectionUtils.isNotEmpty(endpoints))
+        if (!messageProcessors.isEmpty())
         {
             try
             {
-                logger.error("Message being processed is: " + (message == null ? "null" : message.toString()));
-                MuleEventContext ctx = RequestContext.getEventContext();
+                logger.error("Message being processed is: " + (event.getMessage().getPayloadAsString()));
                 String component = "Unknown";
-                EndpointURI endpointUri = null;
-                if (ctx != null)
+                if (event.getFlowConstruct() != null)
                 {
-                    if (ctx.getFlowConstruct() != null)
-                    {
-                        component = ctx.getFlowConstruct().getName();
-                    }
-                    endpointUri = ctx.getEndpointURI();
+                    component = event.getFlowConstruct().getName();
                 }
-                else if (target instanceof ImmutableEndpoint)
-                {
-                    endpointUri = ((ImmutableEndpoint)target).getEndpointURI();
-                }
-                
-                ExceptionMessage msg = new ExceptionMessage(message.getPayload(), t, component, endpointUri);
-                MuleMessage exceptionMessage;
-                if (ctx == null)
-                {
-                    exceptionMessage = new DefaultMuleMessage(msg, muleContext);
-                }
-                else
-                {
-                    exceptionMessage = new DefaultMuleMessage(msg, ctx.getMessage(), muleContext);
-                }
+                EndpointURI endpointUri = event.getEndpoint().getEndpointURI();
 
-                if (ctx != null && ctx.getFlowConstruct() != null && ctx.getFlowConstruct() instanceof Service)
+                // Create an ExceptionMessage which contains the original payload, the exception, and some additional context info.
+                ExceptionMessage msg = new ExceptionMessage(event, t, component, endpointUri);
+                MuleMessage exceptionMessage = new DefaultMuleMessage(msg, event.getMessage(), muleContext);
+
+                // Create an outbound router with all endpoints configured on the exception strategy
+                MulticastingRouter router = new MulticastingRouter()
                 {
-                    OutboundRouter router = createOutboundRouter();
-                    router.process(new DefaultMuleEvent(exceptionMessage, RequestContext.getEvent()));
-                }
-                else
-                {
-                    // As the service is not available an outbound router cannot be
-                    // used to route the exception message.
-                    customRouteExceptionMessage(exceptionMessage);
-                }
+                    @Override
+                    protected void setMessageProperties(FlowConstruct session, MuleMessage message, MessageProcessor target)
+                    {
+                        // No reply-to or correlation for exception targets, at least for now anyway.
+                    }
+                };
+                router.setRoutes(getMessageProcessors());
+                router.setMuleContext(muleContext);
+                
+                // Route the ExceptionMessage to the new router
+                router.process(new DefaultMuleEvent(exceptionMessage, event));
             }
             catch (Exception e)
             {
-                logFatal(message, e);
-                closeStream(message);
+                logFatal(event, e);
             }
         }
-        else
-        {
-            handleTransaction(t);
-            closeStream(message);
-        }
-    }
-
-    private void customRouteExceptionMessage(MuleMessage exceptionMessage)
-        throws MessagingException, MuleException, DispatchException
-    {
-        // This is required because we don't always have the service available which
-        // is required to use an outbound route. This approach doesn't
-        // support everything but rather is an intermediate improvement.
-        int numProcessors = messageProcessors.size();
-        for (int i = 0; i < numProcessors; i++)
-        {
-            MessageProcessor processor = messageProcessors.get(i);
-            if (numProcessors > 1 && ((DefaultMuleMessage) exceptionMessage).isConsumable())
-            {
-                throw new MessagingException(
-                    CoreMessages.cannotCopyStreamPayload(exceptionMessage.getPayload().getClass().getName()),
-                    exceptionMessage);
-            }
-
-            MuleMessage clonedMessage = new DefaultMuleMessage(exceptionMessage.getPayload(),
-                exceptionMessage, muleContext);
-            MuleEvent exceptionEvent = null;
-            if (processor instanceof OutboundEndpoint)
-            {
-                exceptionEvent = new DefaultMuleEvent(clonedMessage, (OutboundEndpoint) processor,
-                    new DefaultMuleSession(muleContext));
-            }
-            else
-            {
-                exceptionEvent = new DefaultMuleEvent(clonedMessage, RequestContext.getEvent().getEndpoint(),
-                    new DefaultMuleSession(muleContext));
-            }
-            exceptionEvent = RequestContext.setEvent(exceptionEvent);
-
-            processor.process(exceptionEvent);
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("routed Exception message via " + processor);
-            }
-        }
-    }
-
-    protected OutboundRouter createOutboundRouter() throws MuleException
-    {
-        // Use an instance of OutboundPassThroughRouter but override creation of
-        // createTransactionTemplate to use a custom ExceptionListener so that
-        // exception handling will not loop forever.
-        // We cannot use PassthroughRouter because multiple targets are supported
-        // on exception strategies.
-        MulticastingRouter router = new MulticastingRouter()
-        {
-            @Override
-            protected void setMessageProperties(FlowConstruct session,
-                                                MuleMessage message,
-                                                MessageProcessor target)
-            {
-                // No reply-to or correlation for exception targets, at least for
-                // now anyway.
-            }
-        };
-        router.setRoutes(new ArrayList<MessageProcessor>(getMessageProcessors()));
-        router.setMuleContext(muleContext);
-        return router;
     }
 
     protected void closeStream(MuleMessage message)
@@ -343,28 +247,6 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         {
             ((StreamCloserService) muleContext.getRegistry().lookupObject(
                     MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE)).closeStream(message.getPayload());
-        }
-    }
-
-    /**
-     * Returns an endpoint for the given exception. ExceptionListeners can have
-     * multiple targets registered on them. This methods allows custom
-     * implementations to control which endpoint is used based on the exception
-     * thrown. This implementation simply returns the first endpoint in the list.
-     * 
-     * @param t the exception thrown
-     * @return The endpoint used to dispatch an exception message on or null if there
-     *         are no targets registered
-     */
-    protected List<MessageProcessor> getMessageProcessors(Throwable t)
-    {
-        if (!messageProcessors.isEmpty())
-        {
-            return messageProcessors;
-        }
-        else
-        {
-            return null;
         }
     }
 
@@ -394,11 +276,11 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
      * @param message The MuleMessage currently being processed
      * @param t the fatal exception to log
      */
-    protected void logFatal(MuleMessage message, Throwable t)
+    protected void logFatal(MuleEvent event, Throwable t)
     {
         logger.fatal(
             "Failed to dispatch message to error queue after it failed to process.  This may cause message loss."
-                            + (message == null ? "" : "Logging Message here: \n" + message.toString()), t);
+                            + (event.getMessage() == null ? "" : "Logging Message here: \n" + event.getMessage().toString()), t);
     }
 
     public boolean isInitialised()

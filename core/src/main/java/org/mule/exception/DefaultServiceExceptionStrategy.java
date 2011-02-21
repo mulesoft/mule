@@ -10,10 +10,9 @@
 
 package org.mule.exception;
 
-import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ExceptionHelper;
@@ -46,38 +45,38 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
     }
 
     @Override
-    protected void defaultHandler(Throwable t)
+    protected void doHandleException(Exception e, MuleEvent event)
     {
-        FlowConstructStatistics statistics = getFlowConstructStatistics();
+        FlowConstructStatistics statistics = getFlowConstructStatistics(event.getFlowConstruct());
 
         if (statistics != null && statistics.isEnabled())
         {
             statistics.incExecutionError();
         }
 
-        super.defaultHandler(DefaultMuleConfiguration.fullStackTraces ? t : ExceptionHelper.sanitize(t));
+        super.doHandleException(DefaultMuleConfiguration.fullStackTraces ? e : (Exception) ExceptionHelper.sanitize(e), event);
     }
 
     @Override
-    protected void logFatal(MuleMessage message, Throwable t)
+    protected void logFatal(MuleEvent event, Throwable t)
     {
-        FlowConstructStatistics statistics = getFlowConstructStatistics();
+        FlowConstructStatistics statistics = getFlowConstructStatistics(event.getFlowConstruct());
         if (statistics != null && statistics.isEnabled())
         {
             statistics.incFatalError();
         }
 
-        super.logFatal(message, t);
+        super.logFatal(event, t);
     }
 
     @Override
-    protected void routeException(MuleMessage message, MessageProcessor target, Throwable t)
+    protected void routeException(MuleEvent event, MessageProcessor target, Throwable t)
     {
-        super.routeException(message, target, t);
-        List<MessageProcessor> processors = getMessageProcessors(t);
-        if (CollectionUtils.isNotEmpty(processors) && getFlowConstructStatistics() instanceof ServiceStatistics)
+        super.routeException(event, target, t);
+        List<MessageProcessor> processors = getMessageProcessors();
+        if (CollectionUtils.isNotEmpty(processors) && getFlowConstructStatistics(event.getFlowConstruct()) instanceof ServiceStatistics)
         {
-            ServiceStatistics statistics = getServiceStatistics();
+            ServiceStatistics statistics = getServiceStatistics(event.getFlowConstruct());
             if (statistics.isEnabled())
             {
                 for (MessageProcessor endpoint : processors)
@@ -88,19 +87,11 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
         }
     }
 
-    protected FlowConstructStatistics getFlowConstructStatistics()
+    protected FlowConstructStatistics getFlowConstructStatistics(FlowConstruct flowConstruct)
     {
-        MuleEvent event = RequestContext.getEvent();
-        if (event == null)
+        if (flowConstruct != null )
         {
-            // very bad should not happen
-            logger.fatal("The Default Service Exception Strategy has been invoked but there is no current event on the context");
-            //logger.fatal("The error is: " + t.getMessage(), t);
-            return null;
-        }
-        else if(event.getFlowConstruct()!= null )
-        {
-            return event.getFlowConstruct().getStatistics();
+            return flowConstruct.getStatistics();
         }
         else
         {
@@ -110,9 +101,9 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
         }
     }
 
-    protected ServiceStatistics getServiceStatistics()
+    protected ServiceStatistics getServiceStatistics(FlowConstruct flowConstruct)
     {
-        FlowConstructStatistics stats = getFlowConstructStatistics();
+        FlowConstructStatistics stats = getFlowConstructStatistics(flowConstruct);
         if (!(stats instanceof ServiceStatistics))
         {
             //this should never happen, but JIC

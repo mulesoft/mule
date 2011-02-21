@@ -173,7 +173,6 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
     /**
      * {@inheritDoc}
      */
-    @Override
     public void handleMessagingException(MuleMessage message, Throwable t)
     {
         defaultHandler(message, t);
@@ -189,7 +188,6 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
     /**
      * {@inheritDoc}
      */
-    @Override
     public void handleLifecycleException(Object component, Throwable t)
     {
         logger.error("The object that failed is: \n" + ObjectUtils.toString(component, "null"));
@@ -199,7 +197,6 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
     /**
      * {@inheritDoc}
      */
-    @Override
     public void handleStandardException(Throwable t)
     {
         handleTransaction(t);
@@ -267,7 +264,7 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
         }
         catch (MuleException e)
         {
-            logFatal(messageCopy, e);
+            logFatal(exceptionEvent, e);
         }
     }
 

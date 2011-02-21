@@ -10,19 +10,15 @@
 
 package org.mule.exception;
 
-import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
-import org.mule.api.MessagingException;
+import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.exception.MessagingExceptionHandler;
-import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.NullPayload;
-import org.mule.util.ObjectUtils;
 
 /**
  * <code>DefaultExceptionStrategy</code> provides a default exception handling
@@ -42,98 +38,39 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
         }
 
         logException(e);
+        doHandleException(e, event);
         handleTransaction(e);
+        closeStream(event.getMessage());
 
-        Throwable t = getExceptionType(e, RoutingException.class);
-        if (t != null)
-        {
-            RoutingException re = (RoutingException) t;
-            handleRoutingException(re.getMuleMessage(), re.getRoute(), e);
-
-            event.getMessage().setPayload(NullPayload.getInstance());
-            event.getMessage().setExceptionPayload(new DefaultExceptionPayload(e));
-            return event;
-        }
-
-        t = getExceptionType(e, MessagingException.class);
-        if (t != null)
-        {
-            MessagingException me = (MessagingException) t;
-            handleMessagingException(me.getMuleMessage(), e);
-
-            event.getMessage().setPayload(NullPayload.getInstance());
-            event.getMessage().setExceptionPayload(new DefaultExceptionPayload(e));
-            return event;
-        }
-
-        t = getExceptionType(e, LifecycleException.class);
-        if (t != null)
-        {
-            LifecycleException le = (LifecycleException) t;
-            handleLifecycleException(le.getComponent(), e);
-            event.getMessage().setPayload(NullPayload.getInstance());
-            event.getMessage().setExceptionPayload(new DefaultExceptionPayload(e));
-            return event;
-        }
-
-        handleStandardException(e);
         event.getMessage().setPayload(NullPayload.getInstance());
-        event.getMessage().setExceptionPayload(new DefaultExceptionPayload(e));
-        return event;
-    }
-
-    public void handleMessagingException(MuleMessage message, Throwable t)
-    {
-        defaultHandler(t);
-        routeException(messageFromContextIfAvailable(message), null, t);
-    }
-
-    public void handleRoutingException(MuleMessage message, MessageProcessor target, Throwable t)
-    {
-        defaultHandler(t);
-        routeException(messageFromContextIfAvailable(message), target, t);
-    }
-
-    public void handleLifecycleException(Object component, Throwable t)
-    {
-        // Do nothing special here. Overriding implmentations may want alter the
-        // behaviour
-        handleStandardException(t);
-        logger.error("The object that failed was: \n" + ObjectUtils.toString(component, "null"));
-    }
-
-    public void handleStandardException(Throwable t)
-    {
-        // Attempt to send the exception details to an endpoint if one is set
-        if (RequestContext.getEventContext() != null)
-        {
-            handleMessagingException(RequestContext.getEventContext().getMessage(), t);
-        }
-        else
-        {
-            logger.info("There is no current event available, routing Null message with the exception");
-            handleMessagingException(new DefaultMuleMessage(NullPayload.getInstance(), muleContext), t);
-        }
-    }
-
-    protected void defaultHandler(Throwable t)
-    {
+        ExceptionPayload exceptionPayload = new DefaultExceptionPayload(e);
+        event.getMessage().setExceptionPayload(exceptionPayload);
         if (RequestContext.getEvent() != null)
         {
-            RequestContext.setExceptionPayload(new DefaultExceptionPayload(t));
+            RequestContext.setExceptionPayload(exceptionPayload);
         }
+        return event;
     }
-
-    protected MuleMessage messageFromContextIfAvailable(MuleMessage message)
+    
+    protected void doHandleException(Exception e, MuleEvent event)
     {
-        if (null != RequestContext.getEvent())
+        // Left this here for backwards-compatibility, remove in the next major version.
+        defaultHandler(e);
+        
+        MessageProcessor target = null;
+        if (e instanceof RoutingException)
         {
-            return RequestContext.getEvent().getMessage();
+            target = ((RoutingException) e).getRoute();
         }
-        else
-        {
-            return message;
-        }
+        routeException(event, target, e);
     }
-
+    
+    /**
+     * @deprecated Override doHandleException(Exception e, MuleEvent event) instead 
+     */
+    // Left this here for backwards-compatibility, remove in the next major version.
+    protected void defaultHandler(Throwable t)   
+    {
+        // empty
+    }
 }
