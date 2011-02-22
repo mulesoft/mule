@@ -26,13 +26,6 @@
             <input type="text" name="payload"/>
             <input type="submit" value="POST" />
         </form>
-
-    To invoke the Hello service programatically, use the MuleClient:
-
-        MuleClient client = new MuleClient(muleContext);
-        client.send("vm://greeter", "Ross", null);
-        UMOMessage response = client.send("vm://greeter", "Ross", null);
-        System.out.println("response = " + response.getPayload());
     -->
 
     <custom-transformer name="StringToNameString" class="org.mule.example.hello.StringToNameString"/>
