@@ -68,18 +68,21 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver implements Baye
             MuleMessage messageToRoute = createMuleMessage(data, endpoint.getEncoding());
             messageToRoute.setInvocationProperty(AjaxConnector.COMETD_CLIENT, client);
 
-            Object replyTo = messageToRoute.getReplyTo();
-            if (replyTo != null)
+            Object replyTo = null;
+            if (endpoint.getExchangePattern().hasResponse())
             {
-                messageToRoute.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE, PropertyScope.INBOUND);
+                replyTo = messageToRoute.getReplyTo();
+                if (replyTo != null)
+                {
+                    messageToRoute.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE, PropertyScope.INBOUND);
+                }
             }
-
             
             MuleEvent event = AjaxMessageReceiver.this.routeMessage(messageToRoute);
             MuleMessage message = event == null ? null : event.getMessage();
             //If a replyTo channel is set the client is expecting a response.
             //Mule does not invoke the replyTo handler if an error occurs, but in this case we want it to.
-            if ((message != null && message.getExceptionPayload() == null) && replyTo != null)
+            if (message != null && message.getExceptionPayload() == null && replyTo != null)
             {
                 AbstractConnector conn = (AbstractConnector) getConnector();
                 conn.getReplyToHandler(endpoint).processReplyTo(RequestContext.getEvent(), message, replyTo);
