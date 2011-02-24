@@ -202,7 +202,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         {
             try
             {
-                logger.error("Message being processed is: " + (event.getMessage().getPayloadAsString()));
+                logger.error("Message being processed is: " + (event.getMessage().getPayloadForLogging()));
                 String component = "Unknown";
                 if (event.getFlowConstruct() != null)
                 {
