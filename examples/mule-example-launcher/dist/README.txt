@@ -1,17 +1,9 @@
 +-----------------------+
 | Mule Example Launcher |
 +-----------------------+
-Launches Mule examples from within a simple web application, displaying an introduction
-to the example, the mule configuration file and when possible, provides interaction with
-the example.
-
-** IMPORTANT **
-This example application is meant to be used together with other examples that ship with
-Mule ESB. The correct way to use it is by launching mule with the following command:
-
-$MULE_HOME/bin/mule_examples
-
-This command will deploy the examples required by the Example Launcher. 
+This example provides a web interface to the Mule examples.  It displays an introduction
+to the example and the mule configuration file.  You can also interact with certain examples 
+through the web page.
 
 For more information visit:
 http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples
@@ -19,14 +11,20 @@ http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples
 +---------------------+
 | Running the example |
 +---------------------+
-Simply build the example and copy the packaged application to Mule's application
-folder ($MULE_HOME/apps).
+This example application is meant to be used together with the other examples that ship with
+Mule ESB. The correct way to use it is by launching mule with the following command:
+
+$MULE_HOME/bin/mule_examples
+
+This command will deploy the examples required by the Example Launcher.  Once the examples are
+deployed, a browser window will pop up with the web interface for the examples launcher.  If
+your browser does not open the examples launcher page, you can go to this url:
+http://localhost:18082/examples/
 
 +----------------------+
 | Building the example |
 +----------------------+
-First, make sure you have set the MULE_HOME environment variable as recommended
-in Mule's README.txt
+The Ant and Maven build files are provided, but it is not necessary to build the example in order to run it.
 
 Depending on the build tool you are using (Ant or Maven), you can build the example
 by simply running "ant" or "mvn".  This will compile the example classes and produce
