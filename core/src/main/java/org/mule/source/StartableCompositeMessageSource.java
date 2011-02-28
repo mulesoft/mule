@@ -10,6 +10,7 @@
 
 package org.mule.source;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -30,6 +31,8 @@ import org.mule.util.ObjectUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.naming.NoPermissionException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
@@ -220,10 +223,10 @@ public class StartableCompositeMessageSource
             }
             else
             {
-                log.warn(String.format(
-                    "A message was receieved from MessageSource, but message source is stopped. Message will be discarded.%n"
-                                    + "  Message: %s%n" + "  MessageSource:%s", event, this));
-                return null;
+                throw new IllegalStateException(
+                    String.format(
+                        "A message was receieved from MessageSource, but CompositeMessageSource is stopped. Message will be discarded.%n"
+                                        + "  Message: %s%n" + "  CompositeMessageSource: %s", event, this));
             }
 
         }
