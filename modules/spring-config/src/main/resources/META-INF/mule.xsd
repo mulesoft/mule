@@ -528,7 +528,9 @@
     <xsd:element name="request-reply" type="requestReplyType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Processes the nest list of message processors asychronously using a thread pool 
+                Provides support for the asynchronous request/reply pattern where a message is sent via a one-way outbound endpoint
+                and an asynchronous response is received via a seperate inbound one-way endpoint.  Message flow is blocked while
+                waiting for the reply message.  Note: This does not currently support setting of replyTo property on the outbound message.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -536,10 +538,28 @@
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
                 <xsd:sequence>
-                    <xsd:group ref="messageProcessorOrOutboundEndpoint"/>
-                    <xsd:element ref="abstract-inbound-endpoint"/>                    
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The outbound endpoint or message processor that will perform the asynchronous request.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:group>
+                    <xsd:element ref="abstract-inbound-endpoint">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The inbound endpoint from which the asynchronous reply message will be received.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>                    
                 </xsd:sequence>
-                <xsd:attribute name="timeout" type="substitutableInt" use="optional"/>
+                <xsd:attribute name="timeout" type="substitutableInt" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The time (ms) to wait for an asynchronous reply message to be received.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
