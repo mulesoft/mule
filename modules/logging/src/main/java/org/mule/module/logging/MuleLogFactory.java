@@ -10,8 +10,6 @@
 
 package org.mule.module.logging;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -29,7 +27,7 @@ import org.slf4j.spi.LocationAwareLogger;
  */
 public class MuleLogFactory extends SLF4JLogFactory
 {
-    protected Map<ClassLoader, ConcurrentMap<String, Log>> repositories = new HashMap<ClassLoader, ConcurrentMap<String, Log>>();
+    protected ConcurrentHashMap<ClassLoader, ConcurrentMap<String, Log>> repositories = new ConcurrentHashMap<ClassLoader, ConcurrentMap<String, Log>>();
 
     public Log getInstance(String name) throws LogConfigurationException
     {
@@ -39,8 +37,12 @@ public class MuleLogFactory extends SLF4JLogFactory
         if (loggerMap == null)
         {
             loggerMap = new ConcurrentHashMap<String, Log>();
-            // TODO rework to use ConcurrentHashMap
-            repositories.put(ccl, loggerMap);
+
+            final ConcurrentMap<String, Log> previous = repositories.putIfAbsent(ccl, loggerMap);
+            if (previous != null)
+            {
+                loggerMap = previous;
+            }
         }
 
         Log instance = loggerMap.get(name);

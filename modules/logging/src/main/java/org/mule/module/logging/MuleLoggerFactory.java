@@ -10,8 +10,6 @@
 
 package org.mule.module.logging;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -21,8 +19,7 @@ import org.slf4j.Logger;
 
 public class MuleLoggerFactory implements ILoggerFactory
 {
-
-    protected Map<ClassLoader, ConcurrentMap<String, Logger>> repositories = new HashMap<ClassLoader, ConcurrentMap<String, Logger>>();
+    protected ConcurrentMap<ClassLoader, ConcurrentMap<String, Logger>> repositories = new ConcurrentHashMap<ClassLoader, ConcurrentMap<String, Logger>>();
 
     public Logger getLogger(String name)
     {
@@ -32,8 +29,11 @@ public class MuleLoggerFactory implements ILoggerFactory
         if (loggerMap == null)
         {
             loggerMap = new ConcurrentHashMap<String, Logger>();
-            // TODO rework to use ConcurrentHashMap
-            repositories.put(ccl, loggerMap);
+            final ConcurrentMap<String, Logger> previous = repositories.putIfAbsent(ccl, loggerMap);
+            if (previous != null)
+            {
+                loggerMap = previous;
+            }
         }
 
         Logger slf4jLogger = loggerMap.get(name);
