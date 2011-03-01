@@ -10,6 +10,8 @@
 
 package org.apache.commons.logging;
 
+import org.mule.module.logging.MuleLogFactory;
+
 import java.util.Hashtable;
 
 import org.apache.commons.logging.impl.SLF4JLogFactory;
@@ -31,7 +33,7 @@ public abstract class LogFactory {
 
   static String UNSUPPORTED_OPERATION_IN_JCL_OVER_SLF4J = "http://www.slf4j.org/codes.html#unsupported_operation_in_jcl_over_slf4j";
 
-  static LogFactory logFactory = new SLF4JLogFactory();
+  static LogFactory logFactory = new MuleLogFactory();
 
   /**
    * The name (<code>priority</code>) of the key in the config file used to
