@@ -15,7 +15,8 @@ import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.log4j.Hierarchy;
 import org.apache.log4j.Level;
@@ -28,13 +29,12 @@ import org.apache.log4j.spi.RootLogger;
 public class ApplicationAwareRepositorySelector implements RepositorySelector
 {
 
-    private Hashtable<ClassLoader, LoggerRepository> repos = new Hashtable<ClassLoader, LoggerRepository>();
+    private ConcurrentMap<ClassLoader, LoggerRepository> repos = new ConcurrentHashMap<ClassLoader, LoggerRepository>();
 
     public LoggerRepository getLoggerRepository()
     {
         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 
-        // TODO don't use classloader, but rather an app name
         LoggerRepository repository = repos.get(ccl);
         if (repository == null)
         {
@@ -61,14 +61,16 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
 
                 root.addAppender(appender);
 
-                repos.put(ccl, repository);
+                final LoggerRepository previous = repos.putIfAbsent(ccl, repository);
+                if (previous != null)
+                {
+                    repository = previous;
+                }
             }
             catch (IOException e)
             {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                throw new RuntimeException(e);
             }
-            //root.addAppender(new ConsoleAppender(
-            //        new PatternLayout(PatternLayout.TTCC_CONVERSION_PATTERN)));
         }
 
         return repository;
