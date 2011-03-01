@@ -193,7 +193,7 @@ public class DeploymentService
 
         if (logger.isInfoEnabled())
         {
-            logger.info("Application directory check interval: " + reloadIntervalMs);
+            logger.info(String.format("Mule is up an kicking (every %dms)", reloadIntervalMs));
         }
     }
 
