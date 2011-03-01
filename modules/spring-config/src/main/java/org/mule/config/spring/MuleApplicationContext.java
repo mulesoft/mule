@@ -125,4 +125,11 @@ public class MuleApplicationContext extends AbstractXmlApplicationContext
     {
         return muleContext;
     }
+
+    @Override
+    protected void prepareRefresh()
+    {
+        System.out.println("MuleApplicationContext.prepareRefresh: " + Thread.currentThread().getContextClassLoader());
+        super.prepareRefresh();
+    }
 }
