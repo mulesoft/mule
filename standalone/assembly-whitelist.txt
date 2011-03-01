@@ -94,7 +94,6 @@ jbpm-pvm-4.4
 jbossts-common-4.2.3-SP5-osgi
 jbossts-jta-4.2.3-SP5-patched-osgi
 jbossts-jta-integration-4.2.3-SP5-osgi
-jcl-over-slf4j-1.6.1
 jdom-1.0-osgi
 jersey-client-1.3
 jersey-core-1.3
@@ -137,6 +136,7 @@ mule-module-jbpm
 mule-module-jersey
 mule-module-json
 mule-module-launcher
+mule-module-logging
 mule-module-management
 mule-module-ognl
 mule-module-pgp
@@ -189,8 +189,6 @@ saxon-dom-8.9.0.4-osgi
 saxon-xqj-8.9.0.4
 servlet-api-2.5-20081211
 scribe-1.0.3
-slf4j-api-1.6.1
-slf4j-log4j12-1.6.1
 smack-3.1.0
 smackx-3.1.0
 spring-aop-3.0.3.RELEASE

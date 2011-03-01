@@ -153,12 +153,10 @@
       <outputDirectory>lib/boot</outputDirectory>
       <includes>
         <include>org.mule.modules:mule-module-boot</include>
+        <include>org.mule.modules:mule-module-logging</include>
         <include>org.mule.modules:mule-module-reboot</include>
         <include>commons-cli:commons-cli</include>
         <include>tanukisoft:wrapper</include>
-        <include>org.slf4j:slf4j-api</include>
-        <include>org.slf4j:jcl-over-slf4j</include>
-        <include>org.slf4j:slf4j-log4j12</include>
         <include>log4j:log4j</include>
       </includes>
     </dependencySet>
@@ -272,6 +270,7 @@
         <exclude>org.mule.modules:mule-module-jca</exclude>
         <exclude>org.mule.modules:mule-module-json</exclude>
         <exclude>org.mule.modules:mule-module-launcher</exclude>
+        <exclude>org.mule.modules:mule-module-logging</exclude>
         <exclude>org.mule.modules:mule-module-management</exclude>
         <exclude>org.mule.modules:mule-module-mcp</exclude>
         <exclude>org.mule.modules:mule-module-ognl</exclude>
