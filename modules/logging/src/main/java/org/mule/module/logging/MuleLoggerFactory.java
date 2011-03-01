@@ -24,12 +24,17 @@ public class MuleLoggerFactory implements ILoggerFactory
     public Logger getLogger(String name)
     {
         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-        ConcurrentMap<String, Logger> loggerMap = repositories.get(ccl);
+        return getLogger(name, ccl);
+    }
+
+    public Logger getLogger(String name, ClassLoader classLoader)
+    {
+        ConcurrentMap<String, Logger> loggerMap = repositories.get(classLoader);
 
         if (loggerMap == null)
         {
             loggerMap = new ConcurrentHashMap<String, Logger>();
-            final ConcurrentMap<String, Logger> previous = repositories.putIfAbsent(ccl, loggerMap);
+            final ConcurrentMap<String, Logger> previous = repositories.putIfAbsent(classLoader, loggerMap);
             if (previous != null)
             {
                 loggerMap = previous;
@@ -49,7 +54,7 @@ public class MuleLoggerFactory implements ILoggerFactory
             {
                 log4jLogger = LogManager.getLogger(name);
             }
-            slf4jLogger = new AccessibleLog4jLoggerAdapter(log4jLogger);
+            slf4jLogger = new DispatchingLogger(new AccessibleLog4jLoggerAdapter(log4jLogger), this);
             final Logger previous = loggerMap.putIfAbsent(name, slf4jLogger);
             if (previous != null)
             {
