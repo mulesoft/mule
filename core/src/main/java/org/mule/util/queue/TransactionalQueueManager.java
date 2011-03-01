@@ -27,9 +27,6 @@ import java.util.Map;
 
 import javax.transaction.xa.XAResource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * The Transactional Queue Manager is responsible for creating and Managing
  * transactional Queues. Queues can also be persistent by setting a persistence
@@ -38,8 +35,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class TransactionalQueueManager extends AbstractXAResourceManager implements QueueManager, MuleContextAware
 {
-
-    private static Log logger = LogFactory.getLog(TransactionalQueueManager.class);
 
     private Map<String, QueueInfo> queues = new HashMap<String, QueueInfo>();
 
@@ -86,11 +81,6 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             queues.put(name, q);
         }
         return q;
-    }
-
-    protected Log getLogger()
-    {
-        return logger;
     }
 
     protected void doStart() throws ResourceManagerSystemException

@@ -20,6 +20,7 @@ import java.util.Iterator;
 import javax.transaction.Status;
 
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This code is based on code coming from the <a
@@ -56,10 +57,10 @@ public abstract class AbstractResourceManager
     protected Collection globalTransactions = Collections.synchronizedCollection(new ArrayList());
     protected int operationMode = OPERATION_MODE_STOPPED;
     protected long defaultTimeout = DEFAULT_TIMEOUT_MSECS;
-    protected Log logger = getLogger();
-    protected boolean dirty = false;
 
-    protected abstract Log getLogger();
+    protected Log logger = LogFactory.getLog(getClass());
+
+    protected boolean dirty = false;
 
     public synchronized void start() throws ResourceManagerSystemException
     {
