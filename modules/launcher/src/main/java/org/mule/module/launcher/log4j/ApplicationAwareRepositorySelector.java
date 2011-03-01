@@ -40,7 +40,6 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
         {
             final RootLogger root = new RootLogger(Level.INFO);
             repository = new Hierarchy(root);
-            repos.put(ccl, repository);
 
             try
             {
@@ -61,6 +60,8 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                 appender.setMaximumFileSize(1000000);
 
                 root.addAppender(appender);
+
+                repos.put(ccl, repository);
             }
             catch (IOException e)
             {
