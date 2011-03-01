@@ -53,7 +53,14 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleTestCas
         assertNull(listener.event);
 
         source.start();
-        source.triggerSource();
+        try
+        {
+            source.triggerSource();
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+        }
         assertNull(listener.event);
 
         compositeSource.start();
