@@ -33,6 +33,7 @@
         <module>jbpm</module>
         <module>jca</module>
         <module>json</module>
+		<module>logging</module>
         <module>management</module>
         <module>mcp</module>
         <module>ognl</module>
