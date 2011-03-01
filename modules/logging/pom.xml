@@ -40,6 +40,17 @@
                             </artifactSet>
                             <filters>
                                 <filter>
+                                    <artifact>org.slf4j:jcl-over-slf4j</artifact>
+                                    <excludes>
+                                        <!--
+                                            We want to statically bind the logging system, but at
+                                            the same time override the jcl-over-slf4j static init
+                                            by providing our own 'replacement' version.
+                                        -->
+                                        <exclude>org/apache/commons/logging/LogFactory.class</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/*.SF</exclude>
