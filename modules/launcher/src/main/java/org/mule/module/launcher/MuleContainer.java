@@ -67,7 +67,7 @@ public class MuleContainer
     static
     {
         // TODO save this guard ref for later
-        //LogManager.setRepositorySelector(new ApplicationAwareRepositorySelector(), new Object());
+        LogManager.setRepositorySelector(new ApplicationAwareRepositorySelector(), new Object());
         logger = LogFactory.getLog(MuleContainer.class);
     }
 
