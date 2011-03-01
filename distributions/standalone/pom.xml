@@ -189,6 +189,11 @@
             <artifactId>mule-module-launcher</artifactId>
             <version>${version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-logging</artifactId>
+            <version>${version}</version>
+        </dependency>
 
         <!-- Include all Mule Transports -->
         <dependency>
