@@ -20,7 +20,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
-import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.ajax.embedded.AjaxConnector;
 import org.mule.transport.ajax.i18n.AjaxMessages;
@@ -78,10 +77,10 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver implements Baye
             MuleMessage message = event == null ? null : event.getMessage();
             //If a replyTo channel is set the client is expecting a response.
             //Mule does not invoke the replyTo handler if an error occurs, but in this case we want it to.
-            if (message != null && message.getExceptionPayload() == null && replyTo != null)
+            AjaxConnector connector = (AjaxConnector) getConnector();
+            if (!connector.isDisableReplyTo() && message != null && message.getExceptionPayload() == null && replyTo != null)
             {
-                AbstractConnector conn = (AbstractConnector) getConnector();
-                conn.getReplyToHandler(endpoint).processReplyTo(RequestContext.getEvent(), message, replyTo);
+                connector.getReplyToHandler(endpoint).processReplyTo(RequestContext.getEvent(), message, replyTo);
             }
             return null;
         }
