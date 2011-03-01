@@ -27,18 +27,18 @@ import org.slf4j.spi.LocationAwareLogger;
  */
 public class MuleLogFactory extends SLF4JLogFactory
 {
-    protected ConcurrentHashMap<ClassLoader, ConcurrentMap<String, Log>> repositories = new ConcurrentHashMap<ClassLoader, ConcurrentMap<String, Log>>();
+    protected ConcurrentHashMap<Integer, ConcurrentMap<String, Log>> repository = new ConcurrentHashMap<Integer, ConcurrentMap<String, Log>>();
 
     public Log getInstance(String name) throws LogConfigurationException
     {
         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-        ConcurrentMap<String, Log> loggerMap = repositories.get(ccl);
+        ConcurrentMap<String, Log> loggerMap = repository.get(ccl.hashCode());
 
         if (loggerMap == null)
         {
             loggerMap = new ConcurrentHashMap<String, Log>();
 
-            final ConcurrentMap<String, Log> previous = repositories.putIfAbsent(ccl, loggerMap);
+            final ConcurrentMap<String, Log> previous = repository.putIfAbsent(ccl.hashCode(), loggerMap);
             if (previous != null)
             {
                 loggerMap = previous;

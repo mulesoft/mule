@@ -20,13 +20,13 @@ import org.slf4j.Marker;
 public class DispatchingLogger implements Logger
 {
     protected Logger originalLogger;
-    protected ClassLoader originalClassLoader;
+    protected Integer originalClassLoaderHash;
     private String name;
     private MuleLoggerFactory factory;
 
     public DispatchingLogger(Logger originalLogger, MuleLoggerFactory factory)
     {
-        this.originalClassLoader = Thread.currentThread().getContextClassLoader();
+        this.originalClassLoaderHash = Thread.currentThread().getContextClassLoader().hashCode();
         this.originalLogger = originalLogger;
         this.name = originalLogger.getName();
         this.factory = factory;
@@ -345,7 +345,7 @@ public class DispatchingLogger implements Logger
     protected Logger getLogger()
     {
         final ClassLoader currentCl = Thread.currentThread().getContextClassLoader();
-        if (currentCl == originalClassLoader)
+        if (currentCl.hashCode() == originalClassLoaderHash)
         {
             return originalLogger;
         }

@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 
 public class MuleLoggerFactory implements ILoggerFactory
 {
-    protected ConcurrentMap<ClassLoader, ConcurrentMap<String, Logger>> repositories = new ConcurrentHashMap<ClassLoader, ConcurrentMap<String, Logger>>();
+    protected ConcurrentMap<Integer, ConcurrentMap<String, Logger>> repository = new ConcurrentHashMap<Integer, ConcurrentMap<String, Logger>>();
 
     public Logger getLogger(String name)
     {
@@ -29,12 +29,12 @@ public class MuleLoggerFactory implements ILoggerFactory
 
     public Logger getLogger(String name, ClassLoader classLoader)
     {
-        ConcurrentMap<String, Logger> loggerMap = repositories.get(classLoader);
+        ConcurrentMap<String, Logger> loggerMap = repository.get(classLoader.hashCode());
 
         if (loggerMap == null)
         {
             loggerMap = new ConcurrentHashMap<String, Logger>();
-            final ConcurrentMap<String, Logger> previous = repositories.putIfAbsent(classLoader, loggerMap);
+            final ConcurrentMap<String, Logger> previous = repository.putIfAbsent(classLoader.hashCode(), loggerMap);
             if (previous != null)
             {
                 loggerMap = previous;

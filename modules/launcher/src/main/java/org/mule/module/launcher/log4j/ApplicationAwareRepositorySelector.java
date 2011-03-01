@@ -31,13 +31,13 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
 {
 
     protected static final String PATTERN_LAYOUT = "%-5p %d [%t] %c: %m%n";
-    private ConcurrentMap<ClassLoader, LoggerRepository> repos = new ConcurrentHashMap<ClassLoader, LoggerRepository>();
+    private ConcurrentMap<Integer, LoggerRepository> repository = new ConcurrentHashMap<Integer, LoggerRepository>();
 
     public LoggerRepository getLoggerRepository()
     {
         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 
-        LoggerRepository repository = repos.get(ccl);
+        LoggerRepository repository = this.repository.get(ccl.hashCode());
         if (repository == null)
         {
             final RootLogger root = new RootLogger(Level.INFO);
@@ -66,7 +66,7 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                     root.addAppender(appender);
                 }
 
-                final LoggerRepository previous = repos.putIfAbsent(ccl, repository);
+                final LoggerRepository previous = this.repository.putIfAbsent(ccl.hashCode(), repository);
                 if (previous != null)
                 {
                     repository = previous;
