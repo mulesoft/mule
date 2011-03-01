@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Hierarchy;
 import org.apache.log4j.Level;
 import org.apache.log4j.PatternLayout;
@@ -29,6 +30,7 @@ import org.apache.log4j.spi.RootLogger;
 public class ApplicationAwareRepositorySelector implements RepositorySelector
 {
 
+    protected static final String PATTERN_LAYOUT = "%-5p %d [%t] %c: %m%n";
     private ConcurrentMap<ClassLoader, LoggerRepository> repos = new ConcurrentHashMap<ClassLoader, LoggerRepository>();
 
     public LoggerRepository getLoggerRepository()
@@ -48,18 +50,21 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                 {
                     MuleApplicationClassLoader muleCL = (MuleApplicationClassLoader) ccl;
                     logName = "-app-" + muleCL.getAppName();
+                    File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "logs");
+                    File logFile = new File(logDir, "mule" + logName + ".log");
+                    RollingFileAppender fileAppender = new RollingFileAppender(new PatternLayout(PATTERN_LAYOUT), logFile.getAbsolutePath(), true);
+                    fileAppender.setMaxBackupIndex(1);
+                    fileAppender.setMaximumFileSize(1000000);
+                    fileAppender.activateOptions();
+                    root.addAppender(fileAppender);
                 }
                 else
                 {
-                    logName = "";
+                    // container logger handled by the wrapper, just output to the sys.out
+                    final ConsoleAppender appender = new ConsoleAppender(new PatternLayout(PATTERN_LAYOUT));
+                    appender.activateOptions();
+                    root.addAppender(appender);
                 }
-                File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "logs");
-                File logFile = new File(logDir, "mule" + logName + ".log");
-                RollingFileAppender appender = new RollingFileAppender(new PatternLayout("%-5p %d [%t] %c: %m%n"), logFile.getAbsolutePath(), true);
-                appender.setMaxBackupIndex(1);
-                appender.setMaximumFileSize(1000000);
-
-                root.addAppender(appender);
 
                 final LoggerRepository previous = repos.putIfAbsent(ccl, repository);
                 if (previous != null)
