@@ -15,13 +15,14 @@ import org.mule.module.reboot.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Hierarchy;
 import org.apache.log4j.Level;
 import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.spi.LoggerRepository;
 import org.apache.log4j.spi.RepositorySelector;
@@ -49,21 +50,31 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                 if (ccl instanceof MuleApplicationClassLoader)
                 {
                     MuleApplicationClassLoader muleCL = (MuleApplicationClassLoader) ccl;
-                    logName = "-app-" + muleCL.getAppName();
-                    File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "logs");
-                    File logFile = new File(logDir, "mule" + logName + ".log");
-                    RollingFileAppender fileAppender = new RollingFileAppender(new PatternLayout(PATTERN_LAYOUT), logFile.getAbsolutePath(), true);
-                    fileAppender.setMaxBackupIndex(1);
-                    fileAppender.setMaximumFileSize(1000000);
-                    fileAppender.activateOptions();
-                    root.addAppender(fileAppender);
+                    // check if there's an app-specific logging configuration available,
+                    // scope the lookup to this classloader only, as getResource() will delegate to parents
+                    final URL appLogConfig = muleCL.findResource("log4j.properties");
+                    if (appLogConfig == null)
+                    {
+                        // fallback to defaults
+                        logName = "-app-" + muleCL.getAppName();
+                        File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "logs");
+                        File logFile = new File(logDir, "mule" + logName + ".log");
+                        RollingFileAppender fileAppender = new RollingFileAppender(new PatternLayout(PATTERN_LAYOUT), logFile.getAbsolutePath(), true);
+                        fileAppender.setMaxBackupIndex(100);
+                        fileAppender.setMaximumFileSize(1000000);
+                        fileAppender.activateOptions();
+                        root.addAppender(fileAppender);
+                    }
+                    else
+                    {
+                        new PropertyConfigurator().doConfigure(appLogConfig, repository);
+                    }
                 }
                 else
                 {
-                    // container logger handled by the wrapper, just output to the sys.out
-                    final ConsoleAppender appender = new ConsoleAppender(new PatternLayout(PATTERN_LAYOUT));
-                    appender.activateOptions();
-                    root.addAppender(appender);
+                    // this is not an app init, but a Mule container, use the top-level defaults
+                    final File defaultSystemLog = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf/log4j.properties");
+                    new PropertyConfigurator().doConfigure(defaultSystemLog.getAbsolutePath(), repository);
                 }
 
                 final LoggerRepository previous = this.repository.putIfAbsent(ccl.hashCode(), repository);
