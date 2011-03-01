@@ -53,7 +53,7 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                 {
                     logName = "container";
                 }
-                File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "log");
+                File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "logs");
                 File logFile = new File(logDir, "mule-" + logName + "-log.txt");
                 RollingFileAppender appender = new RollingFileAppender(new PatternLayout("%-5p %d [%t] %c: %m%n"), logFile.getAbsolutePath(), true);
                 appender.setMaxBackupIndex(1);
