@@ -47,14 +47,14 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                 if (ccl instanceof MuleApplicationClassLoader)
                 {
                     MuleApplicationClassLoader muleCL = (MuleApplicationClassLoader) ccl;
-                    logName = muleCL.getAppName();
+                    logName = "-app-" + muleCL.getAppName();
                 }
                 else
                 {
-                    logName = "container";
+                    logName = "";
                 }
                 File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "logs");
-                File logFile = new File(logDir, "mule-" + logName + "-log.txt");
+                File logFile = new File(logDir, "mule" + logName + ".log");
                 RollingFileAppender appender = new RollingFileAppender(new PatternLayout("%-5p %d [%t] %c: %m%n"), logFile.getAbsolutePath(), true);
                 appender.setMaxBackupIndex(1);
                 appender.setMaximumFileSize(1000000);
