@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Enumeration;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -109,4 +110,24 @@ public class MuleApplicationClassLoader extends GoodCitizenClassLoader
                              Integer.toHexString(System.identityHashCode(this)));
     }
 
+    @Override
+    public URL findResource(String name)
+    {
+        System.out.println("MuleApplicationClassLoader.findResource: " + name);
+        return super.findResource(name);
+    }
+
+    @Override
+    public Enumeration<URL> findResources(String name) throws IOException
+    {
+        System.out.println("MuleApplicationClassLoader.findResources: " + name);
+        return super.findResources(name);
+    }
+
+    @Override
+    protected Class<?> findClass(String name) throws ClassNotFoundException
+    {
+        System.out.println("MuleApplicationClassLoader.findClass: " + name);
+        return super.findClass(name);
+    }
 }

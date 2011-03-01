@@ -10,10 +10,13 @@
 
 package org.mule.module.reboot;
 
+import org.mule.module.launcher.log4j.ApplicationAwareRepositorySelector;
+
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
+import org.apache.log4j.LogManager;
 import org.tanukisoftware.wrapper.WrapperListener;
 import org.tanukisoftware.wrapper.WrapperManager;
 
@@ -45,6 +48,8 @@ public class MuleContainerWrapper implements WrapperListener
     {
         try
         {
+            LogManager.setRepositorySelector(new ApplicationAwareRepositorySelector(), new Object());
+
             ClassLoader muleSystemCl = createContainerSystemClassLoader();
 
             Thread.currentThread().setContextClassLoader(muleSystemCl);
