@@ -9,6 +9,8 @@
  */
 package org.mule.config.expression;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.expression.ExpressionAnnotationParser;
 import org.mule.api.lifecycle.InitialisationException;
@@ -27,6 +29,8 @@ import java.lang.reflect.Method;
  */
 public class ExpressionAnnotationsHelper
 {
+    protected static Log logger = LogFactory.getLog(ExpressionAnnotationsHelper.class);
+
     public static ExpressionTransformer getTransformerForMethodWithAnnotations(Method method, MuleContext context) throws TransformerException, InitialisationException
     {
         ExpressionTransformer trans = new ExpressionTransformer();
@@ -42,7 +46,10 @@ public class ExpressionAnnotationsHelper
                 Annotation ann = annotation[j];
                 ExpressionArgument arg = parseAnnotation(ann, method.getParameterTypes()[i], context);
 
-                trans.addArgument(arg);
+                if (arg != null)
+                {
+                    trans.addArgument(arg);
+                }
             }
         }
         trans.initialise();
@@ -66,7 +73,11 @@ public class ExpressionAnnotationsHelper
         ExpressionAnnotationParser parser = factory.getExpressionParser(annotation);
         if (parser == null)
         {
-            throw new IllegalArgumentException(AnnotationsMessages.noParserFoundForAnnotation(annotation).getMessage());
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(AnnotationsMessages.noParserFoundForAnnotation(annotation).getMessage());
+            }
+            return null;
         }
         return parser.parse(annotation, paramType);
     }
