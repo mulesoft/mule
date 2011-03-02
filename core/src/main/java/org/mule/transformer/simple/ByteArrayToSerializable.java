@@ -16,7 +16,6 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.SerializationUtils;
-import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.InputStream;
 
@@ -46,15 +45,11 @@ public class ByteArrayToSerializable extends AbstractTransformer implements Disc
             final Object result;
             if (src instanceof byte[])
             {
-                result = SerializationUtils.deserialize((byte[]) src, muleContext.getExecutionClassLoader());
+                result = SerializationUtils.deserialize((byte[]) src, muleContext);
             }
             else
             {
-                result = SerializationUtils.deserialize((InputStream) src, muleContext.getExecutionClassLoader());
-            }
-            if (result instanceof DeserializationPostInitialisable)
-            {
-                DeserializationPostInitialisable.Implementation.init(result, muleContext);
+                result = SerializationUtils.deserialize((InputStream) src, muleContext);
             }
             return result;
         }

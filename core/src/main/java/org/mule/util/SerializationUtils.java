@@ -10,6 +10,9 @@
 
 package org.mule.util;
 
+import org.mule.api.MuleContext;
+import org.mule.util.store.DeserializationPostInitialisable;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,29 +41,37 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
      * @throws org.apache.commons.lang.SerializationException
      *                                  (runtime) if the serialization fails
      */
-    public static Object deserialize(InputStream inputStream, ClassLoader cl)
+    public static Object deserialize(InputStream inputStream, MuleContext muleContext)
     {
         if (inputStream == null)
         {
             throw new IllegalArgumentException("The InputStream must not be null");
         }
-        if (cl == null)
+        if (muleContext == null)
         {
-            throw new IllegalArgumentException("The ClassLoader must not be null");
+            throw new IllegalArgumentException("The MuleContext must not be null");
         }
         ObjectInputStream in = null;
         try
         {
             // stream closed in the finally
-            in = new ClassLoaderObjectInputStream(cl, inputStream);
-            return in.readObject();
-
+            in = new ClassLoaderObjectInputStream(muleContext.getExecutionClassLoader(), inputStream);
+            Object obj = in.readObject();
+            if (obj instanceof DeserializationPostInitialisable)
+            {
+                DeserializationPostInitialisable.Implementation.init(obj, muleContext);
+            }
+            return obj;
         }
         catch (ClassNotFoundException ex)
         {
             throw new SerializationException(ex);
         }
         catch (IOException ex)
+        {
+            throw new SerializationException(ex);
+        }
+        catch (Exception ex)
         {
             throw new SerializationException(ex);
         }
@@ -89,13 +100,13 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
      * @throws IllegalArgumentException if <code>objectData</code> is <code>null</code>
      * @throws SerializationException   (runtime) if the serialization fails
      */
-    public static Object deserialize(byte[] objectData, ClassLoader cl)
+    public static Object deserialize(byte[] objectData, MuleContext muleContext)
     {
         if (objectData == null)
         {
             throw new IllegalArgumentException("The byte[] must not be null");
         }
         ByteArrayInputStream bais = new ByteArrayInputStream(objectData);
-        return deserialize(bais, cl);
+        return deserialize(bais, muleContext);
     }
 }

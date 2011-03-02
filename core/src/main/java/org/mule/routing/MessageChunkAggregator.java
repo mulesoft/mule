@@ -77,7 +77,7 @@ public class MessageChunkAggregator extends AbstractAggregator
                     try
                     {
                         // must deserialize in correct classloader
-                        final Object deserialized = SerializationUtils.deserialize(baos.toByteArray(), muleContext.getExecutionClassLoader());
+                        final Object deserialized = SerializationUtils.deserialize(baos.toByteArray(), muleContext);
                         message = new DefaultMuleMessage(deserialized, firstEvent.getMessage(), muleContext);
 
                     }
