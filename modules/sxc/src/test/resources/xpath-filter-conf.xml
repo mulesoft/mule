@@ -89,5 +89,14 @@
             </inbound>
             <component class="org.mule.module.sxc.ReceiveComponent"/>
         </service>
+
+        <service name="wrappedFilter">
+            <inbound>
+                <inbound-endpoint address="vm://dummy" exchange-pattern="one-way">
+                    <sxc:filter pattern="//purchaseOrder[@country]"/>
+                </inbound-endpoint>
+            </inbound>
+        </service>
+
     </model>
 </mule>
