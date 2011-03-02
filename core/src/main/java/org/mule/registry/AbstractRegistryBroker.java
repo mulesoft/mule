@@ -10,13 +10,17 @@
 
 package org.mule.registry;
 
+import org.mule.api.MuleContext;
+import org.mule.api.MuleException;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.LifecycleCallback;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.registry.RegistryBroker;
+import org.mule.lifecycle.RegistryBrokerLifecycleManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,22 +28,46 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public abstract class AbstractRegistryBroker implements RegistryBroker
 {
+    protected transient Log logger = LogFactory.getLog(getClass());
+
+    protected RegistryBrokerLifecycleManager lifecycleManager;
+
+    public AbstractRegistryBroker(MuleContext muleContext)
+    {
+        lifecycleManager = new RegistryBrokerLifecycleManager("mule.registry.broker", this, muleContext);
+    }
+
     public void initialise() throws InitialisationException
     {
-        for (Registry registry : getRegistries())
+        lifecycleManager.fireInitialisePhase(new LifecycleCallback<AbstractRegistryBroker>()
         {
-            registry.initialise();
-        }
+            public void onTransition(String phaseName, AbstractRegistryBroker broker) throws MuleException
+            {
+                for (Registry registry : broker.getRegistries())
+                {
+                    registry.initialise();
+                }
+            }
+        });
     }
 
     public void dispose()
     {
-        for (Registry registry : getRegistries())
+        lifecycleManager.fireDisposePhase(new LifecycleCallback<AbstractRegistryBroker>()
         {
-            registry.dispose();
-        }
+            public void onTransition(String phaseName, AbstractRegistryBroker broker) throws MuleException
+            {
+                for (Registry registry : broker.getRegistries())
+                {
+                    registry.dispose();
+                }
+            }
+        });
     }
 
     public void fireLifecycle(String phase) throws LifecycleException
@@ -54,6 +82,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         }
         else
         {
+            lifecycleManager.fireLifecycle(phase);
             for (Registry registry : getRegistries())
             {
                 registry.fireLifecycle(phase);
@@ -79,8 +108,8 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
 
     abstract protected Collection<Registry> getRegistries();
 
-    ////////////////////////////////////////////////////////////////////////////////
-    // Delegating methods
+     ////////////////////////////////////////////////////////////////////////////////
+   // Delegating methods
     ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -150,8 +179,9 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
         }
         return objects;
     }
-    
-    public void registerObject(String key, Object value) throws RegistrationException
+
+       
+public void registerObject(String key, Object value) throws RegistrationException
     {
         registerObject(key, value, null);
     }
