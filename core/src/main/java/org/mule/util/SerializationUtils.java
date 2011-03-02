@@ -23,7 +23,24 @@ import org.apache.commons.lang.SerializationException;
 
 public class SerializationUtils extends org.apache.commons.lang.SerializationUtils
 {
+    public static Object deserialize(InputStream inputStream, MuleContext muleContext)
+    {
+        if (muleContext == null)
+        {
+            throw new IllegalArgumentException("The MuleContext must not be null");
+        }
+        return deserialize(inputStream, muleContext.getExecutionClassLoader(), muleContext);
+    }
 
+    public static Object deserialize(byte[] objectData, MuleContext muleContext)
+    {
+        if (muleContext == null)
+        {
+            throw new IllegalArgumentException("The MuleContext must not be null");
+        }
+        return deserialize(objectData, muleContext.getExecutionClassLoader(), muleContext);        
+    }
+    
     /**
      * <p>Deserializes an <code>Object</code> from the specified stream.</p>
      * <p/>
@@ -41,21 +58,21 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
      * @throws org.apache.commons.lang.SerializationException
      *                                  (runtime) if the serialization fails
      */
-    public static Object deserialize(InputStream inputStream, MuleContext muleContext)
+    private static Object deserialize(InputStream inputStream, ClassLoader cl, MuleContext muleContext)
     {
         if (inputStream == null)
         {
             throw new IllegalArgumentException("The InputStream must not be null");
         }
-        if (muleContext == null)
+        if (cl == null)
         {
-            throw new IllegalArgumentException("The MuleContext must not be null");
+            throw new IllegalArgumentException("The ClassLoader must not be null");
         }
         ObjectInputStream in = null;
         try
         {
             // stream closed in the finally
-            in = new ClassLoaderObjectInputStream(muleContext.getExecutionClassLoader(), inputStream);
+            in = new ClassLoaderObjectInputStream(cl, inputStream);
             Object obj = in.readObject();
             if (obj instanceof DeserializationPostInitialisable)
             {
@@ -100,13 +117,29 @@ public class SerializationUtils extends org.apache.commons.lang.SerializationUti
      * @throws IllegalArgumentException if <code>objectData</code> is <code>null</code>
      * @throws SerializationException   (runtime) if the serialization fails
      */
-    public static Object deserialize(byte[] objectData, MuleContext muleContext)
+    private static Object deserialize(byte[] objectData, ClassLoader cl, MuleContext muleContext)
     {
         if (objectData == null)
         {
             throw new IllegalArgumentException("The byte[] must not be null");
         }
         ByteArrayInputStream bais = new ByteArrayInputStream(objectData);
-        return deserialize(bais, muleContext);
+        return deserialize(bais, cl, muleContext);
     }
+    
+    /**
+     * @deprecated Call deserialize(InputStream inputStream, MuleContext muleContext) instead
+     */
+    public static Object deserialize(InputStream inputStream, ClassLoader cl)
+    {
+        return deserialize(inputStream, cl, null);
+    }
+    
+    /**
+     * @deprecated Call deserialize(byte[] objectData, MuleContext muleContext) instead
+     */
+    public static Object deserialize(byte[] objectData, ClassLoader cl)
+    {
+        return deserialize(objectData, cl, null);
+    }    
 }
