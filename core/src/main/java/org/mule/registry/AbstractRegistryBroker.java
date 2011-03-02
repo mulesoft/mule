@@ -28,13 +28,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public abstract class AbstractRegistryBroker implements RegistryBroker
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
-
     protected RegistryBrokerLifecycleManager lifecycleManager;
 
     public AbstractRegistryBroker(MuleContext muleContext)
@@ -181,7 +176,7 @@ public abstract class AbstractRegistryBroker implements RegistryBroker
     }
 
        
-public void registerObject(String key, Object value) throws RegistrationException
+    public void registerObject(String key, Object value) throws RegistrationException
     {
         registerObject(key, value, null);
     }
