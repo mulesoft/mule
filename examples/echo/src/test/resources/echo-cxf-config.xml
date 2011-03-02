@@ -10,25 +10,25 @@
 
     <description>
         This config builds a JAX-WS service with CXF.
-        
+
         We use a "serviceClass" which is a JAX-WS interface we've defined. It allows us
         to ensure that the WSDL is only generated for the "echo" method (as opposed
         to all the other methods on the EchoComponent). This keeps our WSDL nice
         in clean - but it is not required.
 
-        To invoke the EchoUMO hit the following URL -
+        To invoke the Echo service hit the following URL -
             http://localhost:65082/services/EchoUMO/echo/text/hello
-        
-        To view the WSDL for the EchoUMO service go to -
+
+        To view the WSDL for the Echo service go to -
             http://localhost:65082/services/EchoUMO?wsdl
     </description>
 
     <model name="echoSample">
-        <service name="EchoUMO">
+        <service name="Echo">
             <inbound>
                 <inbound-endpoint address="http://localhost:65082/services/EchoUMO"
                                   exchange-pattern="request-response">
-                    <cxf:jaxws-service />                  
+                    <cxf:jaxws-service />
                 </inbound-endpoint>
             </inbound>
             <component>
@@ -36,5 +36,4 @@
             </component>
         </service>
     </model>
-    
 </mule>
