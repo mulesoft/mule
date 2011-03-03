@@ -14,8 +14,13 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public abstract class AbstractFileWatcher implements Runnable
 {
+
+    protected Log logger = LogFactory.getLog(getClass());
 
     private long timeStamp;
     private Collection<File> files;
@@ -49,7 +54,14 @@ public abstract class AbstractFileWatcher implements Runnable
         if (latestFile != null)
         {
             this.timeStamp = lastTimeStamp;
-            onChange(latestFile);
+            try
+            {
+                onChange(latestFile);
+            }
+            catch (Throwable t)
+            {
+                logger.error(String.format("Monitor for %s threw an exception", latestFile), t);
+            }
         }
     }
 
