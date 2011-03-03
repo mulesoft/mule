@@ -27,6 +27,7 @@ import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.spi.LoggerRepository;
 import org.apache.log4j.spi.RepositorySelector;
 import org.apache.log4j.spi.RootLogger;
+import org.apache.log4j.xml.DOMConfigurator;
 
 public class ApplicationAwareRepositorySelector implements RepositorySelector
 {
@@ -51,7 +52,12 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                     MuleApplicationClassLoader muleCL = (MuleApplicationClassLoader) ccl;
                     // check if there's an app-specific logging configuration available,
                     // scope the lookup to this classloader only, as getResource() will delegate to parents
-                    final URL appLogConfig = muleCL.findResource("log4j.properties");
+                    // locate xml config first, fallback to properties format if not found
+                    URL appLogConfig = muleCL.findResource("log4j.xml");
+                    if (appLogConfig == null)
+                    {
+                        appLogConfig = muleCL.findResource("log4j.properties");
+                    }
                     if (appLogConfig == null)
                     {
                         // fallback to defaults
@@ -66,14 +72,29 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                     }
                     else
                     {
-                        new PropertyConfigurator().doConfigure(appLogConfig, repository);
+                        if (appLogConfig.toExternalForm().endsWith(".xml"))
+                        {
+                            new DOMConfigurator().doConfigure(appLogConfig, repository);
+                        }
+                        else
+                        {
+                            new PropertyConfigurator().doConfigure(appLogConfig, repository);
+                        }
                     }
                 }
                 else
                 {
                     // this is not an app init, but a Mule container, use the top-level defaults
-                    final File defaultSystemLog = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf/log4j.properties");
-                    new PropertyConfigurator().doConfigure(defaultSystemLog.getAbsolutePath(), repository);
+                    File defaultSystemLog = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf/log4j.xml");
+                    if (defaultSystemLog.exists() && defaultSystemLog.canRead())
+                    {
+                        new DOMConfigurator().doConfigure(defaultSystemLog.getAbsolutePath(), repository);
+                    }
+                    else
+                    {
+                        defaultSystemLog = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf/log4j.properties");
+                        new PropertyConfigurator().doConfigure(defaultSystemLog.getAbsolutePath(), repository);
+                    }
                 }
 
                 final LoggerRepository previous = this.repository.putIfAbsent(ccl.hashCode(), repository);
