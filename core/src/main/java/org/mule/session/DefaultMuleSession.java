@@ -334,7 +334,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         //Can be null if service call originates from MuleClient
         if (serviceName != null)
         {
-            flowConstruct = muleContext.getRegistry().lookupService(serviceName);
+            flowConstruct = muleContext.getRegistry().lookupFlowConstruct(serviceName);
         }
         serializedData = null;
     }
