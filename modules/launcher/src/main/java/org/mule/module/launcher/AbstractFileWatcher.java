@@ -12,8 +12,13 @@ package org.mule.module.launcher;
 
 import java.io.File;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public abstract class AbstractFileWatcher implements Runnable
 {
+
+    protected Log logger = LogFactory.getLog(getClass());
 
     private long timeStamp;
     private File file;
@@ -31,7 +36,14 @@ public abstract class AbstractFileWatcher implements Runnable
         if (this.timeStamp != timeStamp)
         {
             this.timeStamp = timeStamp;
-            onChange(file);
+            try
+            {
+                onChange(file);
+            }
+            catch (Throwable t)
+            {
+                logger.error(String.format("Monitor for %s threw an exception", file), t);
+            }
         }
     }
 
