@@ -33,10 +33,12 @@ import javax.resource.spi.work.Work;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPListParseEngine;
 import org.apache.commons.net.ftp.FTPReply;
 
 public class FtpMessageReceiver extends AbstractPollingMessageReceiver
 {
+    private final static int FTP_LIST_PAGE_SIZE = 25;
     protected final FtpConnector connector;
     protected final FilenameFilter filenameFilter;
 
@@ -104,29 +106,31 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             {
                 throw new ConnectException(e, this);
             }
-            FTPFile[] files = client.listFiles();
+            FTPListParseEngine engine = client.initiateListParsing();
+            FTPFile[] files = null;
+            List<FTPFile> v = new ArrayList<FTPFile>();
+            while (engine.hasNext())
+            {
+                files = engine.getNext(FTP_LIST_PAGE_SIZE);
+                if (files == null || files.length == 0)
+                {
+                    return files;
+                }
+                for (FTPFile file : files)
+                {
+                    if (file.isFile())
+                    {
+                        if (filenameFilter == null || filenameFilter.accept(null, file.getName()))
+                        {
+                            v.add(file);
+                        }
+                    }
+                }
+            }
 
             if (!FTPReply.isPositiveCompletion(client.getReplyCode()))
             {
                 throw new IOException("Failed to list files. Ftp error: " + client.getReplyCode());
-            }
-
-            if (files == null || files.length == 0)
-            {
-                return files;
-            }
-
-            List<FTPFile> v = new ArrayList<FTPFile>();
-
-            for (FTPFile file : files)
-            {
-                if (file.isFile())
-                {
-                    if (filenameFilter == null || filenameFilter.accept(null, file.getName()))
-                    {
-                        v.add(file);
-                    }
-                }
             }
 
             return v.toArray(new FTPFile[v.size()]);
