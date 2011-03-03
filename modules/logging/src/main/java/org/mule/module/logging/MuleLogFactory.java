@@ -29,16 +29,18 @@ public class MuleLogFactory extends SLF4JLogFactory
 {
     protected ConcurrentHashMap<Integer, ConcurrentMap<String, Log>> repository = new ConcurrentHashMap<Integer, ConcurrentMap<String, Log>>();
 
+    protected static final Integer NO_CCL_CLASSLOADER = 0;
+
     public Log getInstance(String name) throws LogConfigurationException
     {
         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-        ConcurrentMap<String, Log> loggerMap = repository.get(ccl.hashCode());
+        ConcurrentMap<String, Log> loggerMap = repository.get(ccl == null ? NO_CCL_CLASSLOADER : ccl.hashCode());
 
         if (loggerMap == null)
         {
             loggerMap = new ConcurrentHashMap<String, Log>();
 
-            final ConcurrentMap<String, Log> previous = repository.putIfAbsent(ccl.hashCode(), loggerMap);
+            final ConcurrentMap<String, Log> previous = repository.putIfAbsent(ccl == null ? NO_CCL_CLASSLOADER : ccl.hashCode(), loggerMap);
             if (previous != null)
             {
                 loggerMap = previous;

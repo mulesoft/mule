@@ -21,6 +21,8 @@ public class MuleLoggerFactory implements ILoggerFactory
 {
     protected ConcurrentMap<Integer, ConcurrentMap<String, Logger>> repository = new ConcurrentHashMap<Integer, ConcurrentMap<String, Logger>>();
 
+    protected static final Integer NO_CCL_CLASSLOADER = 0;
+
     public Logger getLogger(String name)
     {
         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
@@ -29,12 +31,12 @@ public class MuleLoggerFactory implements ILoggerFactory
 
     public Logger getLogger(String name, ClassLoader classLoader)
     {
-        ConcurrentMap<String, Logger> loggerMap = repository.get(classLoader.hashCode());
+        ConcurrentMap<String, Logger> loggerMap = repository.get(classLoader == null ? NO_CCL_CLASSLOADER : classLoader.hashCode());
 
         if (loggerMap == null)
         {
             loggerMap = new ConcurrentHashMap<String, Logger>();
-            final ConcurrentMap<String, Logger> previous = repository.putIfAbsent(classLoader.hashCode(), loggerMap);
+            final ConcurrentMap<String, Logger> previous = repository.putIfAbsent(classLoader == null ? NO_CCL_CLASSLOADER : classLoader.hashCode(), loggerMap);
             if (previous != null)
             {
                 loggerMap = previous;

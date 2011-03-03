@@ -19,6 +19,8 @@ import org.slf4j.Marker;
  */
 public class DispatchingLogger implements Logger
 {
+    protected static final Integer NO_CCL_CLASSLOADER = 0;
+
     protected Logger originalLogger;
     protected Integer originalClassLoaderHash;
     private String name;
@@ -26,7 +28,8 @@ public class DispatchingLogger implements Logger
 
     public DispatchingLogger(Logger originalLogger, MuleLoggerFactory factory)
     {
-        this.originalClassLoaderHash = Thread.currentThread().getContextClassLoader().hashCode();
+        final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+        this.originalClassLoaderHash = ccl == null ? NO_CCL_CLASSLOADER : ccl.hashCode();
         this.originalLogger = originalLogger;
         this.name = originalLogger.getName();
         this.factory = factory;
@@ -345,7 +348,7 @@ public class DispatchingLogger implements Logger
     protected Logger getLogger()
     {
         final ClassLoader currentCl = Thread.currentThread().getContextClassLoader();
-        if (currentCl.hashCode() == originalClassLoaderHash)
+        if (currentCl == null || currentCl.hashCode() == originalClassLoaderHash)
         {
             return originalLogger;
         }

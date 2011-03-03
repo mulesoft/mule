@@ -33,18 +33,19 @@ import org.apache.log4j.xml.DOMConfigurator;
 
 public class ApplicationAwareRepositorySelector implements RepositorySelector
 {
-    // note that this is a direct log4j logger declaration, not a clogging one
-    protected Logger logger = Logger.getLogger(getClass());
-
     protected static final String PATTERN_LAYOUT = "%-5p %d [%t] %c: %m%n";
 
+    protected static final Integer NO_CCL_CLASSLOADER = 0;
     protected ConcurrentMap<Integer, LoggerRepository> repository = new ConcurrentHashMap<Integer, LoggerRepository>();
+
+    // note that this is a direct log4j logger declaration, not a clogging one
+    protected Logger logger = Logger.getLogger(getClass());
 
     public LoggerRepository getLoggerRepository()
     {
         final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 
-        LoggerRepository repository = this.repository.get(ccl.hashCode());
+        LoggerRepository repository = this.repository.get(ccl == null ? NO_CCL_CLASSLOADER : ccl.hashCode());
         if (repository == null)
         {
             final RootLogger root = new RootLogger(Level.INFO);
@@ -110,7 +111,7 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                     }
                 }
 
-                final LoggerRepository previous = this.repository.putIfAbsent(ccl.hashCode(), repository);
+                final LoggerRepository previous = this.repository.putIfAbsent(ccl == null ? NO_CCL_CLASSLOADER : ccl.hashCode(), repository);
                 if (previous != null)
                 {
                     repository = previous;
