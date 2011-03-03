@@ -5,6 +5,8 @@ Top-level logger for the Mule container is configured in "$MULE_HOME/conf/log4j.
 
 *** Xml format has higher priority and will be used if found or in presence of both xml and properties configs. ***
 
+Log4j xml docs: http://wiki.apache.org/logging-log4j/Log4jXmlFormat
+
 Container-level logging is written to the $MULE_HOME/logs/mule.log file.
 
 Application-level logging supports 2 modes:
