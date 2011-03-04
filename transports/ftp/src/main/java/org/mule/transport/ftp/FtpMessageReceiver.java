@@ -82,6 +82,11 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         {
             for (final FTPFile file : files)
             {
+                if (getLifecycleState().isStopping())
+                {
+                    break;
+                }
+
                 final String fileName = file.getName();
 
                 if (!scheduledFiles.contains(fileName) && !currentFiles.contains(fileName))
