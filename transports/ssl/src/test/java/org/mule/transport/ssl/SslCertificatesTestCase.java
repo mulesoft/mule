@@ -26,9 +26,16 @@ public class SslCertificatesTestCase extends DynamicPortTestCase
 {
     private static int NUM_MESSAGES = 100;
 
+    @Override
     protected String getConfigResources()
     {
         return "ssl-certificates-test.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
     public void testOnce() throws Exception
@@ -41,7 +48,27 @@ public class SslCertificatesTestCase extends DynamicPortTestCase
         doTests(NUM_MESSAGES);
     }
 
-    protected void doTests(int n) throws Exception
+    protected void doTests(int numberOfMessages) throws Exception
+    {
+        SaveCertificatesCallback callback = setupEventCallback();
+
+        MuleClient client = new MuleClient(muleContext);
+        for (int i = 0; i < numberOfMessages; ++i)
+        {
+            String msg = TEST_MESSAGE + i;
+            MuleMessage result = client.send("in", msg, null);
+            assertEquals(msg  + " Received", result.getPayloadAsString());
+        }
+
+        Iterator<Certificate[]> certificates = callback.getCertificates().iterator();
+        for (int i = 0; i < numberOfMessages; ++i)
+        {
+            assertTrue("No cert at " + i, certificates.hasNext());
+            assertNotNull("Null cert at " + i, certificates.next());
+        }
+    }
+
+    private SaveCertificatesCallback setupEventCallback() throws Exception
     {
         FunctionalTestComponent ftc = (FunctionalTestComponent) getComponent("service");
         assertNotNull(ftc);
@@ -49,25 +76,6 @@ public class SslCertificatesTestCase extends DynamicPortTestCase
 
         SaveCertificatesCallback callback = (SaveCertificatesCallback) ftc.getEventCallback();
         callback.clear();
-
-        MuleClient client = new MuleClient(muleContext);
-        for (int i = 0; i < n; ++i)
-        {
-            String msg = TEST_MESSAGE + n;
-            MuleMessage result = client.send("in", msg, null);
-            assertEquals(msg  + " Received", result.getPayloadAsString());
-        }
-        Iterator<Certificate[]> certificates = callback.getCertificates().iterator();
-        for (int i = 0; i < n; ++i)
-        {
-            assertTrue("No cert at " + i, certificates.hasNext());
-            assertNotNull("Null cert at " + i, certificates.next());
-        }
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
+        return callback;
     }
 }
