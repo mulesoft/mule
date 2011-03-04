@@ -233,7 +233,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
              * thread from busy-waiting.
              */
             LifecycleState receiverState = this.receiver.getLifecycleState();
-            while (receiverState.isStarted() && !receiverState.isStopped())
+            while (receiverState.isStarted() && !receiverState.isStopping())
             {
                 super.poll();
             }
