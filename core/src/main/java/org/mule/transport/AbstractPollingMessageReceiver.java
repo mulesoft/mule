@@ -133,7 +133,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
                     }
                     catch (InterruptedException e)
                     {
-                        logger.error(
+                        logger.warn(
                                 ObjectUtils.identityToShortString(this) + "  interrupted while waiting for poll() to complete as part of message receiver stop.",
                                 e);
                         break;
