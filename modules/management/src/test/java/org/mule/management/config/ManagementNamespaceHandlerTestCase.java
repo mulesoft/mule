@@ -18,9 +18,6 @@ import org.mule.module.management.agent.JmxAgent;
 import org.mule.module.management.agent.JmxServerNotificationAgent;
 import org.mule.module.management.agent.Log4jAgent;
 import org.mule.module.management.agent.Mx4jAgent;
-import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
-import org.mule.module.management.support.JmxSupport;
-import org.mule.module.management.support.JmxSupportFactory;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestAgent;
 
@@ -30,9 +27,6 @@ import java.util.Iterator;
 public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 {
     private static final int CHAINSAW_PORT = 8080;
-    protected JmxSupportFactory jmxSupportFactory = AutoDiscoveryJmxSupportFactory.getInstance();
-    protected JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
-
     
     public ManagementNamespaceHandlerTestCase()
     {
@@ -41,6 +35,7 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         setStartContext(false);
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "management-namespace-config.xml";
@@ -103,10 +98,10 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
     {
         Registry registry = muleContext.getRegistry();
         assertNotNull(registry);
-        Collection agents = registry.lookupObjects(Agent.class);
+        Collection<Agent> agents = registry.lookupObjects(Agent.class);
         assertEquals(agents.size(), 8);
         
-        Iterator iter = agents.iterator();
+        Iterator<Agent> iter = agents.iterator();
         assertTrue(iter.next() instanceof JmxAgent);
         assertTrue(iter.next() instanceof Log4jAgent);
         assertTrue(iter.next() instanceof Mx4jAgent);
