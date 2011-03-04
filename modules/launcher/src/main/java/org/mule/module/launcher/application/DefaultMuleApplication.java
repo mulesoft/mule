@@ -32,6 +32,7 @@ import org.mule.module.launcher.DefaultMuleSharedDomainClassLoader;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.DeploymentStopException;
+import org.mule.module.launcher.GoodCitizenClassLoader;
 import org.mule.module.launcher.InstallException;
 import org.mule.module.launcher.MuleApplicationClassLoader;
 import org.mule.module.launcher.MuleSharedDomainClassLoader;
@@ -236,28 +237,34 @@ public class DefaultMuleApplication implements Application
 
     public void dispose()
     {
-        if (muleContext == null)
+        // moved wrapper logic into the actual implementation, as redeploy() invokes it directly, bypassing
+        // classloader cleanup
+        try
         {
-            if (logger.isInfoEnabled())
+            ClassLoader appCl = getDeploymentClassLoader();
+            // if not initialized yet, it can be null
+            if (appCl != null)
             {
-                logger.info("MuleContext not created, nothing to dispose of");
+                Thread.currentThread().setContextClassLoader(appCl);
             }
-            return;
-        }
 
-        if (muleContext.isStarted() && !muleContext.isDisposed())
-        {
-            stop();
-        }
-        if (logger.isInfoEnabled())
-        {
-            logger.info("Disposing application: " + appName);
-        }
+            doDispose();
 
-        muleContext.dispose();
-        muleContext = null;
-        // kill any refs to the old classloader to avoid leaks
-        Thread.currentThread().setContextClassLoader(null);
+            if (appCl != null)
+            {
+                // close classloader to release jar connections in lieu of Java 7's ClassLoader.close()
+                if (appCl instanceof GoodCitizenClassLoader)
+                {
+                    GoodCitizenClassLoader classLoader = (GoodCitizenClassLoader) appCl;
+                    classLoader.close();
+                }
+            }
+        }
+        finally
+        {
+            // kill any refs to the old classloader to avoid leaks
+            Thread.currentThread().setContextClassLoader(null);
+        }
     }
 
     public void redeploy()
@@ -308,6 +315,30 @@ public class DefaultMuleApplication implements Application
         return String.format("%s[%s]@%s", getClass().getName(),
                              appName,
                              Integer.toHexString(System.identityHashCode(this)));
+    }
+
+    protected void doDispose()
+    {
+        if (muleContext == null)
+        {
+            if (logger.isInfoEnabled())
+            {
+                logger.info("MuleContext not created, nothing to dispose of");
+            }
+            return;
+        }
+
+        if (muleContext.isStarted() && !muleContext.isDisposed())
+        {
+            stop();
+        }
+        if (logger.isInfoEnabled())
+        {
+            logger.info("Disposing application: " + appName);
+        }
+
+        muleContext.dispose();
+        muleContext = null;
     }
 
     protected void createDeploymentClassLoader()
