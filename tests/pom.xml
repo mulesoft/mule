@@ -35,9 +35,13 @@
             </modules>
         </profile>
         <profile>
-            <id>jdk6</id>
+            <id>beyond-jdk6</id>
             <activation>
-                <jdk>1.6</jdk>
+                <!--
+                    Minimum JDK version for the build is JDK5. Everything with
+                    a higher version number enables this profile.
+                -->
+                <jdk>!1.5</jdk>
             </activation>
             <modules>
                 <module>integration-jdk6</module>
