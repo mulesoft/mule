@@ -11,8 +11,11 @@ package org.mule.routing.correlation;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.routing.RoutingException;
@@ -30,20 +33,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
-
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  */
-public class EventCorrelator
+public class EventCorrelator implements Startable, Stoppable
 {
     /**
      * logger used by this class
@@ -51,11 +50,11 @@ public class EventCorrelator
     protected transient final Log logger = LogFactory.getLog(EventCorrelator.class);
 
     public static final String NO_CORRELATION_ID = "no-id";
-    
+
     public static final int MAX_PROCESSED_GROUPS = 50000;
 
     protected static final long MILLI_TO_NANO_MULTIPLIER = 1000000L;
-    
+
     private static final long ONE_DAY_IN_MILLI = 1000 * 60 * 60 * 24;
 
     protected long groupTimeToLive = ONE_DAY_IN_MILLI;
@@ -82,14 +81,14 @@ public class EventCorrelator
 
     private EventCorrelatorCallback callback;
 
-    private AtomicBoolean timerStarted = new AtomicBoolean(false);
-    
     private MessageProcessor timeoutMessageProcessor;
-    
+
     /**
      * A map with keys = group id and values = group creation time
      */
     private Map expiredAndDispatchedGroups = new ConcurrentHashMap();
+
+    private EventCorrelator.ExpiringGroupMonitoringThread expiringGroupMonitoringThread;
 
     public EventCorrelator(EventCorrelatorCallback callback, MessageProcessor timeoutMessageProcessor, MessageInfoMapping messageInfoMapping, MuleContext muleContext)
     {
@@ -111,16 +110,6 @@ public class EventCorrelator
         this.timeoutMessageProcessor = timeoutMessageProcessor;
     }
 
-    public void enableTimeoutMonitor() throws WorkException
-    {
-        if (timerStarted.get())
-        {
-            return;
-        }
-
-        this.muleContext.getWorkManager().scheduleWork(new ExpiringGroupWork());
-    }
-
     public void forceGroupExpiry(String groupId)
     {
         if (eventGroups.get(groupId) != null)
@@ -132,7 +121,7 @@ public class EventCorrelator
             addProcessedGroup(groupId);
         }
     }
-    
+
     public MuleEvent process(MuleEvent event) throws RoutingException
     {
         // the correlationId of the event's message
@@ -181,16 +170,16 @@ public class EventCorrelator
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("An event was received for an event group that has already been processed, " +
-                            "this is probably because the async-reply timed out. Correlation Id is: " + groupId +
-                            ". Dropping event");
+                                 "this is probably because the async-reply timed out. Correlation Id is: " + groupId +
+                                 ". Dropping event");
                 }
                 //Fire a notification to say we received this message
                 muleContext.fireNotification(new RoutingNotification(event.getMessage(),
-                        event.getEndpoint().getEndpointURI().toString(),
-                        RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT));
+                                                                     event.getEndpoint().getEndpointURI().toString(),
+                                                                     RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT));
                 return null;
             }
-            
+
             // check for an existing group first
             EventGroup group = this.getEventGroup(groupId);
 
@@ -240,7 +229,6 @@ public class EventCorrelator
             }
         }
     }
-    
 
     protected EventGroup getEventGroup(String groupId)
     {
@@ -301,7 +289,7 @@ public class EventCorrelator
     {
         this.timeout = timeout;
     }
-    
+
     protected void handleGroupExpiry(EventGroup group)
     {
         removeEventGroup(group);
@@ -312,7 +300,7 @@ public class EventCorrelator
         {
             final MuleMessageCollection messageCollection = group.toMessageCollection();
             muleContext.fireNotification(new RoutingNotification(messageCollection, null,
-                                                             RoutingNotification.CORRELATION_TIMEOUT));
+                                                                 RoutingNotification.CORRELATION_TIMEOUT));
             service.getExceptionListener().handleException(
                     new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
                                                     group.getMessageCollectionEvent()), group.getMessageCollectionEvent());
@@ -335,7 +323,7 @@ public class EventCorrelator
                     newEvent.getMessage().setCorrelationId(group.getGroupId().toString());
 
 
-                    if (!expiredAndDispatchedGroups.containsKey(group.getGroupId())) 
+                    if (!expiredAndDispatchedGroups.containsKey(group.getGroupId()))
                     {
                         // TODO which use cases would need a sync reply event returned?
                         if (timeoutMessageProcessor != null)
@@ -352,7 +340,7 @@ public class EventCorrelator
                             ((Service) service).dispatchEvent(newEvent);
                         }
                         expiredAndDispatchedGroups.put(group.getGroupId(),
-                            group.getCreated());
+                                                       group.getCreated());
                     }
                     else
                     {
@@ -367,14 +355,36 @@ public class EventCorrelator
         }
     }
 
-    
-    private final class ExpiringGroupWork implements Work, Expirable
+    public void start() throws MuleException
+    {
+        logger.info("Starting event correlator");
+        if (timeout != 0)
+        {
+            expiringGroupMonitoringThread = new ExpiringGroupMonitoringThread();
+            expiringGroupMonitoringThread.start();
+        }
+    }
+
+    public void stop() throws MuleException
+    {
+        logger.info("Stopping event correlator");
+        if (expiringGroupMonitoringThread != null)
+        {
+            expiringGroupMonitoringThread.stopProcessing();
+        }
+    }
+
+
+    private final class ExpiringGroupMonitoringThread extends Thread implements Expirable
     {
         private ExpiryMonitor expiryMonitor;
-        
-        public ExpiringGroupWork()
+
+        private volatile boolean stopRequested;
+
+        public ExpiringGroupMonitoringThread()
         {
             final String name = String.format("%sevent.correlator", ThreadNameHelper.getPrefix(muleContext));
+            setName(name);
             this.expiryMonitor = new ExpiryMonitor(name, 1000 * 60);
             //clean up every 30 minutes
             this.expiryMonitor.addExpirable(1000 * 60 * 30, TimeUnit.MILLISECONDS, this);
@@ -405,6 +415,12 @@ public class EventCorrelator
         {
             while (true)
             {
+                if (stopRequested)
+                {
+                    logger.debug("Received request to stop expiring group monitoring");
+                    break;
+                }
+
                 List<EventGroup> expired = new ArrayList<EventGroup>(1);
                 for (Object o : eventGroups.values())
                 {
@@ -422,6 +438,7 @@ public class EventCorrelator
                         handleGroupExpiry(group);
                     }
                 }
+
                 try
                 {
                     Thread.sleep(100);
@@ -431,7 +448,26 @@ public class EventCorrelator
                     break;
                 }
             }
+
+            logger.debug("Expiring group monitoring fully stopped");
         }
 
+        /**
+         * Stops the monitoring of the expired groups.
+         */
+        public void stopProcessing()
+        {
+            logger.debug("Stopping expiring group monitoring");
+            stopRequested = true;
+
+            try
+            {
+                this.join();
+            }
+            catch (InterruptedException e)
+            {
+                // Ignoring
+            }
+        }
     }
 }
