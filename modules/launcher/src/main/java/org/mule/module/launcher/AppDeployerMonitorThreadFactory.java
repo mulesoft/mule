@@ -10,6 +10,8 @@
 
 package org.mule.module.launcher;
 
+import org.mule.util.concurrent.LoggingUncaughtExceptionHandler;
+
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -37,6 +39,7 @@ public class AppDeployerMonitorThreadFactory implements ThreadFactory
         // make sure it's non-daemon, allows for an 'idle' state of Mule by preventing early termination
         t.setDaemon(false);
         t.setPriority(Thread.MIN_PRIORITY);
+        t.setUncaughtExceptionHandler(new LoggingUncaughtExceptionHandler());
         return t;
     }
 
