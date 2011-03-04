@@ -96,7 +96,7 @@ public class JdbcConnector extends AbstractConnector
         }
         if (resultSetHandler == null)
         {
-            resultSetHandler = new org.apache.commons.dbutils.handlers.MapListHandler();
+            resultSetHandler = new org.apache.commons.dbutils.handlers.MapListHandler(new ColumnAliasRowProcessor());
         }
         if (queryRunner == null)
         {
