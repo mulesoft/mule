@@ -18,9 +18,9 @@ import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.ObjectUtils;
 
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.Future;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
@@ -43,9 +43,9 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
 
     private long frequency = DEFAULT_POLL_FREQUENCY;
     private TimeUnit timeUnit = DEFAULT_POLL_TIMEUNIT;
-
+    
     // @GuardedBy(itself)
-    protected final List<ScheduledFuture> schedules = new LinkedList<ScheduledFuture>();
+    protected final Map<ScheduledFuture, PollingReceiverWorker> schedules = new HashMap<ScheduledFuture, PollingReceiverWorker>();
 
     public AbstractPollingMessageReceiver(Connector connector,
                                           FlowConstruct flowConstruct,
@@ -93,10 +93,11 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
             // polling takes longer than the specified frequency, e.g. when the
             // polled database or network is slow or returns large amounts of
             // data.
+            PollingReceiverWorker pollingReceiverWorker = this.createWork();
             ScheduledFuture schedule = connector.getScheduler().scheduleWithFixedDelay(
-                new PollingReceiverWorkerSchedule(this.createWork()), DEFAULT_STARTUP_DELAY,
+                new PollingReceiverWorkerSchedule(pollingReceiverWorker), DEFAULT_STARTUP_DELAY,
                 this.getFrequency(), this.getTimeUnit());
-            schedules.add(schedule);
+            schedules.put(schedule, pollingReceiverWorker);
 
             if (logger.isDebugEnabled())
             {
@@ -117,10 +118,27 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
         synchronized (schedules)
         {
             // cancel our schedules gently: do not interrupt when polling is in progress
-            for (Iterator<ScheduledFuture> i = schedules.iterator(); i.hasNext();)
+            for (Iterator<ScheduledFuture> i = schedules.keySet().iterator(); i.hasNext();)
             {
                 ScheduledFuture schedule = i.next();
                 schedule.cancel(false);
+                // Wait until in-progress PollingRecevierWorker completes.
+                int shutdownTimeout = connector.getMuleContext().getConfiguration().getShutdownTimeout();
+                PollingReceiverWorker worker = schedules.get(schedule);
+                for (int elapsed = 0; worker.isRunning() && elapsed < shutdownTimeout; elapsed += 50)
+                {
+                    try
+                    {
+                        Thread.sleep(50);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        logger.error(
+                            "PollingReceiverWworker interupted while waiting for poll() to complete as part of message receiver stop.",
+                            e);
+                        break;
+                    }
+                }
                 i.remove();
 
                 if (logger.isDebugEnabled())
