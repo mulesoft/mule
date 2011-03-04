@@ -188,6 +188,27 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
     {
         this.timeUnit = timeUnit;
     }
+    
+    /**
+     * The preferred number of messages to process in the current batch. We need to
+     * drain the queue quickly, but not by slamming the workManager too hard. It is
+     * impossible to determine this more precisely without proper load
+     * statistics/feedback or some kind of "event cost estimate". Therefore we just
+     * try to use half of the receiver's workManager, since it is shared with
+     * receivers for other endpoints. TODO make this user-settable
+     * 
+     * @param available the number if messages currently available to be processed
+     */
+    protected int getBatchSize(int available)
+    {
+        if (available <= 0)
+        {
+            return 0;
+        }
+
+        int maxThreads = connector.getReceiverThreadingProfile().getMaxThreadsActive();
+        return Math.max(1, Math.min(available, ((maxThreads / 2) - 1)));
+    }
 
     public abstract void poll() throws Exception;
 

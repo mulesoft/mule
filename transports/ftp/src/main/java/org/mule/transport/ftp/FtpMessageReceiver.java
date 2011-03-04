@@ -111,6 +111,10 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             List<FTPFile> v = new ArrayList<FTPFile>();
             while (engine.hasNext())
             {
+                if (getLifecycleState().isStopping())
+                {
+                    break;
+                }
                 files = engine.getNext(FTP_LIST_PAGE_SIZE);
                 if (files == null || files.length == 0)
                 {
