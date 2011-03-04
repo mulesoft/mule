@@ -142,8 +142,7 @@ public class DeploymentService
             }
             catch (IOException e)
             {
-                // TODO logging
-                e.printStackTrace();
+                logger.error(String.format("Failed to create application [%s]", app), e);
             }
         }
 
@@ -156,8 +155,8 @@ public class DeploymentService
             }
             catch (Throwable t)
             {
-                // TODO logging
-                t.printStackTrace();
+                // error text has been created by the deployer already
+                logger.error(t);
             }
         }
 
@@ -215,8 +214,7 @@ public class DeploymentService
             }
             catch (Throwable t)
             {
-                // TODO logging
-                t.printStackTrace();
+                logger.error(t);
             }
         }
 
