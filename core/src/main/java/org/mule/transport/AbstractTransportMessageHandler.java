@@ -402,6 +402,11 @@ public abstract class AbstractTransportMessageHandler<O> implements Connectable,
         return getLifecycleState().isStarting();
     }
 
+    public boolean isStopping()
+    {
+        return getLifecycleState().isStopping();
+    }
+
     /**
      * This method uses the connector's <code>createMuleMessageFactory</code> method to create
      * a new {@link MuleMessageFactory}. Subclasses may need to override this method in order to
