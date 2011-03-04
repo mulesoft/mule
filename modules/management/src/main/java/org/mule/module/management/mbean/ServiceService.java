@@ -31,7 +31,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ServiceService extends FlowConstructService implements ServiceServiceMBean, MBeanRegistration, ServiceStatsMBean
 {
-
     /**
      * logger used by this class
      */
@@ -66,7 +65,7 @@ public class ServiceService extends FlowConstructService implements ServiceServi
      * queued messages you can set the 'recoverableMode' property on the
      * Muleconfiguration to true. this causes all internal queues to store their
      * state.
-     * 
+     *
      * @throws MuleException if the service failed to pause.
      * @see MuleConfiguration
      */
@@ -78,7 +77,7 @@ public class ServiceService extends FlowConstructService implements ServiceServi
     /**
      * Resumes the Service that has been paused. If the service is not paused
      * nothing is executed.
-     * 
+     *
      * @throws MuleException if the service failed to resume
      */
     public void resume() throws MuleException
@@ -121,31 +120,36 @@ public class ServiceService extends FlowConstructService implements ServiceServi
         getComponent().start();
     }
 
+    @Override
     public ObjectName getStatistics()
     {
         return statsName;
     }
 
+    @Override
     public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception
     {
         return super.preRegister(server, name);
     }
 
+    @Override
     public void postRegister(Boolean registrationDone)
     {
         try
         {
             if (getComponent().getStatistics() != null)
             {
-                statsName = new ObjectName(objectName.getDomain() + ":type=org.mule.Statistics,service="
-                                           + getName());
+                String quotedName = ObjectName.quote(getName());
+                statsName = new ObjectName(objectName.getDomain() +
+                    ":type=org.mule.Statistics,service=" + quotedName);
+
                 // unregister old version if exists
-                if (this.server.isRegistered(statsName))
+                if (server.isRegistered(statsName))
                 {
-                    this.server.unregisterMBean(statsName);
+                    server.unregisterMBean(statsName);
                 }
 
-                this.server.registerMBean(new ServiceStats(getComponent().getStatistics()), this.statsName);
+                server.registerMBean(new ServiceStats(getComponent().getStatistics()), statsName);
             }
         }
         catch (Exception e)
@@ -154,11 +158,13 @@ public class ServiceService extends FlowConstructService implements ServiceServi
         }
     }
 
+    @Override
     public void preDeregister() throws Exception
     {
         super.preDeregister();
     }
 
+    @Override
     public void postDeregister()
     {
         super.postDeregister();
@@ -170,21 +176,25 @@ public class ServiceService extends FlowConstructService implements ServiceServi
     }
 
     // ///// Service stats impl /////////
+    @Override
     public void clearStatistics()
     {
         statistics.clear();
     }
 
+    @Override
     public long getAsyncEventsReceived()
     {
         return statistics.getAsyncEventsReceived();
     }
 
+    @Override
     public long getSyncEventsReceived()
     {
         return statistics.getSyncEventsReceived();
     }
 
+    @Override
     public long getTotalEventsReceived()
     {
         return statistics.getTotalEventsReceived();

@@ -82,7 +82,7 @@ public class JmxAgent extends AbstractAgent
     public static final String NAME = "jmx-agent";
 
     public static final String DEFAULT_REMOTING_URI = "service:jmx:rmi:///jndi/rmi://localhost:1099/server";
-    
+
     // populated with values below in a static initializer
     public static final Map<String, String> DEFAULT_CONNECTOR_SERVER_PROPERTIES;
 
@@ -398,11 +398,15 @@ public class JmxAgent extends AbstractAgent
         for (Service service : muleContext.getRegistry().lookupObjects(Service.class))
         {
             final String rawName = service.getName();
-            final String name = jmxSupport.escape(rawName);
-            final String jmxName = String.format("%s:%s%s", jmxSupport.getDomainName(muleContext, !containerMode), ServiceServiceMBean.DEFAULT_JMX_NAME_PREFIX, name);
+            final String escapedName = jmxSupport.escape(rawName);
+            final String jmxName = String.format("%s:%s%s",
+                jmxSupport.getDomainName(muleContext, !containerMode),
+                ServiceServiceMBean.DEFAULT_JMX_NAME_PREFIX, escapedName);
             ObjectName on = jmxSupport.getObjectName(jmxName);
+
             ServiceServiceMBean serviceMBean = new ServiceService(rawName, muleContext);
             ClassloaderSwitchingMBeanWrapper wrapper = new ClassloaderSwitchingMBeanWrapper(serviceMBean, ServiceServiceMBean.class, muleContext.getExecutionClassLoader());
+
             logger.debug("Registering service with name: " + on);
             mBeanServer.registerMBean(wrapper, on);
         }
@@ -604,7 +608,7 @@ public class JmxAgent extends AbstractAgent
         {
             // note that we don't try to resolve a domain name clash here.
             // e.g. when stopping an app via jmx, we want to obtain current domain only,
-            // but the execution thread is different, and doesn't have the resolved domain info 
+            // but the execution thread is different, and doesn't have the resolved domain info
             final String domain = jmxSupport.getDomainName(muleContext, false);
             ObjectName query = jmxSupport.getObjectName(domain + ":*");
             Set<ObjectName> mbeans = mBeanServer.queryNames(query, null);

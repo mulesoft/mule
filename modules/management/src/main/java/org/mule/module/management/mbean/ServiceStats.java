@@ -42,7 +42,6 @@ public class ServiceStats extends FlowConstructStats implements ServiceStatsMBea
         this.statistics = statistics;
     }
 
-
     public long getAsyncEventsSent()
     {
         return statistics.getAsyncEventsSent();
@@ -109,39 +108,47 @@ public class ServiceStats extends FlowConstructStats implements ServiceStatsMBea
         return statistics.getTotalExecutionTime();
     }
 
+    @Override
     public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception
     {
         return super.preRegister(server, name);
     }
 
+    @Override
     public void postRegister(Boolean registrationDone)
     {
         super.postRegister(registrationDone);
+
         try
         {
-            RouterStatistics is = this.statistics.getInboundRouterStat();
+            RouterStatistics is = statistics.getInboundRouterStat();
             if (is != null)
             {
+                String quotedStatsName = ObjectName.quote(statistics.getName());
                 inboundName = new ObjectName(name.getDomain() + ":type=org.mule.Statistics,service="
-                                             + statistics.getName() + ",router=inbound");
+                                             + quotedStatsName + ",router=inbound");
+
                 // unregister old version if exists
-                if (this.server.isRegistered(inboundName))
+                if (server.isRegistered(inboundName))
                 {
-                    this.server.unregisterMBean(inboundName);
+                    server.unregisterMBean(inboundName);
                 }
-                this.server.registerMBean(new RouterStats(is), this.inboundName);
+                server.registerMBean(new RouterStats(is), this.inboundName);
             }
+
             RouterStatistics os = this.statistics.getOutboundRouterStat();
             if (os != null)
             {
+                String quotedStatsName = ObjectName.quote(statistics.getName());
                 outboundName = new ObjectName(name.getDomain() + ":type=org.mule.Statistics,service="
-                                              + statistics.getName() + ",router=outbound");
+                                              + quotedStatsName + ",router=outbound");
+
                 // unregister old version if exists
-                if (this.server.isRegistered(outboundName))
+                if (server.isRegistered(outboundName))
                 {
-                    this.server.unregisterMBean(outboundName);
+                    server.unregisterMBean(outboundName);
                 }
-                this.server.registerMBean(new RouterStats(os), this.outboundName);
+                server.registerMBean(new RouterStats(os), this.outboundName);
             }
         }
         catch (Exception e)
@@ -150,11 +157,13 @@ public class ServiceStats extends FlowConstructStats implements ServiceStatsMBea
         }
     }
 
+    @Override
     public void preDeregister() throws Exception
     {
         super.preDeregister();
     }
 
+    @Override
     public void postDeregister()
     {
         super.postDeregister();
