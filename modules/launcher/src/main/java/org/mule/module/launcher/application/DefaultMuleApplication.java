@@ -239,7 +239,6 @@ public class DefaultMuleApplication implements Application
     {
         // moved wrapper logic into the actual implementation, as redeploy() invokes it directly, bypassing
         // classloader cleanup
-        final ClassLoader originalCl = Thread.currentThread().getContextClassLoader();
         try
         {
             ClassLoader appCl = getDeploymentClassLoader();
@@ -263,7 +262,8 @@ public class DefaultMuleApplication implements Application
         }
         finally
         {
-            Thread.currentThread().setContextClassLoader(originalCl);
+            // kill any refs to the old classloader to avoid leaks
+            Thread.currentThread().setContextClassLoader(null);
         }
     }
 
@@ -339,8 +339,6 @@ public class DefaultMuleApplication implements Application
 
         muleContext.dispose();
         muleContext = null;
-        // kill any refs to the old classloader to avoid leaks
-        Thread.currentThread().setContextClassLoader(null);
     }
 
     protected void createDeploymentClassLoader()
