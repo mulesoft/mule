@@ -86,6 +86,11 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
             deploymentService.stop();
         }
         super.doTearDown();
+
+        // this is a complex classloader setup and we can't reproduce standalone Mule 100%,
+        // so trick the next test method into thinking it's the first run, otherwise
+        // app resets CCL ref to null and breaks the next test
+        Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
     }
 
     public void testPriviledgedApp() throws Exception
