@@ -19,31 +19,37 @@ import org.mule.transport.http.HttpConstants;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BasicJerseyTestCase extends FunctionalTestCase {
+public class BasicJerseyTestCase extends FunctionalTestCase
+{
+    @Override
+    protected String getConfigResources()
+    {
+        return "basic-conf.xml";
+    }
 
     public void testBasic() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        
+
         MuleMessage result = client.send("http://localhost:63081/helloworld", "", null);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Hello World", result.getPayloadAsString());
-        
+
         // try invalid url
         result = client.send("http://localhost:63081/hello", "", null);
         assertEquals((Integer)404, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
-        
+
         Map<String, String> props = new HashMap<String, String>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
         result = client.send("http://localhost:63081/helloworld", "", props);
         assertEquals((Integer)405, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
-        
+
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_DELETE);
         result = client.send("http://localhost:63081/helloworld", "", props);
         assertEquals("Hello World Delete", result.getPayloadAsString());
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
-    
+
     public void testParams() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -53,12 +59,12 @@ public class BasicJerseyTestCase extends FunctionalTestCase {
         MuleMessage result = client.send("http://localhost:63081/helloworld/sayHelloWithUri/Dan", "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Hello Dan", result.getPayloadAsString());
-        
+
 
         result = client.send("http://localhost:63081/helloworld/sayHelloWithJson/Dan", "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("{\"message\":\"Hello Dan\"}", result.getPayloadAsString());
-        
+
         result = client.send("http://localhost:63081/helloworld/sayHelloWithQuery?name=Dan", "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Hello Dan", result.getPayloadAsString());
@@ -69,11 +75,20 @@ public class BasicJerseyTestCase extends FunctionalTestCase {
         assertEquals("Hello Dan", result.getPayloadAsString());
         assertEquals("Dan", result.getInboundProperty("X-ResponseName"));
     }
-    
-    @Override
-    protected String getConfigResources() 
+
+    public void testThrowException() throws Exception
     {
-        return "basic-conf.xml";
+    	callThrowException(500, "");
     }
 
+    protected void callThrowException(Integer expectedErrorCode, String expectedData) throws Exception
+    {
+    	MuleClient client = new MuleClient(muleContext);
+
+    	Map<String, String> props = new HashMap<String, String>();
+        props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
+        MuleMessage result = client.send("http://localhost:63081/helloworld/throwException", "", props);
+        assertEquals(expectedErrorCode, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
+        assertEquals(expectedData, result.getPayloadAsString());
+    }
 }

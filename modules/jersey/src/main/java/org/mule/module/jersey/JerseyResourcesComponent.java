@@ -36,12 +36,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.ws.rs.ext.ExceptionMapper;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Wraps a set of components which can get invoked by Jersey. This component
- * will maps the MuleMessage format to the internal Jersey format. Jersey will then select
+ * Wraps a set of components which can get invoked by Jersey. This component will
+ * map the MuleMessage format to the internal Jersey format. Jersey will then select
  * the appropriate component to invoke based on the request parameters/URI.
  */
 public class JerseyResourcesComponent extends AbstractComponent
@@ -54,18 +56,31 @@ public class JerseyResourcesComponent extends AbstractComponent
 
     private WebApplication application;
 
+    private List<ExceptionMapper<?>> exceptionMappers = new ArrayList<ExceptionMapper<?>>();
+
     @Override
     protected void doInitialise() throws InitialisationException
     {
         super.doInitialise();
-        
+
         final Set<Class<?>> resources = new HashSet<Class<?>>();
 
-        if (components == null) 
+        if (components == null)
         {
             throw new IllegalStateException("There must be at least one component in the Jersey resources.");
         }
-        
+
+        initializeResources(resources);
+        initializeExceptionMappers(resources);
+
+        DefaultResourceConfig resourceConfig = createConfiguration(resources);
+
+        application = WebApplicationFactory.createWebApplication();
+        application.initiate(resourceConfig, getComponentProvider());
+    }
+
+    protected void initializeResources(Set<Class<?>> resources) throws InitialisationException
+    {
         // Initialize the Jersey resources using the components
         for (JavaComponent component : components)
         {
@@ -80,11 +95,15 @@ public class JerseyResourcesComponent extends AbstractComponent
                 throw new InitialisationException(e, this);
             }
         }
+    }
 
-        DefaultResourceConfig resourceConfig = createConfiguration(resources);
-
-        application = WebApplicationFactory.createWebApplication();
-        application.initiate(resourceConfig, getComponentProvider());
+    protected void initializeExceptionMappers(final Set<Class<?>> resources)
+    {
+        // Initialise Exception Mappers
+        for (ExceptionMapper<?> exceptionMapper : exceptionMappers)
+        {
+            resources.add(exceptionMapper.getClass());
+        }
     }
 
     protected DefaultResourceConfig createConfiguration(final Set<Class<?>> resources)
@@ -114,7 +133,7 @@ public class JerseyResourcesComponent extends AbstractComponent
         for (Object prop : message.getInboundPropertyNames())
         {
             Object property = message.getInboundProperty(prop.toString());
-            if (property != null) 
+            if (property != null)
             {
                 headers.add(prop.toString(), property.toString());
             }
@@ -144,7 +163,7 @@ public class JerseyResourcesComponent extends AbstractComponent
         ContainerResponse res = new ContainerResponse(application, req, writer);
 
         application.handleRequest(req, res);
-        
+
         return writer.getResponse();
     }
 
@@ -193,21 +212,27 @@ public class JerseyResourcesComponent extends AbstractComponent
     {
         this.components = components;
     }
-    
-    public void setMessageProcessors(List<MessageProcessor> messageProcessors) 
+
+    public void setMessageProcessors(List<MessageProcessor> messageProcessors)
     {
-        List<JavaComponent> components = new ArrayList<JavaComponent>();
-        for (MessageProcessor mp : messageProcessors) 
+        List<JavaComponent> javaComponents = new ArrayList<JavaComponent>();
+        for (MessageProcessor mp : messageProcessors)
         {
-            if (mp instanceof JavaComponent) 
+            if (mp instanceof JavaComponent)
             {
-                components.add((JavaComponent)mp);
+                javaComponents.add((JavaComponent) mp);
             }
             else
             {
-                throw new IllegalStateException("Only JavaComponents are allowed as MessageProcessors. Type " + mp.getClass().getName() + " is not allowed.");
+                throw new IllegalStateException("Only JavaComponents are allowed as MessageProcessors. Type "
+                                                + mp.getClass().getName() + " is not allowed.");
             }
         }
-        setComponents(components);
+        setComponents(javaComponents);
+    }
+
+    public void setExceptionMapper(ExceptionMapper<?> exceptionMapper)
+    {
+        exceptionMappers.add(exceptionMapper);
     }
 }
