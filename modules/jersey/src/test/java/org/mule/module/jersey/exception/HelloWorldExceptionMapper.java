@@ -17,6 +17,7 @@ public class HelloWorldExceptionMapper implements ExceptionMapper<HelloWorldExce
 {
     public Response toResponse(HelloWorldException exception)
     {
-        return Response.status(503).entity(exception.getMessage()).type("text/plain").build();
+        int status = Response.Status.SERVICE_UNAVAILABLE.getStatusCode();
+        return Response.status(status).entity(exception.getMessage()).type("text/plain").build();
     }
 }
