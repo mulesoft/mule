@@ -26,6 +26,8 @@ import org.mule.util.UUID;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.mail.Address;
 import javax.mail.Flags;
@@ -122,11 +124,17 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     public void messagesAdded(MessageCountEvent event)
     {
         Message messages[] = event.getMessages();
+        List<Message> processedMessages = new ArrayList<Message>();
         if (messages != null)
         {
             MuleMessage message = null;
             for (int i = 0; i < messages.length; i++)
             {
+                if (getLifecycleState().isStopping())
+                {
+                    break;
+                }
+                processedMessages.add(messages[i]);
                 try
                 {
                     if (!messages[i].getFlags().contains(Flags.Flag.DELETED)
@@ -185,7 +193,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
             {
                 try
                 {
-                    folder.copyMessages(messages, moveToFolder);
+                    folder.copyMessages(processedMessages.toArray(new Message[processedMessages.size()]), moveToFolder);
                 }
                 catch (MessagingException e)
                 {
@@ -289,61 +297,50 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     @Override
     public synchronized void poll()
     {
-        boolean done = false;
-        while (!done)
+        try
         {
-            if (getLifecycleState().isStopping())
-            {
-                break;
-            }
             try
             {
-                try
+                if (!folder.isOpen())
                 {
-                    if (!folder.isOpen())
-                    {
-                        folder.open(Folder.READ_WRITE);
-                    }
+                    folder.open(Folder.READ_WRITE);
                 }
-                catch (Exception e)
+            }
+            catch (Exception e)
+            {
+                if (logger.isDebugEnabled())
                 {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("ignoring exception: " + e.getMessage());
-                    }
+                    logger.debug("ignoring exception: " + e.getMessage());
                 }
+            }
 
-                int count = folder.getMessageCount();
-                int batchSize = getBatchSize(count);
-                if (count > 0)
-                {
-                    Message[] messages = folder.getMessages(1, batchSize);
-                    MessageCountEvent event = new MessageCountEvent(folder, MessageCountEvent.ADDED, true,
-                        messages);
-                    messagesAdded(event);
-                }
-                else if (count == -1)
-                {
-                    throw new MessagingException("Cannot monitor folder: " + folder.getFullName()
-                        + " as folder is closed");
-                }
-                done = batchSize >= count;
-            }
-            catch (MessagingException e)
+            int count = folder.getMessageCount();
+            if (count > 0)
             {
-                done = true;
-                getConnector().getMuleContext().getExceptionListener().handleException(e);
+                Message[] messages = folder.getMessages();
+                MessageCountEvent event = new MessageCountEvent(folder, MessageCountEvent.ADDED, true,
+                    messages);
+                messagesAdded(event);
             }
-            finally
+            else if (count == -1)
             {
-                try
-                {
-                    folder.close(true); // close and expunge deleted messages
-                }
-                catch (Exception e)
-                {
-                    logger.error("Failed to close pop3  inbox: " + e.getMessage());
-                }
+                throw new MessagingException("Cannot monitor folder: " + folder.getFullName()
+                                             + " as folder is closed");
+            }
+        }
+        catch (MessagingException e)
+        {
+            getConnector().getMuleContext().getExceptionListener().handleException(e);
+        }
+        finally
+        {
+            try
+            {
+                folder.close(true); // close and expunge deleted messages
+            }
+            catch (Exception e)
+            {
+                logger.error("Failed to close pop3  inbox: " + e.getMessage());
             }
         }
     }
