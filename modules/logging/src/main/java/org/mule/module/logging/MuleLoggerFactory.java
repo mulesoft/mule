@@ -10,6 +10,10 @@
 
 package org.mule.module.logging;
 
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -19,9 +23,18 @@ import org.slf4j.Logger;
 
 public class MuleLoggerFactory implements ILoggerFactory
 {
+    protected static final Integer NO_CCL_CLASSLOADER = 0;
+
     protected ConcurrentMap<Integer, ConcurrentMap<String, Logger>> repository = new ConcurrentHashMap<Integer, ConcurrentMap<String, Logger>>();
 
-    protected static final Integer NO_CCL_CLASSLOADER = 0;
+    protected ReferenceQueue<ClassLoader> referenceQueue = new ReferenceQueue<ClassLoader>();
+    // map ref back to the classloader hash for cleanup of repository map, as both Weak- and SoftReference's get() return null by this time
+    protected Map<PhantomReference<ClassLoader>, Integer> refs = new HashMap<PhantomReference<ClassLoader>, Integer>();
+
+    public MuleLoggerFactory()
+    {
+        new LoggerReferenceHandler("Mule.log.slf4j.finalizer", referenceQueue, refs, repository);
+    }
 
     public Logger getLogger(String name)
     {
@@ -40,6 +53,12 @@ public class MuleLoggerFactory implements ILoggerFactory
             if (previous != null)
             {
                 loggerMap = previous;
+            }
+
+            if (classLoader != null)
+            {
+                // must save a strong ref to the PhantomReference in order for it to stay alive and work
+                refs.put(new PhantomReference<ClassLoader>(classLoader, referenceQueue), classLoader.hashCode());
             }
         }
 
