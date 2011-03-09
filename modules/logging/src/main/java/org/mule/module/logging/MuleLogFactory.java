@@ -38,7 +38,7 @@ public class MuleLogFactory extends SLF4JLogFactory
 
     public MuleLogFactory()
     {
-        new LoggerReferenceHandler("Mule.log.clogging.finalizer", referenceQueue, refs, repository);
+        new LoggerReferenceHandler("Mule.log.clogging.ref.handler", referenceQueue, refs, repository);
     }
 
     public Log getInstance(String name) throws LogConfigurationException

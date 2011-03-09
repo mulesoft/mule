@@ -33,7 +33,7 @@ public class MuleLoggerFactory implements ILoggerFactory
 
     public MuleLoggerFactory()
     {
-        new LoggerReferenceHandler("Mule.log.slf4j.finalizer", referenceQueue, refs, repository);
+        new LoggerReferenceHandler("Mule.log.slf4j.ref.handler", referenceQueue, refs, repository);
     }
 
     public Logger getLogger(String name)
