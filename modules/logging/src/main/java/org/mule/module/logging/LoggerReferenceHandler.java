@@ -51,8 +51,7 @@ public class LoggerReferenceHandler
                     try
                     {
                         final Reference<? extends ClassLoader> reference = referenceQueue.remove();
-                        logger.warn(String.format("%n%n CLEANING UP %n%n"));
-
+                        logger.debug("Cleaning up the logging hierarchy");
                         final Integer classLoaderHash = references.get(reference);
                         loggerRepository.remove(classLoaderHash);
                     }
