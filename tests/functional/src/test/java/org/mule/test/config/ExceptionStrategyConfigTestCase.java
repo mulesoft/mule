@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.test.integration.exceptions;
+package org.mule.test.config;
 
 import org.mule.api.service.Service;
 import org.mule.exception.DefaultServiceExceptionStrategy;
@@ -18,7 +18,7 @@ public class ExceptionStrategyConfigTestCase extends FunctionalTestCase
 {
     protected String getConfigResources()
     {
-        return "org/mule/test/integration/exceptions/exception-strategy-config.xml";
+        return "org/mule/test/exceptions/exception-strategy-config.xml";
     }
 
     public void testConfig() throws Exception
