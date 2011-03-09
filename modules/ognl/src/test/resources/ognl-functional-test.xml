@@ -36,5 +36,15 @@
                 </filtering-router>
             </outbound>
         </service>
+
+        <service name="wrappedFilter">
+            <inbound>
+                <inbound-endpoint address="vm://dummy" exchange-pattern="one-way">
+                    <ognl:filter>
+                        <ognl:expression><![CDATA[ equals("foo") || content.endsWith("bar") ]]></ognl:expression>
+                    </ognl:filter>
+                </inbound-endpoint>
+            </inbound>
+        </service>
     </model>
 </mule>

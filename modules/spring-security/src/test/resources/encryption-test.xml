@@ -43,7 +43,11 @@
                     <encryption-security-filter strategy-ref="PBE"/>
                 </inbound-endpoint>
             </inbound>
-            <component class="org.mule.component.simple.EchoComponent"/>
+            <!-- use some spurious global attributes, to demonstrate that they're ignored  -->
+            <component class="org.mule.component.simple.EchoComponent"
+                       xmlns="http://www.mulesoft.org/schema/mule/core"
+                       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+                       vm:foo="bar"/>
         </service>
     </model>
 

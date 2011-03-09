@@ -41,4 +41,22 @@ public class PersistentVMQueueTestCase extends FunctionalTestCase
         }
     }
 
+    public void testAsynchronousDispatchingInFlow() throws Exception
+    {
+        String input = "Test message";
+        String[] output = {"Test", "message"};
+        MuleClient client = new MuleClient(muleContext);
+        client.dispatch("vm://flowReceiver", input, null);
+        MuleMessage result = client.request("vm://flowOut", RECEIVE_TIMEOUT);
+        assertNotNull(result);
+        assertNotNull(result.getPayload());
+        assertNull(result.getExceptionPayload());
+        String[] payload = (String[]) result.getPayload();
+        assertEquals(output.length, payload.length);
+        for (int i = 0; i < output.length; i++)
+        {
+            assertEquals(output[i], payload[i]);
+        }
+    }
+
 }

@@ -12,6 +12,7 @@ package org.mule.module.sxc;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.collection.ChildMapEntryDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 
 public class SxcNamespaceHandler extends AbstractMuleNamespaceHandler
@@ -24,6 +25,6 @@ public class SxcNamespaceHandler extends AbstractMuleNamespaceHandler
              new ChildMapEntryDefinitionParser("namespaces", "prefix", "uri"));
 
         registerBeanDefinitionParser("filter", 
-                new ChildDefinitionParser("filter", SxcFilter.class));
+                new FilterDefinitionParser(SxcFilter.class));
     }
 }

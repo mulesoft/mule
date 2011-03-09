@@ -11,6 +11,7 @@ package org.mule.module.ognl.config;
 
 import org.mule.config.spring.parsers.assembly.BeanAssembler;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
+import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.module.ognl.filters.OGNLFilter;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
@@ -25,7 +26,7 @@ public class OGNLNamespaceHandler extends NamespaceHandlerSupport
 
     public void init()
     {
-        registerBeanDefinitionParser("filter", new ChildDefinitionParser("filter", OGNLFilter.class));
+        registerBeanDefinitionParser("filter", new FilterDefinitionParser(OGNLFilter.class));
         registerBeanDefinitionParser("expression", new CDATABeanDefinitionParser("expression", String.class));
     }
 

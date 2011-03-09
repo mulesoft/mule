@@ -26,6 +26,8 @@ import org.mule.util.UUID;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.mail.Address;
 import javax.mail.Flags;
@@ -122,11 +124,17 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     public void messagesAdded(MessageCountEvent event)
     {
         Message messages[] = event.getMessages();
+        List<Message> processedMessages = new ArrayList<Message>();
         if (messages != null)
         {
             MuleMessage message = null;
             for (int i = 0; i < messages.length; i++)
             {
+                if (getLifecycleState().isStopping())
+                {
+                    break;
+                }
+                processedMessages.add(messages[i]);
                 try
                 {
                     if (!messages[i].getFlags().contains(Flags.Flag.DELETED)
@@ -185,7 +193,7 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
             {
                 try
                 {
-                    folder.copyMessages(messages, moveToFolder);
+                    folder.copyMessages(processedMessages.toArray(new Message[processedMessages.size()]), moveToFolder);
                 }
                 catch (MessagingException e)
                 {
