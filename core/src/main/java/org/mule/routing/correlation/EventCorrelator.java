@@ -89,8 +89,9 @@ public class EventCorrelator implements Startable, Stoppable
     private Map expiredAndDispatchedGroups = new ConcurrentHashMap();
 
     private EventCorrelator.ExpiringGroupMonitoringThread expiringGroupMonitoringThread;
+    private final String name;
 
-    public EventCorrelator(EventCorrelatorCallback callback, MessageProcessor timeoutMessageProcessor, MessageInfoMapping messageInfoMapping, MuleContext muleContext)
+    public EventCorrelator(EventCorrelatorCallback callback, MessageProcessor timeoutMessageProcessor, MessageInfoMapping messageInfoMapping, MuleContext muleContext, String flowConstructName)
     {
         if (callback == null)
         {
@@ -108,6 +109,7 @@ public class EventCorrelator implements Startable, Stoppable
         this.messageInfoMapping = messageInfoMapping;
         this.muleContext = muleContext;
         this.timeoutMessageProcessor = timeoutMessageProcessor;
+        name = String.format("%s%s.event.correlator", ThreadNameHelper.getPrefix(muleContext), flowConstructName);
     }
 
     public void forceGroupExpiry(String groupId)
@@ -357,7 +359,7 @@ public class EventCorrelator implements Startable, Stoppable
 
     public void start() throws MuleException
     {
-        logger.info("Starting event correlator");
+        logger.info("Starting event correlator: " + name);
         if (timeout != 0)
         {
             expiringGroupMonitoringThread = new ExpiringGroupMonitoringThread();
@@ -367,7 +369,7 @@ public class EventCorrelator implements Startable, Stoppable
 
     public void stop() throws MuleException
     {
-        logger.info("Stopping event correlator");
+        logger.info("Stopping event correlator: " + name);
         if (expiringGroupMonitoringThread != null)
         {
             expiringGroupMonitoringThread.stopProcessing();
@@ -383,7 +385,6 @@ public class EventCorrelator implements Startable, Stoppable
 
         public ExpiringGroupMonitoringThread()
         {
-            final String name = String.format("%sevent.correlator", ThreadNameHelper.getPrefix(muleContext));
             setName(name);
             this.expiryMonitor = new ExpiryMonitor(name, 1000 * 60);
             //clean up every 30 minutes
