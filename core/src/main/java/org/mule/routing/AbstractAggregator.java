@@ -18,6 +18,8 @@ import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.lifecycle.Startable;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.routing.Aggregator;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.service.Service;
@@ -25,17 +27,15 @@ import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.routing.correlation.EventCorrelator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 
-import javax.resource.spi.work.WorkException;
-
 /**
  * <code>AbstractEventAggregator</code> will aggregate a set of messages into a
  * single message.
- * 
+ *
  * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Aggregator.html">http://www.eaipatterns.com/Aggregator.html</a>
  */
 
 public abstract class AbstractAggregator extends AbstractInterceptingMessageProcessor
-    implements Initialisable, MuleContextAware, FlowConstructAware, Aggregator
+        implements Initialisable, MuleContextAware, FlowConstructAware, Aggregator, Startable, Stoppable
 {
 
     protected EventCorrelator eventCorrelator;
@@ -54,7 +54,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
         }
 
         eventCorrelator = new EventCorrelator(getCorrelatorCallback(muleContext), next, messageInfoMapping,
-            muleContext);
+                                              muleContext);
 
         // Inherit failOnTimeout from async-reply if this aggregator is being used for async-reply
         if (flowConstruct instanceof Service)
@@ -65,20 +65,21 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
                 failOnTimeout = service.getAsyncReplyMessageSource().isFailOnTimeout();
             }
         }
-        
+
         eventCorrelator.setTimeout(timeout);
         eventCorrelator.setFailOnTimeout(isFailOnTimeout());
+    }
+
+    public void start() throws MuleException {
         if (timeout != 0)
         {
-            try
-            {
-                eventCorrelator.enableTimeoutMonitor();
-            }
-            catch (WorkException e)
-            {
-                throw new InitialisationException(e, this);
-            }
+            eventCorrelator.start();
         }
+    }
+
+    public void stop() throws MuleException
+    {
+        eventCorrelator.stop();
     }
 
     public void setMuleContext(MuleContext context)
