@@ -10,6 +10,10 @@
 
 package org.mule.module.logging;
 
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -22,14 +26,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
 
-/**
- * TODO release/flush logger repositories on app removal
- */
 public class MuleLogFactory extends SLF4JLogFactory
 {
     protected ConcurrentHashMap<Integer, ConcurrentMap<String, Log>> repository = new ConcurrentHashMap<Integer, ConcurrentMap<String, Log>>();
 
     protected static final Integer NO_CCL_CLASSLOADER = 0;
+
+    protected ReferenceQueue<ClassLoader> referenceQueue = new ReferenceQueue<ClassLoader>();
+    // map ref back to the classloader hash for cleanup of repository map, as both Weak- and SoftReference's get() return null by this time
+    protected Map<PhantomReference<ClassLoader>, Integer> refs = new HashMap<PhantomReference<ClassLoader>, Integer>();
+
+    public MuleLogFactory()
+    {
+        new LoggerReferenceHandler("Mule.log.clogging.finalizer", referenceQueue, refs, repository);
+    }
 
     public Log getInstance(String name) throws LogConfigurationException
     {
@@ -45,6 +55,13 @@ public class MuleLogFactory extends SLF4JLogFactory
             {
                 loggerMap = previous;
             }
+
+            if (ccl != null)
+            {
+                // must save a strong ref to the PhantomReference in order for it to stay alive and work
+                refs.put(new PhantomReference<ClassLoader>(ccl, referenceQueue), ccl.hashCode());
+            }
+
         }
 
         Log instance = loggerMap.get(name);
