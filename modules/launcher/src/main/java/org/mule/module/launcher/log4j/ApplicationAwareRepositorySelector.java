@@ -84,7 +84,7 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                         if (appLogConfig.toExternalForm().startsWith("file:"))
                         {
                             // if it's not a file, no sense in monitoring it for changes
-                            configWatchDog = new ConfigWatchDog(appLogConfig.getFile(), repository);
+                            configWatchDog = new ConfigWatchDog(muleCL, appLogConfig.getFile(), repository);
                             configWatchDog.setName(String.format("[%s].log4j.config.watchdog", appName));
                         }
                         else
@@ -152,7 +152,7 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
         protected File file;
         protected long lastModif = 0;
         protected boolean warnedAlready = false;
-        protected boolean interrupted = false;
+        protected volatile boolean interrupted = false;
 
         /**
          * The default delay between every file modification check, set to 60
@@ -170,8 +170,15 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
          */
         protected long delay = DEFAULT_DELAY;
 
-        public ConfigWatchDog(String filename, LoggerRepository repository)
+        public ConfigWatchDog(final MuleApplicationClassLoader appClassLoader, String filename, LoggerRepository repository)
         {
+            appClassLoader.addShutdownListener(new MuleApplicationClassLoader.ShutdownListener()
+            {
+                public void execute()
+                {
+                    interrupted = true;
+                }
+            });
             this.filename = filename;
             this.file = new File(filename);
             this.lastModif = file.lastModified();
@@ -213,7 +220,7 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
             }
             catch (SecurityException e)
             {
-                LogLog.warn("Was not allowed to read check file existance, file:[" + filename + "].");
+                LogLog.warn("Was not allowed to read check file existence, file:[" + filename + "].");
                 interrupted = true; // there is no point in continuing
                 return;
             }
@@ -252,6 +259,10 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                     Thread.currentThread().interrupt();
                 }
                 checkAndConfigure();
+            }
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(getName() + " terminated successfully");
             }
         }
 

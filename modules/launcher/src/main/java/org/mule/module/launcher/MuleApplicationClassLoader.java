@@ -17,7 +17,9 @@ import org.mule.util.SystemUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,6 +39,9 @@ public class MuleApplicationClassLoader extends GoodCitizenClassLoader
 
     protected static final URL[] CLASSPATH_EMPTY = new URL[0];
     protected final transient Log logger = LogFactory.getLog(getClass());
+
+    protected List<ShutdownListener> shutdownListeners = new ArrayList<ShutdownListener>();
+
     private String appName;
 
     public MuleApplicationClassLoader(String appName, ClassLoader parentCl)
@@ -96,6 +101,28 @@ public class MuleApplicationClassLoader extends GoodCitizenClassLoader
         }
     }
 
+    @Override
+    public void close()
+    {
+        for (ShutdownListener listener : shutdownListeners)
+        {
+            try
+            {
+                listener.execute();
+            }
+            catch (Exception e)
+            {
+                logger.error(e);
+            }
+        }
+        super.close();
+    }
+
+    public void addShutdownListener(ShutdownListener listener)
+    {
+        this.shutdownListeners.add(listener);
+    }
+
     public String getAppName()
     {
         return appName;
@@ -109,4 +136,11 @@ public class MuleApplicationClassLoader extends GoodCitizenClassLoader
                              Integer.toHexString(System.identityHashCode(this)));
     }
 
+    /**
+     * Optional hook, invoked synchronously right before the classloader is disposed of and closed.
+     */
+    public interface ShutdownListener
+    {
+        void execute();
+    }
 }
