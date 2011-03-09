@@ -176,6 +176,8 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
             {
                 public void execute()
                 {
+                    final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+                    ApplicationAwareRepositorySelector.this.repository.remove(ccl == null ? NO_CCL_CLASSLOADER : ccl.hashCode());
                     interrupted = true;
                 }
             });
