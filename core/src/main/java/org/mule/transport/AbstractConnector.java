@@ -73,7 +73,6 @@ import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 import org.mule.util.concurrent.NamedThreadFactory;
 import org.mule.util.concurrent.ThreadNameHelper;
-import org.mule.util.concurrent.WaitableBoolean;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -264,7 +263,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     protected ConnectorLifecycleManager lifecycleManager;
 
     // TODO connect and disconnect are not part of lifecycle management right now
-    private WaitableBoolean connected = new WaitableBoolean(false);
+    private AtomicBoolean connected = new AtomicBoolean(false);
 
     /** Is this connector currently undergoing a reconnection strategy? */
     private AtomicBoolean reconnecting = new AtomicBoolean(false);
@@ -524,6 +523,23 @@ public abstract class AbstractConnector implements Connector, WorkListener
                             logger.debug("Stopping receiver on endpoint: " + receiver.getEndpoint().getEndpointURI());
                         }
                         receiver.stop();
+                    }
+                }
+
+                // TODO We shouldn't need to automatically disconnect just because we're stopping, these are 
+                // discrete stages in the connector's lifecycle.  
+                if (isConnected())
+                {
+                    try
+                    {
+                        disconnect();
+                    }
+                    catch (Exception e)
+                    {
+                        //TODO We only log here since we need to make sure we stop with
+                        //a consistent state. Another option would be to collect exceptions
+                        //and handle them at the end of this message
+                        logger.error("Failed to disconnect: " + e.getMessage(), e);
                     }
                 }
 
@@ -1286,15 +1302,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
             MessageReceiver receiver = receivers.remove(getReceiverKey(flowConstruct, endpoint));
             if (receiver != null)
             {
-                if (isConnected())
-                {
-                    receiver.disconnect();
-                }
-
-                if (isStarted())
-                {
-                    receiver.stop();
-                }
+                // This will automatically stop and disconnect before disposing.
                 destroyReceiver(receiver, endpoint);
                 doUnregisterListener(flowConstruct, endpoint, receiver);
             }
@@ -1647,6 +1655,10 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
         try
         {
+	        if (isStarted() && !isStopping())
+    	    {
+        	    stop();
+	        }
             this.doDisconnect();
             if (logger.isInfoEnabled())
             {
@@ -1678,11 +1690,6 @@ public abstract class AbstractConnector implements Connector, WorkListener
     public final void setConnected(boolean flag)
     {
         connected.set(flag);
-    }
-
-    public void waitUntilConnected() throws InterruptedException
-    {
-        connected.whenTrue(null);
     }
 
     public final void setReconnecting(boolean flag)

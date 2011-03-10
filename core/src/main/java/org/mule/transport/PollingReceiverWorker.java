@@ -74,8 +74,6 @@ public class PollingReceiverWorker implements Work
 
     protected void poll() throws Exception
     {
-        // make sure we are connected, wait if necessary
-        ((AbstractConnector) receiver.getConnector()).waitUntilConnected();
         receiver.poll();
     }
 
