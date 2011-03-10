@@ -18,6 +18,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.management.stats.ProcessingTime;
 
 import java.io.OutputStream;
+import java.io.Serializable;
 
 /**
  * <code>MuleEvent</code> represents any data event occuring in the Mule
@@ -29,7 +30,7 @@ import java.io.OutputStream;
  * 
  * @see MuleMessage
  */
-public interface MuleEvent
+public interface MuleEvent extends Serializable
 {
     int TIMEOUT_WAIT_FOREVER = 0;
     int TIMEOUT_DO_NOT_WAIT = -1;

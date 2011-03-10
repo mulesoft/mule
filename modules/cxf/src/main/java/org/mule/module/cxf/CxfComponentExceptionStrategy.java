@@ -11,6 +11,7 @@
 package org.mule.module.cxf;
 
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.exception.DefaultServiceExceptionStrategy;
 
 import org.apache.cxf.interceptor.Fault;
@@ -28,15 +29,15 @@ public class CxfComponentExceptionStrategy extends DefaultServiceExceptionStrate
     }
     
     @Override
-    protected void defaultHandler(Throwable t)
+    protected void doHandleException(Exception e, MuleEvent event)
     {
-        if (t.getCause() instanceof Fault)
+        if (e.getCause() instanceof Fault)
         {
-            super.defaultHandler(t.getCause());
+            super.doHandleException((Exception) e.getCause(), event);
         }
         else
         {
-            super.defaultHandler(t);
+            super.doHandleException(e, event);
         }
     }
 }

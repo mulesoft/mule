@@ -10,10 +10,9 @@
 
 package org.mule.message;
 
-import org.mule.RequestContext;
-import org.mule.api.MuleEventContext;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.transport.PropertyScope;
 
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -51,12 +50,12 @@ public class ExceptionMessage implements Serializable
     private String endpointUri;
     private Date timeStamp;
 
-    public ExceptionMessage(Object payload,
+    public ExceptionMessage(MuleEvent event,
                             Throwable exception,
                             String componentName,
                             EndpointURI endpointUri)
     {
-        this.payload = payload;
+        this.payload = event.getMessage().getPayload();
         properties = new HashMap<String, Object>();
         this.exception = exception;
         timeStamp = new Date();
@@ -66,15 +65,10 @@ public class ExceptionMessage implements Serializable
             this.endpointUri = endpointUri.toString();
         }
 
-        MuleEventContext ctx = RequestContext.getEventContext();
-        if (ctx != null)
+        for (Iterator iterator = event.getMessage().getPropertyNames(PropertyScope.OUTBOUND).iterator(); iterator.hasNext();)
         {
-            MuleMessage msg = ctx.getMessage();
-            for (Iterator iterator = msg.getPropertyNames().iterator(); iterator.hasNext();)
-            {
-                String propertyKey = (String) iterator.next();
-                setProperty(propertyKey, msg.getProperty(propertyKey));
-            }
+            String propertyKey = (String) iterator.next();
+            setProperty(propertyKey, event.getMessage().getProperty(propertyKey, PropertyScope.OUTBOUND));
         }
     }
 

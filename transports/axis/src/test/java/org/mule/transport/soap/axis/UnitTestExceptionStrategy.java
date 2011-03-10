@@ -11,7 +11,7 @@
 package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.exception.DefaultServiceExceptionStrategy;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class UnitTestExceptionStrategy extends DefaultServiceExceptionStrategy
     }
     
     @Override
-    protected void logFatal(MuleMessage message, Throwable t)
+    protected void logFatal(MuleEvent event, Throwable t)
     {
         logger.debug("logFatal", t);
     }
@@ -44,10 +44,10 @@ public class UnitTestExceptionStrategy extends DefaultServiceExceptionStrategy
     }
 
     @Override
-    public void handleMessagingException(MuleMessage message, Throwable t)
+    protected void doHandleException(Exception e, MuleEvent event)
     {
-        messagingExceptions.add(t);
-        super.handleMessagingException(message, t);
+        messagingExceptions.add(e);
+        super.doHandleException(e, event);
     }
     
     public List<Throwable> getMessagingExceptions()

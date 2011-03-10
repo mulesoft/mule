@@ -11,7 +11,7 @@
 package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.TransactionException;
 import org.mule.exception.DefaultServiceExceptionStrategy;
@@ -72,8 +72,10 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase
         }
         
         @Override
-        protected void routeException(MuleMessage message, MessageProcessor target, Throwable t)
+        protected void routeException(MuleEvent event, MessageProcessor target, Throwable t)
         {
+            super.routeException(event, target, t);
+
             if (visits++ > 1)
             {
                 failure = "Exception strategy should only be called once";
@@ -93,8 +95,6 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase
                 failure = e.getMessage();
                 fail(e.getMessage());
             }
-            super.routeException(message, target, t);
-
         }
     }
 

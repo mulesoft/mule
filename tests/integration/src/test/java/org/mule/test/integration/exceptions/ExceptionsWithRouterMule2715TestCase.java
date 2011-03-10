@@ -11,6 +11,8 @@
 package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerMessagingException;
+import org.mule.message.ExceptionMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
@@ -35,7 +37,9 @@ public class ExceptionsWithRouterMule2715TestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://" + path, MESSAGE, null);
         MuleMessage response = client.request("vm://error", TIMEOUT);
-        assertNotNull("exception null", response.getExceptionPayload());
+        assertNotNull(response);
+        assertTrue(response.getPayload() instanceof ExceptionMessage);
+        assertTrue(((ExceptionMessage) response.getPayload()).getException() instanceof TransformerMessagingException);
     }
 
     protected String getConfigResources()

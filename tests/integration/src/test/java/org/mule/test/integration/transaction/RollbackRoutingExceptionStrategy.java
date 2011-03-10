@@ -10,7 +10,7 @@
 
 package org.mule.test.integration.transaction;
 
-import org.mule.api.MuleMessage;
+import org.mule.api.MuleEvent;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
 import org.mule.exception.AbstractMessagingExceptionStrategy;
@@ -21,12 +21,13 @@ import org.mule.exception.AbstractMessagingExceptionStrategy;
 public class RollbackRoutingExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
 
-    public void handleRoutingException(MuleMessage message, MessageProcessor endpoint, Throwable t)
+    protected void doHandleException(Exception e, MuleEvent event)
     {
-        logger.debug("handleRoutingException: endpoint=" + endpoint + " message=" + message);
-        defaultHandler(t);
-        handleTransaction(t);
-        routeException(message, endpoint, t);
+        MessageProcessor endpoint = ((RoutingException) e).getRoute();
+        logger.debug("handleRoutingException: endpoint=" + endpoint + " message=" + event.getMessage());
+        doHandleException(e, event);
+        handleTransaction(e);
+        routeException(event, endpoint, e);
     }
 
 }

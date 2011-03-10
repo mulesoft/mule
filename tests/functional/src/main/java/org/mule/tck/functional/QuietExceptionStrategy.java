@@ -10,8 +10,7 @@
 
 package org.mule.tck.functional;
 
-import org.mule.api.MuleMessage;
-import org.mule.api.processor.MessageProcessor;
+import org.mule.api.MuleEvent;
 import org.mule.exception.AbstractMessagingExceptionStrategy;
 
 import org.apache.commons.logging.Log;
@@ -25,25 +24,7 @@ public class QuietExceptionStrategy extends AbstractMessagingExceptionStrategy
     protected transient Log logger = LogFactory.getLog(getClass());
 
     @Override
-    public void handleMessagingException(MuleMessage message, Throwable e)
-    {
-        logger.debug("Ignoring", e);
-    }
-
-    @Override
-    public void handleRoutingException(MuleMessage message, MessageProcessor target, Throwable e)
-    {
-        logger.debug("Ignoring", e);
-    }
-
-    @Override
-    public void handleLifecycleException(Object component, Throwable e)
-    {
-        logger.debug("Ignoring", e);
-    }
-
-    @Override
-    public void handleStandardException(Throwable e)
+    protected void doHandleException(Exception e, MuleEvent event)
     {
         logger.debug("Ignoring", e);
     }
