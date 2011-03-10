@@ -260,6 +260,7 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                 {
                     interrupted = true;
                     Thread.currentThread().interrupt();
+                    break;
                 }
                 checkAndConfigure();
             }
