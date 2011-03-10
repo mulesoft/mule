@@ -63,7 +63,7 @@ for(currentFile in files)
 // start Mule
 splash "Starting Mule ESB..."
 
-def command = SystemUtils.IS_OS_WINDOWS ? "${muleHome}/bin/mule.bat start" : "${muleHome}/bin/mule start"
+def command = SystemUtils.IS_OS_WINDOWS ? "cmd /c start ${muleHome}/bin/mule.bat" : "${muleHome}/bin/mule start"
 def proc = command.execute()
 proc.waitFor()
 println proc.text
