@@ -19,12 +19,12 @@ import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.log4j.DailyRollingFileAppender;
 import org.apache.log4j.Hierarchy;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggerRepository;
 import org.apache.log4j.spi.RepositorySelector;
@@ -72,9 +72,8 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                         String logName = String.format("mule-app-%s.log", appName);
                         File logDir = new File(MuleContainerBootstrapUtils.getMuleHome(), "logs");
                         File logFile = new File(logDir, logName);
-                        RollingFileAppender fileAppender = new RollingFileAppender(new PatternLayout(PATTERN_LAYOUT), logFile.getAbsolutePath(), true);
-                        fileAppender.setMaxBackupIndex(100);
-                        fileAppender.setMaximumFileSize(1000000);
+                        DailyRollingFileAppender fileAppender = new DailyRollingFileAppender(new PatternLayout(PATTERN_LAYOUT), logFile.getAbsolutePath(), "'.'yyyy-MM-dd");
+                        fileAppender.setAppend(true);
                         fileAppender.activateOptions();
                         root.addAppender(fileAppender);
                     }
