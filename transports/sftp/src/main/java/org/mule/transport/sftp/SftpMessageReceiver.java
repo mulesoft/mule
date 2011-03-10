@@ -76,6 +76,10 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
                 }
                 for (String file : files)
                 {
+                    if (getLifecycleState().isStopping())
+                    {
+                        break;
+                    }
                     routeFile(file);
                 }
                 if (logger.isDebugEnabled())

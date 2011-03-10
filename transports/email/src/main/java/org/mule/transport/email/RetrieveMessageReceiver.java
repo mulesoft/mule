@@ -297,50 +297,61 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
     @Override
     public synchronized void poll()
     {
-        try
+        boolean done = false;
+        while (!done)
         {
+            if (getLifecycleState().isStopping())
+            {
+                break;
+            }
             try
             {
-                if (!folder.isOpen())
+                try
                 {
-                    folder.open(Folder.READ_WRITE);
+                    if (!folder.isOpen())
+                    {
+                        folder.open(Folder.READ_WRITE);
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                if (logger.isDebugEnabled())
+                catch (Exception e)
                 {
-                    logger.debug("ignoring exception: " + e.getMessage());
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("ignoring exception: " + e.getMessage());
+                    }
                 }
-            }
 
-            int count = folder.getMessageCount();
-            if (count > 0)
-            {
-                Message[] messages = folder.getMessages();
-                MessageCountEvent event = new MessageCountEvent(folder, MessageCountEvent.ADDED, true,
-                    messages);
-                messagesAdded(event);
+                int count = folder.getMessageCount();
+                int batchSize = getBatchSize(count);
+                if (count > 0)
+                {
+                    Message[] messages = folder.getMessages(1, batchSize);
+                    MessageCountEvent event = new MessageCountEvent(folder, MessageCountEvent.ADDED, true,
+                        messages);
+                    messagesAdded(event);
+                }
+                else if (count == -1)
+                {
+                    throw new MessagingException("Cannot monitor folder: " + folder.getFullName()
+                        + " as folder is closed");
+                }
+                done = batchSize >= count;
             }
-            else if (count == -1)
+            catch (MessagingException e)
             {
-                throw new MessagingException("Cannot monitor folder: " + folder.getFullName()
-                                             + " as folder is closed");
+                done = true;
+                getConnector().getMuleContext().getExceptionListener().handleException(e);
             }
-        }
-        catch (MessagingException e)
-        {
-            getConnector().getMuleContext().getExceptionListener().handleException(e);
-        }
-        finally
-        {
-            try
+            finally
             {
-                folder.close(true); // close and expunge deleted messages
-            }
-            catch (Exception e)
-            {
-                logger.error("Failed to close pop3  inbox: " + e.getMessage());
+                try
+                {
+                    folder.close(true); // close and expunge deleted messages
+                }
+                catch (Exception e)
+                {
+                    logger.error("Failed to close pop3  inbox: " + e.getMessage());
+                }
             }
         }
     }

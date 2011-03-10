@@ -27,6 +27,7 @@ import org.mule.lifecycle.phases.MuleContextInitialisePhase;
 import org.mule.lifecycle.phases.MuleContextStartPhase;
 import org.mule.lifecycle.phases.MuleContextStopPhase;
 import org.mule.lifecycle.phases.NotInLifecyclePhase;
+import org.mule.registry.AbstractRegistryBroker;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,20 +46,28 @@ import org.apache.commons.logging.LogFactory;
 public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry> implements RegistryLifecycleHelpers
 {
     protected Map<String, LifecyclePhase> phases = new HashMap<String, LifecyclePhase>();
-    private TreeMap<String, LifecycleCallback> callbacks = new TreeMap<String, LifecycleCallback>();
-    private MuleContext muleContext;
+    protected TreeMap<String, LifecycleCallback> callbacks = new TreeMap<String, LifecycleCallback>();
+    protected MuleContext muleContext;
 
     public RegistryLifecycleManager(String id, Registry object, MuleContext muleContext)
     {
         super(id, object);
         this.muleContext = muleContext;
 
+        registerPhases();
+    }
+
+    protected void registerPhases()
+    {
         RegistryLifecycleCallback callback = new RegistryLifecycleCallback();
 
-        registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE, new EmptyLifecycleCallback());
+        registerPhase(NotInLifecyclePhase.PHASE_NAME, NOT_IN_LIFECYCLE_PHASE,
+            new EmptyLifecycleCallback<AbstractRegistryBroker>());
         registerPhase(Initialisable.PHASE_NAME, new MuleContextInitialisePhase(), callback);
-        registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(), callback);
-        registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(), callback);
+        registerPhase(Startable.PHASE_NAME, new MuleContextStartPhase(),
+            new EmptyLifecycleCallback<AbstractRegistryBroker>());
+        registerPhase(Stoppable.PHASE_NAME, new MuleContextStopPhase(),
+            new EmptyLifecycleCallback<AbstractRegistryBroker>());
         registerPhase(Disposable.PHASE_NAME, new MuleContextDisposePhase(), callback);
     }
 
@@ -91,6 +100,13 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
         addDirectTransition(Initialisable.PHASE_NAME, Disposable.PHASE_NAME);
         addDirectTransition(Stoppable.PHASE_NAME, Disposable.PHASE_NAME);
 
+    }
+
+    protected void registerPhase(String phaseName, LifecyclePhase phase)
+    {
+        phaseNames.add(phaseName);
+        callbacks.put(phaseName, new RegistryLifecycleCallback());
+        phases.put(phaseName, phase);
     }
 
     protected void registerPhase(String phaseName, LifecyclePhase phase, LifecycleCallback callback)

@@ -171,6 +171,10 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             }
             for (File file : files)
             {
+                if (getLifecycleState().isStopping())
+                {
+                    break;
+                }
                 // don't process directories
                 if (file.isFile())
                 {
@@ -184,7 +188,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    public synchronized void processFile(File sourceFile) throws MuleException
+    public void processFile(File sourceFile) throws MuleException
     {
         FileConnector fileConnector = (FileConnector) connector;
         

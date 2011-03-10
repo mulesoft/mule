@@ -12,26 +12,15 @@ package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.lifecycle.Disposable;
-import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.lifecycle.LifecycleException;
-import org.mule.api.lifecycle.LifecyclePhase;
-import org.mule.api.lifecycle.Startable;
-import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.lifecycle.RegistryLifecycleManager;
-import org.mule.lifecycle.phases.ContainerManagedLifecyclePhase;
-import org.mule.lifecycle.phases.MuleContextStartPhase;
-import org.mule.lifecycle.phases.MuleContextStopPhase;
-import org.mule.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.registry.AbstractRegistry;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -128,12 +117,7 @@ public class SpringRegistry extends AbstractRegistry
     @Override
     protected RegistryLifecycleManager createLifecycleManager()
     {
-        Map<String, LifecyclePhase> phases = new HashMap<String, LifecyclePhase>(3);
-        phases.put(Initialisable.PHASE_NAME, new SpringContextInitialisePhase());
-        phases.put(Startable.PHASE_NAME, new MuleContextStartPhase());
-        phases.put(Stoppable.PHASE_NAME, new MuleContextStopPhase());
-        phases.put(Disposable.PHASE_NAME, new SpringContextDisposePhase());
-        return new RegistryLifecycleManager(getRegistryId(), this, phases);
+        return new SpringRegistryLifecycleManager(getRegistryId(), this, muleContext);
     }
 
     public Object lookupObject(String key)
@@ -246,56 +230,6 @@ public class SpringRegistry extends AbstractRegistry
     public boolean isRemote()
     {
         return false;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////
-    // Spring custom lifecycle phases
-    /////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * A lifecycle phase that will delegate any lifecycle invocations to a container such as Spring or Guice
-     */
-    class SpringContextInitialisePhase extends ContainerManagedLifecyclePhase
-    {
-        public SpringContextInitialisePhase()
-        {
-            super(Initialisable.PHASE_NAME, Initialisable.class, Disposable.PHASE_NAME);
-            registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
-        }
-
-        /**
-         * We don't need to apply any lifecycle here since Spring manages that for us
-         *
-         * @param o the object apply lifecycle to.  This parameter will be ignorred
-         * @throws LifecycleException never thrown
-         */
-        @Override
-        public void applyLifecycle(Object o) throws LifecycleException
-        {
-            //Spring starts initialised, do nothing here
-        }
-    }
-
-
-    /**
-     * A lifecycle phase that will delegate to the {@link org.mule.config.spring.SpringRegistry#doDispose()} method which in
-     * turn will destroy the application context managed by this registry
-     */
-    class SpringContextDisposePhase extends ContainerManagedLifecyclePhase
-    {
-        public SpringContextDisposePhase()
-        {
-            super(Disposable.PHASE_NAME, Disposable.class, Initialisable.PHASE_NAME);
-            registerSupportedPhase(NotInLifecyclePhase.PHASE_NAME);
-            //You can dispose from all phases
-            registerSupportedPhase(LifecyclePhase.ALL_PHASES);
-        }
-
-        @Override
-        public void applyLifecycle(Object o) throws LifecycleException
-        {
-            doDispose();
-        }
     }
 
 }

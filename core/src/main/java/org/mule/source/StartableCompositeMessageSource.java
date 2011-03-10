@@ -220,12 +220,11 @@ public class StartableCompositeMessageSource
             }
             else
             {
-                log.warn(String.format(
-                    "A message was receieved from MessageSource, but message source is stopped. Message will be discarded.%n"
-                                    + "  Message: %s%n" + "  MessageSource:%s", event, this));
-                return null;
+                // TODO i18n
+                throw new IllegalStateException(String.format(
+                    "A message was receieved from MessageSource, but CompositeMessageSource is stopped.%n"
+                                    + "  Message: %s%n" + "  CompositeMessageSource: %s", event, this));
             }
-
         }
 
         @Override

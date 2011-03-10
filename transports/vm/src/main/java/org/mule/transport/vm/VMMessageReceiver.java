@@ -18,6 +18,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.transport.Connector;
 import org.mule.transport.PollingReceiverWorker;
 import org.mule.transport.TransactedPollingMessageReceiver;
@@ -148,15 +149,7 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         // The list of retrieved messages that will be returned
         List<MuleMessage> messages = new LinkedList<MuleMessage>();
 
-        /*
-         * Determine how many messages to batch in this poll: we need to drain the queue quickly, but not by
-         * slamming the workManager too hard. It is impossible to determine this more precisely without proper
-         * load statistics/feedback or some kind of "event cost estimate". Therefore we just try to use half
-         * of the receiver's workManager, since it is shared with receivers for other endpoints.
-         */
-        int maxThreads = connector.getReceiverThreadingProfile().getMaxThreadsActive();
-        // also make sure batchSize is always at least 1
-        int batchSize = Math.max(1, Math.min(queue.size(), ((maxThreads / 2) - 1)));
+        int batchSize = getBatchSize(queue.size());
 
         // try to get the first event off the queue
         MuleEvent message = (MuleEvent) queue.poll(connector.getQueueTimeout());
@@ -226,11 +219,13 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
         protected void poll() throws Exception
         {
             /*
-             * We simply run our own polling loop all the time as long as the receiver is started. The
-             * blocking wait defined by VMConnector.getQueueTimeout() will prevent this worker's receiver
+             * We simply run our own polling loop all the time as long as the
+             * receiver is started. The blocking wait defined by
+             * VMConnector.getQueueTimeout() will prevent this worker's receiver
              * thread from busy-waiting.
              */
-            while (this.getReceiver().isConnected())
+            LifecycleState receiverState = this.receiver.getLifecycleState();
+            while (receiverState.isStarted() && !receiverState.isStopping())
             {
                 super.poll();
             }
