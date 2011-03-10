@@ -100,15 +100,13 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                 {
                     // this is not an app init, but a Mule container, use the top-level defaults
                     File defaultSystemLog = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf/log4j.xml");
-                    if (defaultSystemLog.exists() && defaultSystemLog.canRead())
-                    {
-                        new DOMConfigurator().doConfigure(defaultSystemLog.getAbsolutePath(), repository);
-                    }
-                    else
+                    if (!defaultSystemLog.exists() && !defaultSystemLog.canRead())
                     {
                         defaultSystemLog = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf/log4j.properties");
-                        new PropertyConfigurator().doConfigure(defaultSystemLog.getAbsolutePath(), repository);
                     }
+                    configureFrom(defaultSystemLog.toURL(), repository);
+                    configWatchDog = new ConfigWatchDog(ccl, defaultSystemLog.getAbsolutePath(), repository);
+                    configWatchDog.setName("Mule.system.log4j.config.watchdog");
                 }
 
                 final LoggerRepository previous = this.repository.putIfAbsent(ccl == null ? NO_CCL_CLASSLOADER : ccl.hashCode(), repository);
@@ -170,17 +168,20 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
          */
         protected long delay = DEFAULT_DELAY;
 
-        public ConfigWatchDog(final MuleApplicationClassLoader appClassLoader, String filename, LoggerRepository repository)
+        public ConfigWatchDog(final ClassLoader classLoader, String filename, LoggerRepository repository)
         {
-            appClassLoader.addShutdownListener(new MuleApplicationClassLoader.ShutdownListener()
+            if (classLoader instanceof MuleApplicationClassLoader)
             {
-                public void execute()
+                ((MuleApplicationClassLoader) classLoader).addShutdownListener(new MuleApplicationClassLoader.ShutdownListener()
                 {
-                    final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-                    ApplicationAwareRepositorySelector.this.repository.remove(ccl == null ? NO_CCL_CLASSLOADER : ccl.hashCode());
-                    interrupted = true;
-                }
-            });
+                    public void execute()
+                    {
+                        final ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+                        ApplicationAwareRepositorySelector.this.repository.remove(ccl == null ? NO_CCL_CLASSLOADER : ccl.hashCode());
+                        interrupted = true;
+                    }
+                });
+            }
             this.filename = filename;
             this.file = new File(filename);
             this.lastModif = file.lastModified();
