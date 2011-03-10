@@ -12,6 +12,7 @@ package org.mule.construct;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 import org.mule.tck.AbstractMuleTestCase;
@@ -147,8 +148,9 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
     
     public void testRegisterUnregister() throws MuleException, Exception
     {
-        muleContext.getRegistry().registerFlowConstruct(getFlowConstruct());
-        assertNotNull(muleContext.getRegistry().lookupFlowConstruct("test-flow"));
+        FlowConstruct construct = getFlowConstruct();
+        muleContext.getRegistry().registerFlowConstruct(construct);
+        assertNotNull(muleContext.getRegistry().lookupFlowConstruct(construct.getName()));
     }    
 
 }
