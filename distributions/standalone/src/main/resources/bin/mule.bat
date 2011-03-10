@@ -141,10 +141,6 @@ goto :eof
 "%_WRAPPER_EXE%" -r %_WRAPPER_CONF% %MULE_OPTS%
 goto :eof
 
-:examples
-call %MULE_HOME%\bin\mule_examples.bat
-goto :eof
-
 rem ###############################################################
 
 :restart

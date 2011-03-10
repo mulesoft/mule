@@ -1,9 +1,23 @@
+<p class="example-title">What is covered?</p>
+<p class="example-text">
+    <ul class="example-text">
+        <li>Multiple Flows</li>
+        <li>The HTTP Transport</li>
+        <li>Message Routing</li>
+        <li>Transformations</li>
+    </ul>
+</p>
 
-					<p>
-					When you point a Web browser to the predefined address (http://localhost:8888/?name=Ross), Mule parses the value entered after ?name=, does some validation, and uses a java class called greeter to add some text to the string before passing it on to another flow. The second flow adds text, then passes it back via the browser. There are simpler ways to do this, but this sample uses flows and the HTTP Transport to illustrate message routing and transformation in a Mule application.
-					</p>
-					<p>
+<p class="example-title">Description</p>
+<p class="example-text">
+Takes a name from a browser and adds text to create an output of “Hello, [name], How are you?”
+</p>
 
-					<div align="center"><img width="95%"
-						src="http://www.mulesoft.org/documentation/download/attachments/29098002/HelloW.png" border="0" /></div>
-					</p>
+
+<p class="example-title">Under the Hood</p>
+<p class="example-text">
+Mule parses the value entered via a HTTP request, does some validation, and uses a java class called greeter to add some text to the string before passing it on to another flow. The second flow Append text, then passes it back HTTP response.
+</p>
+<p>
+<div align="center"><img width="95%" src="/examples/hello/hellow.png" border="0" /></div>
+</p>

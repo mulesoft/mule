@@ -15,8 +15,9 @@ function rpcChangeMachineResponse(message) {
 }
 
 </script>
-<p><b>Instructions:</b></p>
-<p>Select a currency, enter an amount and press <b>Get Change</b>.</p>
+<p class="example-title">Running the example</p>
+<p class="example-strong-text">Instructions:</p>
+<p class="example-text">Select a currency, enter an amount and press <b>Get Change</b>.</p>
 
 <form name="changeMachineForm" id="changeMachineForm" action="">
 	<table cellspacing="2px" cellpadding="1px" border="0">
@@ -35,16 +36,16 @@ function rpcChangeMachineResponse(message) {
 	</table>
 </form>
 
-<p><b>Response:</b></p>
+<p class="example-text"><b>Response:</b></p>
 <div id="response-output" class='response'></div>
 
-<p><b>Additional Information:</b></p>
-<p>
+<p class="example-title">Additional Information</p>
+<p class="example-text">
 You can also consume this service by directly calling the HTTP endpoint, opening a URL such as <a
     href="http://localhost:47493/change-machine?amount=2.42&currency=USD"
     target="_blank">http://localhost:47493/change-machine?amount=2.42&currency=USD</a>, replacing "USD" with "GBP" and the amount with a decimal number.
 </p>
-<p>    
+<p class="example-text">    
     Complete documentation for this example can be found <a
     href="http://www.mulesoft.org/documentation/display/MULE3INTRO/Scripting+Example"
     target="_blank">here</a>.

@@ -63,7 +63,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
         
         MuleMessage response = client.send("vm://httpService1", "symbol=IBM", props);
         assertNotNull(response);
-        assertTrue(response.getPayloadAsString().contains("PreviousClose"));
+        checkPayLoad(response.getPayloadAsString());
         assertEquals("TestID", response.getOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY));
         assertEquals("TestGroupSize", response.getOutboundProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY));
         assertEquals("TestSequence", response.getOutboundProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY));
@@ -83,7 +83,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
 
         MuleMessage response = client.send("vm://cxfService1", "IBM", props);
         assertNotNull(response);
-        assertTrue(response.getPayloadAsString().contains("PreviousClose"));
+        checkPayLoad(response.getPayloadAsString());
         assertEquals("TestID", response.getOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY));
         assertEquals("TestGroupSize", response.getOutboundProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY));
         assertEquals("TestSequence", response.getOutboundProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY));
@@ -146,7 +146,7 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
 
         MuleMessage response = client.send("vm://httpService2", "symbol=IBM", props);
         assertNotNull(response);
-        assertTrue(response.getPayloadAsString().contains("PreviousClose"));
+        checkPayLoad(response.getPayloadAsString());
         assertEquals("thing", response.getInboundProperty("some"));
         assertEquals("stuff", response.getInboundProperty("other"));
     }
@@ -165,8 +165,14 @@ public class MessagePropertiesPropagationTestCase extends FunctionalTestCase
 
         MuleMessage response = client.send("vm://cxfService2", "symbol=IBM", props);
         assertNotNull(response);
-        assertTrue(response.getPayloadAsString().contains("PreviousClose"));
+        checkPayLoad(response.getPayloadAsString());
         assertEquals("thing", response.getOutboundProperty("some"));
         assertEquals("stuff", response.getOutboundProperty("other"));
+    }
+    
+    private void checkPayLoad(String payload)
+    {
+        assertNotNull("payload is null", payload);
+        assertTrue("payload does not contain 'PreviousClose': " + payload, payload.contains("PreviousClose"));
     }
 }
