@@ -21,6 +21,9 @@ import org.mule.module.client.MuleClient;
 import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -97,6 +100,30 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         Map<?, ?> payloadMap = (Map<?, ?>) payload;
         assertEquals("value1", payloadMap.get("key1"));
         assertEquals("value2", payloadMap.get("key2"));
+    }
+
+    public void testStopsServiceOnException() throws MuleException, InterruptedException
+    {
+        final Service service = muleContext.getRegistry().lookupService("testService5");
+
+        MuleClient mc = new MuleClient(muleContext);
+        mc.dispatch("vm://in5", "test", null);
+
+        assertExceptionMessage(mc.request("vm://out5", FunctionalTestCase.RECEIVE_TIMEOUT));
+
+        Prober prober = new PollingProber(5000, 100);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                return !service.isStarted();
+            }
+
+            public String describeFailure()
+            {
+                return "Service was not stopped after processing the exception";
+            }
+        });
     }
 
     private void assertExceptionMessage(MuleMessage out)

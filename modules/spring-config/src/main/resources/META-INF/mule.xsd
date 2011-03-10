@@ -4027,7 +4027,7 @@
     <!--   Exception strategies                                       -->
     <!--==============================================================-->
 
-    <xsd:element name="default-exception-strategy" type="abstractExceptionStrategyType"
+    <xsd:element name="default-exception-strategy" type="serviceExceptionStrategyType"
                  substitutionGroup="abstract-exception-strategy">
         <xsd:annotation>
             <xsd:documentation>
@@ -4035,6 +4035,20 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+
+    <xsd:complexType name="serviceExceptionStrategyType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractExceptionStrategyType">
+                <xsd:attribute name="stopMessageProcessing" type="substitutableBoolean" default="false" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Stops the service/flow that owns the exception strategy when an exception is managed in the strategy so no more messages get consumed.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="custom-exception-strategy" type="customExceptionStrategyType"
                  substitutionGroup="abstract-exception-strategy">
@@ -4068,7 +4082,7 @@
     </xsd:complexType>
 
     <!-- This is left in for backwards-compatibility only, remove for next major version. -->
-    <xsd:element name="default-service-exception-strategy" type="abstractExceptionStrategyType"
+    <xsd:element name="default-service-exception-strategy" type="serviceExceptionStrategyType"
                  substitutionGroup="abstract-exception-strategy">
         <xsd:annotation>
             <xsd:documentation>

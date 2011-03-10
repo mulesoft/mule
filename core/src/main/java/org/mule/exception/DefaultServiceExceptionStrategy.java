@@ -12,7 +12,10 @@ package org.mule.exception;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.lifecycle.Lifecycle;
+import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.ExceptionHelper;
@@ -29,6 +32,9 @@ import java.util.List;
  */
 public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
+
+    private boolean stopMessageProcessing;
+
     /** 
      * For IoC only 
      * @deprecated Use DefaultServiceExceptionStrategy(MuleContext muleContext) instead
@@ -85,6 +91,32 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
                 }
             }
         }
+
+        if (stopMessageProcessing)
+        {
+            stopFlowConstruct();
+        }
+    }
+
+    private void stopFlowConstruct()
+    {
+        if (flowConstruct instanceof Stoppable)
+        {
+            logger.info("Stopping flow '" + flowConstruct.getName() + "' due to exception");
+
+            try
+            {
+                ((Lifecycle) flowConstruct).stop();
+            }
+            catch (MuleException e)
+            {
+                logger.error("Unable to stop flow '" + flowConstruct.getName() + "'", e);
+            }
+        }
+        else
+        {
+            logger.warn("Flow is not stoppable");
+        }
     }
 
     protected FlowConstructStatistics getFlowConstructStatistics(FlowConstruct flowConstruct)
@@ -111,5 +143,15 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
             return null;
         }
         return (ServiceStatistics) stats;
+    }
+
+    public boolean isStopMessageProcessing()
+    {
+        return stopMessageProcessing;
+    }
+
+    public void setStopMessageProcessing(boolean stopMessageProcessing)
+    {
+        this.stopMessageProcessing = stopMessageProcessing;
     }
 }
