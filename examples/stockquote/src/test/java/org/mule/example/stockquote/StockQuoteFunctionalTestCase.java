@@ -85,7 +85,7 @@ public class StockQuoteFunctionalTestCase extends DynamicPortTestCase
         }
         else
         {
-            fail();
+            fail("expoected response code : " + HttpConstants.SC_OK + ", but got :" + responseCode);
         }
     }
 

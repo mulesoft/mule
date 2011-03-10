@@ -5,6 +5,7 @@
 #
 USER1_NAME=muletest1
 USER1_PASSWORD=muletest1
+#http://news.softpedia.com/news/How-to-Use-RSA-Key-for-SSH-Authentication-38599.shtml
 USER1_IDENTITYFILE=/PATH/TO/THE/FILE/id_rsa-muletest1
 USER1_IDENTITYFILE_PASSPHRASE=muletest1
 SFTP_HOST=localhost
