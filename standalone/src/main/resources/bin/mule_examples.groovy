@@ -27,6 +27,8 @@ muleHome = SystemUtils.getenv()['MULE_HOME']
 exampleAppsBaseDir = new File("${muleHome}/examples")
 deployDir = new File("${muleHome}/apps")
 
+antBuilder = new AntBuilder()
+
 LF_CR = System.getProperty("line.separator")
 TAB = "   "
 
@@ -70,7 +72,7 @@ println proc.text
 // wait for the example launcher application to be started
 splash "Waiting for example applications to become ready..."
 def i = 0
-def timeoutInMs = 120000 // 2 minutes
+def timeoutInMs = 180000 // 3 minutes
 def waitIntervalInMs = 3000
 def loops = timeoutInMs / waitIntervalInMs
 
@@ -127,7 +129,7 @@ def deployExample(exampleDir)
 			{
 				// deploy (copy) application file to apps directory
 				splash "Deploying ${exampleFile.name}"
-				(new AntBuilder()).copy(file: exampleFile.getCanonicalPath(), tofile: "${deployDir}/${exampleFile.name}")
+				antBuilder.copy(file: exampleFile.getCanonicalPath(), tofile: "${deployDir}/${exampleFile.name}")
 			}
 		}
 	}
