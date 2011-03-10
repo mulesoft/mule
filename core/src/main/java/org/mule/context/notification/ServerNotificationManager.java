@@ -35,7 +35,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -271,7 +270,7 @@ public class ServerNotificationManager implements Work, Disposable, ServerNotifi
             }
             catch (InterruptedException e)
             {
-                // ignore - we just loop round
+                Thread.currentThread().interrupt();
             }
         }
     }
