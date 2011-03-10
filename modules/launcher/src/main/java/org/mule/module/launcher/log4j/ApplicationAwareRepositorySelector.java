@@ -84,7 +84,7 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                         {
                             // if it's not a file, no sense in monitoring it for changes
                             configWatchDog = new ConfigWatchDog(muleCL, appLogConfig.getFile(), repository);
-                            configWatchDog.setName(String.format("[%s].log4j.config.watchdog", appName));
+                            configWatchDog.setName(String.format("[%s].log4j.config.monitor", appName));
                         }
                         else
                         {
@@ -105,7 +105,7 @@ public class ApplicationAwareRepositorySelector implements RepositorySelector
                     }
                     configureFrom(defaultSystemLog.toURL(), repository);
                     configWatchDog = new ConfigWatchDog(ccl, defaultSystemLog.getAbsolutePath(), repository);
-                    configWatchDog.setName("Mule.system.log4j.config.watchdog");
+                    configWatchDog.setName("Mule.system.log4j.config.monitor");
                 }
 
                 final LoggerRepository previous = this.repository.putIfAbsent(ccl == null ? NO_CCL_CLASSLOADER : ccl.hashCode(), repository);
