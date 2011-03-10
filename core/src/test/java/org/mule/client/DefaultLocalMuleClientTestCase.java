@@ -10,6 +10,11 @@
 
 package org.mule.client;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
+import static org.mockito.Mockito.verify;
+
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
@@ -25,11 +30,6 @@ import java.util.Map;
 
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
-import static org.mockito.Mockito.verify;
 
 public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
 {
@@ -252,23 +252,21 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
 
         InboundEndpoint createInboundEndpoint(String uri, MessageExchangePattern mep) throws MuleException
         {
-            return super.getInboundEndpoint(uri, mep);
+            return getInboundEndpoint(uri, mep);
         }
 
         OutboundEndpoint createOutboundEndpoint(String uri, MessageExchangePattern mep, Long responseTimeout)
             throws MuleException
         {
-            return super.getOutboundEndpoint(uri, mep, responseTimeout);
+            return getOutboundEndpoint(uri, mep, responseTimeout);
         }
 
-        @Override
         protected InboundEndpoint getInboundEndpoint(String uri, MessageExchangePattern mep)
             throws MuleException
         {
             return inboundEndpoint;
         }
 
-        @Override
         protected OutboundEndpoint getOutboundEndpoint(String uri,
                                                        MessageExchangePattern mep,
                                                        Long responseTimeout) throws MuleException
