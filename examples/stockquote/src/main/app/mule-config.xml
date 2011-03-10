@@ -22,6 +22,7 @@
             proxyPort="${proxyPort}" proxyUsername="${proxyUsername}"/>
     -->
 
+    <context:property-placeholder location="stockquote.properties" system-properties-mode="OVERRIDE"/>
     <xml-entity-decoder-transformer name="XmlDecoder" />
     <xm:xslt-transformer name="XsltRest" xsl-file="xsl/rest-stock.xsl" />
     <xm:xslt-transformer name="XsltSoap" xsl-file="xsl/soap-stock.xsl" />
@@ -32,7 +33,7 @@
     </expression-transformer>
 
     <flow name="HTTP input">
-        <http:inbound-endpoint host="localhost" port="48309" path="stockquote">
+        <http:inbound-endpoint host="localhost" port="${port1}" path="stockquote">
             <http:body-to-parameter-map-transformer />
             <response>
                 <object-to-string-transformer />

@@ -9,7 +9,7 @@ var echoUrlPrefix = "http://localhost:65082/services/EchoUMO/echo/text/"
 
 function doEcho() {
     var data = new Object();
-    data.url = echoUrlPrefix + document.getElementById('phrase').value;
+    data.url = echoUrlPrefix + escape(document.getElementById('phrase').value);
     data.method = 'GET';
     mule.rpc("/examples/ajaxproxy", data, rpcEchoResponse);
 }

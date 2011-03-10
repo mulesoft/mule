@@ -10,7 +10,7 @@
 
 package org.mule.example.stockquote;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.util.WebServiceOnlineCheck;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.StringUtils;
@@ -21,7 +21,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 
 
-public class StockQuoteFunctionalTestCase extends FunctionalTestCase
+public class StockQuoteFunctionalTestCase extends DynamicPortTestCase
 {
     public StockQuoteFunctionalTestCase()
     {
@@ -66,7 +66,7 @@ public class StockQuoteFunctionalTestCase extends FunctionalTestCase
 
     private void runTest(String method) throws Exception
     {
-        String url = String.format("http://localhost:48309/stockquote?symbol=CSCO&method=%1s", method);
+        String url = String.format("http://localhost:" + getPorts().get(0) + "/stockquote?symbol=CSCO&method=%1s", method);
         GetMethod request = new GetMethod(url);
         int responseCode = new HttpClient().executeMethod(request);
         
@@ -87,5 +87,11 @@ public class StockQuoteFunctionalTestCase extends FunctionalTestCase
         {
             fail();
         }
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 }
