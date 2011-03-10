@@ -759,6 +759,10 @@ public class MuleRegistryHelper implements MuleRegistry
         {
             name = ((NamedObject) obj).getName();
         }
+        else if (obj instanceof FlowConstruct)
+        {
+            name = ((FlowConstruct) obj).getName();
+        }
         if (StringUtils.isBlank(name))
         {
             name = obj.getClass().getName() + ":" + UUID.getUUID();

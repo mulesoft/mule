@@ -144,5 +144,11 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
             // expected
         }
     }
+    
+    public void testRegisterUnregister() throws MuleException, Exception
+    {
+        muleContext.getRegistry().registerFlowConstruct(getFlowConstruct());
+        assertNotNull(muleContext.getRegistry().lookupFlowConstruct("test-flow"));
+    }    
 
 }
