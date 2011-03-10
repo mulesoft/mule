@@ -27,8 +27,8 @@ import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.PropertyScope;
-import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.endpoint.SimpleEndpointCache;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transport.NullPayload;
 import org.mule.util.StringUtils;
@@ -87,6 +87,8 @@ public class Process implements Initialisable, Disposable, MessageService
 
     protected static final Log logger = LogFactory.getLog(Process.class);
 
+    private final EndpointCache endpointCache;
+
     public Process(BPMS bpms, String name, String resource, FlowConstruct flowConstruct, MuleContext muleContext)
     {
         this(bpms, name, resource, null, flowConstruct, muleContext);
@@ -100,6 +102,7 @@ public class Process implements Initialisable, Disposable, MessageService
         this.processIdField = processIdField;
         this.flowConstruct = flowConstruct;
         this.muleContext = muleContext;
+        this.endpointCache = new SimpleEndpointCache(muleContext);
     }
 
     public void initialise() throws InitialisationException
@@ -272,8 +275,7 @@ public class Process implements Initialisable, Disposable, MessageService
         message.addProperties(messageProperties, PropertyScope.INBOUND);
         message.addProperties(messageProperties, PropertyScope.INVOCATION);
 
-        // Use the endpoint cache from the LocalMuleClient to prevent memory leaks (see MULE-5422)
-        EndpointCache endpointCache = ((DefaultLocalMuleClient) muleContext.getClient()).getEndpointCache();
+        // Use an endpoint cache to prevent memory leaks (see MULE-5422)
         OutboundEndpoint ep = endpointCache.getOutboundEndpoint(endpoint, exchangePattern, null);
         DefaultMuleEvent event = new DefaultMuleEvent(message, ep, new DefaultMuleSession(flowConstruct, muleContext));
         RequestContext.setEvent(event);

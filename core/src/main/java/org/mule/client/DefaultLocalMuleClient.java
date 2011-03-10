@@ -153,11 +153,6 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         }
     }
 
-    public EndpointCache getEndpointCache()
-    {
-        return endpointCache;
-    }
-
     /**
      * Placeholder class which makes the default exception handler available.
      */
