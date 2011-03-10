@@ -511,37 +511,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
     }
 
-    // TODO This might make retry work a bit better w/ JMS
-//    @Override
-//    public boolean validateConnection() throws Exception
-//    {
-//        logger.debug("Creating a temporary session to verify that we have a healthy connection...");
-//
-//        Connection connection;
-//        Session session;
-//        try
-//        {
-//            connection = createConnection();
-//            if (connection == null)
-//            {
-//                return false;
-//            }
-//            session = connection.createSession(false, 1);
-//            if (session == null)
-//            {
-//                return false;
-//            }
-//            session.close();
-//            connection.close();
-//            return true;
-//        }
-//        finally
-//        {
-//            session = null;
-//            connection = null;
-//        }
-//    }
-
     @Override
     protected void doConnect() throws Exception
     {
@@ -569,7 +538,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
         finally
         {
-            // connectionFactory = null;
             connection = null;
         }
     }
@@ -768,7 +736,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
         catch (JMSException e)
         {
-            logger.error("Failed to close jms message producer", e);
+            logger.warn("Failed to close jms message producer: " + e.getMessage());
         }
     }
 
@@ -808,7 +776,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
         catch (JMSException e)
         {
-            logger.error("Failed to close jms message consumer", e);
+            logger.warn("Failed to close jms message consumer: " + e.getMessage());
         }
     }
 
@@ -844,7 +812,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
         catch (JMSException e)
         {
-            logger.warn("Failed to close jms session consumer", e);
+            logger.warn("Failed to close jms session consumer: " + e.getMessage());
         }
     }
 
@@ -933,7 +901,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 {
                     // ignore, we are just trying to get the topic name
                 }
-                logger.warn("Failed to delete a temporary topic " + topicName, e);
+                logger.warn("Failed to delete a temporary topic " + topicName + ": " + e.getMessage());
             }
         }
     }

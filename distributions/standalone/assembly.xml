@@ -21,6 +21,7 @@
         <include>launcher</include>
         <include>mule</include>
         <include>setup_local_instance.sh</include>
+	<include>mule_examples</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -135,6 +136,16 @@
     <fileSet>
         <directory>../../examples/stockquote/dist</directory>
         <outputDirectory>examples/stockquote</outputDirectory>
+    </fileSet>
+
+    <!--
+    ============================
+        Mule Examples: Mule Example Launcher
+    ============================
+    -->
+    <fileSet>
+        <directory>../../examples/mule-example-launcher/dist</directory>
+        <outputDirectory>examples/mule-example-launcher</outputDirectory>
     </fileSet>
   </fileSets>
 
@@ -300,6 +311,7 @@
         <exclude>org.mule.examples:mule-example-notifications</exclude>
         <exclude>org.mule.examples:mule-example-scripting</exclude>
         <exclude>org.mule.examples:mule-example-stockquote</exclude>
+        <exclude>org.mule.examples:mule-example-launcher</exclude>
 
         <!-- lib/user -->
         <exclude>junit:junit</exclude>
@@ -419,6 +431,12 @@
       <outputDirectory>examples/stockquote</outputDirectory>
       <includes>
         <include>org.mule.examples:mule-example-stockquote</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>examples/mule-example-launcher</outputDirectory>
+      <includes>
+        <include>org.mule.examples:mule-example-launcher</include>
       </includes>
     </dependencySet>
   </dependencySets>

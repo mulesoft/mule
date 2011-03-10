@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+        http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/3.1/mule-jetty.xsd">
+
+    <description>
+        This is the configuration file that is started up by Mule when the application is deployed.
+        Mule's servlets need a reference to a MuleContext which cannot be provided here. The main
+        Mule config is started through a servlet context listener in the bookstore-admin web
+        context.
+    </description>
+
+    <jetty:connector name="jettyConnector">
+        <jetty:webapps directory="${app.home}/webapps" port="8083"/>
+    </jetty:connector>
+
+</mule>
