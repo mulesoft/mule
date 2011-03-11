@@ -43,7 +43,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
 
     private long frequency = DEFAULT_POLL_FREQUENCY;
     private TimeUnit timeUnit = DEFAULT_POLL_TIMEUNIT;
-    
+
     // @GuardedBy(itself)
     protected final Map<ScheduledFuture, PollingReceiverWorker> schedules = new HashMap<ScheduledFuture, PollingReceiverWorker>();
 
@@ -78,14 +78,14 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
      * This method registers this receiver for periodic polling ticks with the connectors
      * scheduler. Subclasses can override this in case they want to handle their polling
      * differently.
-     * 
+     *
      * @throws RejectedExecutionException
      * @throws NullPointerException
      * @throws IllegalArgumentException
      * @see ScheduledExecutorService#scheduleWithFixedDelay(Runnable, long, long, TimeUnit)
      */
     protected void schedule()
-        throws RejectedExecutionException, NullPointerException, IllegalArgumentException
+            throws RejectedExecutionException, NullPointerException, IllegalArgumentException
     {
         synchronized (schedules)
         {
@@ -95,8 +95,8 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
             // data.
             PollingReceiverWorker pollingReceiverWorker = this.createWork();
             ScheduledFuture schedule = connector.getScheduler().scheduleWithFixedDelay(
-                new PollingReceiverWorkerSchedule(pollingReceiverWorker), DEFAULT_STARTUP_DELAY,
-                this.getFrequency(), this.getTimeUnit());
+                    new PollingReceiverWorkerSchedule(pollingReceiverWorker), DEFAULT_STARTUP_DELAY,
+                    this.getFrequency(), this.getTimeUnit());
             schedules.put(schedule, pollingReceiverWorker);
 
             if (logger.isDebugEnabled())
@@ -110,7 +110,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
 
     /**
      * This method cancels the schedules which were created in {@link #schedule()}.
-     * 
+     *
      * @see Future#cancel(boolean)
      */
     protected void unschedule()
@@ -134,8 +134,8 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
                     catch (InterruptedException e)
                     {
                         logger.warn(
-                            "PollingReceiverWworker interupted while waiting for poll() to complete as part of message receiver stop.",
-                            e);
+                                ObjectUtils.identityToShortString(this) + "  interrupted while waiting for poll() to complete as part of message receiver stop.",
+                                e);
                         break;
                     }
                 }
@@ -149,7 +149,7 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
             }
         }
     }
-    
+
     public void disableNativeScheduling()
     {
         this.unschedule();

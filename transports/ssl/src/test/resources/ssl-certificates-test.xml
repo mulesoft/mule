@@ -18,13 +18,13 @@
     <ssl:endpoint name="in" host="localhost" port="${port1}" exchange-pattern="request-response"/>
 
     <model name="main">
-        <custom-service name="service" class="org.mule.tck.testmodels.mule.TestSedaService">
+        <service name="service">
             <inbound>
                 <ssl:inbound-endpoint ref="in"/>
             </inbound>
             <test:component appendString=" Received">
                 <test:callback class="org.mule.transport.ssl.SaveCertificatesCallback"/>
             </test:component>
-        </custom-service>
+        </service>
     </model>
 </mule>
