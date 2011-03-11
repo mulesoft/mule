@@ -4042,7 +4042,7 @@
                 <xsd:attribute name="stopMessageProcessing" type="substitutableBoolean" default="false" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Stops the service/flow that owns the exception strategy when an exception is managed in the strategy so no more messages get consumed.
+                            Stop the flow/service when an exception occurs.  You will need to restart the flow/service manually after this (e.g, using JMX).
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

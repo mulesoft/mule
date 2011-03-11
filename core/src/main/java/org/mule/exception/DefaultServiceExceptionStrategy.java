@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
-
+    /** Stop the flow/service when an exception occurs.  You will need to restart the flow/service manually after this (e.g, using JMX). */
     private boolean stopMessageProcessing;
 
     /** 
