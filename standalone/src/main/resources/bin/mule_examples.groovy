@@ -65,14 +65,17 @@ splash "Starting Mule ESB..."
 
 def command = SystemUtils.IS_OS_WINDOWS ? "cmd /c start ${muleHome}/bin/mule.bat" : "${muleHome}/bin/mule start"
 def proc = command.execute()
-proc.waitFor()
-println proc.text
+if(!SystemUtils.IS_OS_WINDOWS)
+{
+    proc.waitFor()
+    println proc.text
+}
 
 
 // wait for the example launcher application to be started
 splash "Waiting for example applications to become ready..."
 def i = 0
-def timeoutInMs = 180000 // 3 minutes
+def timeoutInMs = 300000 // 3 minutes
 def waitIntervalInMs = 3000
 def loops = timeoutInMs / waitIntervalInMs
 
