@@ -20,6 +20,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.transport.Connector;
+import org.mule.transport.ContinuousPollingReceiverWorker;
 import org.mule.transport.PollingReceiverWorker;
 import org.mule.transport.TransactedPollingMessageReceiver;
 import org.mule.util.queue.Queue;
@@ -199,37 +200,6 @@ public class VMMessageReceiver extends TransactedPollingMessageReceiver
     @Override
     protected PollingReceiverWorker createWork()
     {
-        return new VMReceiverWorker(this);
-    }
-    
-    /*
-     * Even though the VM transport is "polling" for messages, the nonexistent cost of accessing the queue is
-     * a good reason to not use the regular scheduling mechanism in order to both minimize latency and
-     * maximize throughput.
-     */
-    protected static class VMReceiverWorker extends PollingReceiverWorker
-    {
-
-        public VMReceiverWorker(VMMessageReceiver pollingMessageReceiver)
-        {
-            super(pollingMessageReceiver);
-        }
-
-        @Override
-        protected void poll() throws Exception
-        {
-            /*
-             * We simply run our own polling loop all the time as long as the
-             * receiver is started. The blocking wait defined by
-             * VMConnector.getQueueTimeout() will prevent this worker's receiver
-             * thread from busy-waiting.
-             */
-            LifecycleState receiverState = this.receiver.getLifecycleState();
-            while (receiverState.isStarted() && !receiverState.isStopping())
-            {
-                super.poll();
-            }
-        }
-    }
-
+        return new ContinuousPollingReceiverWorker(this);
+    }    
 }

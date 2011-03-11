@@ -134,6 +134,12 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
      */
     private int refsThreshold = INT_VALUE_NOT_SET;
 
+    /**
+     * By default, an asynchronous reply to the inbound endpoint is sent back.  This can cause unwanted side effects 
+     * in some cases, use this attribute to disable.
+     */
+    private boolean disableReplyTo = false;
+    
     private ContinuationCometdServlet servlet;
 
     public AjaxConnector(MuleContext context)
@@ -414,5 +420,15 @@ public class AjaxConnector extends JettyHttpsConnector implements BayeuxAware
     {
         // ajax connector doesn't host full wars, flag this to Mule
         return false;
+    }
+
+    public void setDisableReplyTo(boolean disableReplyTo) 
+    {
+        this.disableReplyTo = disableReplyTo;
+    }
+
+    public boolean isDisableReplyTo() 
+    {
+        return disableReplyTo;
     }
 }
