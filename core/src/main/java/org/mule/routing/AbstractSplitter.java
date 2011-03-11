@@ -85,6 +85,7 @@ public abstract class AbstractSplitter extends
         List<MuleEvent> resultEvents = new ArrayList<MuleEvent>();
         int correlationSequence = 1;
 
+        MuleMessage originalMessage = event.getMessage();
         for (Object part : parts)
         {
             MuleMessage message;
@@ -93,8 +94,9 @@ public abstract class AbstractSplitter extends
                 message = (MuleMessage) part;
             }
             else
-            {
-                message = new DefaultMuleMessage(part, muleContext);
+            {               
+                message = new DefaultMuleMessage(originalMessage, muleContext);
+                message.setPayload(part);
             }
 
             if (enableCorrelation != CorrelationMode.NEVER)
