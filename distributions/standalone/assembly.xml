@@ -216,7 +216,6 @@
         <include>org.mule.modules:mule-module-jbpm</include>
         <include>org.mule.modules:mule-module-json</include>
         <include>org.mule.modules:mule-module-management</include>
-        <include>org.mule.modules:mule-module-mcp</include>
         <include>org.mule.modules:mule-module-ognl</include>
         <include>org.mule.modules:mule-module-pgp</include>
         <include>org.mule.modules:mule-module-rss</include>
@@ -227,6 +226,7 @@
         <include>org.mule.modules:mule-module-sxc</include>
         <include>org.mule.modules:mule-module-tomcat</include>
         <include>org.mule.modules:mule-module-xml</include>
+        <include>org.mule.patterns:mule-pattern-core</include>
       </includes>
     </dependencySet>
 
@@ -283,7 +283,6 @@
         <exclude>org.mule.modules:mule-module-launcher</exclude>
         <exclude>org.mule.modules:mule-module-logging</exclude>
         <exclude>org.mule.modules:mule-module-management</exclude>
-        <exclude>org.mule.modules:mule-module-mcp</exclude>
         <exclude>org.mule.modules:mule-module-ognl</exclude>
         <exclude>org.mule.modules:mule-module-pgp</exclude>
         <exclude>org.mule.modules:mule-module-reboot</exclude>
@@ -295,6 +294,8 @@
         <exclude>org.mule.modules:mule-module-sxc</exclude>
         <exclude>org.mule.modules:mule-module-tomcat</exclude>
         <exclude>org.mule.modules:mule-module-xml</exclude>
+        <exclude>org.mule.patterns:mule-patterns-all</exclude>
+        <exclude>org.mule.patterns:mule-pattern-core</exclude>
         <exclude>org.mule.examples:mule-examples-all</exclude>
         <exclude>org.mule.examples:mule-example-bookstore</exclude>
         <exclude>org.mule.examples:mule-example-cep</exclude>

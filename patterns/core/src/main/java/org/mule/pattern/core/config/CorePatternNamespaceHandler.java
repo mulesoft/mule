@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.mcp.config;
+package org.mule.pattern.core.config;
 
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.specific.BridgeDefinitionParser;
@@ -17,9 +17,9 @@ import org.mule.config.spring.parsers.specific.ValidatorDefinitionParser;
 import org.mule.module.ws.config.spring.parsers.specific.WSProxyDefinitionParser;
 
 /**
- * Registers a Bean Definition Parser for handling <code><mcp:*></code> elements.
+ * Registers a Bean Definition Parser for handling <code><pattern:*></code> elements.
  */
-public class MCPNamespaceHandler extends AbstractMuleNamespaceHandler
+public class CorePatternNamespaceHandler extends AbstractMuleNamespaceHandler
 {
     public void init()
     {
@@ -28,6 +28,5 @@ public class MCPNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("simple-service", new SimpleServiceDefinitionParser());
         registerBeanDefinitionParser("bridge", new BridgeDefinitionParser());
         registerBeanDefinitionParser("validator", new ValidatorDefinitionParser());
-        
     }
 }

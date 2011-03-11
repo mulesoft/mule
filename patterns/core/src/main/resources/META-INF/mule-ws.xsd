@@ -30,7 +30,7 @@
     <xsd:element name="proxy" type="proxyType" substitutionGroup="mule:abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
-                Deprecated.  Use mcp:web-service-proxy
+                Deprecated: use pattern:web-service-proxy instead.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>

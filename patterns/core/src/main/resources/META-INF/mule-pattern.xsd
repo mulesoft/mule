@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/mcp"
+<xsd:schema xmlns="http://www.mulesoft.org/schema/mule/pattern"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
             xmlns:ws="http://www.mulesoft.org/schema/mule/ws"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
-            targetNamespace="http://www.mulesoft.org/schema/mule/mcp"
+            targetNamespace="http://www.mulesoft.org/schema/mule/pattern"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
@@ -25,11 +25,11 @@
             <schemadoc:page-title>MCP Module</schemadoc:page-title>
         </xsd:appinfo>
     </xsd:annotation>
-    
+
     <!--==============================================================-->
     <!--   Flow Constructs                                            -->
     <!--==============================================================-->
-    
+
     <xsd:element name="web-service-proxy" type="ws:proxyType" substitutionGroup="mule:abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>

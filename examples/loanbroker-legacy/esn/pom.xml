@@ -27,14 +27,14 @@
             <artifactId>mule-module-spring-config</artifactId>
             <version>${version}</version>
         </dependency>
-         <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-mcp</artifactId>
-            <version>${version}</version>
-        </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-cxf</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.patterns</groupId>
+            <artifactId>mule-pattern-core</artifactId>
             <version>${version}</version>
         </dependency>
         <dependency>

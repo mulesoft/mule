@@ -72,6 +72,13 @@
             <type>pom</type>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mule.patterns</groupId>
+            <artifactId>mule-patterns-all</artifactId>
+            <version>${version}</version>
+            <type>pom</type>
+            <scope>test</scope>
+        </dependency>
         <!-- some tests reference cxf test classes -->
         <dependency>
             <groupId>org.mule.modules</groupId>

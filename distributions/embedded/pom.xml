@@ -250,12 +250,12 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mule.modules</groupId>
-                                    <artifactId>mule-module-mcp</artifactId>
+                                    <artifactId>mule-module-xml</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.mule.modules</groupId>
-                                    <artifactId>mule-module-xml</artifactId>
+                                    <groupId>org.mule.patterns</groupId>
+                                    <artifactId>mule-pattern-core</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                             </artifactItems>
