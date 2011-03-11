@@ -67,14 +67,10 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver implements Baye
             MuleMessage messageToRoute = createMuleMessage(data, endpoint.getEncoding());
             messageToRoute.setInvocationProperty(AjaxConnector.COMETD_CLIENT, client);
 
-            Object replyTo = null;
-            if (endpoint.getExchangePattern().hasResponse())
+            Object replyTo = messageToRoute.getReplyTo();
+            if (replyTo != null)
             {
-                replyTo = messageToRoute.getReplyTo();
-                if (replyTo != null)
-                {
-                    messageToRoute.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE, PropertyScope.INBOUND);
-                }
+                messageToRoute.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE, PropertyScope.INBOUND);
             }
             
             MuleEvent event = AjaxMessageReceiver.this.routeMessage(messageToRoute);
