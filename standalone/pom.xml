@@ -195,6 +195,13 @@
             <version>${version}</version>
         </dependency>
 
+        <!-- Include all Mule Patterns -->
+        <dependency>
+            <groupId>org.mule.patterns</groupId>
+            <artifactId>mule-patterns-all</artifactId>
+            <version>${version}</version>
+            <type>pom</type>
+        </dependency>
         <!-- Include all Mule Transports -->
         <dependency>
             <groupId>org.mule.transports</groupId>
