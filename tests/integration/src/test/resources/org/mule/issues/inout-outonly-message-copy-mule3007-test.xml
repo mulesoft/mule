@@ -16,7 +16,7 @@
     <model name="StreamTest">
         <service name="StreamTestService">
             <inbound>
-                <inbound-endpoint address="http://localhost:38900/services" exchange-pattern="request-response"/>
+                <inbound-endpoint address="http://localhost:${port1}/services" exchange-pattern="request-response"/>
             </inbound>
             <outbound>
                 <pass-through-router>
