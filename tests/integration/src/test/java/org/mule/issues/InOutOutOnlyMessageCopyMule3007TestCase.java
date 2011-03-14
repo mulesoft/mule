@@ -13,23 +13,30 @@ package org.mule.issues;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
-public class InOutOutOnlyMessageCopyMule3007TestCase extends FunctionalTestCase
+public class InOutOutOnlyMessageCopyMule3007TestCase extends DynamicPortTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/issues/inout-outonly-message-copy-mule3007-test.xml";
     }
 
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
+    }
+
     public void testStreamMessage() throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage response = client.send("http://localhost:38900/services", "test", null);
+        String url = String.format("http://localhost:%1d/services", getPorts().get(0));
+        System.out.println(url);
+        MuleMessage response = client.send(url, "test", null);
         assertNull(response.getExceptionPayload());
     }
-    
 }
 
 
