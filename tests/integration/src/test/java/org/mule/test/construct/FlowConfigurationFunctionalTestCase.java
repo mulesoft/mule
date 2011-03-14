@@ -463,4 +463,18 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertEquals("abc", result.getPayloadAsString());
     }
     
+    public void testPoll() throws Exception
+    {
+        MuleMessage message = muleContext.getClient().request("vm://poll-out", RECEIVE_TIMEOUT);
+        assertNotNull(message);
+        assertEquals(" Hello fooout", message.getPayloadAsString());
+    }
+
+    public void testPollFlowRef() throws Exception
+    {
+        MuleMessage message = muleContext.getClient().request("vm://poll2-out", RECEIVE_TIMEOUT);
+        assertNotNull(message);
+        assertEquals("pollappendout", message.getPayloadAsString());
+    }
+
 }
