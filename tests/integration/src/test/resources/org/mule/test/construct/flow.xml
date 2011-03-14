@@ -340,7 +340,20 @@
         <poll frequency="3000">
             <append-string-transformer message=" Hello foo" />
         </poll>
-        <logger level="ERROR" message="#[payload]"/>
+        <append-string-transformer message="out" />
+        <vm:outbound-endpoint path="poll-out"/>
+    </flow>
+
+    <flow name="poll2">
+        <poll frequency="3000">
+            <flow-ref name="pollappend"/>
+        </poll>
+        <append-string-transformer message="out" />
+        <vm:outbound-endpoint path="poll2-out"/>
+    </flow>
+    
+    <flow name="pollappend">
+        <append-string-transformer message="pollappend" />
     </flow>
 
     <flow name="customRouter">
