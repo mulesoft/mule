@@ -197,7 +197,7 @@
         </xsl:variable>
         <xsl:variable name="retry">
             <xsl:choose>
-                <xsl:when test="schemadoc:transport-features/@reties = 'true'">
+                <xsl:when test="schemadoc:transport-features/@retries = 'true'">
                     <xsl:copy-of select="$yes"/>
                 </xsl:when>
                 <xsl:otherwise>
