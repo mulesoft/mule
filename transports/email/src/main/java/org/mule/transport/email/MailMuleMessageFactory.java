@@ -24,11 +24,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.mail.Address;
 import javax.mail.Header;
 import javax.mail.Message;
+import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
+import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,7 +41,7 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
     public static final String HEADER_LIST_PREFIX = "List:";
 
     private static Log log = LogFactory.getLog(MailMuleMessageFactory.class);
-    
+
     public MailMuleMessageFactory(MuleContext context)
     {
         super(context);
@@ -55,7 +58,7 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
     {
         return transportMessage;
     }
-    
+
     @Override
     protected void addProperties(DefaultMuleMessage muleMessage, Object transportMessage) throws Exception
     {
@@ -63,12 +66,10 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
 
         Message mailMessage = (Message) transportMessage;
 
-        muleMessage.setOutboundProperty(MailProperties.INBOUND_TO_ADDRESSES_PROPERTY,
-                                        MailUtils.mailAddressesToString(mailMessage.getRecipients(Message.RecipientType.TO)));
-        muleMessage.setOutboundProperty(MailProperties.INBOUND_CC_ADDRESSES_PROPERTY,
-                                        MailUtils.mailAddressesToString(mailMessage.getRecipients(Message.RecipientType.CC)));
-        muleMessage.setOutboundProperty(MailProperties.INBOUND_BCC_ADDRESSES_PROPERTY,
-                                        MailUtils.mailAddressesToString(mailMessage.getRecipients(Message.RecipientType.BCC)));
+        addRecipientProperty(muleMessage, mailMessage, RecipientType.TO, MailProperties.INBOUND_TO_ADDRESSES_PROPERTY);
+        addRecipientProperty(muleMessage, mailMessage, RecipientType.CC, MailProperties.INBOUND_CC_ADDRESSES_PROPERTY);
+        addRecipientProperty(muleMessage, mailMessage, RecipientType.BCC, MailProperties.INBOUND_BCC_ADDRESSES_PROPERTY);
+
         try
         {
             muleMessage.setOutboundProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY,
@@ -104,7 +105,7 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
         for (Enumeration<?> e = mailMessage.getAllHeaders(); e.hasMoreElements();)
         {
             Header header = (Header) e.nextElement();
-            
+
             String name = header.getName();
             String listName = MailUtils.toListHeader(name);
             String value = header.getValue();
@@ -127,6 +128,31 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
         }
     }
 
+    protected void addRecipientProperty(MuleMessage muleMessage, Message mailMessage,
+        RecipientType recipientType, String property) throws MessagingException
+    {
+        MimeMessage mimeMessage = null;
+        if (mailMessage instanceof MimeMessage)
+        {
+            mimeMessage = (MimeMessage) mailMessage;
+        }
+
+        try
+        {
+            Address[] recipients = mailMessage.getRecipients(recipientType);
+            muleMessage.setOutboundProperty(property, MailUtils.mailAddressesToString(recipients));
+        }
+        catch (MessagingException e)
+        {
+            if (mimeMessage != null)
+            {
+                String[] header = mimeMessage.getHeader(recipientType.toString());
+                String recipients = StringUtils.join(header, ", ");
+                muleMessage.setOutboundProperty(property, recipients);
+            }
+        }
+    }
+
     @Override
     protected void addAttachments(DefaultMuleMessage muleMessage, Object transportMessage) throws Exception
     {
@@ -136,7 +162,7 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
         if (content instanceof Multipart)
         {
             Multipart multipart = (Multipart) content;
-            
+
             TreeMap<String, Part> attachments = new TreeMap<String, Part>();
             MailUtils.getAttachments(multipart, attachments);
 
@@ -151,7 +177,7 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
             }
         }
     }
-    
+
     protected void addAttachmentHeaders(String name, Part part, MuleMessage muleMessage) throws javax.mail.MessagingException
     {
         Map<String, String> headers = new HashMap<String, String>();
@@ -160,7 +186,7 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
             Header h = (Header) e.nextElement();
             headers.put(h.getName(), h.getValue());
         }
-        
+
         if (headers.size() > 0)
         {
             muleMessage.setOutboundProperty(name + AbstractMailConnector.ATTACHMENT_HEADERS_PROPERTY_POSTFIX,
