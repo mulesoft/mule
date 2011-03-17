@@ -61,7 +61,7 @@ public class SimpleComponentDefinitionParser extends ComponentDefinitionParser
         Node attr;
         for (int i = 0; i < numAttrs; ++i)
         {
-            attr = attrs.item(i);
+            attr = attrs.item(0);
             properties.put(attr.getNodeName(), attr.getNodeValue());
             attrs.removeNamedItem(attr.getNodeName());
         }
