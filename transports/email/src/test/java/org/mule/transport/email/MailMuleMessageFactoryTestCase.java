@@ -17,6 +17,7 @@ import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.Message;
+import javax.mail.Message.RecipientType;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.internet.MimeBodyPart;
@@ -45,7 +46,7 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     {
         return "this is not a valid transport message for MailMuleMessageFactory";
     }
-    
+
     public void testAttachments() throws Exception
     {
         Message payload = createMimeMessageWithAttachment();
@@ -54,12 +55,31 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         MuleMessage muleMessage = factory.create(payload, encoding);
         assertEquals(2, muleMessage.getInboundAttachmentNames().size());
     }
-    
+
+    public void testAddRecipientProperties() throws Exception
+    {
+        String to = "Information <info@domain.com>";
+        String cc = "\"info@\" <domain.com info@domain.com>";
+        String bcc = "'invalid@domain.com', info <info@domain.com>";
+
+        MimeMessage payload = getValidTransportMessage();
+        payload.setHeader(RecipientType.TO.toString(), to);
+        payload.setHeader(RecipientType.CC.toString(), cc);
+        payload.setHeader(RecipientType.BCC.toString(), bcc);
+
+        MuleMessageFactory factory = createMuleMessageFactory();
+        MuleMessage muleMessage = factory.create(payload, encoding);
+
+        assertEquals(to, muleMessage.getOutboundProperty(MailProperties.INBOUND_TO_ADDRESSES_PROPERTY));
+        assertEquals(cc, muleMessage.getOutboundProperty(MailProperties.INBOUND_CC_ADDRESSES_PROPERTY));
+        assertEquals(bcc, muleMessage.getOutboundProperty(MailProperties.INBOUND_BCC_ADDRESSES_PROPERTY));
+    }
+
     private Message createMimeMessageWithAttachment() throws Exception
     {
         MimeBodyPart mainBody = new MimeBodyPart();
         mainBody.setText("This is the main message text");
-        
+
         MimeBodyPart attachment = new MimeBodyPart();
         DataSource source = new ByteArrayDataSource(TEST_MESSAGE.getBytes(), "text/plain");
         attachment.setDataHandler(new DataHandler(source));
@@ -68,7 +88,7 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         Multipart multipart = new MimeMultipart();
         multipart.addBodyPart(mainBody);
         multipart.addBodyPart(attachment);
-          
+
         MimeMessage message = getValidTransportMessage();
         message.setContent(multipart);
         return message;
