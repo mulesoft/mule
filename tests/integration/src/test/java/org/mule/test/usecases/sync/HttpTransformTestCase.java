@@ -34,6 +34,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
         MuleMessage message = client.send("http://localhost:18080/RemoteService", "payload", null);
         assertNotNull(message);
         GZipUncompressTransformer gu = new GZipUncompressTransformer();
+        gu.setMuleContext(muleContext);
         gu.setReturnDataType(DataTypeFactory.STRING);
         assertNotNull(message.getPayload());
         String result = (String)gu.transform(message.getPayloadAsBytes());
