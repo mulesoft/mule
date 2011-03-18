@@ -14,12 +14,11 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
+import org.mule.util.SerializationUtils;
 import org.mule.util.compression.GZipCompression;
 
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.commons.lang.SerializationUtils;
 
 /**
  * <code>GZipCompressTransformer</code> will uncompress a byte[] or InputStream
@@ -70,7 +69,7 @@ public class GZipUncompressTransformer extends AbstractCompressionTransformer
 
         if (!DataTypeFactory.BYTE_ARRAY.equals(getReturnDataType()))
         {
-            return SerializationUtils.deserialize(buffer);
+            return SerializationUtils.deserialize(buffer, muleContext);
         }
 
         return buffer;

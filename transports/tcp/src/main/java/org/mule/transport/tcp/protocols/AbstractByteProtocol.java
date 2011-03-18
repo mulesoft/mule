@@ -15,6 +15,7 @@ import org.mule.api.MuleMessage;
 import org.mule.transport.tcp.TcpProtocol;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
+import org.mule.util.SerializationUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +25,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

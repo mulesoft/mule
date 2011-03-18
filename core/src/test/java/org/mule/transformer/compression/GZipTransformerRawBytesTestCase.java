@@ -50,6 +50,7 @@ public class GZipTransformerRawBytesTestCase extends GZipTransformerTestCase
     public Transformer getRoundTripTransformer()
     {
         GZipUncompressTransformer transformer = new GZipUncompressTransformer();
+        transformer.setMuleContext(muleContext);
 
         try
         {

@@ -13,13 +13,12 @@ package org.mule.transformer.compression;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
+import org.mule.util.SerializationUtils;
 import org.mule.util.compression.GZipCompression;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-
-import org.apache.commons.lang.SerializationUtils;
 
 /**
  * <code>GZipCompressTransformer</code> is a transformer compressing objects into

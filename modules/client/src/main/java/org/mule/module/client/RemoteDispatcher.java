@@ -41,6 +41,7 @@ import org.mule.transformer.TransformerUtils;
 import org.mule.transport.NullPayload;
 import org.mule.util.ClassUtils;
 import org.mule.util.IOUtils;
+import org.mule.util.SerializationUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -50,7 +51,6 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.Callable;
 import edu.emory.mathcs.backport.java.util.concurrent.Executor;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -127,7 +127,7 @@ public class RemoteDispatcher implements Disposable
         try
         {
             ByteArrayInputStream in = new ByteArrayInputStream(result.getPayloadAsBytes());
-            handshake = (ServerHandshake) SerializationUtils.deserialize(in);
+            handshake = (ServerHandshake) SerializationUtils.deserialize(in, muleContext);
         }
         catch (Exception e)
         {

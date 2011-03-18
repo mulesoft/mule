@@ -18,13 +18,12 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
+import org.mule.util.SerializationUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-
-import org.apache.commons.lang.SerializationUtils;
 
 /** <code>ObjectToOutputHandler</code> converts a byte array into a String. */
 public class ObjectToOutputHandler extends AbstractTransformer implements DiscoverableTransformer

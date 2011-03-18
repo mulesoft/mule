@@ -11,12 +11,11 @@
 package org.mule.transformer.compression;
 
 import org.mule.api.transformer.TransformerException;
+import org.mule.util.SerializationUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
-
-import org.apache.commons.lang.SerializationUtils;
 
 public class GZipTransformerStreamTestCase extends GZipTransformerTestCase
 {
@@ -36,6 +35,7 @@ public class GZipTransformerStreamTestCase extends GZipTransformerTestCase
     public void testStreamingDecompression() throws TransformerException
     {
         GZipUncompressTransformer transformer = new GZipUncompressTransformer();
+        transformer.setMuleContext(muleContext);
         
         InputStream input = new ByteArrayInputStream((byte[]) this.getResultData());
         byte[] resultBytes = (byte[]) transformer.transform(input);

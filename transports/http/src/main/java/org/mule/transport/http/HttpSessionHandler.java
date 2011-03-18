@@ -18,10 +18,10 @@ import org.mule.api.model.SessionException;
 import org.mule.api.transport.SessionHandler;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.Base64;
+import org.mule.util.SerializationUtils;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -50,7 +50,7 @@ public class HttpSessionHandler implements SessionHandler
             
             if (serializedSession != null)
             {
-                session = (MuleSession) SerializationUtils.deserialize(serializedSession);
+                session = (MuleSession) SerializationUtils.deserialize(serializedSession, message.getMuleContext());
             }
         }
         return session;
