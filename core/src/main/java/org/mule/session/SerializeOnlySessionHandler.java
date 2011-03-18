@@ -15,10 +15,10 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.SessionHandler;
+import org.mule.util.SerializationUtils;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -39,7 +39,7 @@ public class SerializeOnlySessionHandler implements SessionHandler
 
         if (serializedSession != null)
         {
-            session = (MuleSession) SerializationUtils.deserialize(serializedSession);
+            session = (MuleSession) SerializationUtils.deserialize(serializedSession, message.getMuleContext());
         }
         return session;
     }

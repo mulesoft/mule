@@ -14,10 +14,9 @@ import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.util.SerializationUtils;
 
 import java.io.Serializable;
-
-import org.apache.commons.lang.SerializationUtils;
 
 /**
  * <code>SerializableToByteArray</code> converts a serializable object or a String

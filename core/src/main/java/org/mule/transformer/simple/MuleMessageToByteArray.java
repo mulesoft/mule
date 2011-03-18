@@ -12,8 +12,7 @@ package org.mule.transformer.simple;
 import org.mule.api.MuleMessage;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.transformer.types.DataTypeFactory;
-
-import org.apache.commons.lang.SerializationUtils;
+import org.mule.util.SerializationUtils;
 
 /** TODO */
 public class MuleMessageToByteArray extends AbstractMessageTransformer

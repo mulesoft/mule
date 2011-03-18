@@ -28,6 +28,7 @@ import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.IOUtils;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
+import org.mule.util.SerializationUtils;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -61,7 +62,6 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.apache.commons.lang.SerializationUtils;
 
 /**
  * <code>ObjectToHttpClientMethodRequest</code> transforms a MuleMessage into a

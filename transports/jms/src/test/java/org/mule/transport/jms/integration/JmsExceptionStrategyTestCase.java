@@ -12,6 +12,7 @@ package org.mule.transport.jms.integration;
 
 import org.mule.api.config.MuleProperties;
 import org.mule.message.ExceptionMessage;
+import org.mule.util.SerializationUtils;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
@@ -21,7 +22,6 @@ import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
 
 /**
@@ -81,7 +81,7 @@ public class JmsExceptionStrategyTestCase extends AbstractJmsFunctionalTestCase
             {
                 byte[] messageBytes = new byte[(int) ((BytesMessage) message).getBodyLength()];
                 ((BytesMessage) message).readBytes(messageBytes);
-                obj = SerializationUtils.deserialize(messageBytes);
+                obj = SerializationUtils.deserialize(messageBytes, muleContext);
             }
             // ExceptionMessage did not get serialized by JMS provider
             else if (message instanceof ObjectMessage)
