@@ -14,6 +14,9 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class PersistentBoundedQueueTestCase extends FunctionalTestCase
 {
     // add some sizeable delat, as queue store ordering won't be guaranteed
@@ -37,19 +40,28 @@ public class PersistentBoundedQueueTestCase extends FunctionalTestCase
 
         // wait enough for queue offer to timeout
         Thread.sleep(muleContext.getConfiguration().getDefaultQueueTimeout());
-        
-        MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        assertEquals("Test1", result.getPayloadAsString());
-        result = client.request("vm://out", RECEIVE_TIMEOUT);
-        assertNotNull(result);
-        assertEquals("Test2", result.getPayloadAsString());
+
+        // poll the 'out' queue 3 times, the first 2 times we must have a result. The 3rd message
+        // must have been discarded as the queue was bounded.
+        Set<String> results = new HashSet<String>();
+        pollOutQueue(client, results);
+        pollOutQueue(client, results);
+        assertTrue(results.contains("Test1"));
+        assertTrue(results.contains("Test2"));
+
         Thread.sleep(SLEEP);
-        result = client.request("vm://out", RECEIVE_TIMEOUT);
-        if (result != null) {
+        MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+        if (result != null)
+        {
             System.out.println("result = " + result.getPayloadAsString());
         }
         assertNull(result);
     }
 
+    private void pollOutQueue(MuleClient client, Set<String> results) throws Exception
+    {
+        MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+        assertNotNull(result);
+        results.add(result.getPayloadAsString());
+    }
 }
