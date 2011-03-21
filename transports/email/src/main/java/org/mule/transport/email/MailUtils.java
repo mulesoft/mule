@@ -14,6 +14,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.util.StringUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import javax.mail.Address;
@@ -22,6 +23,7 @@ import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeUtility;
 
 /**
  * Contains javax.mail helpers.
@@ -96,38 +98,74 @@ public class MailUtils
         }
     }
 
-    public static void getAttachments(Multipart content, Map attachments) throws MessagingException, IOException
+    public static void getAttachments(Multipart content, Map<String, Part> attachments) throws MessagingException, IOException
     {
         int x = 0;
-        for(int i=0; i < content.getCount(); i++)
+        for(int i = 0; i < content.getCount(); i++)
         {
-            Part p = content.getBodyPart(i);
-            if(p.getContentType().indexOf("multipart/mixed") > -1)
+            Part part = content.getBodyPart(i);
+            if (part.getContentType().indexOf("multipart/mixed") > -1)
             {
-                Multipart m = (Multipart)p.getContent();
+                Multipart m = (Multipart) part.getContent();
                 getAttachments(m, attachments);
             }
             else
             {
                 String key;
-                if(StringUtils.isNotEmpty(p.getDescription()))
+                if (StringUtils.isNotEmpty(part.getDescription()))
                 {
-                    key = p.getDescription();
+                    key = part.getDescription();
                 }
-                else if(StringUtils.isNotEmpty(p.getFileName()))
+                else if (StringUtils.isNotEmpty(part.getFileName()))
                 {
-                    key = p.getFileName();
+                    try
+                    {
+                        key = MimeUtility.decodeText(part.getFileName());
+                    }
+                    catch (UnsupportedEncodingException e)
+                    {
+                        key = part.getFileName();
+                    }
                 }
-                else if(StringUtils.isNotEmpty(p.getDisposition()))
+                else if (StringUtils.isNotEmpty(part.getDisposition()))
                 {
-                    key = p.getDisposition();
+                    key = part.getDisposition();
                 }
                 else
                 {
                     key = String.valueOf(x++);
                 }
-                attachments.put(key, p);
+
+                key = getAttachmentName(key, attachments);
+
+                attachments.put(key, part);
             }
+        }
+    }
+
+
+    /**
+     * Check whether an attachment with the same name already exists,
+     * using a counter for override protection.
+     *
+     * @param key A attachment name
+     * @param attachments Map with attachments
+     * @return attachment name
+     */
+    public static String getAttachmentName(String key, Map<String, Part> attachments)
+    {
+        if (attachments.containsKey(key))
+        {
+            int x = 0;
+            while (attachments.containsKey(x + "_" + key))
+            {
+                x++;
+            }
+            return x + "_" + key;
+
+        } else
+        {
+            return key;
         }
     }
 
