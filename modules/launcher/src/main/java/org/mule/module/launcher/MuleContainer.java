@@ -16,6 +16,7 @@ import org.mule.config.ExceptionHelper;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
+import org.mule.module.launcher.log4j.ApplicationAwareRepositorySelector;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
@@ -26,6 +27,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.LogManager;
 
 /**
  *
@@ -47,7 +49,7 @@ public class MuleContainer
     /**
      * logger used by this class
      */
-    private static final Log logger = LogFactory.getLog(MuleContainer.class);
+    private static Log logger;
 
     /**
      * A properties file to be read at startup. This can be useful for setting
@@ -61,6 +63,16 @@ public class MuleContainer
     private static MuleShutdownHook muleShutdownHook;
 
     protected DeploymentService deploymentService;
+
+    static
+    {
+        if (System.getProperty("mule.simpleLog") == null)
+        {
+            // TODO save this guard ref for later
+            LogManager.setRepositorySelector(new ApplicationAwareRepositorySelector(), new Object());
+        }
+        logger = LogFactory.getLog(MuleContainer.class);
+    }
 
     /**
      * Application entry point.

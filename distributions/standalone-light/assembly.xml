@@ -33,7 +33,7 @@
             <fileMode>755</fileMode>
         </fileSet>
 
-		<!-- Override any files here -->
+        <!-- Override any files here -->
         <fileSet>
             <directory>src/main/resources</directory>
             <outputDirectory></outputDirectory>

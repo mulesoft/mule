@@ -14,15 +14,12 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Loads a standard $MULE_HOME/lib/* hierarchy.
  */
 public class MuleContainerSystemClassLoader extends URLClassLoader
 {
-    protected transient Log logger = LogFactory.getLog(getClass());
+    //protected transient Log logger = LogFactory.getLog(getClass());
 
     public MuleContainerSystemClassLoader(DefaultMuleClassPathConfig classPath)
     {
@@ -33,20 +30,20 @@ public class MuleContainerSystemClassLoader extends URLClassLoader
             final List<URL> urlsList = classPath.getURLs();
             for (URL url : urlsList)
             {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("adding URL " + url);
-                }
+                //if (logger.isDebugEnabled())
+                //{
+                //    logger.debug("adding URL " + url);
+                //}
 
                 addURL(url);
             }
         }
         catch (Exception e)
         {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug(e);
-            }
+            //if (logger.isDebugEnabled())
+            //{
+            //    logger.debug(e);
+            //}
         }
     }
 }

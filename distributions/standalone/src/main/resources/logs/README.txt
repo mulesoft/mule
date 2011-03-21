@@ -1,15 +1,28 @@
-This directory is used for tracing the execution of the Mule server.
+This directory is used for tracing the execution of the Mule container.
 
-Application-level logging is configured in the file "conf/log4j.properties" (by 
-default all output is sent to the console).
+Top-level logger for the Mule container is configured in "$MULE_HOME/conf/log4j.properties" or
+"$MULE_HOME/conf/log4j.xml".
 
-System-level logging is configured in the file "conf/wrapper.conf" (by default 
-all output is sent to the file "logs/mule.log"
+*** Xml format has higher priority and will be used if found or in presence of both xml and properties configs. ***
 
-Note that, unless the application is run in the foreground (i.e., not as a 
-daemon), this means that while the application itself is configured to send its 
-output to the console, the wrapper receives the console output and sends it to 
-the log file.
+Log4j xml docs: http://wiki.apache.org/logging-log4j/Log4jXmlFormat
+
+Container-level logging is written to the $MULE_HOME/logs/mule.log file.
+
+Application-level logging supports 2 modes:
+
+    1. No log4j configuration packaged with the app (either in app's lib or classes) -
+       a rolling log file is automatically created by Mule:
+
+              $MULE_HOME/logs/mule-app-<appName>.log
+
+       The format is the same as the default Mule config.
+
+    2. A log4j configuration is packaged with the app - no default log file is created
+       by Mule and app has a full control (and responsibility) to configure logging.
+
+
+*** TIP: use ${mule.home} placeholder in log4j.properties to resolve the Mule's directory (e.g. for file appenders). ***
 
 In addition to the application's output, the wrapper also sends any JVM-level or 
 OS-level errors/warnings to the log file.  This means that if the JVM crashes 

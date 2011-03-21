@@ -6,7 +6,7 @@ abdera-server-0.4.0-incubating
 abdera-spring-0.4.0-incubating
 acegi-security-1.0.7-osgi
 activation-1.1-osgi
-antlr-2.7.6
+antlr-3.1.1
 ant-1.6.5
 aopalliance-1.0
 asm-3.1-osgi
@@ -54,6 +54,9 @@ cxf-rt-ws-security-2.3.1
 cxf-tools-common-2.3.1
 cxf-wstx-msv-validation-2.3.1
 dom4j-1.6.1-osgi
+drools-api-5.0.1
+drools-compiler-5.0.1
+drools-core-5.0.1
 geronimo-annotation_1.0_spec-1.1.1
 geronimo-ejb_2.1_spec-1.1-osgi
 geronimo-j2ee-connector_1.5_spec-1.1-osgi
@@ -125,6 +128,7 @@ mule-module-bpm
 mule-module-builders
 mule-module-client
 mule-module-cxf
+mule-module-drools
 mule-module-ibeans
 mule-module-jaas
 mule-module-jbossts
@@ -144,8 +148,8 @@ mule-module-spring-extras
 mule-module-spring-security
 mule-module-sxc
 mule-module-tomcat
+mule-module-mcp
 mule-module-xml
-mule-pattern-core
 mule-tests-functional
 mule-transport-ajax
 mule-transport-ejb
@@ -167,6 +171,7 @@ mule-transport-tcp
 mule-transport-udp
 mule-transport-vm
 mule-transport-xmpp
+mvel2-2.0.10
 mx4j-jmx-2.1.1-osgi
 mx4j-impl-2.1.1-osgi
 mx4j-tools-2.1.1-osgi
