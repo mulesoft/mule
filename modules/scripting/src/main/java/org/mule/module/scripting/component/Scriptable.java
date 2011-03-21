@@ -225,20 +225,21 @@ public class Scriptable implements Initialisable, MuleContextAware
         Object result;
         try
         {
+            RegistryLookupBindings registryLookupBindings = new RegistryLookupBindings(muleContext.getRegistry(), bindings);
             if (compiledScript != null)
             {
-                result = compiledScript.eval(bindings);
+                result = compiledScript.eval(registryLookupBindings);
             }
             else
             {
-                result = scriptEngine.eval(scriptText, bindings);
+                result = scriptEngine.eval(scriptText, registryLookupBindings);
             }
 
             // The result of the script can be returned directly or it can
             // be set as the variable "result".
             if (result == null)
             {
-                result = bindings.get("result");
+                result = registryLookupBindings.get("result");
             }
         }
         catch (ScriptException e)
