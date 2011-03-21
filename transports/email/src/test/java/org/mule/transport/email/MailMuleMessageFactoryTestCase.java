@@ -16,8 +16,10 @@ import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.Message.RecipientType;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.internet.MimeBodyPart;
@@ -75,22 +77,62 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertEquals(bcc, muleMessage.getOutboundProperty(MailProperties.INBOUND_BCC_ADDRESSES_PROPERTY));
     }
 
+    public void testAttachmentsWithSameName() throws Exception
+    {
+        Message payload = createMimeMessageWithSameAttachmentNames();
+
+        MuleMessageFactory factory = createMuleMessageFactory();
+        MuleMessage muleMessage = factory.create(payload, encoding);
+        assertEquals(3, muleMessage.getInboundAttachmentNames().size());
+    }
+
     private Message createMimeMessageWithAttachment() throws Exception
     {
         MimeBodyPart mainBody = new MimeBodyPart();
         mainBody.setText("This is the main message text");
 
-        MimeBodyPart attachment = new MimeBodyPart();
-        DataSource source = new ByteArrayDataSource(TEST_MESSAGE.getBytes(), "text/plain");
-        attachment.setDataHandler(new DataHandler(source));
-        attachment.setFileName("message.txt");
+        MimeBodyPart attachment = createBodyPart(TEST_MESSAGE, "message.txt");
 
-        Multipart multipart = new MimeMultipart();
-        multipart.addBodyPart(mainBody);
-        multipart.addBodyPart(attachment);
+        Multipart multipart = createMultipart(mainBody, attachment);
 
         MimeMessage message = getValidTransportMessage();
         message.setContent(multipart);
         return message;
+    }
+
+    private Message createMimeMessageWithSameAttachmentNames() throws Exception
+    {
+        MimeBodyPart mainBody = new MimeBodyPart();
+        mainBody.setText("This is the main message text");
+
+        MimeBodyPart firstAttachment = createBodyPart("The first attachment content", "message.txt");
+        MimeBodyPart secondAttachment = createBodyPart("The second attachment content", "message.txt");
+
+        Multipart multipart = createMultipart(mainBody, firstAttachment, secondAttachment);
+
+        MimeMessage message = getValidTransportMessage();
+        message.setContent(multipart);
+        return message;
+    }
+
+    private MimeBodyPart createBodyPart(String content, String fileName) throws MessagingException
+    {
+        MimeBodyPart attachment = new MimeBodyPart();
+        DataSource source = new ByteArrayDataSource(content.getBytes(), "text/plain");
+        attachment.setDataHandler(new DataHandler(source));
+        attachment.setFileName(fileName);
+        return attachment;
+    }
+
+    private Multipart createMultipart(BodyPart... parts) throws MessagingException
+    {
+        Multipart multipart = new MimeMultipart();
+
+        for (BodyPart part : parts)
+        {
+            multipart.addBodyPart(part);
+        }
+
+        return multipart;
     }
 }

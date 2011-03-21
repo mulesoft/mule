@@ -11,9 +11,14 @@
 package org.mule.transport.email;
 
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.email.MailUtils;
 
+import java.util.Map;
+
+import javax.mail.Part;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+
+import org.apache.commons.collections.map.HashedMap;
 
 public class MailUtilsTestCase extends AbstractMuleTestCase
 {
@@ -24,6 +29,7 @@ public class MailUtilsTestCase extends AbstractMuleTestCase
     private static final String MULTIPLE_EMAILS_WITH_WHITESPACE = EMAIL_1 + ", " + EMAIL_2;
     private static final String MULTIPLE_EMAILS_WITHOUT_WHITESPACE = EMAIL_1 + "," + EMAIL_2;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         inetAddress1 = new InternetAddress(EMAIL_1);
@@ -68,4 +74,15 @@ public class MailUtilsTestCase extends AbstractMuleTestCase
         assertEquals("Wrong internet address conversion.", inetAddress2, result[1]);
     }
 
+    public void testGetAttachmentName() throws Exception
+    {
+        @SuppressWarnings("unchecked")
+        Map<String, Part> attachments = new HashedMap();
+
+        String key = "test.txt";
+        assertEquals(key, MailUtils.getAttachmentName(key, attachments));
+
+        attachments.put(key, new MimeBodyPart());
+        assertEquals("0_" + key, MailUtils.getAttachmentName(key, attachments));
+    }
 }
