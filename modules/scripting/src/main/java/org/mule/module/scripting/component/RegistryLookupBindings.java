@@ -17,6 +17,11 @@ import java.util.Set;
 
 import javax.script.Bindings;
 
+/**
+ * This class will attempt to lookup up objects inside the registry in case they don't
+ * exist in the delegate binding. This makes it possible to reference named objects 
+ * inside of Mule (such as a Spring bean) from a script with no extra work.
+ */
 public class RegistryLookupBindings implements Bindings
 {  
     private final Bindings delegate;
