@@ -39,6 +39,11 @@
             <artifactId>mule-transport-vm</artifactId>
             <version>${muleVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-ajax</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>

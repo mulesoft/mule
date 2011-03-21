@@ -14,7 +14,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -39,10 +38,7 @@ public class TickFeed implements Initialisable, Callable
     {
         try
         {
-            InputStream is = IOUtils.getResourceAsStream(DATA_FILE, TickFeed.class, false, false);
-            List<String> linesList = IOUtils.readLines(is);
-            logger.debug("Read data file, " + linesList.size() + " lines");
-            lines = linesList.iterator();
+            lines = readStockTickDataFile();
         }
         catch (IOException e)
         {
@@ -50,21 +46,35 @@ public class TickFeed implements Initialisable, Callable
         }
     }
 
+    private Iterator<String> readStockTickDataFile() throws IOException
+    {
+        InputStream is = IOUtils.getResourceAsStream(DATA_FILE, TickFeed.class, false, false);
+        try
+        {
+            List<String> linesList = IOUtils.readLines(is);
+            logger.debug("Read data file, " + linesList.size() + " lines");
+            return linesList.iterator();
+        }
+        finally
+        {
+            is.close();
+        }
+    }
+    
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
-        if (lines.hasNext())
+        // If we've gone through the entire datafile, start over again from the beginning.
+        if (!lines.hasNext())
         {
-            Object[] results = lineFormat.parse(lines.next());
-            StockTick tick = new StockTick((String)results[1],
-                                           ((Number)results[2]).doubleValue(),
-                                           ((Number)results[0]).longValue());
-            logger.info("New Stock Tick: " + tick);
-            return tick;
+            lines = readStockTickDataFile();
         }
-        else
-        {
-            return NullPayload.getInstance();
-        }
+
+        Object[] results = lineFormat.parse(lines.next());
+        StockTick tick = new StockTick((String)results[1],
+                                       ((Number)results[2]).doubleValue(),
+                                       ((Number)results[0]).longValue());
+        logger.info("New Stock Tick: " + tick);
+        return tick;
     }
 }
 

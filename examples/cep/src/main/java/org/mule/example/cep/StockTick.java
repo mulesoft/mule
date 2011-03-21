@@ -72,6 +72,6 @@ public class StockTick
 
     public static String percent(double number)
     {
-        return new DecimalFormat("%0.00").format(number);
+        return new DecimalFormat("0.0%").format(number);
     }
 }
