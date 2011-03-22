@@ -318,8 +318,8 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             }
             if (outboundMimeType == null)
             {
-                logger.info("Content-Type not set on outgoing request, defaulting to: " + HttpConstants.DEFAULT_CONTENT_TYPE);
                 outboundMimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
+                logger.info("Content-Type not set on outgoing request, defaulting to: " + outboundMimeType);
             }
 
             if (encoding != null && !"UTF-8".equals(encoding.toUpperCase())
