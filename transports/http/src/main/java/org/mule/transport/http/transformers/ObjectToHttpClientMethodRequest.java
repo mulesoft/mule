@@ -27,8 +27,8 @@ import org.mule.transport.http.StreamPayloadRequestEntity;
 import org.mule.transport.http.i18n.HttpMessages;
 import org.mule.util.IOUtils;
 import org.mule.util.ObjectUtils;
-import org.mule.util.StringUtils;
 import org.mule.util.SerializationUtils;
+import org.mule.util.StringUtils;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -318,7 +318,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
             }
             if (outboundMimeType == null)
             {
-                logger.info("Content-Type not set on outgoing request, defaulting to: " + outboundMimeType);
+                logger.info("Content-Type not set on outgoing request, defaulting to: " + HttpConstants.DEFAULT_CONTENT_TYPE);
                 outboundMimeType = HttpConstants.DEFAULT_CONTENT_TYPE;
             }
 
