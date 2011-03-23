@@ -46,7 +46,7 @@ public class LoggerReferenceHandler
         {
             public void run()
             {
-                while (true)
+                while (!Thread.currentThread().isInterrupted())
                 {
                     try
                     {
