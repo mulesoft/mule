@@ -127,7 +127,7 @@ public class AjaxFunctionalTestCase extends DynamicPortTestCase
         
         // parse the result string into java objects.  different jvms return it in different order, so we can't do a straight string comparison 
         ObjectMapper mapper = new ObjectMapper();
-        Map result  = mapper.readValue((String) data.get(), Map.class);
+        Map<?, ?> result  = mapper.readValue((String) data.get(), Map.class);
         assertEquals("/test1", result.get("channel"));
         assertEquals("Ross Received", result.get("data"));
     }
@@ -137,7 +137,7 @@ public class AjaxFunctionalTestCase extends DynamicPortTestCase
         MuleClient muleClient = new MuleClient(muleContext);
 
         bayeuxClient.publish("/test2", "Ross", null);
-        MuleMessage msg = muleClient.request("vm://in2", RECEIVE_TIMEOUT);
+        MuleMessage msg = muleClient.request("vm://in2", RECEIVE_TIMEOUT * 2);
 
         assertNotNull(msg);
         assertEquals("Ross Received", msg.getPayloadAsString());

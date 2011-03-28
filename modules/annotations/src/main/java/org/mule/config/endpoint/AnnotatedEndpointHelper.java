@@ -59,8 +59,7 @@ public class AnnotatedEndpointHelper
     {
         String uri = parsePlaceholderValues(epData.getAddress());
 
-        EndpointBuilder endpointBuilder = muleContext.getRegistry().lookupEndpointFactory()
-                .getEndpointBuilder(uri);
+        EndpointBuilder endpointBuilder = muleContext.getEndpointFactory().getEndpointBuilder(uri);
         endpointBuilder.setMuleContext(muleContext);
 
         return endpointBuilder;

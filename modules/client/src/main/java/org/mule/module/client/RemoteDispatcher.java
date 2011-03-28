@@ -95,7 +95,7 @@ public class RemoteDispatcher implements Disposable
     protected RemoteDispatcher(String endpoint, MuleContext muleContext) throws MuleException
     {
         this.muleContext = muleContext;
-        EndpointFactory endpointFactory = muleContext.getRegistry().lookupEndpointFactory();
+        EndpointFactory endpointFactory = muleContext.getEndpointFactory();
         asyncServerEndpoint = endpointFactory.getOutboundEndpoint(endpoint);
 
         EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpoint);
@@ -110,7 +110,7 @@ public class RemoteDispatcher implements Disposable
     {
         MuleMessage msg = new DefaultMuleMessage(ServerHandshake.SERVER_HANDSHAKE_PROPERTY, muleContext);
         MuleMessage result = null;
-        
+
         MuleEvent resultEvent = syncServerEndpoint.process(new DefaultMuleEvent(msg, syncServerEndpoint,
             new DefaultMuleSession(new MuleClientFlowConstruct(muleContext), muleContext)));
         if (resultEvent != null)
@@ -244,7 +244,7 @@ public class RemoteDispatcher implements Disposable
 
     public MuleMessage sendRemote(String endpoint, Object payload, Map messageProperties) throws MuleException
     {
-        return doToRemote(endpoint, payload, messageProperties, true, 
+        return doToRemote(endpoint, payload, messageProperties, true,
             muleContext.getConfiguration().getDefaultResponseTimeout());
     }
 
@@ -319,7 +319,7 @@ public class RemoteDispatcher implements Disposable
         setCredentials(message);
         RemoteDispatcherNotification action = new RemoteDispatcherNotification(message, RemoteDispatcherNotification.ACTION_INVOKE,
             "mule://" + component);
-        return dispatchAction(action, synchronous, 
+        return dispatchAction(action, synchronous,
             muleContext.getConfiguration().getDefaultResponseTimeout());
     }
 
@@ -351,7 +351,7 @@ public class RemoteDispatcher implements Disposable
             serverEndpoint = asyncServerEndpoint;
         }
         MuleMessage serializeMessage = new DefaultMuleMessage(action, muleContext);
-        
+
         updateContext(serializeMessage, serverEndpoint, synchronous);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -397,7 +397,7 @@ public class RemoteDispatcher implements Disposable
                 {
                     return null;
                 }
-                
+
                 Object response;
                 if (result.getPayload() instanceof InputStream)
                 {

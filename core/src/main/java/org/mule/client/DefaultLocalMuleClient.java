@@ -35,10 +35,10 @@ import org.mule.session.DefaultMuleSession;
 import java.util.Map;
 
 public class DefaultLocalMuleClient implements LocalMuleClient
-{    
+{
     protected final MuleContext muleContext;
     private final EndpointCache endpointCache;
-    
+
     public DefaultLocalMuleClient(MuleContext muleContext)
     {
         this.muleContext = muleContext;
@@ -199,5 +199,5 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         {
             return null;
         }
-    };
+    }
 }

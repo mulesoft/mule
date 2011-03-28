@@ -117,7 +117,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             m.setAccessible(true);
             m.invoke(action.getMessage(), muleContext);
         }
-        
+
         if (RemoteDispatcherNotification.ACTION_INVOKE == action.getAction())
         {
             result = invokeAction(action, context);
@@ -224,9 +224,11 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             }
             else
             {
-                EndpointFactory endpointFactory = managementContext.getRegistry().lookupEndpointFactory();
+                EndpointFactory endpointFactory = managementContext.getEndpointFactory();
+
                 EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(action.getResourceIdentifier());
                 endpointBuilder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
+
                 endpoint = managementContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
                 result = context.sendEvent(action.getMessage(), endpoint);
                 if (result == null)
@@ -252,9 +254,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
         MuleMessage result = null;
         try
         {
-            ImmutableEndpoint endpoint = context.getMuleContext()
-                .getRegistry()
-                .lookupEndpointFactory()
+            ImmutableEndpoint endpoint = context.getMuleContext().getEndpointFactory()
                 .getOutboundEndpoint(action.getResourceIdentifier());
 
             long timeout = MapUtils.getLongValue(action.getProperties(),
@@ -325,7 +325,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
     /**
      * Wraps an exception into a MuleMessage with an Exception payload and returns
      * the Xml representation of it
-     * 
+     *
      * @param result the result of the invocation or null if the exception occurred
      *            before or during the invocation
      * @param e the Exception thrown

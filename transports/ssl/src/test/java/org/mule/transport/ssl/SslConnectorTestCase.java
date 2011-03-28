@@ -42,11 +42,13 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         cnn.getDispatcherThreadingProfile().setDoThreading(false);
     }
 
+    @Override
     public String getTestEndpointURI()
     {
         return "ssl://localhost:56801";
     }
 
+    @Override
     public Object getValidMessage() throws Exception
     {
         return "Hello".getBytes();
@@ -56,10 +58,9 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
     {
         Service service = getTestService("orange", Orange.class);
         Connector connector = getConnector();
-        
-        InboundEndpoint endpoint2 = muleContext.getRegistry()
-            .lookupEndpointFactory()
-            .getInboundEndpoint("ssl://localhost:30303");
+
+        InboundEndpoint endpoint2 =
+            muleContext.getEndpointFactory().getInboundEndpoint("ssl://localhost:30303");
 
         connector.registerListener(endpoint2, getSensingNullMessageProcessor(), service);
         try

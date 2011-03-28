@@ -72,7 +72,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Returns the message payload for this event
-     * 
+     *
      * @return the message payload for this event
      */
     public MuleMessage getMessage()
@@ -82,7 +82,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Reterns the conents of the message as a byte array.
-     * 
+     *
      * @return the conents of the message as a byte array
      * @throws org.mule.api.MuleException if the message cannot be converted into an
      *             array of bytes
@@ -115,7 +115,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * Returns the message transformed into its recognised or expected format. The
      * transformer used is the one configured on the endpoint through which this
      * event was received.
-     * 
+     *
      * @param expectedType The class type required for the return object. This param
      *            just provides a convienient way to manage type casting of
      *            transformed objects
@@ -134,7 +134,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * Returns the message transformed into it's recognised or expected format and
      * then into an array of bytes. The transformer used is the one configured on the
      * endpoint through which this event was received.
-     * 
+     *
      * @return the message transformed into it's recognised or expected format as an
      *         array of bytes.
      * @throws org.mule.api.transformer.TransformerException if a failure occurs in
@@ -150,7 +150,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Returns the message contents as a string
-     * 
+     *
      * @return the message contents as a string
      * @throws org.mule.api.MuleException if the message cannot be converted into a
      *             string
@@ -165,7 +165,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * then into a String. The transformer used is the one configured on the endpoint
      * through which this event was received. This method will use the default
      * encoding on the event
-     * 
+     *
      * @return the message transformed into it's recognised or expected format as a
      *         Strings.
      * @throws org.mule.api.transformer.TransformerException if a failure occurs in
@@ -180,7 +180,7 @@ public class DefaultMuleEventContext implements MuleEventContext
     /**
      * Returns the message contents as a string This method will use the default
      * encoding on the event
-     * 
+     *
      * @return the message contents as a string
      * @throws org.mule.api.MuleException if the message cannot be converted into a
      *             string
@@ -192,7 +192,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Returns the current transaction (if any) for the session
-     * 
+     *
      * @return the current transaction for the session or null if there is no
      *         transaction in progress
      */
@@ -211,7 +211,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * This will send an event via the configured outbound router on the service
-     * 
+     *
      * @param message the message to send
      * @return the result of the send if any
      * @throws org.mule.api.MuleException if there is no outbound endpoint configured
@@ -226,7 +226,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * Depending on the session state this methods either Passes an event
      * synchronously to the next available Mule component in the pool or via the
      * endpoint configured for the event
-     * 
+     *
      * @param message the event message payload to send
      * @param endpoint The endpoint to disptch the event through.
      * @return the return Message from the call or null if there was no result
@@ -242,7 +242,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * Depending on the session state this methods either Passes an event
      * synchronously to the next available Mule component in the pool or via the
      * endpoint configured for the event
-     * 
+     *
      * @param message the message payload to send
      * @return the return Message from the call or null if there was no result
      * @throws org.mule.api.MuleException if the event fails to be processed by the
@@ -273,7 +273,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * Depending on the session state this methods either Passes an event
      * synchronously to the next available Mule component in the pool or via the
      * endpointUri configured for the event
-     * 
+     *
      * @param message the event message payload to send
      * @param endpointUri The endpointUri to disptch the event through
      * @return the return Message from the call or null if there was no result
@@ -294,10 +294,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
         builder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
 
-        OutboundEndpoint endpoint = getMuleContext().getRegistry()
-            .lookupEndpointFactory()
-            .getOutboundEndpoint(builder);
-
+        OutboundEndpoint endpoint = getMuleContext().getEndpointFactory().getOutboundEndpoint(builder);
         return clientInterface.process(endpoint, message);
     }
 
@@ -309,7 +306,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * any time to check that the invocation has completed. A timeout is associated
      * with the invocation, which is the maximum time in milli-seconds that the
      * invocation should take to complete
-     * 
+     *
      * @param message the object that is the payload of the event
      * @param timeout how long to block in milliseconds waiting for a result
      * @return the result message if any of the invocation
@@ -343,7 +340,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * any time to check that the invocation has completed. A timeout is associated
      * with the invocation, which is the maximum time in milli-seconds that the
      * invocation should take to complete
-     * 
+     *
      * @param message the MuleMessage of the event
      * @param timeout how long to block in milliseconds waiting for a result
      * @return the result message if any of the invocation
@@ -376,7 +373,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * any time to check that the invocation has completed. A timeout is associated
      * with the invocation, which is the maximum time in milli-seconds that the
      * invocation should take to complete
-     * 
+     *
      * @param message the MuleMessage of the event
      * @param endpointUri the endpointUri to dispatch to
      * @param timeout how long to block in milliseconds waiting for a result
@@ -411,7 +408,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * any time to check that the invocation has completed. A timeout is associated
      * with the invocation, which is the maximum time in milli-seconds that the
      * invocation should take to complete
-     * 
+     *
      * @param message the MuleMessage of the event
      * @param endpointName The endpoint name to disptch the event through. This will
      *            be looked up first on the service configuration and then on the
@@ -444,7 +441,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * Depending on the session state this methods either Passes an event
      * synchronously to the next available Mule component in the pool or via the
      * endpoint configured for the event
-     * 
+     *
      * @param message the event message payload to send
      * @param endpointName The endpoint name to disptch the event through. This will
      *            be looked up first on the service configuration and then on the
@@ -461,7 +458,7 @@ public class DefaultMuleEventContext implements MuleEventContext
     /**
      * This will dispatch an event asynchronously via the configured outbound
      * endpoint on the service for this session
-     * 
+     *
      * @param message payload to dispatch
      * @throws org.mule.api.MuleException if there is no outbound endpoint configured
      *             on the service or the events fails during dispatch
@@ -474,7 +471,7 @@ public class DefaultMuleEventContext implements MuleEventContext
     /**
      * This will dispatch an event asynchronously via the configured outbound
      * endpoint on the service for this session
-     * 
+     *
      * @param message the message to send
      * @throws org.mule.api.MuleException if there is no outbound endpoint configured
      *             on the service or the events fails during dispatch
@@ -507,7 +504,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * Depending on the session state this methods either Passes an event
      * asynchronously to the next available Mule component in the pool or via the
      * endpointUri configured for the event
-     * 
+     *
      * @param message the event message payload to send
      * @param endpointUri the endpointUri to dispatc the event to first on the
      *            service configuration and then on the mule manager configuration
@@ -528,17 +525,14 @@ public class DefaultMuleEventContext implements MuleEventContext
 
         builder.setExchangePattern(MessageExchangePattern.ONE_WAY);
 
-        OutboundEndpoint endpoint = getMuleContext().getRegistry()
-            .lookupEndpointFactory()
-            .getOutboundEndpoint(builder);
-
+        OutboundEndpoint endpoint = getMuleContext().getEndpointFactory().getOutboundEndpoint(builder);
         clientInterface.process(endpoint, message);    }
 
     /**
      * Depending on the session state this methods either Passes an event
      * asynchronously to the next available Mule component in the pool or via the
      * endpoint configured for the event
-     * 
+     *
      * @param message the event message payload to send
      * @param endpointName The endpoint name to disptch the event through. This will
      *            be looked up first on the service configuration and then on the
@@ -557,10 +551,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
         builder.setExchangePattern(MessageExchangePattern.ONE_WAY);
 
-        OutboundEndpoint endpoint = getMuleContext().getRegistry()
-            .lookupEndpointFactory()
-            .getOutboundEndpoint(builder);
-
+        OutboundEndpoint endpoint = getMuleContext().getEndpointFactory().getOutboundEndpoint(builder);
         clientInterface.process(endpoint, message);
     }
 
@@ -568,7 +559,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * Depending on the session state this methods either Passes an event
      * asynchronously to the next available Mule component in the pool or via the
      * endpoint configured for the event
-     * 
+     *
      * @param message the event message payload to send
      * @param endpoint The endpoint name to disptch the event through.
      * @throws org.mule.api.MuleException if the event fails to be processed by the
@@ -581,7 +572,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Requests a synchronous receive of an event on the service
-     * 
+     *
      * @param endpoint the endpoint identifing the endpointUri on ewhich the event
      *            will be received
      * @param timeout time in milliseconds before the request timesout
@@ -595,7 +586,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Requests a synchronous receive of an event on the service
-     * 
+     *
      * @param endpointName the endpoint identifing the endpointUri on ewhich the
      *            event will be received
      * @param timeout time in milliseconds before the request timesout
@@ -609,7 +600,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Requests a synchronous receive of an event on the service
-     * 
+     *
      * @param endpointUri the endpointUri on which the event will be received
      * @param timeout time in milliseconds before the request timesout
      * @return The requested event or null if the request times out
@@ -639,7 +630,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * <code>RequestContext.getEventContext</code> to obtain the MuleEventContext for
      * the current thread. The user can programmatically control how events are
      * dispatched.
-     * 
+     *
      * @return Returns true is the user has set stopFurtherProcessing.
      * @see org.mule.api.MuleEventContext
      * @see org.mule.api.lifecycle.Callable
@@ -658,7 +649,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * <code>RequestContext.getEventContext</code> to obtain the MuleEventContext for
      * the current thread. The user can programmatically control how events are
      * dispached.
-     * 
+     *
      * @param stopFurtherProcessing the value to set.
      */
     public void setStopFurtherProcessing(boolean stopFurtherProcessing)
@@ -669,7 +660,7 @@ public class DefaultMuleEventContext implements MuleEventContext
     /**
      * An outputstream the can optionally be used write response data to an incoming
      * message.
-     * 
+     *
      * @return an output stream if one has been made available by the message
      *         receiver that received the message
      */
@@ -682,7 +673,7 @@ public class DefaultMuleEventContext implements MuleEventContext
     {
         return event.getEndpoint().getEndpointURI();
     }
-    
+
     public MessageExchangePattern getExchangePattern()
     {
         return event.getEndpoint().getExchangePattern();
@@ -691,7 +682,7 @@ public class DefaultMuleEventContext implements MuleEventContext
     /**
      * Returns the transaction for the current event or null if there is no
      * transaction in progresss
-     * 
+     *
      * @return the transaction for the current event or null if there is no
      *         transaction in progresss
      */
@@ -702,7 +693,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     /**
      * Get the timeout value associated with the event
-     * 
+     *
      * @return the timeout for the event
      */
     public int getTimeout()
@@ -715,7 +706,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      * Information with the message, this method should be overriden to expose the
      * transport encoding, otherwise the default encoding in the Mule configuration
      * will be used
-     * 
+     *
      * @return the encoding for this message. This method must never return null
      */
     public String getEncoding()

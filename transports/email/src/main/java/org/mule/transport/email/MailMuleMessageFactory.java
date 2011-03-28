@@ -70,62 +70,16 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
         addRecipientProperty(muleMessage, mailMessage, RecipientType.CC, MailProperties.INBOUND_CC_ADDRESSES_PROPERTY);
         addRecipientProperty(muleMessage, mailMessage, RecipientType.BCC, MailProperties.INBOUND_BCC_ADDRESSES_PROPERTY);
 
-        try
-        {
-            muleMessage.setOutboundProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY,
-                                            MailUtils.mailAddressesToString(mailMessage.getReplyTo()));
-        }
-        catch (MessagingException me)
-        {
-            log.warn("Invalid address found in ReplyTo header:", me);
-        }
-
-        try
-        {
-            muleMessage.setOutboundProperty(MailProperties.INBOUND_FROM_ADDRESS_PROPERTY,
-                                            MailUtils.mailAddressesToString(mailMessage.getFrom()));
-        }
-        catch (javax.mail.MessagingException me)
-        {
-            log.warn("Invalid address found in From header:", me);
-        }
+        addReplyToProperty(muleMessage, mailMessage);
+        addFromProperty(muleMessage, mailMessage);
 
         muleMessage.setOutboundProperty(MailProperties.INBOUND_SUBJECT_PROPERTY,
                                         StringUtils.defaultIfEmpty(mailMessage.getSubject(), "(no subject)"));
         muleMessage.setOutboundProperty(MailProperties.INBOUND_CONTENT_TYPE_PROPERTY,
                                         StringUtils.defaultIfEmpty(mailMessage.getContentType(), "text/plain"));
 
-        Date sentDate = mailMessage.getSentDate();
-        if (sentDate == null)
-        {
-            sentDate = new Date();
-        }
-        muleMessage.setOutboundProperty(MailProperties.SENT_DATE_PROPERTY, sentDate);
-
-        for (Enumeration<?> e = mailMessage.getAllHeaders(); e.hasMoreElements();)
-        {
-            Header header = (Header) e.nextElement();
-
-            String name = header.getName();
-            String listName = MailUtils.toListHeader(name);
-            String value = header.getValue();
-
-            if (null == muleMessage.getOutboundProperty(name))
-            {
-                muleMessage.setOutboundProperty(name, value);
-            }
-
-            Object listPropertyValue = muleMessage.getOutboundProperty(listName);
-            if (null == listPropertyValue)
-            {
-                listPropertyValue = new LinkedList<Object>();
-                muleMessage.setOutboundProperty(listName, listPropertyValue);
-            }
-            if (listPropertyValue instanceof List<?>)
-            {
-                ((List) listPropertyValue).add(header.getValue());
-            }
-        }
+        addSentDateProperty(muleMessage, mailMessage);
+        addMailHeadersToMessageProperties(mailMessage, muleMessage);
     }
 
     protected void addRecipientProperty(MuleMessage muleMessage, Message mailMessage,
@@ -149,6 +103,73 @@ public class MailMuleMessageFactory extends AbstractMuleMessageFactory
                 String[] header = mimeMessage.getHeader(recipientType.toString());
                 String recipients = StringUtils.join(header, ", ");
                 muleMessage.setOutboundProperty(property, recipients);
+            }
+        }
+    }
+
+    protected void addReplyToProperty(DefaultMuleMessage muleMessage, Message mailMessage)
+    {
+        try
+        {
+            muleMessage.setOutboundProperty(MailProperties.INBOUND_REPLY_TO_ADDRESSES_PROPERTY,
+                                            MailUtils.mailAddressesToString(mailMessage.getReplyTo()));
+        }
+        catch (MessagingException me)
+        {
+            log.warn("Invalid address found in ReplyTo header:", me);
+        }
+    }
+
+    protected void addFromProperty(DefaultMuleMessage muleMessage, Message mailMessage)
+    {
+        try
+        {
+            muleMessage.setOutboundProperty(MailProperties.INBOUND_FROM_ADDRESS_PROPERTY,
+                                            MailUtils.mailAddressesToString(mailMessage.getFrom()));
+        }
+        catch (javax.mail.MessagingException me)
+        {
+            log.warn("Invalid address found in From header:", me);
+        }
+    }
+
+    protected void addSentDateProperty(DefaultMuleMessage muleMessage, Message mailMessage)
+        throws MessagingException
+    {
+        Date sentDate = mailMessage.getSentDate();
+        if (sentDate == null)
+        {
+            sentDate = new Date();
+        }
+        muleMessage.setOutboundProperty(MailProperties.SENT_DATE_PROPERTY, sentDate);
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    protected void addMailHeadersToMessageProperties(Message mailMessage, DefaultMuleMessage muleMessage)
+        throws MessagingException
+    {
+        for (Enumeration<?> e = mailMessage.getAllHeaders(); e.hasMoreElements();)
+        {
+            Header header = (Header) e.nextElement();
+
+            String name = header.getName();
+            String listName = MailUtils.toListHeader(name);
+            String value = header.getValue();
+
+            if (null == muleMessage.getOutboundProperty(name))
+            {
+                muleMessage.setOutboundProperty(name, value);
+            }
+
+            Object listPropertyValue = muleMessage.getOutboundProperty(listName);
+            if (null == listPropertyValue)
+            {
+                listPropertyValue = new LinkedList<Object>();
+                muleMessage.setOutboundProperty(listName, listPropertyValue);
+            }
+            if (listPropertyValue instanceof List<?>)
+            {
+                ((List) listPropertyValue).add(header.getValue());
             }
         }
     }

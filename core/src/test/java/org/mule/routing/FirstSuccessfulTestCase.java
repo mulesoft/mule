@@ -23,7 +23,7 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class FirstSuccessfulTestCase extends AbstractMuleTestCase
@@ -38,15 +38,11 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
     public void testFirstSuccessful() throws Exception
     {
         MuleSession session = getTestSession(getTestService(), muleContext);
-        FirstSuccessful fs = new FirstSuccessful();
-        fs.setMuleContext(muleContext);
-        List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
-        routes.add(new TestProcessor("abc"));
-        routes.add(new TestProcessor("def"));
-        routes.add(new TestProcessor("ghi"));
-        fs.setMessageProcessors(routes);
-        fs.setMuleContext(muleContext);
+
+        FirstSuccessful fs = createFirstSuccessfulRouter(new TestProcessor("abc"),
+            new TestProcessor("def"), new TestProcessor("ghi"));
         fs.initialise();
+
         assertEquals("No abc", getPayload(fs, session, ""));
         assertEquals("No def", getPayload(fs, session, "abc"));
         assertEquals("No ghi", getPayload(fs, session, "abcdef"));
@@ -58,55 +54,49 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
 
     public void testFailureExpression() throws MuleException, Exception
     {
-        FirstSuccessful fs = new FirstSuccessful();
-        fs.setFailureExpression("#[payload-type:java.lang.Integer]");
-        List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
-        routes.add(new MessageProcessor()
+        MessageProcessor intSetter = new MessageProcessor()
         {
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getMessage().setPayload(Integer.valueOf(1));
                 return event;
             }
-        });
-        routes.add(new StringAppendTransformer("abc"));
-        fs.setMessageProcessors(routes);
-        fs.setMuleContext(muleContext);
+        };
+
+        FirstSuccessful fs = createFirstSuccessfulRouter(intSetter, new StringAppendTransformer("abc"));
+        fs.setFailureExpression("#[payload-type:java.lang.Integer]");
         fs.initialise();
+
         assertEquals("abc", fs.process(getTestEvent("")).getMessageAsString());
     }
 
     public void testRouteReturnsNullEvent() throws MuleException, Exception
     {
-        FirstSuccessful fs = new FirstSuccessful();
-        List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
-        routes.add(new MessageProcessor()
+        MessageProcessor nullReturningMp = new MessageProcessor()
         {
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 return null;
             }
-        });
-        fs.setMessageProcessors(routes);
-        fs.setMuleContext(muleContext);
+        };
+        FirstSuccessful fs = createFirstSuccessfulRouter(nullReturningMp);
         fs.initialise();
+
         assertNull(fs.process(getTestEvent("")));
     }
 
     public void testRouteReturnsNullMessage() throws MuleException, Exception
     {
-        FirstSuccessful fs = new FirstSuccessful();
-        List<MessageProcessor> routes = new ArrayList<MessageProcessor>();
-        routes.add(new MessageProcessor()
+        MessageProcessor nullEventMp = new MessageProcessor()
         {
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 return new DefaultMuleEvent(null, event);
             }
-        });
-        fs.setMessageProcessors(routes);
-        fs.setMuleContext(muleContext);
+        };
+        FirstSuccessful fs = createFirstSuccessfulRouter(nullEventMp);
         fs.initialise();
+
         try
         {
             fs.process(getTestEvent(""));
@@ -114,8 +104,19 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         }
         catch (CouldNotRouteOutboundMessageException e)
         {
-
+            // this one was expected
         }
+    }
+
+    private FirstSuccessful createFirstSuccessfulRouter(MessageProcessor... processors) throws MuleException
+    {
+        FirstSuccessful fs = new FirstSuccessful();
+        fs.setMuleContext(muleContext);
+
+        List<MessageProcessor> routes = Arrays.asList(processors);
+        fs.setRoutes(routes);
+
+        return fs;
     }
 
     private String getPayload(MessageProcessor mp, MuleSession session, String message) throws Exception
@@ -140,7 +141,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         }
     }
 
-    static class TestProcessor implements MessageProcessor
+    private static class TestProcessor implements MessageProcessor
     {
         private String rejectIfMatches;
 

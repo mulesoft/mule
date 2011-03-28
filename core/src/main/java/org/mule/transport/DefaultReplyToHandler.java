@@ -123,7 +123,7 @@ public class DefaultReplyToHandler implements ReplyToHandler
         OutboundEndpoint endpoint = (OutboundEndpoint) endpointCache.get(endpointUri);
         if (endpoint == null)
         {
-            EndpointFactory endpointFactory = muleContext.getRegistry().lookupEndpointFactory();
+            EndpointFactory endpointFactory = muleContext.getEndpointFactory();
             EndpointBuilder endpointBuilder = endpointFactory.getEndpointBuilder(endpointUri);
             if (transformers == null)
             {

@@ -74,7 +74,7 @@ public interface MuleRegistry extends Registry
     EndpointBuilder lookupEndpointBuilder(String name);
 
     /**
-     * @deprecated use {@link MuleContext#getEndpointFactory()} instead/
+     * @deprecated use {@link MuleContext#getEndpointFactory()} instead
      */
     @Deprecated
     EndpointFactory lookupEndpointFactory();

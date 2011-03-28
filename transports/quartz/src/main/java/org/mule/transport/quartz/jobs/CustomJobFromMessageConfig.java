@@ -33,10 +33,7 @@ public class CustomJobFromMessageConfig extends AbstractJobConfig
 
     public Job getJob(MuleMessage message) throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException
     {
-        if (evaluator.equals("custom"))
-        {
-            evaluator = customEvaluator;
-        }
+        setupEvaluator();
 
         Object result = getMuleContext().getExpressionManager().evaluate(expression, evaluator, message, true);
         Class<? extends Job> clazz;
@@ -54,15 +51,12 @@ public class CustomJobFromMessageConfig extends AbstractJobConfig
                     new Class[]{Job.class, JobConfig.class}, result.getClass()).getMessage());
         }
 
-        return (Job) ClassUtils.instanciateClass(clazz);
+        return ClassUtils.instanciateClass(clazz);
     }
 
     public JobConfig getJobConfig(MuleMessage message) throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InvocationTargetException, InstantiationException
     {
-        if (evaluator.equals("custom"))
-        {
-            evaluator = customEvaluator;
-        }
+        setupEvaluator();
 
         final MuleContext muleContext = getMuleContext();
         Object result = muleContext.getExpressionManager().evaluate(expression, evaluator, message, true);
@@ -85,6 +79,14 @@ public class CustomJobFromMessageConfig extends AbstractJobConfig
         {
             throw new IllegalStateException(CoreMessages.propertyIsNotSupportedType(evaluator + ":" + expression,
                     new Class[]{Job.class, JobConfig.class, Class.class, String.class}, result.getClass()).getMessage());
+        }
+    }
+
+    protected void setupEvaluator()
+    {
+        if (evaluator.equals("custom"))
+        {
+            evaluator = customEvaluator;
         }
     }
 

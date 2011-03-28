@@ -154,9 +154,7 @@ public class DefaultMuleConnection implements MuleConnection
     protected OutboundEndpoint getOutboundEndpoint(String uri, MessageExchangePattern exchangePattern)
         throws MuleException
     {
-        EndpointBuilder endpointBuilder = muleContext.getRegistry()
-            .lookupEndpointFactory()
-            .getEndpointBuilder(uri);
+        EndpointBuilder endpointBuilder = muleContext.getEndpointFactory().getEndpointBuilder(uri);
         endpointBuilder.setExchangePattern(exchangePattern);
         return muleContext.getEndpointFactory().getOutboundEndpoint(endpointBuilder);
     }
