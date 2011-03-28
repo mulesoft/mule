@@ -17,6 +17,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.message.DefaultExceptionPayload;
@@ -52,7 +53,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         assertEquals(EXCEPTION_SEEN, getPayload(fs, session, "ABCDEFGHI"));
     }
 
-    public void testFailureExpression() throws MuleException, Exception
+    public void testFailureExpression() throws Exception
     {
         MessageProcessor intSetter = new MessageProcessor()
         {
@@ -70,7 +71,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         assertEquals("abc", fs.process(getTestEvent("")).getMessageAsString());
     }
 
-    public void testRouteReturnsNullEvent() throws MuleException, Exception
+    public void testRouteReturnsNullEvent() throws Exception
     {
         MessageProcessor nullReturningMp = new MessageProcessor()
         {
@@ -85,7 +86,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         assertNull(fs.process(getTestEvent("")));
     }
 
-    public void testRouteReturnsNullMessage() throws MuleException, Exception
+    public void testRouteReturnsNullMessage() throws Exception
     {
         MessageProcessor nullEventMp = new MessageProcessor()
         {
@@ -106,6 +107,28 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         {
             // this one was expected
         }
+    }
+
+    public void testProcessingIsForcedOnSameThread() throws Exception
+    {
+        MessageProcessor checkForceSyncFlag = new MessageProcessor()
+        {
+            public MuleEvent process(MuleEvent event) throws MuleException
+            {
+                MuleMessage message = event.getMessage();
+                Boolean deliveryForcedInSameThread = message.getInboundProperty(
+                    MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.FALSE);
+                assertTrue(deliveryForcedInSameThread.booleanValue());
+
+                return event;
+            }
+        };
+        FirstSuccessful router = createFirstSuccessfulRouter(checkForceSyncFlag);
+        router.initialise();
+
+        // the configured message processor will blow up if the router did not force processing
+        // on same thread
+        router.process(getTestEvent(TEST_MESSAGE));
     }
 
     private FirstSuccessful createFirstSuccessfulRouter(MessageProcessor... processors) throws MuleException

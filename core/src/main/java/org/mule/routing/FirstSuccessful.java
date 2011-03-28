@@ -14,9 +14,11 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 
@@ -60,8 +62,7 @@ public class FirstSuccessful extends AbstractOutboundRouter
         {
             try
             {
-                MuleMessage clonedMessage = cloneMessage(event.getMessage());
-                MuleEvent toProcess = createEventToRoute(event, clonedMessage, mp);
+                MuleEvent toProcess = cloneEventForRoutinng(event, mp);
                 returnEvent = mp.process(toProcess);
 
                 if (returnEvent == null)
@@ -92,6 +93,18 @@ public class FirstSuccessful extends AbstractOutboundRouter
         return returnEvent;
     }
 
+    protected MuleEvent cloneEventForRoutinng(MuleEvent event, MessageProcessor mp)
+    {
+        MuleMessage clonedMessage = cloneMessage(event.getMessage());
+        MuleEvent toProcess = createEventToRoute(event, clonedMessage, mp);
+
+        // force processing the event to route in the same thread so that we can catch exceptions
+        // that may happen during processing here and try sending to the next endpoint.
+        clonedMessage.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE, PropertyScope.INBOUND);
+
+        return toProcess;
+    }
+
     public boolean isMatch(MuleMessage message) throws MuleException
     {
         return true;
@@ -100,7 +113,7 @@ public class FirstSuccessful extends AbstractOutboundRouter
     /**
      * Specifies an expression that when evaluated as determines if the processing of
      * one a route was a failure or not.
-     * 
+     *
      * @param failureExpression
      * @see ExpressionFilter
      */
