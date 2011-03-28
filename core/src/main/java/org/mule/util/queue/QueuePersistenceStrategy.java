@@ -31,7 +31,7 @@ public interface QueuePersistenceStrategy
 
     /**
      * Stores an object and returns its generated id.
-     * 
+     *
      * @param obj the object to be stored
      * @return the id of the stored object
      * @throws IOException
@@ -40,7 +40,7 @@ public interface QueuePersistenceStrategy
 
     /**
      * Loads an object specified by the given id.
-     * 
+     *
      * @param id the id of the stored object
      * @return the object
      * @throws IOException
@@ -49,7 +49,7 @@ public interface QueuePersistenceStrategy
 
     /**
      * Removes the object specified by the given id from the store.
-     * 
+     *
      * @param id the id of the stored object
      * @throws IOException
      */
@@ -57,7 +57,7 @@ public interface QueuePersistenceStrategy
 
     /**
      * Retrieves the ids of the stored objects.
-     * 
+     *
      * @return the list of ids
      * @throws IOException
      */
@@ -65,18 +65,23 @@ public interface QueuePersistenceStrategy
 
     /**
      * Open the store.
-     * 
+     *
      * @throws IOException
      */
     void open() throws IOException;
 
     /**
      * Closes the store.
-     * 
+     *
      * @throws IOException
      */
     void close() throws IOException;
 
+    /**
+     * @deprecated This method is an implementation detail of the persistence store and is not
+     * even used in the current code base.
+     */
+    @Deprecated
     boolean isTransient();
 
 }

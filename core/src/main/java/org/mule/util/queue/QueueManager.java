@@ -36,8 +36,18 @@ public interface QueueManager extends Startable, Stoppable
      */
     void setPersistenceStrategy(QueuePersistenceStrategy persistenceStrategy);
 
+    /**
+     * @deprecated QueueManager should not be able to choose different persistence strategies,
+     * it should use whatever is set via #setPersistenceStrategy
+     */
+    @Deprecated
     QueuePersistenceStrategy getMemoryPersistenceStrategy();
 
+    /**
+     * @deprecated QueueManager should not be able to choose different persistence strategies,
+     * it should use whatever is set via #setPersistenceStrategy
+     */
+    @Deprecated
     void setMemoryPersistenceStrategy(QueuePersistenceStrategy memoryPersistenceStrategy);
 
 }

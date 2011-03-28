@@ -83,6 +83,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         return q;
     }
 
+    @Override
     protected void doStart() throws ResourceManagerSystemException
     {
         if (persistenceStrategy != null)
@@ -98,6 +99,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         }
     }
 
+    @Override
     protected boolean shutdown(int mode, long timeoutMSecs)
     {
         try
@@ -120,6 +122,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         return super.shutdown(mode, timeoutMSecs);
     }
 
+    @Override
     protected void recover() throws ResourceManagerSystemException
     {
         if (persistenceStrategy != null)
@@ -140,21 +143,25 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         }
     }
 
+    @Override
     protected AbstractTransactionContext createTransactionContext(Object session)
     {
         return new QueueTransactionContext();
     }
 
+    @Override
     protected void doBegin(AbstractTransactionContext context)
     {
         // Nothing special to do
     }
 
+    @Override
     protected int doPrepare(AbstractTransactionContext context)
     {
         return XAResource.XA_OK;
     }
 
+    @Override
     protected void doCommit(AbstractTransactionContext context) throws ResourceManagerException
     {
         QueueTransactionContext ctx = (QueueTransactionContext) context;
@@ -231,6 +238,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         return obj;
     }
 
+    @Override
     protected void doRollback(AbstractTransactionContext context) throws ResourceManagerException
     {
         QueueTransactionContext ctx = (QueueTransactionContext) context;
@@ -301,7 +309,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             }
             queueAdded.add(item);
         }
-        
+
         @SuppressWarnings("unchecked")
         public Object poll(QueueInfo queue, long timeout) throws IOException, InterruptedException
         {
@@ -395,11 +403,19 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         this.persistenceStrategy = persistenceStrategy;
     }
 
+    /**
+     * @deprecated
+     */
+    @Deprecated
     public QueuePersistenceStrategy getMemoryPersistenceStrategy()
     {
         return memoryPersistenceStrategy;
     }
 
+    /**
+     * @deprecated
+     */
+    @Deprecated
     public void setMemoryPersistenceStrategy(QueuePersistenceStrategy memoryPersistenceStrategy)
     {
         if (operationMode != OPERATION_MODE_STOPPED)
