@@ -25,7 +25,7 @@ public class AllStatistics
 {
     private boolean isStatisticsEnabled;
     private long startTime;
-
+    private ApplicationStatistics appStats;
     private Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<String, FlowConstructStatistics>();
 
     /**
@@ -34,6 +34,9 @@ public class AllStatistics
     public AllStatistics()
     {
         clear();
+        appStats = new ApplicationStatistics(this);
+        appStats.setEnabled(isStatisticsEnabled);
+        add(appStats);
     }
 
     public void logSummary()
@@ -128,5 +131,10 @@ public class AllStatistics
     public synchronized Collection<FlowConstructStatistics> getServiceStatistics()
     {
         return flowConstructStats.values();
+    }
+
+    public FlowConstructStatistics getApplicationStatistics()
+    {
+        return appStats;
     }
 }
