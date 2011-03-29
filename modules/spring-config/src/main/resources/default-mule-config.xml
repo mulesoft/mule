@@ -54,6 +54,8 @@
 
     <bean name="_muleSecurityManager" class="org.mule.security.MuleSecurityManager"/>
 
+    <bean name="_muleObjectStore" class="org.mule.util.store.InMemoryObjectStore"/>
+
     <bean name="_muleProperties" class="java.util.HashMap"/>
 
     <bean name="_muleEndpointFactory" class="org.mule.endpoint.DefaultEndpointFactory"/>
