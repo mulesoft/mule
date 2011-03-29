@@ -25,6 +25,7 @@ import org.mule.util.DefaultStreamCloserService;
 import org.mule.util.queue.FilePersistenceStrategy;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
+import org.mule.util.store.InMemoryObjectStore;
 
 /**
  * Configures defaults required by Mule. This configuration builder is used to
@@ -36,6 +37,7 @@ import org.mule.util.queue.TransactionalQueueManager;
  * <li> {@link SimpleRegistryBootstrap}
  * <li> {@link QueueManager}
  * <li> {@link SecurityManager}
+ * <li> {@link ObjectStore}
  * <li> {@link DefaultEndpointFactory}
  * <li> {@link Model} systemModel
  * <li> {@link ThreadingProfile} defaultThreadingProfile
@@ -61,6 +63,8 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
         registry.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
         
         registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
+        
+        registry.registerObject(MuleProperties.OBJECT_STORE, new InMemoryObjectStore());
         
         registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());
         registry.registerObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE, new DefaultStreamCloserService());

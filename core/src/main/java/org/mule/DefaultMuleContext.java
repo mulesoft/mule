@@ -33,6 +33,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
+import org.mule.api.store.ObjectStore;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
@@ -539,7 +540,7 @@ public class DefaultMuleContext implements MuleContext
     {
         if (lifecycleManager.isPhaseComplete(phase))
         {
-            throw new IllegalStateException("Cannot set property: '" + propertyName + "' once the server has been gone through the " + phase + " phase.");
+            throw new IllegalStateException("Cannot set property: '" + propertyName + "' once the server has already been through the " + phase + " phase.");
         }
     }
 
@@ -651,5 +652,25 @@ public class DefaultMuleContext implements MuleContext
     public EndpointFactory getEndpointFactory()
     {
         return (EndpointFactory) registryBroker.lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
+    }
+
+    public void setObjectStore(ObjectStore store) throws RegistrationException
+    {
+        checkLifecycleForPropertySet(MuleProperties.OBJECT_STORE, Initialisable.PHASE_NAME);
+        registryBroker.registerObject(MuleProperties.OBJECT_STORE, store);
+    }
+
+    public ObjectStore getObjectStore()
+    {
+        ObjectStore objectStore = (ObjectStore) registryBroker.lookupObject(MuleProperties.OBJECT_STORE);
+        if (objectStore == null)
+        {
+            Collection temp = registryBroker.lookupObjects(ObjectStore.class);
+            if (temp.size() > 0)
+            {
+                objectStore = ((ObjectStore) temp.iterator().next());
+            }
+        }
+        return objectStore;
     }
 }

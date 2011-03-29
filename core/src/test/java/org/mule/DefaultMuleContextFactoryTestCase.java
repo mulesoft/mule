@@ -183,6 +183,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         // Asert existance of defauts in registry
         assertNotNull(muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER));
         assertNotNull(muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER));
+        assertNotNull(muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE));
         assertNotNull(muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_SYSTEM_MODEL));
         assertNotNull(muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY));
         assertNotNull(muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
@@ -193,6 +194,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         // Asert non-existance of defauts in registry
         assertNull(muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER));
         assertNull(muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER));
+        assertNull(muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE));
         assertNull(muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_SYSTEM_MODEL));
         assertNull(muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY));
         assertNull(muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
