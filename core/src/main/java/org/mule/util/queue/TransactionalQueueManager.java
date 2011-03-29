@@ -19,7 +19,6 @@ import org.mule.util.xa.ResourceManagerException;
 import org.mule.util.xa.ResourceManagerSystemException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -146,7 +145,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     @Override
     protected AbstractTransactionContext createTransactionContext(Object session)
     {
-        return new QueueTransactionContext();
+        return new QueueTransactionContext(this);
     }
 
     @Override
@@ -260,133 +259,6 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         }
         ctx.added = null;
         ctx.removed = null;
-    }
-
-    protected class QueueTransactionContext extends AbstractTransactionContext
-    {
-        protected Map added;
-        protected Map removed;
-
-        @SuppressWarnings("unchecked")
-        public boolean offer(QueueInfo queue, Object item, long timeout) throws InterruptedException
-        {
-            readOnly = false;
-            if (added == null)
-            {
-                added = new HashMap();
-            }
-            List queueAdded = (List) added.get(queue);
-            if (queueAdded == null)
-            {
-                queueAdded = new ArrayList();
-                added.put(queue, queueAdded);
-            }
-            // wait for enough room
-            if (queue.offer(null, queueAdded.size(), timeout))
-            {
-                queueAdded.add(item);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        public void untake(QueueInfo queue, Object item) throws InterruptedException
-        {
-            readOnly = false;
-            if (added == null)
-            {
-                added = new HashMap();
-            }
-            List queueAdded = (List) added.get(queue);
-            if (queueAdded == null)
-            {
-                queueAdded = new ArrayList();
-                added.put(queue, queueAdded);
-            }
-            queueAdded.add(item);
-        }
-
-        @SuppressWarnings("unchecked")
-        public Object poll(QueueInfo queue, long timeout) throws IOException, InterruptedException
-        {
-            readOnly = false;
-            if (added != null)
-            {
-                List queueAdded = (List)added.get(queue);
-                if (queueAdded != null)
-                {
-                    return queueAdded.remove(queueAdded.size() - 1);
-                }
-            }
-            Object o;
-            try
-            {
-                o = queue.poll(timeout);
-            }
-            catch (InterruptedException e)
-            {
-                if (muleContext.isStopping())
-                {
-                    throw e;
-                }
-                // if disposing, ignore
-                return null;
-            }
-            if (o != null)
-            {
-                if (removed == null)
-                {
-                    removed = new HashMap();
-                }
-                List queueRemoved = (List) removed.get(queue);
-                if (queueRemoved == null)
-                {
-                    queueRemoved = new ArrayList();
-                    removed.put(queue, queueRemoved);
-                }
-                queueRemoved.add(o);
-                o = doLoad(queue, o);
-            }
-            return o;
-        }
-
-        public Object peek(QueueInfo queue) throws IOException, InterruptedException
-        {
-            readOnly = false;
-            if (added != null)
-            {
-                List queueAdded = (List) added.get(queue);
-                if (queueAdded != null)
-                {
-                    return queueAdded.get(queueAdded.size() - 1);
-                }
-            }
-            Object o = queue.peek();
-            if (o != null)
-            {
-                o = doLoad(queue, o);
-            }
-            return o;
-        }
-
-        public int size(QueueInfo queue)
-        {
-            int sz = queue.list.size();
-            if (added != null)
-            {
-                List queueAdded = (List) added.get(queue);
-                if (queueAdded != null)
-                {
-                    sz += queueAdded.size();
-                }
-            }
-            return sz;
-        }
-
     }
 
     public QueuePersistenceStrategy getPersistenceStrategy()
