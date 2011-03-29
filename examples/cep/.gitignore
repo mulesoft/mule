@@ -1,6 +1,7 @@
 /target
 /.classpath
 /.project
+/.settings
 /bin
 /weblogic
 /*.iml
