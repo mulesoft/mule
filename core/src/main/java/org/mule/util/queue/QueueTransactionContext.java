@@ -21,31 +21,24 @@ import java.util.Map;
 class QueueTransactionContext extends AbstractTransactionContext
 {
     private final TransactionalQueueManager transactionalQueueManager;
+    protected Map<QueueInfo, List<Object>> added;
+    // TODO BL-405 this looks pretty unused, can it be removed?
+    protected Map<QueueInfo, List<Object>> removed;
 
     QueueTransactionContext(TransactionalQueueManager transactionalQueueManager)
     {
+        super();
         this.transactionalQueueManager = transactionalQueueManager;
     }
 
-    protected Map added;
-    protected Map removed;
-
-    @SuppressWarnings("unchecked")
-    public boolean offer(QueueInfo queue, Object item, long timeout) throws InterruptedException
+    public boolean offer(QueueInfo queue, Object item, long offerTimeout) throws InterruptedException
     {
         readOnly = false;
-        if (added == null)
-        {
-            added = new HashMap();
-        }
-        List queueAdded = (List) added.get(queue);
-        if (queueAdded == null)
-        {
-            queueAdded = new ArrayList();
-            added.put(queue, queueAdded);
-        }
+        initializeAdded();
+
+        List<Object> queueAdded = lookupQueue(queue);
         // wait for enough room
-        if (queue.offer(null, queueAdded.size(), timeout))
+        if (queue.offer(null, queueAdded.size(), offerTimeout))
         {
             queueAdded.add(item);
             return true;
@@ -56,39 +49,31 @@ class QueueTransactionContext extends AbstractTransactionContext
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void untake(QueueInfo queue, Object item) throws InterruptedException
     {
         readOnly = false;
-        if (added == null)
-        {
-            added = new HashMap();
-        }
-        List queueAdded = (List) added.get(queue);
-        if (queueAdded == null)
-        {
-            queueAdded = new ArrayList();
-            added.put(queue, queueAdded);
-        }
+        initializeAdded();
+
+        List<Object> queueAdded = lookupQueue(queue);
         queueAdded.add(item);
     }
 
-    @SuppressWarnings("unchecked")
-    public Object poll(QueueInfo queue, long timeout) throws IOException, InterruptedException
+    public Object poll(QueueInfo queue, long pollTimeout) throws IOException, InterruptedException
     {
         readOnly = false;
         if (added != null)
         {
-            List queueAdded = (List)added.get(queue);
+            List<Object> queueAdded = added.get(queue);
             if (queueAdded != null)
             {
                 return queueAdded.remove(queueAdded.size() - 1);
             }
         }
-        Object o;
+
+        Object object;
         try
         {
-            o = queue.poll(timeout);
+            object = queue.poll(pollTimeout);
         }
         catch (InterruptedException e)
         {
@@ -99,22 +84,23 @@ class QueueTransactionContext extends AbstractTransactionContext
             // if disposing, ignore
             return null;
         }
-        if (o != null)
+
+        if (object != null)
         {
             if (removed == null)
             {
-                removed = new HashMap();
+                removed = new HashMap<QueueInfo, List<Object>>();
             }
-            List queueRemoved = (List) removed.get(queue);
+            List<Object> queueRemoved = removed.get(queue);
             if (queueRemoved == null)
             {
-                queueRemoved = new ArrayList();
+                queueRemoved = new ArrayList<Object>();
                 removed.put(queue, queueRemoved);
             }
-            queueRemoved.add(o);
-            o = transactionalQueueManager.doLoad(queue, o);
+            queueRemoved.add(object);
+            object = transactionalQueueManager.doLoad(queue, object);
         }
-        return o;
+        return object;
     }
 
     public Object peek(QueueInfo queue) throws IOException, InterruptedException
@@ -122,7 +108,7 @@ class QueueTransactionContext extends AbstractTransactionContext
         readOnly = false;
         if (added != null)
         {
-            List queueAdded = (List) added.get(queue);
+            List<Object> queueAdded = added.get(queue);
             if (queueAdded != null)
             {
                 return queueAdded.get(queueAdded.size() - 1);
@@ -141,12 +127,31 @@ class QueueTransactionContext extends AbstractTransactionContext
         int sz = queue.list.size();
         if (added != null)
         {
-            List queueAdded = (List) added.get(queue);
+            List<Object> queueAdded = added.get(queue);
             if (queueAdded != null)
             {
                 sz += queueAdded.size();
             }
         }
         return sz;
+    }
+
+    protected void initializeAdded()
+    {
+        if (added == null)
+        {
+            added = new HashMap<QueueInfo, List<Object>>();
+        }
+    }
+
+    protected List<Object> lookupQueue(QueueInfo queue)
+    {
+        List<Object> queueAdded = added.get(queue);
+        if (queueAdded == null)
+        {
+            queueAdded = new ArrayList<Object>();
+            added.put(queue, queueAdded);
+        }
+        return queueAdded;
     }
 }
