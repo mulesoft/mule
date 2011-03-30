@@ -75,8 +75,9 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         {
             q = new QueueInfo();
             q.name = name;
-            q.list = new LinkedList();
+            q.list = new LinkedList<Object>();
             q.config = defaultQueueConfiguration;
+
             queues.put(name, q);
         }
         return q;
@@ -168,11 +169,10 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         {
             if (ctx.added != null)
             {
-                for (Object o : ctx.added.entrySet())
+                for (Map.Entry<QueueInfo, List<Object>> entry : ctx.added.entrySet())
                 {
-                    Map.Entry entry = (Map.Entry) o;
-                    QueueInfo queue = (QueueInfo) entry.getKey();
-                    List queueAdded = (List) entry.getValue();
+                    QueueInfo queue = entry.getKey();
+                    List<Object> queueAdded = entry.getValue();
                     if (queueAdded != null && queueAdded.size() > 0)
                     {
                         for (Object object : queueAdded)
@@ -185,11 +185,10 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             }
             if (ctx.removed != null)
             {
-                for (Object o : ctx.removed.entrySet())
+                for (Map.Entry<QueueInfo, List<Object>> entry : ctx.removed.entrySet())
                 {
-                    Map.Entry entry = (Map.Entry) o;
-                    QueueInfo queue = (QueueInfo) entry.getKey();
-                    List queueRemoved = (List) entry.getValue();
+                    QueueInfo queue = entry.getKey();
+                    List<Object> queueRemoved = entry.getValue();
                     if (queueRemoved != null && queueRemoved.size() > 0)
                     {
                         for (Object id : queueRemoved)
@@ -202,9 +201,6 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         }
         catch (Exception e)
         {
-            // throw new ResourceManagerException("Could not commit
-            // transaction", e);
-            // TODO: add an i18n Message
             throw new ResourceManagerException(e);
         }
         finally
@@ -243,11 +239,12 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         QueueTransactionContext ctx = (QueueTransactionContext) context;
         if (ctx.removed != null)
         {
-            for (Object o : ctx.removed.entrySet())
+            for (Map.Entry<QueueInfo, List<Object>> entry : ctx.removed.entrySet())
+//            for (Object o : ctx.removed.entrySet())
             {
-                Map.Entry entry = (Map.Entry) o;
-                QueueInfo queue = (QueueInfo) entry.getKey();
-                List queueRemoved = (List) entry.getValue();
+//                Map.Entry entry = (Map.Entry) o;
+                QueueInfo queue = entry.getKey();
+                List<Object> queueRemoved = entry.getValue();
                 if (queueRemoved != null && queueRemoved.size() > 0)
                 {
                     for (Object id : queueRemoved)

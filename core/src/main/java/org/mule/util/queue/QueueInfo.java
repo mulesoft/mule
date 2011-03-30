@@ -17,10 +17,11 @@ import java.util.LinkedList;
  */
 public class QueueInfo
 {
-    protected LinkedList list;
+    protected LinkedList<Object> list;
     protected String name;
     protected QueueConfiguration config;
 
+    @Override
     public boolean equals(Object obj)
     {
         return (obj instanceof QueueInfo && name.equals(((QueueInfo) obj).name));
@@ -30,7 +31,8 @@ public class QueueInfo
     {
         return name;
     }
-    
+
+    @Override
     public int hashCode()
     {
         return name.hashCode();
