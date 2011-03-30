@@ -21,15 +21,16 @@ public class ObjectStoreConfigTestCase extends AbstractMuleTestCase
 {
     public void testDefault()
     {
-        ObjectStore store = muleContext.getObjectStore();
+        ObjectStore<?> store = muleContext.getObjectStore();
         assertNotNull(store);
-        assertTrue(store instanceof InMemoryObjectStore);
+        assertTrue(store instanceof SimpleMemoryObjectStore);
     }
 
     public void testNonDefault() throws Exception
     {
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE, new TextFileObjectStore());
-        ObjectStore store = muleContext.getObjectStore();
+
+        ObjectStore<?> store = muleContext.getObjectStore();
         assertNotNull(store);
         assertTrue(store instanceof TextFileObjectStore);
     }
