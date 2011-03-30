@@ -240,9 +240,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         if (ctx.removed != null)
         {
             for (Map.Entry<QueueInfo, List<Object>> entry : ctx.removed.entrySet())
-//            for (Object o : ctx.removed.entrySet())
             {
-//                Map.Entry entry = (Map.Entry) o;
                 QueueInfo queue = entry.getKey();
                 List<Object> queueRemoved = entry.getValue();
                 if (queueRemoved != null && queueRemoved.size() > 0)
