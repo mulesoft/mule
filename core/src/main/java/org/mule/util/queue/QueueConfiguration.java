@@ -12,9 +12,8 @@ package org.mule.util.queue;
 
 public class QueueConfiguration
 {
-
-    protected int capacity;
-    protected boolean persistent;
+    protected final int capacity;
+    protected final boolean persistent;
 
     public QueueConfiguration(int capacity, boolean persistent)
     {
@@ -35,38 +34,6 @@ public class QueueConfiguration
     public QueueConfiguration()
     {
         this(0, false);
-    }
-
-    /**
-     * @return Returns the capacity.
-     */
-    public int getCapacity()
-    {
-        return capacity;
-    }
-
-    /**
-     * @param capacity The capacity to set.
-     */
-    public void setCapacity(int capacity)
-    {
-        this.capacity = capacity;
-    }
-
-    /**
-     * @return Returns the persistent.
-     */
-    public boolean isPersistent()
-    {
-        return persistent;
-    }
-
-    /**
-     * @param persistent The persistent to set.
-     */
-    public void setPersistent(boolean persistent)
-    {
-        this.persistent = persistent;
     }
 
     @Override
@@ -105,5 +72,4 @@ public class QueueConfiguration
         }
         return true;
     }
-    
 }
