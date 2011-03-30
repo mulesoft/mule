@@ -18,19 +18,24 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.channels.ServerSocketChannel;
+import java.util.List;
 
 public class FixedHostRmiClienSocketFactoryTestCase extends AbstractMuleTestCase
 {
-    private static final int TEST_PORT = 60504;
     protected volatile ServerSocket serverSocket;
+    private int port;
 
-    protected void doSetUp () throws Exception
+    @Override
+    protected void doSetUp() throws Exception
     {
         super.doSetUp();
+
+        port = findFreePort();
         setupDummyServer();
     }
 
-    protected void doTearDown () throws Exception
+    @Override
+    protected void doTearDown() throws Exception
     {
         super.doTearDown();
         if (null != serverSocket)
@@ -39,14 +44,13 @@ public class FixedHostRmiClienSocketFactoryTestCase extends AbstractMuleTestCase
         }
     }
 
-    public void testHostConstructorOverride () throws Exception
+    public void testHostConstructorOverride() throws Exception
     {
         final String overrideHost = "127.0.0.1";
-        final FixedHostRmiClientSocketFactory factory =
-                new FixedHostRmiClientSocketFactory(overrideHost);
-
+        final FixedHostRmiClientSocketFactory factory = new FixedHostRmiClientSocketFactory(overrideHost);
         assertEquals(overrideHost, factory.getOverrideHost());
-        final Socket clientSocket = factory.createSocket("www.example.com", TEST_PORT);
+
+        final Socket clientSocket = factory.createSocket("www.example.com", port);
         final InetAddress address = clientSocket.getInetAddress();
         final String socketHost = address.getHostAddress();
         assertEquals(overrideHost, socketHost);
@@ -55,7 +59,7 @@ public class FixedHostRmiClienSocketFactoryTestCase extends AbstractMuleTestCase
     /**
      * Setter property may be used to dynamically switch the client socket host.
      */
-    public void testHostSetterOverride () throws Exception
+    public void testHostSetterOverride() throws Exception
     {
         final String overrideHost = "127.0.0.1";
         final FixedHostRmiClientSocketFactory factory =
@@ -66,7 +70,7 @@ public class FixedHostRmiClienSocketFactoryTestCase extends AbstractMuleTestCase
         Socket clientSocket = null;
         try
         {
-            clientSocket = factory.createSocket("www.example.com", TEST_PORT);
+            clientSocket = factory.createSocket("www.example.com", port);
             final InetAddress address = clientSocket.getInetAddress();
             final String socketHost = address.getHostAddress();
             assertEquals(overrideHost, socketHost);
@@ -83,11 +87,18 @@ public class FixedHostRmiClienSocketFactoryTestCase extends AbstractMuleTestCase
     /**
      * Simple socket to have something to ping.
      */
-    protected void setupDummyServer () throws Exception
+    protected void setupDummyServer() throws Exception
     {
         ServerSocketChannel ssChannel = ServerSocketChannel.open();
         ssChannel.configureBlocking(false);
         serverSocket = ssChannel.socket();
-        serverSocket.bind(new InetSocketAddress(TEST_PORT));
+
+        serverSocket.bind(new InetSocketAddress(port));
+    }
+
+    private int findFreePort()
+    {
+        List<Integer> freePorts = findFreePorts(1);
+        return freePorts.get(0).intValue();
     }
 }
