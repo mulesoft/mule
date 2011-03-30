@@ -18,14 +18,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class QueueTransactionContext extends AbstractTransactionContext
+public class QueueTransactionContext extends AbstractTransactionContext
 {
     private final TransactionalQueueManager transactionalQueueManager;
     protected Map<QueueInfo, List<Object>> added;
     // TODO BL-405 this looks pretty unused, can it be removed?
     protected Map<QueueInfo, List<Object>> removed;
 
-    QueueTransactionContext(TransactionalQueueManager transactionalQueueManager)
+    public QueueTransactionContext(TransactionalQueueManager transactionalQueueManager)
     {
         super();
         this.transactionalQueueManager = transactionalQueueManager;
