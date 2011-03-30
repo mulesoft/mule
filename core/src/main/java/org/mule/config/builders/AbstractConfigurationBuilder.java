@@ -14,7 +14,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.lifecycle.LifecycleManager;
-import org.mule.config.i18n.CoreMessages;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
  * A support class for {@link org.mule.api.config.ConfigurationBuilder} implementations
  * that handles the logic of creating config arrays and {@link java.util.Properties}
  * arguments
- * 
+ *
  * @see org.mule.api.config.ConfigurationBuilder
  */
 public abstract class AbstractConfigurationBuilder implements ConfigurationBuilder
@@ -50,7 +49,6 @@ public abstract class AbstractConfigurationBuilder implements ConfigurationBuild
         }
         catch (Exception e)
         {
-            logger.error(CoreMessages.configurationBuilderError(this), e);
             throw new ConfigurationException(e);
         }
     }
