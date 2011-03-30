@@ -106,9 +106,9 @@ public class DefaultMuleContext implements MuleContext
     private ExpressionManager expressionManager;
 
     private ClassLoader executionClassLoader;
-    
+
     protected LocalMuleClient localMuleClient;
-    
+
     /** Global exception handler which handles "system" exceptions (i.e., when no message is involved). */
     protected SystemExceptionHandler exceptionListener;
 
@@ -457,10 +457,10 @@ public class DefaultMuleContext implements MuleContext
         QueueManager queueManager = (QueueManager) registryBroker.lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER);
         if (queueManager == null)
         {
-            Collection temp = registryBroker.lookupObjects(QueueManager.class);
+            Collection<QueueManager> temp = registryBroker.lookupObjects(QueueManager.class);
             if (temp.size() > 0)
             {
-                queueManager = ((QueueManager) temp.iterator().next());
+                queueManager = temp.iterator().next();
             }
         }
         return queueManager;
