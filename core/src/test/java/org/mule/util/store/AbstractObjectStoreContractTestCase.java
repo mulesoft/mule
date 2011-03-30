@@ -35,7 +35,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
             // this one was expected
         }
     }
-    
+
     public void testStoreWithNullKey()
     {
         try
@@ -49,7 +49,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
             // this one was expected
         }
     }
-    
+
     public void testRetrieveWithNullKey()
     {
         try
@@ -62,7 +62,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
             // this one was expected
         }
     }
-    
+
     public void testRemoveWithNullKey()
     {
         try
@@ -75,7 +75,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
             // this one was expected
         }
     }
-    
+
     public void testRetrieveUnboundKey() throws ObjectStoreException
     {
         try
@@ -88,7 +88,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
             // this one was expected
         }
     }
-    
+
     public void testRemoveWithUnboundKey() throws ObjectStoreException
     {
         try
@@ -101,29 +101,29 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
             // this one was expected
         }
     }
-    
+
     public void testStoreWithExistingKey() throws ObjectStoreException
     {
         String key = "theKey";
         Serializable value = getStorableValue();
         ObjectStore<Serializable> objectStore = getObjectStore();
-        
+
         // storing for the first time must work
         objectStore.store(key, value);
-        
+
         // storing with the same key again must fail
         try
         {
             objectStore.store(key, value);
-            fail("store() with and existing key must throw ObjectAlreadyExistsException");
+            fail("store() with an existing key must throw ObjectAlreadyExistsException");
         }
         catch (ObjectAlreadyExistsException oaee)
         {
             // this one was expected
         }
     }
-    
+
     public abstract ObjectStore<Serializable> getObjectStore();
-    
+
     public abstract Serializable getStorableValue();
 }
