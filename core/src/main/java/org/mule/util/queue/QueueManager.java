@@ -14,12 +14,11 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 
 /**
- * A Queue manager is responsible for manageing one or more Queue resources and
- * providing common support fot transactions and persistence
+ * A Queue manager is responsible for managing one or more Queue resources and
+ * providing common support for transactions and persistence.
  */
 public interface QueueManager extends Startable, Stoppable
 {
-
     QueueSession getQueueSession();
 
     void setDefaultQueueConfiguration(QueueConfiguration config);
@@ -49,5 +48,4 @@ public interface QueueManager extends Startable, Stoppable
      */
     @Deprecated
     void setMemoryPersistenceStrategy(QueuePersistenceStrategy memoryPersistenceStrategy);
-
 }
