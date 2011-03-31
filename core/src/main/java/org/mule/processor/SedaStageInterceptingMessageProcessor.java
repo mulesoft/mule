@@ -57,10 +57,9 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
     protected QueueProfile queueProfile;
     protected int queueTimeout;
     protected QueueStatistics queueStatistics;
-    protected MuleContext muleContext;
     protected String name;
     protected Queue queue;
-    private WaitableBoolean running = new WaitableBoolean(false);;
+    private WaitableBoolean running = new WaitableBoolean(false);
     protected SedaStageLifecycleManager lifecycleManager;
 
     public SedaStageInterceptingMessageProcessor(String name,
