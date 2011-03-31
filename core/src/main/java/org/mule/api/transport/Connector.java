@@ -92,11 +92,6 @@ public interface Connector extends Lifecycle, NamedObject, Connectable, Lifecycl
     boolean supportsProtocol(String protocol);
 
     /**
-     * @param exception the exception that was caught
-     */
-    void handleException(Exception exception);
-
-    /**
      * The dispatcher factory is used to create a message dispatcher of the current
      * request
      *

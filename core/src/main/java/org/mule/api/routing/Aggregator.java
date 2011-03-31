@@ -10,6 +10,8 @@
 
 package org.mule.api.routing;
 
+import org.mule.api.MessagingException;
+
 public interface Aggregator
 {
 
@@ -17,6 +19,6 @@ public interface Aggregator
 
     void setFailOnTimeout(boolean failOnTimeout);
 
-    void expireAggregation(String groupId);
+    void expireAggregation(String groupId) throws MessagingException;
 
 }

@@ -12,6 +12,7 @@ package org.mule.exception;
 
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.message.DefaultExceptionPayload;
@@ -44,12 +45,17 @@ public class DefaultSystemExceptionStrategy extends AbstractExceptionListener im
     {
         AbstractConnector connector = null;
 
-        // unwrap any exception caused by using reflection apis, but only the top layer
-        if (e instanceof InvocationTargetException)
+        // Unwrap any exception caused by using reflection apis, but only the top layer.
+        // Also unwrap MuleRuntimeException since it is generally used when a checked exception cannot be declared 
+        // (e.g. restricted by 3rd party APIs).
+        if (e instanceof InvocationTargetException || e instanceof MuleRuntimeException)
         {
             Throwable t = e.getCause();
-            // just because API accepts Exception, not Throwable :\
-            e = t instanceof Exception ? (Exception) t : new Exception(t);
+            if (t != null)
+            {
+                // just because API accepts Exception, not Throwable :\
+                e = t instanceof Exception ? (Exception) t : new Exception(t);
+            }
         }
 
         if (enableNotifications)

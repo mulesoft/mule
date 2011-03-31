@@ -10,6 +10,7 @@
 
 package org.mule.service;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.Aggregator;
@@ -60,7 +61,7 @@ public class ServiceAsyncReplyCompositeMessageSource extends ServiceCompositeMes
         this.failOnTimeout = failOnTimeout;
     }
 
-    public void expireAggregation(String groupId)
+    public void expireAggregation(String groupId) throws MessagingException
     {
         for (MessageProcessor processor : processors)
         {

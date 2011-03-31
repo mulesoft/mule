@@ -11,6 +11,7 @@
 package org.mule.transport;
 
 import org.mule.MessageExchangePattern;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -836,16 +837,6 @@ public abstract class AbstractConnector implements Connector, WorkListener
     public boolean isDisposed()
     {
         return lifecycleManager.getState().isDisposed();
-    }
-
-    public void handleException(Exception exception)
-    {
-        muleContext.getExceptionListener().handleException(exception);
-    }
-
-    public void exceptionThrown(Exception e)
-    {
-        handleException(e);
     }
 
     /**
@@ -1971,22 +1962,22 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     public void workAccepted(WorkEvent event)
     {
-        this.handleWorkException(event, "workAccepted");
+        handleWorkException(event, "workAccepted");
     }
 
     public void workRejected(WorkEvent event)
     {
-        this.handleWorkException(event, "workRejected");
+        handleWorkException(event, "workRejected");
     }
 
     public void workStarted(WorkEvent event)
     {
-        this.handleWorkException(event, "workStarted");
+        handleWorkException(event, "workStarted");
     }
 
     public void workCompleted(WorkEvent event)
     {
-        this.handleWorkException(event, "workCompleted");
+        handleWorkException(event, "workCompleted");
     }
 
     protected void handleWorkException(WorkEvent event, String type)
@@ -2011,13 +2002,19 @@ public abstract class AbstractConnector implements Connector, WorkListener
         logger.error("Work caused exception on '" + type + "'. Work being executed was: "
                 + event.getWork().toString());
 
-        if (e instanceof Exception)
+        if (e instanceof MessagingException)
         {
-            this.handleException((Exception) e);
+            MuleEvent failedEvent = ((MessagingException) e).getEvent();
+            failedEvent.getFlowConstruct().getExceptionListener().handleException((MessagingException) e, failedEvent);
+        }
+        else if (e instanceof Exception)
+        {
+            muleContext.getExceptionListener().handleException((Exception) e);
         }
         else
         {
-            throw new MuleRuntimeException(CoreMessages.connectorCausedError(this.getName()), e);
+            muleContext.getExceptionListener().handleException(
+                new MuleRuntimeException(CoreMessages.connectorCausedError(this.getName()), e));
         }
     }
 

@@ -81,12 +81,12 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
 
         assertNotNull(muleContext.getExceptionListener());
         muleContext.setExceptionListener((SystemExceptionHandler) ehandlerMock.proxy());
-        connector.handleException(new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
+        muleContext.getExceptionListener().handleException(new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
 
         if (connector instanceof AbstractConnector)
         {
             ehandlerMock.expect("handleException", C.isA(Exception.class));
-            ((AbstractConnector) connector).exceptionThrown(
+            muleContext.getExceptionListener().handleException(
                     new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
         }
 
@@ -95,7 +95,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         muleContext.setExceptionListener(null);
         try
         {
-            connector.handleException(new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
+            muleContext.getExceptionListener().handleException(new DefaultMuleException(MessageFactory.createStaticMessage("Dummy")));
             fail("Should have thrown exception as no strategy is set");
         }
         catch (RuntimeException e)

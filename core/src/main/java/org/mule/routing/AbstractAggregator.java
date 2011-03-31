@@ -10,6 +10,7 @@
 
 package org.mule.routing;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -99,7 +100,7 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
         return processNext(result);
     }
 
-    public void expireAggregation(String groupId)
+    public void expireAggregation(String groupId) throws MessagingException
     {
         eventCorrelator.forceGroupExpiry(groupId);
     }

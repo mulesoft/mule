@@ -11,6 +11,7 @@
 package org.mule.transport.jms;
 
 import org.mule.api.MuleException;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -35,6 +36,7 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.Topic;
+import javax.resource.spi.work.WorkException;
 
 /**
  * Registers a single JmsMessage listener but uses a thread pool to process incoming
@@ -88,9 +90,9 @@ public class JmsMessageReceiver extends AbstractMessageReceiver implements Messa
         {
             getWorkManager().scheduleWork(new JmsWorker(message, this));
         }
-        catch (Exception e)
+        catch (WorkException e)
         {
-            getConnector().getMuleContext().getExceptionListener().handleException(e);
+            throw new MuleRuntimeException(e);
         }
     }
 

@@ -10,6 +10,7 @@
 
 package org.mule.service.processor;
 
+import org.mule.api.MessagingException;
 import org.mule.api.source.MessageSource;
 import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
@@ -17,7 +18,7 @@ import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
 public class ServiceAsyncRequestReplyRequestor extends AbstractAsyncRequestReplyRequester
 {
 
-    protected void postLatchAwait(String asyncReplyCorrelationId)
+    protected void postLatchAwait(String asyncReplyCorrelationId) throws MessagingException
     {
         if (replyMessageSource instanceof ServiceAsyncReplyCompositeMessageSource)
         {

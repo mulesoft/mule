@@ -11,6 +11,7 @@
 package org.mule.routing.requestreply;
 
 import org.mule.OptimizedRequestContext;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessageCollection;
@@ -108,7 +109,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         processNext(event);
     }
     
-    protected MuleEvent receiveAsyncReply(MuleEvent event) throws ResponseTimeoutException
+    protected MuleEvent receiveAsyncReply(MuleEvent event) throws MessagingException
     {
         String asyncReplyCorrelationId = getAsyncReplyCorrelationId(event);
         Latch asyncReplyLatch = locks.get(asyncReplyCorrelationId);
@@ -193,7 +194,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         }
     }
 
-    protected void postLatchAwait(String asyncReplyCorrelationId)
+    protected void postLatchAwait(String asyncReplyCorrelationId) throws MessagingException
     {
         // Template method
     }

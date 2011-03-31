@@ -507,7 +507,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         {
             receiverReportedExceptionCount.set(0);
 
-            handleException(new ConnectException(jmsException, this));
+            throw new MuleRuntimeException(new ConnectException(jmsException, this));
         }
     }
 

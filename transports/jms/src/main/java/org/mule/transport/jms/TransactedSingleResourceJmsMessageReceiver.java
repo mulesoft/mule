@@ -12,6 +12,7 @@ package org.mule.transport.jms;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -37,6 +38,7 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.Topic;
 import javax.resource.spi.work.Work;
+import javax.resource.spi.work.WorkException;
 
 public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageReceiver
         implements MessageListener
@@ -198,9 +200,9 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
         {
             getWorkManager().scheduleWork(new MessageReceiverWorker(message, this));
         }
-        catch (Exception e)
+        catch (WorkException e)
         {
-            getConnector().getMuleContext().getExceptionListener().handleException(e);
+            throw new MuleRuntimeException(e);
         }
     }
 

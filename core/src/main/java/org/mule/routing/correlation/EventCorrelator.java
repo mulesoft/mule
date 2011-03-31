@@ -9,6 +9,7 @@
  */
 package org.mule.routing.correlation;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -36,6 +37,7 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.collections.buffer.BoundedFifoBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -112,7 +114,7 @@ public class EventCorrelator implements Startable, Stoppable
         name = String.format("%s%s.event.correlator", ThreadNameHelper.getPrefix(muleContext), flowConstructName);
     }
 
-    public void forceGroupExpiry(String groupId)
+    public void forceGroupExpiry(String groupId) throws MessagingException
     {
         if (eventGroups.get(groupId) != null)
         {
@@ -292,7 +294,7 @@ public class EventCorrelator implements Startable, Stoppable
         this.timeout = timeout;
     }
 
-    protected void handleGroupExpiry(EventGroup group)
+    protected void handleGroupExpiry(EventGroup group) throws MessagingException
     {
         removeEventGroup(group);
 
@@ -303,9 +305,8 @@ public class EventCorrelator implements Startable, Stoppable
             final MuleMessageCollection messageCollection = group.toMessageCollection();
             muleContext.fireNotification(new RoutingNotification(messageCollection, null,
                                                                  RoutingNotification.CORRELATION_TIMEOUT));
-            service.getExceptionListener().handleException(
-                    new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
-                                                    group.getMessageCollectionEvent()), group.getMessageCollectionEvent());
+            throw new CorrelationTimeoutException(CoreMessages.correlationTimedOut(group.getGroupId()),
+                                                    group.getMessageCollectionEvent());
         }
         else
         {
@@ -350,9 +351,13 @@ public class EventCorrelator implements Startable, Stoppable
                     }
                 }
             }
+            catch (MessagingException me)
+            {
+                throw me;
+            }
             catch (Exception e)
             {
-                service.getExceptionListener().handleException(e, group.getMessageCollectionEvent());
+                throw new MessagingException(group.getMessageCollectionEvent(), e);
             }
         }
     }
@@ -436,7 +441,14 @@ public class EventCorrelator implements Startable, Stoppable
                     for (Object anExpired : expired)
                     {
                         EventGroup group = (EventGroup) anExpired;
-                        handleGroupExpiry(group);
+                        try
+                        {
+                            handleGroupExpiry(group);
+                        }
+                        catch (MessagingException e)
+                        {
+                            e.getEvent().getFlowConstruct().getExceptionListener().handleException(e, e.getEvent());
+                        }
                     }
                 }
 

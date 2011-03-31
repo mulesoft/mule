@@ -33,14 +33,7 @@ public class SingleJmsMessageReceiver extends JmsMessageReceiver implements Mess
 
     public void onMessage(Message message)
     {
-        try
-        {
-            JmsWorker worker = new JmsWorker(message, this);
-            worker.run();
-        }
-        catch (Exception e)
-        {
-            getConnector().getMuleContext().getExceptionListener().handleException(e);
-        }
+        JmsWorker worker = new JmsWorker(message, this);
+        worker.run();
     }
 }
