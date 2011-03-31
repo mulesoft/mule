@@ -65,11 +65,11 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
         for (int i = 0; i < TEST_COUNT; i++)
         {
             testObjectXmlOut();
-            
+
             // Pull result from "xml-object-out" endpoint as queuing is enabled and otherwise we get
             // OutOfMemoryExceptions during stress tests when these results build up in queue.
             request(new MuleClient(muleContext), "xml-object-out", Parent.class);
-            
+
             if (i % tenth == 0)
             {
                 logger.info("Iteration " + i);
@@ -79,10 +79,10 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
 
     protected Object request(MuleClient client, String endpoint, Class<?> clazz) throws MuleException
     {
-        MuleMessage message = client.request(endpoint, TIMEOUT);
+        MuleMessage message = client.request(endpoint, TIMEOUT * 2);
         assertNotNull(message);
         assertNotNull(message.getPayload());
-        
+
         Class<?> payloadClass = message.getPayload().getClass();
         String assertionMessage = String.format("expected payload of type %1s but was %2s", clazz.getName(), payloadClass);
         assertTrue(assertionMessage, clazz.isAssignableFrom(payloadClass));

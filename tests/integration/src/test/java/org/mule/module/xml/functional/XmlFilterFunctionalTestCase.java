@@ -21,6 +21,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
     public static final int MAX_COUNT = 100;
     public static final String STRING_MESSAGE = "Hello world";
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/module/xml/xml-filter-functional-test.xml";
@@ -53,7 +54,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
     {
         MuleClient client = new MuleClient(muleContext);
         client.dispatch("in", xml, null);
-        MuleMessage response = client.request(endpoint, TIMEOUT);
+        MuleMessage response = client.request(endpoint, TIMEOUT * 2);
         assertNotNull(response);
         assertNotNull(response.getPayload());
         assertEquals(xml, response.getPayloadAsString());
