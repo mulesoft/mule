@@ -14,6 +14,7 @@ import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.handlers.AbstractMuleNamespaceHandler;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.assembly.configuration.PrefixValueMap;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.specific.FilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.MessageProcessorDefinitionParser;
@@ -28,6 +29,7 @@ import org.mule.transport.jms.activemq.ActiveMQJmsConnector;
 import org.mule.transport.jms.activemq.ActiveMQXAJmsConnector;
 import org.mule.transport.jms.filters.JmsPropertyFilter;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
+import org.mule.transport.jms.jndi.SimpleJndiNameResolver;
 import org.mule.transport.jms.mulemq.MuleMQJmsConnector;
 import org.mule.transport.jms.mulemq.MuleMQXAJmsConnector;
 import org.mule.transport.jms.transformers.JMSMessageToObject;
@@ -75,6 +77,8 @@ public class JmsNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("object-to-jmsmessage-transformer", new MessageProcessorDefinitionParser(ObjectToJMSMessage.class));
         registerBeanDefinitionParser("property-filter", new FilterDefinitionParser(JmsPropertyFilter.class));
         registerBeanDefinitionParser("selector", new FilterDefinitionParser(JmsSelectorFilter.class));
+        registerBeanDefinitionParser("default-jndi-name-resolver", new ChildDefinitionParser("jndiNameResolver", SimpleJndiNameResolver.class));
+        registerBeanDefinitionParser("custom-jndi-name-resolver", new ChildDefinitionParser("jndiNameResolver"));
     }
 
     /**

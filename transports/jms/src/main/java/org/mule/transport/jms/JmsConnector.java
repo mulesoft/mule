@@ -32,13 +32,14 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jms.i18n.JmsMessages;
+import org.mule.transport.jms.jndi.JndiNameResolver;
+import org.mule.transport.jms.jndi.SimpleJndiNameResolver;
 import org.mule.transport.jms.redelivery.AutoDiscoveryRedeliveryHandlerFactory;
 import org.mule.transport.jms.redelivery.RedeliveryHandlerFactory;
 import org.mule.transport.jms.xa.ConnectionFactoryWrapper;
 import org.mule.util.BeanUtils;
 
 import java.text.MessageFormat;
-import java.util.Hashtable;
 import java.util.Map;
 
 import javax.jms.Connection;
@@ -52,8 +53,6 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
 import javax.jms.XAConnectionFactory;
 import javax.naming.CommunicationException;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
@@ -123,14 +122,6 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     ////////////////////////////////////////////////////////////////////////
     // JNDI Connection
     ////////////////////////////////////////////////////////////////////////
-
-    private Context jndiContext = null;
-
-    /**
-     * This object guards all access to the jndiContext
-     */
-    private final Object jndiLock = new Object();
-
     private String jndiProviderUrl;
 
     private String jndiInitialFactory;
@@ -142,6 +133,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     private boolean jndiDestinations = false;
 
     private boolean forceJndiDestinations = false;
+
+    /**
+     * Resolves JNDI names if the connector uses {@link #jndiDestinations}
+     */
+    private JndiNameResolver jndiNameResolver;
 
     ////////////////////////////////////////////////////////////////////////
     // Strategy classes
@@ -286,11 +282,15 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
     {
         // if an initial factory class was configured that takes precedence over the 
         // spring-configured connection factory or the one that our subclasses may provide
-        if (jndiInitialFactory != null)
+        if (jndiInitialFactory != null || jndiNameResolver != null)
         {
-            this.initJndiContext();
+            if (jndiNameResolver == null)
+            {
+                jndiNameResolver = createDefaultJndiResolver();
+            }
+            jndiNameResolver.initialise();
 
-            Object temp = jndiContext.lookup(connectionFactoryJndiName);
+            Object temp = jndiNameResolver.lookup(connectionFactoryJndiName);
             if (temp instanceof ConnectionFactory)
             {
                 return (ConnectionFactory) temp;
@@ -333,9 +333,24 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         }
     }
 
+    private JndiNameResolver createDefaultJndiResolver()
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Creating default JndiNameResolver");
+        }
+
+        SimpleJndiNameResolver jndiContextFactory = new SimpleJndiNameResolver();
+        jndiContextFactory.setJndiProviderUrl(jndiProviderUrl);
+        jndiContextFactory.setJndiInitialFactory(jndiInitialFactory);
+        jndiContextFactory.setJndiProviderProperties(jndiProviderProperties);
+
+        return jndiContextFactory;
+    }
+
     /**
      * Override this method to provide a default ConnectionFactory for a vendor-specific JMS Connector.
-     * @throws Exception 
+     * @throws Exception
      */
     protected ConnectionFactory getDefaultConnectionFactory() throws Exception
     {
@@ -358,80 +373,36 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             connection = null;
         }
 
-        if (jndiContext != null)
+        if (jndiNameResolver != null)
         {
-            try
-            {
-                jndiContext.close();
-            }
-            catch (NamingException ne)
-            {
-                logger.error("Jms connector failed to dispose properly: ", ne);
-            }
-            finally
-            {
-                jndiContext = null;
-            }
-        }
-    }
-
-    protected void initJndiContext() throws NamingException, InitialisationException
-    {
-        synchronized (jndiLock)
-        {
-            Hashtable<String, Object> props = new Hashtable<String, Object>();
-
-            if (jndiInitialFactory != null)
-            {
-                props.put(Context.INITIAL_CONTEXT_FACTORY, jndiInitialFactory);
-            }
-            else if (jndiProviderProperties == null
-                    || !jndiProviderProperties.containsKey(Context.INITIAL_CONTEXT_FACTORY))
-            {
-                throw new InitialisationException(CoreMessages.objectIsNull("jndiInitialFactory"), this);
-            }
-
-            if (jndiProviderUrl != null)
-            {
-                props.put(Context.PROVIDER_URL, jndiProviderUrl);
-            }
-
-            if (jndiProviderProperties != null)
-            {
-                props.putAll(jndiProviderProperties);
-            }
-
-            jndiContext = new InitialContext(props);
+            jndiNameResolver.dispose();
         }
     }
 
     protected Object lookupFromJndi(String jndiName) throws NamingException
     {
-        synchronized (jndiLock)
+        try
+        {
+            return jndiNameResolver.lookup(jndiName);
+        }
+        catch (CommunicationException ce)
         {
             try
             {
-                return jndiContext.lookup(jndiName);
+                final Transaction tx = TransactionCoordination.getInstance().getTransaction();
+                if (tx != null)
+                {
+                    tx.setRollbackOnly();
+                }
             }
-            catch (CommunicationException ce)
+            catch (TransactionException e)
             {
-                try
-                {
-                    final Transaction tx = TransactionCoordination.getInstance().getTransaction();
-                    if (tx != null)
-                    {
-                        tx.setRollbackOnly();
-                    }
-                }
-                catch (TransactionException e)
-                {
-                    throw new MuleRuntimeException(
-                            MessageFactory.createStaticMessage("Failed to mark transaction for rollback: "), e);
-                }
-
-                // re-throw
-                throw ce;
+                throw new MuleRuntimeException(
+                        MessageFactory.createStaticMessage("Failed to mark transaction for rollback: "), e);
             }
+
+            // re-throw
+            throw ce;
         }
     }
 
@@ -630,6 +601,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
                 throw new StartException(CoreMessages.failedToStart("Jms Connection"), e, this);
             }
         }
+
+        if (jndiNameResolver != null)
+        {
+            jndiNameResolver.start();
+        }
     }
 
 
@@ -669,6 +645,11 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
             {
                 throw new StopException(CoreMessages.failedToStop("Jms Connection"), e, this);
             }
+        }
+
+        if (jndiNameResolver != null)
+        {
+            jndiNameResolver.stop();
         }
     }
 
@@ -1176,44 +1157,68 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         return honorQosHeaders;
     }
 
-    public Context getJndiContext()
-    {
-        return jndiContext;
-    }
-
-    public void setJndiContext(Context jndiContext)
-    {
-        this.jndiContext = jndiContext;
-    }
-
+    /**
+     * @Deprecated use a {@link JndiNameResolver} instead of access this property
+     */
+    @Deprecated
     public String getJndiInitialFactory()
     {
         return jndiInitialFactory;
     }
 
+    /**
+     * @Deprecated use a {@link JndiNameResolver} instead of access this property
+     */
+    @Deprecated
     public void setJndiInitialFactory(String jndiInitialFactory)
     {
         this.jndiInitialFactory = jndiInitialFactory;
     }
 
+    /**
+     * @Deprecated use a {@link JndiNameResolver} instead of access this property
+     */
+    @Deprecated
     public String getJndiProviderUrl()
     {
         return jndiProviderUrl;
     }
 
+    /**
+     * @Deprecated use a {@link JndiNameResolver} instead of access this property
+     */
+    @Deprecated
     public void setJndiProviderUrl(String jndiProviderUrl)
     {
         this.jndiProviderUrl = jndiProviderUrl;
     }
 
+    /**
+     * @Deprecated use a {@link JndiNameResolver} instead of access this property
+     */
+    @Deprecated
     public Map getJndiProviderProperties()
     {
         return jndiProviderProperties;
     }
 
+    /**
+     * @Deprecated use a {@link JndiNameResolver} instead of access this property
+     */
+    @Deprecated
     public void setJndiProviderProperties(Map jndiProviderProperties)
     {
         this.jndiProviderProperties = jndiProviderProperties;
+    }
+
+    public JndiNameResolver getJndiNameResolver()
+    {
+        return jndiNameResolver;
+    }
+
+    public void setJndiNameResolver(JndiNameResolver jndiNameResolver)
+    {
+        this.jndiNameResolver = jndiNameResolver;
     }
 
     public String getConnectionFactoryJndiName()

@@ -3,11 +3,14 @@
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             xmlns:mule="http://www.mulesoft.org/schema/mule/core"
             xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
+            xmlns:spring="http://www.springframework.org/schema/beans"
             targetNamespace="http://www.mulesoft.org/schema/mule/jms"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"/>
     <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
                 schemaLocation="http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd" />
     <xsd:import namespace = "http://www.mulesoft.org/schema/mule/schemadoc"
@@ -38,6 +41,10 @@
     <xsd:complexType name="genericConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element ref="abstract-jndi-name-resolver" minOccurs="0" maxOccurs="1"/>
+                </xsd:sequence>
+
                 <!-- The ConnectionFactory is required for non-vendor JMS configs -->
                 <xsd:attribute name="connectionFactory-ref" type="xsd:string">
                     <xsd:annotation>
@@ -61,7 +68,10 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="mule:customConnectorType">
-                    <xsd:attributeGroup ref="jmsConnectorAttributes"/>
+                    <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xsd:element ref="abstract-jndi-name-resolver" minOccurs="0" maxOccurs="1" />
+                    </xsd:sequence>
+                    <xsd:attributeGroup ref="jmsConnectorAttributes" />
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
@@ -190,6 +200,7 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The initial factory class to use when connecting to JNDI.
+                    DEPRECATED: use jndiNameResolver-ref propertie to configure this value.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -197,6 +208,7 @@
             <xsd:annotation>
                 <xsd:documentation>
                     The URL to use when connecting to JNDI.
+                    DEPRECATED: use jndiNameResolver-ref propertie to configure this value.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -204,6 +216,7 @@
             <xsd:annotation>
                 <xsd:documentation>
                     Reference to a Map that contains additional provider properties.
+                    DEPRECATED: use jndiNameResolver-ref propertie to configure this value.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -252,6 +265,10 @@
     <xsd:complexType name="vendorJmsConnectorType">
         <xsd:complexContent>
             <xsd:extension base="mule:connectorType">
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element ref="abstract-jndi-name-resolver" minOccurs="0" maxOccurs="1"/>
+                </xsd:sequence>
+
                 <!-- Optional, a default ConnectionFactory is provided for vendor JMS configs -->
                 <xsd:attribute name="connectionFactory-ref" type="xsd:string" use="optional">
                     <xsd:annotation>
@@ -653,4 +670,95 @@
         </xsd:complexType>
     </xsd:element>
 
+    <xsd:element name="abstract-jndi-name-resolver" abstract="true" type="abstractJndiNameResolverType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for jndi-name-resolver strategy elements.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="abstractJndiNameResolverType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A service to resolve JNDI names.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+
+    <xsd:element name="default-jndi-name-resolver" type="defaultJndiNameResolverType" substitutionGroup="abstract-jndi-name-resolver"/>
+
+    <xsd:complexType name="defaultJndiNameResolverType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A deafult strategy to resolve JNDI names.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="abstractJndiNameResolverType">
+                <xsd:attribute name="jndiInitialFactory" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The initial factory class to use when connecting to JNDI.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="jndiProviderUrl" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The URL to use when connecting to JNDI.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="jndiProviderProperties-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to a Map that contains additional provider properties.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="initialContextFactory-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to a javax.naming.spi.InitialContextFactory implementation that will be used to create the JDNI context.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-jndi-name-resolver" type="customJndiNameResolverType" substitutionGroup="abstract-jndi-name-resolver"/>
+
+    <xsd:complexType name="customJndiNameResolverType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A custom strategy to resolve JNDI names.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="abstractJndiNameResolverType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="mule:substitutableClass" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            An implementation of the LifecycleAdapter interface.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 </xsd:schema>
