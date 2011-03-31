@@ -33,7 +33,7 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
-import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ListableObjectStore;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
@@ -54,6 +54,7 @@ import org.mule.util.ServerStartupSplashScreen;
 import org.mule.util.SplashScreen;
 import org.mule.util.queue.QueueManager;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 import javax.resource.spi.work.WorkListener;
@@ -654,21 +655,23 @@ public class DefaultMuleContext implements MuleContext
         return (EndpointFactory) registryBroker.lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
 
-    public void setObjectStore(ObjectStore store) throws RegistrationException
+    public void setObjectStore(ListableObjectStore<Serializable> store) throws RegistrationException
     {
         checkLifecycleForPropertySet(MuleProperties.OBJECT_STORE, Initialisable.PHASE_NAME);
         registryBroker.registerObject(MuleProperties.OBJECT_STORE, store);
     }
 
-    public ObjectStore getObjectStore()
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public ListableObjectStore<Serializable> getObjectStore()
     {
-        ObjectStore objectStore = (ObjectStore) registryBroker.lookupObject(MuleProperties.OBJECT_STORE);
+        ListableObjectStore<Serializable> objectStore =
+            (ListableObjectStore<Serializable>) registryBroker.lookupObject(MuleProperties.OBJECT_STORE);
         if (objectStore == null)
         {
-            Collection temp = registryBroker.lookupObjects(ObjectStore.class);
+            Collection<ListableObjectStore> temp = registryBroker.lookupObjects(ListableObjectStore.class);
             if (temp.size() > 0)
             {
-                objectStore = ((ObjectStore) temp.iterator().next());
+                objectStore = temp.iterator().next();
             }
         }
         return objectStore;

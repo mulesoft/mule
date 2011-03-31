@@ -25,11 +25,13 @@ import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
-import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ListableObjectStore;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.util.queue.QueueManager;
+
+import java.io.Serializable;
 
 import javax.resource.spi.work.WorkListener;
 import javax.transaction.TransactionManager;
@@ -133,7 +135,7 @@ public interface MuleContext extends Lifecycle
      * @param securityManager the security manager used by this Mule instance to
      *                        authenticate and authorise incoming and outgoing event traffic
      *                        and service invocations
-     * @throws RegistrationException 
+     * @throws RegistrationException
      */
     void setSecurityManager(SecurityManager securityManager) throws InitialisationException, RegistrationException;
 
@@ -165,8 +167,8 @@ public interface MuleContext extends Lifecycle
      * service queues
      *
      * @param queueManager
-     * @throws RegistrationException 
-     * 
+     * @throws RegistrationException
+     *
      */
     void setQueueManager(QueueManager queueManager) throws RegistrationException;
 
@@ -181,7 +183,7 @@ public interface MuleContext extends Lifecycle
     LifecycleManager getLifecycleManager();
 
     MuleRegistry getRegistry();
-    
+
     MuleConfiguration getConfiguration();
 
     ThreadingProfile getDefaultMessageDispatcherThreadingProfile();
@@ -199,7 +201,7 @@ public interface MuleContext extends Lifecycle
 
     // TODO This should ideally only be available via an Admin interface
     void removeRegistry(Registry registry);
-    
+
     /**
      * Returns the date when the server was started.
      * @return the date when the server was started.
@@ -219,7 +221,7 @@ public interface MuleContext extends Lifecycle
      * @see EndpointFactory
      */
     EndpointFactory getEndpointFactory();
-    
+
     void setExecutionClassLoader(ClassLoader cl);
 
     ClassLoader getExecutionClassLoader();
@@ -229,14 +231,14 @@ public interface MuleContext extends Lifecycle
     boolean isStopping();
 
     boolean isStarting();
-    
+
     LocalMuleClient getClient();
-    
+
     SystemExceptionHandler getExceptionListener();
 
     void setExceptionListener(SystemExceptionHandler exceptionListener);
-    
-    ObjectStore getObjectStore();
-    
-    void setObjectStore(ObjectStore store) throws RegistrationException;
+
+    ListableObjectStore<Serializable> getObjectStore();
+
+    void setObjectStore(ListableObjectStore<Serializable> store) throws RegistrationException;
 }

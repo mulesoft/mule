@@ -10,14 +10,17 @@
 
 package org.mule.util.store;
 
+import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.CoreMessages;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObjectStore<T>
+public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObjectStore<T> implements ListableObjectStore<T>
 {
     private Map<Serializable, T> map = new HashMap<Serializable, T>();
 
@@ -48,5 +51,20 @@ public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObj
     protected T doRemove(Serializable key)
     {
         return map.remove(key);
+    }
+
+    public void open() throws ObjectStoreException
+    {
+        // this is a no-op
+    }
+
+    public void close() throws ObjectStoreException
+    {
+        // this is a no-op
+    }
+
+    public List<Serializable> allKeys() throws ObjectStoreException
+    {
+        return new ArrayList<Serializable>(map.keySet());
     }
 }
