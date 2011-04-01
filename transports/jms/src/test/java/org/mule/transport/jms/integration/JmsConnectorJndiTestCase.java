@@ -43,7 +43,7 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
     @Test
     public void testConnectionFactoryFromJndi() throws Exception
     {
-        // No need to specifically test anything here, if the ConnectionFactory 
+        // No need to specifically test anything here, if the ConnectionFactory
         // is not successfully looked up from JNDI, Mule won't even start up.
     }
 
@@ -110,6 +110,74 @@ public class JmsConnectorJndiTestCase extends AbstractJmsFunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
 
         client.dispatch("ep_non-jndi-queue-force-jndi", DEFAULT_INPUT_MESSAGE, null);
+
+        MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+        assertNull("Attempt to look up a non-existant JNDI Destination should have failed", result);
+    }
+
+    @Test
+    public void testQueueFromJndiWithJndiNameResolver() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+
+        client.dispatch("ep_jndi-queue-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
+
+        MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+        assertNotNull(result);
+        assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
+    }
+
+    @Test
+    public void testTopicFromJndiWithJndiNameResolver() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+
+        client.dispatch("ep_jndi-topic-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
+
+        MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+        assertNotNull(result);
+        assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
+    }
+
+    /**
+    * Use a non-JNDI Destination when jndiDestinations="false", test should pass.
+    */
+    @Test
+    public void testNonJndiDestinationWithJndiNameResolver() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+
+        client.dispatch("ep_non-jndi-queue-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
+
+        MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+        assertNotNull(result);
+        assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
+    }
+
+    /**
+    * Use a non-JNDI Destination when jndiDestinations="true" but forceJndiDestinations="false", test should pass.
+    */
+    @Test
+    public void testNonJndiDestinationOptionalWithJndiNameResolver() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+
+        client.dispatch("ep_non-jndi-queue-optional-jndi-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
+
+        MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
+        assertNotNull(result);
+        assertEquals(DEFAULT_INPUT_MESSAGE, result.getPayloadAsString());
+    }
+
+    /**
+    * Use a non-JNDI Destination when forceJndiDestinations="true", test should fail.
+    */
+    @Test
+    public void testNonJndiDestinationForceWithJndiNameResolver() throws Exception
+    {
+        MuleClient client = new MuleClient(muleContext);
+
+        client.dispatch("ep_non-jndi-queue-force-jndi-with-jndi-name-resolver", DEFAULT_INPUT_MESSAGE, null);
 
         MuleMessage result = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNull("Attempt to look up a non-existant JNDI Destination should have failed", result);

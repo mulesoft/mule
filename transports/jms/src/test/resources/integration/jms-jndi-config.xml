@@ -49,5 +49,43 @@
                 </pass-through-router>
             </outbound>
         </service>
+
+
+         <!-- Similar services but using JndiNameResolvers instead of JmsConnector properties -->
+
+        <service name="QueueFromJndiWithJndiNameResolver">
+            <inbound>
+                <!-- this queue is looked up from JNDI -->
+                <inbound-endpoint ref="ep_jndi-queue-with-jndi-name-resolver" />
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="TopicFromJndiWithJndiNameResolver">
+            <inbound>
+                <!-- this topic is looked up from JNDI -->
+                <inbound-endpoint ref="ep_jndi-topic-with-jndi-name-resolver" />
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+
+        <service name="NonJndiQueueWithJndiNameResolver">
+            <inbound>
+                <inbound-endpoint ref="ep_non-jndi-queue-with-jndi-name-resolver" />
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint path="out"/>
+                </pass-through-router>
+            </outbound>
+        </service>
     </model>
 </mule>
