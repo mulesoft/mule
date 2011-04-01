@@ -527,23 +527,6 @@ public abstract class AbstractConnector implements Connector, WorkListener
                     }
                 }
 
-                // TODO We shouldn't need to automatically disconnect just because we're stopping, these are 
-                // discrete stages in the connector's lifecycle.  
-                if (isConnected())
-                {
-                    try
-                    {
-                        disconnect();
-                    }
-                    catch (Exception e)
-                    {
-                        //TODO We only log here since we need to make sure we stop with
-                        //a consistent state. Another option would be to collect exceptions
-                        //and handle them at the end of this message
-                        logger.error("Failed to disconnect: " + e.getMessage(), e);
-                    }
-                }
-
                 // Now that dispatchers are borrowed/returned in worker thread we need to
                 // dispose workManager before clearing object pools
                 disposeWorkManagers();
