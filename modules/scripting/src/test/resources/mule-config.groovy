@@ -32,13 +32,13 @@ import org.mule.tck.testmodels.mule.TestEntryPointResolverSet
 import org.mule.tck.testmodels.mule.TestExceptionStrategy
 import org.mule.tck.testmodels.mule.TestResponseAggregator
 import org.mule.tck.testmodels.mule.TestTransactionManagerFactory
-import org.mule.util.queue.MemoryPersistenceStrategy
+import org.mule.util.store.SimpleMemoryObjectStore
 import org.mule.util.queue.QueueManager
 import org.mule.util.queue.TransactionalQueueManager
 
 // Set up defaults / system objects
 QueueManager queueManager = new TransactionalQueueManager();
-queueManager.persistenceStrategy = new MemoryPersistenceStrategy()
+queueManager.persistentObjectStore = new SimpleMemoryObjectStore()
 muleContext.registry.registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
 
 muleContext.registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
