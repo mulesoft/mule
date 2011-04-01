@@ -12,6 +12,7 @@ package org.mule.util.store;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStore;
@@ -40,7 +41,8 @@ import org.apache.commons.lang.SerializationException;
  * internal queues. This implementation uses <a href="http://download.oracle.com/javase/1.5.0/docs/guide/serialization/spec/serialTOC.html">
  * Java serialization</a> to implement persistence.
  */
-public class QueuePersistenceObjectStore<T extends Serializable> extends AbstractObjectStore<T> implements ListableObjectStore<T>
+public class QueuePersistenceObjectStore<T extends Serializable> extends AbstractObjectStore<T>
+    implements ListableObjectStore<T>, MuleContextAware
 {
     /**
      * The default queueStore directory for persistence
@@ -55,6 +57,14 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
      * This is the base directory into which all queues will be persisted
      */
     private File storeDirectory;
+
+    /**
+     * Default constructor for Spring.
+     */
+    public QueuePersistenceObjectStore()
+    {
+        super();
+    }
 
     public QueuePersistenceObjectStore(MuleContext context)
     {
@@ -259,12 +269,12 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         }
     }
 
-
     @Override
     protected T doRemove(Serializable key) throws ObjectStoreException
     {
         File storeFile = createStoreFile(key);
         deleteStoreFile(storeFile);
+
         // TODO BL-405 can we safely return null here to avoid loading the message?
         return null;
     }
@@ -284,5 +294,10 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         {
             throw new ObjectDoesNotExistException();
         }
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
+        muleContext = context;
     }
 }

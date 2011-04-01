@@ -10,13 +10,17 @@
 
 package org.mule.util.queue;
 
+import org.mule.util.store.SimpleMemoryObjectStore;
+
+import java.io.Serializable;
+
 public class NoPersistenceTestCase extends AbstractTransactionQueueManagerTestCase
 {
     @Override
     protected TransactionalQueueManager createQueueManager() throws Exception
     {
         TransactionalQueueManager mgr = new TransactionalQueueManager();
-        mgr.setPersistenceStrategy(new MemoryPersistenceStrategy());
+        mgr.setPersistentObjectStore(new SimpleMemoryObjectStore<Serializable>());
         return mgr;
     }
 
@@ -25,5 +29,4 @@ public class NoPersistenceTestCase extends AbstractTransactionQueueManagerTestCa
     {
         return false;
     }
-
 }

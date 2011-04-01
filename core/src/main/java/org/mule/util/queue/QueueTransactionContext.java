@@ -10,9 +10,10 @@
 
 package org.mule.util.queue;
 
+import org.mule.api.store.ObjectStoreException;
 import org.mule.util.xa.AbstractTransactionContext;
 
-import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,9 +22,8 @@ import java.util.Map;
 public class QueueTransactionContext extends AbstractTransactionContext
 {
     private final TransactionalQueueManager transactionalQueueManager;
-    protected Map<QueueInfo, List<Object>> added;
-    // TODO BL-405 this looks pretty unused, can it be removed?
-    protected Map<QueueInfo, List<Object>> removed;
+    protected Map<QueueInfo, List<Serializable>> added;
+    protected Map<QueueInfo, List<Serializable>> removed;
 
     public QueueTransactionContext(TransactionalQueueManager transactionalQueueManager)
     {
@@ -31,12 +31,12 @@ public class QueueTransactionContext extends AbstractTransactionContext
         this.transactionalQueueManager = transactionalQueueManager;
     }
 
-    public boolean offer(QueueInfo queue, Object item, long offerTimeout) throws InterruptedException
+    public boolean offer(QueueInfo queue, Serializable item, long offerTimeout) throws InterruptedException
     {
         readOnly = false;
         initializeAdded();
 
-        List<Object> queueAdded = lookupQueue(queue);
+        List<Serializable> queueAdded = lookupQueue(queue);
         // wait for enough room
         if (queue.offer(null, queueAdded.size(), offerTimeout))
         {
@@ -49,28 +49,28 @@ public class QueueTransactionContext extends AbstractTransactionContext
         }
     }
 
-    public void untake(QueueInfo queue, Object item) throws InterruptedException
+    public void untake(QueueInfo queue, Serializable item) throws InterruptedException
     {
         readOnly = false;
         initializeAdded();
 
-        List<Object> queueAdded = lookupQueue(queue);
+        List<Serializable> queueAdded = lookupQueue(queue);
         queueAdded.add(item);
     }
 
-    public Object poll(QueueInfo queue, long pollTimeout) throws IOException, InterruptedException
+    public Serializable poll(QueueInfo queue, long pollTimeout) throws InterruptedException, ObjectStoreException
     {
         readOnly = false;
         if (added != null)
         {
-            List<Object> queueAdded = added.get(queue);
+            List<Serializable> queueAdded = added.get(queue);
             if (queueAdded != null)
             {
                 return queueAdded.remove(queueAdded.size() - 1);
             }
         }
 
-        Object object;
+        Serializable object;
         try
         {
             object = queue.poll(pollTimeout);
@@ -89,12 +89,12 @@ public class QueueTransactionContext extends AbstractTransactionContext
         {
             if (removed == null)
             {
-                removed = new HashMap<QueueInfo, List<Object>>();
+                removed = new HashMap<QueueInfo, List<Serializable>>();
             }
-            List<Object> queueRemoved = removed.get(queue);
+            List<Serializable> queueRemoved = removed.get(queue);
             if (queueRemoved == null)
             {
-                queueRemoved = new ArrayList<Object>();
+                queueRemoved = new ArrayList<Serializable>();
                 removed.put(queue, queueRemoved);
             }
             queueRemoved.add(object);
@@ -103,18 +103,19 @@ public class QueueTransactionContext extends AbstractTransactionContext
         return object;
     }
 
-    public Object peek(QueueInfo queue) throws IOException, InterruptedException
+    public Serializable peek(QueueInfo queue) throws InterruptedException, ObjectStoreException
     {
         readOnly = false;
         if (added != null)
         {
-            List<Object> queueAdded = added.get(queue);
+            List<Serializable> queueAdded = added.get(queue);
             if (queueAdded != null)
             {
                 return queueAdded.get(queueAdded.size() - 1);
             }
         }
-        Object o = queue.peek();
+
+        Serializable o = queue.peek();
         if (o != null)
         {
             o = transactionalQueueManager.doLoad(queue, o);
@@ -127,7 +128,7 @@ public class QueueTransactionContext extends AbstractTransactionContext
         int sz = queue.list.size();
         if (added != null)
         {
-            List<Object> queueAdded = added.get(queue);
+            List<Serializable> queueAdded = added.get(queue);
             if (queueAdded != null)
             {
                 sz += queueAdded.size();
@@ -140,16 +141,16 @@ public class QueueTransactionContext extends AbstractTransactionContext
     {
         if (added == null)
         {
-            added = new HashMap<QueueInfo, List<Object>>();
+            added = new HashMap<QueueInfo, List<Serializable>>();
         }
     }
 
-    protected List<Object> lookupQueue(QueueInfo queue)
+    protected List<Serializable> lookupQueue(QueueInfo queue)
     {
-        List<Object> queueAdded = added.get(queue);
+        List<Serializable> queueAdded = added.get(queue);
         if (queueAdded == null)
         {
-            queueAdded = new ArrayList<Object>();
+            queueAdded = new ArrayList<Serializable>();
             added.put(queue, queueAdded);
         }
         return queueAdded;

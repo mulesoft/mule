@@ -11,6 +11,7 @@
 package org.mule.util.queue;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ public interface QueuePersistenceStrategy
 
     public interface Holder
     {
-        Object getId();
+        Serializable getId();
 
         String getQueue();
     }

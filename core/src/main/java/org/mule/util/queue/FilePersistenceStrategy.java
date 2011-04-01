@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -217,15 +218,15 @@ public class FilePersistenceStrategy implements QueuePersistenceStrategy, MuleCo
     protected static class HolderImpl implements Holder
     {
         private String queue;
-        private Object id;
+        private Serializable id;
 
-        public HolderImpl(String queue, Object id)
+        public HolderImpl(String queue, Serializable id)
         {
             this.queue = queue;
             this.id = id;
         }
 
-        public Object getId()
+        public Serializable getId()
         {
             return id;
         }

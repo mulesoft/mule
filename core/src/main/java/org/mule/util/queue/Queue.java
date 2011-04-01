@@ -10,12 +10,13 @@
 
 package org.mule.util.queue;
 
+import java.io.Serializable;
+
 /**
  * <code>Queue</code> TODO
  */
 public interface Queue
 {
-
     /**
      * Returns the number of elements in this queue.
      */
@@ -23,25 +24,23 @@ public interface Queue
 
     /**
      * Puts a new object in this queue and wait if necessary.
-     * 
-     * @param o the object to put
      */
-    void put(Object o) throws InterruptedException;
+    void put(Serializable object) throws InterruptedException;
 
     /**
      * Blocks and retrieves an object from this queue.
-     * 
+     *
      * @return an object.
      */
-    Object take() throws InterruptedException;
+    Serializable take() throws InterruptedException;
 
-    void untake(Object item) throws InterruptedException;
+    void untake(Serializable item) throws InterruptedException;
 
-    Object peek() throws InterruptedException;
+    Serializable peek() throws InterruptedException;
 
-    Object poll(long timeout) throws InterruptedException;
+    Serializable poll(long timeout) throws InterruptedException;
 
-    boolean offer(Object o, long timeout) throws InterruptedException;
+    boolean offer(Serializable object, long timeout) throws InterruptedException;
 
     String getName();
 }

@@ -17,6 +17,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.model.Model;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
+import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
 import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.bootstrap.SimpleRegistryBootstrap;
@@ -25,7 +26,6 @@ import org.mule.model.seda.SedaModel;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
 import org.mule.security.MuleSecurityManager;
 import org.mule.util.DefaultStreamCloserService;
-import org.mule.util.queue.FilePersistenceStrategy;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.store.SimpleMemoryObjectStore;
@@ -81,11 +81,10 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
 
     protected void configureQueueManager(MuleContext muleContext) throws RegistrationException
     {
-        FilePersistenceStrategy ps = new FilePersistenceStrategy();
-        ps.setMuleContext(muleContext);
+        ListableObjectStore<Serializable> store = muleContext.getObjectStore();
 
         QueueManager queueManager = new TransactionalQueueManager();
-        queueManager.setPersistenceStrategy(ps);
+        queueManager.setPersistentObjectStore(store);
 
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
     }

@@ -16,11 +16,12 @@ import org.mule.api.service.Service;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.util.queue.FilePersistenceStrategy;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
+import org.mule.util.store.QueuePersistenceObjectStore;
 
 import java.io.File;
+import java.io.Serializable;
 
 import org.apache.commons.io.FileUtils;
 
@@ -39,9 +40,9 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
     protected MuleContext createMuleContext() throws Exception
     {
         // Use a graceful shutdown but not the full 5s default
-        MuleContext muleContext = super.createMuleContext();
-        ((DefaultMuleConfiguration) muleContext.getConfiguration()).setShutdownTimeout(WAIT_TIME_MILLIS);
-        return muleContext;
+        MuleContext context = super.createMuleContext();
+        ((DefaultMuleConfiguration) context.getConfiguration()).setShutdownTimeout(WAIT_TIME_MILLIS);
+        return context;
     }
 
     @Override
@@ -177,7 +178,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
      * After each run the following should total 500 events: 1) Event still in SEDA
      * queue 2) Events dispatched to outbound vm endpooint 3) Events that were unable
      * to be sent to stopped service and raised exceptions
-     * 
+     *
      * @throws Exception
      */
     protected synchronized void assertNoLostMessages(int numMessages, Service service) throws Exception
@@ -232,11 +233,14 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         else
         {
             MuleContext localMuleContext = new DefaultMuleContextBuilder().buildMuleContext();
+
+            QueuePersistenceObjectStore<Serializable> store =
+                new QueuePersistenceObjectStore<Serializable>(localMuleContext);
+
             QueueManager queueManager = new TransactionalQueueManager();
-            FilePersistenceStrategy persistenceStrategy = new FilePersistenceStrategy();
-            persistenceStrategy.setMuleContext(localMuleContext);
-            queueManager.setPersistenceStrategy(persistenceStrategy);
+            queueManager.setPersistentObjectStore(store);
             queueManager.start();
+
             int size = queueManager.getQueueSession().getQueue(name).size();
             queueManager.stop();
             localMuleContext = null;

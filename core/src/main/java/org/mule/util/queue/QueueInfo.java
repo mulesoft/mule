@@ -10,6 +10,7 @@
 
 package org.mule.util.queue;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
 /**
@@ -17,7 +18,7 @@ import java.util.LinkedList;
  */
 public class QueueInfo
 {
-    protected LinkedList<Object> list;
+    protected LinkedList<Serializable> list;
     protected String name;
     protected QueueConfiguration config;
 
@@ -38,7 +39,7 @@ public class QueueInfo
         return name.hashCode();
     }
 
-    public void putNow(Object o)
+    public void putNow(Serializable o)
     {
         synchronized (list)
         {
@@ -47,7 +48,7 @@ public class QueueInfo
         }
     }
 
-    public boolean offer(Object o, int room, long timeout) throws InterruptedException
+    public boolean offer(Serializable o, int room, long timeout) throws InterruptedException
     {
         if (Thread.interrupted())
         {
@@ -82,7 +83,7 @@ public class QueueInfo
         }
     }
 
-    public Object poll(long timeout) throws InterruptedException
+    public Serializable poll(long timeout) throws InterruptedException
     {
         if (Thread.interrupted())
         {
@@ -101,13 +102,14 @@ public class QueueInfo
                 list.wait(l2);
                 l2 = timeout - (System.currentTimeMillis() - l1);
             }
-            Object o = list.removeFirst();
+
+            Serializable o = list.removeFirst();
             list.notifyAll();
             return o;
         }
     }
 
-    public Object peek() throws InterruptedException
+    public Serializable peek() throws InterruptedException
     {
         if (Thread.interrupted())
         {
@@ -126,7 +128,7 @@ public class QueueInfo
         }
     }
 
-    public void untake(Object item) throws InterruptedException
+    public void untake(Serializable item) throws InterruptedException
     {
         if (Thread.interrupted())
         {
@@ -137,5 +139,4 @@ public class QueueInfo
             list.addFirst(item);
         }
     }
-
 }

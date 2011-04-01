@@ -14,6 +14,8 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.store.ObjectStore;
 import org.mule.tck.AbstractMuleTestCase;
 
+import java.io.Serializable;
+
 /**
  * Test the configuration of an ObjectStore for the MuleContext.
  */
@@ -26,14 +28,14 @@ public class ObjectStoreConfigTestCase extends AbstractMuleTestCase
         assertTrue(store instanceof SimpleMemoryObjectStore);
     }
 
-    // TODO BL-405 re-enable this test once we have a file based ListableObjectStore impl
-    public void _testNonDefault() throws Exception
+    public void testNonDefault() throws Exception
     {
-        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE, new TextFileObjectStore());
+        ObjectStore<?> store = new QueuePersistenceObjectStore<Serializable>();
+        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE, store);
 
-        ObjectStore<?> store = muleContext.getObjectStore();
+        store = muleContext.getObjectStore();
         assertNotNull(store);
-        assertTrue(store instanceof TextFileObjectStore);
+        assertTrue(store instanceof QueuePersistenceObjectStore);
     }
 }
 

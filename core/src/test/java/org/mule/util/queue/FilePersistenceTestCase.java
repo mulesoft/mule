@@ -10,15 +10,21 @@
 
 package org.mule.util.queue;
 
+import org.mule.api.store.ListableObjectStore;
+import org.mule.util.store.QueuePersistenceObjectStore;
+
+import java.io.Serializable;
+
 public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTestCase
 {
     @Override
     protected TransactionalQueueManager createQueueManager() throws Exception
     {
+        ListableObjectStore<Serializable> store = new QueuePersistenceObjectStore<Serializable>(muleContext);
+
         TransactionalQueueManager mgr = new TransactionalQueueManager();
-        FilePersistenceStrategy ps = new FilePersistenceStrategy();
-        ps.setMuleContext(muleContext);
-        mgr.setPersistenceStrategy(ps);
+        mgr.setPersistentObjectStore(store);
+
         mgr.setDefaultQueueConfiguration(new QueueConfiguration(true));
         return mgr;
     }

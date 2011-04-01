@@ -14,6 +14,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.xa.AbstractResourceManager;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import org.apache.commons.logging.Log;
@@ -48,7 +49,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         assertEquals("Queue size", 0, q.size());
 
         purgeQueue(q);
-        
+
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
     }
 
@@ -94,10 +95,10 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         assertTrue(t1 - t0 > 100);
 
         purgeQueue(q);
-        
+
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
     }
-    
+
     public void testPutTakeUntake() throws Exception
     {
         final TransactionalQueueManager mgr = createQueueManager();
@@ -132,7 +133,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         QueueSession s = mgr.getQueueSession();
         Queue q = s.getQueue("queue1");
         assertEquals("Queue size", 0, q.size());
-        Object o = q.take();
+        Serializable o = q.take();
         long t1 = System.currentTimeMillis();
         t.join();
         assertNotNull(o);
@@ -148,9 +149,9 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         Object o2 = q.take();
         assertEquals("Queue content", "String1", o2);
         assertEquals("Queue size", 1, q.size());
-        
+
         purgeQueue(q);
-        
+
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
 
     }
@@ -202,7 +203,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         assertTrue(t1 - t0 > 100);
 
         purgeQueue(q);
-        
+
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
     }
 
@@ -213,9 +214,9 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
         final Latch latch = new Latch();
 
-        final Object object1 = "string1";
-        final Object object2 = "string2";
-        
+        final Serializable object1 = "string1";
+        final Serializable object2 = "string2";
+
         Thread t = new Thread()
         {
             @Override
@@ -228,7 +229,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
                     QueueSession s = mgr.getQueueSession();
                     Queue q = s.getQueue("queue1");
                     assertEquals("Queue size", 0, q.size());
-                    
+
                     s.begin();
                     q.put(object1);
                     q.put(object2);
@@ -239,7 +240,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
                     s.begin();
                     q.untake(object1);
                     s.commit();
-                    
+
                     s.begin();
                     q.untake(object2);
                     s.rollback();
@@ -265,7 +266,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         assertTrue(t1 - t0 > 100);
 
         purgeQueue(q);
-        
+
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
     }
 
@@ -298,21 +299,26 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             }
         };
         t.start();
+
         QueueSession s = mgr.getQueueSession();
         Queue q = s.getQueue("queue1");
         assertEquals("Queue size", 0, q.size());
         q.put("String1");
         q.put("String2");
+
         latch.countDown();
+
         long t0 = System.currentTimeMillis();
         q.put("String3");
         long t1 = System.currentTimeMillis();
+
         t.join();
+
         assertEquals("Queue size", 2, q.size());
         assertTrue(t1 - t0 > 100);
 
         purgeQueue(q);
-        
+
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
     }
 
@@ -346,7 +352,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
                 QueueSession s = mgr.getQueueSession();
                 Queue q = s.getQueue("queue1");
                 assertEquals("Queue size", 1, q.size());
-                
+
                 purgeQueue(q);
             }
             finally
@@ -550,7 +556,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             assertEquals("Queue size", 0, q1s2.size());
             assertEquals("Queue size", 1, q2s1.size());
             assertEquals("Queue size", 1, q2s2.size());
-            
+
             purgeQueue(q1s1);
             purgeQueue(q1s2);
             purgeQueue(q2s1);
@@ -564,7 +570,6 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
     public void testPoll() throws Exception
     {
-
         final TransactionalQueueManager mgr = createQueueManager();
 
         try
@@ -607,7 +612,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             o = q.poll(1000);
             assertEquals("Queue size", q.size(), 0);
             assertEquals("Queue content", "String1", o);
-        
+
             purgeQueue(q);
         }
         finally
@@ -640,7 +645,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             o = q.poll(1000);
             assertEquals("Queue size", 0, q.size());
             assertEquals("Queue content", "String1", o);
-            
+
             purgeQueue(q);
         }
         finally
@@ -686,7 +691,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             }).start();
             assertTrue(q.offer("String2", 1000));
             assertEquals("Queue size", 1, q.size());
-            
+
             purgeQueue(q);
         }
         finally
@@ -725,7 +730,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             long t1 = System.currentTimeMillis();
 
             logger.info("Time: " + (t1 - t0) + " ms");
-            
+
             purgeQueue(q);
         }
         finally
@@ -733,10 +738,10 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
         }
     }
-    
+
     protected void purgeQueue(Queue queue) throws InterruptedException
     {
-        while(queue.size() > 0)
+        while (queue.size() > 0)
         {
             queue.poll(1000);
         }
@@ -805,5 +810,5 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         }
 
     }
-    
+
 }

@@ -12,6 +12,9 @@ package org.mule.util.queue;
 
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
+import org.mule.api.store.ListableObjectStore;
+
+import java.io.Serializable;
 
 /**
  * A Queue manager is responsible for managing one or more Queue resources and
@@ -26,26 +29,8 @@ public interface QueueManager extends Startable, Stoppable
     void setQueueConfiguration(String queueName, QueueConfiguration config);
 
     /**
-     * @return Returns the persistenceStrategy.
+     * This is the {@link ListableObjectStore} that is used when the queue profile is configured to
+     * be persistent.
      */
-    QueuePersistenceStrategy getPersistenceStrategy();
-
-    /**
-     * @param persistenceStrategy The persistenceStrategy to set.
-     */
-    void setPersistenceStrategy(QueuePersistenceStrategy persistenceStrategy);
-
-    /**
-     * @deprecated QueueManager should not be able to choose different persistence strategies,
-     * it should use whatever is set via #setPersistenceStrategy
-     */
-    @Deprecated
-    QueuePersistenceStrategy getMemoryPersistenceStrategy();
-
-    /**
-     * @deprecated QueueManager should not be able to choose different persistence strategies,
-     * it should use whatever is set via #setPersistenceStrategy
-     */
-    @Deprecated
-    void setMemoryPersistenceStrategy(QueuePersistenceStrategy memoryPersistenceStrategy);
+    void setPersistentObjectStore(ListableObjectStore<Serializable> store);
 }

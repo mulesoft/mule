@@ -10,10 +10,11 @@
 
 package org.mule.util.queue;
 
+import org.mule.api.store.ObjectStoreException;
 import org.mule.util.xa.AbstractXAResourceManager;
 import org.mule.util.xa.DefaultXASession;
 
-import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * A Queue session that is used to manage the transaction context of a Queue
@@ -38,7 +39,6 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
 
     protected class QueueImpl implements Queue
     {
-
         protected QueueInfo queue;
 
         public QueueImpl(QueueInfo queue)
@@ -46,23 +46,22 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             this.queue = queue;
         }
 
-        public void put(Object item) throws InterruptedException
+        public void put(Serializable item) throws InterruptedException
         {
             offer(item, Long.MAX_VALUE);
         }
 
-        public boolean offer(Object item, long timeout) throws InterruptedException
+        public boolean offer(Serializable item, long timeout) throws InterruptedException
         {
             if (localContext != null)
             {
-                return ((QueueTransactionContext) localContext).offer(queue, item,
-                    timeout);
+                return ((QueueTransactionContext) localContext).offer(queue, item, timeout);
             }
             else
             {
                 try
                 {
-                    Object id = queueManager.doStore(queue, item);
+                    Serializable id = queueManager.doStore(queue, item);
                     try
                     {
                         if (!queue.offer(id, 0, timeout))
@@ -81,19 +80,19 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
                         throw e;
                     }
                 }
-                catch (IOException e)
+                catch (ObjectStoreException e)
                 {
                     throw new RuntimeException(e);
                 }
             }
         }
 
-        public Object take() throws InterruptedException
+        public Serializable take() throws InterruptedException
         {
             return poll(Long.MAX_VALUE);
         }
 
-        public void untake(Object item) throws InterruptedException
+        public void untake(Serializable item) throws InterruptedException
         {
             if (localContext != null)
             {
@@ -103,31 +102,30 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             {
                 try
                 {
-                    Object id = queueManager.doStore(queue, item);
+                    Serializable id = queueManager.doStore(queue, item);
                     queue.untake(id);
                 }
-                catch (IOException e)
+                catch (ObjectStoreException e)
                 {
                     throw new RuntimeException(e);
                 }
             }
         }
 
-        public Object poll(long timeout) throws InterruptedException
+        public Serializable poll(long timeout) throws InterruptedException
         {
             try
             {
                 if (localContext != null)
                 {
-                    return ((QueueTransactionContext) localContext).poll(queue,
-                                                                                                   timeout);
+                    return ((QueueTransactionContext) localContext).poll(queue, timeout);
                 }
                 else
                 {
-                    Object id = queue.poll(timeout);
+                    Serializable id = queue.poll(timeout);
                     if (id != null)
                     {
-                        Object item = queueManager.doLoad(queue, id);
+                        Serializable item = queueManager.doLoad(queue, id);
                         queueManager.doRemove(queue, id);
                         return item;
                     }
@@ -143,14 +141,13 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
                 // if stopping, ignore
                 return null;
             }
-            catch (IOException e)
+            catch (ObjectStoreException e)
             {
                 throw new RuntimeException(e);
             }
-
         }
 
-        public Object peek() throws InterruptedException
+        public Serializable peek() throws InterruptedException
         {
             try
             {
@@ -160,7 +157,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
                 }
                 else
                 {
-                    Object id = queue.peek();
+                    Serializable id = queue.peek();
                     if (id != null)
                     {
                         return queueManager.doLoad(queue, id);
@@ -168,7 +165,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
                     return null;
                 }
             }
-            catch (IOException e)
+            catch (ObjectStoreException e)
             {
                 throw new RuntimeException(e);
             }
@@ -190,6 +187,5 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         {
             return queue.getName();
         }
-
     }
 }

@@ -12,13 +12,17 @@ package org.mule.util.queue;
 
 import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
-import org.mule.util.queue.QueuePersistenceStrategy.Holder;
+import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.ObjectStore;
+import org.mule.api.store.ObjectStoreException;
+import org.mule.util.UUID;
+import org.mule.util.store.SimpleMemoryObjectStore;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;
 import org.mule.util.xa.ResourceManagerException;
 import org.mule.util.xa.ResourceManagerSystemException;
 
-import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,24 +38,13 @@ import javax.transaction.xa.XAResource;
  */
 public class TransactionalQueueManager extends AbstractXAResourceManager implements QueueManager, MuleContextAware
 {
-
     private Map<String, QueueInfo> queues = new HashMap<String, QueueInfo>();
 
-    private QueuePersistenceStrategy memoryPersistenceStrategy = new MemoryPersistenceStrategy();
-    private QueuePersistenceStrategy persistenceStrategy;
+    private ObjectStore<Serializable> memoryObjectStore = new SimpleMemoryObjectStore<Serializable>();
+    private ListableObjectStore<Serializable> persistentObjectStore;
 
     private QueueConfiguration defaultQueueConfiguration = new QueueConfiguration(false);
     private MuleContext muleContext;
-
-    public void setMuleContext(MuleContext context)
-    {
-        this.muleContext = context;
-    }
-
-    public MuleContext getMuleContext()
-    {
-        return muleContext;
-    }
 
     public synchronized QueueSession getQueueSession()
     {
@@ -75,7 +68,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         {
             q = new QueueInfo();
             q.name = name;
-            q.list = new LinkedList<Object>();
+            q.list = new LinkedList<Serializable>();
             q.config = defaultQueueConfiguration;
 
             queues.put(name, q);
@@ -86,13 +79,13 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     @Override
     protected void doStart() throws ResourceManagerSystemException
     {
-        if (persistenceStrategy != null)
+        if (persistentObjectStore != null)
         {
             try
             {
-                persistenceStrategy.open();
+                persistentObjectStore.open();
             }
-            catch (IOException e)
+            catch (ObjectStoreException e)
             {
                 throw new ResourceManagerSystemException(e);
             }
@@ -104,16 +97,17 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     {
         try
         {
-            if (persistenceStrategy != null)
+            if (persistentObjectStore != null)
             {
-                persistenceStrategy.close();
+                persistentObjectStore.close();
             }
         }
-        catch (IOException e)
+        catch (ObjectStoreException e)
         {
-            // TODO MULE-863: What should we really do?
+            // TODO BL-405 what to do with this exception? Looking at the call graph of this method it seems that it's never called from any production code (i.e. when shutting down MuleContext)
             logger.error("Error closing persistent store", e);
         }
+
         // Clear queues on shutdown to avoid duplicate entries on warm restarts (MULE-3678)
         synchronized (this)
         {
@@ -125,15 +119,15 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     @Override
     protected void recover() throws ResourceManagerSystemException
     {
-        if (persistenceStrategy != null)
+        if (persistentObjectStore != null)
         {
             try
             {
-                List msgs = persistenceStrategy.restore();
-                for (Object msg : msgs)
+                List<Serializable> keys = persistentObjectStore.allKeys();
+                for (Serializable key : keys)
                 {
-                    Holder h = (Holder) msg;
-                    getQueue(h.getQueue()).putNow(h.getId());
+                    QueueKey queueKey = (QueueKey) key;
+                    getQueue(queueKey.queueName).putNow(queueKey.id);
                 }
             }
             catch (Exception e)
@@ -169,15 +163,15 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         {
             if (ctx.added != null)
             {
-                for (Map.Entry<QueueInfo, List<Object>> entry : ctx.added.entrySet())
+                for (Map.Entry<QueueInfo, List<Serializable>> entry : ctx.added.entrySet())
                 {
                     QueueInfo queue = entry.getKey();
-                    List<Object> queueAdded = entry.getValue();
+                    List<Serializable> queueAdded = entry.getValue();
                     if (queueAdded != null && queueAdded.size() > 0)
                     {
-                        for (Object object : queueAdded)
+                        for (Serializable object : queueAdded)
                         {
-                            Object id = doStore(queue, object);
+                            Serializable id = doStore(queue, object);
                             queue.putNow(id);
                         }
                     }
@@ -185,13 +179,13 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
             }
             if (ctx.removed != null)
             {
-                for (Map.Entry<QueueInfo, List<Object>> entry : ctx.removed.entrySet())
+                for (Map.Entry<QueueInfo, List<Serializable>> entry : ctx.removed.entrySet())
                 {
                     QueueInfo queue = entry.getKey();
-                    List<Object> queueRemoved = entry.getValue();
+                    List<Serializable> queueRemoved = entry.getValue();
                     if (queueRemoved != null && queueRemoved.size() > 0)
                     {
-                        for (Object id : queueRemoved)
+                        for (Serializable id : queueRemoved)
                         {
                             doRemove(queue, id);
                         }
@@ -210,27 +204,30 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         }
     }
 
-    protected Object doStore(QueueInfo queue, Object object) throws IOException
+    protected Serializable doStore(QueueInfo queue, Serializable object) throws ObjectStoreException
     {
-        QueuePersistenceStrategy ps = (queue.config.persistent)
-                        ? persistenceStrategy : memoryPersistenceStrategy;
-        Object id = ps.store(queue.name, object);
+        ObjectStore<Serializable> store = queue.config.persistent ? persistentObjectStore : memoryObjectStore;
+
+        String id = UUID.getUUID();
+        Serializable key = new QueueKey(queue.name, id);
+        store.store(key, object);
         return id;
     }
 
-    protected void doRemove(QueueInfo queue, Object id) throws IOException
+    protected void doRemove(QueueInfo queue, Serializable id) throws ObjectStoreException
     {
-        QueuePersistenceStrategy ps = (queue.config.persistent)
-                        ? persistenceStrategy : memoryPersistenceStrategy;
-        ps.remove(queue.name, id);
+        ObjectStore<Serializable> store = queue.config.persistent ? persistentObjectStore : memoryObjectStore;
+
+        Serializable key = new QueueKey(queue.name, id);
+        store.remove(key);
     }
 
-    protected Object doLoad(QueueInfo queue, Object id) throws IOException
+    protected Serializable doLoad(QueueInfo queue, Serializable id) throws ObjectStoreException
     {
-        QueuePersistenceStrategy ps = (queue.config.persistent)
-                        ? persistenceStrategy : memoryPersistenceStrategy;
-        Object obj = ps.load(queue.name, id);
-        return obj;
+        ObjectStore<Serializable> store = queue.config.persistent ? persistentObjectStore : memoryObjectStore;
+
+        Serializable key = new QueueKey(queue.name, id);
+        return store.retrieve(key);
     }
 
     @Override
@@ -239,13 +236,13 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         QueueTransactionContext ctx = (QueueTransactionContext) context;
         if (ctx.removed != null)
         {
-            for (Map.Entry<QueueInfo, List<Object>> entry : ctx.removed.entrySet())
+            for (Map.Entry<QueueInfo, List<Serializable>> entry : ctx.removed.entrySet())
             {
                 QueueInfo queue = entry.getKey();
-                List<Object> queueRemoved = entry.getValue();
+                List<Serializable> queueRemoved = entry.getValue();
                 if (queueRemoved != null && queueRemoved.size() > 0)
                 {
-                    for (Object id : queueRemoved)
+                    for (Serializable id : queueRemoved)
                     {
                         queue.putNow(id);
                     }
@@ -256,40 +253,18 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         ctx.removed = null;
     }
 
-    public QueuePersistenceStrategy getPersistenceStrategy()
+    public void setPersistentObjectStore(ListableObjectStore<Serializable> store)
     {
-        return persistenceStrategy;
+        this.persistentObjectStore = store;
     }
 
-    public void setPersistenceStrategy(QueuePersistenceStrategy persistenceStrategy)
+    public void setMuleContext(MuleContext context)
     {
-        if (operationMode != OPERATION_MODE_STOPPED)
-        {
-            throw new IllegalStateException();
-        }
-        this.persistenceStrategy = persistenceStrategy;
+        this.muleContext = context;
     }
 
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public QueuePersistenceStrategy getMemoryPersistenceStrategy()
+    public MuleContext getMuleContext()
     {
-        return memoryPersistenceStrategy;
+        return muleContext;
     }
-
-    /**
-     * @deprecated
-     */
-    @Deprecated
-    public void setMemoryPersistenceStrategy(QueuePersistenceStrategy memoryPersistenceStrategy)
-    {
-        if (operationMode != OPERATION_MODE_STOPPED)
-        {
-            throw new IllegalStateException();
-        }
-        this.memoryPersistenceStrategy = memoryPersistenceStrategy;
-    }
-
 }
