@@ -80,7 +80,10 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
     {
         try
         {
-            getObjectStore().retrieve("this_key_does_not_exist");
+            // nothing was stored in the OS yet so using any key must trigger the ObjectDoesNotExistException
+            Serializable key = createKey();
+
+            getObjectStore().retrieve(key);
             fail("retrieve() with unbound key must throw ObjectDoesNotExistException");
         }
         catch (ObjectDoesNotExistException odne)
@@ -93,7 +96,10 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
     {
         try
         {
-            getObjectStore().remove("this_key_does_not_exist");
+            // nothing was stored in the OS yet so using any key must trigger the ObjectDoesNotExistException
+            Serializable key = createKey();
+
+            getObjectStore().remove(key);
             fail("remove() with unbound key must throw ObjectDoesNotExistException");
         }
         catch (ObjectDoesNotExistException odnee)
@@ -104,7 +110,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
 
     public void testStoreWithExistingKey() throws ObjectStoreException
     {
-        String key = "theKey";
+        Serializable key = createKey();
         Serializable value = getStorableValue();
         ObjectStore<Serializable> objectStore = getObjectStore();
 
@@ -123,7 +129,12 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
         }
     }
 
-    public abstract ObjectStore<Serializable> getObjectStore();
+    protected Serializable createKey()
+    {
+        return "theKey";
+    }
+
+    public abstract ObjectStore<Serializable> getObjectStore() throws ObjectStoreException;
 
     public abstract Serializable getStorableValue();
 }

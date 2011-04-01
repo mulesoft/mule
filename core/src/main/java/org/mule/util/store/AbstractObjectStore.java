@@ -18,6 +18,9 @@ import org.mule.config.i18n.CoreMessages;
 
 import java.io.Serializable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * This is an abstract superclass for {@link ObjectStore} implementations that conforms to the
  * contract defined in the interface's javadocs. Subclasses only need to implement storing the
@@ -25,6 +28,8 @@ import java.io.Serializable;
  */
 public abstract class AbstractObjectStore<T extends Serializable> implements ObjectStore<T>
 {
+    protected final Log logger = LogFactory.getLog(getClass());
+
     public boolean contains(Serializable key) throws ObjectStoreException
     {
         if (key == null)
