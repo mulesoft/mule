@@ -12,9 +12,9 @@ package org.mule.test.integration.routing;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.RoutingNotificationListener;
-import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.module.client.MuleClient;
+import org.mule.routing.correlation.CorrelationTimeoutException;
 import org.mule.tck.FunctionalTestCase;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
@@ -36,7 +36,7 @@ public class AsyncReplyTimeoutFailTestCase extends FunctionalTestCase
         muleContext.registerListener(new RoutingNotificationListener<RoutingNotification>() {
             public void onNotification(RoutingNotification notification)
             {
-                if (notification.getAction() == RoutingNotification.ASYNC_REPLY_TIMEOUT)
+                if (notification.getAction() == RoutingNotification.CORRELATION_TIMEOUT)
                 {
                     latch.countDown();
                 }
@@ -48,7 +48,7 @@ public class AsyncReplyTimeoutFailTestCase extends FunctionalTestCase
         MuleMessage result = client.send("vm://distributor.queue", message, null);
         assertNotNull(result);
         assertNotNull(result.getExceptionPayload());
-        assertTrue(result.getExceptionPayload().getException() instanceof ResponseTimeoutException);
+        assertTrue(result.getExceptionPayload().getException() instanceof CorrelationTimeoutException);
 
         assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
     }
