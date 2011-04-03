@@ -67,7 +67,8 @@ public abstract class AbstractObjectStore<T extends Serializable> implements Obj
 
         if (contains(key) == false)
         {
-            throw new ObjectDoesNotExistException();
+            String message = "Key does not exist: " + key;
+            throw new ObjectDoesNotExistException(CoreMessages.createStaticMessage(message));
         }
 
         return doRetrieve(key);

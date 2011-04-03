@@ -27,6 +27,20 @@ public class QueueKey implements Serializable
     }
 
     @Override
+    public String toString()
+    {
+        StringBuilder buf = new StringBuilder(128);
+        buf.append(getClass().getSimpleName());
+        buf.append("@");
+        buf.append(System.identityHashCode(this));
+        buf.append(" queueName=");
+        buf.append(queueName);
+        buf.append(" id=");
+        buf.append(id);
+        return buf.toString();
+    }
+
+    @Override
     public int hashCode()
     {
         final int prime = 31;
