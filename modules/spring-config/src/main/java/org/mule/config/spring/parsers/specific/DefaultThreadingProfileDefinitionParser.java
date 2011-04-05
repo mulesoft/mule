@@ -18,7 +18,6 @@ import org.mule.config.spring.parsers.processors.NameAttribute;
 /**
  * This parser is responsible for processing the <code><threading-profile><code> configuration elements.
  */
-// shouldn't this extend MuleOrphanDefinitionParser?
 public class DefaultThreadingProfileDefinitionParser extends OrphanDefinitionParser
 {
 
