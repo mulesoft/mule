@@ -253,6 +253,11 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         ctx.removed = null;
     }
 
+    public ListableObjectStore<Serializable> getPersistentObjectStore()
+    {
+        return this.persistentObjectStore;
+    }
+
     public void setPersistentObjectStore(ListableObjectStore<Serializable> store)
     {
         this.persistentObjectStore = store;
