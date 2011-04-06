@@ -307,7 +307,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
                 Exception ex = faultMsg.getContent(Exception.class);
                 if (ex != null)
                 {
-                    ExceptionPayload exceptionPayload = new DefaultExceptionPayload(new Exception(""));
+                    ExceptionPayload exceptionPayload = new DefaultExceptionPayload(ex);
                     event.getMessage().setExceptionPayload(exceptionPayload);
                     muleResMsg.setOutboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 500);
                 }
