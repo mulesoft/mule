@@ -125,7 +125,7 @@
         <jbossTsVersion>4.2.3-SP5</jbossTsVersion>
         <jbpmVersion>4.4</jbpmVersion>
         <jcrVersion>1.0</jcrVersion>
-        <jdomVersion>1.0</jdomVersion>
+        <jdomVersion>1.1.1</jdomVersion>
         <jettyVersion>6.1.26</jettyVersion>
         <jettyServletApiVersion>2.5-20081211</jettyServletApiVersion>
         <jschVersion>0.1.44</jschVersion>
@@ -897,9 +897,10 @@
                 <version>${antVersion}</version>
             </dependency>
             <dependency>
+                <!-- this really should be the org.jdom groupId but all the other modules use the jdom groupId -->
                 <groupId>jdom</groupId>
                 <artifactId>jdom</artifactId>
-                <version>${jdomVersion}-osgi</version>
+                <version>${jdomVersion}</version>
             </dependency>
             <dependency>
                 <groupId>dom4j</groupId>
