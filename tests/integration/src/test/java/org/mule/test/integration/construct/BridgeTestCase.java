@@ -10,6 +10,9 @@
 
 package org.mule.test.integration.construct;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleEventContext;
@@ -24,84 +27,75 @@ import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
-public class BridgeTestCase extends FunctionalTestCase
-{
+public class BridgeTestCase extends FunctionalTestCase {
     private MuleClient muleClient;
 
     @Override
-    protected void doSetUp() throws Exception
-    {
+    protected void doSetUp() throws Exception {
         super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         muleClient = new MuleClient(muleContext);
     }
 
     @Override
-    protected String getConfigResources()
-    {
+    protected String getConfigResources() {
         return "org/mule/test/integration/construct/bridge-config.xml";
     }
 
-    public void testSynchronous() throws Exception
-    {
+    public void testSynchronous() throws Exception {
         doTestMathsService("vm://synchronous-bridge.in");
     }
 
-    public void testAsynchronous() throws Exception
-    {
+    public void testAsynchronous() throws Exception {
         final MuleMessage result = muleClient.send("vm://asynchronous-bridge.in", "foobar", null);
         assertEquals(NullPayload.getInstance(), result.getPayload());
     }
 
-    public void testTransformers() throws Exception
-    {
+    public void testTransformers() throws Exception {
         doTestStringMassager("vm://transforming-bridge.in");
     }
 
-    public void testEndpointReferences() throws Exception
-    {
+    public void testEndpointReferences() throws Exception {
         doTestMathsService("vm://endpoint-ref-bridge.in");
     }
 
-    public void testChildEndpoints() throws Exception
-    {
+    public void testChildEndpoints() throws Exception {
         doTestMathsService("vm://child-endpoint-bridge.in");
     }
 
-    public void testExceptionHandler() throws Exception
-    {
+    public void testExceptionHandler() throws Exception {
         doTestMathsService("vm://exception-bridge.in");
     }
 
-    public void testVmTransacted() throws Exception
-    {
+    public void testVmTransacted() throws Exception {
         doTestMathsService("vm://transacted-bridge.in");
     }
 
-    public void testInheritance() throws Exception
-    {
+    public void testInheritance() throws Exception {
         doTestMathsService("vm://concrete-child-bridge.in");
     }
 
-    public void testHeterogeneousTransports() throws Exception
-    {
+    public void testHeterogeneousTransports() throws Exception {
         doJmsBasedTest("jms://myDlq", "dlq-file-picker");
     }
 
-    public void testJmsTransactions() throws Exception
-    {
+    public void testJmsTransactions() throws Exception {
         doJmsBasedTest("jms://myQueue", "topic-listener");
     }
 
-    private void doJmsBasedTest(String jmsDestinationUri, String ftcName)
-        throws Exception, MuleException, InterruptedException
-    {
+    public void testDynamicEndpoint() throws Exception {
+        doTestMathsService("vm://child-dynamic-endpoint-bridge.in", Collections.singletonMap("bridgeTarget", "maths-service.in"));
+    }
+
+    public void testDynamicAddress() throws Exception {
+        doTestMathsService("vm://address-dynamic-endpoint-bridge.in", Collections.singletonMap("bridgeTarget", "maths-service.in"));
+    }
+
+    private void doJmsBasedTest(final String jmsDestinationUri, final String ftcName) throws Exception, MuleException, InterruptedException {
         final FunctionalTestComponent ftc = getFunctionalTestComponent(ftcName);
         final Latch latch = new Latch();
-        ftc.setEventCallback(new EventCallback()
-        {
-            public void eventReceived(MuleEventContext context, Object component) throws Exception
-            {
+        ftc.setEventCallback(new EventCallback() {
+            public void eventReceived(final MuleEventContext context, final Object component) throws Exception {
                 latch.countDown();
             }
         });
@@ -113,25 +107,25 @@ public class BridgeTestCase extends FunctionalTestCase
         assertEquals(payload, byteArrayOrStringtoString(ftc.getReceivedMessage(1)));
     }
 
-    private void doTestMathsService(String url) throws MuleException
-    {
+    private void doTestMathsService(final String url) throws MuleException {
+        doTestMathsService(url, null);
+    }
+
+    private void doTestMathsService(final String url, final Map<?, ?> messageProperties) throws MuleException {
         final int a = RandomUtils.nextInt(100);
         final int b = RandomUtils.nextInt(100);
-        final int result = (Integer) muleClient.send(url, new int[]{a, b}, null).getPayload();
+        final int result = (Integer) muleClient.send(url, new int[] { a, b }, messageProperties).getPayload();
         assertEquals(a + b, result);
     }
 
-    private void doTestStringMassager(String url) throws Exception, MuleException
-    {
+    private void doTestStringMassager(final String url) throws Exception, MuleException {
         final String payload = RandomStringUtils.randomAlphabetic(10);
         final String result = muleClient.send(url, payload.getBytes(), null).getPayloadAsString();
         assertEquals(payload + "barbaz", result);
     }
 
-    private String byteArrayOrStringtoString(Object o)
-    {
-        if (o instanceof String)
-        {
+    private String byteArrayOrStringtoString(final Object o) {
+        if (o instanceof String) {
             return (String) o;
         }
 

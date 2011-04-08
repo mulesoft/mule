@@ -75,6 +75,17 @@
           inboundAddress="jms://myDlq"
           outboundAddress="file://./test?outputPattern=#[function:uuid].dl" />
 
+  <pattern:bridge name="child-dynamic-endpoint-bridge">
+    <vm:inbound-endpoint path="child-dynamic-endpoint-bridge.in"
+                         exchange-pattern="request-response" />
+    <vm:outbound-endpoint path="#[header:INBOUND:bridgeTarget]"
+                          exchange-pattern="request-response" />
+  </pattern:bridge>
+  
+  <pattern:bridge name="address-dynamic-endpoint-bridge"
+          inboundAddress="vm://address-dynamic-endpoint-bridge.in"
+          outboundAddress="vm://#[header:INBOUND:bridgeTarget]" />
+
   <!--
         Test support
   -->
