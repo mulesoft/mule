@@ -35,26 +35,9 @@
                 <artifactId>maven-mule-plugin</artifactId>
                 <version>1.4</version>
                 <extensions>true</extensions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <id>package-example</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${project.build.directory}/${build.finalName}.zip"
-                                    todir="../../apps" overwrite="true"/>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
+                <configuration>
+                    <copyToAppsDirectory>true</copyToAppsDirectory>
+                </configuration>
             </plugin>
         </plugins>
     </build>

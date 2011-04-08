@@ -133,28 +133,9 @@
                 <artifactId>maven-mule-plugin</artifactId>
                 <version>1.6</version>
                 <extensions>true</extensions>
-            </plugin>
-            <!-- "mvn install" will copy the application to the $MULE_HOME/apps directory,
-                overwriting the previous one. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <tasks>
-                                <copy file="${project.build.directory}/${build.finalName}.zip"
-                                    todir="../../apps" overwrite="true"/>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
+                <configuration>
+                    <copyToAppsDirectory>true</copyToAppsDirectory>
+                </configuration>
             </plugin>
         </plugins>
     </build>
