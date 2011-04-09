@@ -16,13 +16,14 @@ import org.mule.config.i18n.CoreMessages;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObjectStore<T> implements ListableObjectStore<T>
 {
-    private Map<Serializable, T> map = new HashMap<Serializable, T>();
+    private Map<Serializable, T> map = Collections.synchronizedMap(new HashMap<Serializable, T>());
 
     @Override
     protected boolean doContains(Serializable key)
