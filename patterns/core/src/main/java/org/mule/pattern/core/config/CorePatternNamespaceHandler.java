@@ -15,6 +15,7 @@ import org.mule.config.spring.parsers.specific.BridgeDefinitionParser;
 import org.mule.config.spring.parsers.specific.SimpleServiceDefinitionParser;
 import org.mule.config.spring.parsers.specific.ValidatorDefinitionParser;
 import org.mule.module.ws.config.spring.parsers.specific.WSProxyDefinitionParser;
+import org.mule.transport.http.config.spring.parsers.specific.HttpProxyDefinitionParser;
 
 /**
  * Registers a Bean Definition Parser for handling <code><pattern:*></code> elements.
@@ -28,5 +29,6 @@ public class CorePatternNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("simple-service", new SimpleServiceDefinitionParser());
         registerBeanDefinitionParser("bridge", new BridgeDefinitionParser());
         registerBeanDefinitionParser("validator", new ValidatorDefinitionParser());
+        registerBeanDefinitionParser("http-proxy", new HttpProxyDefinitionParser());
     }
 }

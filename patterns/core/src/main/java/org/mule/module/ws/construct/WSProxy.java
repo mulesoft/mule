@@ -10,6 +10,11 @@
 
 package org.mule.module.ws.construct;
 
+import java.net.InetAddress;
+import java.net.URI;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
@@ -28,72 +33,63 @@ import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.interceptor.ProcessingTimeInterceptor;
+import org.mule.pattern.core.construct.CopyInboundToOutboundPropertiesTransformerCallback;
 import org.mule.processor.StopFurtherMessageProcessingMessageProcessor;
 import org.mule.transformer.TransformerTemplate;
-import org.mule.transformer.TransformerTemplate.TransformerCallback;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 
-import java.net.InetAddress;
-import java.net.URI;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
- * This class is implemented to act as a Proxy for a Web Service. It listens for
- * requests on the inbound endpoint and if it encounters the "WSDL" property in the
- * address, it will fetch the WSDL from the original web service and return it back.
- * In case the wsdlFile property is set, when the WSProxyService encounters a request
- * for the wsdl, instead of fetching the WSDL from the original web service, it will
- * return back the file expressed in the property. When a normal SOAP request is
- * encountered, it will forward the call to the web service with no modifications to
- * the SOAP message. The outbound router of this class must include the address of
- * the webservice to be proxied. No need to include the method name as a parameter in
- * the address, since it will be in the SOAP message as well. Furthermore a property
- * named uriWsdl can optionally be set which as the name suggests, indicate the URL
- * of the WSDL for the service. If this property is not set, the address of the WSDL
- * will be assumed to be the value of uriWebservice followed by "?WSDL".
+ * This class is implemented to act as a Proxy for a Web Service. It listens for requests on the inbound endpoint and if
+ * it encounters the "WSDL" property in the address, it will fetch the WSDL from the original web service and return it
+ * back. In case the wsdlFile property is set, when the WSProxyService encounters a request for the wsdl, instead of
+ * fetching the WSDL from the original web service, it will return back the file expressed in the property. When a
+ * normal SOAP request is encountered, it will forward the call to the web service with no modifications to the SOAP
+ * message. The outbound router of this class must include the address of the webservice to be proxied. No need to
+ * include the method name as a parameter in the address, since it will be in the SOAP message as well. Furthermore a
+ * property named uriWsdl can optionally be set which as the name suggests, indicate the URL of the WSDL for the
+ * service. If this property is not set, the address of the WSDL will be assumed to be the value of uriWebservice
+ * followed by "?WSDL".
  */
 public class WSProxy extends AbstractFlowConstruct
 {
     private final AbstractProxyRequestProcessor proxyMessageProcessor;
     private final OutboundEndpoint outboundEndpoint;
 
-    public WSProxy(String name,
-                   MuleContext muleContext,
-                   MessageSource messageSource,
-                   OutboundEndpoint outboundEndpoint) throws MuleException
+    public WSProxy(final String name,
+                   final MuleContext muleContext,
+                   final MessageSource messageSource,
+                   final OutboundEndpoint outboundEndpoint) throws MuleException
     {
         this(name, muleContext, messageSource, outboundEndpoint, new DynamicWsdlProxyRequestProcessor(
             outboundEndpoint));
     }
 
-    public WSProxy(String name,
-                   MuleContext muleContext,
-                   MessageSource messageSource,
-                   OutboundEndpoint outboundEndpoint,
-                   String wsdlContents) throws MuleException
+    public WSProxy(final String name,
+                   final MuleContext muleContext,
+                   final MessageSource messageSource,
+                   final OutboundEndpoint outboundEndpoint,
+                   final String wsdlContents) throws MuleException
     {
         this(name, muleContext, messageSource, outboundEndpoint, new StaticWsdlProxyRequestProcessor(
             wsdlContents));
     }
 
-    public WSProxy(String name,
-                   MuleContext muleContext,
-                   MessageSource messageSource,
-                   OutboundEndpoint outboundEndpoint,
-                   URI wsdlUri) throws MuleException
+    public WSProxy(final String name,
+                   final MuleContext muleContext,
+                   final MessageSource messageSource,
+                   final OutboundEndpoint outboundEndpoint,
+                   final URI wsdlUri) throws MuleException
     {
         this(name, muleContext, messageSource, outboundEndpoint,
             new DynamicWsdlProxyRequestProcessor(wsdlUri));
     }
 
-    private WSProxy(String name,
-                    MuleContext muleContext,
-                    MessageSource messageSource,
-                    OutboundEndpoint outboundEndpoint,
-                    AbstractProxyRequestProcessor proxyMessageProcessor) throws MuleException
+    private WSProxy(final String name,
+                    final MuleContext muleContext,
+                    final MessageSource messageSource,
+                    final OutboundEndpoint outboundEndpoint,
+                    final AbstractProxyRequestProcessor proxyMessageProcessor) throws MuleException
     {
         super(name, muleContext);
 
@@ -119,7 +115,7 @@ public class WSProxy extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
+    protected void configureMessageProcessors(final MessageProcessorChainBuilder builder)
     {
         builder.chain(new ProcessingTimeInterceptor());
         builder.chain(new LoggingInterceptor());
@@ -152,21 +148,6 @@ public class WSProxy extends AbstractFlowConstruct
         }
     }
 
-    private static final class CopyInboundToOutboundPropertiesTransformerCallback
-        implements TransformerCallback
-    {
-        public Object doTransform(MuleMessage message) throws Exception
-        {
-            for (final String inboundPropertyName : message.getInboundPropertyNames())
-            {
-                message.setOutboundProperty(inboundPropertyName,
-                    message.getInboundProperty(inboundPropertyName));
-            }
-
-            return message;
-        }
-    }
-
     private static abstract class AbstractProxyRequestProcessor implements MessageProcessor
     {
         private static final String HTTP_REQUEST = "http.request";
@@ -175,7 +156,7 @@ public class WSProxy extends AbstractFlowConstruct
 
         protected final Log logger = LogFactory.getLog(WSProxy.class);
 
-        public MuleEvent process(MuleEvent event) throws MuleException
+        public MuleEvent process(final MuleEvent event) throws MuleException
         {
             if (isWsdlRequest(event))
             {
@@ -190,7 +171,7 @@ public class WSProxy extends AbstractFlowConstruct
             return event;
         }
 
-        private MuleEvent buildWsdlResult(MuleEvent event) throws MuleException
+        private MuleEvent buildWsdlResult(final MuleEvent event) throws MuleException
         {
             try
             {
@@ -210,7 +191,7 @@ public class WSProxy extends AbstractFlowConstruct
             }
         }
 
-        private boolean isWsdlRequest(MuleEvent event) throws MuleException
+        private boolean isWsdlRequest(final MuleEvent event) throws MuleException
         {
             // retrieve the original HTTP request. This will be used to check if the
             // user asked for the WSDL or a service method.
@@ -237,13 +218,12 @@ public class WSProxy extends AbstractFlowConstruct
         private final String wsdlContents;
 
         /**
-         * Instantiates a request processor that returns a static WSDL contents when
-         * the proxy receives a WSDL request.
-         *
+         * Instantiates a request processor that returns a static WSDL contents when the proxy receives a WSDL request.
+         * 
          * @param wsdlContents the WSDL contents to use.
          * @throws FlowConstructInvalidException
          */
-        StaticWsdlProxyRequestProcessor(String wsdlContents) throws FlowConstructInvalidException
+        StaticWsdlProxyRequestProcessor(final String wsdlContents) throws FlowConstructInvalidException
         {
             if (StringUtils.isBlank(wsdlContents))
             {
@@ -255,7 +235,7 @@ public class WSProxy extends AbstractFlowConstruct
         }
 
         @Override
-        protected String getWsdlContents(MuleEvent event) throws Exception
+        protected String getWsdlContents(final MuleEvent event) throws Exception
         {
             if (logger.isDebugEnabled())
             {
@@ -277,9 +257,9 @@ public class WSProxy extends AbstractFlowConstruct
         private final WsdlAddressProvider wsdlAddressProvider;
 
         /**
-         * Instantiates a request processor that fetches and rewrites addresses of a
-         * remote WSDL when the proxy receives a WSDL request.
-         *
+         * Instantiates a request processor that fetches and rewrites addresses of a remote WSDL when the proxy receives
+         * a WSDL request.
+         * 
          * @param wsdlUri the URI to fetch the WSDL from.
          * @throws FlowConstructInvalidException
          */
@@ -295,7 +275,7 @@ public class WSProxy extends AbstractFlowConstruct
 
             wsdlAddressProvider = new WsdlAddressProvider()
             {
-                public String get(MuleEvent event)
+                public String get(final MuleEvent event)
                 {
                     return wsdlAddress;
                 }
@@ -305,13 +285,13 @@ public class WSProxy extends AbstractFlowConstruct
         }
 
         /**
-         * Instantiates a request processor that fetches and rewrites addresses of a
-         * remote WSDL when the proxy receives a WSDL request.
-         *
+         * Instantiates a request processor that fetches and rewrites addresses of a remote WSDL when the proxy receives
+         * a WSDL request.
+         * 
          * @param outboundEndpoint the endpoint to fetch the WSDL from.
          * @throws FlowConstructInvalidException
          */
-        DynamicWsdlProxyRequestProcessor(OutboundEndpoint outboundEndpoint)
+        DynamicWsdlProxyRequestProcessor(final OutboundEndpoint outboundEndpoint)
             throws FlowConstructInvalidException
         {
             if (outboundEndpoint == null)
@@ -326,10 +306,11 @@ public class WSProxy extends AbstractFlowConstruct
             {
                 wsdlAddressProvider = new WsdlAddressProvider()
                 {
-                    public String get(MuleEvent event)
+                    public String get(final MuleEvent event)
                     {
-                        final String resolvedWsAddress = event.getMuleContext().getExpressionManager().parse(
-                            wsAddress, event.getMessage(), true);
+                        final String resolvedWsAddress = event.getMuleContext()
+                            .getExpressionManager()
+                            .parse(wsAddress, event.getMessage(), true);
 
                         return makeWsdlAddress(resolvedWsAddress);
                     }
@@ -343,7 +324,7 @@ public class WSProxy extends AbstractFlowConstruct
 
                 wsdlAddressProvider = new WsdlAddressProvider()
                 {
-                    public String get(MuleEvent event)
+                    public String get(final MuleEvent event)
                     {
                         return wsdlAddress;
                     }
@@ -353,20 +334,20 @@ public class WSProxy extends AbstractFlowConstruct
             }
         }
 
-        private static String makeWsdlAddress(String wsAddress)
+        private static String makeWsdlAddress(final String wsAddress)
         {
             return StringUtils.substringBefore(wsAddress, "?").concat("?wsdl");
         }
 
         @Override
-        protected String getWsdlContents(MuleEvent event) throws Exception
+        protected String getWsdlContents(final MuleEvent event) throws Exception
         {
             final String wsdlAddress = wsdlAddressProvider.get(event);
             String wsdlString;
 
             final MuleContext muleContext = event.getMuleContext();
-            final InboundEndpoint webServiceEndpoint =
-                muleContext.getEndpointFactory().getInboundEndpoint(wsdlAddress);
+            final InboundEndpoint webServiceEndpoint = muleContext.getEndpointFactory().getInboundEndpoint(
+                wsdlAddress);
 
             if (logger.isDebugEnabled())
             {

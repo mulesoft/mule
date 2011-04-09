@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+  xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+  xmlns:spring="http://www.springframework.org/schema/beans"
+  xmlns:pattern="http://www.mulesoft.org/schema/mule/pattern"
+  xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/pattern http://www.mulesoft.org/schema/mule/pattern/3.2/mule-pattern.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <pattern:http-proxy name="direct-http-proxy"
+                      inboundAddress="http://localhost:8090/bar-appender/0"
+                      outboundAddress="http://localhost:6090/bar-appender" />
+                      
+  <pattern:http-proxy name="child-endpoints-http-proxy">
+    <http:inbound-endpoint address="http://localhost:8090/bar-appender/1" />
+    <http:outbound-endpoint address="http://localhost:6090/bar-appender" />
+  </pattern:http-proxy>
+  
+  <pattern:http-proxy name="exception-http-proxy">
+    <http:inbound-endpoint address="http://localhost:8090/bar-appender/2" />
+    <http:outbound-endpoint address="http://localhost:6090/bar-appender" />
+    <default-exception-strategy />
+  </pattern:http-proxy>
+  
+  <pattern:http-proxy name="transforming-http-proxy"
+                      inboundAddress="http://localhost:8090/bar-appender/3"
+                      transformer-refs="append-in"
+                      outboundAddress="http://localhost:6090/bar-appender"
+                      responseTransformer-refs="append-out" />
+                      
+  <!--
+        Test support
+  -->
+  <object-to-string-transformer name="object-to-string" />
+  <append-string-transformer name="append-out" message="out"/>
+  <append-string-transformer name="append-in" message="in"/>
+  <append-string-transformer name="append-bar" message="bar"/>
+  
+  <flow name="bar-appender">
+    <http:inbound-endpoint address="http://localhost:6090/bar-appender">
+      <transformer ref="object-to-string" />
+      <response>
+        <transformer ref="append-bar" />
+        <message-properties-transformer scope="outbound">
+          <add-message-property key="X-Custom-Header-Response"
+                                value="#[string:#[header:INBOUND:X-Custom-Header]baz]"/>
+        </message-properties-transformer>
+      </response>
+    </http:inbound-endpoint>
+    <script:component>
+      <script:script engine="groovy">
+        assert payload.length() == Integer.valueOf(message.getInboundProperty("Content-Length", 0))
+        payload
+      </script:script>
+    </script:component>
+  </flow>
+</mule>
