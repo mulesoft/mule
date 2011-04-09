@@ -10,11 +10,11 @@
 
 package org.mule.test.integration.construct;
 
-import java.util.Collections;
-
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+
+import java.util.Collections;
 
 public class HttpProxyTestCase extends FunctionalTestCase
 {
@@ -67,8 +67,16 @@ public class HttpProxyTestCase extends FunctionalTestCase
         final MuleMessage result = muleClient.send("http://localhost:8090/bar-appender/" + proxyId, "foo",
             Collections.singletonMap("X-Custom-Header", "w00t"), getTestTimeoutSecs() * 1000);
         assertEquals(expectedResult, result.getPayloadAsString());
-        assertEquals(expectedResult.length(),
-            Integer.valueOf(result.getInboundProperty("Content-Length").toString()).intValue());
+
+        int contentLength = getContentLength(result);
+        assertEquals(expectedResult.length(), contentLength);
+
         assertEquals("w00tbaz", result.getInboundProperty("X-Custom-Header-Response"));
+    }
+
+    private int getContentLength(MuleMessage result)
+    {
+        Object messageProperty = result.getInboundProperty("Content-Length");
+        return Integer.parseInt(messageProperty.toString());
     }
 }
