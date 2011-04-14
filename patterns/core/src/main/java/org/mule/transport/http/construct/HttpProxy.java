@@ -117,17 +117,18 @@ public class HttpProxy extends AbstractConfigurationPattern
     @Override
     protected void validateConstruct() throws FlowConstructInvalidException
     {
-        // FIXME (DDO) enforce HTTP endpoints
-
         super.validateConstruct();
 
-        if ((messageSource instanceof InboundEndpoint)
-            && (!((InboundEndpoint) messageSource).getExchangePattern().equals(
-                MessageExchangePattern.REQUEST_RESPONSE)))
+        if (messageSource instanceof InboundEndpoint)
         {
-            throw new FlowConstructInvalidException(
-                MessageFactory.createStaticMessage("HttpProxy only works with a request-response inbound endpoint."),
-                this);
+            final InboundEndpoint inboundEndpoint = (InboundEndpoint) messageSource;
+
+            if (!inboundEndpoint.getExchangePattern().equals(MessageExchangePattern.REQUEST_RESPONSE))
+            {
+                throw new FlowConstructInvalidException(
+                    MessageFactory.createStaticMessage("HttpProxy only works with a request-response inbound endpoint."),
+                    this);
+            }
         }
 
         if (!outboundEndpoint.getExchangePattern().equals(MessageExchangePattern.REQUEST_RESPONSE))

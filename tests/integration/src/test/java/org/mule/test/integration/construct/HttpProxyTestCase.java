@@ -14,10 +14,9 @@ import java.util.Collections;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 
-// FIXME (DDO) use DynamicPortTestCase
-public class HttpProxyTestCase extends FunctionalTestCase
+public class HttpProxyTestCase extends DynamicPortTestCase
 {
     private MuleClient muleClient;
 
@@ -28,9 +27,14 @@ public class HttpProxyTestCase extends FunctionalTestCase
     }
 
     @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
+    }
+
+    @Override
     protected void doSetUp() throws Exception
     {
-        super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         muleClient = new MuleClient(muleContext);
     }
@@ -64,7 +68,8 @@ public class HttpProxyTestCase extends FunctionalTestCase
 
     private void testRequest(final int proxyId, final String expectedResult) throws Exception
     {
-        final MuleMessage result = muleClient.send("http://localhost:8090/http-proxy/" + proxyId, "foo",
+        final MuleMessage result = muleClient.send("http://localhost:" + getPorts().get(0) + "/http-proxy/"
+                                                   + proxyId, "foo",
             Collections.singletonMap("X-Custom-Header", "w00t"), getTestTimeoutSecs() * 1000);
         assertEquals(expectedResult, result.getPayloadAsString());
 

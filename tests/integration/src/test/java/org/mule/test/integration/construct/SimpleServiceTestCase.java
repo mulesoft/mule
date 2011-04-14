@@ -17,22 +17,26 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleException;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.construct.SimpleService;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.test.integration.tck.WeatherForecaster;
 import org.mule.util.StringUtils;
 import org.springframework.util.FileCopyUtils;
 
-//FIXME (DDO) use DynamicPortTestCase
-public class SimpleServiceTestCase extends FunctionalTestCase
+public class SimpleServiceTestCase extends DynamicPortTestCase
 {
     private LocalMuleClient muleClient;
 
     @Override
     protected void doSetUp() throws Exception
     {
-        super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         muleClient = muleContext.getClient();
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
     }
 
     @Override
@@ -94,7 +98,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
 
     public void testJaxWsService() throws Exception
     {
-        doTestJaxWsService(6099);
+        doTestJaxWsService(1);
     }
 
     public void testJaxbConsumer() throws Exception
@@ -130,7 +134,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
 
     public void testInheritedType() throws Exception
     {
-        doTestJaxWsService(6098);
+        doTestJaxWsService(2);
     }
 
     private void doTestFunctionalTestComponent(final String ftcUri, final String ftcName)
@@ -156,16 +160,19 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         assertEquals(s + "barbaz", result);
     }
 
-    private void doTestJaxWsService(final int portNumber) throws Exception
+    private void doTestJaxWsService(final int portId) throws Exception
     {
-        final String wsdl = new String(FileCopyUtils.copyToByteArray((InputStream) muleClient.request(
-            "http://localhost:" + portNumber + "/weather-forecast?wsdl", getTestTimeoutSecs() * 1000L)
-            .getPayload()));
+        final Integer port = getPorts().get(portId - 1);
+
+        final String wsdl = new String(
+            FileCopyUtils.copyToByteArray((InputStream) muleClient.request(
+                "http://localhost:" + port + "/weather-forecast?wsdl", getTestTimeoutSecs() * 1000L)
+                .getPayload()));
 
         assertTrue(wsdl.contains("GetWeatherByZipCode"));
 
         final String weatherForecast = muleClient.send(
-            "wsdl-cxf:http://localhost:" + portNumber + "/weather-forecast?wsdl&method=GetWeatherByZipCode",
+            "wsdl-cxf:http://localhost:" + port + "/weather-forecast?wsdl&method=GetWeatherByZipCode",
             "95050", null, getTestTimeoutSecs() * 1000).getPayloadAsString();
 
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);

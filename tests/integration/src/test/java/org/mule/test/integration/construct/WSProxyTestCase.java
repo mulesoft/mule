@@ -11,11 +11,10 @@
 package org.mule.test.integration.construct;
 
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.test.integration.tck.WeatherForecaster;
 
-//FIXME (DDO) use DynamicPortTestCase
-public class WSProxyTestCase extends FunctionalTestCase
+public class WSProxyTestCase extends DynamicPortTestCase
 {
     private MuleClient muleClient;
 
@@ -26,9 +25,14 @@ public class WSProxyTestCase extends FunctionalTestCase
     }
 
     @Override
+    protected int getNumPortsToFind()
+    {
+        return 2;
+    }
+
+    @Override
     protected void doSetUp() throws Exception
     {
-        super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         muleClient = new MuleClient(muleContext);
     }
@@ -91,7 +95,8 @@ public class WSProxyTestCase extends FunctionalTestCase
 
     private void testWsdlRequest(final int proxyId) throws Exception
     {
-        final String wsdl = muleClient.request("http://localhost:8090/weather-forecast/" + proxyId + "?wsdl",
+        final String wsdl = muleClient.request(
+            "http://localhost:" + getPorts().get(0) + "/weather-forecast/" + proxyId + "?wsdl",
             getTestTimeoutSecs() * 1000L).getPayloadAsString();
         assertTrue(wsdl.contains("GetWeatherByZipCode"));
     }
@@ -99,8 +104,8 @@ public class WSProxyTestCase extends FunctionalTestCase
     private void testWebServiceRequest(final int proxyId) throws Exception
     {
         final String weatherForecast = muleClient.send(
-            "wsdl-cxf:http://localhost:8090/weather-forecast/" + proxyId + "?wsdl&method=GetWeatherByZipCode",
-            "95050", null, getTestTimeoutSecs() * 1000)
+            "wsdl-cxf:http://localhost:" + getPorts().get(0) + "/weather-forecast/" + proxyId
+                            + "?wsdl&method=GetWeatherByZipCode", "95050", null, getTestTimeoutSecs() * 1000)
             .getPayloadAsString();
 
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);

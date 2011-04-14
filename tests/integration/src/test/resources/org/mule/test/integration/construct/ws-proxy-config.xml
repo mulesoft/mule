@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:http="http://www.mulesoft.org/schema/mule/http"
-  xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
-  xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
-  xmlns:spring="http://www.springframework.org/schema/beans"
-  xmlns:pattern="http://www.mulesoft.org/schema/mule/pattern"
-  xsi:schemaLocation="
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xmlns:script="http://www.mulesoft.org/schema/mule/scripting" xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:pattern="http://www.mulesoft.org/schema/mule/pattern"
+    xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
        http://www.mulesoft.org/schema/mule/pattern http://www.mulesoft.org/schema/mule/pattern/3.2/mule-pattern.xsd
@@ -15,83 +12,79 @@
        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-  <pattern:web-service-proxy name="weather-forecast-ws-proxy"
-            inboundAddress="http://localhost:8090/weather-forecast/0"
-            outboundAddress="http://localhost:6090/weather-forecast" />
+    <pattern:web-service-proxy name="weather-forecast-ws-proxy"
+        inboundAddress="http://localhost:${port1}/weather-forecast/0"
+        outboundAddress="http://localhost:${port2}/weather-forecast" />
 
-  <pattern:web-service-proxy name="weather-forecast-ws-proxy-fixed-wsdl-file"
-            inboundAddress="http://localhost:8090/weather-forecast/1"
-            outboundAddress="http://localhost:6090/weather-forecast"
-            wsdlFile="org/mule/test/integration/construct/weather-forecaster.wsdl" />
+    <pattern:web-service-proxy name="weather-forecast-ws-proxy-fixed-wsdl-file"
+        inboundAddress="http://localhost:${port1}/weather-forecast/1"
+        outboundAddress="http://localhost:${port2}/weather-forecast"
+        wsdlFile="org/mule/test/integration/construct/weather-forecaster.wsdl" />
 
-  <pattern:web-service-proxy name="weather-forecast-ws-proxy-fixed-wsdl-url"
-            inboundAddress="http://localhost:8090/weather-forecast/2"
-            outboundAddress="http://localhost:6090/weather-forecast"
-            wsdlLocation="http://localhost:6090/weather-forecast?wsdl" />
+    <pattern:web-service-proxy name="weather-forecast-ws-proxy-fixed-wsdl-url"
+        inboundAddress="http://localhost:${port1}/weather-forecast/2"
+        outboundAddress="http://localhost:${port2}/weather-forecast"
+        wsdlLocation="http://localhost:${port2}/weather-forecast?wsdl" />
 
-  <http:endpoint name="local-proxy-endpoint"
-                 address="http://localhost:8090/weather-forecast/3" />
+    <http:endpoint name="local-proxy-endpoint"
+        address="http://localhost:${port1}/weather-forecast/3" />
 
-  <http:endpoint name="target-ws-endpoint"
-                 address="http://localhost:6090/weather-forecast" />
+    <http:endpoint name="target-ws-endpoint"
+        address="http://localhost:${port2}/weather-forecast" />
 
-  <pattern:web-service-proxy name="weather-forecast-ws-proxy-endpoints"
-            inboundEndpoint-ref="local-proxy-endpoint"
-            outboundEndpoint-ref="target-ws-endpoint" />
+    <pattern:web-service-proxy name="weather-forecast-ws-proxy-endpoints"
+        inboundEndpoint-ref="local-proxy-endpoint" outboundEndpoint-ref="target-ws-endpoint" />
 
-  <pattern:web-service-proxy name="weather-forecast-ws-proxy-transformers"
-            inboundAddress="http://localhost:8090/weather-forecast/4"
-            transformer-refs="object-to-string-transformer zip-code-changer-1"
-            responseTransformer-refs="object-to-string-transformer zip-code-changer-2"
-            outboundEndpoint-ref="target-ws-endpoint" />
+    <pattern:web-service-proxy name="weather-forecast-ws-proxy-transformers"
+        inboundAddress="http://localhost:${port1}/weather-forecast/4"
+        transformer-refs="object-to-string-transformer zip-code-changer-1"
+        responseTransformer-refs="object-to-string-transformer zip-code-changer-2"
+        outboundEndpoint-ref="target-ws-endpoint" />
 
-  <pattern:web-service-proxy name="weather-forecast-ws-proxy-exception-strategy"
-            inboundAddress="http://localhost:8090/weather-forecast/5"
-            outboundEndpoint-ref="target-ws-endpoint">
-    <default-exception-strategy />
-  </pattern:web-service-proxy>
-  
-  <pattern:web-service-proxy name="weather-forecast-ws-proxy-abstract-parent"
-            abstract="true"
-            transformer-refs="object-to-string-transformer zip-code-changer-1"
-            responseTransformer-refs="object-to-string-transformer zip-code-changer-2"
-            outboundEndpoint-ref="target-ws-endpoint" />
+    <pattern:web-service-proxy name="weather-forecast-ws-proxy-exception-strategy"
+        inboundAddress="http://localhost:${port1}/weather-forecast/5"
+        outboundEndpoint-ref="target-ws-endpoint">
+        <default-exception-strategy />
+    </pattern:web-service-proxy>
 
-  <pattern:web-service-proxy name="weather-forecast-ws-proxy-concrete-child"
-            parent="weather-forecast-ws-proxy-abstract-parent"
-            inboundAddress="http://localhost:8090/weather-forecast/6" />
-            
-  <pattern:web-service-proxy name="weather-forecast-ws-proxy-child-endpoints">
-    <http:inbound-endpoint address="http://localhost:8090/weather-forecast/7" />
-    <http:outbound-endpoint address="http://localhost:6090/weather-forecast" />
-  </pattern:web-service-proxy>
-            
-  <pattern:web-service-proxy name="weather-forecast-ws-proxy-concrete-child-endpoints"
-            parent="weather-forecast-ws-proxy-abstract-parent">
-    <http:inbound-endpoint address="http://localhost:8090/weather-forecast/8" />
-  </pattern:web-service-proxy>
-  
-  <pattern:web-service-proxy name="weather-forecast-ws-proxy-expression"
-            inboundAddress="http://localhost:8090/weather-forecast/9"
-            outboundAddress="http://localhost:6090/#[string:weather-forecast]" />
+    <pattern:web-service-proxy name="weather-forecast-ws-proxy-abstract-parent"
+        abstract="true" transformer-refs="object-to-string-transformer zip-code-changer-1"
+        responseTransformer-refs="object-to-string-transformer zip-code-changer-2"
+        outboundEndpoint-ref="target-ws-endpoint" />
+
+    <pattern:web-service-proxy name="weather-forecast-ws-proxy-concrete-child"
+        parent="weather-forecast-ws-proxy-abstract-parent" inboundAddress="http://localhost:${port1}/weather-forecast/6" />
+
+    <pattern:web-service-proxy name="weather-forecast-ws-proxy-child-endpoints">
+        <http:inbound-endpoint address="http://localhost:${port1}/weather-forecast/7" />
+        <http:outbound-endpoint address="http://localhost:${port2}/weather-forecast" />
+    </pattern:web-service-proxy>
+
+    <pattern:web-service-proxy
+        name="weather-forecast-ws-proxy-concrete-child-endpoints" parent="weather-forecast-ws-proxy-abstract-parent">
+        <http:inbound-endpoint address="http://localhost:${port1}/weather-forecast/8" />
+    </pattern:web-service-proxy>
+
+    <pattern:web-service-proxy name="weather-forecast-ws-proxy-expression"
+        inboundAddress="http://localhost:${port1}/weather-forecast/9"
+        outboundAddress="http://localhost:${port2}/#[string:weather-forecast]" />
 
   <!--
         Test support
   -->
-  <object-to-string-transformer name="object-to-string-transformer" />
-  <script:transformer name="zip-code-changer-1">
-    <script:script engine="groovy">
-      <script:text>return payload.replace('95050','21718')</script:text>
-    </script:script>
-  </script:transformer>
-  <script:transformer name="zip-code-changer-2">
-    <script:script engine="groovy">
-      <script:text>return payload.replace('21718','95050')</script:text>
-    </script:script>
-  </script:transformer>
-  
-  <simple-service name="weather-forecaster-ws"
-                  address="http://localhost:6090/weather-forecast"
-                  component-class="org.mule.test.integration.tck.WeatherForecaster"
-                  type="jax-ws" />
+    <object-to-string-transformer name="object-to-string-transformer" />
+    <script:transformer name="zip-code-changer-1">
+        <script:script engine="groovy">
+            <script:text>return payload.replace('95050','21718')</script:text>
+        </script:script>
+    </script:transformer>
+    <script:transformer name="zip-code-changer-2">
+        <script:script engine="groovy">
+            <script:text>return payload.replace('21718','95050')</script:text>
+        </script:script>
+    </script:transformer>
+
+    <simple-service name="weather-forecaster-ws"
+        address="http://localhost:${port2}/weather-forecast" component-class="org.mule.test.integration.tck.WeatherForecaster"
+        type="jax-ws" />
 </mule>
