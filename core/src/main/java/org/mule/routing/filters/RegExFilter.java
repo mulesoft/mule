@@ -10,29 +10,32 @@
 
 package org.mule.routing.filters;
 
-import static org.mule.util.ClassUtils.equal;
-import static org.mule.util.ClassUtils.hash;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.ObjectFilter;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transformer.simple.ByteArrayToObject;
+import org.mule.util.ClassUtils;
 
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import static org.mule.util.ClassUtils.hash;
+
 /**
  * <code>RegExFilter</code> is used to match a String argument against a regular expression.
  */
 public class RegExFilter implements Filter, ObjectFilter
 {
+    private static final int NO_FLAGS = 0;
     protected transient Log logger = LogFactory.getLog(getClass());
 
     private Pattern pattern;
+
+    private int flags = NO_FLAGS;
 
     public RegExFilter()
     {
@@ -41,7 +44,13 @@ public class RegExFilter implements Filter, ObjectFilter
 
     public RegExFilter(String pattern)
     {
-        this.pattern = Pattern.compile(pattern);
+        this(pattern, NO_FLAGS);
+    }
+
+    public RegExFilter(String pattern, int flags)
+    {
+        this.pattern = Pattern.compile(pattern, flags);
+        this.flags = flags;
     }
 
     public boolean accept(MuleMessage message)
@@ -98,9 +107,20 @@ public class RegExFilter implements Filter, ObjectFilter
 
     public void setPattern(String pattern)
     {
-        this.pattern = (pattern != null ? Pattern.compile(pattern) : null);
+        this.pattern = (pattern != null ? Pattern.compile(pattern, flags) : null);
     }
-    
+
+    public int getFlags()
+    {
+        return flags;
+    }
+
+    public void setFlags(int flags)
+    {
+        this.flags = flags;
+        this.pattern = (this.pattern != null ? Pattern.compile(pattern.pattern(), flags) : null);
+    }
+
     @Override
     public boolean equals(Object obj)
     {
@@ -108,7 +128,9 @@ public class RegExFilter implements Filter, ObjectFilter
         if (obj == null || getClass() != obj.getClass()) return false;
 
         final RegExFilter other = (RegExFilter) obj;
-        return equal(pattern, other.pattern);
+        boolean patternsAreEqual = ClassUtils.equal(pattern.pattern(), other.pattern.pattern());
+        boolean flagsAreEqual = (flags == other.flags);
+        return (patternsAreEqual && flagsAreEqual);
     }
 
     @Override
