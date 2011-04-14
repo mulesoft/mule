@@ -72,23 +72,29 @@ public class HttpProxy extends AbstractConfigurationPattern
     @Override
     protected void configureMessageProcessorsBeforeTransformation(final MessageProcessorChainBuilder builder)
     {
-        // if transformers have been configured, pre-emptively drop the content-length header to prevent side effects
+        configureContentLengthRemover(this, builder);
+    }
+
+    public static void configureContentLengthRemover(final AbstractConfigurationPattern configurationPattern,
+                                                     final MessageProcessorChainBuilder builder)
+    {
+        // if transformers have been configured, preemptively drop the content-length header to prevent side effects
         // induced by mismatches
-        if ((hasTransformers()) || (hasResponseTransformers()))
+        if ((configurationPattern.hasTransformers()) || (configurationPattern.hasResponseTransformers()))
         {
             final MessagePropertiesTransformer contentLengthHeaderRemover = newContentLengthHeaderRemover();
-            if (hasTransformers())
+            if (configurationPattern.hasTransformers())
             {
                 builder.chain(contentLengthHeaderRemover);
             }
-            if (hasResponseTransformers())
+            if (configurationPattern.hasResponseTransformers())
             {
                 builder.chain(new ResponseMessageProcessorAdapter(contentLengthHeaderRemover));
             }
         }
     }
 
-    public static MessagePropertiesTransformer newContentLengthHeaderRemover()
+    private static MessagePropertiesTransformer newContentLengthHeaderRemover()
     {
         final MessagePropertiesTransformer contentLengthHeaderRemover = new MessagePropertiesTransformer();
         contentLengthHeaderRemover.setScope(PropertyScope.INBOUND);

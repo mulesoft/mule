@@ -33,6 +33,7 @@ import org.mule.construct.AbstractConfigurationPattern;
 import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.pattern.core.construct.CopyInboundToOutboundPropertiesTransformerCallback;
 import org.mule.transformer.TransformerTemplate;
+import org.mule.transport.http.construct.HttpProxy;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
 
@@ -123,14 +124,12 @@ public class WSProxy extends AbstractConfigurationPattern
     protected void configureMessageProcessorsBeforeTransformation(final MessageProcessorChainBuilder builder)
     {
         builder.chain(proxyMessageProcessor);
+        HttpProxy.configureContentLengthRemover(this, builder);
     }
 
     @Override
     protected void configureMessageProcessorsAfterTransformation(final MessageProcessorChainBuilder builder)
     {
-        // FIXME (DDO) MULE-5502 ensure inbound/outbound content length is correct when a transformer is defined on the
-        // proxy
-
         builder.chain(new TransformerTemplate(new CopyInboundToOutboundPropertiesTransformerCallback()));
         builder.chain(outboundEndpoint);
     }

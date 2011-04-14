@@ -66,12 +66,12 @@ public abstract class AbstractConfigurationPattern extends AbstractFlowConstruct
         configureMessageProcessorsAfterTransformation(builder);
     }
 
-    protected boolean hasTransformers()
+    public boolean hasTransformers()
     {
         return !transformers.isEmpty();
     }
 
-    protected boolean hasResponseTransformers()
+    public boolean hasResponseTransformers()
     {
         return !responseTransformers.isEmpty();
     }
