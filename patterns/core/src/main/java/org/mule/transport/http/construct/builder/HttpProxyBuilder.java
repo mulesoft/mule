@@ -36,15 +36,15 @@ public class HttpProxyBuilder extends
         return MessageExchangePattern.REQUEST_RESPONSE;
     }
 
-    public HttpProxyBuilder outboundTransformers(final Transformer... outboundTransformers)
+    public HttpProxyBuilder transformers(final Transformer... outboundTransformers)
     {
-        this.outboundTransformers = Arrays.asList((MessageProcessor[]) outboundTransformers);
+        this.transformers = Arrays.asList((MessageProcessor[]) outboundTransformers);
         return this;
     }
 
-    public HttpProxyBuilder outboundResponseTransformers(final Transformer... outboundResponseTransformers)
+    public HttpProxyBuilder responseTransformers(final Transformer... outboundResponseTransformers)
     {
-        this.outboundResponseTransformers = Arrays.asList((MessageProcessor[]) outboundResponseTransformers);
+        this.responseTransformers = Arrays.asList((MessageProcessor[]) outboundResponseTransformers);
         return this;
     }
 
@@ -52,6 +52,6 @@ public class HttpProxyBuilder extends
     protected HttpProxy buildFlowConstruct(final MuleContext muleContext) throws MuleException
     {
         return new HttpProxy(name, muleContext, getOrBuildInboundEndpoint(muleContext),
-            getOrBuildOutboundEndpoint(muleContext));
+            getOrBuildOutboundEndpoint(muleContext), transformers, responseTransformers);
     }
 }

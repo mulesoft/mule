@@ -10,14 +10,11 @@
 
 package org.mule.construct.builder;
 
-import java.util.List;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.AbstractFlowConstruct;
 
 @SuppressWarnings("unchecked")
@@ -27,10 +24,6 @@ public abstract class AbstractFlowConstructWithSingleInboundEndpointBuilder<T ex
     private InboundEndpoint inboundEndpoint;
     private EndpointBuilder inboundEndpointBuilder;
     private String inboundAddress;
-
-    // setters should be exposed only for builders where it makes sense
-    protected List<MessageProcessor> inboundTransformers;
-    protected List<MessageProcessor> inboundResponseTransformers;
 
     public T inboundEndpoint(InboundEndpoint inboundEndpoint)
     {
@@ -63,17 +56,6 @@ public abstract class AbstractFlowConstructWithSingleInboundEndpointBuilder<T ex
         }
 
         inboundEndpointBuilder.setExchangePattern(getInboundMessageExchangePattern());
-
-        // FIXME (DDO) review transformer injection: better be done in flow?
-        if (inboundTransformers != null)
-        {
-            inboundEndpointBuilder.setMessageProcessors(inboundTransformers);
-        }
-
-        if (inboundResponseTransformers != null)
-        {
-            inboundEndpointBuilder.setResponseMessageProcessors(inboundResponseTransformers);
-        }
 
         doConfigureInboundEndpointBuilder(muleContext, inboundEndpointBuilder);
 

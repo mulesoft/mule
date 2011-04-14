@@ -10,6 +10,9 @@
 
 package org.mule.construct;
 
+import java.util.Collections;
+
+import org.apache.commons.lang.Validate;
 import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
@@ -27,21 +30,16 @@ import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.expression.transformers.ExpressionTransformer;
-import org.mule.interceptor.LoggingInterceptor;
-import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.routing.ChoiceRouter;
 import org.mule.util.StringUtils;
 
-import org.apache.commons.lang.Validate;
-
-public class Validator extends AbstractFlowConstruct
+public class Validator extends AbstractConfigurationPattern
 {
     private final OutboundEndpoint outboundEndpoint;
     private final Filter validationFilter;
@@ -61,6 +59,7 @@ public class Validator extends AbstractFlowConstruct
             nackExpression, null);
     }
 
+    @SuppressWarnings("unchecked")
     public Validator(String name,
                      MuleContext muleContext,
                      MessageSource messageSource,
@@ -70,7 +69,7 @@ public class Validator extends AbstractFlowConstruct
                      String nackExpression,
                      String errorExpression)
     {
-        super(name, muleContext);
+        super(name, muleContext, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
 
         Validate.notNull(messageSource, "messageSource can't be null");
         Validate.notNull(outboundEndpoint, "outboundEndpoint can't be null");
@@ -87,12 +86,14 @@ public class Validator extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
+    protected void configureMessageProcessorsBeforeTransformation(MessageProcessorChainBuilder builder)
     {
-        builder.chain(new ProcessingTimeInterceptor());
-        builder.chain(new LoggingInterceptor());
-        builder.chain(new FlowConstructStatisticsMessageProcessor());
+        // NOOP
+    }
 
+    @Override
+    protected void configureMessageProcessorsAfterTransformation(MessageProcessorChainBuilder builder)
+    {
         final ErrorAwareEventReturningMessageProcessor outboundMessageProcessor = new ErrorAwareEventReturningMessageProcessor();
         outboundMessageProcessor.setListener(outboundEndpoint);
 
@@ -224,9 +225,8 @@ public class Validator extends AbstractFlowConstruct
         AbstractInterceptingMessageProcessor
     {
         /*
-         * Returns the incoming event whatever the outcome of the rest of the chain
-         * maybe. Sets an exception payload on the incoming event if an error
-         * occurred downstream.
+         * Returns the incoming event whatever the outcome of the rest of the chain maybe. Sets an exception payload on
+         * the incoming event if an error occurred downstream.
          */
         public MuleEvent process(MuleEvent event) throws MuleException
         {

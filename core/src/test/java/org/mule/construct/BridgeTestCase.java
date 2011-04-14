@@ -10,6 +10,8 @@
 
 package org.mule.construct;
 
+import java.util.Collections;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -21,6 +23,7 @@ public class BridgeTestCase extends AbstractFlowConstuctTestCase
     private Bridge bridge;
     protected Connector testConnector;
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void doSetUp() throws Exception
     {
@@ -33,7 +36,7 @@ public class BridgeTestCase extends AbstractFlowConstuctTestCase
         testConnector.start();
 
         bridge = new Bridge("test-bridge", muleContext, directInboundMessageSource, testOutboundEndpoint,
-            MessageExchangePattern.REQUEST_RESPONSE, false);
+            Collections.EMPTY_LIST, Collections.EMPTY_LIST, MessageExchangePattern.REQUEST_RESPONSE, false);
     }
 
     @Override

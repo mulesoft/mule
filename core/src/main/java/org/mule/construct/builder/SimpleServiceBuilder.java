@@ -45,15 +45,15 @@ public class SimpleServiceBuilder extends
         return MessageExchangePattern.REQUEST_RESPONSE;
     }
 
-    public SimpleServiceBuilder inboundTransformers(Transformer... transformers)
+    public SimpleServiceBuilder transformers(Transformer... transformers)
     {
-        this.inboundTransformers = Arrays.asList((MessageProcessor[]) transformers);
+        this.transformers = Arrays.asList((MessageProcessor[]) transformers);
         return this;
     }
 
-    public SimpleServiceBuilder inboundResponseTransformers(Transformer... responseTransformers)
+    public SimpleServiceBuilder responseTransformers(Transformer... responseTransformers)
     {
-        this.inboundResponseTransformers = Arrays.asList((MessageProcessor[]) responseTransformers);
+        this.responseTransformers = Arrays.asList((MessageProcessor[]) responseTransformers);
         return this;
     }
 
@@ -102,7 +102,8 @@ public class SimpleServiceBuilder extends
     @Override
     protected SimpleService buildFlowConstruct(MuleContext muleContext) throws MuleException
     {
-        return new SimpleService(name, muleContext, getOrBuildInboundEndpoint(muleContext), component, type);
+        return new SimpleService(name, muleContext, getOrBuildInboundEndpoint(muleContext), transformers,
+            responseTransformers, component, type);
     }
 
     protected EntryPointResolverSet createEntryPointResolverSet()

@@ -60,15 +60,15 @@ public class BridgeBuilder extends
         return this;
     }
 
-    public BridgeBuilder inboundTransformers(Transformer... transformers)
+    public BridgeBuilder transformers(Transformer... transformers)
     {
-        this.inboundTransformers = Arrays.asList((MessageProcessor[]) transformers);
+        this.transformers = Arrays.asList((MessageProcessor[]) transformers);
         return this;
     }
 
-    public BridgeBuilder inboundResponseTransformers(Transformer... responseTransformers)
+    public BridgeBuilder responseTransformers(Transformer... responseTransformers)
     {
-        this.inboundResponseTransformers = Arrays.asList((MessageProcessor[]) responseTransformers);
+        this.responseTransformers = Arrays.asList((MessageProcessor[]) responseTransformers);
         return this;
     }
 
@@ -107,7 +107,8 @@ public class BridgeBuilder extends
             setTransactionFactoriesIfNeeded(inboundEndpoint, outboundEndpoint);
         }
 
-        return new Bridge(name, muleContext, inboundEndpoint, outboundEndpoint, exchangePattern, transacted);
+        return new Bridge(name, muleContext, inboundEndpoint, outboundEndpoint, transformers,
+            responseTransformers, exchangePattern, transacted);
     }
 
     private void setTransactionFactoriesIfNeeded(InboundEndpoint inboundEndpoint,

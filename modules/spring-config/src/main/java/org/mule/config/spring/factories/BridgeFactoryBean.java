@@ -66,12 +66,12 @@ public class BridgeFactoryBean extends AbstractFlowConstructFactoryBean
 
     public void setTransformers(Transformer... transformers)
     {
-        bridgeBuilder.inboundTransformers(transformers);
+        bridgeBuilder.transformers(transformers);
     }
 
     public void setResponseTransformers(Transformer... responseTransformers)
     {
-        bridgeBuilder.inboundResponseTransformers(responseTransformers);
+        bridgeBuilder.responseTransformers(responseTransformers);
     }
 
     public void setTransacted(boolean transacted)

@@ -48,8 +48,8 @@ public class WSProxyBuilderTestCase extends AbstractMuleTestCase
             .wsdlFile(new File(getTestWsdlUri()))
             .inboundAddress("test://foo")
             .outboundAddress("test://bar")
-            .outboundTransformers(new StringAppendTransformer("bar"))
-            .outboundResponseTransformers(new ObjectToByteArray(), new GZipCompressTransformer())
+            .transformers(new StringAppendTransformer("bar"))
+            .responseTransformers(new ObjectToByteArray(), new GZipCompressTransformer())
             .exceptionStrategy(new DefaultServiceExceptionStrategy(muleContext))
             .build(muleContext);
 

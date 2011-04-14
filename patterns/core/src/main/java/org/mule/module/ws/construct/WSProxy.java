@@ -12,6 +12,7 @@ package org.mule.module.ws.construct;
 
 import java.net.InetAddress;
 import java.net.URI;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,13 +29,9 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.construct.AbstractFlowConstruct;
-import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
+import org.mule.construct.AbstractConfigurationPattern;
 import org.mule.endpoint.DynamicOutboundEndpoint;
-import org.mule.interceptor.LoggingInterceptor;
-import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.pattern.core.construct.CopyInboundToOutboundPropertiesTransformerCallback;
-import org.mule.processor.StopFurtherMessageProcessingMessageProcessor;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.util.ObjectUtils;
 import org.mule.util.StringUtils;
@@ -51,7 +48,7 @@ import org.mule.util.StringUtils;
  * service. If this property is not set, the address of the WSDL will be assumed to be the value of uriWebservice
  * followed by "?WSDL".
  */
-public class WSProxy extends AbstractFlowConstruct
+public class WSProxy extends AbstractConfigurationPattern
 {
     private final AbstractProxyRequestProcessor proxyMessageProcessor;
     private final OutboundEndpoint outboundEndpoint;
@@ -59,29 +56,35 @@ public class WSProxy extends AbstractFlowConstruct
     public WSProxy(final String name,
                    final MuleContext muleContext,
                    final MessageSource messageSource,
-                   final OutboundEndpoint outboundEndpoint) throws MuleException
+                   final OutboundEndpoint outboundEndpoint,
+                   final List<MessageProcessor> transformers,
+                   final List<MessageProcessor> responseTransformers) throws MuleException
     {
-        this(name, muleContext, messageSource, outboundEndpoint, new DynamicWsdlProxyRequestProcessor(
-            outboundEndpoint));
+        this(name, muleContext, messageSource, outboundEndpoint, transformers, responseTransformers,
+            new DynamicWsdlProxyRequestProcessor(outboundEndpoint));
     }
 
     public WSProxy(final String name,
                    final MuleContext muleContext,
                    final MessageSource messageSource,
                    final OutboundEndpoint outboundEndpoint,
+                   final List<MessageProcessor> transformers,
+                   final List<MessageProcessor> responseTransformers,
                    final String wsdlContents) throws MuleException
     {
-        this(name, muleContext, messageSource, outboundEndpoint, new StaticWsdlProxyRequestProcessor(
-            wsdlContents));
+        this(name, muleContext, messageSource, outboundEndpoint, transformers, responseTransformers,
+            new StaticWsdlProxyRequestProcessor(wsdlContents));
     }
 
     public WSProxy(final String name,
                    final MuleContext muleContext,
                    final MessageSource messageSource,
                    final OutboundEndpoint outboundEndpoint,
+                   final List<MessageProcessor> transformers,
+                   final List<MessageProcessor> responseTransformers,
                    final URI wsdlUri) throws MuleException
     {
-        this(name, muleContext, messageSource, outboundEndpoint,
+        this(name, muleContext, messageSource, outboundEndpoint, transformers, responseTransformers,
             new DynamicWsdlProxyRequestProcessor(wsdlUri));
     }
 
@@ -89,9 +92,11 @@ public class WSProxy extends AbstractFlowConstruct
                     final MuleContext muleContext,
                     final MessageSource messageSource,
                     final OutboundEndpoint outboundEndpoint,
+                    final List<MessageProcessor> transformers,
+                    final List<MessageProcessor> responseTransformers,
                     final AbstractProxyRequestProcessor proxyMessageProcessor) throws MuleException
     {
-        super(name, muleContext);
+        super(name, muleContext, transformers, responseTransformers);
 
         if (messageSource == null)
         {
@@ -115,13 +120,17 @@ public class WSProxy extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(final MessageProcessorChainBuilder builder)
+    protected void configureMessageProcessorsBeforeTransformation(final MessageProcessorChainBuilder builder)
     {
-        builder.chain(new ProcessingTimeInterceptor());
-        builder.chain(new LoggingInterceptor());
-        builder.chain(new FlowConstructStatisticsMessageProcessor());
         builder.chain(proxyMessageProcessor);
-        builder.chain(new StopFurtherMessageProcessingMessageProcessor());
+    }
+
+    @Override
+    protected void configureMessageProcessorsAfterTransformation(final MessageProcessorChainBuilder builder)
+    {
+        // FIXME (DDO) MULE-5502 ensure inbound/outbound content length is correct when a transformer is defined on the
+        // proxy
+
         builder.chain(new TransformerTemplate(new CopyInboundToOutboundPropertiesTransformerCallback()));
         builder.chain(outboundEndpoint);
     }

@@ -10,6 +10,8 @@
 
 package org.mule.transport.http.construct;
 
+import java.util.Collections;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -25,6 +27,7 @@ public class NoCacheHttpProxyTestCase extends AbstractFlowConstuctTestCase
     protected Connector testConnector;
     private HttpProxy httpProxy;
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void doSetUp() throws Exception
     {
@@ -37,7 +40,7 @@ public class NoCacheHttpProxyTestCase extends AbstractFlowConstuctTestCase
         testConnector.start();
 
         httpProxy = new HttpProxy("no-cache-http-proxy", muleContext, directInboundMessageSource,
-            testOutboundEndpoint);
+            testOutboundEndpoint, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
     }
 
     @Override

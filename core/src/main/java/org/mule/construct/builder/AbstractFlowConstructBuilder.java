@@ -10,9 +10,13 @@
 
 package org.mule.construct.builder;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.AbstractFlowConstruct;
 
@@ -22,6 +26,10 @@ public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstru
     protected String name;
     protected MessageSource messageSource;
     protected MessagingExceptionHandler exceptionListener;
+
+    // setters should be exposed only for builders where it makes sense
+    protected List<MessageProcessor> transformers = Collections.emptyList();
+    protected List<MessageProcessor> responseTransformers = Collections.emptyList();
 
     public T name(String name)
     {

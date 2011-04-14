@@ -13,24 +13,24 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
   <pattern:http-proxy name="direct-http-proxy"
-                      inboundAddress="http://localhost:8090/bar-appender/0"
-                      outboundAddress="http://localhost:6090/bar-appender" />
+                      inboundAddress="http://localhost:8090/http-proxy/0"
+                      outboundAddress="http://localhost:8090/bar-appender" />
                       
   <pattern:http-proxy name="child-endpoints-http-proxy">
-    <http:inbound-endpoint address="http://localhost:8090/bar-appender/1" />
-    <http:outbound-endpoint address="http://localhost:6090/bar-appender" />
+    <http:inbound-endpoint address="http://localhost:8090/http-proxy/1" />
+    <http:outbound-endpoint address="http://localhost:8090/bar-appender" />
   </pattern:http-proxy>
   
   <pattern:http-proxy name="exception-http-proxy">
-    <http:inbound-endpoint address="http://localhost:8090/bar-appender/2" />
-    <http:outbound-endpoint address="http://localhost:6090/bar-appender" />
+    <http:inbound-endpoint address="http://localhost:8090/http-proxy/2" />
+    <http:outbound-endpoint address="http://localhost:8090/bar-appender" />
     <default-exception-strategy />
   </pattern:http-proxy>
   
   <pattern:http-proxy name="transforming-http-proxy"
-                      inboundAddress="http://localhost:8090/bar-appender/3"
+                      inboundAddress="http://localhost:8090/http-proxy/3"
                       transformer-refs="append-in"
-                      outboundAddress="http://localhost:6090/bar-appender"
+                      outboundAddress="http://localhost:8090/bar-appender"
                       responseTransformer-refs="append-out" />
                       
   <!--
@@ -42,7 +42,7 @@
   <append-string-transformer name="append-bar" message="bar"/>
   
   <flow name="bar-appender">
-    <http:inbound-endpoint address="http://localhost:6090/bar-appender">
+    <http:inbound-endpoint address="http://localhost:8090/bar-appender">
       <transformer ref="object-to-string" />
       <response>
         <transformer ref="append-bar" />

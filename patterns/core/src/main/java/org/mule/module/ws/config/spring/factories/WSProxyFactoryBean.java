@@ -69,12 +69,12 @@ public class WSProxyFactoryBean extends AbstractFlowConstructFactoryBean
 
     public void setTransformers(Transformer... transformers)
     {
-        wsProxyBuilder.outboundTransformers(transformers);
+        wsProxyBuilder.transformers(transformers);
     }
 
     public void setResponseTransformers(Transformer... responseTransformers)
     {
-        wsProxyBuilder.outboundResponseTransformers(responseTransformers);
+        wsProxyBuilder.responseTransformers(responseTransformers);
     }
 
     public void setWsdlLocation(URI wsldLocation)

@@ -11,6 +11,7 @@
 package org.mule.module.ws.construct;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.concurrent.Callable;
 
 import org.mule.MessageExchangePattern;
@@ -18,6 +19,7 @@ import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
 
+@SuppressWarnings("unchecked")
 public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
 {
     public void testNullMessageSource()
@@ -28,7 +30,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
             {
                 return new WSProxy("testNullMessageSource", muleContext, null,
                     MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE,
-                        muleContext));
+                        muleContext), Collections.EMPTY_LIST, Collections.EMPTY_LIST);
             }
         });
     }
@@ -40,7 +42,8 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
             public WSProxy call() throws Exception
             {
                 return new WSProxy("testNullOutboundEndpoint", muleContext,
-                    getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE), null);
+                    getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE), null,
+                    Collections.EMPTY_LIST, Collections.EMPTY_LIST);
             }
         });
     }
@@ -52,7 +55,8 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
             public WSProxy call() throws Exception
             {
                 return new WSProxy("testNullOutboundEndpointWithWsdl", muleContext,
-                    getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE), null, "fake_wsdl");
+                    getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE), null,
+                    Collections.EMPTY_LIST, Collections.EMPTY_LIST, "fake_wsdl");
             }
         });
     }
@@ -66,7 +70,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
                 return new WSProxy("testBlankWsdlContents", muleContext,
                     getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE),
                     MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE,
-                        muleContext), "");
+                        muleContext), Collections.EMPTY_LIST, Collections.EMPTY_LIST, "");
             }
         });
     }
@@ -80,7 +84,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
                 return new WSProxy("testNullWsdlUrl", muleContext,
                     getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE),
                     MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE,
-                        muleContext), (URI) null);
+                        muleContext), Collections.EMPTY_LIST, Collections.EMPTY_LIST, (URI) null);
             }
         });
     }
@@ -94,7 +98,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
                 return new WSProxy("testOneWayInboundEndpoint", muleContext,
                     getTestInboundEndpoint(MessageExchangePattern.ONE_WAY),
                     MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE,
-                        muleContext));
+                        muleContext), Collections.EMPTY_LIST, Collections.EMPTY_LIST);
             }
         });
     }
@@ -107,12 +111,13 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
             {
                 return new WSProxy("testOneWayOutboundEndpoint", muleContext,
                     getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE),
-                    MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.ONE_WAY, muleContext));
+                    MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.ONE_WAY, muleContext),
+                    Collections.EMPTY_LIST, Collections.EMPTY_LIST);
             }
         });
     }
 
-    private void runTestFailingWithExpectedFlowConstructInvalidException(Callable<WSProxy> failingStatement)
+    private void runTestFailingWithExpectedFlowConstructInvalidException(final Callable<WSProxy> failingStatement)
     {
         try
         {

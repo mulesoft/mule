@@ -24,8 +24,8 @@ public class BridgeBuilderTestCase extends AbstractMuleTestCase
     {
         Bridge bridge = new BridgeBuilder().name("test-bridge-full")
             .inboundAddress("test://foo.in")
-            .inboundTransformers(new StringAppendTransformer("bar"))
-            .inboundResponseTransformers(new ObjectToByteArray(), new GZipCompressTransformer())
+            .transformers(new StringAppendTransformer("bar"))
+            .responseTransformers(new ObjectToByteArray(), new GZipCompressTransformer())
             .outboundAddress("test://foo.out")
             .exchangePattern(MessageExchangePattern.REQUEST_RESPONSE)
             .transacted(false)

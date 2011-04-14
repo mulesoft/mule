@@ -10,6 +10,8 @@
 
 package org.mule.construct;
 
+import java.util.Collections;
+
 import org.mule.api.MuleEvent;
 import org.mule.component.AbstractComponent;
 import org.mule.construct.SimpleService.Type;
@@ -20,13 +22,14 @@ public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
 {
     private SimpleService simpleService;
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
 
         simpleService = new SimpleService("test-simple-service", muleContext, directInboundMessageSource,
-            new StringReverserComponent(), Type.DIRECT);
+            Collections.EMPTY_LIST, Collections.EMPTY_LIST, new StringReverserComponent(), Type.DIRECT);
     }
 
     @Override

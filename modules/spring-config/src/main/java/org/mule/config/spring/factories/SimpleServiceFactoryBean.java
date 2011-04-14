@@ -65,12 +65,12 @@ public class SimpleServiceFactoryBean extends AbstractFlowConstructFactoryBean
 
     public void setTransformers(Transformer... transformers)
     {
-        simpleServiceBuilder.inboundTransformers(transformers);
+        simpleServiceBuilder.transformers(transformers);
     }
 
     public void setResponseTransformers(Transformer... responseTransformers)
     {
-        simpleServiceBuilder.inboundResponseTransformers(responseTransformers);
+        simpleServiceBuilder.responseTransformers(responseTransformers);
     }
 
     public void setComponentClass(Class<?> componentClass)

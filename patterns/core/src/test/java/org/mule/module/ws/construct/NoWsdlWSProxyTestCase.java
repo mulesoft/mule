@@ -10,14 +10,17 @@
 
 package org.mule.module.ws.construct;
 
+import java.util.Collections;
 
 import org.mule.api.endpoint.OutboundEndpoint;
 
 public class NoWsdlWSProxyTestCase extends AbstractWSProxyTestCase
 {
+    @SuppressWarnings("unchecked")
     @Override
-    protected WSProxy newWSProxy(OutboundEndpoint testOutboundEndpoint) throws Exception
+    protected WSProxy newWSProxy(final OutboundEndpoint testOutboundEndpoint) throws Exception
     {
-        return new WSProxy("no-wsdl-ws-proxy", muleContext, directInboundMessageSource, testOutboundEndpoint);
+        return new WSProxy("no-wsdl-ws-proxy", muleContext, directInboundMessageSource, testOutboundEndpoint,
+            Collections.EMPTY_LIST, Collections.EMPTY_LIST);
     }
 }

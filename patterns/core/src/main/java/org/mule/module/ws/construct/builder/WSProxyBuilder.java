@@ -43,32 +43,32 @@ public class WSProxyBuilder extends
         return MessageExchangePattern.REQUEST_RESPONSE;
     }
 
-    public WSProxyBuilder outboundTransformers(Transformer... outboundTransformers)
+    public WSProxyBuilder transformers(final Transformer... outboundTransformers)
     {
-        this.outboundTransformers = Arrays.asList((MessageProcessor[]) outboundTransformers);
+        this.transformers = Arrays.asList((MessageProcessor[]) outboundTransformers);
         return this;
     }
 
-    public WSProxyBuilder outboundResponseTransformers(Transformer... outboundResponseTransformers)
+    public WSProxyBuilder responseTransformers(final Transformer... outboundResponseTransformers)
     {
-        this.outboundResponseTransformers = Arrays.asList((MessageProcessor[]) outboundResponseTransformers);
+        this.responseTransformers = Arrays.asList((MessageProcessor[]) outboundResponseTransformers);
         return this;
     }
 
-    public WSProxyBuilder wsldLocation(URI wsldLocation)
+    public WSProxyBuilder wsldLocation(final URI wsldLocation)
     {
         this.wsldLocation = wsldLocation;
         return this;
     }
 
-    public WSProxyBuilder wsdlFile(File wsdlFile)
+    public WSProxyBuilder wsdlFile(final File wsdlFile)
     {
         this.wsdlFile = wsdlFile;
         return this;
     }
 
     @Override
-    protected WSProxy buildFlowConstruct(MuleContext muleContext) throws MuleException
+    protected WSProxy buildFlowConstruct(final MuleContext muleContext) throws MuleException
     {
         if (wsdlFile != null)
         {
@@ -83,18 +83,19 @@ public class WSProxyBuilder extends
         return buildDynamicWsdlUriWSProxy(muleContext);
     }
 
-    private WSProxy buildDynamicWsdlUriWSProxy(MuleContext muleContext) throws MuleException
+    private WSProxy buildDynamicWsdlUriWSProxy(final MuleContext muleContext) throws MuleException
     {
         return new WSProxy(name, muleContext, getOrBuildInboundEndpoint(muleContext),
-            getOrBuildOutboundEndpoint(muleContext));
+            getOrBuildOutboundEndpoint(muleContext), transformers, responseTransformers);
     }
 
-    private WSProxy buildStaticWsdlContentsWSProxy(MuleContext muleContext) throws MuleException
+    private WSProxy buildStaticWsdlContentsWSProxy(final MuleContext muleContext) throws MuleException
     {
         try
         {
             return new WSProxy(name, muleContext, getOrBuildInboundEndpoint(muleContext),
-                getOrBuildOutboundEndpoint(muleContext), FileUtils.readFileToString(wsdlFile));
+                getOrBuildOutboundEndpoint(muleContext), transformers, responseTransformers,
+                FileUtils.readFileToString(wsdlFile));
         }
         catch (final IOException ioe)
         {
@@ -102,9 +103,9 @@ public class WSProxyBuilder extends
         }
     }
 
-    private WSProxy buildStaticWsdlUriWSProxy(MuleContext muleContext) throws MuleException
+    private WSProxy buildStaticWsdlUriWSProxy(final MuleContext muleContext) throws MuleException
     {
         return new WSProxy(name, muleContext, getOrBuildInboundEndpoint(muleContext),
-            getOrBuildOutboundEndpoint(muleContext), wsldLocation);
+            getOrBuildOutboundEndpoint(muleContext), transformers, responseTransformers, wsldLocation);
     }
 }

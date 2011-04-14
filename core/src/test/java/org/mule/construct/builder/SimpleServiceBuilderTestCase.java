@@ -29,8 +29,8 @@ public class SimpleServiceBuilderTestCase extends AbstractMuleTestCase
     {
         SimpleService simpleService = new SimpleServiceBuilder().name("test-simple-service-full")
             .inboundAddress("test://foo")
-            .inboundTransformers(new StringAppendTransformer("bar"))
-            .inboundResponseTransformers(new ObjectToByteArray(), new GZipCompressTransformer())
+            .transformers(new StringAppendTransformer("bar"))
+            .responseTransformers(new ObjectToByteArray(), new GZipCompressTransformer())
             .component(EchoComponent.class)
             .type(Type.DIRECT)
             .exceptionStrategy(new DefaultServiceExceptionStrategy(muleContext))

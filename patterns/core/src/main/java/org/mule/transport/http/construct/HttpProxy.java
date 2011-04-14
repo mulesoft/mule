@@ -10,29 +10,30 @@
 
 package org.mule.transport.http.construct;
 
+import java.util.List;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.construct.AbstractFlowConstruct;
-import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
-import org.mule.interceptor.LoggingInterceptor;
-import org.mule.interceptor.ProcessingTimeInterceptor;
+import org.mule.construct.AbstractConfigurationPattern;
 import org.mule.pattern.core.construct.CopyInboundToOutboundPropertiesTransformerCallback;
 import org.mule.processor.ResponseMessageProcessorAdapter;
-import org.mule.processor.StopFurtherMessageProcessingMessageProcessor;
 import org.mule.transformer.TransformerTemplate;
+import org.mule.transformer.simple.MessagePropertiesTransformer;
 import org.mule.util.ObjectUtils;
 
 /**
  * A simple HTTP proxy that supports transformation and caching.
  */
-public class HttpProxy extends AbstractFlowConstruct
+public class HttpProxy extends AbstractConfigurationPattern
 {
     // TODO (DDO) support outbound request path extension
     // TODO (DDO) support caching, using SimpleCachingHeadersPageCachingFilter / ObjectStore / mule-module-cache
@@ -43,9 +44,11 @@ public class HttpProxy extends AbstractFlowConstruct
     public HttpProxy(final String name,
                      final MuleContext muleContext,
                      final MessageSource messageSource,
-                     final OutboundEndpoint outboundEndpoint) throws MuleException
+                     final OutboundEndpoint outboundEndpoint,
+                     final List<MessageProcessor> transformers,
+                     final List<MessageProcessor> responseTransformers) throws MuleException
     {
-        super(name, muleContext);
+        super(name, muleContext, transformers, responseTransformers);
 
         if (messageSource == null)
         {
@@ -67,19 +70,40 @@ public class HttpProxy extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(final MessageProcessorChainBuilder builder)
+    protected void configureMessageProcessorsBeforeTransformation(final MessageProcessorChainBuilder builder)
     {
-        builder.chain(new ProcessingTimeInterceptor());
-        builder.chain(new LoggingInterceptor());
-        builder.chain(new FlowConstructStatisticsMessageProcessor());
-        builder.chain(new StopFurtherMessageProcessingMessageProcessor());
+        // if transformers have been configured, pre-emptively drop the content-length header to prevent side effects
+        // induced by mismatches
+        if ((hasTransformers()) || (hasResponseTransformers()))
+        {
+            final MessagePropertiesTransformer contentLengthHeaderRemover = newContentLengthHeaderRemover();
+            if (hasTransformers())
+            {
+                builder.chain(contentLengthHeaderRemover);
+            }
+            if (hasResponseTransformers())
+            {
+                builder.chain(new ResponseMessageProcessorAdapter(contentLengthHeaderRemover));
+            }
+        }
+    }
 
+    public static MessagePropertiesTransformer newContentLengthHeaderRemover()
+    {
+        final MessagePropertiesTransformer contentLengthHeaderRemover = new MessagePropertiesTransformer();
+        contentLengthHeaderRemover.setScope(PropertyScope.INBOUND);
+        contentLengthHeaderRemover.setDeleteProperties("(?i)content-length");
+        return contentLengthHeaderRemover;
+    }
+
+    @Override
+    protected void configureMessageProcessorsAfterTransformation(final MessageProcessorChainBuilder builder)
+    {
+        // ensure properties, hence HTTP headers, are propagated both ways
         final TransformerTemplate copyInboundToOutboundPropertiesTransformer = new TransformerTemplate(
             new CopyInboundToOutboundPropertiesTransformerCallback());
         builder.chain(copyInboundToOutboundPropertiesTransformer);
         builder.chain(new ResponseMessageProcessorAdapter(copyInboundToOutboundPropertiesTransformer));
-
-        // FIXME (DDO) MULE-5502 ensure outbound content length is correct when a transformer is defined on the proxy
 
         builder.chain(outboundEndpoint);
     }

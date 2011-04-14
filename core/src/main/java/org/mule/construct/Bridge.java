@@ -10,26 +10,25 @@
 
 package org.mule.construct;
 
+import java.util.List;
+
+import org.apache.commons.lang.Validate;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
-import org.mule.interceptor.LoggingInterceptor;
-import org.mule.interceptor.ProcessingTimeInterceptor;
-
-import org.apache.commons.lang.Validate;
 
 /**
- * A simple bridge between a single inbound endpoint and a single outbound endpoint.
- * It enforces a consistent exchange pattern across its endpoints. If declared
- * transactional, it ensures that the correct endpoint configuration is in place.
+ * A simple bridge between a single inbound endpoint and a single outbound endpoint. It enforces a consistent exchange
+ * pattern across its endpoints. If declared transactional, it ensures that the correct endpoint configuration is in
+ * place.
  */
-public class Bridge extends AbstractFlowConstruct
+public class Bridge extends AbstractConfigurationPattern
 {
     private final OutboundEndpoint outboundEndpoint;
     private final MessageExchangePattern exchangePattern;
@@ -39,10 +38,12 @@ public class Bridge extends AbstractFlowConstruct
                   MuleContext muleContext,
                   MessageSource messageSource,
                   OutboundEndpoint outboundEndpoint,
+                  List<MessageProcessor> transformers,
+                  List<MessageProcessor> responseTransformers,
                   MessageExchangePattern exchangePattern,
                   boolean transacted)
     {
-        super(name, muleContext);
+        super(name, muleContext, transformers, responseTransformers);
 
         Validate.notNull(messageSource, "messageSource can't be null");
         Validate.notNull(outboundEndpoint, "outboundEndpoint can't be null");
@@ -55,11 +56,14 @@ public class Bridge extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
+    protected void configureMessageProcessorsBeforeTransformation(MessageProcessorChainBuilder builder)
     {
-        builder.chain(new ProcessingTimeInterceptor());
-        builder.chain(new LoggingInterceptor());
-        builder.chain(new FlowConstructStatisticsMessageProcessor());
+        // NOOP
+    }
+
+    @Override
+    protected void configureMessageProcessorsAfterTransformation(MessageProcessorChainBuilder builder)
+    {
         builder.chain(outboundEndpoint);
     }
 

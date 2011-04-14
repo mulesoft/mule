@@ -10,6 +10,9 @@
 
 package org.mule.construct;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -24,27 +27,19 @@ import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
-import org.mule.interceptor.LoggingInterceptor;
-import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.util.ClassUtils;
-
-import java.lang.reflect.Method;
-import java.util.List;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
- * In-out SOA-style simple service, with no outbound router. Always fully
- * synchronous.
+ * In-out SOA-style simple service, with no outbound router. Always fully synchronous.
  */
-public class SimpleService extends AbstractFlowConstruct
+public class SimpleService extends AbstractConfigurationPattern
 {
     public enum Type
     {
         /**
-         * Expose a JAX-WS annoted component as a web service. The CXF module is
-         * required to have this working.
+         * Expose a JAX-WS annoted component as a web service. The CXF module is required to have this working.
          */
         JAX_WS
         {
@@ -70,8 +65,7 @@ public class SimpleService extends AbstractFlowConstruct
         },
 
         /**
-         * Expose a JAX-RS annoted component as a web service. The Jersey module is
-         * required to have this working.
+         * Expose a JAX-RS annoted component as a web service. The Jersey module is required to have this working.
          */
         JAX_RS
         {
@@ -134,10 +128,12 @@ public class SimpleService extends AbstractFlowConstruct
     public SimpleService(String name,
                          MuleContext muleContext,
                          MessageSource messageSource,
+                         List<MessageProcessor> transformers,
+                         List<MessageProcessor> responseTransformers,
                          Component component,
                          Type type) throws MuleException
     {
-        super(name, muleContext);
+        super(name, muleContext, transformers, responseTransformers);
 
         if (messageSource == null)
         {
@@ -168,11 +164,14 @@ public class SimpleService extends AbstractFlowConstruct
     }
 
     @Override
-    protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
+    protected void configureMessageProcessorsBeforeTransformation(MessageProcessorChainBuilder builder)
     {
-        builder.chain(new ProcessingTimeInterceptor());
-        builder.chain(new LoggingInterceptor());
-        builder.chain(new FlowConstructStatisticsMessageProcessor());
+        // NOOP
+    }
+
+    @Override
+    protected void configureMessageProcessorsAfterTransformation(MessageProcessorChainBuilder builder)
+    {
         type.configureComponentMessageProcessor(muleContext, builder, component);
     }
 

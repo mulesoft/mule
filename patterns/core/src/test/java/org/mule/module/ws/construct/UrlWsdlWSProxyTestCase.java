@@ -11,15 +11,17 @@
 package org.mule.module.ws.construct;
 
 import java.net.URI;
+import java.util.Collections;
 
 import org.mule.api.endpoint.OutboundEndpoint;
 
 public class UrlWsdlWSProxyTestCase extends AbstractWSProxyTestCase
 {
+    @SuppressWarnings("unchecked")
     @Override
-    protected WSProxy newWSProxy(OutboundEndpoint testOutboundEndpoint) throws Exception
+    protected WSProxy newWSProxy(final OutboundEndpoint testOutboundEndpoint) throws Exception
     {
         return new WSProxy("url-wsdl-ws-proxy", muleContext, directInboundMessageSource,
-            testOutboundEndpoint, new URI("test://test?wsdl"));
+            testOutboundEndpoint, Collections.EMPTY_LIST, Collections.EMPTY_LIST, new URI("test://test?wsdl"));
     }
 }

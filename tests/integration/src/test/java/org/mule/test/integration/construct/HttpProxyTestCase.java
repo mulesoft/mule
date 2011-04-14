@@ -52,8 +52,7 @@ public class HttpProxyTestCase extends FunctionalTestCase
 
     public void testTransforming() throws Exception
     {
-        // FIXME (DDO) should be "fooinbarout": why isn't the transformer on outbound http executing?
-        testRequest(3, "foobarout");
+        testRequest(3, "fooinbarout");
     }
 
     // TODO (DDO) test inheritance, dynamic endpoints, caching
@@ -65,7 +64,7 @@ public class HttpProxyTestCase extends FunctionalTestCase
 
     private void testRequest(final int proxyId, final String expectedResult) throws Exception
     {
-        final MuleMessage result = muleClient.send("http://localhost:8090/bar-appender/" + proxyId, "foo",
+        final MuleMessage result = muleClient.send("http://localhost:8090/http-proxy/" + proxyId, "foo",
             Collections.singletonMap("X-Custom-Header", "w00t"), getTestTimeoutSecs() * 1000);
         assertEquals(expectedResult, result.getPayloadAsString());
 

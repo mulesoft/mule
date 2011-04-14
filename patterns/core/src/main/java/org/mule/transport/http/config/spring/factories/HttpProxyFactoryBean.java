@@ -67,11 +67,11 @@ public class HttpProxyFactoryBean extends AbstractFlowConstructFactoryBean
 
     public void setTransformers(final Transformer... transformers)
     {
-        httpProxyBuilder.outboundTransformers(transformers);
+        httpProxyBuilder.transformers(transformers);
     }
 
     public void setResponseTransformers(final Transformer... responseTransformers)
     {
-        httpProxyBuilder.outboundResponseTransformers(responseTransformers);
+        httpProxyBuilder.responseTransformers(responseTransformers);
     }
 }
