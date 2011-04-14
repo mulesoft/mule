@@ -275,7 +275,7 @@
     <xsd:element name="abstract-message-processor" abstract="true" type="abstractMessageProcessorType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for message processor elements. 
+                A placeholder for message processor elements.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -386,7 +386,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="invoke" type="invokeType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -414,14 +414,14 @@
                 <xsd:attribute name="methodArguments" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Comma-seperated list of mule expression that when evaluated are the arguments for the method invocation 
+                            Comma-seperated list of mule expression that when evaluated are the arguments for the method invocation
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
                 <xsd:attribute name="methodArgumentTypes" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Comma-seperated list of mule expression that when evaluated are the arguments for the method invocation 
+                            Comma-seperated list of mule expression that when evaluated are the arguments for the method invocation
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -441,7 +441,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 Enriches the current message, using expressins to define source and target,
-                with the result of processing a nested message processor.  Use the target and optionally sourcre attributes 
+                with the result of processing a nested message processor.  Use the target and optionally sourcre attributes
                 for 1-1 enrichment.  If you require n-m enrichment than use the child 'enrich' elements instead.
             </xsd:documentation>
         </xsd:annotation>
@@ -468,7 +468,7 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             The enricher expression used to enrich the current message with the result
-                            the processing of the enrichement message processor specificed. 
+                            the processing of the enrichement message processor specificed.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -512,7 +512,7 @@
             <xsd:extension base="abstractMessageProcessorType">
                 <xsd:sequence>
                     <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="unbounded"/>
-                    <xsd:element ref="threading-profile" minOccurs="0"/>                    
+                    <xsd:element ref="threading-profile" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attribute name="name" type="xsd:string" use="optional">
                     <xsd:annotation>
@@ -524,7 +524,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="request-reply" type="requestReplyType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -551,7 +551,7 @@
                                 The inbound endpoint from which the asynchronous reply message will be received.
                             </xsd:documentation>
                         </xsd:annotation>
-                    </xsd:element>                    
+                    </xsd:element>
                 </xsd:sequence>
                 <xsd:attribute name="timeout" type="substitutableInt" use="optional">
                     <xsd:annotation>
@@ -563,7 +563,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="logger" type="loggerType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
     <xsd:documentation>
@@ -579,7 +579,7 @@
                 <xsd:attribute name="message" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Message that will be logged.  Embedded expressions can be used to extract value from the current message.  If no message is 
+                            Message that will be logged.  Embedded expressions can be used to extract value from the current message.  If no message is
                             specified then the current message is used.
                         </xsd:documentation>
                     </xsd:annotation>
@@ -610,8 +610,8 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-     
-    <!--  TODO 
+
+    <!--  TODO
     <xsd:element name="seda-stage" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -632,7 +632,7 @@
     <xsd:element name="transactional" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                Processes the nest list of message processors asychronously using a thread pool 
+                Processes the nest list of message processors asychronously using a thread pool
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -647,12 +647,12 @@
         </xsd:complexType>
     </xsd:element>
     -->
-    
+
     <!-- Message Sources -->
     <xsd:element name="abstract-message-source" abstract="true" type="abstractMessageSourceType">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for message source elements. 
+                A placeholder for message source elements.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -661,7 +661,7 @@
             <xsd:extension base="annotatedType"/>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <!--  TODO MULE-4987
     <xsd:element name="custom-source" type="customMessageSourceType" substitutionGroup="abstract-message-source"/>
     <xsd:complexType name="customMessageSourceType">
@@ -675,7 +675,7 @@
         </xsd:complexContent>
     </xsd:complexType>
      -->
-    
+
     <xsd:element name="composite-source" type="compositeMessageSourceType" substitutionGroup="abstract-message-source"/>
     <xsd:complexType name="compositeMessageSourceType">
         <xsd:complexContent>
@@ -699,7 +699,7 @@
                                 </xsd:documentation>
                             </xsd:annotation>
                         </xsd:element>
-                    </xsd:choice> 
+                    </xsd:choice>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -812,7 +812,7 @@
     <xsd:element name="abstract-filter" abstract="true" type="abstractFilterType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for filter elements, which control which messages are handled. 
+                A placeholder for filter elements, which control which messages are handled.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -921,7 +921,7 @@
         <xsd:attribute name="shutdownTimeout" type="substitutableInt" default="5000">
             <xsd:annotation>
                 <xsd:documentation>
-                    (As of Mule 2.2.2) The time in milliseconds to wait for any in-progress messages to finish processing before Mule shuts down. After this threshold has been reached, Mule starts interrupting threads, and messages can be lost. If you have a very large number of services in the same Mule instance, if you have components that take more than a couple seconds to process, or if you are using large payloads and/or slower transports, you should increase this value to allow more time for graceful shutdown. The value you specify is applied to services and separately to dispatchers, so the default value of 5000 milliseconds specifies that Mule has ten seconds to process and dispatch messages gracefully after shutdown is initiated. 
+                    (As of Mule 2.2.2) The time in milliseconds to wait for any in-progress messages to finish processing before Mule shuts down. After this threshold has been reached, Mule starts interrupting threads, and messages can be lost. If you have a very large number of services in the same Mule instance, if you have components that take more than a couple seconds to process, or if you are using large payloads and/or slower transports, you should increase this value to allow more time for graceful shutdown. The value you specify is applied to services and separately to dispatchers, so the default value of 5000 milliseconds specifies that Mule has ten seconds to process and dispatch messages gracefully after shutdown is initiated.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -1665,7 +1665,7 @@
     <!--==============================================================-->
     <!--   Flow Constructs                                            -->
     <!--==============================================================-->
-    
+
     <xsd:element name="abstract-flow-construct" abstract="true" type="abstractFlowConstructType">
         <xsd:annotation>
             <xsd:documentation>
@@ -1721,7 +1721,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="flow" type="flowType">
         <xsd:annotation>
             <xsd:documentation>
@@ -1803,8 +1803,8 @@
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
-    </xsd:element>    
-    
+    </xsd:element>
+
     <xsd:element name="simple-service" type="simpleServiceType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
@@ -1824,7 +1824,7 @@
                     <xsd:enumeration value="direct">
                       <xsd:annotation>
                         <xsd:documentation>
-                          Pass the inbound messages unaltered to the component.  
+                          Pass the inbound messages unaltered to the component.
                         </xsd:documentation>
                       </xsd:annotation>
                     </xsd:enumeration>
@@ -1917,7 +1917,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="bridge" type="bridgeType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
@@ -2004,7 +2004,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="validator" type="validatorType" substitutionGroup="abstract-flow-construct">
         <xsd:annotation>
             <xsd:documentation>
@@ -2064,7 +2064,7 @@
                             The filter to use to validate incoming message: accepted messages are considered valid.
                         </xsd:documentation>
                     </xsd:annotation>
-                </xsd:attribute>                
+                </xsd:attribute>
                 <xsd:attribute name="outboundAddress" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -2097,14 +2097,14 @@
                     <xsd:annotation>
                         <xsd:documentation>
                             An expression used to build the content of the response in case an error occurs during the outbound dispatch.
-                            The outbound endpoint's exchange pattern must be request-response if errorExpression is used. 
+                            The outbound endpoint's exchange pattern must be request-response if errorExpression is used.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-        
+
     <!--==============================================================-->
     <!-- Components                                              -->
     <!--==============================================================-->
@@ -2133,7 +2133,7 @@
     <xsd:element name="component" type="defaultJavaComponentType" substitutionGroup="abstract-component">
         <xsd:annotation>
             <xsd:documentation>
-                A simple POJO (Plain Old Java Object) component that will be invoked by Mule when a message is received. The class or object instance to be used can be specified using a child object factory element, or via the 'class' attribute.  If the 'class' attribute is used, an object factory cannot be configured as well. Using the 'class' attribute is equivilant to using the propotype object factory ('prototype-object' child element). 
+                A simple POJO (Plain Old Java Object) component that will be invoked by Mule when a message is received. The class or object instance to be used can be specified using a child object factory element, or via the 'class' attribute.  If the 'class' attribute is used, an object factory cannot be configured as well. Using the 'class' attribute is equivilant to using the propotype object factory ('prototype-object' child element).
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -2398,7 +2398,7 @@
                 <xsd:attribute name="interactWithExternal" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If this is set to "true", Mule interacts with transactions begun outside of Mule.  E.g. if an external transaction is active, then BEGIN_OR_JOIN wil join it, and ALWAYS_BEGIN will cause an exception to be thrown. 
+                            If this is set to "true", Mule interacts with transactions begun outside of Mule.  E.g. if an external transaction is active, then BEGIN_OR_JOIN wil join it, and ALWAYS_BEGIN will cause an exception to be thrown.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -2553,7 +2553,7 @@
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
             <xsd:extension base="globalEndpointTypeWithoutExchangePattern">
-                <xsd:attributeGroup ref="allExchangePatterns"/>    
+                <xsd:attributeGroup ref="allExchangePatterns"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -2563,7 +2563,7 @@
             <xsd:extension base="abstractGlobalEndpointType">
                 <xsd:group ref="defaultXaEndpointElements"/>
                 <xsd:attributeGroup ref="defaultEndpointAttributes"/>
-                <xsd:attributeGroup ref="allExchangePatterns"/>    
+                <xsd:attributeGroup ref="allExchangePatterns"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -2689,7 +2689,7 @@
             <xsd:group ref="propertiesGroup"/>
         </xsd:sequence>
     </xsd:group>
-    
+
     <xsd:group name="endpointMessageProcessorElements">
         <xsd:choice>
             <xsd:element ref="abstract-transformer" />
@@ -2842,7 +2842,7 @@
             </xsd:simpleType>
         </xsd:attribute>
     </xsd:attributeGroup>
-    
+
 
     <!--==============================================================-->
     <!--   Filter elements                                            -->
@@ -2978,13 +2978,26 @@
     </xsd:complexType>
 
 
-    <xsd:element name="regex-filter" type="patternFilterType" substitutionGroup="abstract-filter">
+    <xsd:element name="regex-filter" type="regexFilterType" substitutionGroup="abstract-filter">
         <xsd:annotation>
             <xsd:documentation>
                 A filter that matches string messages against a regular expression. The Java regular expression engine (java.util.regex.Pattern) is used.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
+    <xsd:complexType name="regexFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="patternFilterType">
+                <xsd:attribute name="flags" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Comma-separated list of flags for compiling the pattern. Valid values are CASE_INSENSITIVE, MULTILINE, DOTALL, UNICODE_CASE and CANON_EQ.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
     <xsd:complexType name="patternFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractFilterType">
@@ -3630,7 +3643,7 @@
                         <xsd:element name="return-argument">
                             <xsd:annotation>
                                 <xsd:documentation>
-                                    A list of expressions, each of which is evaluated and equates to an element in the result message. If just one 'return-argument' is configured, the result will be the evaluation of that expression rather than an object array. 
+                                    A list of expressions, each of which is evaluated and equates to an element in the result message. If just one 'return-argument' is configured, the result will be the evaluation of that expression rather than an object array.
                                 </xsd:documentation>
                             </xsd:annotation>
                             <xsd:complexType>
@@ -3655,7 +3668,7 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    
+
     <xsd:simpleType name="standardExpressionEvaluators">
         <xsd:restriction base="substitutableName">
             <xsd:enumeration value="attachment"/>
@@ -3688,7 +3701,7 @@
             <xsd:enumeration value="custom"/>
         </xsd:restriction>
     </xsd:simpleType>
-    
+
     <xsd:simpleType name="standardExpressionEnrichers">
         <xsd:restriction base="substitutableName">
             <xsd:enumeration value="header"/>
@@ -4213,11 +4226,11 @@
     <!--==================================-->
     <!-- Simple (1-1) Message Processors  -->
     <!--==================================-->
-    
+
     <xsd:element name="abstract-intercepting-message-processor" abstract="true" type="abstractInterceptingMessageProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for intercepting router elements. 
+                A placeholder for intercepting router elements.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -4226,7 +4239,7 @@
         	<xsd:extension base="abstractMessageProcessorType"/>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="message-filter" type="messageFilterType"  substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -4270,7 +4283,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:complexType name="idempotentMessageFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractInterceptingMessageProcessorType">
@@ -4287,7 +4300,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="idempotent-message-filter" type="idempotentMessageFilterType"
                  substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
@@ -4317,7 +4330,7 @@
 	        </xsd:complexContent>
 	    </xsd:complexType>
 	</xsd:element>
-	
+
 	<xsd:element name="wire-tap" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -4335,7 +4348,7 @@
 	        </xsd:complexContent>
 	    </xsd:complexType>
     </xsd:element>
-    
+
     <xsd:complexType name="baseAggregatorType">
         <xsd:complexContent>
             <xsd:extension base="abstractInterceptingMessageProcessorType">
@@ -4359,7 +4372,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="resequencer" type="baseAggregatorType"
                  substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
@@ -4368,7 +4381,7 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
     <xsd:element name="collection-aggregator" type="baseAggregatorType"
                  substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
@@ -4377,7 +4390,7 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
     <xsd:element name="message-chunk-aggregator" type="baseAggregatorType"
                  substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
@@ -4387,7 +4400,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="custom-aggregator" 
+    <xsd:element name="custom-aggregator"
                  substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -4417,7 +4430,7 @@
 	        </xsd:complexContent>
 	    </xsd:complexType>
 	</xsd:element>
-     
+
     <xsd:complexType name="baseSplitterType">
         <xsd:complexContent>
             <xsd:extension base="abstractInterceptingMessageProcessorType">
@@ -4427,8 +4440,8 @@
                 <xsd:attributeGroup ref="defaultCorrelationAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
-    </xsd:complexType> 
-     
+    </xsd:complexType>
+
     <xsd:element name="splitter" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -4443,11 +4456,11 @@
 	        </xsd:complexContent>
 	    </xsd:complexType>
     </xsd:element>
-    
+
     <xsd:element name="collection-splitter" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                The collection splitter accepts a collection of objects and splits the collection invoking the next message processor with each item in the collection in sequence. 
+                The collection splitter accepts a collection of objects and splits the collection invoking the next message processor with each item in the collection in sequence.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -4456,11 +4469,11 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    
+
     <xsd:element name="map-splitter" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                The map splitter accepts a map of objects and splits the collection invoking the next message processor with each item in the collection in sequence. 
+                The map splitter accepts a map of objects and splits the collection invoking the next message processor with each item in the collection in sequence.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -4473,7 +4486,7 @@
     <xsd:element name="message-chunk-splitter" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                The collection splitter accepts a collection of objects and splits the collection invoking the next message processor with each item in the collection in sequence. 
+                The collection splitter accepts a collection of objects and splits the collection invoking the next message processor with each item in the collection in sequence.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
@@ -4490,7 +4503,7 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    
+
     <xsd:element name="custom-splitter" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -4520,10 +4533,10 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    
+
     <!-- Conditional Message Processor Elements -->
     <xsd:complexType name="abstractMessageProcessorFilterPairType" abstract="true" />
-    
+
     <xsd:complexType name="whenMessageProcessorFilterPairType">
       <xsd:complexContent>
         <xsd:extension base="abstractMessageProcessorFilterPairType">
@@ -4554,7 +4567,7 @@
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:complexType name="otherwiseMessageProcessorFilterPairType">
       <xsd:complexContent>
         <xsd:extension base="abstractMessageProcessorFilterPairType">
@@ -4570,7 +4583,7 @@
     <xsd:element name="abstract-routing-message-processor" abstract="true" type="abstractRoutingMessageProcessorType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
-                A placeholder for intercepting router elements. 
+                A placeholder for intercepting router elements.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -4589,7 +4602,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:complexType name="baseMultipleRoutesRoutingMessageProcessorType">
         <xsd:complexContent>
             <xsd:extension base="baseSingleRouteRoutingMessageProcessorType">
@@ -4600,7 +4613,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="custom-router" substitutionGroup="abstract-routing-message-processor">
         <xsd:complexType>
             <xsd:complexContent>
@@ -4609,7 +4622,7 @@
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required"/>
-                </xsd:extension>            
+                </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
@@ -4633,7 +4646,7 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    
+
     <xsd:element name="all" type="baseMultipleRoutesRoutingMessageProcessorType" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -4666,7 +4679,7 @@
                         <xsd:annotation>
                             <xsd:documentation>
                                 Specifies an expression that when evaluated as determines if the processing of one a route was a failure or not.
-                            </xsd:documentation>                        
+                            </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
                 </xsd:extension>
@@ -5068,7 +5081,7 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
-    
+
     <!-- Default Outbound Router Types -->
     <xsd:complexType name="outboundRouterType">
         <xsd:complexContent>
@@ -5196,7 +5209,7 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <!-- Splitter routers -->
 
     <!-- Extends AbstractMessageSplitter-->
@@ -5387,7 +5400,7 @@
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
             <xsd:documentation>
-                Allows you to configure a custom outbound router by specifying the custom router class and by using Spring properties. 
+                Allows you to configure a custom outbound router by specifying the custom router class and by using Spring properties.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -5452,7 +5465,7 @@
                         <xsd:documentation>
                             Fully qualified class name of the custom catch-all strategy to be used.
                         </xsd:documentation>
-                    </xsd:annotation>                
+                    </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
@@ -5495,7 +5508,7 @@
                         <xsd:documentation>
                             Fully qualified class name of the custom forwarding catch-all strategy to be used.
                         </xsd:documentation>
-                    </xsd:annotation>                
+                    </xsd:annotation>
                 </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
@@ -5610,7 +5623,7 @@
     <xsd:complexType name="abstractObjectFactoryType">
         <xsd:annotation>
             <xsd:documentation>
-                An object factory is used to obtain object instances. The object factory is responsible for object creation and can implement different patterns, such a singleton or prototype, or lookup an instance from other object containers.  
+                An object factory is used to obtain object instances. The object factory is responsible for object creation and can implement different patterns, such a singleton or prototype, or lookup an instance from other object containers.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:sequence>
@@ -5850,7 +5863,7 @@
             <xsd:documentation>
                 Configures a direct trust store. TLS/SSL connections are made to trusted systems. The public certificates of trusted systems are stored in a keystore (called a trust store) and used to verify that the connection made to a remote system is the expected identity.
             </xsd:documentation>
-        </xsd:annotation>    
+        </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="tlsTrustStoreType">
                 <xsd:attribute name="class" type="substitutableClass"/>
@@ -5879,7 +5892,7 @@
                 <xsd:attribute name="requireClientAuthentication" type="substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
-                            If a server socket is constructed directly, this attribute is used to determine whether client authentication is required. This does not apply to client connections. 
+                            If a server socket is constructed directly, this attribute is used to determine whether client authentication is required. This does not apply to client connections.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -6306,7 +6319,7 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:attribute>
-    
+
     -->
 
 </xsd:schema>

@@ -74,6 +74,7 @@ import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
+import org.mule.config.spring.parsers.specific.RegExFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ResponseDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
@@ -137,7 +138,6 @@ import org.mule.routing.filters.ExceptionTypeFilter;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.filters.MessagePropertyFilter;
 import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.routing.filters.RegExFilter;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.filters.logic.AndFilter;
 import org.mule.routing.filters.logic.NotFilter;
@@ -314,14 +314,14 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
             .addCollection("enrichExpressionPairs");
         registerMuleBeanDefinitionParser("enrich", new ChildDefinitionParser("enrichExpressionPair",
             EnrichExpressionPair.class));
-        
+
         registerBeanDefinitionParser("async", new ChildDefinitionParser("messageProcessor",
             AsyncMessageProcessorsFactoryBean.class));
         registerBeanDefinitionParser("transactional", new ChildDefinitionParser("messageProcessor",
             TransactionalMessageProcessorsFactoryBean.class));
         registerMuleBeanDefinitionParser("logger", new ChildDefinitionParser("messageProcessor",
             LoggerMessageProcessor.class));
-        
+
         // Message Sources
         // TODO MULE-4987
         // registerBeanDefinitionParser("custom-source", new ChildDefinitionParser("messageSource", null, MessageSource.class));
@@ -456,7 +456,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("round-robin", new ChildDefinitionParser("messageProcessor", RoundRobin.class));
 
         registerBeanDefinitionParser("custom-router", new ChildDefinitionParser("messageProcessor"));
-        
+
         //Message Info Mappings
         registerBeanDefinitionParser("expression-message-info-mapping", new ChildDefinitionParser("messageInfoMapping", ExpressionMessageInfoMapping.class));
         registerBeanDefinitionParser("custom-message-info-mapping", new ChildDefinitionParser("messageInfoMapping"));
@@ -472,7 +472,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("and-filter", new FilterDefinitionParser(AndFilter.class));
         registerBeanDefinitionParser("or-filter", new FilterDefinitionParser(OrFilter.class));
         registerBeanDefinitionParser("not-filter", new FilterDefinitionParser(NotFilter.class));
-        registerBeanDefinitionParser("regex-filter", new FilterDefinitionParser(RegExFilter.class));
+        registerBeanDefinitionParser("regex-filter", new RegExFilterDefinitionParser());
         registerBeanDefinitionParser("exception-type-filter", new FilterDefinitionParser(ExceptionTypeFilter.class));
         registerBeanDefinitionParser("message-property-filter", new FilterDefinitionParser(MessagePropertyFilter.class));
         registerBeanDefinitionParser("payload-type-filter", new FilterDefinitionParser(PayloadTypeFilter.class));
