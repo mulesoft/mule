@@ -14,6 +14,7 @@ import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.test.integration.tck.WeatherForecaster;
 
+//FIXME (DDO) use DynamicPortTestCase
 public class WSProxyTestCase extends FunctionalTestCase
 {
     private MuleClient muleClient;
@@ -82,20 +83,20 @@ public class WSProxyTestCase extends FunctionalTestCase
         testWsdlAndWebServiceRequests(9);
     }
 
-    private void testWsdlAndWebServiceRequests(int proxyId) throws Exception
+    private void testWsdlAndWebServiceRequests(final int proxyId) throws Exception
     {
         testWsdlRequest(proxyId);
         testWebServiceRequest(proxyId);
     }
 
-    private void testWsdlRequest(int proxyId) throws Exception
+    private void testWsdlRequest(final int proxyId) throws Exception
     {
         final String wsdl = muleClient.request("http://localhost:8090/weather-forecast/" + proxyId + "?wsdl",
             getTestTimeoutSecs() * 1000L).getPayloadAsString();
         assertTrue(wsdl.contains("GetWeatherByZipCode"));
     }
 
-    private void testWebServiceRequest(int proxyId) throws Exception
+    private void testWebServiceRequest(final int proxyId) throws Exception
     {
         final String weatherForecast = muleClient.send(
             "wsdl-cxf:http://localhost:8090/weather-forecast/" + proxyId + "?wsdl&method=GetWeatherByZipCode",

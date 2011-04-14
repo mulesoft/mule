@@ -17,7 +17,7 @@ import org.mule.api.source.MessageSource;
 import org.mule.construct.AbstractFlowConstruct;
 
 @SuppressWarnings("unchecked")
-public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstructBuilder, F extends AbstractFlowConstruct>
+public abstract class AbstractFlowConstructBuilder<T extends AbstractFlowConstructBuilder<?, ?>, F extends AbstractFlowConstruct>
 {
     protected String name;
     protected MessageSource messageSource;

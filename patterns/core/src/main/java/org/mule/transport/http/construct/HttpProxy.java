@@ -34,7 +34,9 @@ import org.mule.util.ObjectUtils;
  */
 public class HttpProxy extends AbstractFlowConstruct
 {
-    // TODO (DDO) support caching
+    // TODO (DDO) support outbound request path extension
+    // TODO (DDO) support caching, using SimpleCachingHeadersPageCachingFilter / ObjectStore / mule-module-cache
+    // TODO (DDO) support cache bypass? X-Mule-HttpProxy-CacheControl=no-cache?
 
     private final OutboundEndpoint outboundEndpoint;
 
@@ -85,6 +87,8 @@ public class HttpProxy extends AbstractFlowConstruct
     @Override
     protected void validateConstruct() throws FlowConstructInvalidException
     {
+        // FIXME (DDO) enforce HTTP endpoints
+
         super.validateConstruct();
 
         if ((messageSource instanceof InboundEndpoint)

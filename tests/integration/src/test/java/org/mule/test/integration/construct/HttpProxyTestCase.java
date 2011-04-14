@@ -10,12 +10,13 @@
 
 package org.mule.test.integration.construct;
 
+import java.util.Collections;
+
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-import java.util.Collections;
-
+// FIXME (DDO) use DynamicPortTestCase
 public class HttpProxyTestCase extends FunctionalTestCase
 {
     private MuleClient muleClient;
@@ -55,7 +56,7 @@ public class HttpProxyTestCase extends FunctionalTestCase
         testRequest(3, "foobarout");
     }
 
-    // TODO (DDO) test inheritance, caching
+    // TODO (DDO) test inheritance, dynamic endpoints, caching
 
     private void testDirectRequest(final int proxyId) throws Exception
     {
@@ -68,15 +69,15 @@ public class HttpProxyTestCase extends FunctionalTestCase
             Collections.singletonMap("X-Custom-Header", "w00t"), getTestTimeoutSecs() * 1000);
         assertEquals(expectedResult, result.getPayloadAsString());
 
-        int contentLength = getContentLength(result);
+        final int contentLength = getContentLength(result);
         assertEquals(expectedResult.length(), contentLength);
 
         assertEquals("w00tbaz", result.getInboundProperty("X-Custom-Header-Response"));
     }
 
-    private int getContentLength(MuleMessage result)
+    private int getContentLength(final MuleMessage result)
     {
-        Object messageProperty = result.getInboundProperty("Content-Length");
+        final Object messageProperty = result.getInboundProperty("Content-Length");
         return Integer.parseInt(messageProperty.toString());
     }
 }

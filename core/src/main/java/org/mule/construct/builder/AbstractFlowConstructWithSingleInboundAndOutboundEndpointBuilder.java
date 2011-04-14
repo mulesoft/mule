@@ -21,7 +21,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.AbstractFlowConstruct;
 
 @SuppressWarnings("unchecked")
-public abstract class AbstractFlowConstructWithSingleInboundAndOutboundEndpointBuilder<T extends AbstractFlowConstructBuilder, F extends AbstractFlowConstruct>
+public abstract class AbstractFlowConstructWithSingleInboundAndOutboundEndpointBuilder<T extends AbstractFlowConstructBuilder<?, ?>, F extends AbstractFlowConstruct>
     extends AbstractFlowConstructWithSingleInboundEndpointBuilder<T, F>
 {
     private OutboundEndpoint outboundEndpoint;
@@ -59,12 +59,12 @@ public abstract class AbstractFlowConstructWithSingleInboundAndOutboundEndpointB
 
         if (outboundEndpointBuilder == null)
         {
-            outboundEndpointBuilder = muleContext.getEndpointFactory().getEndpointBuilder(
-                outboundAddress);
+            outboundEndpointBuilder = muleContext.getEndpointFactory().getEndpointBuilder(outboundAddress);
         }
 
         outboundEndpointBuilder.setExchangePattern(getOutboundMessageExchangePattern());
 
+        // FIXME (DDO) review transformer injection: better be done in flow?
         if (outboundTransformers != null)
         {
             outboundEndpointBuilder.setMessageProcessors(outboundTransformers);

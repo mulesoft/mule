@@ -22,6 +22,7 @@ import org.mule.test.integration.tck.WeatherForecaster;
 import org.mule.util.StringUtils;
 import org.springframework.util.FileCopyUtils;
 
+//FIXME (DDO) use DynamicPortTestCase
 public class SimpleServiceTestCase extends FunctionalTestCase
 {
     private LocalMuleClient muleClient;
@@ -100,8 +101,11 @@ public class SimpleServiceTestCase extends FunctionalTestCase
     {
         final String result = muleClient.send(
             "vm://weather-consumer.in",
-            Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                "org/mule/test/integration/construct/weather-report.xml"), null).getPayload().toString();
+            Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream("org/mule/test/integration/construct/weather-report.xml"), null)
+            .getPayload()
+            .toString();
 
         assertTrue(StringUtils.isNotBlank(result));
     }
@@ -110,8 +114,11 @@ public class SimpleServiceTestCase extends FunctionalTestCase
     {
         final String result = muleClient.send(
             "vm://weather-xpath-consumer.in",
-            Thread.currentThread().getContextClassLoader().getResourceAsStream(
-                "org/mule/test/integration/construct/weather-report.xml"), null).getPayload().toString();
+            Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream("org/mule/test/integration/construct/weather-report.xml"), null)
+            .getPayload()
+            .toString();
 
         assertTrue(StringUtils.isNotBlank(result));
     }
@@ -134,7 +141,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         assertEquals(s, getFunctionalTestComponent(ftcName).getLastReceivedMessage());
     }
 
-    private void doTestMathsService(String url) throws MuleException
+    private void doTestMathsService(final String url) throws MuleException
     {
         final int a = RandomUtils.nextInt(100);
         final int b = RandomUtils.nextInt(100);
@@ -142,14 +149,14 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         assertEquals(a + b, result);
     }
 
-    private void doTestStringMassager(String url) throws Exception, MuleException
+    private void doTestStringMassager(final String url) throws Exception, MuleException
     {
         final String s = RandomStringUtils.randomAlphabetic(10);
         final String result = new String((byte[]) muleClient.send(url, s.getBytes(), null).getPayload());
         assertEquals(s + "barbaz", result);
     }
 
-    private void doTestJaxWsService(int portNumber) throws Exception
+    private void doTestJaxWsService(final int portNumber) throws Exception
     {
         final String wsdl = new String(FileCopyUtils.copyToByteArray((InputStream) muleClient.request(
             "http://localhost:" + portNumber + "/weather-forecast?wsdl", getTestTimeoutSecs() * 1000L)
@@ -163,11 +170,11 @@ public class SimpleServiceTestCase extends FunctionalTestCase
 
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
     }
-    
+
     public void testInheritedElementsUnique() throws Exception
     {
-        SimpleService child1 = (SimpleService) getFlowConstruct("child-service-1");
-        SimpleService child2 = (SimpleService) getFlowConstruct("child-service-2");
+        final SimpleService child1 = (SimpleService) getFlowConstruct("child-service-1");
+        final SimpleService child2 = (SimpleService) getFlowConstruct("child-service-2");
         assertNotSame(child1.getMessageSource(), child2.getMessageSource());
         assertNotSame(child1.getComponent(), child2.getComponent());
         assertNotSame(child1.getExceptionListener(), child2.getExceptionListener());
