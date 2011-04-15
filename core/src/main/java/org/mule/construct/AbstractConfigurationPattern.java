@@ -76,7 +76,9 @@ public abstract class AbstractConfigurationPattern extends AbstractFlowConstruct
         return !responseTransformers.isEmpty();
     }
 
-    protected abstract void configureMessageProcessorsBeforeTransformation(final MessageProcessorChainBuilder builder);
+    protected abstract void configureMessageProcessorsBeforeTransformation(final MessageProcessorChainBuilder builder)
+        throws MuleException;
 
-    protected abstract void configureMessageProcessorsAfterTransformation(final MessageProcessorChainBuilder builder);
+    protected abstract void configureMessageProcessorsAfterTransformation(final MessageProcessorChainBuilder builder)
+        throws MuleException;
 }

@@ -15,6 +15,7 @@ import java.util.List;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -24,18 +25,22 @@ import org.mule.api.source.MessageSource;
 import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.construct.AbstractConfigurationPattern;
+import org.mule.endpoint.DynamicOutboundEndpoint;
+import org.mule.endpoint.DynamicURIOutboundEndpoint;
+import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.pattern.core.construct.CopyInboundToOutboundPropertiesTransformerCallback;
 import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.transformer.TransformerTemplate;
+import org.mule.transformer.TransformerTemplate.TransformerCallback;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
 import org.mule.util.ObjectUtils;
+import org.mule.util.StringUtils;
 
 /**
  * A simple HTTP proxy that supports transformation and caching.
  */
 public class HttpProxy extends AbstractConfigurationPattern
 {
-    // TODO (DDO) support outbound request path extensions (including query parameters)
     // TODO (DDO) support caching, using SimpleCachingHeadersPageCachingFilter / ObjectStore / mule-module-cache
     // TODO (DDO) support cache bypass? X-Mule-HttpProxy-CacheControl=no-cache?
 
@@ -75,6 +80,48 @@ public class HttpProxy extends AbstractConfigurationPattern
         configureContentLengthRemover(this, builder);
     }
 
+    @Override
+    protected void configureMessageProcessorsAfterTransformation(final MessageProcessorChainBuilder builder)
+        throws MuleException
+    {
+        // ensure properties, hence HTTP headers, are propagated both ways
+        final TransformerTemplate copyInboundToOutboundPropertiesTransformer = new TransformerTemplate(
+            new CopyInboundToOutboundPropertiesTransformerCallback());
+        builder.chain(copyInboundToOutboundPropertiesTransformer);
+        builder.chain(new ResponseMessageProcessorAdapter(copyInboundToOutboundPropertiesTransformer));
+
+        if (outboundEndpoint instanceof DynamicURIOutboundEndpoint)
+        {
+            // do not mess with endpoints that are already dynamic
+            builder.chain(outboundEndpoint);
+        }
+        else
+        {
+            // create a templated outbound endpoint to propagate extra path elements (including query parameters)
+            builder.chain(new TransformerTemplate(new TransformerCallback()
+            {
+                public Object doTransform(final MuleMessage message) throws Exception
+                {
+                    final String pathExtension = StringUtils.substringAfter(
+                        (String) message.getInboundProperty("http.request"),
+                        (String) message.getInboundProperty("http.context.path"));
+
+                    message.setInvocationProperty("http.path.extension",
+                        StringUtils.defaultString(pathExtension));
+                    return message;
+                }
+            }));
+
+            final String uriTemplate = outboundEndpoint.getEndpointURI().getUri().toString()
+                                       + "#[variable:http.path.extension]";
+
+            final DynamicOutboundEndpoint dynamicOutboundEndpoint = new DynamicOutboundEndpoint(muleContext,
+                new EndpointURIEndpointBuilder(outboundEndpoint), uriTemplate);
+
+            builder.chain(dynamicOutboundEndpoint);
+        }
+    }
+
     public static void configureContentLengthRemover(final AbstractConfigurationPattern configurationPattern,
                                                      final MessageProcessorChainBuilder builder)
     {
@@ -100,18 +147,6 @@ public class HttpProxy extends AbstractConfigurationPattern
         contentLengthHeaderRemover.setScope(PropertyScope.INBOUND);
         contentLengthHeaderRemover.setDeleteProperties("(?i)content-length");
         return contentLengthHeaderRemover;
-    }
-
-    @Override
-    protected void configureMessageProcessorsAfterTransformation(final MessageProcessorChainBuilder builder)
-    {
-        // ensure properties, hence HTTP headers, are propagated both ways
-        final TransformerTemplate copyInboundToOutboundPropertiesTransformer = new TransformerTemplate(
-            new CopyInboundToOutboundPropertiesTransformerCallback());
-        builder.chain(copyInboundToOutboundPropertiesTransformer);
-        builder.chain(new ResponseMessageProcessorAdapter(copyInboundToOutboundPropertiesTransformer));
-
-        builder.chain(outboundEndpoint);
     }
 
     @Override

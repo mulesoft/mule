@@ -59,15 +59,16 @@
                     scope="outbound">
                     <add-message-property key="X-Custom-Header-Response"
                         value="#[string:#[header:INBOUND:X-Custom-Header]baz]" />
+                    <add-message-property key="X-Actual-Request-Path"
+                        value="#[header:INBOUND:http.request]" />
                 </message-properties-transformer>
             </response>
         </http:inbound-endpoint>
         <script:component>
             <script:script engine="groovy">
-                assert payload.length() ==
-                Integer.valueOf(message.getInboundProperty("Content-Length", 0))
+                assert payload.length() == Integer.valueOf(message.getInboundProperty('Content-Length', 0))
                 payload
-      </script:script>
+            </script:script>
         </script:component>
     </flow>
 </mule>

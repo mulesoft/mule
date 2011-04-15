@@ -11,7 +11,9 @@
 package org.mule.pattern.core.construct;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.transformer.TransformerTemplate.TransformerCallback;
+import org.mule.util.StringUtils;
 
 public final class CopyInboundToOutboundPropertiesTransformerCallback implements TransformerCallback
 {
@@ -19,6 +21,11 @@ public final class CopyInboundToOutboundPropertiesTransformerCallback implements
     {
         for (final String inboundPropertyName : message.getInboundPropertyNames())
         {
+            if (StringUtils.startsWith(inboundPropertyName, MuleProperties.PROPERTY_PREFIX))
+            {
+                continue;
+            }
+
             message.setOutboundProperty(inboundPropertyName, message.getInboundProperty(inboundPropertyName));
         }
 

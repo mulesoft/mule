@@ -17,6 +17,7 @@ import java.util.Map;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
+import org.mule.util.StringUtils;
 
 public class HttpProxyTestCase extends DynamicPortTestCase
 {
@@ -71,7 +72,13 @@ public class HttpProxyTestCase extends DynamicPortTestCase
         testExtraHeadersRequest(5, Collections.singletonMap("proxyTarget", "bar-appender"));
     }
 
-    // TODO (DDO) test path extensions, caching
+    @SuppressWarnings("unchecked")
+    public void testPathExtensions() throws Exception
+    {
+        testRequest(1, "/extension", "foobar", Collections.EMPTY_MAP);
+        testRequest(1, "?name=value", "foobar", Collections.EMPTY_MAP);
+        testRequest(1, "/other?name=value", "foobar", Collections.EMPTY_MAP);
+    }
 
     private void testDirectRequest(final int proxyId) throws Exception
     {
@@ -94,18 +101,28 @@ public class HttpProxyTestCase extends DynamicPortTestCase
                              final String expectedResult,
                              final Map<String, String> extraHeaders) throws Exception
     {
+        testRequest(proxyId, StringUtils.EMPTY, expectedResult, extraHeaders);
+    }
+
+    private void testRequest(final int proxyId,
+                             final String pathExtension,
+                             final String expectedResult,
+                             final Map<String, String> extraHeaders) throws Exception
+    {
         final Map<String, String> headers = new HashMap<String, String>(Collections.singletonMap(
             "X-Custom-Header", "w00t"));
         headers.putAll(extraHeaders);
 
         final MuleMessage result = muleClient.send("http://localhost:" + getPorts().get(0) + "/http-proxy/"
-                                                   + proxyId, "foo", headers, getTestTimeoutSecs() * 1000);
+                                                   + proxyId + pathExtension, "foo", headers,
+            getTestTimeoutSecs() * 1000);
         assertEquals(expectedResult, result.getPayloadAsString());
 
         final int contentLength = getContentLength(result);
         assertEquals(expectedResult.length(), contentLength);
 
         assertEquals("w00tbaz", result.getInboundProperty("X-Custom-Header-Response"));
+        assertEquals("/bar-appender" + pathExtension, result.getInboundProperty("X-Actual-Request-Path"));
     }
 
     private int getContentLength(final MuleMessage result)
