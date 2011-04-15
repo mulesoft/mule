@@ -35,7 +35,7 @@ import org.mule.util.ObjectUtils;
  */
 public class HttpProxy extends AbstractConfigurationPattern
 {
-    // TODO (DDO) support outbound request path extension
+    // TODO (DDO) support outbound request path extensions (including query parameters)
     // TODO (DDO) support caching, using SimpleCachingHeadersPageCachingFilter / ObjectStore / mule-module-cache
     // TODO (DDO) support cache bypass? X-Mule-HttpProxy-CacheControl=no-cache?
 

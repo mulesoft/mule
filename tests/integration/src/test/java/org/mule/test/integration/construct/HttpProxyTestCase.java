@@ -11,6 +11,8 @@
 package org.mule.test.integration.construct;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -59,18 +61,45 @@ public class HttpProxyTestCase extends DynamicPortTestCase
         testRequest(3, "fooinbarout");
     }
 
-    // TODO (DDO) test inheritance, dynamic endpoints, caching
+    public void testInheritance() throws Exception
+    {
+        testRequest(4, "fooinbarout");
+    }
+
+    public void testDynamicAddress() throws Exception
+    {
+        testExtraHeadersRequest(5, Collections.singletonMap("proxyTarget", "bar-appender"));
+    }
+
+    // TODO (DDO) test path extensions, caching
 
     private void testDirectRequest(final int proxyId) throws Exception
     {
         testRequest(proxyId, "foobar");
     }
 
+    private void testExtraHeadersRequest(final int proxyId, final Map<String, String> extraHeaders)
+        throws Exception
+    {
+        testRequest(proxyId, "foobar", extraHeaders);
+    }
+
+    @SuppressWarnings("unchecked")
     private void testRequest(final int proxyId, final String expectedResult) throws Exception
     {
+        testRequest(proxyId, expectedResult, Collections.EMPTY_MAP);
+    }
+
+    private void testRequest(final int proxyId,
+                             final String expectedResult,
+                             final Map<String, String> extraHeaders) throws Exception
+    {
+        final Map<String, String> headers = new HashMap<String, String>(Collections.singletonMap(
+            "X-Custom-Header", "w00t"));
+        headers.putAll(extraHeaders);
+
         final MuleMessage result = muleClient.send("http://localhost:" + getPorts().get(0) + "/http-proxy/"
-                                                   + proxyId, "foo",
-            Collections.singletonMap("X-Custom-Header", "w00t"), getTestTimeoutSecs() * 1000);
+                                                   + proxyId, "foo", headers, getTestTimeoutSecs() * 1000);
         assertEquals(expectedResult, result.getPayloadAsString());
 
         final int contentLength = getContentLength(result);

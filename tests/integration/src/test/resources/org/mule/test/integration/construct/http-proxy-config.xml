@@ -25,12 +25,23 @@
 
     <pattern:http-proxy name="transforming-http-proxy"
         inboundAddress="http://localhost:${port1}/http-proxy/3"
-        transformer-refs="append-in" outboundAddress="http://localhost:${port2}/bar-appender"
-        responseTransformer-refs="append-out" />
+        transformer-refs="append-in" responseTransformer-refs="append-out"
+        outboundAddress="http://localhost:${port2}/bar-appender" />
+
+    <pattern:http-proxy name="abstract-parent-http-proxy"
+        abstract="true" transformer-refs="append-in" responseTransformer-refs="append-out" />
+
+    <pattern:http-proxy name="concrete-child-http-proxy"
+        parent="abstract-parent-http-proxy" inboundAddress="http://localhost:${port1}/http-proxy/4"
+        outboundAddress="http://localhost:${port2}/bar-appender" />
+        
+    <pattern:http-proxy name="dynamic-address-http-proxy"
+        inboundAddress="http://localhost:${port1}/http-proxy/5"
+        outboundAddress="http://localhost:${port2}/#[header:INBOUND:proxyTarget]" />
                       
-  <!--
+    <!--
         Test support
-  -->
+    -->
     <object-to-string-transformer name="object-to-string" />
     <append-string-transformer name="append-out"
         message="out" />
