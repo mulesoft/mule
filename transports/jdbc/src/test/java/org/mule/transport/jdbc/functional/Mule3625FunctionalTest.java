@@ -39,6 +39,10 @@ public class Mule3625FunctionalTest extends FunctionalTestCase
         DataSource dataSource = (DataSource) muleContext.getRegistry().lookupObject("hsqldbDataSource");
         Connection connection = dataSource.getConnection();
         Statement statement = connection.createStatement();
+        
+        // make sure other tests didnt leave anything behind
+        statement.execute("DROP SCHEMA PUBLIC CASCADE");        
+        
         statement.executeUpdate("create table TABLE_A (value varchar(1))");
         statement.executeUpdate("create table TABLE_B (value varchar(1))");
         statement.executeUpdate("insert into TABLE_A(value) values('n')");
@@ -46,6 +50,11 @@ public class Mule3625FunctionalTest extends FunctionalTestCase
         ResultSet resultSet = statement.executeQuery("select count(*) from TABLE_B where value='y'");
         assertTrue(resultSet.next());
         assertEquals(1, resultSet.getLong(1));
+        
+        // clean up for later tests
+        statement.execute("DROP SCHEMA PUBLIC CASCADE");
+        resultSet.close();
+        connection.close();
     }
 
 }
