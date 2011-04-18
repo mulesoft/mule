@@ -26,20 +26,20 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
     {
         return tempFile;
     }
-        
+
     public void testMessageProperties() throws Exception
     {
         MuleMessageFactory factory = createMuleMessageFactory();
-        
+
         MuleMessage message = factory.create(getValidTransportMessage(), encoding);
         assertNotNull(message);
         assertMessageProperties(message);
     }
-    
+
     public void testCreateMessageFromStream() throws Exception
     {
         MuleMessageFactory factory = createMuleMessageFactory();
-        
+
         ReceiverFileInputStream stream = new ReceiverFileInputStream(tempFile, false, null);
         MuleMessage message = factory.create(stream, encoding);
         assertNotNull(message);
@@ -48,9 +48,10 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
 
     private void assertMessageProperties(MuleMessage message)
     {
-        assertEquals(tempFile.getName(), 
+        assertEquals(tempFile.getName(),
             message.getOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME));
         assertEquals(tempFile.getParent(), message.getOutboundProperty(FileConnector.PROPERTY_DIRECTORY));
+        assertEquals(0l, message.getOutboundProperty(FileConnector.PROPERTY_FILE_SIZE));
     }
 }
 
