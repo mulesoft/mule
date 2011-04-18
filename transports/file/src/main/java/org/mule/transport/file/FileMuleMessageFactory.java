@@ -71,5 +71,6 @@ public class FileMuleMessageFactory extends AbstractMuleMessageFactory
     {
         message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
         message.setOutboundProperty(FileConnector.PROPERTY_DIRECTORY, file.getParent());
+        message.setOutboundProperty(FileConnector.PROPERTY_FILE_SIZE, file.length());
     }
 }
