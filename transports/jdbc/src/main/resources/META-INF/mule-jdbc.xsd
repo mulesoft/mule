@@ -245,5 +245,59 @@
         <xsd:attribute name="class" type="mule:substitutableClass" use="optional"/>
         <xsd:attribute name="ref" use="optional" type="xsd:string"/>
     </xsd:attributeGroup>
+    
+    <xsd:element name="object-store" type="jdbcObjectStoreType" substitutionGroup="mule:abstract-object-store"/>
+
+    <xsd:complexType name="jdbcObjectStoreType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractObjectStoreType">
+                <xsd:sequence>
+	                <xsd:element ref="mule:abstract-transaction" minOccurs="0" maxOccurs="1"/>
+                </xsd:sequence>
+                <xsd:attribute name="jdbcConnector-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The reference to the jdbcConnector
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="name" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the store
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="tableName" type="xsd:string" default="ids">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the table
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="keyColumn" type="xsd:string" default="key_column">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the key column of the table
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="valueColumn" type="xsd:string" default="value_column">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the value column of the table
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="insertQuery" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allow overriding the default insert query in case we need to pass extra parameters
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 </xsd:schema>

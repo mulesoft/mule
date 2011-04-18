@@ -14,6 +14,7 @@ import org.mule.config.spring.parsers.ClassOrRefDefinitionParser;
 import org.mule.config.spring.parsers.MuleDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionParser;
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
+import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryWrapper;
 import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
@@ -21,6 +22,7 @@ import org.mule.config.spring.parsers.specific.properties.NestedMapDefinitionPar
 import org.mule.endpoint.URIBuilder;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.transport.jdbc.JdbcTransactionFactory;
+import org.mule.transport.jdbc.store.JdbcObjectStore;
 
 /**
  * Registers Bean Definition Parsers for the "jdbc" namespace.
@@ -44,5 +46,6 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("query", new ParentContextDefinitionParser("connector", connectorQuery).otherwise(endpointQuery));
         registerBeanDefinitionParser("extractors", new ParentDefinitionParser());
         registerBeanDefinitionParser("transaction", new TransactionDefinitionParser(JdbcTransactionFactory.class));
+        registerBeanDefinitionParser("object-store", new ChildDefinitionParser("store", JdbcObjectStore.class));
     }
 }

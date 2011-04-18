@@ -42,6 +42,9 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
     protected String idExpression = MessageFormat.format("{0}message:id{1}",
         ExpressionManager.DEFAULT_EXPRESSION_PREFIX, ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
 
+    protected String valueExpression = MessageFormat.format("{0}message:id{1}",
+        ExpressionManager.DEFAULT_EXPRESSION_PREFIX, ExpressionManager.DEFAULT_EXPRESSION_POSTFIX);
+
     public IdempotentMessageFilter()
     {
         super();
@@ -70,9 +73,10 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
     protected MuleEvent processNext(MuleEvent event) throws MuleException
     {
         String id = this.getIdForEvent(event);
+        String value = this.getValueForEvent(event);
         try
         {
-            store.store(id, id);
+            store.store(id, value);
             return super.processNext(event);
         }
         catch (Exception e)
@@ -80,6 +84,11 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
             throw new RoutingException(CoreMessages.failedToWriteMessageToStore(id, assignedComponentName),
                 event, this, e);
         }
+    }
+
+    protected String getValueForEvent(MuleEvent event) throws MessagingException
+    {
+        return event.getMuleContext().getExpressionManager().parse(valueExpression, event.getMessage(), true);
     }
 
     protected String getIdForEvent(MuleEvent event) throws MessagingException
@@ -155,6 +164,16 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
+    }
+
+    public String getValueExpression()
+    {
+        return valueExpression;
+    }
+
+    public void setValueExpression(String valueExpression)
+    {
+        this.valueExpression = valueExpression;
     }
 
 }
