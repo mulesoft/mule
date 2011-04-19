@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
@@ -19,7 +20,6 @@ import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.Connector;
-import org.mule.config.i18n.MessageFactory;
 import org.mule.transaction.TransactionCollection;
 import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.AbstractReceiverWorker;
@@ -38,7 +38,6 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
-import javax.resource.spi.work.WorkException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
@@ -319,16 +318,22 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         {
             try
             {
-                // This must be the doWork() to preserve the transactional context.
-                // We are already running in the consumer thread by this time.
-                // The JmsWorker class is a one-off executor which is abandoned after it's done 
-                // and is easily garbage-collected (confirmed with a profiler)
-                getWorkManager().doWork(new JmsWorker(message, MultiConsumerJmsMessageReceiver.this, this));
+                JmsWorker worker = new JmsWorker(message, MultiConsumerJmsMessageReceiver.this, this);
+                worker.processMessages();
+                // Just in case we're not using AUTO_ACKNOWLEDGE (which is the default)
+                message.acknowledge();
             }
-            catch (WorkException e)
+            catch (MessagingException e)
             {
-                throw new MuleRuntimeException(MessageFactory.createStaticMessage(
-                        "Couldn't submit a work item to the WorkManager"), e);
+                getFlowConstruct().getExceptionListener().handleException(e, e.getEvent());
+                // This will cause a negative ack for JMS
+                throw new MuleRuntimeException(e);
+            }
+            catch (Exception e)
+            {
+                getConnector().getMuleContext().getExceptionListener().handleException(e);
+                // This will cause a negative ack for JMS
+                throw new MuleRuntimeException(e);
             }
         }
     }

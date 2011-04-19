@@ -10,7 +10,6 @@
 package org.mule.transport;
 
 import org.mule.api.MessagingException;
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
@@ -65,17 +64,30 @@ public abstract class AbstractReceiverWorker implements Work
         release();
     }
 
+    protected void doRun()
+    {
+        try
+        {
+            processMessages();
+        }
+        catch (MessagingException e)
+        {
+            receiver.getFlowConstruct().getExceptionListener().handleException(e, e.getEvent());
+        }
+        catch (Exception e)
+        {
+            receiver.getConnector().getMuleContext().getExceptionListener().handleException(e);
+        }
+    }
+    
     /**
      * The actual logic used to receive messages from the underlying transport.  The default implementation
      * will execute the processing of messages within a TransactionTemplate.  This template will manage the
      * transaction lifecycle for the list of messages associated with this receiver worker.
      */
-    protected void doRun()
+    public void processMessages() throws Exception
     {
-        //  MuleContext is used down the line for
-        // getTransactionManager() (XaTransactionFactory) and getQueueManager() (VMTransaction)
-        final MuleContext muleContext = receiver.getConnector().getMuleContext();
-        TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(), muleContext);
+        TransactionTemplate tt = new TransactionTemplate(endpoint.getTransactionConfig(), receiver.getConnector().getMuleContext());
 
         // Receive messages and process them in a single transaction
         // Do not enable threading here, but serveral workers
@@ -148,14 +160,6 @@ public abstract class AbstractReceiverWorker implements Work
         {
             List results = (List) tt.execute(cb);
             handleResults(results);
-        }
-        catch (MessagingException e)
-        {
-            receiver.getFlowConstruct().getExceptionListener().handleException(e, e.getEvent());
-        }
-        catch (Exception e)
-        {
-            muleContext.getExceptionListener().handleException(e);
         }
         finally
         {
