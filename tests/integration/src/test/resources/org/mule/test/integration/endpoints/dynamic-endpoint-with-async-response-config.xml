@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.1/mule-http.xsd">
+
+    <vm:connector name="vmConnector"/>
+
+    <flow name="testFlow">
+        <inbound-endpoint address="vm://vmProxy" exchange-pattern="request-response"/>
+
+        <response>
+            <async>
+                <vm:outbound-endpoint path="vmOut"/>
+            </async>
+        </response>
+
+        <http:outbound-endpoint
+                address="http://#[header:INBOUND:host]:#[header:INBOUND:port]#[header:INBOUND:path]"
+                exchange-pattern="request-response" responseTimeout="600000"/>
+    </flow>
+
+    <flow name="transformerFlow">
+        <http:inbound-endpoint address="http://localhost:${port1}/TEST"
+                               exchange-pattern="request-response"/>
+        <append-string-transformer message=" Received"/>
+    </flow>
+</mule>
+

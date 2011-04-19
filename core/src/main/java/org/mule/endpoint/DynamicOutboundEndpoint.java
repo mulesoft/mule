@@ -10,12 +10,6 @@
 
 package org.mule.endpoint;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
@@ -36,6 +30,12 @@ import org.mule.api.transport.DispatchException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transport.service.TransportFactory;
 import org.mule.transport.service.TransportFactoryException;
+
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * An Outbound endpoint who's URI will be constructed based on the current message.
@@ -146,11 +146,10 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
         }
         
         final EndpointURI uri = getEndpointURIForMessage(event);
-        if (endpoint instanceof NullOutboundEndpoint)
-        {
-            builder.setURIBuilder(new URIBuilder(uri));
-            endpoint = builder.buildOutboundEndpoint();
-        }
+
+        builder.setURIBuilder(new URIBuilder(uri));
+        endpoint = builder.buildOutboundEndpoint();
+
         final OutboundEndpoint outboundEndpoint = new DynamicURIOutboundEndpoint(endpoint, uri);
 
         return outboundEndpoint.process(event);
