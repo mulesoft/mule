@@ -157,22 +157,33 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     {
                         break;
                     }
-                    
-                    // Ensure that we drop any monitors, we'll add again for the next request
-                    ((HttpConnector) connector).getKeepAliveMonitor().removeExpirable(this);
-                    
-                    conn.writeResponse(processRequest(request));
-                    
-                    if (request.getBody() != null)
+                        
+                    try
                     {
-                        request.getBody().close();
+                        conn.writeResponse(processRequest(request));
                     }
+                    catch (Exception e)
+                    {
+                        conn.writeResponse(buildFailureResponse(request.getRequestLine().getHttpVersion(), HttpConstants.SC_INTERNAL_SERVER_ERROR, e.getMessage()));
+                        getConnector().getMuleContext().getExceptionListener().handleException(e);                        
+                        break;
+                    }
+                    finally
+                    {
+                        // Ensure that we drop any monitors
+                        ((HttpConnector) connector).getKeepAliveMonitor().removeExpirable(this);
+                        
+                        if (request.getBody() != null)
+                        {
+                            request.getBody().close();
+                        }
+                    }                    
                 }
                 while (conn.isKeepAlive());
             }
             catch (Exception e)
             {
-                getConnector().getMuleContext().getExceptionListener().handleException(e);
+                getConnector().getMuleContext().getExceptionListener().handleException(e);                        
             }
             finally
             {
@@ -181,10 +192,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                 if (conn.isOpen())
                 {
                     conn.close();
-                    conn = null;
-                    
-                    // Ensure that we drop any monitors
-                    ((HttpConnector) connector).getKeepAliveMonitor().removeExpirable(this);
+                    conn = null;                    
                 }
             }
         }
@@ -294,7 +302,12 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
             else
             {
-                response = buildFailureResponse(request.getRequestLine(), message);
+                EndpointURI uri = endpoint.getEndpointURI();
+                String failedPath = String.format("%s://%s:%d%s",
+                                                  uri.getScheme(), uri.getHost(), uri.getPort(),
+                                                  message.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
+                response = buildFailureResponse(request.getRequestLine().getHttpVersion(), HttpConstants.SC_NOT_FOUND, 
+                                                HttpMessages.cannotBindToAddress(failedPath).toString());
             }
             return response;
         }
@@ -364,21 +377,11 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             }
         }
 
-        protected HttpResponse buildFailureResponse(RequestLine requestLine, MuleMessage message) throws MuleException
+        protected HttpResponse buildFailureResponse(HttpVersion version, int statusCode, String description) throws MuleException
         {
-            EndpointURI uri = endpoint.getEndpointURI();
-            String failedPath = String.format("%s://%s:%d%s",
-                                              uri.getScheme(), uri.getHost(), uri.getPort(),
-                                              message.getInboundProperty(HttpConnector.HTTP_REQUEST_PATH_PROPERTY));
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Failed to bind to " + failedPath);
-            }
-
             HttpResponse response = new HttpResponse();
-            response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_NOT_FOUND);
-            response.setBody(HttpMessages.cannotBindToAddress(failedPath).toString());
+            response.setStatusLine(version, statusCode);
+            response.setBody(description);
             DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(response, connector.getMuleContext()), endpoint,
                 new DefaultMuleSession(flowConstruct, connector.getMuleContext()));
             RequestContext.setEvent(event);
