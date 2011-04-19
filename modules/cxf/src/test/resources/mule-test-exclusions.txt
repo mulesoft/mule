@@ -31,3 +31,6 @@ org.mule.module.cxf.wsa.WSATest
 org.mule.module.cxf.ClientSimpleFrontendTestCase
 
 org.mule.module.cxf.StaxFeatureTestCase
+
+# intermittent failures
+org.mule.module.cxf.issues.LargeProxyTestCase
