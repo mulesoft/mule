@@ -10,6 +10,7 @@
 
 package org.mule.transport.ftp.server;
 
+import org.mule.tck.PortUtils;
 import org.mule.transport.ftp.AbstractFtpServerTestCase;
 
 import java.io.File;
@@ -26,7 +27,7 @@ public class FTPServerClientTest extends TestCase
 {
     Server ftpServer = null;
     FTPTestClient ftpClient = null;
-    public static final int PORT = 60198;
+    public int port = -1;
     private static final String adminUser = "admin";
     private static final String adminPassword = "admin";
     
@@ -36,7 +37,9 @@ public class FTPServerClientTest extends TestCase
     public void setUp() throws Exception
     {
         new File(AbstractFtpServerTestCase.FTP_SERVER_BASE_DIR).mkdirs();
-        ftpServer = new Server(PORT);
+        port = PortUtils.findFreePorts(1).get(0).intValue();
+        ftpServer = new Server(port);
+        System.out.println("using port : " + port);
     }
     
     /**
@@ -45,7 +48,7 @@ public class FTPServerClientTest extends TestCase
      */
     public void testCreateDeleteDir() throws IOException
     {
-        ftpClient = new FTPTestClient("localhost", PORT, adminUser, adminPassword);
+        ftpClient = new FTPTestClient("localhost", port, adminUser, adminPassword);
         String dir = "/foo/";
         assertTrue("unable to create directory: " + dir, ftpClient.makeDir(dir));
         //verify directory was created
@@ -60,7 +63,7 @@ public class FTPServerClientTest extends TestCase
      */    
     public void testCreateDeleteFile() throws IOException
     {
-        ftpClient = new FTPTestClient("localhost", PORT, adminUser, adminPassword);
+        ftpClient = new FTPTestClient("localhost", port, adminUser, adminPassword);
         File testFile = File.createTempFile("fake", "file");
         ftpClient.putFile(testFile.getAbsolutePath(),"/");
         assertTrue("Could not find file :" + testFile.getName(), ftpClient.fileExists(testFile.getName()));
@@ -74,7 +77,7 @@ public class FTPServerClientTest extends TestCase
      */
     public void testRecursiveDelete() throws IOException
     {                        
-        ftpClient = new FTPTestClient("localhost", PORT, adminUser, adminPassword);
+        ftpClient = new FTPTestClient("localhost", port, adminUser, adminPassword);
         
         assertTrue(ftpClient.makeDir("dir1/"));
         ftpClient.dirExists("dir1/");

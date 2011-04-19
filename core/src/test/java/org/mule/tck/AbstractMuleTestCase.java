@@ -47,7 +47,6 @@ import org.mule.util.concurrent.Latch;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ServerSocket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -61,9 +60,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
+
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
@@ -128,10 +129,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
     protected int numPorts = 0;
     
-    public List<Integer> ports = null;    
-
-    final static private int MIN_PORT = 5000;
-    final static private int MAX_PORT = 6000;    
+    public List<Integer> ports = null;   
     
     static
     {
@@ -420,7 +418,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         if (numPorts > 0)
         {
             //find some free ports
-            ports = findFreePorts(numPorts);
+            ports = PortUtils.findFreePorts(numPorts);
 
             //set the port properties
             setPortProperties();
@@ -983,7 +981,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
      * to have any objects injected and lifecycle methods called.  Note that the object lifecycle will be called to the same current
      * lifecycle as the MuleContext
      *
-     * @param o the object to register and initialise it
+     * @param o the object to register and initialize it
      * @throws RegistrationException
      */
     protected void initialiseObject(Object o) throws RegistrationException
@@ -1016,94 +1014,9 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             System.setProperty("port" + (i + 1), String.valueOf(ports.get(i)));
         }
     }
-    
-    /**
-     * Find a given number of available ports
-     * 
-     * @param numberOfPorts The number of free ports to find
-     * @return an List with the number of requested ports
-     */
-    public List<Integer> findFreePorts(int numberOfPorts)
-    {
-        List<Integer> freePorts = new ArrayList<Integer>();
-        for (int port = MIN_PORT; freePorts.size() != numberOfPorts && port < MAX_PORT; ++port)
-        {
-            if (isPortFree(port))
-            {
-                freePorts.add(port);
-            }
-        }
 
-        if (freePorts.size() != numberOfPorts)
-        {
-            logger.info("requested " + numberOfPorts + " open ports, but returning " + freePorts.size());
-        }
-        return freePorts;
-    }
-    
-    /**
-     * Iterate through the ports and log whether each is available
-     * @param failIfTaken If true, fails the current test if the port is not available
-     */
-    public void checkPorts(boolean failIfTaken, String prefix)
-    {
-        for (Integer port : ports)
-        {
-            if (isPortFree(port))
-            {
-                logger.info(prefix + " port is free : " + port);
-            }
-            else
-            {
-                logger.info(prefix + " port is not free : " + port);
-                if (failIfTaken)
-                {
-                    fail("failing test since port is not free : " + port);
-                }
-            }
-        }
-    }
-    
-
-    /**
-     * Check and log is a given port is available
-     * 
-     * @param port the port number to check
-     * @return true if the port is available, false otherwise
-     */
-    public boolean isPortFree(int port)
-    {
-        boolean portIsFree = true;
-        
-        ServerSocket server = null;
-        try
-        {
-            server = new ServerSocket(port);
-        }
-        catch (IOException e)
-        {
-            portIsFree = false;
-        }
-        finally
-        {
-            if (server != null)
-            {
-                try
-                {
-                    server.close();
-                }
-                catch (IOException e)
-                {
-                    // ignore
-                }
-            }
-        }
-        
-        return portIsFree;
-    }
-    
     public List<Integer> getPorts()
     {
         return ports;
-    }
+    }    
 }

@@ -12,6 +12,7 @@ package org.mule.management.agents;
 
 import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.PortUtils;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -98,7 +99,7 @@ public class FixedHostRmiClienSocketFactoryTestCase extends AbstractMuleTestCase
 
     private int findFreePort()
     {
-        List<Integer> freePorts = findFreePorts(1);
+        List<Integer> freePorts = PortUtils.findFreePorts(1);
         return freePorts.get(0).intValue();
     }
 }
