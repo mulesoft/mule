@@ -249,7 +249,7 @@ public class MuleUniversalConduit extends AbstractConduit
 
             MuleEvent resEvent = processNext(reqEvent, m.getExchange());
 
-            if (resEvent == null || !reqEvent.getEndpoint().getExchangePattern().hasResponse())
+            if (resEvent == null)
             {
                 m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
                 return;
