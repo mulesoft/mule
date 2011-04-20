@@ -386,6 +386,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         //Stores
         registerBeanDefinitionParser("in-memory-store", new ChildDefinitionParser("store", InMemoryObjectStore.class));
         registerBeanDefinitionParser("simple-text-file-store", new ChildDefinitionParser("store", TextFileObjectStore.class));
+        registerBeanDefinitionParser("custom-object-store", new ChildDefinitionParser("store", null));
 
         //Routers
         registerBeanDefinitionParser("inbound", new ChildDefinitionParser("messageSource", ServiceCompositeMessageSource.class, true));
