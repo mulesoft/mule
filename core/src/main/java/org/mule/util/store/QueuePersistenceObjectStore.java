@@ -37,9 +37,20 @@ import java.util.List;
 import org.apache.commons.lang.SerializationException;
 
 /**
- * This is an {@link ObjectStore} implementation that is to be used to persist messages on Mule's
- * internal queues. This implementation uses <a href="http://download.oracle.com/javase/1.5.0/docs/guide/serialization/spec/serialTOC.html">
- * Java serialization</a> to implement persistence.
+ * <p>
+ * This is an {@link ObjectStore} implementation that is to be used to persist
+ * messages on Mule's internal queues. Note that this is a specialized implementation
+ * of the {@link ObjectStore} interface which hard-codes the location of the
+ * persistence folder to <code>$MULE_HOME/.mule/queuestore</code>. It also breaks the
+ * contract defined in the {@link ObjectStore} javadocs as it does not load and
+ * return the stored object when deleting and entry - the calling code does not care
+ * about the removed object anyway.
+ * </p>
+ * <p>
+ * This implementation uses <a href=
+ * "http://download.oracle.com/javase/1.5.0/docs/guide/serialization/spec/serialTOC.html"
+ * > Java serialization</a> to implement persistence.
+ * </p>
  */
 public class QueuePersistenceObjectStore<T extends Serializable> extends AbstractObjectStore<T>
     implements ListableObjectStore<T>, MuleContextAware
@@ -275,7 +286,8 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
         File storeFile = createStoreFile(key);
         deleteStoreFile(storeFile);
 
-        // TODO BL-405 can we safely return null here to avoid loading the message?
+        // we can safely return null here to avoid loading the message - the calling code
+        // discards the returned object anyway (see TransactionalQueueManager#doRemove)
         return null;
     }
 
