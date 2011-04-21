@@ -30,7 +30,7 @@ public class JsonBeanRoundTripTestCase extends AbstractTransformerTestCase
     public static final String JSON_STRING = "{\"apple\":{\"bitten\":true,\"washed\":false},\"orange\":{\"brand\":\"JuicyFruit\",\"segments\":8,\"radius\":3.45,\"listProperties\":null,\"mapProperties\":null,\"arrayProperties\":null}}";
 
     //Note that Banana is null
-    public static final FruitCollection JSON_OBJECT = new FruitCollection(new Apple(true), null, new Orange(8, new Double(3.45), "JuicyFruit"));
+    public static final FruitCollection JSON_OBJECT = new FruitCollection(new Apple(true), null, new Orange(8, 3.45, "JuicyFruit"));
 
     @Override
     public Transformer getTransformer() throws Exception
