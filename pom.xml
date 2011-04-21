@@ -112,7 +112,8 @@
         <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
         <hibernateVersion>3.6.0.Final</hibernateVersion>
         <ibeansVersion>1.0-SNAPSHOT</ibeansVersion>
-        <jacksonVersion>1.3.1</jacksonVersion>
+        <jacksonVersion>1.8.0</jacksonVersion>
+        <jerseyVersion>1.6</jerseyVersion>
         <jaxbApiVersion>2.1</jaxbApiVersion>
         <javassistVersion>3.7.ga</javassistVersion>
         <javaActivationVersion>1.1</javaActivationVersion>
@@ -1155,6 +1156,60 @@
                 <groupId>jboss</groupId>
                 <artifactId>javassist</artifactId>
                 <version>${javassistVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-server</artifactId>
+                <version>${jerseyVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-json</artifactId>
+                <version>${jerseyVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.codehaus.jackson</groupId>
+                        <artifactId>jackson-lgpl</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.codehaus.jettison</groupId>
+                        <artifactId>jettison</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>javax.xml.stream</groupId>
+                        <artifactId>stax-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>stax-api</artifactId>
+                        <groupId>stax</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-client</artifactId>
+                <version>${jerseyVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.codehaus.jackson</groupId>
+                        <artifactId>jackson-lgpl</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.codehaus.jettison</groupId>
+                        <artifactId>jettison</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>javax.xml.stream</groupId>
+                        <artifactId>stax-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>stax-api</artifactId>
+                        <groupId>stax</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
         </dependencies>
