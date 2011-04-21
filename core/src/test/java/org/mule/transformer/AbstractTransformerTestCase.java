@@ -57,8 +57,12 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         Object expectedResult = this.getResultData();
         assertNotNull("The expected result data must not be null", expectedResult);
 
-        assertTrue("Transformation result does not match expected result", this.compareResults(
-            expectedResult, result));
+        final boolean match = this.compareResults(expectedResult, result);
+        if (!match)
+        {
+            fail(String.format("Transformation result does not match expected result. Expected '%s', but got '%s'",
+                               expectedResult, result));
+        }
     }
 
     public void testRoundtripTransform() throws Exception
@@ -70,7 +74,13 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
             Object result = roundTripTransformer.transform(this.getResultData());
             assertNotNull("The result of the roundtrip transform shouldn't be null", result);
 
-            assertTrue("The result of the roundtrip transform does not match the expected result", this.compareRoundtripResults(this.getTestData(), result));
+            final boolean match = this.compareRoundtripResults(this.getTestData(), result);
+
+            if (!match)
+            {
+                fail(String.format("The result of the roundtrip transform does not match expected result. Expected '%s', but got '%s'",
+                                   this.getTestData(), result));
+            }
         }
     }
 
