@@ -31,11 +31,11 @@ public class JsonBeanRoundTripNonAsciiTestCase extends JsonBeanRoundTripTestCase
 
     public JsonBeanRoundTripNonAsciiTestCase()
     {
-        jsonString = "{\"apple\":{\"washed\":false,\"bitten\":true},\"orange\":{\"brand\":\""
+        jsonString = "{\"apple\":{\"bitten\":true,\"washed\":false},\"orange\":{\"brand\":\""
             +  getBrandOfOrange(Locale.JAPAN)
             + "\",\"segments\":8,\"radius\":3.45,\"listProperties\":null,\"mapProperties\":null,\"arrayProperties\":null}}";
 
-        jsonObject = new FruitCollection(new Apple(true), null, new Orange(8, new Double(3.45), getBrandOfOrange(Locale.JAPAN)));
+        jsonObject = new FruitCollection(new Apple(true), null, new Orange(8, 3.45, getBrandOfOrange(Locale.JAPAN)));
     }
 
     @Override
