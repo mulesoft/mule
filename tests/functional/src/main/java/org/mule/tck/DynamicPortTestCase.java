@@ -40,6 +40,6 @@ public abstract class DynamicPortTestCase extends FunctionalTestCase
         super.doTearDown();
         // make sure that the ports have been freed. It's not a fatal error, but we
         // want to track down why it's not being released
-        checkPorts(false, "TEARDOWN");
+        PortUtils.checkPorts(false, "TEARDOWN", getPorts());
     }
 }

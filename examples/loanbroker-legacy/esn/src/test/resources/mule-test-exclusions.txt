@@ -6,3 +6,5 @@ org.mule.example.loanbroker.esn.VMLoanBrokerSynchronousFunctionalTestCase
 org.mule.example.loanbroker.esn.VMLoanBrokerAsynchronousFunctionalTestCase
 # EE-1911 : intermittent failure
 org.mule.example.loanbroker.esn.CxfLoanBrokerAsynchronousFunctionalTestCase
+# intermittent failure; failed 10 out 190 runs
+org.mule.example.loanbroker.esn.CxfLoanBrokerSynchronousFlowFunctionalTestCase
