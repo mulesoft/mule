@@ -171,6 +171,7 @@ mule-transport-tcp
 mule-transport-udp
 mule-transport-vm
 mule-transport-xmpp
+mule-tools-anttasks
 mvel2-2.0.10
 mx4j-jmx-2.1.1-osgi
 mx4j-impl-2.1.1-osgi

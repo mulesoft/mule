@@ -20,7 +20,8 @@
         <module>mule-module-archetype</module>
         <module>mule-example-archetype</module>
         <module>mule-catalog-archetype</module>
-  </modules>
+        <module>anttasks</module>
+    </modules>
 
     <profiles>
         <profile>
