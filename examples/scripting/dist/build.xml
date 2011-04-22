@@ -8,15 +8,29 @@
 -->
 <project name="Mule Examples: Scripting" default="set-paths" basedir=".">
 
-    <property name="app.name" value="mule-example-scripting"/>
-    <property environment="env"/>
+    <property name="dir.mule.home" value="${basedir}/../.."/>
+    <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
+    <property name="dir.opt.lib" value="${dir.mule.home}/lib/opt/"/>
 
     <property name="dir.java" value="src"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
 
+    
+    <property name="app.name" value="mule-example-scripting"/>
+    <property name="app.jar" value="${dir.build}/${app.name}.jar"/>
+    <property name="app.file" value="${app.name}.zip"/>
+    
+    <property environment="env"/>
+
     <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
     <property name="url.maven.repo2" value="http://dist.codehaus.org/mule/dependencies/maven2"/>
+
+    <path id="anttasks.path">
+        <fileset dir="${dir.opt.lib}" includes="mule-tools-anttasks-*.jar"/>
+    </path>
+    <taskdef resource="org/mule/mulePackagingTasks.properties"
+              classpathref="anttasks.path"/>
 
     <target name="clean"
             description="Clean the output directory (start from scratch).">
@@ -27,11 +41,11 @@
     <target name="get.libraries">
         <mkdir dir="${dir.build}/lib"/>
         <get src="${url.maven.repo2}/javax/script/jython-engine/1.1/jython-engine-1.1-jdk14.jar"
-             dest="${dir.build}/lib/jython-engine-1.1-jdk14.jar"
+             dest="${dir.build}/jython-engine-1.1-jdk14.jar"
              verbose="true"
              usetimestamp="true"/>
         <get src="${url.maven.repo}/org/python/jython/2.2.1/jython-2.2.1.jar"
-             dest="${dir.build}/lib/jython-2.2.1.jar"
+             dest="${dir.build}/jython-2.2.1.jar"
              verbose="true"
              usetimestamp="true"/>
     </target>
@@ -66,7 +80,8 @@
                destdir="${dir.classes}"
                debug="true"
                source="1.5"
-               target="1.5">
+               target="1.5"
+               includeAntRuntime="false">
             <classpath refid="classpath.mule"/>
         </javac>
 
@@ -76,37 +91,35 @@
         </copy>
     </target>
 
-   <target name="package"
-           depends="compile"
+    <target name="jar"
+            depends="compile"
+            description="build the application jar">
+
+        <jar jarfile="${app.jar}"
+             basedir="${dir.classes}"/>
+    </target>
+        
+
+    <target name="package"
+           depends="jar"
            description="Package the application">
 
-        <jar jarfile="${dir.build}/${app.name}.jar"
-             basedir="${dir.classes}"/>
-             
-        <zip destfile="${app.name}.zip">
-            <zipfileset file="${dir.build}/${app.name}.jar" fullpath="lib/mule-example-scripting.jar"/>
-            <zipfileset file="src/main/app/mule-config.xml" fullpath="mule-config.xml"/>
-            <fileset dir="${dir.build}">
-                <include name="lib/**"/>
-            </fileset>
-        </zip>
-   </target>
+        <mulePackage applicationFile="${app.file}">
+            <config dir="src/main/app"/>
+            <lib dir="${dir.build}">
+                <include name="*.jar"/>
+            </lib>
+        </mulePackage>
+    </target>
 
-   <target name="deploy"
+    <target name="deploy"
            depends="package"
            description="Deploy the application to the Mule server">
 
-            <copy file="${app.name}.zip" todir="${dir.mule.home}/apps" overwrite="true"/>
-            
-            <!-- workaround for MULE-4921 -->
-            <copy file="${dir.build}/lib/jython-engine-1.1-jdk14.jar" todir="${dir.mule.home}/lib/user"/>
-            <copy file="${dir.build}/lib/jython-2.2.1.jar" todir="${dir.mule.home}/lib/user"/>
-   </target>
-
-   <target name="set-paths">
-      <property name="dir.mule.home" value="${basedir}/../.."/>
-      <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-      <antcall target="deploy"/>
-   </target>
+        <muleDeploy applicationFile="${app.file}" />
+        <!-- workaround for MULE-4921 -->
+        <copy file="${dir.build}/jython-engine-1.1-jdk14.jar" todir="${dir.mule.home}/lib/user"/>
+        <copy file="${dir.build}/jython-2.2.1.jar" todir="${dir.mule.home}/lib/user"/>
+    </target>
 
 </project>
