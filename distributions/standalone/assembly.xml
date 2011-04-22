@@ -137,6 +137,10 @@
         <directory>../../examples/stockquote/dist</directory>
         <outputDirectory>examples/stockquote</outputDirectory>
     </fileSet>
+    <fileSet>
+        <directory>../../examples/bookstore/dist</directory>
+        <outputDirectory>examples/bookstore</outputDirectory>
+    </fileSet>
 
     <!--
     ============================
