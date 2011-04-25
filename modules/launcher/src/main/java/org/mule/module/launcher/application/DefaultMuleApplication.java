@@ -330,7 +330,15 @@ public class DefaultMuleApplication implements Application
 
         if (muleContext.isStarted() && !muleContext.isDisposed())
         {
-            stop();
+            try
+            {
+                stop();
+            }
+            catch (DeploymentStopException e)
+            {
+                // catch the stop errors and just log, we're disposing of an app anyway
+                logger.error(e);
+            }
         }
         if (logger.isInfoEnabled())
         {
