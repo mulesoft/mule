@@ -7,15 +7,28 @@
 -->
 <project name="Mule Example Launcher" default="deploy">
 
-    <property name="app.name" value="mule-example-launcher"/>
-    <property environment="env"/>
-
+    <property name="dir.mule.home" value="${basedir}/../.."/>
+    <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
+    <property name="dir.opt.lib" value="${dir.mule.home}/lib/opt/"/>
+    
     <property name="dir.java" value="src"/>
     <property name="dir.conf" value="conf"/>
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
 
+    <property name="app.name" value="mule-example-launcher"/>
+    <property name="app.jar" value="${dir.build}/${app.name}.jar"/>
+    <property name="app.file" value="${app.name}.zip"/>
+    
+    <property environment="env"/>
+
     <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
+    
+    <path id="anttasks.path">
+        <fileset dir="${dir.opt.lib}" includes="mule-tools-anttasks-*.jar"/>
+    </path>
+    <taskdef resource="org/mule/mulePackagingTasks.properties"
+              classpathref="anttasks.path"/>
     
     <target name="clean"
             description="Clean the output directory (start from scratch).">
@@ -30,7 +43,7 @@
              usetimestamp="true"/>
     </target>
 
-    <target name="init" depends="set-paths,get.libraries">
+    <target name="init" depends="get.libraries">
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
         
@@ -60,34 +73,35 @@
                destdir="${dir.classes}"
                debug="true"
                source="1.5"
-               target="1.5">
+               target="1.5"
+               includeAntRuntime="false">
             <classpath refid="classpath.mule"/>
         </javac>
 
     </target>
 
-   <target name="package" 
-           depends="compile" 
-           description="Package the application">
-           
-        <jar jarfile="${dir.build}/${app.name}.jar" 
+    <target name="jar"
+            depends="compile"
+            description="build the application jar">
+
+        <jar jarfile="${app.jar}"
              basedir="${dir.classes}"/>
-   	
-    <zip destfile="${app.name}.zip">
-        <zipfileset file="${dir.build}/${app.name}.jar" fullpath="lib/${app.name}.jar"/>
-        <zipfileset dir="src/main/app" includes="docroot/**,mule-config.xml"/>            
-    </zip>
-   	
+    </target>
+        
+    <target name="package"
+           depends="jar"
+           description="Package the application">
+
+        <mulePackage applicationFile="${app.file}">
+            <config dir="src/main/app"/>
+            <lib file="${app.jar}"/>
+        </mulePackage>
    </target>
 
    <target name="deploy" 
            depends="package" 
            description="Deploy the application to the Mule server">   	
-        <copy file="${app.name}.zip" todir="${dir.mule.home}/apps" overwrite="true"/>
+        <muleDeploy applicationFile="${app.file}" />
    </target>
 
-    <target name="set-paths">
-        <property name="dir.mule.home" value="${basedir}/../.."/>
-        <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-    </target>
 </project>

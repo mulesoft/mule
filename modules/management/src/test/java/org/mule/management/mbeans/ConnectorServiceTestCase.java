@@ -51,7 +51,9 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
         // 3) org.mule.management.mbeans.ModelService@Mule.ConnectorServiceTest:type=org.mule.Model,name="_muleSystemModel(seda)"
         // 4) org.mule.management.mbeans.MuleService@Mule.ConnectorServiceTest:type=org.mule.MuleContext,name=MuleServerInfo
         // 5) org.mule.management.mbeans.ConnectorService@Mule.ConnectorServiceTest:type=org.mule.Connector,name="TEST.CONNECTOR"
-        assertEquals("Unexpected number of components registered in the domain.", 5, mbeans.size());
+        // 6) org.mule.module.management.mbean.ApplicationService:type=Application,name="totals for all flows and services"]
+        // 7) org.mule.module.management.mbean.FlowConstructStats:type=org.mule.Statistics,Application=totals for all flows and services]
+        assertEquals("Unexpected number of components registered in the domain.", 7, mbeans.size());
         muleContext.dispose();
 
         mbeans = mBeanServer.queryMBeans(objectName, null);

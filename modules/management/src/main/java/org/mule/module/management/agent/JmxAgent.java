@@ -22,7 +22,9 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
+import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.module.management.i18n.ManagementMessages;
+import org.mule.module.management.mbean.ApplicationService;
 import org.mule.module.management.mbean.ConnectorService;
 import org.mule.module.management.mbean.ConnectorServiceMBean;
 import org.mule.module.management.mbean.EndpointService;
@@ -428,6 +430,23 @@ public class JmxAgent extends AbstractAgent
         }
     }
 
+    protected void registerApplicationServices() throws NotCompliantMBeanException, MBeanRegistrationException,
+        InstanceAlreadyExistsException, MalformedObjectNameException
+    {
+        FlowConstructStatistics appStats = muleContext.getStatistics().getApplicationStatistics();
+        if (appStats != null)
+        {
+            final String rawName = appStats.getName();
+            final String name = jmxSupport.escape(rawName);
+            final String jmxName = String.format("%s:type=%s,name=%s", jmxSupport.getDomainName(muleContext, !containerMode), appStats.getFlowConstructType(), name);
+            ObjectName on = jmxSupport.getObjectName(jmxName);
+            FlowConstructServiceMBean fcMBean = new ApplicationService(appStats.getFlowConstructType(), rawName, muleContext,appStats);
+            ClassloaderSwitchingMBeanWrapper wrapper = new ClassloaderSwitchingMBeanWrapper(fcMBean, FlowConstructServiceMBean.class, muleContext.getExecutionClassLoader());
+            logger.debug("Registering application statistics with name: " + on);
+            mBeanServer.registerMBean(wrapper, on);
+        }
+    }
+
     protected void registerEndpointServices() throws NotCompliantMBeanException, MBeanRegistrationException,
         InstanceAlreadyExistsException, MalformedObjectNameException
     {
@@ -682,6 +701,7 @@ public class JmxAgent extends AbstractAgent
                     registerFlowConstructServices();
                     registerEndpointServices();
                     registerConnectorServices();
+                    registerApplicationServices();
                 }
                 catch (Exception e)
                 {

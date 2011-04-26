@@ -7,8 +7,9 @@
 -->
 <project name="Mule Examples: Error Handler" default="deploy" basedir=".">
 
-    <property name="app.name" value="mule-example-errorhandler"/>
-    <property environment="env"/>
+    <property name="dir.mule.home" value="${basedir}/../.."/>
+    <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
+    <property name="dir.opt.lib" value="${dir.mule.home}/lib/opt/"/>
 
     <property name="dir.java" value="src"/>
     <property name="dir.conf" value="conf"/>
@@ -16,8 +17,22 @@
     <property name="dir.build" value="target"/>
     <property name="dir.classes" value="${dir.build}/classes"/>
 
+    <property name="app.name" value="mule-example-errorhandler"/>
+    <property name="app.jar" value="${dir.build}/${app.name}.jar"/>
+    <property name="app.file" value="${app.name}.zip"/>
+    
+    <property environment="env"/>
+
+
     <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
     <property name="url.maven.repo2" value="https://maven.atlassian.com/repository/public/"/>
+
+    <path id="anttasks.path">
+        <fileset dir="${dir.opt.lib}" includes="mule-tools-anttasks-*.jar"/>
+    </path>
+    <taskdef resource="org/mule/mulePackagingTasks.properties"
+              classpathref="anttasks.path"/>
+
 
     <target name="clean"
             description="Clean the output directory (start from scratch).">
@@ -28,12 +43,12 @@
     <target name="get.libraries">
         <mkdir dir="${dir.build}/lib"/>
         <get src="${url.maven.repo2}/org/apache/activemq/activemq-core/4.1.2/activemq-core-4.1.2.jar"
-             dest="${dir.build}/lib/activemq-core-4.1.2.jar"
+             dest="${dir.build}/activemq-core-4.1.2.jar"
              verbose="true"
              usetimestamp="true"/>
     </target>
 
-    <target name="init" depends="get.libraries, set-paths">
+    <target name="init" depends="get.libraries">
 
         <!-- Create the build directory if it doesn't exist -->
         <mkdir dir="${dir.classes}"/>
@@ -64,7 +79,8 @@
                destdir="${dir.classes}"
                debug="true"
                source="1.5"
-               target="1.5">
+               target="1.5"
+               includeAntRuntime="false">
             <classpath refid="classpath.mule"/>
         </javac>
 
@@ -75,34 +91,33 @@
         </copy>
     </target>
 
-   <target name="package"
-           depends="compile"
-           description="Package the application">
+    <target name="jar"
+            depends="compile"
+            description="build the application jar">
 
         <jar jarfile="${dir.build}/${app.name}.jar"
              basedir="${dir.classes}"/>
+    </target>
 
-        <zip destfile="${app.name}.zip">
-            <zipfileset file="${dir.build}/${app.name}.jar" fullpath="lib/mule-example-errorhandler.jar"/>
-            <zipfileset file="src/main/app/mule-config.xml" fullpath="mule-config.xml"/>
-            <zipfileset file="${dir.build}/lib/activemq-core-4.1.2.jar" fullpath="lib/activemq-core-4.1.2.jar"/>
-            <fileset dir="src/main/app">
-                <include name="test-data/**"/>
-            </fileset>
-        </zip>
-   </target>
+    <target name="package"
+            depends="jar"
+            description="Package the application">
+
+        <mulePackage applicationFile="${app.file}">
+            <config dir="src/main/app"/>
+            <lib dir="${dir.build}">
+                <include name ="**/*.jar"/>
+            </lib>
+        </mulePackage>
+
+    </target>
 
     <target name="deploy" 
            depends="package, test" 
            description="Deploy the application to the Mule server">
 
-        <copy file="${app.name}.zip" todir="${dir.mule.home}/apps" overwrite="true"/>
+        <muleDeploy applicationFile="${app.file}" />
     </target>
-
-   <target name="set-paths">
-      <property name="dir.mule.home" value="${basedir}/../.."/>
-      <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
-   </target>
 
     <target name="test" depends="compile">
         <junit haltonerror="true" haltonfailure="true">
@@ -111,7 +126,7 @@
                 <pathelement location="${dir.java}/test/resources"/>
                 <path refid="classpath.mule"/>
                 <path>
-                    <fileset dir="${dir.build}/lib">
+                    <fileset dir="${dir.build}">
                         <include name="**/*.jar"/>
                     </fileset>
                 </path>

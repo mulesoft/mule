@@ -68,7 +68,7 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
     }
 
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(final Object src, String encoding) throws TransformerException
     {
         try
         {
@@ -106,7 +106,7 @@ public class JAXBMarshallerTransformer extends AbstractTransformer
                     {
                         try
                         {
-                            m.marshal(event.getMessage().getPayload(), out);
+                            m.marshal(src, out);
                         }
                         catch (JAXBException e)
                         {

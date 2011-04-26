@@ -25,7 +25,7 @@
             <schemadoc:page-title>FTP Transport</schemadoc:page-title>
             <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
                                           requestEvents="true" retries="true"
-                                          transactions="false" streaming="false">
+                                          transactions="false" streaming="true">
                 <schemadoc:MEPs supported="one-way" default="one-way"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
