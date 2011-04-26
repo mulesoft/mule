@@ -147,6 +147,7 @@ mule-module-tomcat
 mule-module-xml
 mule-pattern-core
 mule-tests-functional
+mule-tools-anttasks
 mule-transport-ajax
 mule-transport-ejb
 mule-transport-email
