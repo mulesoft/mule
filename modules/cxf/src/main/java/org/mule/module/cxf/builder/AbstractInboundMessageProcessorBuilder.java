@@ -72,6 +72,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     private String port;
     private Map<String,Object> properties;
     private boolean validationEnabled;
+    private List<String> schemaLocations;
     
     public CxfInboundMessageProcessor build() throws MuleException
     {
@@ -162,6 +163,8 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
             sfb.setWsdlURL(wsdlLocation);
         }
 
+        sfb.setSchemaLocations(schemaLocations);
+        
         ReflectionServiceFactoryBean svcFac = sfb.getServiceFactory();
         initServiceFactory(svcFac);
 
@@ -421,6 +424,16 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     public void setValidationEnabled(boolean validationEnabled)
     {
         this.validationEnabled = validationEnabled;
+    }
+
+    public List<String> getSchemaLocations()
+    {
+        return schemaLocations;
+    }
+
+    public void setSchemaLocations(List<String> schemaLocations)
+    {
+        this.schemaLocations = schemaLocations;
     }
     
 }

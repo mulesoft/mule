@@ -13,7 +13,7 @@
     <file:connector name="fileConnector" streaming="false"/>
 
     <flow name="feedSplitterConsumer">
-        <file:inbound-endpoint  path="${mule.working.dir}" pollingFrequency="1000" >
+        <file:inbound-endpoint  path="${mule.working.dir}" pollingFrequency="100" >
             <file:filename-wildcard-filter pattern="*.rss"/>
             <rss:feed-splitter/>
         </file:inbound-endpoint>

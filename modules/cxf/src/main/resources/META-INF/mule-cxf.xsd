@@ -101,11 +101,18 @@
     <xsd:complexType name="webServiceType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractInterceptingMessageProcessorType">
-                <xsd:group ref="commonConfiguration"/>
+                <xsd:sequence>
+                    <xsd:element name="schemaLocations" type="schemasType" minOccurs="0"/>
+                    
+                    <xsd:group ref="commonConfiguration"/>
+                </xsd:sequence>
+            
                 <xsd:attributeGroup ref="inboundAttributes"/>
                 <xsd:attributeGroup ref="commonAttributes"/>
             </xsd:extension>
+            
         </xsd:complexContent>
+        
     </xsd:complexType>
 
     <xsd:element name="simple-client" type="simpleClientType" substitutionGroup="mule:abstract-intercepting-message-processor"/>

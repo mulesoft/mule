@@ -85,6 +85,12 @@ public class ProxyTestCase extends DynamicPortTestCase
         doTestProxyValidation("http://localhost:" + getPorts().get(0) + "/services/proxyBodyWithValidation");
     }
 
+
+    public void testProxyBodyValidationWithExternalSchema() throws Exception
+    {
+        doTestProxyValidation("http://localhost:" + getPorts().get(0) + "/services/proxyBodyWithValidationAndSchemas");
+    }
+
     public void testProxyEnvelopeValidation() throws Exception
     {
         doTestProxyValidation("http://localhost:" + getPorts().get(0) + "/services/proxyEnvelopeWithValidation");

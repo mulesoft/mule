@@ -24,6 +24,7 @@ import org.mule.module.cxf.support.MuleSecurityManagerCallbackHandler;
 import org.mule.module.cxf.support.StaxFeature;
 
 import org.apache.cxf.configuration.spring.SimpleBeanDefinitionParser;
+import org.apache.cxf.configuration.spring.StringBeanDefinitionParser;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -63,6 +64,9 @@ public class CxfNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("proxy-client", new MessageProcessorDefinitionParser(ProxyClientFactoryBean.class));
 
         registerBeanDefinitionParser(CxfConstants.FEATURES, new ChildListDefinitionParser(CxfConstants.FEATURES));
+        registerBeanDefinitionParser("schemaLocations", new ChildListDefinitionParser("schemaLocations"));
+        registerBeanDefinitionParser("schemaLocation", new StringBeanDefinitionParser());
+        
 //        registerBeanDefinitionParser(CxfConstants.DATA_BINDING, new GrandchildDefinitionParser(CxfConstants.DATA_BINDING));
         
         registerBeanDefinitionParser(CxfConstants.IN_INTERCEPTORS, new ChildListDefinitionParser(CxfConstants.IN_INTERCEPTORS));

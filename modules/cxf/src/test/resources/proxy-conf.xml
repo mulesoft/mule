@@ -52,6 +52,26 @@
         </static-component>
     </flow>
     
+    <flow name="serverClientProxyBodyWithValidationAndSchemas">
+        <inbound-endpoint
+            address="http://localhost:${port1}/services/proxyBodyWithValidationAndSchemas"
+            exchange-pattern="request-response">
+        </inbound-endpoint>
+        <cxf:proxy-service 
+            service="WebService2"
+            wsdlLocation="localWsdl.wsdl" 
+            namespace="http://www.muleumo.org"
+            validationEnabled="true"
+            payload="body">
+            <cxf:schemaLocations>
+                <cxf:schemaLocation>localWsdl-schema.xsd</cxf:schemaLocation>
+            </cxf:schemaLocations>
+        </cxf:proxy-service>
+        <static-component>
+            <return-data>&lt;echoResponse xmlns="http://www.muleumo.org"&gt;&lt;echo&gt;test&lt;/echo&gt;&lt;/echoResponse&gt;</return-data>
+        </static-component>
+    </flow>
+    
     <model name="BridgeTest">
     
         <service name="jaxwsProxy">
