@@ -17,7 +17,12 @@
 		<vm:inbound-endpoint path="in" />
 
 		<idempotent-message-filter idExpression="#[header:INBOUND:originalId]" valueExpression="#[header:INBOUND:valueId]" throwOnUnaccepted="true">
-			<jdbc:object-store jdbcConnector-ref="jdbcConnector" keyColumn="ID" valueColumn="RESULT" tableName="TEST"/>
+			<jdbc:object-store 
+				jdbcConnector-ref="jdbcConnector"
+				name="jdbcObjectStore"
+				insertQueryKey="insertIdempotency"
+				selectQueryKey="selectIdempotency"
+				deleteQueryKey="deleteIdempotency"/>
 		</idempotent-message-filter>
 		
 		<vm:outbound-endpoint path="forProcessing" />

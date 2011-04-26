@@ -11,6 +11,7 @@ package org.mule.transport.jdbc.functional;
 
 import java.util.Calendar;
 
+import org.apache.commons.dbutils.QueryRunner;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
@@ -49,5 +50,21 @@ public class IdempotencyTestCase extends AbstractJdbcFunctionalTestCase
     protected String getConfigResources()
     {
         return super.getConfigResources() + ",jdbc-store.xml";
+    }
+
+    @Override
+    protected void createTable() throws Exception
+    {
+        super.createTable();
+        QueryRunner qr = jdbcConnector.getQueryRunner();
+        qr.update(jdbcConnector.getConnection(), "CREATE TABLE IDS(K VARCHAR(255) NOT NULL PRIMARY KEY, VALUE VARCHAR(255))");
+    }
+
+    @Override
+    protected void deleteTable() throws Exception
+    {
+        super.deleteTable();
+        QueryRunner qr = jdbcConnector.getQueryRunner();
+        qr.update(jdbcConnector.getConnection(), "DELETE FROM IDS");
     }
 }

@@ -7,15 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.transport.jdbc.store;
 
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.text.MessageFormat;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
-import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.transaction.TransactionCallback;
@@ -25,22 +25,14 @@ import org.mule.transaction.TransactionTemplate;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.util.store.AbstractMonitoredObjectStore;
 
-public class JdbcObjectStore extends AbstractMonitoredObjectStore<String>
+public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredObjectStore<T>
 {
-
-    public static final String selectQueryTemplate = "SELECT * FROM {0} WHERE {1} = ?";
-    public static final String deleteQueryTemplate = "DELETE FROM {0} WHERE {1} = ?";
-    public static final String insertQueryTemplate = "INSERT INTO {0}({1}, {2}) VALUES(?, ?)";
 
     private JdbcConnector jdbcConnector;
     private TransactionConfig transactionConfig;
-    private String tableName;
-    private String keyColumn;
-    private String valueColumn;
-
-    private String insertQuery;
-    private String deleteQuery;
-    private String selectQuery;
+    private String insertQueryKey;
+    private String selectQueryKey;
+    private String deleteQueryKey;
 
     private ArrayHandler arrayHandler;
 
@@ -49,7 +41,7 @@ public class JdbcObjectStore extends AbstractMonitoredObjectStore<String>
         this.arrayHandler = new ArrayHandler();
         this.maxEntries = -1;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -61,56 +53,41 @@ public class JdbcObjectStore extends AbstractMonitoredObjectStore<String>
     /**
      * {@inheritDoc}
      */
-    public void initialise() throws InitialisationException
-    {
-        if (this.insertQuery == null)
-        {
-            // initialize if it is not overridden
-            this.insertQuery = MessageFormat.format(insertQueryTemplate, this.getTableName(),
-                this.getKeyColumn(), this.getValueColumn());
-        }
-        this.deleteQuery = MessageFormat.format(deleteQueryTemplate, this.getTableName(), this.getKeyColumn());
-        this.selectQuery = MessageFormat.format(selectQueryTemplate, this.getTableName(), this.getKeyColumn());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public boolean contains(Serializable key) throws ObjectStoreException
     {
         this.notNullKey(key);
-        Object[] result = (Object[]) this.query(selectQuery, this.arrayHandler, key);
+        Object[] result = (Object[]) this.query(this.getSelectQuery(), this.arrayHandler, key);
         return result != null;
     }
 
     /**
      * {@inheritDoc}
      */
-    public String remove(Serializable key) throws ObjectStoreException
+    public T remove(Serializable key) throws ObjectStoreException
     {
         this.notNullKey(key);
-        String value = this.retrieve(key);
-        this.update(deleteQuery, key);
+        T value = this.retrieve(key);
+        this.update(this.getDeleteQuery(), key);
         return value;
     }
 
     /**
      * {@inheritDoc}
      */
-    public String retrieve(Serializable key) throws ObjectStoreException
+    public T retrieve(Serializable key) throws ObjectStoreException
     {
-        Object[] row = (Object[]) this.query(selectQuery, this.arrayHandler, key);
+        Object[] row = (Object[]) this.query(this.getSelectQuery(), this.arrayHandler, key);
         if (row == null)
         {
             throw new ObjectDoesNotExistException(CoreMessages.objectNotFound(key));
         }
         else
         {
-            return (String) row[1];
+            return (T) row[1];
         }
     }
 
-    public void store(Serializable key, String value, String[] parameters) throws ObjectStoreException
+    public void store(Serializable key, T value, String[] parameters) throws ObjectStoreException
     {
         Object[] arguments = new Object[2 + parameters.length];
         arguments[0] = key;
@@ -122,15 +99,23 @@ public class JdbcObjectStore extends AbstractMonitoredObjectStore<String>
             arguments[2 + i] = parameter;
         }
 
-        this.update(insertQuery, arguments);
+        this.update(this.getInsertQuery(), arguments);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void store(Serializable key, String value) throws ObjectStoreException
+    public void store(Serializable key, T value) throws ObjectStoreException
     {
-        this.update(insertQuery, key, value);
+        this.notNullKey(key);
+        try
+        {
+            this.update(this.getInsertQuery(), key, value);
+        }
+        catch (ObjectStoreException e)
+        {
+            throw new ObjectAlreadyExistsException(e);
+        }
     }
 
     /**
@@ -239,55 +224,48 @@ public class JdbcObjectStore extends AbstractMonitoredObjectStore<String>
         this.transactionConfig = transactionConfig;
     }
 
-    public String getTableName()
-    {
-        if (this.tableName == null)
-        {
-            this.tableName = "ids";
-        }
-        return tableName;
-    }
-
-    public void setTableName(String tableName)
-    {
-        this.tableName = tableName;
-    }
-
-    public String getKeyColumn()
-    {
-        if (this.keyColumn == null)
-        {
-            this.keyColumn = "key_column";
-        }
-        return keyColumn;
-    }
-
-    public void setKeyColumn(String keyColumn)
-    {
-        this.keyColumn = keyColumn;
-    }
-
-    public String getValueColumn()
-    {
-        if (this.valueColumn == null)
-        {
-            this.valueColumn = "value_column";
-        }
-        return valueColumn;
-    }
-
-    public void setValueColumn(String valueColumn)
-    {
-        this.valueColumn = valueColumn;
-    }
-
     public String getInsertQuery()
     {
-        return insertQuery;
+        return (String) this.jdbcConnector.getQueries().get(this.insertQueryKey);
     }
 
-    public void setInsertQuery(String insertQuery)
+    public String getSelectQuery()
     {
-        this.insertQuery = insertQuery;
+        return (String) this.jdbcConnector.getQueries().get(this.selectQueryKey);
+    }
+
+    public String getDeleteQuery()
+    {
+        return (String) this.jdbcConnector.getQueries().get(this.deleteQueryKey);
+    }
+
+    public String getInsertQueryKey()
+    {
+        return insertQueryKey;
+    }
+
+    public void setInsertQueryKey(String insertQueryKey)
+    {
+        this.insertQueryKey = insertQueryKey;
+    }
+
+    public String getSelectQueryKey()
+    {
+        return selectQueryKey;
+    }
+
+    public void setSelectQueryKey(String selectQueryKey)
+    {
+        this.selectQueryKey = selectQueryKey;
+    }
+
+    public String getDeleteQueryKey()
+    {
+        return deleteQueryKey;
+    }
+
+    public void setDeleteQueryKey(String deleteQueryKey)
+    {
+        this.deleteQueryKey = deleteQueryKey;
     }
 }

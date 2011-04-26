@@ -26,5 +26,11 @@
                     value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(#[type], #[payload], NULL, NULL)"/>
         <jdbc:query key="writeMap"
                     value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(#[type], #[map-payload:data], NULL, NULL)"/>
+        <jdbc:query key="insertIdempotency"
+                    value="INSERT INTO IDS(K, VALUE) VALUES(?, ?)"/>
+        <jdbc:query key="selectIdempotency"
+                    value="SELECT K, VALUE FROM IDS WHERE K = ?"/>
+        <jdbc:query key="deleteIdempotency"
+                    value="DELETE FROM IDS WHERE K = ?"/>
     </jdbc:connector>
 </mule>
