@@ -63,7 +63,7 @@ public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
 
             if (method == null)
             {
-                method = ClassUtils.getMethod(component.getClass(), methodName, classTypes);
+                method = ClassUtils.getMethod(component.getClass(), methodName, classTypes, true);
             }
             if (method != null)
             {
@@ -71,7 +71,7 @@ public class ExplicitMethodEntryPointResolver extends AbstractEntryPointResolver
                 
                 // check if the current payload can be handled by this method
                 Class<?>[] parameterTypes = method.getParameterTypes();
-                if (ClassUtils.compare(parameterTypes, classTypes, false))
+                if (ClassUtils.compare(parameterTypes, classTypes, false, true))
                 {
                     // we found a matching method, let's invoke it
                     break;

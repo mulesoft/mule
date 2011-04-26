@@ -74,6 +74,22 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCa
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
+    /**
+     * If a method with correct name is available then it should be used even if one
+     * or more parameter types in the payload are null, as long as the parameter
+     * count matches.
+     * 
+     * @throws Exception
+     */
+    public void testMethodPropertyParameterNull() throws Exception
+    {
+        ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
+        resolver.addMethod("someOtherBusinessMethod");
+        InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(),
+            getTestEventContext(new Object[]{null, "blah"}));
+        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+    }
+
     public static class TestFruitCleaner
     {
         public void wash(Fruit fruit)

@@ -479,6 +479,11 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
      */
     public static Method getMethod(Class<?> clazz, String name, Class<?>[] parameterTypes)
     {
+        return getMethod(clazz, name, parameterTypes, false);
+    }
+
+    public static Method getMethod(Class clazz, String name, Class[] parameterTypes, boolean acceptNulls)
+    {
         Method[] methods = clazz.getMethods();
         for (int i = 0; i < methods.length; i++)
         {
@@ -488,7 +493,7 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
                 {
                     return methods[i];
                 }
-                else if (compare(methods[i].getParameterTypes(), parameterTypes, true))
+                else if (compare(methods[i].getParameterTypes(), parameterTypes, true, acceptNulls))
                 {
                     return methods[i];
                 }
@@ -743,15 +748,51 @@ public class ClassUtils extends org.apache.commons.lang.ClassUtils
 
     public static boolean compare(Class[] c1, Class[] c2, boolean matchOnObject)
     {
+        return compare(c1, c2, matchOnObject, false);
+    }
+
+    /**
+     * Returns true if the types from array c2 are assignable to the types from c1
+     * and the arrays are the same size. If matchOnObject argument is true and there
+     * is a parameter of type Object in c1 then the method returns false. If
+     * acceptNulls argument is true, null values are accepted in c2.
+     * 
+     * @param c1 parameter types array
+     * @param c2 parameter types array
+     * @param matchOnObject return false if there is a parameter of type Object in c1
+     * @param acceptNulls allows null parameter types in c2
+     * @return true if arrays are the same size and the types assignable from c2 to
+     *         c1
+     */
+    public static boolean compare(Class[] c1, Class[] c2, boolean matchOnObject, boolean acceptNulls)
+    {
         if (c1.length != c2.length)
         {
             return false;
         }
         for (int i = 0; i < c1.length; i++)
         {
-            if ((c1[i] == null) || (c2[i] == null))
+            if (!acceptNulls)
             {
-                return false;
+                if ((c1[i] == null) || (c2[i] == null))
+                {
+                    return false;
+                }
+            } 
+            else 
+            {
+                if (c1[i] == null)
+                {
+                    return false;
+                }
+                if ((c2[i] == null) && (c1[i].isPrimitive()))
+                {
+                    return false;
+                }
+                if (c2[i] == null)
+                {
+                    return true;
+                }
             }
             if (c1[i].equals(Object.class) && !matchOnObject)
             {
