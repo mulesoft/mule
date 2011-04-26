@@ -20,7 +20,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
         <component class="org.mule.cxf.weatherservice.mycode.CreateZipQuery" doc:name="Component" doc:description="Invoke a Java component"/>
         <cxf:jaxws-client clientClass="org.mule.cxf.weatherservice.myweather.Weather" port="WeatherSoap" operation="GetCityWeatherByZIP" doc:name="SOAP" doc:description="Make a web service available via CXF"/>
         <object-to-string-transformer></object-to-string-transformer>
-        <component class="org.mule.issues.HttpReturnsJaxbObject5331TestCase$WeatherReport"/>
+        <component class="org.mule.issues.HttpReturnsJaxbObject5531TestCase$WeatherReport"/>
         <!-- <http:outbound-endpoint address="http://wsf.cdyne.com/WeatherWS/Weather.asmx" doc:name="HTTP" doc:description="Process HTTP reqests or responses."/> -->
      </flow>
 </mule>

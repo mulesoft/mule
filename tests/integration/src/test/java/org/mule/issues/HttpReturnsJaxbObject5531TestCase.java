@@ -37,7 +37,7 @@ public class HttpReturnsJaxbObject5531TestCase extends DynamicPortTestCase
     @Override
     protected String getConfigResources()
     {
-        return "org/mule/issues/http-returns-jaxb-object-mule-5331-test.xml";
+        return "org/mule/issues/http-returns-jaxb-object-mule-5531-test.xml";
     }
 
     public void testGetWeather() throws Exception
