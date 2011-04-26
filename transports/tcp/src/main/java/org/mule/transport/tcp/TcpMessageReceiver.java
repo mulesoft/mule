@@ -232,34 +232,27 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
             final TcpConnector tcpConnector = ((TcpConnector) connector);
             protocol = tcpConnector.getTcpProtocol();
 
-            try
-            {
-                tcpConnector.configureSocket(TcpConnector.SERVER, socket);
+            tcpConnector.configureSocket(TcpConnector.SERVER, socket);
 
-                underlyingIn = new BufferedInputStream(socket.getInputStream());
-                dataIn = new TcpInputStream(underlyingIn)
-                {
-                    @Override
-                    public void close() throws IOException
-                    {
-                        // Don't actually close the stream, we just want to know if the
-                        // we want to stop receiving messages on this sockete.
-                        // The Protocol is responsible for closing this.
-                        dataInWorkFinished = true;
-                        moreMessages = false;
-                        
-                        synchronized (notify)
-                        {
-                            notify.notifyAll();
-                        }
-                    }
-                };
-                dataOut = new BufferedOutputStream(socket.getOutputStream());
-            }
-            catch (IOException e)
+            underlyingIn = new BufferedInputStream(socket.getInputStream());
+            dataIn = new TcpInputStream(underlyingIn)
             {
-                logger.error("Failed to set Socket properties: " + e.getMessage(), e);
-            }
+                @Override
+                public void close() throws IOException
+                {
+                    // Don't actually close the stream, we just want to know if the
+                    // we want to stop receiving messages on this sockete.
+                    // The Protocol is responsible for closing this.
+                    dataInWorkFinished = true;
+                    moreMessages = false;
+                    
+                    synchronized (notify)
+                    {
+                        notify.notifyAll();
+                    }
+                }
+            };
+            dataOut = new BufferedOutputStream(socket.getOutputStream());
         }
 
         public void expired()
@@ -307,32 +300,32 @@ public class TcpMessageReceiver extends AbstractMessageReceiver implements Work
          */
         private void releaseSocket()
         {
-            try
+            if (socket != null && !socket.isClosed())
             {
-                if (socket != null && !socket.isClosed())
+                if (logger.isDebugEnabled())
                 {
-                    if (logger.isDebugEnabled())
+                    // some dirty workaround for IBM JSSE's SSL implementation,
+                    // which closes sockets asynchronously by that point.
+                    final SocketAddress socketAddress = socket.getLocalSocketAddress();
+                    if (socketAddress == null)
                     {
-                        // some dirty workaround for IBM JSSE's SSL implementation,
-                        // which closes sockets asynchronously by that point.
-                        final SocketAddress socketAddress = socket.getLocalSocketAddress();
-                        if (socketAddress == null)
-                        {
-                            logger.debug("Listener has already been closed by other process.");
-                        }
-                        else
-                        {
-                            logger.debug("Closing listener: " + socketAddress);
-                        }
+                        logger.debug("Listener has already been closed by other process.");
                     }
+                    else
+                    {
+                        logger.debug("Closing listener: " + socketAddress);
+                    }
+                }
                     
+                try
+                {
                     shutdownSocket();
                     socket.close();
                 }
-            }
-            catch (IOException e)
-            {
-                logger.warn("Socket close failed with: " + e);
+                catch (IOException e)
+                {
+                    logger.warn("Socket close failed with: " + e);
+                }
             }
         }
 

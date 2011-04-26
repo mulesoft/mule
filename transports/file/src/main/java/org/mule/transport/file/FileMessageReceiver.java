@@ -305,7 +305,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     }
 
     private void moveAndDelete(final File sourceFile, File destinationFile,
-        String sourceFileOriginalName, MuleMessage message)
+        String sourceFileOriginalName, MuleMessage message) throws MuleException
     {
         boolean fileWasMoved = false;
 
@@ -378,7 +378,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             // wrap exception & handle it
             Message msg = FileMessages.exceptionWhileProcessing(sourceFile.getName(),
                 (fileWasRolledBack ? "successful" : "unsuccessful"));
-            getConnector().getMuleContext().getExceptionListener().handleException(new MessagingException(msg, message, e));
+            throw new MessagingException(msg, message, e);
         }
     }
 

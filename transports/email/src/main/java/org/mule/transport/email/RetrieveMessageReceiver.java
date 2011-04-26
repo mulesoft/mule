@@ -12,6 +12,7 @@ package org.mule.transport.email;
 
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -121,85 +122,85 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
         folder.addMessageCountListener(this);
     }
 
-    public void messagesAdded(MessageCountEvent event)
+    public void messagesAdded(MessageCountEvent event) 
     {
-        Message messages[] = event.getMessages();
-        List<Message> processedMessages = new ArrayList<Message>();
-        if (messages != null)
+        try
         {
-            MuleMessage message = null;
-            for (int i = 0; i < messages.length; i++)
+            Message messages[] = event.getMessages();
+            List<Message> processedMessages = new ArrayList<Message>();
+            if (messages != null)
             {
-                if (getLifecycleState().isStopping())
+                MuleMessage message = null;
+                for (int i = 0; i < messages.length; i++)
                 {
-                    break;
-                }
-                processedMessages.add(messages[i]);
-                try
-                {
-                    if (!messages[i].getFlags().contains(Flags.Flag.DELETED)
-                        && !messages[i].getFlags().contains(Flags.Flag.SEEN))
+                    if (getLifecycleState().isStopping())
                     {
-                        MimeMessage mimeMessage = new MimeMessage((MimeMessage) messages[i]);
-                        storeMessage(mimeMessage);
-                        message = createMuleMessage(mimeMessage, endpoint.getEncoding());
-
-                        if (castConnector().isDeleteReadMessages())
+                        break;
+                    }
+                    processedMessages.add(messages[i]);
+                    try
+                    {
+                        if (!messages[i].getFlags().contains(Flags.Flag.DELETED)
+                            && !messages[i].getFlags().contains(Flags.Flag.SEEN))
                         {
-                            // Mark as deleted
-                            messages[i].setFlag(Flags.Flag.DELETED, true);
-                        }
-                        else
-                        {
-                            if (this.getEndpoint().getFilter() != null && this.getEndpoint().getFilter().accept(message))
+                            MimeMessage mimeMessage = new MimeMessage((MimeMessage) messages[i]);
+                            storeMessage(mimeMessage);
+                            message = createMuleMessage(mimeMessage, endpoint.getEncoding());
+    
+                            if (castConnector().isDeleteReadMessages())
                             {
-                                Flags.Flag flag = castConnector().getDefaultProcessMessageAction();
-                                if (flag != null)
-                                {
-                                    messages[i].setFlag(flag, true);
-                                }
+                                // Mark as deleted
+                                messages[i].setFlag(Flags.Flag.DELETED, true);
                             }
                             else
                             {
-                                messages[i].setFlag(Flags.Flag.SEEN, false);
+                                if (this.getEndpoint().getFilter() != null && this.getEndpoint().getFilter().accept(message))
+                                {
+                                    Flags.Flag flag = castConnector().getDefaultProcessMessageAction();
+                                    if (flag != null)
+                                    {
+                                        messages[i].setFlag(flag, true);
+                                    }
+                                }
+                                else
+                                {
+                                    messages[i].setFlag(Flags.Flag.SEEN, false);
+                                }
                             }
+    
+                            routeMessage(message);
                         }
-
-                        routeMessage(message);
                     }
-                }
-                catch (MuleException e)
-                {
-                    getConnector().getMuleContext().getExceptionListener().handleException(e);
-                }
-                catch (Exception e)
-                {
-                    Exception forwarded;
-
-                    if (message != null)
+                    catch (MuleException e)
                     {
-                        forwarded = new org.mule.api.MessagingException(EmailMessages.routingError(), message, e);
+                        throw e;
                     }
-                    else
+                    catch (Exception e)
                     {
-                        forwarded = new ReceiveException(endpoint, -1, e);
+                        Exception forwarded;
+    
+                        if (message != null)
+                        {
+                            forwarded = new org.mule.api.MessagingException(EmailMessages.routingError(), message, e);
+                        }
+                        else
+                        {
+                            forwarded = new ReceiveException(endpoint, -1, e);
+                        }
+                        throw forwarded;
                     }
-
-                    getConnector().getMuleContext().getExceptionListener().handleException(forwarded);
                 }
-            }
-            // Lets move all messages in one go
-            if (moveToFolder != null)
-            {
-                try
+                // Lets move all messages in one go
+                if (moveToFolder != null)
                 {
                     folder.copyMessages(processedMessages.toArray(new Message[processedMessages.size()]), moveToFolder);
                 }
-                catch (MessagingException e)
-                {
-                    getConnector().getMuleContext().getExceptionListener().handleException(e);
-                }
             }
+        }
+        catch (Exception e)
+        {
+            // Throw a runtime exception because the javax.mail API does not allow a checked exception on this method.
+            throw new MuleRuntimeException(e);
         }
     }
 

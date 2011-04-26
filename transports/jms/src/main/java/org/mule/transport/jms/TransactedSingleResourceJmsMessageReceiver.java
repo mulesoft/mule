@@ -10,6 +10,7 @@
 
 package org.mule.transport.jms;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
@@ -37,8 +38,6 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.Topic;
-import javax.resource.spi.work.Work;
-import javax.resource.spi.work.WorkException;
 
 public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageReceiver
         implements MessageListener
@@ -198,103 +197,89 @@ public class TransactedSingleResourceJmsMessageReceiver extends AbstractMessageR
     {
         try
         {
-            getWorkManager().scheduleWork(new MessageReceiverWorker(message, this));
+            processMessages(message, this);
+            // Just in case we're not using AUTO_ACKNOWLEDGE (which is the default)
+            message.acknowledge();
         }
-        catch (WorkException e)
+        catch (MessagingException e)
         {
+            getFlowConstruct().getExceptionListener().handleException(e, e.getEvent());
+            // This will cause a negative ack for JMS
+            throw new MuleRuntimeException(e);
+        }
+        catch (Exception e)
+        {
+            getConnector().getMuleContext().getExceptionListener().handleException(e);
+            // This will cause a negative ack for JMS
             throw new MuleRuntimeException(e);
         }
     }
 
-    protected class MessageReceiverWorker implements Work
+    public void processMessages(final Message message, final MessageReceiver receiver) throws Exception
     {
-        Message message;
-        MessageReceiver receiver;
+        TransactionTemplate<Void> tt = new TransactionTemplate<Void>(
+                                                endpoint.getTransactionConfig(),
+                                                connector.getMuleContext());
 
-        public MessageReceiverWorker(Message message, MessageReceiver receiver)
-        {
-            this.message = message;
-            this.receiver = receiver;
-        }
+        final String encoding = endpoint.getEncoding();
 
-        public void run()
+        if (receiveMessagesInTransaction)
         {
-            try
+            TransactionCallback<Void> cb = new MessageTransactionCallback<Void>(message)
             {
-                TransactionTemplate<Void> tt = new TransactionTemplate<Void>(
-                                                        endpoint.getTransactionConfig(),
-                                                        connector.getMuleContext());
 
-                final String encoding = endpoint.getEncoding();
-
-                if (receiveMessagesInTransaction)
+                public Void doInTransaction() throws Exception
                 {
-                    TransactionCallback<Void> cb = new MessageTransactionCallback<Void>(message)
+                    // Get Transaction & Bind MuleSession
+                    Transaction tx = TransactionCoordination.getInstance().getTransaction();
+                    if (tx != null)
                     {
+                        tx.bindResource(connector.getConnection(), session);
+                    }
+                    if (tx instanceof JmsClientAcknowledgeTransaction)
+                    {
+                        tx.bindResource(message, message);
+                    }
 
-                        public Void doInTransaction() throws Exception
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Message received it is of type: " +
+                                ClassUtils.getSimpleName(message.getClass()));
+                        if (message.getJMSDestination() != null)
                         {
-                            // Get Transaction & Bind MuleSession
-                            Transaction tx = TransactionCoordination.getInstance().getTransaction();
-                            if (tx != null)
-                            {
-                                tx.bindResource(connector.getConnection(), session);
-                            }
-                            if (tx instanceof JmsClientAcknowledgeTransaction)
-                            {
-                                tx.bindResource(message, message);
-                            }
-
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug("Message received it is of type: " +
-                                        ClassUtils.getSimpleName(message.getClass()));
-                                if (message.getJMSDestination() != null)
-                                {
-                                    logger.debug("Message received on " + message.getJMSDestination() + " ("
-                                            + message.getJMSDestination().getClass().getName() + ")");
-                                }
-                                else
-                                {
-                                    logger.debug("Message received on unknown destination");
-                                }
-                                logger.debug("Message CorrelationId is: " + message.getJMSCorrelationID());
-                                logger.debug("Jms Message Id is: " + message.getJMSMessageID());
-                            }
-
-                            if (message.getJMSRedelivered())
-                            {
-                                if (logger.isDebugEnabled())
-                                {
-                                    logger.debug("Message with correlationId: "
-                                            + message.getJMSCorrelationID()
-                                            + " is redelivered. handing off to Exception Handler");
-                                }
-                                redeliveryHandler.handleRedelivery(message, receiver.getEndpoint(), receiver.getFlowConstruct());
-                            }
-
-                            MuleMessage messageToRoute = createMuleMessage(message, encoding);
-                            routeMessage(messageToRoute);
-                            return null;
+                            logger.debug("Message received on " + message.getJMSDestination() + " ("
+                                    + message.getJMSDestination().getClass().getName() + ")");
                         }
-                    };
-                    tt.execute(cb);
-                }
-                else
-                {
+                        else
+                        {
+                            logger.debug("Message received on unknown destination");
+                        }
+                        logger.debug("Message CorrelationId is: " + message.getJMSCorrelationID());
+                        logger.debug("Jms Message Id is: " + message.getJMSMessageID());
+                    }
+
+                    if (message.getJMSRedelivered())
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Message with correlationId: "
+                                    + message.getJMSCorrelationID()
+                                    + " is redelivered. handing off to Exception Handler");
+                        }
+                        redeliveryHandler.handleRedelivery(message, receiver.getEndpoint(), receiver.getFlowConstruct());
+                    }
+
                     MuleMessage messageToRoute = createMuleMessage(message, encoding);
                     routeMessage(messageToRoute);
+                    return null;
                 }
-            }
-            catch (Exception e)
-            {
-                getConnector().getMuleContext().getExceptionListener().handleException(e);
-            }
+            };
+            tt.execute(cb);
         }
-
-        public void release()
+        else
         {
-            // Nothing to release.
+            MuleMessage messageToRoute = createMuleMessage(message, encoding);
+            routeMessage(messageToRoute);
         }
     }
 }
