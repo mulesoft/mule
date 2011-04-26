@@ -30,4 +30,8 @@ public class MultiplePayloadsTestObject
         // nothing to do
     }
 
+    public void someOtherBusinessMethod(String parameter, String otherParameter)
+    {
+        // nothing to do
+    }
 }
