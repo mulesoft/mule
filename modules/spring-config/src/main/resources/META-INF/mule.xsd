@@ -4336,6 +4336,14 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="valueExpression" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines one or more expressions to use when extracting the value from the message. 
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="throwOnUnaccepted" type="substitutableBoolean" />
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

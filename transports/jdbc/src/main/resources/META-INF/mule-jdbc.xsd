@@ -245,5 +245,52 @@
         <xsd:attribute name="class" type="mule:substitutableClass" use="optional"/>
         <xsd:attribute name="ref" use="optional" type="xsd:string"/>
     </xsd:attributeGroup>
+    
+    <xsd:element name="object-store" type="jdbcObjectStoreType" substitutionGroup="mule:abstract-object-store"/>
+
+    <xsd:complexType name="jdbcObjectStoreType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractObjectStoreType">
+                <xsd:sequence>
+	                <xsd:element ref="mule:abstract-transaction" minOccurs="0" maxOccurs="1"/>
+                </xsd:sequence>
+                <xsd:attribute name="jdbcConnector-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The reference to the jdbcConnector
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="name" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the store
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="insertQueryKey" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The key for the insert query in the connector
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="selectQueryKey" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The key for the select query in the connector
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="deleteQueryKey" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The key for the delete query in the connector
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 </xsd:schema>

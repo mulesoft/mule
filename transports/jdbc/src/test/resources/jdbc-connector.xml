@@ -13,7 +13,7 @@
         <spring:property name="url" value="jdbc:derby:muleEmbeddedDB;create=true"/>
     </spring:bean>
 
-    <jdbc:connector name="jdbcConnector" pollingFrequency="1000" dataSource-ref="jdbcDataSource">
+    <jdbc:connector name="jdbcConnector" pollingFrequency="1000" dataSource-ref="jdbcDataSource" queryTimeout="3000">
         <jdbc:query key="getTest"
                     value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = #[type] AND ACK IS NULL"/>
         <jdbc:query key="getTestPayload"
@@ -26,5 +26,11 @@
                     value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(#[type], #[payload], NULL, NULL)"/>
         <jdbc:query key="writeMap"
                     value="INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES(#[type], #[map-payload:data], NULL, NULL)"/>
+        <jdbc:query key="insertIdempotency"
+                    value="INSERT INTO IDS(K, VALUE) VALUES(?, ?)"/>
+        <jdbc:query key="selectIdempotency"
+                    value="SELECT K, VALUE FROM IDS WHERE K = ?"/>
+        <jdbc:query key="deleteIdempotency"
+                    value="DELETE FROM IDS WHERE K = ?"/>
     </jdbc:connector>
 </mule>
