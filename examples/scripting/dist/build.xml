@@ -6,7 +6,7 @@
  license, a copy of which has been included with this distribution in the
  LICENSE.txt file.
 -->
-<project name="Mule Examples: Scripting" default="set-paths" basedir=".">
+<project name="Mule Examples: Scripting" default="deploy" basedir=".">
 
     <property name="dir.mule.home" value="${basedir}/../.."/>
     <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
