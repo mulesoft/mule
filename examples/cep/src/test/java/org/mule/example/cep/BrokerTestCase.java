@@ -22,7 +22,7 @@ public class BrokerTestCase extends FunctionalTestCase
 
     public void testBroker() throws Exception
     {       
-        Thread.sleep(100000);
+        Thread.sleep(20000); //don't set this too high without adjusting the test timeout first
         
 //        MuleClient client = new MuleClient();
 //        
