@@ -157,6 +157,7 @@ import org.mule.routing.outbound.StaticRecipientList;
 import org.mule.routing.requestreply.SimpleAsyncRequestReplyRequester;
 import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.security.SecretKeyEncryptionStrategy;
+import org.mule.security.UsernamePasswordAuthenticationFilter;
 import org.mule.security.filters.MuleEncryptionEndpointSecurityFilter;
 import org.mule.service.ForwardingConsumer;
 import org.mule.service.ServiceAsyncReplyCompositeMessageSource;
@@ -502,6 +503,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("secret-key-encryption-strategy", new ChildDefinitionParser("encryptionStrategy", SecretKeyEncryptionStrategy.class)).registerPreProcessor(new CheckExclusiveAttributes(new String[][]{new String[]{"key"}, new String[]{"keyFactory-ref"}}));
         registerBeanDefinitionParser("encryption-security-filter", new SecurityFilterDefinitionParser(MuleEncryptionEndpointSecurityFilter.class));
         registerBeanDefinitionParser("custom-security-filter", new SecurityFilterDefinitionParser());
+        registerBeanDefinitionParser("username-password-filter", new SecurityFilterDefinitionParser(UsernamePasswordAuthenticationFilter.class));
+        
         //Interceptors
         registerMuleBeanDefinitionParser("interceptor-stack", new InterceptorStackDefinitionParser());
         registerBeanDefinitionParser("custom-interceptor", new InterceptorDefinitionParser());
