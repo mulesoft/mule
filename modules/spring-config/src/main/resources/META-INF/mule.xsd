@@ -2714,6 +2714,35 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="username-password-filter" type="usernamePasswordFilterType" substitutionGroup="abstract-security-filter">
+        <xsd:annotation>
+            <xsd:documentation>
+                Authenticates a message based on username and password expressions.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="usernamePasswordFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractSecurityFilterType">
+                <xsd:attribute name="username" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A Mule expression which extracts the username from the message. Defaults to #[header:inbound:username].
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="password" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A Mule expression which extracts the password from the message. Defaults to #[header:inbound:password].
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
     <xsd:element name="custom-security-filter" type="customSecurityFilterType" substitutionGroup="abstract-security-filter">
         <xsd:annotation>
             <xsd:documentation>
@@ -2725,6 +2754,15 @@
     <xsd:complexType name="customSecurityFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractSecurityFilterType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Spring-style property element for custom configuration.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required"/>
             </xsd:extension>
         </xsd:complexContent>
