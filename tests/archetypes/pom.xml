@@ -12,7 +12,9 @@
     <name>Mule Tests for Maven Archetypes</name>
 
     <modules>
+	    <!-- MULE-5536
         <module>catalog-archetype</module>
+        -->
         <module>example-archetype</module>
         <module>module-archetype</module>
         <module>project-archetype</module>
