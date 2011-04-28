@@ -44,7 +44,7 @@ public class IBeansEndpointURIBuilder extends ResourceNameEndpointURIBuilder
 
         String ibean = address.substring(0, i);
         String method = address. substring(i+1);
-        IBeanHolder holder = muleContext.getRegistry().lookupObject(ibean);
+        IBeanHolder holder = muleContext.getRegistry().lookupObject(ibean + IBeanHolder.REGISTRY_SUFFIX);
         if(holder == null)
         {
             throw new MalformedEndpointException(IBeansMessages.ibeanNotRegistered(ibean), uri.toString());

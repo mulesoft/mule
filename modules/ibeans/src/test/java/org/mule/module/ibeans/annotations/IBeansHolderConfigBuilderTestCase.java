@@ -44,17 +44,17 @@ public class IBeansHolderConfigBuilderTestCase extends AbstractIBeansTestCase
             ids[i] = iBeanHolder.getId();
         }
 
-        assertEquals("errorfilter", ids[0]);
+        assertEquals("errorfilter.holder", ids[0]);
         //these are loaded from  a jar on the classpath, part test for MULE-5108
-        assertEquals("flickr", ids[1]);
-        assertEquals("flickrauthentication", ids[2]);
-        assertEquals("flickrsearch", ids[3]);
-        assertEquals("flickrupload", ids[4]);
-        assertEquals("hostip", ids[5]);
-        assertEquals("search", ids[6]);
-        assertEquals("testexception", ids[7]);
-        assertEquals("testimplicitpropertiesinfactory", ids[8]);
-        assertEquals("testparamsfactory", ids[9]);
-        assertEquals("testuri", ids[10]);
+        assertEquals("flickr.holder", ids[1]);
+        assertEquals("flickrauthentication.holder", ids[2]);
+        assertEquals("flickrsearch.holder", ids[3]);
+        assertEquals("flickrupload.holder", ids[4]);
+        assertEquals("hostip.holder", ids[5]);
+        assertEquals("search.holder", ids[6]);
+        assertEquals("testexception.holder", ids[7]);
+        assertEquals("testimplicitpropertiesinfactory.holder", ids[8]);
+        assertEquals("testparamsfactory.holder", ids[9]);
+        assertEquals("testuri.holder", ids[10]);
     }
 }

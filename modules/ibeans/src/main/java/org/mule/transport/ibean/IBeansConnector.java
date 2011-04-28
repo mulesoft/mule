@@ -104,7 +104,7 @@ public class IBeansConnector extends AbstractConnector
             String address = uri.getAddress();
             int i = address.indexOf(".");
             String ibeanName = address.substring(0, i);
-            IBeanHolder holder = getMuleContext().getRegistry().lookupObject(ibeanName);
+            IBeanHolder holder = getMuleContext().getRegistry().lookupObject(ibeanName + IBeanHolder.REGISTRY_SUFFIX);
             if(holder==null)
             {
                 throw new IllegalArgumentException();

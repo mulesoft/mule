@@ -23,6 +23,8 @@ import org.ibeans.impl.view.TextView;
  */
 public class IBeanHolder implements Comparable
 {
+    public static final String REGISTRY_SUFFIX = ".holder";
+    
     private Class ibean;
     private String usage;
 
@@ -55,9 +57,14 @@ public class IBeanHolder implements Comparable
 
     public String getId()
     {
-        return IBeansNotationHelper.getIBeanShortID(ibean);
+        return getId(ibean);
     }
-
+    
+    public static String getId(Class ibean)
+    {
+        return IBeansNotationHelper.getIBeanShortID(ibean) + REGISTRY_SUFFIX;
+    }
+    
     public String getUsage()
     {
         if (usage == null)

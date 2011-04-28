@@ -20,7 +20,6 @@ import java.util.Set;
 import org.ibeans.annotation.Call;
 import org.ibeans.annotation.IBeanGroup;
 import org.ibeans.annotation.Template;
-import org.ibeans.impl.IBeansNotationHelper;
 
 /**
  * A configuration builder that registers iBean objects on the classpath with the Mule registry.
@@ -75,8 +74,7 @@ public class IBeanHolderConfigurationBuilder extends AbstractAnnotationConfigura
 
         for (Class ibeanClass : ibeanClasses)
         {
-
-            muleContext.getRegistry().registerObject(IBeansNotationHelper.getIBeanShortID(ibeanClass), new IBeanHolder(ibeanClass));
+            muleContext.getRegistry().registerObject(IBeanHolder.getId(ibeanClass), new IBeanHolder(ibeanClass));
         }
     }
 }
