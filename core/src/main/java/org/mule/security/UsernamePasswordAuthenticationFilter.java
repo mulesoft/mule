@@ -1,5 +1,5 @@
 /*
- * $Id: HttpBasicAuthenticationFilter.java 20866 2011-01-04 01:48:01Z dandiep $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
