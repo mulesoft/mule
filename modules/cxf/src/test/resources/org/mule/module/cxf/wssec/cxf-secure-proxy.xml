@@ -14,23 +14,22 @@
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
        http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd
-       http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/3.1/mule-spring-security.xsd
+       http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/3.2/mule-spring-security.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd">
-       
-    <model name="SecurityTesting">
 
-          <service name="secureProxy">
-              <description>
-                  Secure Proxy using Spring Security
-              </description>
+    <model name="SecurityTesting">
+        <service name="secureProxy">
+            <description>
+                Secure Proxy using Spring Security
+            </description>
             <inbound>
                 <inbound-endpoint address="http://localhost:${port1}/proxy-envelope"
                                   exchange-pattern="request-response">
-                     <cxf:proxy-service payload="envelope">
-                         <cxf:inInterceptors>
+                    <cxf:proxy-service payload="envelope">
+                        <cxf:inInterceptors>
                             <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-                                   <spring:property name="properties" ref="wss4jInConfiguration" />
+                                <spring:property name="properties" ref="wss4jInConfiguration" />
                             </spring:bean>
                         </cxf:inInterceptors>
                     </cxf:proxy-service>
@@ -42,7 +41,7 @@
                         <cxf:proxy-client payload="envelope">
                             <cxf:outInterceptors>
                                 <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
-                                   <spring:property name="properties" ref="wss4jOutConfiguration" />
+                                    <spring:property name="properties" ref="wss4jOutConfiguration" />
                                 </spring:bean>
                             </cxf:outInterceptors>
                         </cxf:proxy-client>
@@ -51,16 +50,16 @@
             </outbound>
         </service>
 
-          <service name="secureProxy2">
-              <description>
-                  Secure Proxy using Spring Security
-              </description>
+        <service name="secureProxy2">
+            <description>
+                Secure Proxy using Spring Security
+            </description>
             <inbound>
                 <inbound-endpoint address="http://localhost:${port1}/proxy-body" exchange-pattern="request-response">
-                     <cxf:proxy-service>
-                         <cxf:inInterceptors>
+                    <cxf:proxy-service>
+                        <cxf:inInterceptors>
                             <spring:bean class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-                                   <spring:property name="properties" ref="wss4jInConfiguration" />
+                                <spring:property name="properties" ref="wss4jInConfiguration" />
                             </spring:bean>
                         </cxf:inInterceptors>
                     </cxf:proxy-service>
@@ -87,6 +86,5 @@
             </inbound>
             <log-component/>
         </service>
-
     </model>
-</mule> 
+</mule>

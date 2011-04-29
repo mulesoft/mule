@@ -6,7 +6,7 @@
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/parsers-test http://www.mulesoft.org/schema/mule/parsers-test/3.1/mule-parsers-test.xsd">
+       http://www.mulesoft.org/schema/mule/parsers-test http://www.mulesoft.org/schema/mule/parsers-test/3.2/mule-parsers-test.xsd">
 
     <parsers-test:orphan name="orphan1">
         <parsers-test:list-element-test-1 listAttribute="kid1"/>
@@ -20,5 +20,4 @@
         <parsers-test:list-element-test-3 attr1="kid1" attr2="kid2"/>
         <parsers-test:list-element-test-3 attr1="kid3"/>
     </parsers-test:orphan -->
-    
 </beans>

@@ -5,8 +5,8 @@
        xmlns:ext="http://www.mulesoft.org/schema/mule/nest-example-extension"
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.mulesoft.org/schema/mule/nest-example-base http://www.mulesoft.org/schema/mule/nest-example-base/3.1/nest-example-base.xsd
-       http://www.mulesoft.org/schema/mule/nest-example-extension http://www.mulesoft.org/schema/mule/nest-example-extension/3.1/nest-example-extension.xsd">
+       http://www.mulesoft.org/schema/mule/nest-example-base http://www.mulesoft.org/schema/mule/nest-example-base/3.2/nest-example-base.xsd
+       http://www.mulesoft.org/schema/mule/nest-example-extension http://www.mulesoft.org/schema/mule/nest-example-extension/3.2/nest-example-extension.xsd">
 
     <ext:service>
         <ext:component/>

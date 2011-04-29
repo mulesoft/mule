@@ -11,9 +11,9 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/3.1/mule-spring-security.xsd
+       http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/3.2/mule-spring-security.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
-    
+
     <spring:beans>
         <ss:authentication-manager alias="authenticationManager">
             <ss:authentication-provider>
@@ -28,12 +28,12 @@
     <mule-ss:security-manager>
         <mule-ss:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
     </mule-ss:security-manager>
-    
+
     <http:endpoint name="outbound" host="localhost" port="50504" exchange-pattern="request-response"
         user="ross" password="ross"/>
-        
+
     <vm:endpoint name="out" path="out" exchange-pattern="one-way"/>
-    
+
     <model name="http secured test model">
         <service name="SecureService">
             <inbound>
@@ -49,5 +49,4 @@
             </outbound>
         </service>
     </model>
-
 </mule>

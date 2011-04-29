@@ -6,13 +6,13 @@
       xmlns:json="http://www.mulesoft.org/schema/mule/json"
       xmlns:jetty="http://www.mulesoft.org/schema/mule/jetty"
       xsi:schemaLocation="
-        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.1/mule-json.xsd
-        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.1/mule-ajax.xsd
-        http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/3.1/mule-jetty.xsd
-        http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/3.1/mule-management.xsd
-        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd">
+        http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/3.2/mule-json.xsd
+        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.2/mule-ajax.xsd
+        http://www.mulesoft.org/schema/mule/jetty http://www.mulesoft.org/schema/mule/jetty/3.2/mule-jetty.xsd
+        http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/3.2/mule-management.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 
-    <ajax:connector name="ajaxServer" serverUrl="http://0.0.0.0:8082/services/notifications" 
+    <ajax:connector name="ajaxServer" serverUrl="http://0.0.0.0:8082/services/notifications"
         resourceBase="${app.home}/docroot"/>
 
     <notifications dynamic="true">
@@ -23,7 +23,7 @@
         <json:serialization-mixin targetClass="org.mule.context.notification.ComponentMessageNotification" 
             mixinClass="org.mule.example.notifications.ComponentMessageNotificationMixin"/>
     </json:object-to-json-transformer>
-    
+
     <json:json-to-object-transformer name="JsonToObject"/>
 
     <management:publish-notifications ignoreConnectionNotifications="true">

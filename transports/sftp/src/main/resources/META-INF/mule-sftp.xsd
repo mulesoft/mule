@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xsd:schema xmlns="http://www.mulesoft.org/schema/mule/sftp"
-			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-			xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-			xmlns:file="http://www.mulesoft.org/schema/mule/file"
-			xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
-			targetNamespace="http://www.mulesoft.org/schema/mule/sftp"
-			elementFormDefault="qualified"
-			attributeFormDefault="unqualified">
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+            xmlns:file="http://www.mulesoft.org/schema/mule/file"
+            xmlns:schemadoc="http://www.mulesoft.org/schema/mule/schemadoc"
+            targetNamespace="http://www.mulesoft.org/schema/mule/sftp"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
 
-	<xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-	<xsd:import namespace="http://www.mulesoft.org/schema/mule/file"
-				schemaLocation="http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd"/>
-	<xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
-				schemaLocation="http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd"/>
-	<xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
-				schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.2/mule-schemadoc.xsd"/>
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/file"
+                schemaLocation="http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/core"
+                schemaLocation="http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd"/>
+    <xsd:import namespace="http://www.mulesoft.org/schema/mule/schemadoc"
+                schemaLocation="http://www.mulesoft.org/schema/mule/schemadoc/3.2/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation>
@@ -31,33 +31,33 @@
         </xsd:appinfo>
     </xsd:annotation>
 
-	<xsd:element name="connector" type="sftpConnectorType" substitutionGroup="mule:abstract-connector">
-		<xsd:annotation>
-			<xsd:documentation>
-				SFTP connectivity
-			</xsd:documentation>
-		</xsd:annotation>
-	</xsd:element>
+    <xsd:element name="connector" type="sftpConnectorType" substitutionGroup="mule:abstract-connector">
+        <xsd:annotation>
+            <xsd:documentation>
+                SFTP connectivity
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
 
-	<xsd:complexType name="sftpConnectorType">
-		<xsd:complexContent>
-			<xsd:extension base="mule:connectorType">
-				<xsd:sequence minOccurs="0" maxOccurs="1">
-					<xsd:element ref="file:abstract-filenameParser"/>
-				</xsd:sequence>
-				<xsd:attributeGroup ref="poolingAttributes"/>
-				<xsd:attributeGroup ref="inboundAttributes"/>
-				<xsd:attributeGroup ref="outboundAttributes"/>
-				<xsd:attributeGroup ref="commonKeyAuthenticationAttributes"/>
-				<xsd:attributeGroup ref="connectorAttributes"/>
-				<xsd:attributeGroup ref="commonEndpointAndConnectorAttributes"/>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
+    <xsd:complexType name="sftpConnectorType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:connectorType">
+                <xsd:sequence minOccurs="0" maxOccurs="1">
+                    <xsd:element ref="file:abstract-filenameParser"/>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="poolingAttributes"/>
+                <xsd:attributeGroup ref="inboundAttributes"/>
+                <xsd:attributeGroup ref="outboundAttributes"/>
+                <xsd:attributeGroup ref="commonKeyAuthenticationAttributes"/>
+                <xsd:attributeGroup ref="connectorAttributes"/>
+                <xsd:attributeGroup ref="commonEndpointAndConnectorAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
-	<xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
-	<xsd:complexType name="inboundEndpointType">
+    <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
+    <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
             <xsd:extension base="mule:inboundEndpointType">
 <!--
@@ -72,355 +72,354 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-	<xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>	
-	<xsd:complexType name="outboundEndpointType">
-		<xsd:complexContent>
-            <xsd:extension base="mule:outboundEndpointType">		
-				<xsd:attributeGroup ref="addressAttributes"/>
-				<xsd:attributeGroup ref="outboundAttributes"/>
-				<xsd:attributeGroup ref="commonKeyAuthenticationAttributes"/>
-				<xsd:attributeGroup ref="commonEndpointAttributes"/>
-				<xsd:attributeGroup ref="commonEndpointAndConnectorAttributes"/>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
+    <xsd:element name="outbound-endpoint" type="outboundEndpointType" substitutionGroup="mule:abstract-outbound-endpoint"/>    
+    <xsd:complexType name="outboundEndpointType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:outboundEndpointType">
+                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="outboundAttributes"/>
+                <xsd:attributeGroup ref="commonKeyAuthenticationAttributes"/>
+                <xsd:attributeGroup ref="commonEndpointAttributes"/>
+                <xsd:attributeGroup ref="commonEndpointAndConnectorAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
-	<xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
-	<xsd:complexType name="globalEndpointType">
-		<xsd:complexContent>
+    <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
+    <xsd:complexType name="globalEndpointType">
+        <xsd:complexContent>
             <!-- 
                 The only valid exchange-pattern is one-way which is the default. No need to make 
-                the exchange-pattern attribute configurable.  
+                the exchange-pattern attribute configurable.
             -->
             <xsd:extension base="mule:globalEndpointType">
-				<xsd:attributeGroup ref="addressAttributes"/>
-				<xsd:attributeGroup ref="inboundAttributes"/>
-				<xsd:attributeGroup ref="outboundAttributes"/>
-				<xsd:attributeGroup ref="commonKeyAuthenticationAttributes"/>
-				<xsd:attributeGroup ref="commonEndpointAttributes"/>
-				<xsd:attributeGroup ref="commonEndpointAndConnectorAttributes"/>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
+                <xsd:attributeGroup ref="addressAttributes"/>
+                <xsd:attributeGroup ref="inboundAttributes"/>
+                <xsd:attributeGroup ref="outboundAttributes"/>
+                <xsd:attributeGroup ref="commonKeyAuthenticationAttributes"/>
+                <xsd:attributeGroup ref="commonEndpointAttributes"/>
+                <xsd:attributeGroup ref="commonEndpointAndConnectorAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
 
-	<!-- Various attributes for the connector -->
-	<xsd:attributeGroup name="connectorAttributes">
-		<xsd:attribute name="tempDirInbound" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: No
-					Default: disabled
+    <!-- Various attributes for the connector -->
+    <xsd:attributeGroup name="connectorAttributes">
+        <xsd:attribute name="tempDirInbound" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: No
+                    Default: disabled
 
-					If specified then Mule tries to create the temp-directory in the endpoint folder if it doesn't already exist.
-					Ensure that the user Mule is configured to use to access the sftp server has privileges to create a temp folder if required!
+                    If specified then Mule tries to create the temp-directory in the endpoint folder if it doesn't already exist.
+                    Ensure that the user Mule is configured to use to access the sftp server has privileges to create a temp folder if required!
 
-					For inbound endpoints:
-					A temporary directory on the ftp-server from where the download takes place.
-					The file will be moved (locally on the sftp-server) to the tempDir, to mark that a download is taking place, before the download starts.
+                    For inbound endpoints:
+                    A temporary directory on the ftp-server from where the download takes place.
+                    The file will be moved (locally on the sftp-server) to the tempDir, to mark that a download is taking place, before the download starts.
 
-					NOTE: A file in the tempDir of an inbound endpoint is always correct (has only been moved locally on the sftp-server) and can therefore be
-					used to
-					restart a failing file transfer.
+                    NOTE: A file in the tempDir of an inbound endpoint is always correct (has only been moved locally on the sftp-server) and can therefore be
+                    used to
+                    restart a failing file transfer.
 
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="tempDirOutbound" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: No
-					Default: disabled
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="tempDirOutbound" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: No
+                    Default: disabled
 
-					If specified then Mule tries to create the temp-directory in the endpoint folder if it doesn't already exist.
-					Ensure that the user Mule is configured to use to access the sftp server has privileges to create a temp folder if required!
+                    If specified then Mule tries to create the temp-directory in the endpoint folder if it doesn't already exist.
+                    Ensure that the user Mule is configured to use to access the sftp server has privileges to create a temp folder if required!
 
-					For outbound endpoints:
-					A temporary directory on the sftp-server to first upload the file to. When the file is fully uploaded the file is moved to its final
-					destination.
-					The tempDir will be created as a sub directory to the endpoint.
+                    For outbound endpoints:
+                    A temporary directory on the sftp-server to first upload the file to. When the file is fully uploaded the file is moved to its final
+                    destination.
+                    The tempDir will be created as a sub directory to the endpoint.
 
-					NOTE: A file in the tempDir of an outbound endpoint might not be correct (since the upload takes place to this folder) and can therefore NOT
-					be used
-					to restart a failing file transfer.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-	</xsd:attributeGroup>
+                    NOTE: A file in the tempDir of an outbound endpoint might not be correct (since the upload takes place to this folder) and can therefore NOT
+                    be used
+                    to restart a failing file transfer.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
 
-	<xsd:attributeGroup name="inboundAttributes">
-		<xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: no
-					Default: 1000 ms
+    <xsd:attributeGroup name="inboundAttributes">
+        <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: no
+                    Default: 1000 ms
 
-					The frequency in milliseconds that the read directory should be checked.
-					Note that the read directory is specified by the endpoint of the listening component.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="autoDelete" type="mule:substitutableBoolean">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: no
-					Default: true
+                    The frequency in milliseconds that the read directory should be checked.
+                    Note that the read directory is specified by the endpoint of the listening component.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="autoDelete" type="mule:substitutableBoolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: no
+                    Default: true
 
-					Whether to delete the file after successfully reading it.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="fileAge" type="mule:substitutableLong">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: no
-					Default: disabled
+                    Whether to delete the file after successfully reading it.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="fileAge" type="mule:substitutableLong">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: no
+                    Default: disabled
 
-					Miniumum age (in ms) for a file to be processed. This can be useful when consuming large files. It tells Mule to wait for a period of time
-					before
-					consuming the file, allowing the file to be completely written before the file is processed.
+                    Miniumum age (in ms) for a file to be processed. This can be useful when consuming large files. It tells Mule to wait for a period of time
+                    before
+                    consuming the file, allowing the file to be completely written before the file is processed.
 
-					WARNING: The fileAge attribute will only work properly if the servers where Mule and the sftp-server runs have synchronized time.
+                    WARNING: The fileAge attribute will only work properly if the servers where Mule and the sftp-server runs have synchronized time.
 
-					NOTE: See attribute sizeCheckWaitTime for an alternate method of determing if a incoming file is ready for processing.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="sizeCheckWaitTime" type="mule:substitutableLong">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: no
-					Default: disabled
+                    NOTE: See attribute sizeCheckWaitTime for an alternate method of determing if a incoming file is ready for processing.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="sizeCheckWaitTime" type="mule:substitutableLong">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: no
+                    Default: disabled
 
-					Wait time (in ms) between size-checks to determine if a file is ready to be processed.
-					Disabled if not set or set to a negative value.
-					This feature can be useful to avoid processing not yet completely written files (e.g. consuming large files).
-					It tells Mule to do two size checks waiting the specified time between the two size calls.
-					If the two size calls return the same value Mule consider the file ready for processing.
+                    Wait time (in ms) between size-checks to determine if a file is ready to be processed.
+                    Disabled if not set or set to a negative value.
+                    This feature can be useful to avoid processing not yet completely written files (e.g. consuming large files).
+                    It tells Mule to do two size checks waiting the specified time between the two size calls.
+                    If the two size calls return the same value Mule consider the file ready for processing.
 
-					NOTE: See attribute fileAge for an alternate method of determing if a incoming file is ready for processing.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="archiveDir" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: no
-					Default: disabled
+                    NOTE: See attribute fileAge for an alternate method of determing if a incoming file is ready for processing.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="archiveDir" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: no
+                    Default: disabled
 
-					Archives a copy of the file in the specified directory on the file system where mule is running.
-					The archive folder must have been created before Mule is started and the user Mule runs under must have privileges to read and write to the
-					folder.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="archiveTempReceivingDir" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: no
-					Default: disabled
+                    Archives a copy of the file in the specified directory on the file system where mule is running.
+                    The archive folder must have been created before Mule is started and the user Mule runs under must have privileges to read and write to the
+                    folder.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="archiveTempReceivingDir" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: no
+                    Default: disabled
 
-					If specified then the file to be archived is received in this folder and then moved to the archiveTempSendingDir while sent further on to
-					the outbound
-					endpoint.
-					This folder is created as a subfolder to the archiveDir.
+                    If specified then the file to be archived is received in this folder and then moved to the archiveTempSendingDir while sent further on to
+                    the outbound
+                    endpoint.
+                    This folder is created as a subfolder to the archiveDir.
 
-					NOTE: Must be specified together with the archiveTempSendingDir and archiveDir attributes.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="archiveTempSendingDir" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: no
-					Default: disabled
+                    NOTE: Must be specified together with the archiveTempSendingDir and archiveDir attributes.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="archiveTempSendingDir" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: no
+                    Default: disabled
 
-					If specified then the file to be archived is sent to the outbound endpoint from this folder.
-					This folder is created as a subfolder to the archiveDir.
-					After the file is consumed by the outbound endpoint or the component itself (i.e. when the underlying InputStream is closed) it will be
-					moved to the
-					archive folder.
+                    If specified then the file to be archived is sent to the outbound endpoint from this folder.
+                    This folder is created as a subfolder to the archiveDir.
+                    After the file is consumed by the outbound endpoint or the component itself (i.e. when the underlying InputStream is closed) it will be
+                    moved to the
+                    archive folder.
 
-					NOTE: Must be specified together with the archiveTempReceivingDir and archiveDir attributes.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-	</xsd:attributeGroup>
+                    NOTE: Must be specified together with the archiveTempReceivingDir and archiveDir attributes.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
 
-	<xsd:attributeGroup name="outboundAttributes">
-		<xsd:attribute name="outputPattern" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: no
-					Default: the message id, e.g. ee241e68-c619-11de-986b-adeb3d6db038
+    <xsd:attributeGroup name="outboundAttributes">
+        <xsd:attribute name="outputPattern" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: no
+                    Default: the message id, e.g. ee241e68-c619-11de-986b-adeb3d6db038
 
-					The pattern to use when writing a file to disk.
-					This can use the patterns supported by the filename-parser configured for this connector,
-					by default the [Legacy Filename Parser|http://www.mulesoft.org/display/MULE2USER/File+Transport#FileTransport-LegacyFilenameParser] is used.
+                    The pattern to use when writing a file to disk.
+                    This can use the patterns supported by the filename-parser configured for this connector,
+                    by default the [Legacy Filename Parser|http://www.mulesoft.org/display/MULE2USER/File+Transport#FileTransport-LegacyFilenameParser] is used.
 
-					See section [Child Elements to File Connector|http://www.mulesoft.org/display/MULE2USER/File+Transport] for information on how to override
-					the default
-					parser.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="keepFileOnError" type="mule:substitutableBoolean">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: no
-					Default: true
+                    See section [Child Elements to File Connector|http://www.mulesoft.org/display/MULE2USER/File+Transport] for information on how to override
+                    the default
+                    parser.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="keepFileOnError" type="mule:substitutableBoolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: no
+                    Default: true
 
-					If true the file on the inbound-endpoint will not be deleted if an error occurs when writing to the outbound-endpoint.
-					NOTE: This assumes that both the inbound and outbound endpoints are using the SFTP-Transport.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="duplicateHandling" type="duplicateHandlingType">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: no
-					Default: throwException
+                    If true the file on the inbound-endpoint will not be deleted if an error occurs when writing to the outbound-endpoint.
+                    NOTE: This assumes that both the inbound and outbound endpoints are using the SFTP-Transport.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="duplicateHandling" type="duplicateHandlingType">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: no
+                    Default: throwException
 
-					Determines what to do if a file already exist on the outbound endpoint with the specified name.
-					throwException: Will throw an exception if a file already exists
-					overwrite: Will overwrite an existing file
-					addSeqNo: Will add a sequence number to the target filename making the filename unique, starting with 1 and incrementing the number until a
-					unique
-					filename is found
-					The default behavior is to throw an exception.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-	</xsd:attributeGroup>
+                    Determines what to do if a file already exist on the outbound endpoint with the specified name.
+                    throwException: Will throw an exception if a file already exists
+                    overwrite: Will overwrite an existing file
+                    addSeqNo: Will add a sequence number to the target filename making the filename unique, starting with 1 and incrementing the number until a
+                    unique
+                    filename is found
+                    The default behavior is to throw an exception.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
 
-	<xsd:simpleType name="duplicateHandlingType">
-		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="throwException"/>
-			<xsd:enumeration value="overwrite"/>
-			<xsd:enumeration value="addSeqNo"/>
-		</xsd:restriction>
-	</xsd:simpleType>
+    <xsd:simpleType name="duplicateHandlingType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="throwException"/>
+            <xsd:enumeration value="overwrite"/>
+            <xsd:enumeration value="addSeqNo"/>
+        </xsd:restriction>
+    </xsd:simpleType>
 
-	<xsd:attributeGroup name="addressAttributes">
-		<xsd:attribute name="path" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					A file location.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="user" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					A username.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="password" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					A password.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="host" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					An IP address (eg www.mulesoft.com, localhost, 127.0.0.1).
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="port" type="mule:substitutablePortNumber">
-			<xsd:annotation>
-				<xsd:documentation>
-					A port number.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-	</xsd:attributeGroup>
+    <xsd:attributeGroup name="addressAttributes">
+        <xsd:attribute name="path" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A file location.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="user" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A username.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="password" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A password.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="host" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    An IP address (eg www.mulesoft.com, localhost, 127.0.0.1).
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="port" type="mule:substitutablePortNumber">
+            <xsd:annotation>
+                <xsd:documentation>
+                    A port number.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
 
-	<xsd:attributeGroup name="commonEndpointAttributes">
-		<xsd:attribute name="tempDir" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: No
-					Default: disabled
+    <xsd:attributeGroup name="commonEndpointAttributes">
+        <xsd:attribute name="tempDir" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: No
+                    Default: disabled
 
-					If specified then Mule tries to create the temp-directory in the endpoint folder if it doesn't already exist.
-					Ensure that the user Mule is configured to use to access the sftp server has privileges to create a temp folder if required!
+                    If specified then Mule tries to create the temp-directory in the endpoint folder if it doesn't already exist.
+                    Ensure that the user Mule is configured to use to access the sftp server has privileges to create a temp folder if required!
 
-					For inbound endpoints:
-					A temporary directory on the ftp-server from where the download takes place.
-					The file will be moved (locally on the sftp-server) to the tempDir, to mark that a download is taking place, before the download starts.
+                    For inbound endpoints:
+                    A temporary directory on the ftp-server from where the download takes place.
+                    The file will be moved (locally on the sftp-server) to the tempDir, to mark that a download is taking place, before the download starts.
 
-					NOTE: A file in the tempDir of an inbound endpoint is always correct (has only been moved locally on the sftp-server) and can therefore be
-					used to
-					restart a failing file transfer.
+                    NOTE: A file in the tempDir of an inbound endpoint is always correct (has only been moved locally on the sftp-server) and can therefore be
+                    used to
+                    restart a failing file transfer.
 
-					For outbound endpoints:
-					A temporary directory on the sftp-server to first upload the file to. When the file is fully uploaded the file is moved to its final
-					destination.
-					The tempDir will be created as a sub directory to the endpoint.
+                    For outbound endpoints:
+                    A temporary directory on the sftp-server to first upload the file to. When the file is fully uploaded the file is moved to its final
+                    destination.
+                    The tempDir will be created as a sub directory to the endpoint.
 
-					NOTE: A file in the tempDir of an outbound endpoint might not be correct (since the upload takes place to this folder) and can therefore NOT
-					be used
-					to restart a failing file transfer.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-	</xsd:attributeGroup>
+                    NOTE: A file in the tempDir of an outbound endpoint might not be correct (since the upload takes place to this folder) and can therefore NOT
+                    be used
+                    to restart a failing file transfer.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
 
-	<!-- Various attributes both on the endpoints and connectors -->
-	<xsd:attributeGroup name="commonEndpointAndConnectorAttributes">
-		<xsd:attribute name="useTempFileTimestampSuffix" type="xsd:boolean">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: No
-					Default: disabled
+    <!-- Various attributes both on the endpoints and connectors -->
+    <xsd:attributeGroup name="commonEndpointAndConnectorAttributes">
+        <xsd:attribute name="useTempFileTimestampSuffix" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: No
+                    Default: disabled
 
-					Used together with the tempDir - attribute to give the files in the tempDir a guaranteed unique name based on the local time when the file
-					was moved
-					to the tempDir.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-	</xsd:attributeGroup>
+                    Used together with the tempDir - attribute to give the files in the tempDir a guaranteed unique name based on the local time when the file
+                    was moved
+                    to the tempDir.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
 
-	<xsd:attributeGroup name="commonKeyAuthenticationAttributes">
-		<xsd:attribute name="identityFile" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: no
-					Default: disabled
+    <xsd:attributeGroup name="commonKeyAuthenticationAttributes">
+        <xsd:attribute name="identityFile" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: no
+                    Default: disabled
 
-					An identityFile location for a PKI private key.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="passphrase" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: no
-					Default: disabled
+                    An identityFile location for a PKI private key.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="passphrase" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: no
+                    Default: disabled
 
-					The passphrase (password) for the identityFile if required.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-	</xsd:attributeGroup>
+                    The passphrase (password) for the identityFile if required.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
 
-	<xsd:attributeGroup name="poolingAttributes">
-		<xsd:attribute name="maxConnectionPoolSize" type="mule:substitutableInt">
-			<xsd:annotation>
-				<xsd:documentation>
-					Required: No
-					Default: disabled
+    <xsd:attributeGroup name="poolingAttributes">
+        <xsd:attribute name="maxConnectionPoolSize" type="mule:substitutableInt">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Required: No
+                    Default: disabled
 
-					If the number of active connections is specified, then a connection pool will be used with active connections up to this number.
-					Use a negative value for no limit. If the value is zero no connection pool will be used.
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-	</xsd:attributeGroup>
-
+                    If the number of active connections is specified, then a connection pool will be used with active connections up to this number.
+                    Use a negative value for no limit. If the value is zero no connection pool will be used.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
 </xsd:schema>

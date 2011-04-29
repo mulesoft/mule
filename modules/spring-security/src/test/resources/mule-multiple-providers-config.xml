@@ -11,26 +11,26 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/3.1/mule-spring-security.xsd
+       http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/3.2/mule-spring-security.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 
     <spring:beans xmlns="http://www.springframework.org/schema/beans">
-        <bean id="authenticationManager1" class="org.springframework.security.authentication.ProviderManager">        
+        <bean id="authenticationManager1" class="org.springframework.security.authentication.ProviderManager">
             <property name="providers">
-                <bean class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">                
+                <bean class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
                     <property name="userDetailsService" ref="userService1"/>
                 </bean>
             </property>
         </bean>
 
-        <bean id="authenticationManager2" class="org.springframework.security.authentication.ProviderManager">        
+        <bean id="authenticationManager2" class="org.springframework.security.authentication.ProviderManager">
             <property name="providers">
-                <bean class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">                
+                <bean class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
                     <property name="userDetailsService" ref="userService2"/>
                 </bean>
             </property>
         </bean>
-        
+
         <ss:user-service id="userService1">
             <ss:user name="ross" password="ross" authorities="ROLE_ADMIN" />
             <ss:user name="admin1" password="admin1" authorities="ROLE_ADMIN" />
@@ -62,7 +62,7 @@
                 </http:inbound-endpoint>
             </inbound>
         </service>
-        
+
         <service name="flow2">
             <inbound>
                 <http:inbound-endpoint address="http://localhost:4446" exchange-pattern="request-response">
@@ -71,7 +71,7 @@
                 </http:inbound-endpoint>
             </inbound>
         </service>
-        
+
         <service name="flow3">
             <inbound>
                 <http:inbound-endpoint address="http://localhost:4447" exchange-pattern="request-response">
