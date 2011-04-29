@@ -92,7 +92,9 @@
                           </xsd:documentation>
                       </xsd:annotation>
                   </xsd:element>
-                  <xsd:element ref="mule:abstract-exception-strategy" minOccurs="0"/>
+                  <xsd:element ref="mule:abstract-exception-strategy" minOccurs="0" maxOccurs="1"/>
+                  <!-- TODO consider being more restrictive and allowing only cache elements from mule-module-cache -->
+                  <xsd:element ref="mule:abstract-intercepting-message-processor" minOccurs="0" maxOccurs="1" />
                 </xsd:sequence>
                 <xsd:attribute name="inboundAddress" type="xsd:string">
                     <xsd:annotation>
@@ -136,7 +138,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <!-- TODO (DDO) add cache configuration -->
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

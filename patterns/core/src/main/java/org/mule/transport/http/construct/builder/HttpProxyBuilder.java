@@ -15,6 +15,7 @@ import java.util.Arrays;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.Transformer;
 import org.mule.construct.builder.AbstractFlowConstructWithSingleInboundAndOutboundEndpointBuilder;
@@ -24,6 +25,8 @@ public class HttpProxyBuilder extends
     AbstractFlowConstructWithSingleInboundAndOutboundEndpointBuilder<HttpProxyBuilder, HttpProxy>
 
 {
+    private InterceptingMessageProcessor cachingMessageProcessor;
+
     @Override
     protected MessageExchangePattern getInboundMessageExchangePattern()
     {
@@ -48,10 +51,17 @@ public class HttpProxyBuilder extends
         return this;
     }
 
+    public HttpProxyBuilder cachingMessageProcessor(final InterceptingMessageProcessor cachingMessageProcessor)
+    {
+        this.cachingMessageProcessor = cachingMessageProcessor;
+        return this;
+    }
+
     @Override
     protected HttpProxy buildFlowConstruct(final MuleContext muleContext) throws MuleException
     {
         return new HttpProxy(name, muleContext, getOrBuildInboundEndpoint(muleContext),
-            getOrBuildOutboundEndpoint(muleContext), transformers, responseTransformers);
+            getOrBuildOutboundEndpoint(muleContext), transformers, responseTransformers,
+            cachingMessageProcessor);
     }
 }

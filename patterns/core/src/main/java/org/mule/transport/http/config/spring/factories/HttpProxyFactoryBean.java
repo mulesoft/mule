@@ -12,6 +12,7 @@ package org.mule.transport.http.config.spring.factories;
 
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.Transformer;
 import org.mule.config.spring.factories.AbstractFlowConstructFactoryBean;
@@ -73,5 +74,10 @@ public class HttpProxyFactoryBean extends AbstractFlowConstructFactoryBean
     public void setResponseTransformers(final Transformer... responseTransformers)
     {
         httpProxyBuilder.responseTransformers(responseTransformers);
+    }
+
+    public void setCachingMessageProcessor(final InterceptingMessageProcessor cachingMessageProcessor)
+    {
+        httpProxyBuilder.cachingMessageProcessor(cachingMessageProcessor);
     }
 }

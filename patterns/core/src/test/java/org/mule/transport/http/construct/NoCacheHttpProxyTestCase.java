@@ -40,7 +40,7 @@ public class NoCacheHttpProxyTestCase extends AbstractFlowConstuctTestCase
         testConnector.start();
 
         httpProxy = new HttpProxy("no-cache-http-proxy", muleContext, directInboundMessageSource,
-            testOutboundEndpoint, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+            testOutboundEndpoint, Collections.EMPTY_LIST, Collections.EMPTY_LIST, null);
     }
 
     @Override

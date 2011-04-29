@@ -19,6 +19,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
@@ -41,17 +42,17 @@ import org.mule.util.StringUtils;
  */
 public class HttpProxy extends AbstractConfigurationPattern
 {
-    // TODO (DDO) support caching, using SimpleCachingHeadersPageCachingFilter / ObjectStore / mule-module-cache
-    // TODO (DDO) support cache bypass? X-Mule-HttpProxy-CacheControl=no-cache?
-
     private final OutboundEndpoint outboundEndpoint;
+
+    private final InterceptingMessageProcessor cachingMessageProcessor;
 
     public HttpProxy(final String name,
                      final MuleContext muleContext,
                      final MessageSource messageSource,
                      final OutboundEndpoint outboundEndpoint,
                      final List<MessageProcessor> transformers,
-                     final List<MessageProcessor> responseTransformers) throws MuleException
+                     final List<MessageProcessor> responseTransformers,
+                     final InterceptingMessageProcessor cachingMessageProcessor) throws MuleException
     {
         super(name, muleContext, transformers, responseTransformers);
 
@@ -72,6 +73,7 @@ public class HttpProxy extends AbstractConfigurationPattern
         }
 
         this.outboundEndpoint = outboundEndpoint;
+        this.cachingMessageProcessor = cachingMessageProcessor;
     }
 
     @Override
@@ -89,6 +91,11 @@ public class HttpProxy extends AbstractConfigurationPattern
             new CopyInboundToOutboundPropertiesTransformerCallback());
         builder.chain(copyInboundToOutboundPropertiesTransformer);
         builder.chain(new ResponseMessageProcessorAdapter(copyInboundToOutboundPropertiesTransformer));
+
+        if (cachingMessageProcessor != null)
+        {
+            builder.chain(cachingMessageProcessor);
+        }
 
         if (outboundEndpoint instanceof DynamicURIOutboundEndpoint)
         {
