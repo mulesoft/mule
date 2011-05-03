@@ -4,7 +4,6 @@ abdera-i18n-0.4.0-incubating
 abdera-parser-0.4.0-incubating
 abdera-server-0.4.0-incubating
 abdera-spring-0.4.0-incubating
-acegi-security-1.0.7-osgi
 activation-1.1-osgi
 antlr-3.1.1
 ant-1.6.5
@@ -120,7 +119,6 @@ mockito-all-1.8.4
 msv-core-2010.1
 mule-core
 mule-core-tests
-mule-module-acegi
 mule-module-annotations
 mule-module-atom
 mule-module-boot

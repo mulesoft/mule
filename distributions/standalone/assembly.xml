@@ -21,7 +21,7 @@
         <include>launcher</include>
         <include>mule</include>
         <include>setup_local_instance.sh</include>
-	<include>mule_examples</include>
+        <include>mule_examples</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -206,7 +206,6 @@
         <include>org.mule.transports:mule-transport-xmpp</include>
         <!-- Modules -->
         <include>org.mule.modules:mule-module-launcher</include>
-        <include>org.mule.modules:mule-module-acegi</include>
         <include>org.mule.modules:mule-module-annotations</include>
         <include>org.mule.modules:mule-module-atom</include>
         <include>org.mule.modules:mule-module-bpm</include>
@@ -269,7 +268,6 @@
         <exclude>org.mule.transports:mule-transport-vm</exclude>
         <exclude>org.mule.transports:mule-transport-xfire</exclude>
         <exclude>org.mule.transports:mule-transport-xmpp</exclude>
-        <exclude>org.mule.modules:mule-module-acegi</exclude>
         <exclude>org.mule.modules:mule-modules-all</exclude>
         <exclude>org.mule.modules:mule-module-annotations</exclude>
         <exclude>org.mule.modules:mule-module-atom</exclude>
