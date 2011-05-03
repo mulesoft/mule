@@ -67,9 +67,12 @@ public class DeploymentService
 
     private List<StartupListener> startupListeners = new ArrayList<StartupListener>();
 
+    private final ApplicationStatusTracker applicationStatusTracker;
+
     public DeploymentService()
     {
-        deployer = new DefaultMuleDeployer(this);
+        applicationStatusTracker = new ApplicationStatusTracker();
+        deployer = new DefaultMuleDeployer(this, applicationStatusTracker);
         appFactory = new ApplicationFactory(this);
     }
 
@@ -109,6 +112,9 @@ public class DeploymentService
                 catch (Throwable t)
                 {
                     logger.error(String.format("Failed to install app from archive '%s'", zip), t);
+
+                    applicationStatusTracker.addZombie(StringUtils.removeEnd(zip, ".zip"));
+
                     File appFile = new File(appsDir, zip);
                     try
                     {
@@ -136,6 +142,8 @@ public class DeploymentService
 
         for (String app : apps)
         {
+            applicationStatusTracker.addApplication(app);
+
             final Application a;
             try
             {
@@ -172,6 +180,11 @@ public class DeploymentService
             }
         }
 
+        if (logger.isInfoEnabled())
+        {
+            logApplicationDeploymentStatuses();
+        }
+
         for (StartupListener listener : startupListeners)
         {
             try
@@ -190,6 +203,26 @@ public class DeploymentService
         {
             scheduleChangeMonitor(appsDir);
         }
+    }
+
+    /**
+     * Logs the application deployment statuses in a tabular form.
+     */
+    private void logApplicationDeploymentStatuses()
+    {
+        SimpleLoggingTable applicationTable = new SimpleLoggingTable();
+        applicationTable.addColumn("APPLICATION", 45);
+        applicationTable.addColumn("STATUS", 18);
+
+        Map<String, ApplicationStatusTracker.ApplicationDeploymentState> applicationStates = applicationStatusTracker.getApplicationStates();
+
+        for (String app : applicationStates.keySet())
+        {
+            String[] data = new String[] {app, applicationStates.get(app).toString()};
+            applicationTable.addDataRow(data);
+        }
+
+        logger.info("Finished deployment of applications\n" + applicationTable.toString());
     }
 
     protected void scheduleChangeMonitor(File appsDir)
@@ -349,6 +382,11 @@ public class DeploymentService
     public void removeStartupListener(StartupListener listener)
     {
         this.startupListeners.remove(listener);
+    }
+
+    public ApplicationStatusTracker getApplicationStatusTracker()
+    {
+        return applicationStatusTracker;
     }
 
     public interface StartupListener

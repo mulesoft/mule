@@ -39,9 +39,6 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 import static org.junit.Assert.assertArrayEquals;
 
-/**
- *
- */
 public class DeploymentServiceTestCase extends AbstractMuleTestCase
 {
 
@@ -319,7 +316,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
     private class TestDeployer implements MuleDeployer
     {
-        MuleDeployer delegate = new DefaultMuleDeployer(deploymentService);
+        MuleDeployer delegate = new DefaultMuleDeployer(deploymentService, deploymentService.getApplicationStatusTracker());
 
         public void deploy(Application app)
         {
