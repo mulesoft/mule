@@ -10,6 +10,8 @@
 
 package org.mule.config;
 
+import org.mule.api.MuleContext;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueManager;
@@ -22,23 +24,23 @@ import org.mule.util.queue.QueueManager;
 public class QueueProfile
 {
     private int maxOutstandingMessages = 0;
-    private boolean persistent = false;
+    private String storeName;
 
     public QueueProfile()
     {
-        super();
+        this(0, false);
     }
 
     public QueueProfile(int maxOutstandingMessages, boolean persistent)
     {
         this.maxOutstandingMessages = maxOutstandingMessages;
-        this.persistent = persistent;
+        this.storeName = persistent ? MuleProperties.OBJECT_STORE_PERSISTENT_NAME : MuleProperties.OBJECT_STORE_IN_MEMORY_NAME;
     }
 
     public QueueProfile(QueueProfile queueProfile)
     {
         this.maxOutstandingMessages = queueProfile.getMaxOutstandingMessages();
-        this.persistent = queueProfile.isPersistent();
+        this.storeName = queueProfile.storeName;
     }
 
     /**
@@ -63,25 +65,26 @@ public class QueueProfile
         this.maxOutstandingMessages = maxOutstandingMessages;
     }
 
-    public boolean isPersistent()
+    public QueueConfiguration configureQueue(MuleContext context, String component, QueueManager queueManager) throws InitialisationException
     {
-        return persistent;
-    }
-
-    public void setPersistent(boolean persistent)
-    {
-        this.persistent = persistent;
-    }
-
-    public void configureQueue(String component, QueueManager queueManager) throws InitialisationException
-    {
-        QueueConfiguration qc = new QueueConfiguration(maxOutstandingMessages, persistent);
+        QueueConfiguration qc = new QueueConfiguration(context, maxOutstandingMessages, storeName);
         queueManager.setQueueConfiguration(component, qc);
+        return qc;
+    }
+
+    public String getStoreName()
+    {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName)
+    {
+        this.storeName = storeName;
     }
 
     public String toString()
     {
-        return "QueueProfile{maxOutstandingMessage=" + maxOutstandingMessages + ", persistent="
-               + persistent + "}";
+        return "QueueProfile{maxOutstandingMessage=" + maxOutstandingMessages + ", storeName="
+               + storeName + "}";
     }
 }

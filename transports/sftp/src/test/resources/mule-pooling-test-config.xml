@@ -21,7 +21,7 @@
     <sftp:connector name="sftp-pool" maxConnectionPoolSize="3"/>
 
     <vm:connector name="VMQueue">
-        <vm:queueProfile persistent="true" maxOutstandingMessages="110"/>
+        <vm:queueProfile storeName="_persistentQueueStore" maxOutstandingMessages="110"/>
     </vm:connector>
 
     <model name="send">

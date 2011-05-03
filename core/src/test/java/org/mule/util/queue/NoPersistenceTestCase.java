@@ -20,7 +20,7 @@ public class NoPersistenceTestCase extends AbstractTransactionQueueManagerTestCa
     protected TransactionalQueueManager createQueueManager() throws Exception
     {
         TransactionalQueueManager mgr = new TransactionalQueueManager();
-        mgr.setPersistentObjectStore(new SimpleMemoryObjectStore<Serializable>());
+        mgr.setDefaultQueueConfiguration(new QueueConfiguration(0, new SimpleMemoryObjectStore()));
         return mgr;
     }
 

@@ -10,30 +10,32 @@
 
 package org.mule.util.queue;
 
+import org.mule.api.MuleContext;
+import org.mule.api.MuleRuntimeException;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.ObjectStore;
+import org.mule.config.i18n.CoreMessages;
+
 public class QueueConfiguration
 {
     protected final int capacity;
-    protected final boolean persistent;
+    protected final ListableObjectStore objectStore;
 
-    public QueueConfiguration(int capacity, boolean persistent)
+    public QueueConfiguration(MuleContext context, int capacity, String storeName)
     {
         this.capacity = capacity;
-        this.persistent = persistent;
+        this.objectStore = context.getObjectStore(storeName);
+        if (this.objectStore == null)
+        {
+            throw new MuleRuntimeException(CoreMessages.objectStoreNotFound(storeName));
+        }
     }
 
-    public QueueConfiguration(int capacity)
+    public QueueConfiguration(int capacity, ListableObjectStore objectStore)
     {
-        this(capacity, false);
-    }
-
-    public QueueConfiguration(boolean persistent)
-    {
-        this(0, persistent);
-    }
-
-    public QueueConfiguration()
-    {
-        this(0, false);
+        this.capacity = capacity;
+        this.objectStore = objectStore;
     }
 
     @Override
@@ -42,7 +44,7 @@ public class QueueConfiguration
         final int prime = 31;
         int result = 1;
         result = prime * result + capacity;
-        result = prime * result + (persistent ? 1231 : 1237);
+        result = prime * result + objectStore.hashCode();
         return result;
     }
 
@@ -66,10 +68,15 @@ public class QueueConfiguration
         {
             return false;
         }
-        if (persistent != other.persistent)
+        if (!objectStore.equals(objectStore))
         {
             return false;
         }
         return true;
+    }
+
+    public boolean isPersistent()
+    {
+        return objectStore.isPersistent();
     }
 }

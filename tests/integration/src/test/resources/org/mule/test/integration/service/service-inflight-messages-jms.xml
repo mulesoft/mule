@@ -47,7 +47,7 @@
                     <jms:outbound-endpoint ref="out"/>
                 </pass-through-router>
             </outbound>
-            <queue-profile persistent="true"/>
+            <queue-profile storeName="_persistentQueueStore"/>
         </service>
         
         <service name="PausedTestPersistentQueueService" initialState="paused">
@@ -57,7 +57,7 @@
                     <jms:outbound-endpoint ref="out"/>
                 </pass-through-router>
             </outbound>
-            <queue-profile persistent="true"/>
+            <queue-profile storeName="_persistentQueueStore"/>
         </service>
     </model>
 </mule>

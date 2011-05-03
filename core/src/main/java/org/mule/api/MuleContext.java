@@ -238,7 +238,7 @@ public interface MuleContext extends Lifecycle
 
     void setExceptionListener(SystemExceptionHandler exceptionListener);
 
-    ListableObjectStore<Serializable> getObjectStore();
+    ListableObjectStore<Serializable> getObjectStore(String name);
 
-    void setObjectStore(ListableObjectStore<Serializable> store) throws RegistrationException;
+    void setObjectStore(String name, ListableObjectStore<Serializable> store) throws RegistrationException;
 }

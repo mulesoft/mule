@@ -61,4 +61,11 @@ public interface ObjectStore<T extends Serializable>
      * @throws ObjectDoesNotExistException if no value for the given key was previously stored.
      */
     T remove(Serializable key) throws ObjectStoreException;
+
+    /**
+     * Is this store persistent?
+     *
+     * @return true if this store is persistent
+     */
+    boolean isPersistent();
 }

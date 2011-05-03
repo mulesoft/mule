@@ -11,6 +11,7 @@
 package org.mule.util.queue;
 
 import org.mule.api.MuleContext;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
@@ -24,9 +25,11 @@ import org.mule.util.xa.ResourceManagerSystemException;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.transaction.xa.XAResource;
 
@@ -40,25 +43,35 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 {
     private Map<String, QueueInfo> queues = new HashMap<String, QueueInfo>();
 
-    private ObjectStore<Serializable> memoryObjectStore = new SimpleMemoryObjectStore<Serializable>();
-    private ListableObjectStore<Serializable> persistentObjectStore;
-
-    private QueueConfiguration defaultQueueConfiguration = new QueueConfiguration(false);
+    private QueueConfiguration defaultQueueConfiguration;
     private MuleContext muleContext;
+    private Set<ListableObjectStore> stores = new HashSet();
 
     public synchronized QueueSession getQueueSession()
     {
         return new TransactionalQueueSession(this, this);
     }
 
+    public synchronized QueueConfiguration getDefaultQueueConfiguration()
+    {
+        if (this.defaultQueueConfiguration == null)
+        {
+            this.defaultQueueConfiguration =
+                new QueueConfiguration(getMuleContext(), 0, MuleProperties.OBJECT_STORE_IN_MEMORY_NAME);
+        }
+        return this.defaultQueueConfiguration;
+    }
+
     public synchronized void setDefaultQueueConfiguration(QueueConfiguration config)
     {
         this.defaultQueueConfiguration = config;
+        stores.add(config.objectStore);
     }
 
     public synchronized void setQueueConfiguration(String queueName, QueueConfiguration config)
     {
         getQueue(queueName).config = config;
+        stores.add(config.objectStore);
     }
 
     protected synchronized QueueInfo getQueue(String name)
@@ -79,11 +92,12 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     @Override
     protected void doStart() throws ResourceManagerSystemException
     {
-        if (persistentObjectStore != null)
+        findAllStores();
+        for (ListableObjectStore store: stores)
         {
             try
             {
-                persistentObjectStore.open();
+                store.open();
             }
             catch (ObjectStoreException e)
             {
@@ -95,17 +109,18 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     @Override
     protected boolean shutdown(int mode, long timeoutMSecs)
     {
-        try
+        findAllStores();
+        for (ListableObjectStore store: stores)
         {
-            if (persistentObjectStore != null)
+            try
             {
-                persistentObjectStore.close();
+                store.close();
             }
-        }
-        catch (ObjectStoreException e)
-        {
-            // TODO BL-405 what to do with this exception? Looking at the call graph of this method it seems that it's never called from any production code (i.e. when shutting down MuleContext)
-            logger.error("Error closing persistent store", e);
+            catch (ObjectStoreException e)
+            {
+                // TODO BL-405 what to do with this exception? Looking at the call graph of this method it seems that it's never called from any production code (i.e. when shutting down MuleContext)
+                logger.error("Error closing persistent store", e);
+            }
         }
 
         // Clear queues on shutdown to avoid duplicate entries on warm restarts (MULE-3678)
@@ -119,11 +134,12 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     @Override
     protected void recover() throws ResourceManagerSystemException
     {
-        if (persistentObjectStore != null)
+        findAllStores();
+        for (ListableObjectStore store: stores)
         {
             try
             {
-                List<Serializable> keys = persistentObjectStore.allKeys();
+                List<Serializable> keys = store.allKeys();
                 for (Serializable key : keys)
                 {
                     QueueKey queueKey = (QueueKey) key;
@@ -206,7 +222,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 
     protected Serializable doStore(QueueInfo queue, Serializable object) throws ObjectStoreException
     {
-        ObjectStore<Serializable> store = queue.config.persistent ? persistentObjectStore : memoryObjectStore;
+        ObjectStore<Serializable> store = queue.config.objectStore;
 
         String id = UUID.getUUID();
         Serializable key = new QueueKey(queue.name, id);
@@ -216,7 +232,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 
     protected void doRemove(QueueInfo queue, Serializable id) throws ObjectStoreException
     {
-        ObjectStore<Serializable> store = queue.config.persistent ? persistentObjectStore : memoryObjectStore;
+        ObjectStore<Serializable> store = queue.config.objectStore;
 
         Serializable key = new QueueKey(queue.name, id);
         store.remove(key);
@@ -224,7 +240,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 
     protected Serializable doLoad(QueueInfo queue, Serializable id) throws ObjectStoreException
     {
-        ObjectStore<Serializable> store = queue.config.persistent ? persistentObjectStore : memoryObjectStore;
+        ObjectStore<Serializable> store = queue.config.objectStore;
 
         Serializable key = new QueueKey(queue.name, id);
         return store.retrieve(key);
@@ -253,14 +269,12 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         ctx.removed = null;
     }
 
-    public ListableObjectStore<Serializable> getPersistentObjectStore()
+    protected synchronized void findAllStores()
     {
-        return this.persistentObjectStore;
-    }
-
-    public void setPersistentObjectStore(ListableObjectStore<Serializable> store)
-    {
-        this.persistentObjectStore = store;
+        if (muleContext != null)
+        {
+            stores.addAll(muleContext.getRegistry().lookupByType(ListableObjectStore.class).values());
+        }
     }
 
     public void setMuleContext(MuleContext context)
@@ -271,5 +285,10 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     public MuleContext getMuleContext()
     {
         return muleContext;
+    }
+
+    public void setPersistentObjectStore(Object o)
+    {
+        System.out.println(o.getClass());   
     }
 }

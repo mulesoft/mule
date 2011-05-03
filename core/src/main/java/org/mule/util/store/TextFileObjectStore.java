@@ -38,6 +38,15 @@ public class TextFileObjectStore extends InMemoryObjectStore<String>
 
     private FileOutputStream output;
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isPersistent()
+    {
+        return true;
+    }
+
     @Override
     public void initialise() throws InitialisationException
     {

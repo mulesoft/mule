@@ -1335,7 +1335,11 @@ public class CoreMessages extends MessageFactory
 
     public static Message authorizationDeniedOnEndpoint(EndpointURI endpointURI)
     {
-        return factory.createMessage(BUNDLE_PATH, 332, endpointURI);
+        return factory.createMessage(BUNDLE_PATH, 331, endpointURI);
     }
 
+    public static Message objectStoreNotFound(String name)
+    {
+        return factory.createMessage(BUNDLE_PATH, 332, name);
+    }
 }

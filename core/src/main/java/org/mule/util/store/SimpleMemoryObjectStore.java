@@ -25,6 +25,15 @@ public class SimpleMemoryObjectStore<T extends Serializable> extends AbstractObj
 {
     private Map<Serializable, T> map = Collections.synchronizedMap(new HashMap<Serializable, T>());
 
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isPersistent()
+    {
+        return false;
+    }
+
     @Override
     protected boolean doContains(Serializable key)
     {

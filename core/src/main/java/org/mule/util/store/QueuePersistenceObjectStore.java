@@ -58,7 +58,7 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
     /**
      * The default queueStore directory for persistence
      */
-    protected static final String DEFAULT_QUEUE_STORE = "queuestore";
+    public static final String DEFAULT_QUEUE_STORE = "queuestore";
 
     private static final String FILE_EXTENSION = ".msg";
 
@@ -81,6 +81,14 @@ public class QueuePersistenceObjectStore<T extends Serializable> extends Abstrac
     {
         super();
         muleContext = context;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isPersistent()
+    {
+        return true;
     }
 
     public void open() throws ObjectStoreException

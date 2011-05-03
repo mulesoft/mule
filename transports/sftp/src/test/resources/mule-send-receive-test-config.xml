@@ -20,7 +20,7 @@
     </sftp:connector>
 
     <vm:connector name="VMQueue" validateConnections="true">
-        <vm:queueProfile persistent="true" maxOutstandingMessages="10" />
+        <vm:queueProfile storeName="_persistentQueueStore" maxOutstandingMessages="10" />
     </vm:connector>
 
     <model name="send">

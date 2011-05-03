@@ -13,7 +13,7 @@
 	</configuration>
 
 	<vm:connector name="outPersistentConnector">
-		<vm:queueProfile persistent="true" />
+		<vm:queueProfile storeName="_persistentQueueStore" />
 	</vm:connector>
 
 	<vm:endpoint name="out" path="out" exchange-pattern="one-way" />
@@ -45,7 +45,7 @@
 					<vm:outbound-endpoint ref="out" />
 				</pass-through-router>
 			</outbound>
-			<queue-profile persistent="true" />
+			<queue-profile storeName="_persistentQueueStore" />
 		</service>
 
 		<service name="PausedTestPersistentQueueService" initialState="paused">
@@ -55,7 +55,7 @@
 					<vm:outbound-endpoint ref="out" />
 				</pass-through-router>
 			</outbound>
-			<queue-profile persistent="true" />
+			<queue-profile storeName="_persistentQueueStore" />
 		</service>
 
 

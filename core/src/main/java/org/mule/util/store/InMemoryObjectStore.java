@@ -40,6 +40,14 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
     /**
      * {@inheritDoc}
      */
+    public boolean isPersistent()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean contains(Serializable key) throws ObjectStoreException
     {
         if (key == null)

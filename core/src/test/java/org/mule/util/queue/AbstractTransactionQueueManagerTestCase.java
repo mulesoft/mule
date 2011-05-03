@@ -12,6 +12,7 @@ package org.mule.util.queue;
 
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.concurrent.Latch;
+import org.mule.util.store.SimpleMemoryObjectStore;
 import org.mule.util.xa.AbstractResourceManager;
 
 import java.io.Serializable;
@@ -274,7 +275,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     {
         final TransactionalQueueManager mgr = createQueueManager();
         mgr.start();
-        mgr.setDefaultQueueConfiguration(new QueueConfiguration(2));
+        mgr.setDefaultQueueConfiguration(new QueueConfiguration(2, new SimpleMemoryObjectStore()));
 
         final Latch latch = new Latch();
 
@@ -330,10 +331,9 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
             try
             {
-                mgr.start();
-
                 QueueSession s = mgr.getQueueSession();
                 Queue q = s.getQueue("queue1");
+                mgr.start();
                 q.put("String1");
                 assertEquals("Queue size", 1, q.size());
 
@@ -348,9 +348,9 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             mgr = createQueueManager();
             try
             {
-                mgr.start();
                 QueueSession s = mgr.getQueueSession();
                 Queue q = s.getQueue("queue1");
+                mgr.start();
                 assertEquals("Queue size", 1, q.size());
 
                 purgeQueue(q);
@@ -374,10 +374,9 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
             try
             {
-                mgr.start();
-
                 QueueSession s = mgr.getQueueSession();
                 Queue q = s.getQueue("queue1");
+                mgr.start();
                 s.begin();
                 q.put("String1");
                 assertEquals("Queue size", 1, q.size());
@@ -391,9 +390,9 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
                 mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
 
                 mgr = createQueueManager();
-                mgr.start();
                 s = mgr.getQueueSession();
                 q = s.getQueue("queue1");
+                mgr.start();
                 assertEquals("Queue size", 1, q.size());
 
                 purgeQueue(q);
@@ -459,11 +458,10 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         if (isPersistent())
         {
             TransactionalQueueManager mgr1 = createQueueManager();
-            mgr1.start();
 
             QueueSession s1 = mgr1.getQueueSession();
             Queue q1 = s1.getQueue("queue1");
-
+            mgr1.start();
             assertEquals("Queue size", 0, q1.size());
             final int numberOfElements = 10;
             for (int i = 1; i <= numberOfElements; i++)
@@ -475,11 +473,10 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
             mgr1.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
 
             TransactionalQueueManager mgr2 = createQueueManager();
-            mgr2.start();
 
             QueueSession s2 = mgr2.getQueueSession();
             Queue q2 = s2.getQueue("queue1");
-
+            mgr2.start();
             for (int i = 1; i <= numberOfElements; i++)
             {
                 Object o = q2.take();
@@ -658,7 +655,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     {
 
         final TransactionalQueueManager mgr = createQueueManager();
-        mgr.setDefaultQueueConfiguration(new QueueConfiguration(1));
+        mgr.setDefaultQueueConfiguration(new QueueConfiguration(1, new SimpleMemoryObjectStore()));
         try
         {
             mgr.start();
@@ -777,9 +774,9 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
     public void testRecoverColdRestart() throws Exception
     {
         TransactionalQueueManager mgr = createQueueManager();
-        mgr.start();
         QueueSession s = mgr.getQueueSession();
         Queue q = s.getQueue("warmRecoverQueue");
+        mgr.start();
 
         int toPopulate = 500;
 
@@ -796,10 +793,9 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         // Stop and recreate TransactionalQueueManager simulating a cold restart
         mgr.stop();
         mgr = createQueueManager();
-        mgr.start();
         s = mgr.getQueueSession();
         q = s.getQueue("warmRecoverQueue");
-
+        mgr.start();
         if (isPersistent())
         {
             assertEquals(toPopulate, q.size());

@@ -11,7 +11,7 @@
        http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.2/mule-quartz.xsd">
 
     <vm:connector name="persistentVmConnector">
-        <vm:queue-profile persistent="true"/>
+        <vm:queue-profile storeName="_persistentQueueStore"/>
     </vm:connector>
 
     <!--
@@ -45,7 +45,7 @@
                     </quartz:outbound-endpoint>
                 </pass-through-router>
             </outbound>
-            <queue-profile persistent="true"/>
+            <queue-profile storeName="_persistentQueueStore"/>
         </service>
     </model>
 </mule>

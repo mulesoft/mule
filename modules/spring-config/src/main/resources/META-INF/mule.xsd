@@ -131,6 +131,7 @@
             <xsd:element ref="custom-processor"/>
             <xsd:element ref="invoke"/>
             <xsd:element ref="message-filter"/>
+            <xsd:element ref="custom-queue-store" maxOccurs="unbounded"/>
         </xsd:choice>
     </xsd:group>
 
@@ -189,18 +190,37 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-     <xsd:element name="custom-agent" type="customAgentType" substitutionGroup="abstract-agent"/>
+    <xsd:element name="custom-agent" type="customAgentType" substitutionGroup="abstract-agent"/>
     <xsd:complexType name="customAgentType">
         <xsd:complexContent>
             <xsd:extension base="abstractAgentType">
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="class" type="xsd:NMTOKEN" use="required"/>
+                <xsd:attribute name="class" type="substitutableClass" use="required"/>
                 <xsd:attribute name="name" type="substitutableName" use="required">
                     <xsd:annotation>
                         <xsd:documentation>
                             Identifies the agent in the registry.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-queue-store" type="customQueueStore" />
+    <xsd:complexType name="customQueueStore">
+        <xsd:complexContent>
+            <xsd:extension base="annotatedType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="substitutableClass" use="required"/>
+                <xsd:attribute name="name" type="substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the store in the registry.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -3810,10 +3830,10 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="persistent" type="substitutableBoolean" default="false">
+                <xsd:attribute name="storeName" type="xsd:string" default="false">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Whether Mule messages are persisted to a store. Primarily, this is used for persisting queued messages to disk so that the internal state of the server is mirrored on disk in case the server fails and needs to be restarted. Default is false.
+                            The name of the object store used to store the queue's entries.  This can be defined in the configuration, or one of the predefined queue stores: "_inMemoryQueueStore" (the default) and "_persistentQueueStore".
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

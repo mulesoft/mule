@@ -11,7 +11,7 @@
     </description>
 
     <vm:connector name="VMQueue">
-        <vm:queueProfile persistent="true" maxOutstandingMessages="10"/>
+        <vm:queueProfile storeName="_persistentQueueStore" maxOutstandingMessages="10"/>
     </vm:connector>
 
     <scripting:script engine="groovy" name="testComponent">

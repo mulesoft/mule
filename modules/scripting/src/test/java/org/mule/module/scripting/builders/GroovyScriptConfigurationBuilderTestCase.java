@@ -12,8 +12,12 @@ package org.mule.module.scripting.builders;
 
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.module.scripting.builders.ScriptConfigurationBuilder;
+import org.mule.api.config.MuleProperties;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
+import org.mule.util.store.QueuePersistenceObjectStore;
+import org.mule.util.store.SimpleMemoryObjectStore;
+
+import java.util.Properties;
 
 public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
@@ -37,4 +41,13 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
         }
     }
 
+    @Override
+    protected Properties getStartUpProperties()
+    {
+        Properties superProps = super.getStartUpProperties();
+        Properties props = superProps == null ? new Properties() : new Properties(superProps);
+        props.put(MuleProperties.OBJECT_STORE_IN_MEMORY_NAME, new SimpleMemoryObjectStore());
+        props.put(MuleProperties.OBJECT_STORE_PERSISTENT_NAME, new QueuePersistenceObjectStore());
+        return props;
+    }
 }

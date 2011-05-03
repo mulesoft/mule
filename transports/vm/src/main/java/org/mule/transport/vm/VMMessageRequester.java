@@ -111,7 +111,8 @@ public class VMMessageRequester extends AbstractMessageRequester
     protected void doConnect() throws Exception
     {
         // use the default queue profile to configure this queue.
-        connector.getQueueProfile().configureQueue(endpoint.getEndpointURI().getAddress(),
+        connector.getQueueProfile().configureQueue(
+            connector.getMuleContext(), endpoint.getEndpointURI().getAddress(),
             connector.getQueueManager());
     }
 

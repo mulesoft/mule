@@ -217,6 +217,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("commit-transaction", new ExceptionTXFilterDefinitionParser("commitTxFilter"));
         registerBeanDefinitionParser("rollback-transaction", new ExceptionTXFilterDefinitionParser("rollbackTxFilter"));
         registerBeanDefinitionParser("custom-agent", new DefaultNameMuleOrphanDefinitionParser());
+        registerBeanDefinitionParser("custom-queue-store", new DefaultNameMuleOrphanDefinitionParser(true));
 
         registerBeanDefinitionParser("routeable-exception-strategy", new ChildDefinitionParser("exceptionListener", RouteableExceptionStrategy.class));
         registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());

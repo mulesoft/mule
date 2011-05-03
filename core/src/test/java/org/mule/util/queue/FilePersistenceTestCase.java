@@ -23,9 +23,8 @@ public class FilePersistenceTestCase extends AbstractTransactionQueueManagerTest
         ListableObjectStore<Serializable> store = new QueuePersistenceObjectStore<Serializable>(muleContext);
 
         TransactionalQueueManager mgr = new TransactionalQueueManager();
-        mgr.setPersistentObjectStore(store);
 
-        mgr.setDefaultQueueConfiguration(new QueueConfiguration(true));
+        mgr.setDefaultQueueConfiguration(new QueueConfiguration(0, store));
         return mgr;
     }
 

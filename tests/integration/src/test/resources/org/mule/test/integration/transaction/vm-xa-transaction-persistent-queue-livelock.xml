@@ -56,7 +56,7 @@
             <default-exception-strategy>
                 <rollback-transaction exception-pattern="*"/>
             </default-exception-strategy>
-            <queue-profile persistent="true"/>
+            <queue-profile storeName="_persistentQueueStore"
         </service>
 
     </model>

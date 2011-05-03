@@ -89,5 +89,11 @@ public class MonitoredObjectStoreTestCase extends AbstractMuleTestCase
         {
             // does nothing
         }
+
+
+        public boolean isPersistent()
+        {
+            return false;
+        }
     }
 }

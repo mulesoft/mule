@@ -10,6 +10,10 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
                http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
 
+    <custom-queue-store class="org.mule.transport.vm.VMFunctionalTestCase$CustomObjectStore" name="custom-store"/>
+    <vm:connector name="vm">
+        <vm:queue-profile storeName="custom-store"/>
+    </vm:connector>
     <model>
         <service name="myAsyncService">
             <inbound>

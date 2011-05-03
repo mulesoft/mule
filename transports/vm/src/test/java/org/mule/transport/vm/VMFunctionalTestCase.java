@@ -11,10 +11,14 @@
 package org.mule.transport.vm;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.store.ObjectStoreException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 import org.junit.Test;
+import org.mule.util.store.SimpleMemoryObjectStore;
+
+import java.io.Serializable;
 
 public class VMFunctionalTestCase extends FunctionalTestCase
 {
@@ -75,6 +79,7 @@ public class VMFunctionalTestCase extends FunctionalTestCase
         MuleMessage response = client.request("vm://out1", RECEIVE_TIMEOUT);
         assertNotNull("Response is null", response);
         assertEquals("Polo", response.getPayload());
+        assertTrue(CustomObjectStore.count > 0); // ensure custom store was used
     }
 
     @Test
@@ -96,5 +101,22 @@ public class VMFunctionalTestCase extends FunctionalTestCase
         assertEquals("Polo", response.getPayload());
         MuleMessage secondMessage = client.request("vm://out", RECEIVE_TIMEOUT);
         assertNull(secondMessage);
+    }
+
+    public static class CustomObjectStore<T extends Serializable> extends SimpleMemoryObjectStore<T>
+    {
+        static int count;
+
+        public CustomObjectStore()
+        {
+        }
+
+        @Override
+        protected void doStore(Serializable key, T value) throws ObjectStoreException
+        {
+            count++;
+            super.doStore(key, value);    //To change body of overridden methods use File | Settings | File Templates.
+        }
+        
     }
 }

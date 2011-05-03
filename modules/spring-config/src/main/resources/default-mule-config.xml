@@ -46,11 +46,11 @@
 
     </mule:mule>
 
-    <bean name="_muleObjectStore" class="org.mule.util.store.QueuePersistenceObjectStore"/>
+    <bean name="_inMemoryQueueStore" class="org.mule.util.store.SimpleMemoryObjectStore"/>
 
-    <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager">
-        <property name="persistentObjectStore" ref="_muleObjectStore"/>
-    </bean>
+    <bean name="_persistentQueueStore" class="org.mule.util.store.QueuePersistenceObjectStore"/>
+
+    <bean name="_muleQueueManager" class="org.mule.util.queue.TransactionalQueueManager"/>
 
     <bean name="_muleSecurityManager" class="org.mule.security.MuleSecurityManager"/>
 

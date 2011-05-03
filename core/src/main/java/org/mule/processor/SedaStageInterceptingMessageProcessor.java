@@ -35,6 +35,7 @@ import org.mule.service.Pausable;
 import org.mule.service.Resumable;
 import org.mule.util.concurrent.WaitableBoolean;
 import org.mule.util.queue.Queue;
+import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueSession;
 import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
@@ -59,6 +60,7 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
     protected QueueStatistics queueStatistics;
     protected String name;
     protected Queue queue;
+    protected QueueConfiguration queueConfiguration;
     private WaitableBoolean running = new WaitableBoolean(false);
     protected SedaStageLifecycleManager lifecycleManager;
 
@@ -271,7 +273,7 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
     /** Are the events in the SEDA queue persistent? */
     protected boolean isQueuePersistent()
     {
-        return queueProfile.isPersistent();
+        return queueConfiguration == null ? false : queueConfiguration.isPersistent();
     }
 
     public int getQueueSize()
@@ -336,7 +338,7 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
                         "Next message processor cannot be null with this InterceptingMessageProcessor");
                 }
                 // Setup event Queue
-                queueProfile.configureQueue(getQueueName(), muleContext.getQueueManager());
+                queueConfiguration = queueProfile.configureQueue(getMuleContext(), getQueueName(), muleContext.getQueueManager());
                 queue = muleContext.getQueueManager().getQueueSession().getQueue(getQueueName());
                 if (queue == null)
                 {

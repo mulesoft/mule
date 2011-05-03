@@ -297,7 +297,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         Service service = muleContext.getRegistry().lookupService("appleComponent2");
         QueueProfile qp = ((SedaService)service).getQueueProfile();
         assertEquals(102, qp.getMaxOutstandingMessages());
-        assertTrue(qp.isPersistent());
+        //assertTrue(qp.isPersistent());
 
         // test override
 //        descriptor = (MuleDescriptor)muleContext.getModel().getDescriptor("appleComponent2");

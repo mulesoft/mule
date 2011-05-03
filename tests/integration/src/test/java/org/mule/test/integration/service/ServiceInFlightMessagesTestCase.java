@@ -16,6 +16,7 @@ import org.mule.api.service.Service;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.queue.TransactionalQueueManager;
 import org.mule.util.store.QueuePersistenceObjectStore;
@@ -128,7 +129,7 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         // Let mule finish up with the rest of the messages until seda queue is empty
         startService(service);
         service.resume();
-        Thread.sleep(WAIT_TIME_MILLIS * 10);
+        Thread.sleep(WAIT_TIME_MILLIS * 20);
         stopService(service);
 
         assertNoLostMessages(NUM_MESSAGES, service);
@@ -232,19 +233,13 @@ public class ServiceInFlightMessagesTestCase extends FunctionalTestCase
         }
         else
         {
+            // Don;t fool around trying to use objects that weren't started fully, just go to the disk
             MuleContext localMuleContext = new DefaultMuleContextBuilder().buildMuleContext();
+            String workingDirectory = localMuleContext.getConfiguration().getWorkingDirectory();
+            String path = workingDirectory + File.separator + QueuePersistenceObjectStore.DEFAULT_QUEUE_STORE + File.separator + name;
 
-            QueuePersistenceObjectStore<Serializable> store =
-                new QueuePersistenceObjectStore<Serializable>(localMuleContext);
-
-            QueueManager queueManager = new TransactionalQueueManager();
-            queueManager.setPersistentObjectStore(store);
-            queueManager.start();
-
-            int size = queueManager.getQueueSession().getQueue(name).size();
-            queueManager.stop();
-            localMuleContext = null;
-            return size;
+            File[] filesInQueue = new File(path).listFiles();
+            return filesInQueue.length;
         }
     }
 

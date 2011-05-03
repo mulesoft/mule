@@ -655,25 +655,17 @@ public class DefaultMuleContext implements MuleContext
         return (EndpointFactory) registryBroker.lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY);
     }
 
-    public void setObjectStore(ListableObjectStore<Serializable> store) throws RegistrationException
+    public void setObjectStore(String name, ListableObjectStore<Serializable> store) throws RegistrationException
     {
-        checkLifecycleForPropertySet(MuleProperties.OBJECT_STORE, Initialisable.PHASE_NAME);
-        registryBroker.registerObject(MuleProperties.OBJECT_STORE, store);
+        checkLifecycleForPropertySet(name, Initialisable.PHASE_NAME);
+        registryBroker.registerObject(name, store);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public ListableObjectStore<Serializable> getObjectStore()
+    public ListableObjectStore<Serializable> getObjectStore(String name)
     {
         ListableObjectStore<Serializable> objectStore =
-            (ListableObjectStore<Serializable>) registryBroker.lookupObject(MuleProperties.OBJECT_STORE);
-        if (objectStore == null)
-        {
-            Collection<ListableObjectStore> temp = registryBroker.lookupObjects(ListableObjectStore.class);
-            if (temp.size() > 0)
-            {
-                objectStore = temp.iterator().next();
-            }
-        }
+            (ListableObjectStore<Serializable>) registryBroker.lookupObject(name);
         return objectStore;
     }
 }

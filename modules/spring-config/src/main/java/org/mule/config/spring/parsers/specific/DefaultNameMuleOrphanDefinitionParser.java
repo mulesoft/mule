@@ -18,8 +18,17 @@ public class DefaultNameMuleOrphanDefinitionParser extends MuleOrphanDefinitionP
 
     public DefaultNameMuleOrphanDefinitionParser()
     {
+        this(false);
+    }
+
+    public DefaultNameMuleOrphanDefinitionParser(boolean ignoreName)
+    {
         super(true);
         registerPreProcessor(new ProvideDefaultNameFromElement());
+        if (ignoreName)
+        {
+            addIgnored(ATTRIBUTE_NAME);
+        }
     }
 
     public DefaultNameMuleOrphanDefinitionParser(Class beanClass)

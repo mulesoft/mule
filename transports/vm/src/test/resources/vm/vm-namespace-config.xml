@@ -17,7 +17,7 @@
     <vm:connector name="vmConnector1" />
 
     <vm:connector name="vmConnector2" queueTimeout="5000">
-        <vm:queueProfile maxOutstandingMessages="10" persistent="true" />
+        <vm:queueProfile maxOutstandingMessages="10" storeName="_persistentQueueStore" />
     </vm:connector>
 
     <vm:endpoint path="queue" name="vmEndpoint" connector-ref="vmConnector1" exchange-pattern="one-way"/>

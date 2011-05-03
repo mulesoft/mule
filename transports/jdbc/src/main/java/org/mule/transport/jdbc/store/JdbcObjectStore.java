@@ -45,6 +45,14 @@ public class JdbcObjectStore<T extends Serializable> extends AbstractMonitoredOb
     /**
      * {@inheritDoc}
      */
+    public boolean isPersistent()
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected void expire()
     {
         // DO NOTHING

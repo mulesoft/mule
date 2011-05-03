@@ -66,7 +66,7 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalT
         assertEquals("the-store", fileStore.getName());
 
         File tmpDir = SystemUtils.getJavaIoTmpDir();
-        assertEquals(tmpDir.getAbsolutePath(), fileStore.getDirectory());
+        assertEquals(tmpDir.getCanonicalPath(), new File(fileStore.getDirectory()).getCanonicalPath());
 
         assertEquals(1000, fileStore.getEntryTTL());
         assertEquals(2000, fileStore.getExpirationInterval());

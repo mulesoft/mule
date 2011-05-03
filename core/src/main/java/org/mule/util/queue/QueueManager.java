@@ -27,10 +27,4 @@ public interface QueueManager extends Startable, Stoppable
     void setDefaultQueueConfiguration(QueueConfiguration config);
 
     void setQueueConfiguration(String queueName, QueueConfiguration config);
-
-    /**
-     * This is the {@link ListableObjectStore} that is used when the queue profile is configured to
-     * be persistent.
-     */
-    void setPersistentObjectStore(ListableObjectStore<Serializable> store);
 }
