@@ -2,31 +2,35 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:sec="http://www.springframework.org/schema/security"
        xmlns:spring-sec="http://www.mulesoft.org/schema/mule/spring-security"
        xmlns:axis="http://www.mulesoft.org/schema/mule/axis"
        xmlns:servlet="http://www.mulesoft.org/schema/mule/servlet"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/3.2/mule-spring-security.xsd
        http://www.mulesoft.org/schema/mule/axis http://www.mulesoft.org/schema/mule/axis/3.2/mule-axis.xsd
        http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/3.2/mule-servlet.xsd">
 
-    <spring:bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
-        <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>
-    </spring:bean>
+    <spring:beans>
+        <sec:authentication-manager alias="authenticationManager">
+            <sec:authentication-provider>
+                <sec:user-service id="userService">
+                    <sec:user name="ross" password="ross_may_not_invoke_web_service" authorities="ROLE_ADMIN" />
+                </sec:user-service>
+            </sec:authentication-provider>
+        </sec:authentication-manager>
+    </spring:beans>
 
-    <spring:bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
-        <spring:property name="userMap" value="ross=ross_may_not_invoke_web_service,ROLE_ADMIN"/>
-    </spring:bean>
+    <spring-sec:security-manager>
+        <spring-sec:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
+    </spring-sec:security-manager>
 
     <byte-array-to-string-transformer name="ByteArrayToString"/>
 
     <servlet:connector name="servletConnector" servletUrl="http://localhost:${port1}/services" />
-
-    <spring-sec:security-manager>
-        <spring-sec:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
-    </spring-sec:security-manager>
 
     <model name="test">
         <service name="mycomponent">
@@ -42,5 +46,4 @@
 	        <custom-exception-strategy class="org.mule.transport.soap.axis.UnitTestExceptionStrategy"/>
         </service>
     </model>
-
 </mule>
