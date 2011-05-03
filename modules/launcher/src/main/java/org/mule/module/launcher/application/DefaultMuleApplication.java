@@ -39,6 +39,7 @@ import org.mule.module.launcher.MuleSharedDomainClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ClassUtils;
+import org.mule.util.ExceptionUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 
@@ -146,13 +147,17 @@ public class DefaultMuleApplication implements Application
         }
         catch (MuleException e)
         {
+            // log it here so it ends up in app log, sys log will only log a message without stacktrace
+            logger.error(null, ExceptionUtils.getRootCause(e));
             // TODO add app name to the exception field
-            throw new DeploymentStartException(MessageFactory.createStaticMessage(appName), e);
+            throw new DeploymentStartException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
         }
         catch (IOException e)
         {
+            // log it here so it ends up in app log, sys log will only log a message without stacktrace
+            logger.error(null, ExceptionUtils.getRootCause(e));
             // TODO add app name to the exception field
-            throw new DeploymentStartException(MessageFactory.createStaticMessage(appName), e);
+            throw new DeploymentStartException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
         }
     }
 
@@ -223,7 +228,9 @@ public class DefaultMuleApplication implements Application
         }
         catch (Exception e)
         {
-            throw new DeploymentInitException(CoreMessages.failedToLoad(configBuilderClassName), e);
+            // log it here so it ends up in app log, sys log will only log a message without stacktrace
+            logger.error(null, ExceptionUtils.getRootCause(e));
+            throw new DeploymentInitException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
         }
     }
 

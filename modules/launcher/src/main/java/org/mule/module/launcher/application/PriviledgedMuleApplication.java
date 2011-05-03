@@ -35,7 +35,7 @@ public class PriviledgedMuleApplication extends DefaultMuleApplication
     {
         if (this.deploymentService == null)
         {
-            final String msg = String.format("Deployment service ref wasn't provided for priviledged app '%s'", getAppName());
+            final String msg = String.format("Deployment service ref wasn't provided for privileged app '%s'", getAppName());
             throw new DeploymentInitException(MessageFactory.createStaticMessage(msg));
         }
 
@@ -49,7 +49,7 @@ public class PriviledgedMuleApplication extends DefaultMuleApplication
         }
         catch (RegistrationException e)
         {
-            final String msg = String.format("Failed to init a priviledged app: [%s]", getDescriptor().getAppName());
+            final String msg = String.format("Failed to init a privileged app: [%s]", getDescriptor().getAppName());
             throw new DeploymentInitException(MessageFactory.createStaticMessage(msg), e);
         }
     }
