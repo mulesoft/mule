@@ -9,7 +9,7 @@
         <version>3.2.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule</artifactId>
-    <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the 
+    <!-- Packaging 'pom' ensures that maven does not try to bind a plugin to the
          'package' phase. We bind the assembly plugin here, that's enough. -->
     <packaging>pom</packaging>
     <name>Embedded (Single jar file)</name>
@@ -131,11 +131,6 @@
                                 <artifactItem>
                                     <groupId>org.mule.transports</groupId>
                                     <artifactId>mule-transport-xmpp</artifactId>
-                                    <version>${version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.mule.modules</groupId>
-                                    <artifactId>mule-module-acegi</artifactId>
                                     <version>${version}</version>
                                 </artifactItem>
                                 <artifactItem>
