@@ -54,6 +54,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import static org.mule.util.SplashScreen.miniSplash;
+
 public class DefaultMuleApplication implements Application
 {
 
@@ -80,7 +82,7 @@ public class DefaultMuleApplication implements Application
     {
         if (logger.isInfoEnabled())
         {
-            logger.info("Installing application: " + appName);
+            logger.info(miniSplash(String.format("New app '%s'", appName)));
         }
 
         AppBloodhound bh = new DefaultAppBloodhound();
@@ -132,7 +134,7 @@ public class DefaultMuleApplication implements Application
     {
         if (logger.isInfoEnabled())
         {
-            logger.info("Starting application: " + appName);
+            logger.info(miniSplash(String.format("Starting app '%s'", appName)));
         }
 
         try
@@ -158,7 +160,7 @@ public class DefaultMuleApplication implements Application
     {
         if (logger.isInfoEnabled())
         {
-            logger.info("Initializing application: " + appName);
+            logger.info(miniSplash(String.format("Initializing application '%s'", appName)));
         }
 
         String configBuilderClassName = null;
@@ -271,7 +273,7 @@ public class DefaultMuleApplication implements Application
     {
         if (logger.isInfoEnabled())
         {
-            logger.info("Redeploying application: " + appName);
+            logger.info(miniSplash(String.format("Redeploying application '%s'", appName)));
         }
         dispose();
         install();
@@ -296,7 +298,7 @@ public class DefaultMuleApplication implements Application
         }
         if (logger.isInfoEnabled())
         {
-            logger.info("Stopping application: " + appName);
+            logger.info(miniSplash(String.format("Stopping app '%s'", appName)));
         }
         try
         {
@@ -342,7 +344,7 @@ public class DefaultMuleApplication implements Application
         }
         if (logger.isInfoEnabled())
         {
-            logger.info("Disposing application: " + appName);
+            logger.info(miniSplash(String.format("Disposing application '%s'", appName)));
         }
 
         muleContext.dispose();

@@ -47,6 +47,8 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import static org.mule.util.SplashScreen.miniSplash;
+
 public class DeploymentService
 {
     public static final String APP_ANCHOR_SUFFIX = "-anchor.txt";
@@ -202,7 +204,7 @@ public class DeploymentService
 
         if (logger.isInfoEnabled())
         {
-            logger.info(String.format("Mule is up and kicking (every %dms)", reloadIntervalMs));
+            logger.info(miniSplash(String.format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
         }
     }
 

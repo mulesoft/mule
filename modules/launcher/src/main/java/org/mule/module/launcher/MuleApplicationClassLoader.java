@@ -59,11 +59,6 @@ public class MuleApplicationClassLoader extends GoodCitizenClassLoader
 
             File libDir = new File(parentFile, PATH_LIBRARY);
 
-            if (logger.isInfoEnabled())
-            {
-                logger.info(String.format("[%s] Library directory: %s", appName, libDir));
-            }
-
             if (libDir.exists() && libDir.canRead())
             {
                 @SuppressWarnings("unchecked")

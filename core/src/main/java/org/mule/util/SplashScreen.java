@@ -52,7 +52,13 @@ public abstract class SplashScreen
         footer.clear();
         doFooter(context);
     }
-    
+
+    public static String miniSplash(final String message)
+    {
+        // middle dot char
+        return StringMessageUtils.getBoilerPlate(message, '+', 50);
+    }
+
     protected void doHeader(MuleContext context)
     {
         // default reserved for mule core info
