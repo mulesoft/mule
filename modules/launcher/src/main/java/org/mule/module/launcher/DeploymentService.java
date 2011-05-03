@@ -137,7 +137,17 @@ public class DeploymentService
             final Application a;
             try
             {
-                a = appFactory.createApp(app);
+                // if there's a zip, explode and install it
+                final File appZip = new File(appsDir, app + ".zip");
+                if (appZip.exists())
+                {
+                    a = deployer.installFromAppDir(appZip.getName());
+                }
+                else
+                {
+                    // otherwise just create an app object from a deployed app
+                    a = appFactory.createApp(app);
+                }
                 applications.add(a);
             }
             catch (IOException e)
