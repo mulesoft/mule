@@ -102,7 +102,7 @@
     <link><item>mule:decrypt-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:expression-transformer</item><page>Additional+Configuration</page></link>
     <link><item>mule:encryption-security-filter</item><page>Additional+Configuration</page></link>
-    
+
     <link><item>mule:inbound-endpoint</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:outbound-endpoint</item><page>Configuring+Endpoints</page></link>
     <link><item>mule:endpoint</item><page>Configuring+Endpoints</page></link>
@@ -112,7 +112,7 @@
     <link><item>mule:receiver-threading-profile</item><page>General+Transport+Configuration</page></link>
     <link><item>mule:dispatcher-threading-profile</item><page>General+Transport+Configuration</page></link>
     <link><item>mule:service-overrides</item><page>General+Transport+Configuration</page></link>
-    
+
     <link><item>axis:connector</item><page>Axis+Transport</page></link>
     <link><item>axis:inbound-endpoint</item><page>Axis+Transport</page></link>
     <link><item>axis:outbound-endpoint</item><page>Axis+Transport</page></link>
@@ -317,7 +317,7 @@
     <link><item>udp:inbound-endpoint</item><page>UDP+Transport</page></link>
     <link><item>udp:outbound-endpoint</item><page>UDP+Transport</page></link>
     <link><item>udp:endpoint</item><page>UDP+Transport</page></link>
-    
+
     <link><item>vm:connector</item><page>VM+Transport</page></link>
     <link><item>vm:queueProfile</item><page>VM+Transport</page></link>
     <link><item>vm:inbound-endpoint</item><page>VM+Transport</page></link>
@@ -328,11 +328,6 @@
     <link><item>xmpp:inbound-endpoint</item><page>XMPP+Transport</page></link>
     <link><item>xmpp:outbound-endpoint</item><page>XMPP+Transport</page></link>
     <link><item>xmpp:endpoint</item><page>XMPP+Transport</page></link>
-
-    <link><item>acegi:security-manager</item><page>Acegi+Module</page></link>
-    <link><item>acegi:delegate-security-provider</item><page>Acegi+Module</page></link>
-    <link><item>acegi:security-property</item><page>Acegi+Module</page></link>
-    <link><item>acegi:http-security-filter</item><page>Acegi+Module</page></link>
 
     <link><item>client:remote-dispatcher-agent</item><page>Client+Module</page></link>
     <link><item>client:remote-endpoint</item><page>Client+Module</page></link>

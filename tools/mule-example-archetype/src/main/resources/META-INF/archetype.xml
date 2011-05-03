@@ -32,7 +32,7 @@
             <name>modules</name>
             <description>Which Mule modules do you want to include in this project?
 
-(options: acegi, annotations, atom, boot, builders, client, cxf, guice, ibeans,
+(options: annotations, atom, boot, builders, client, cxf, guice, ibeans,
           jaas, jbossts, jersey, json, management, ognl, pgp, rss, scripting,
           spring-extras, spring-security, sxc, ws, xml):
 

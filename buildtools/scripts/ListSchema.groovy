@@ -7,7 +7,7 @@
   - generate a list of the schema and their deploy location (disabled)
   - generate a set of commands that can be used to deploy the schema
 
-  This script will generate a script to upload the schemas via curl.  
+  This script will generate a script to upload the schemas via curl.
   It uses davfs to locate the schema locations.  The generated script
   requires that you set the following environment variables:
   - CURLUSER = your davfs username
@@ -19,12 +19,12 @@
   Example schema and their locations:
     transports/file/src/main/resources/META-INF/mule-file.xsd
      -> http://www.mulesoft.org/schema/mule/file/3.1/mule-file.xsd
-    modules/acegi/src/main/resources/META-INF/mule-acegi.xsd
-     -> http://www.mulesoft.org/schema/mule/acegi/3.1/mule-acegi.xsd
+    modules/cxf/src/main/resources/META-INF/mule-cxf.xsd
+     -> http://www.mulesoft.org/schema/mule/cxf/3.1/mule-cxf.xsd
     core/src/main/resources/META-INF/mule.xsd
      -> http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
 
-  This script and the generated script have only been verified to 
+  This script and the generated script have only been verified to
   work on Linux.
 
   $Id$
@@ -61,7 +61,7 @@ def parseArguments(def arguments)
 	cliBuilder.d(longOpt: "davmountpoint", args: 1, "mount point of the DAV filesystem")
 	cliBuilder.h(longOpt: "help", "show usage info")
 	cliBuilder.r(longOpt: "root", required: true, args: 1, "start scanning at this root folder")
-	
+
 	options = cliBuilder.parse(arguments)
 	if (!options)
 	{
@@ -94,7 +94,7 @@ def scanForSchemaAndInferDestinations = {
             exclude(name:"**/src/test/**/*.xsd")
             exclude(name:"**/target/**/*.xsd")
           }
-        }) 
+        })
     {
     if (f.absolutePath ==~ corexsd) {
       schemaNames << "core"
@@ -161,7 +161,7 @@ def scanAndCheckConfigs = {
             // println "# parsing $f"
             def parser = new XmlParser().parse(f)
             for (key in parser?.attributes().keySet()) {
-                if (key instanceof groovy.xml.QName && key.localPart == "schemaLocation") {                    
+                if (key instanceof groovy.xml.QName && key.localPart == "schemaLocation") {
                     tokens = new StringTokenizer(parser.attributes()[key])
                     while (tokens.hasMoreTokens()) {
                         id = tokens.nextToken()
@@ -169,7 +169,7 @@ def scanAndCheckConfigs = {
                         match = (id =~ /.*mulesoft\.org.*mule\/([^\/]+)\/.*/)
                         if (match.matches()) {
                             name = match[0][1]
-                            // we should really scan for test schema too, 
+                            // we should really scan for test schema too,
                             // but there's only one^H^H^H a few
                             if (name != "parsers-test" && ! name.startsWith("nest-example")) {
                                 if (! schemaNames.contains(name)) {

@@ -2,17 +2,19 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:sec="http://www.springframework.org/schema/security"
        xmlns:http="http://www.mulesoft.org/schema/mule/http"
        xmlns:https="http://www.mulesoft.org/schema/mule/https"
-       xmlns:acegi="http://www.mulesoft.org/schema/mule/acegi"
+       xmlns:spring-sec="http://www.mulesoft.org/schema/mule/spring-security"
        xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
        http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/3.2/mule-https.xsd
        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd
-       http://www.mulesoft.org/schema/mule/acegi http://www.mulesoft.org/schema/mule/acegi/3.2/mule-acegi.xsd">
+       http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/3.2/mule-spring-security.xsd">
 
     <https:connector name="httpConnector">
         <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
@@ -20,22 +22,20 @@
         <https:tls-server path="trustStore" storePassword="mulepassword"/>
     </https:connector>
 
-    <spring:bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
-        <spring:property name="userDetailsService" ref="inMemoryDaoImpl"/>
-    </spring:bean>
+    <spring:beans>
+        <sec:authentication-manager alias="authenticationManager">
+            <sec:authentication-provider>
+                <sec:user-service id="userService">
+                    <sec:user name="ross" password="ross" authorities="ROLE_ADMIN" />
+                    <sec:user name="anon" password="anon" authorities="ROLE_ANONYMOUS" />
+                </sec:user-service>
+            </sec:authentication-provider>
+        </sec:authentication-manager>
+    </spring:beans>
 
-    <spring:bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
-        <spring:property name="userMap">
-            <spring:value>
-                ross=ross,ROLE_ADMIN
-                anon=anon,ROLE_ANONYMOUS
-            </spring:value>
-        </spring:property>
-    </spring:bean>
-
-    <acegi:security-manager>
-        <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
-    </acegi:security-manager>
+    <spring-sec:security-manager>
+        <spring-sec:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
+    </spring-sec:security-manager>
 
     <model name="http secured test model">
         <service name="SecureUMO">
@@ -43,7 +43,7 @@
                 <inbound-endpoint 
                     address="https://localhost:${port2}/services/Echo"
                     exchange-pattern="request-response">
-                    <acegi:http-security-filter realm="mule-realm"/>
+                    <spring-sec:http-security-filter realm="mule-realm"/>
                     <cxf:simple-service/>
                 </inbound-endpoint>
             </inbound>
@@ -54,12 +54,11 @@
                 <inbound-endpoint 
                     address="http://localhost:${port1}/services/Echo"
                     exchange-pattern="request-response">
-                    <acegi:http-security-filter realm="mule-realm"/>
+                    <spring-sec:http-security-filter realm="mule-realm"/>
                     <cxf:simple-service/>
                 </inbound-endpoint>
             </inbound>
             <echo-component/>
         </service>
     </model>
-
 </mule>

@@ -46,7 +46,7 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <!-- 
+            <!--
                 This is absolutely necessary as the cxf-codegen-plugin already attaches
                 the generated source dir to the lifecycle. Then again, when generating your IDE
                 project files, this project will have compile errors because of missing sources
@@ -575,12 +575,6 @@
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-acegi</artifactId>
-            <version>${version}</version>
-            <scope>test</scope>
-        </dependency>
 
         <!-- for integration tests -->
         <!-- Maven classpath gets messed up and WsdlCallTestCase doesn't pass unless this is here -->
@@ -656,7 +650,7 @@
             </exclusions>
         </dependency>
     </dependencies>
-    
+
     <repositories>
         <repository>
             <id>java.net</id>

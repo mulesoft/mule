@@ -21,7 +21,7 @@ import org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilte
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * Registers a Bean Definition Parser for handling Acegi related elements.
+ * Registers a Bean Definition Parser for handling Spring Security related elements.
  */
 public class SpringSecurityNamespaceHandler extends NamespaceHandlerSupport
 {

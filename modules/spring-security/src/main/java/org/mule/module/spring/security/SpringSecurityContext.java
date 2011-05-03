@@ -17,8 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 
 /**
- * <code>AcegiSecurityContext</code> is a SecurityContext wrapper used to
- * interface with an Acegi SecurityContext
+ * <code>SpringSecurityContext</code> is a SecurityContext wrapper used to
+ * interface with an Spring's {@link org.springframework.security.core.context.SecurityContext}.
  */
 
 public class SpringSecurityContext implements SecurityContext

@@ -19,8 +19,8 @@ import org.springframework.security.core.context.SecurityContextImpl;
 
 
 /**
- * <code>AcegiSecurityContextFactory</code> creates an AcegiSecurityContext for an
- * Authentication object
+ * <code>SpringSecurityContextFactory</code> creates an SpringSecurityContext for an
+ * Authentication object.
  */
 public class SpringSecurityContextFactory implements SecurityContextFactory
 {

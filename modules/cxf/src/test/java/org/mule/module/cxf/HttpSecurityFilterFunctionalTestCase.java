@@ -33,6 +33,7 @@ public class HttpSecurityFilterFunctionalTestCase extends DynamicPortTestCase
            "</soapenv:Body>" +
         "</soapenv:Envelope>";
 
+    @Override
     protected String getConfigResources()
     {
         return "http-security-filter-test.xml";
@@ -61,7 +62,7 @@ public class HttpSecurityFilterFunctionalTestCase extends DynamicPortTestCase
             int status = client.executeMethod(get);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
             assertEquals(
-                "Registered authentication is set to org.mule.module.acegi.filters.http.HttpBasicAuthenticationFilter "
+                "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
                                 + "but there was no security context on the session. Authentication denied on "
                                 + "endpoint http://localhost:" + getPorts().get(0) + "/services/Echo. Message payload is of type: "
                                 + "String", get.getResponseBodyAsString());
@@ -88,7 +89,7 @@ public class HttpSecurityFilterFunctionalTestCase extends DynamicPortTestCase
             int status = client.executeMethod(post);
             assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
             assertEquals(
-                "Registered authentication is set to org.mule.module.acegi.filters.http.HttpBasicAuthenticationFilter "
+                "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "
                                 + "but there was no security context on the session. Authentication denied on "
                                 + "endpoint http://localhost:" + getPorts().get(0) + "/services/Echo. Message payload is of type: "
                                 + "ContentLengthInputStream",   post.getResponseBodyAsString());

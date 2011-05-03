@@ -2,15 +2,17 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:sec="http://www.springframework.org/schema/security"
        xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
        xmlns:https="http://www.mulesoft.org/schema/mule/https"
-       xmlns:acegi="http://www.mulesoft.org/schema/mule/acegi"
+       xmlns:spring-sec="http://www.mulesoft.org/schema/mule/spring-security"
        xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd
-       http://www.mulesoft.org/schema/mule/acegi http://www.mulesoft.org/schema/mule/acegi/3.2/mule-acegi.xsd
-       http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/3.2/mule-https.xsd">
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd
+        http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/3.2/mule-spring-security.xsd
+        http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/3.2/mule-https.xsd">
 
     <https:connector name="httpConnector">
         <https:tls-client path="clientKeystore" storePassword="mulepassword"/>
@@ -18,19 +20,19 @@
         <https:tls-server path="trustStore" storePassword="mulepassword"/>
     </https:connector>
    
-    <spring:bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
-        <spring:property name="userDetailsService">
-            <spring:ref bean="inMemoryDaoImpl"/>
-        </spring:property>
-    </spring:bean>
-
-    <spring:bean id="inMemoryDaoImpl" class="org.acegisecurity.userdetails.memory.InMemoryDaoImpl">
-        <spring:property name="userMap" value="admin=admin,ROLE_ADMIN"/>
-    </spring:bean>  
-
-    <acegi:security-manager>
-        <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
-    </acegi:security-manager>
+    <spring:beans>
+        <sec:authentication-manager alias="authenticationManager">
+            <sec:authentication-provider>
+                <sec:user-service id="userService">
+                    <sec:user name="admin" password="admin" authorities="ROLE_ADMIN" />
+                </sec:user-service>
+            </sec:authentication-provider>
+        </sec:authentication-manager>
+    </spring:beans>
+    
+    <spring-sec:security-manager>
+        <spring-sec:delegate-security-provider name="memory-dao" delegate-ref="authenticationManager"/>
+    </spring-sec:security-manager>
     
     <endpoint name="cxfOutbound" 
         address="cxf:http://admin:admin@localhost:${port1}/services/Echo?method=echo"
@@ -42,7 +44,7 @@
                 <inbound-endpoint 
                    address="http://localhost:${port1}/services/Echo"
                    exchange-pattern="request-response">
-                   <acegi:http-security-filter realm="mule-realm"/>
+                   <spring-sec:http-security-filter realm="mule-realm"/>
                    <cxf:simple-service />
                 </inbound-endpoint>
             </inbound>
@@ -55,7 +57,7 @@
                    address="https://localhost:${port2}/services/Echo"
                    connector-ref="httpConnector"
                    exchange-pattern="request-response">
-                   <acegi:http-security-filter realm="mule-realm"/>
+                   <spring-sec:http-security-filter realm="mule-realm"/>
                    <cxf:simple-service />
                 </inbound-endpoint>
             </inbound>

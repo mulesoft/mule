@@ -17,13 +17,13 @@ import org.mule.security.AbstractSecurityProvider;
 
 import java.util.Map;
 
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.core.AuthenticationException;
 
 
 /**
- * <code>AcegiProviderAdapter</code> is a wrapper for an Acegi Security provider to
+ * <code>SpringProviderAdapter</code> is a wrapper for a Spring Security provider to
  * use with the SecurityManager
  */
 public class SpringProviderAdapter extends AbstractSecurityProvider implements AuthenticationProvider
@@ -49,6 +49,7 @@ public class SpringProviderAdapter extends AbstractSecurityProvider implements A
         this.delegate = delegate;
     }
 
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         setSecurityContextFactory(new SpringSecurityContextFactory());

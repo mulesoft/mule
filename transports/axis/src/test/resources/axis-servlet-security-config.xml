@@ -2,13 +2,13 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:acegi="http://www.mulesoft.org/schema/mule/acegi"
+       xmlns:spring-sec="http://www.mulesoft.org/schema/mule/spring-security"
        xmlns:axis="http://www.mulesoft.org/schema/mule/axis"
        xmlns:servlet="http://www.mulesoft.org/schema/mule/servlet"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-       http://www.mulesoft.org/schema/mule/acegi http://www.mulesoft.org/schema/mule/acegi/3.2/mule-acegi.xsd
+       http://www.mulesoft.org/schema/mule/spring-security http://www.mulesoft.org/schema/mule/spring-security/3.2/mule-spring-security.xsd
        http://www.mulesoft.org/schema/mule/axis http://www.mulesoft.org/schema/mule/axis/3.2/mule-axis.xsd
        http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/3.2/mule-servlet.xsd">
 
@@ -24,15 +24,15 @@
 
     <servlet:connector name="servletConnector" servletUrl="http://localhost:${port1}/services" />
 
-    <acegi:security-manager>
-        <acegi:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
-    </acegi:security-manager>
+    <spring-sec:security-manager>
+        <spring-sec:delegate-security-provider name="memory-dao" delegate-ref="daoAuthenticationProvider"/>
+    </spring-sec:security-manager>
 
     <model name="test">
         <service name="mycomponent">
             <inbound>
                 <axis:inbound-endpoint address="servlet://mycomponent" exchange-pattern="request-response">
-                    <acegi:http-security-filter realm="mule-realm"/>
+                    <spring-sec:http-security-filter realm="mule-realm"/>
                     <response>
                     	<transformer ref="ByteArrayToString" />
                     </response>

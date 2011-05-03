@@ -106,11 +106,6 @@
 
         <dependency>
             <groupId>org.mule.modules</groupId>
-            <artifactId>mule-module-acegi</artifactId>
-            <version>${version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-client</artifactId>
             <version>${version}</version>
         </dependency>
@@ -171,6 +166,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-spring-security</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-xml</artifactId>
             <version>${version}</version>
         </dependency>
@@ -191,9 +191,9 @@
                 <version>1.1</version>
                 <executions>
                     <execution>
-                        <!-- 
+                        <!--
                                 The choice of phase is sensitive here. Since we use a class
-                                that's compiled in this module we must chose a phase 
+                                that's compiled in this module we must chose a phase
                                 later than 'compile'.  We also need a phase earlier than
                                 'package' since our results are in target.
                                 -->
