@@ -215,7 +215,7 @@ public class DeploymentService
         {
             if (logger.isInfoEnabled())
             {
-                logger.info(miniSplash("Mule is up and running in a single app mode"));
+                logger.info(miniSplash("Mule is up and running in a fixed app set mode"));
             }
         }
     }
