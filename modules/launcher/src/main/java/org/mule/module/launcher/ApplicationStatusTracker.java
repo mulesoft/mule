@@ -17,10 +17,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Keeps track of the status of all applications and zombies that were
- * discovered during the Mule instance starting process.
+ * Keeps track of the status of all applications and zombies that have been
+ * discovered during the Mule instance startup.
  */
-public class ApplicationStatusTracker implements DeployListener
+public class ApplicationStatusTracker implements DeploymentListener
 {
 
     /**
@@ -62,17 +62,17 @@ public class ApplicationStatusTracker implements DeployListener
         return Collections.unmodifiableMap(applicationStates);
     }
 
-    public void onDeployStart(Application application)
+    public void onDeploymentStart(Application application)
     {
         setApplicationState(application, ApplicationDeploymentState.DEPLOYING);
     }
 
-    public void onDeploySuccessful(Application application)
+    public void onDeploymentSuccess(Application application)
     {
         setApplicationState(application, ApplicationDeploymentState.RUNNING);
     }
 
-    public void onDeployFailure(Application application, Throwable failureCause)
+    public void onDeploymentFailure(Application application, Throwable failureCause)
     {
         setApplicationState(application, ApplicationDeploymentState.FAILED);
     }

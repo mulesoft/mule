@@ -15,7 +15,7 @@ import org.mule.module.launcher.application.Application;
 /**
  * Defines a lister for deployment events.
  */
-public interface DeployListener
+public interface DeploymentListener
 {
 
     /**
@@ -23,14 +23,14 @@ public interface DeployListener
      *
      * @param application the application being deployed
      */
-    void onDeployStart(Application application);
+    void onDeploymentStart(Application application);
 
     /**
      * Notifies that a deploy for a given application has successfully finished.
      *
      * @param application the application that was deployed
      */
-    void onDeploySuccessful(Application application);
+    void onDeploymentSuccess(Application application);
 
     /**
      * Notifies that a deploy for a given application has finished with a failure.
@@ -38,5 +38,5 @@ public interface DeployListener
      * @param application the application being deployed
      * @param cause       the cause of the failure
      */
-    void onDeployFailure(Application application, Throwable cause);
+    void onDeploymentFailure(Application application, Throwable cause);
 }

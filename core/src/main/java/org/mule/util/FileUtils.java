@@ -941,4 +941,28 @@ public class FileUtils extends org.apache.commons.io.FileUtils
             // ignore
         }
     }
+
+    public static boolean isFile(URL url)
+    {
+        return "file".equals(url.getProtocol());
+    }
+
+    /**
+     * Returns a file timestamp.
+     *
+     * @param url the file URL.
+     * @return the file's timestamp if the URL has the file protocol, otherwise.
+     *         returns -1.
+     */
+    public static long getFileTimeStamp(URL url)
+    {
+        long timeStamp = -1;
+
+        if (isFile(url))
+        {
+            timeStamp = new File(url.getFile()).lastModified();
+        }
+
+        return timeStamp;
+    }
 }

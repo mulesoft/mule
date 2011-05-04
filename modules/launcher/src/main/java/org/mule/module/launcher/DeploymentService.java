@@ -10,7 +10,6 @@
 
 package org.mule.module.launcher;
 
-import org.mule.config.MuleManifest;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.Application;
@@ -21,6 +20,7 @@ import org.mule.module.launcher.util.ElementRemovedEvent;
 import org.mule.module.launcher.util.ObservableList;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.CollectionUtils;
+import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 
 import java.beans.PropertyChangeEvent;
@@ -75,6 +75,7 @@ public class DeploymentService
         applicationStatusTracker = new ApplicationStatusTracker();
         deployer = new DefaultMuleDeployer(this, applicationStatusTracker);
         appFactory = new ApplicationFactory(this);
+        addStartupListener(new StartupSummaryDeploymentListener(applicationStatusTracker));
     }
 
     public void start()
@@ -183,11 +184,6 @@ public class DeploymentService
             }
         }
 
-        if (logger.isInfoEnabled())
-        {
-            logApplicationDeploymentStatuses();
-        }
-
         for (StartupListener listener : startupListeners)
         {
             try
@@ -213,33 +209,6 @@ public class DeploymentService
                 logger.info(miniSplash("Mule is up and running in a single app mode"));
             }
         }
-    }
-
-    /**
-     * Logs the application deployment statuses in a tabular form.
-     */
-    private void logApplicationDeploymentStatuses()
-    {
-        String message = "Mule " + MuleManifest.getProductVersion() + " started";
-
-        Map<String, ApplicationStatusTracker.ApplicationDeploymentState> applicationStates = applicationStatusTracker.getApplicationStates();
-
-        if (applicationStates.size() != 0)
-        {
-            SimpleLoggingTable applicationTable = new SimpleLoggingTable();
-            applicationTable.addColumn("APPLICATION", 45);
-            applicationTable.addColumn("STATUS", 18);
-
-            for (String app : applicationStates.keySet())
-            {
-                String[] data = new String[] {app, applicationStates.get(app).toString()};
-                applicationTable.addDataRow(data);
-            }
-
-            message = message + "\n\n" + applicationTable;
-        }
-
-        logger.info(message);
     }
 
     protected void scheduleChangeMonitor(File appsDir)
@@ -381,33 +350,9 @@ public class DeploymentService
             return;
         }
 
-        long lastModified = getFileTimeStamp(appArchiveUrl);
+        long lastModified = FileUtils.getFileTimeStamp(appArchiveUrl);
 
         zombieMap.put(appArchiveUrl, lastModified);
-    }
-
-    /**
-     * Returns a file timestamp.
-     *
-     * @param url the file URL.
-     * @return the file's timestamp if the URL has the file protocol, otherwise.
-     *         returns -1.
-     */
-    protected long getFileTimeStamp(URL url)
-    {
-        long timeStamp = -1;
-
-        if (isFile(url))
-        {
-            timeStamp = new File(url.getFile()).lastModified();
-        }
-
-        return timeStamp;
-    }
-
-    protected static boolean isFile(URL url)
-    {
-        return "file".equals(url.getProtocol());
     }
 
     public void addStartupListener(StartupListener listener)
@@ -634,10 +579,10 @@ public class DeploymentService
         {
             boolean result = false;
 
-            if (isFile(url) && zombieMap.containsKey(url))
+            if (FileUtils.isFile(url) && zombieMap.containsKey(url))
             {
                 long originalTimeStamp = zombieMap.get(url);
-                long newTimeStamp = getFileTimeStamp(url);
+                long newTimeStamp = FileUtils.getFileTimeStamp(url);
 
                 if (originalTimeStamp == newTimeStamp)
                 {
