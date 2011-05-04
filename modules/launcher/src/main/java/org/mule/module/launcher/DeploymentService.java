@@ -10,7 +10,6 @@
 
 package org.mule.module.launcher;
 
-import org.mule.config.MuleManifest;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.Application;
@@ -76,6 +75,7 @@ public class DeploymentService
         applicationStatusTracker = new ApplicationStatusTracker();
         deployer = new DefaultMuleDeployer(this, applicationStatusTracker);
         appFactory = new ApplicationFactory(this);
+        addStartupListener(new StartupSummaryDeploymentListener(applicationStatusTracker));
     }
 
     public void start()
@@ -184,11 +184,6 @@ public class DeploymentService
             }
         }
 
-        if (logger.isInfoEnabled())
-        {
-            logApplicationDeploymentStatuses();
-        }
-
         for (StartupListener listener : startupListeners)
         {
             try
@@ -207,33 +202,6 @@ public class DeploymentService
         {
             scheduleChangeMonitor(appsDir);
         }
-    }
-
-    /**
-     * Logs the application deployment statuses in a tabular form.
-     */
-    private void logApplicationDeploymentStatuses()
-    {
-        String message = "Mule " + MuleManifest.getProductVersion() + " started";
-
-        Map<String, ApplicationStatusTracker.ApplicationDeploymentState> applicationStates = applicationStatusTracker.getApplicationStates();
-
-        if (applicationStates.size() != 0)
-        {
-            SimpleLoggingTable applicationTable = new SimpleLoggingTable();
-            applicationTable.addColumn("APPLICATION", 45);
-            applicationTable.addColumn("STATUS", 18);
-
-            for (String app : applicationStates.keySet())
-            {
-                String[] data = new String[] {app, applicationStates.get(app).toString()};
-                applicationTable.addDataRow(data);
-            }
-
-            message = message + "\n\n" + applicationTable;
-        }
-
-        logger.info(message);
     }
 
     protected void scheduleChangeMonitor(File appsDir)

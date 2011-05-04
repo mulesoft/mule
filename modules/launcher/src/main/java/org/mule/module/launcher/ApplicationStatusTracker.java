@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Keeps track of the status of all applications and zombies that were
- * discovered during the Mule instance starting process.
+ * Keeps track of the status of all applications and zombies that have been
+ * discovered during the Mule instance startup.
  */
 public class ApplicationStatusTracker implements DeploymentListener
 {
