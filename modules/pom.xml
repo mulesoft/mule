@@ -16,7 +16,6 @@
     <modules>
         <module>atom</module>
         <module>annotations</module>
-        <module>acegi</module>
         <module>all-modules</module>
         <module>builders</module>
         <module>boot</module>
@@ -32,7 +31,7 @@
         <module>jbpm</module>
         <module>jca</module>
         <module>json</module>
-		<module>logging</module>
+        <module>logging</module>
         <module>management</module>
         <module>ognl</module>
         <module>pgp</module>
