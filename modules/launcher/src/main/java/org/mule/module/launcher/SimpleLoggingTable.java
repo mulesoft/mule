@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class SimpleLoggingTable
 {
-
+    protected static final String NEW_LINE = String.format("%n");
     private static final char SEPARATOR_CHAR = '*';
 
     private List<TableColumn> columns = new LinkedList<TableColumn>();
@@ -73,9 +73,9 @@ public class SimpleLoggingTable
 
         for (TableColumn column : columns)
         {
-            builder.append(String.format("%c %s ", SEPARATOR_CHAR, formatValue(column.name, column.width)));
+            builder.append(String.format("%c %s ", SEPARATOR_CHAR, formatHeaderValue(column.name, column.width)));
         }
-        builder.append(SEPARATOR_CHAR + "\n");
+        builder.append(SEPARATOR_CHAR).append(NEW_LINE);
 
         addSeparatorLine(builder);
     }
@@ -88,7 +88,7 @@ public class SimpleLoggingTable
             {
                 builder.append(String.format("%c %s ", SEPARATOR_CHAR, formatValue(row[i], columns.get(i).width)));
             }
-            builder.append(SEPARATOR_CHAR + "\n");
+            builder.append(SEPARATOR_CHAR).append(NEW_LINE);
         }
 
         addSeparatorLine(builder);
@@ -97,7 +97,7 @@ public class SimpleLoggingTable
     private void addSeparatorLine(StringBuilder builder)
     {
         builder.append(StringUtils.repeat(SEPARATOR_CHAR, width));
-        builder.append("\n");
+        builder.append(NEW_LINE);
     }
 
     /**
@@ -126,6 +126,14 @@ public class SimpleLoggingTable
     {
         String result = StringUtils.substring(value, 0, size);
         result = StringUtils.rightPad(result, size, ' ');
+
+        return result;
+    }
+
+    private String formatHeaderValue(String value, int size)
+    {
+        String result = StringUtils.substring(value, 0, size);
+        result = StringUtils.center(String.format("- - + %s + - -", result), size, ' ');
 
         return result;
     }
