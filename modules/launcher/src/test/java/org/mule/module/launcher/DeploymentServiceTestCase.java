@@ -199,6 +199,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         assertTrue("Install never invoked", installLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
 
+        // Resets the latch to detect a new attempt to deploy the zip file
+        installLatch = new Latch();
+
         // let the file system's write-behind cache commit the delete operation?
         Thread.sleep(1000);
 
@@ -212,6 +215,9 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
         assertEquals("Wrong URL tagged as zombie.", "broken-app.zip", new File(zombie.getKey().getFile()).getName());
         assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
+
+        // Checks that the invalid zip was not deployed again
+        assertFalse("Install was invoked again for the broken application file", installLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
     public void testBrokenAppName() throws Exception
@@ -252,6 +258,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         deploymentService.start();
 
         assertTrue("Deployer never invoked", deployLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
+        deployLatch.release();
 
         assertAppsDir(NONE, new String[] {"configurableApp", "dummy-app"}, true);
 

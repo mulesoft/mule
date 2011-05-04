@@ -372,14 +372,33 @@ public class DeploymentService
             return;
         }
 
-        long lastModified = -1;
-        // get timestamp only from file:// urls
-        if ("file".equals(appArchiveUrl.getProtocol()))
-        {
-            lastModified = new File(appArchiveUrl.getFile()).lastModified();
-        }
+        long lastModified = getFileTimeStamp(appArchiveUrl);
 
         zombieMap.put(appArchiveUrl, lastModified);
+    }
+
+    /**
+     * Returns a file timestamp.
+     *
+     * @param url the file URL.
+     * @return the file's timestamp if the URL has the file protocol, otherwise.
+     *         returns -1.
+     */
+    protected long getFileTimeStamp(URL url)
+    {
+        long timeStamp = -1;
+
+        if (isFile(url))
+        {
+            timeStamp = new File(url.getFile()).lastModified();
+        }
+
+        return timeStamp;
+    }
+
+    protected static boolean isFile(URL url)
+    {
+        return "file".equals(url.getProtocol());
     }
 
     public void addStartupListener(StartupListener listener)
@@ -528,6 +547,13 @@ public class DeploymentService
                             undeploy(appName);
                         }
                         url = new File(appsDir, zip).toURI().toURL();
+
+                        if (isZombieApplicationFile(url))
+                        {
+                            // Skips the file because it was already deployed with failure
+                            continue;
+                        }
+
                         deploy(url);
                     }
                     catch (Throwable t)
@@ -585,6 +611,32 @@ public class DeploymentService
                 }
                 dirty = false;
             }
+        }
+
+        /**
+         * Determines if a given URL points to the same file that an existent
+         * zombie application.
+         *
+         * @param url the URL representing the resource to be checked
+         * @return true if the URL already a zombie application and both file
+         *         timestamps are the same.
+         */
+        protected boolean isZombieApplicationFile(URL url)
+        {
+            boolean result = false;
+
+            if (isFile(url) && zombieMap.containsKey(url))
+            {
+                long originalTimeStamp = zombieMap.get(url);
+                long newTimeStamp = getFileTimeStamp(url);
+
+                if (originalTimeStamp == newTimeStamp)
+                {
+                    result = true;
+                }
+            }
+
+            return result;
         }
 
         /**
