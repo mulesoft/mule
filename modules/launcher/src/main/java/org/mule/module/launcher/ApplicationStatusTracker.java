@@ -29,41 +29,10 @@ public class ApplicationStatusTracker implements DeployListener
      */
     public static enum ApplicationDeploymentState
     {
-        PENDING
-                {
-                    @Override
-                    public String toString()
-                    {
-                        return "PENDING";
-                    }
-                },
-        FAILED
-                {
-                    @Override
-                    public String toString()
-                    {
-                        return "FAILED";
-                    }
-                },
-        DEPLOYING
-                {
-                    @Override
-                    public String toString()
-                    {
-                        return "DEPLOYING";
-                    }
-                },
+        PENDING,
+        FAILED,
+        DEPLOYING,
         RUNNING
-                {
-                    @Override
-                    public String toString()
-                    {
-                        return "RUNNING";
-                    }
-                };
-
-        @Override
-        public abstract String toString();
     }
 
     private Map<String, ApplicationDeploymentState> applicationStates = new ConcurrentHashMap<String, ApplicationDeploymentState>();
