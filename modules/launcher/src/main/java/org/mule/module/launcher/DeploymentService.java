@@ -21,6 +21,7 @@ import org.mule.module.launcher.util.ElementRemovedEvent;
 import org.mule.module.launcher.util.ObservableList;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.CollectionUtils;
+import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
 
 import java.beans.PropertyChangeEvent;
@@ -374,33 +375,9 @@ public class DeploymentService
             return;
         }
 
-        long lastModified = getFileTimeStamp(appArchiveUrl);
+        long lastModified = FileUtils.getFileTimeStamp(appArchiveUrl);
 
         zombieMap.put(appArchiveUrl, lastModified);
-    }
-
-    /**
-     * Returns a file timestamp.
-     *
-     * @param url the file URL.
-     * @return the file's timestamp if the URL has the file protocol, otherwise.
-     *         returns -1.
-     */
-    protected long getFileTimeStamp(URL url)
-    {
-        long timeStamp = -1;
-
-        if (isFile(url))
-        {
-            timeStamp = new File(url.getFile()).lastModified();
-        }
-
-        return timeStamp;
-    }
-
-    protected static boolean isFile(URL url)
-    {
-        return "file".equals(url.getProtocol());
     }
 
     public void addStartupListener(StartupListener listener)
@@ -627,10 +604,10 @@ public class DeploymentService
         {
             boolean result = false;
 
-            if (isFile(url) && zombieMap.containsKey(url))
+            if (FileUtils.isFile(url) && zombieMap.containsKey(url))
             {
                 long originalTimeStamp = zombieMap.get(url);
-                long newTimeStamp = getFileTimeStamp(url);
+                long newTimeStamp = FileUtils.getFileTimeStamp(url);
 
                 if (originalTimeStamp == newTimeStamp)
                 {
