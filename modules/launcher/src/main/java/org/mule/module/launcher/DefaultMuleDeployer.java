@@ -32,13 +32,10 @@ public class DefaultMuleDeployer implements MuleDeployer
 
     protected transient final Log logger = LogFactory.getLog(getClass());
     protected DeploymentService deploymentService;
-    protected final DeploymentListener deploymentListener;
 
-
-    public DefaultMuleDeployer(DeploymentService deploymentService, DeploymentListener deploymentListener)
+    public DefaultMuleDeployer(DeploymentService deploymentService)
     {
         this.deploymentService = deploymentService;
-        this.deploymentListener = deploymentListener;
     }
 
     public void deploy(Application app)
@@ -50,11 +47,9 @@ public class DefaultMuleDeployer implements MuleDeployer
             {
                 return;
             }
-            deploymentListener.onDeploymentStart(app);
             app.install();
             app.init();
             app.start();
-            deploymentListener.onDeploymentSuccess(app);
         }
         catch (InterruptedException e)
         {
@@ -63,7 +58,6 @@ public class DefaultMuleDeployer implements MuleDeployer
         }
         catch (Throwable t)
         {
-            deploymentListener.onDeploymentFailure(app, t);
             if (t instanceof DeploymentException)
             {
                 // re-throw as is

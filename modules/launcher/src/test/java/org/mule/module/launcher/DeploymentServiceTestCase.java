@@ -323,7 +323,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
     private class TestDeployer implements MuleDeployer
     {
-        MuleDeployer delegate = new DefaultMuleDeployer(deploymentService, deploymentService.getApplicationStatusTracker());
+        MuleDeployer delegate = new DefaultMuleDeployer(deploymentService);
 
         public void deploy(Application app)
         {
