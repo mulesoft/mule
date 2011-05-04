@@ -10,6 +10,7 @@
 
 package org.mule.module.launcher;
 
+import org.mule.config.MuleManifest;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.Application;
@@ -210,19 +211,26 @@ public class DeploymentService
      */
     private void logApplicationDeploymentStatuses()
     {
-        SimpleLoggingTable applicationTable = new SimpleLoggingTable();
-        applicationTable.addColumn("APPLICATION", 45);
-        applicationTable.addColumn("STATUS", 18);
+        String message = "Mule " + MuleManifest.getProductVersion() + " started";
 
         Map<String, ApplicationStatusTracker.ApplicationDeploymentState> applicationStates = applicationStatusTracker.getApplicationStates();
 
-        for (String app : applicationStates.keySet())
+        if (applicationStates.size() != 0)
         {
-            String[] data = new String[] {app, applicationStates.get(app).toString()};
-            applicationTable.addDataRow(data);
+            SimpleLoggingTable applicationTable = new SimpleLoggingTable();
+            applicationTable.addColumn("APPLICATION", 45);
+            applicationTable.addColumn("STATUS", 18);
+
+            for (String app : applicationStates.keySet())
+            {
+                String[] data = new String[] {app, applicationStates.get(app).toString()};
+                applicationTable.addDataRow(data);
+            }
+
+            message = message + "\n\n" + applicationTable;
         }
 
-        logger.info("Finished deployment of applications\n" + applicationTable.toString());
+        logger.info(message);
     }
 
     protected void scheduleChangeMonitor(File appsDir)
