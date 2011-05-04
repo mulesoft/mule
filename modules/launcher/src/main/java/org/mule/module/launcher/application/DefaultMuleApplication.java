@@ -180,7 +180,7 @@ public class DefaultMuleApplication implements Application
     {
         if (logger.isInfoEnabled())
         {
-            logger.info(miniSplash(String.format("Initializing application '%s'", appName)));
+            logger.info(miniSplash(String.format("Initializing app '%s'", appName)));
         }
 
         String configBuilderClassName = null;
@@ -295,7 +295,7 @@ public class DefaultMuleApplication implements Application
     {
         if (logger.isInfoEnabled())
         {
-            logger.info(miniSplash(String.format("Redeploying application '%s'", appName)));
+            logger.info(miniSplash(String.format("Redeploying app '%s'", appName)));
         }
         dispose();
         install();
@@ -347,7 +347,7 @@ public class DefaultMuleApplication implements Application
         {
             if (logger.isInfoEnabled())
             {
-                logger.info("MuleContext not created, nothing to dispose of");
+                logger.info(String.format("App '%s' never started, nothing to dispose of", appName));
             }
             return;
         }
@@ -366,7 +366,7 @@ public class DefaultMuleApplication implements Application
         }
         if (logger.isInfoEnabled())
         {
-            logger.info(miniSplash(String.format("Disposing application '%s'", appName)));
+            logger.info(miniSplash(String.format("Disposing app '%s'", appName)));
         }
 
         muleContext.dispose();
