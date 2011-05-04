@@ -15,8 +15,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Keeps track of the deployment status of all applications that have been
- * discovered during the Mule instance startup.
+ * Keeps track of the deployment status of all applications in the Mule instance.
  */
 public class DeploymentStatusTracker implements DeploymentListener
 {
@@ -40,21 +39,17 @@ public class DeploymentStatusTracker implements DeploymentListener
 
     public void onDeploymentStart(String appName)
     {
-        setApplicationState(appName, DeploymentState.DEPLOYING);
+        deploymentStates.put(appName, DeploymentState.DEPLOYING);
     }
 
     public void onDeploymentSuccess(String appName)
     {
-        setApplicationState(appName, DeploymentState.DEPLOYED);
+        deploymentStates.put(appName, DeploymentState.DEPLOYED);
     }
 
     public void onDeploymentFailure(String appName, Throwable failureCause)
     {
-        setApplicationState(appName, DeploymentState.FAILED);
+        deploymentStates.put(appName, DeploymentState.FAILED);
     }
 
-    protected void setApplicationState(String appName, DeploymentState deploymentState)
-    {
-        deploymentStates.put(appName, deploymentState);
-    }
 }
