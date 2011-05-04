@@ -17,13 +17,6 @@ public interface DeploymentListener
 {
 
     /**
-     * Notifies that a new application deployment was detected.
-     *
-     * @param appName the name of the application to be deployed.
-     */
-    void onNewDeploymentDetected(String appName);
-
-    /**
      * Notifies that a deploy for a given application has started.
      *
      * @param appName the name of the application being deployed

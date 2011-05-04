@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -68,7 +69,7 @@ public class DeploymentService
 
     private List<StartupListener> startupListeners = new ArrayList<StartupListener>();
 
-    private List<DeploymentListener> deploymentListeners = new ArrayList<DeploymentListener> ();
+    private List<DeploymentListener> deploymentListeners = new CopyOnWriteArrayList<DeploymentListener>();
 
     public DeploymentService()
     {
@@ -114,8 +115,6 @@ public class DeploymentService
 
                 try
                 {
-                    fireOnNewDeploymentDetected(appName);
-
                     // we don't care about the returned app object on startup
                     deployer.installFromAppDir(zip);
                 }
@@ -384,27 +383,6 @@ public class DeploymentService
     }
 
     /**
-     * Notifies all deployment listeners that a new application was detected
-     * for deployment.
-     *
-     * @param appName the name of the application to be deployed.
-     */
-    protected void fireOnNewDeploymentDetected(String appName)
-    {
-        for (DeploymentListener listener : deploymentListeners)
-        {
-            try
-            {
-                listener.onNewDeploymentDetected(appName);
-            }
-            catch (Throwable t)
-            {
-                logger.error(t);
-            }
-        }
-    }
-
-    /**
      * Notifies all deployment listeners that the deploy for a given application
      * has just started.
      *
@@ -420,7 +398,7 @@ public class DeploymentService
             }
             catch (Throwable t)
             {
-                logger.error(t);
+                logger.error("Listener failed to process onDeploymentStart notification", t);
             }
         }
     }
@@ -441,7 +419,7 @@ public class DeploymentService
             }
             catch (Throwable t)
             {
-                logger.error(t);
+                logger.error("Listener failed to process onDeploymentSuccess notification", t);
             }
         }
     }
@@ -463,7 +441,7 @@ public class DeploymentService
             }
             catch (Throwable t)
             {
-                logger.error(t);
+                logger.error("Listener failed to process onDeploymentFailure notification", t);
             }
         }
     }

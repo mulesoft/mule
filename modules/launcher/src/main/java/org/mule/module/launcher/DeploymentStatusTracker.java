@@ -23,8 +23,6 @@ public class DeploymentStatusTracker implements DeploymentListener
 
     public static enum DeploymentState
     {
-        // Indicate that the deployment was not started yet
-        PENDING,
         // The deployment is in progress
         DEPLOYING,
         // The deployment was finished with a failure
@@ -38,11 +36,6 @@ public class DeploymentStatusTracker implements DeploymentListener
     public Map<String, DeploymentState> getDeploymentStates()
     {
         return Collections.unmodifiableMap(deploymentStates);
-    }
-
-    public void onNewDeploymentDetected(String appName)
-    {
-        deploymentStates.put(appName, DeploymentState.PENDING);
     }
 
     public void onDeploymentStart(String appName)
@@ -62,9 +55,6 @@ public class DeploymentStatusTracker implements DeploymentListener
 
     protected void setApplicationState(String appName, DeploymentState deploymentState)
     {
-        if (deploymentStates.containsKey(appName))
-        {
-            deploymentStates.put(appName, deploymentState);
-        }
+        deploymentStates.put(appName, deploymentState);
     }
 }
