@@ -68,7 +68,7 @@
          -->
         <productUrl>http://www.mulesoft.org</productUrl>
         <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
-        <coberturaVersion>2.2</coberturaVersion>
+        <coberturaVersion>2.5</coberturaVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
         <jdk14Name>jdk1.4</jdk14Name>
         <!--
