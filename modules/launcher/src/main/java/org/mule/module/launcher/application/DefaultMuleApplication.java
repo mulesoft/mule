@@ -30,6 +30,7 @@ import org.mule.module.launcher.ConfigChangeMonitorThreadFactory;
 import org.mule.module.launcher.DefaultAppBloodhound;
 import org.mule.module.launcher.DefaultMuleSharedDomainClassLoader;
 import org.mule.module.launcher.DeploymentInitException;
+import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.DeploymentStartException;
 import org.mule.module.launcher.DeploymentStopException;
 import org.mule.module.launcher.GoodCitizenClassLoader;
@@ -64,6 +65,7 @@ public class DefaultMuleApplication implements Application
     protected static final String ANCHOR_FILE_BLURB = "Delete this file while Mule is running to undeploy this app in a clean way.";
 
     protected transient final Log logger = LogFactory.getLog(getClass());
+    protected transient final Log deployLogger = LogFactory.getLog(DeploymentService.class);
 
     protected ScheduledExecutorService watchTimer;
 
@@ -144,6 +146,19 @@ public class DefaultMuleApplication implements Application
             // save app's state in the marker file
             File marker = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), String.format("%s-anchor.txt", getAppName()));
             FileUtils.writeStringToFile(marker, ANCHOR_FILE_BLURB);
+
+            // null CCL ensures we log at 'system' level
+            // TODO create a more usable wrapper for any logger to be logged at sys level
+            final ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+            try
+            {
+                Thread.currentThread().setContextClassLoader(null);
+                deployLogger.info(miniSplash(String.format("Started app '%s'", appName)));
+            }
+            finally
+            {
+                Thread.currentThread().setContextClassLoader(oldCl);
+            }
         }
         catch (MuleException e)
         {

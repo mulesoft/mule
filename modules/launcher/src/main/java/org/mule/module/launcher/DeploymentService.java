@@ -177,6 +177,8 @@ public class DeploymentService
             catch (Throwable t)
             {
                 // error text has been created by the deployer already
+                final String msg = miniSplash(String.format("Failed to deploy app '%s', see below", application.getAppName()));
+                logger.error(msg);
                 logger.error(t);
             }
         }
