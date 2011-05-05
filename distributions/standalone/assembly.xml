@@ -21,7 +21,7 @@
         <include>launcher</include>
         <include>mule</include>
         <include>setup_local_instance.sh</include>
-	<include>mule_examples</include>
+        <include>mule_examples</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -84,8 +84,8 @@
             <exclude>**/*.iml</exclude>
             <exclude>**/*.ipr</exclude>
             <exclude>**/*.iws</exclude>
-			<!-- Exclude this example until someone gets it working -->
-			<exclude>geomail/**</exclude>
+            <!-- Exclude this example until someone gets it working -->
+            <exclude>geomail/**</exclude>
             <!-- Legacy LoanBroker example, used for testing only -->
             <exclude>loanbroker-legacy/**</exclude>
         </excludes>
@@ -290,6 +290,8 @@
         <include>org.mule.modules:mule-module-tomcat</include>
         <include>org.mule.modules:mule-module-xml</include>
         <include>org.mule.patterns:mule-pattern-core</include>
+        <!-- Tools -->
+        <include>org.mule.tools:mule-tools-anttasks</include>
       </includes>
     </dependencySet>
 
@@ -375,6 +377,7 @@
         <exclude>org.mule.examples:mule-example-stockquote</exclude>
         <exclude>org.mule.examples:mule-example-bookstore</exclude>
         <exclude>org.mule.examples:mule-example-launcher</exclude>
+        <exclude>org.mule.tools:mule-tools-anttasks</exclude>
 
         <!-- lib/user -->
         <exclude>junit:junit</exclude>
