@@ -80,8 +80,6 @@ public class JettyHttpConnector extends AbstractConnector
     private WebappsConfiguration webappsConfiguration;
 
     protected HashMap<String, ConnectorHolder> holders = new HashMap<String, ConnectorHolder>();
-    
-    private boolean statsEnabled;
 
     private WebAppDeployer deployer;
 
@@ -329,9 +327,7 @@ public class JettyHttpConnector extends AbstractConnector
 
     protected org.mortbay.jetty.AbstractConnector createJettyConnector()
     {
-        org.mortbay.jetty.AbstractConnector cnn = new SelectChannelConnector();
-        cnn.setStatsOn(isStatsEnabled());
-        return cnn;
+        return new SelectChannelConnector();
     }
 
     public void unregisterListener(MessageReceiver receiver) throws MuleException
@@ -396,16 +392,6 @@ public class JettyHttpConnector extends AbstractConnector
     public void setUseContinuations(boolean useContinuations)
     {
         this.useContinuations = useContinuations;
-    }
-    
-    public boolean isStatsEnabled()
-    {
-        return statsEnabled;
-    }
-
-    public void setStatsEnabled(boolean statsEnabled)
-    {
-    	this.statsEnabled = statsEnabled;
     }
 
     ConnectorHolder<? extends MuleReceiverServlet, ? extends JettyHttpMessageReceiver> registerJettyEndpoint(MessageReceiver receiver, InboundEndpoint endpoint) throws MuleException

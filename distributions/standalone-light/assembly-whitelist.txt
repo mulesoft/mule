@@ -99,7 +99,6 @@ jersey-json-1.6
 jersey-server-1.6
 jetty-6.1.26
 jetty-util-6.1.26
-jetty-management-6.1.26
 jetty-util5-6.1.26
 jetty-annotations-6.1.26
 jetty-plus-6.1.26
