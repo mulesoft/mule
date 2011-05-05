@@ -10,10 +10,8 @@
 
 package org.mule.module.launcher;
 
-import org.mule.module.launcher.application.Application;
-
 /**
- * Defines a lister for deployment events.
+ * Defines a listener for deployment events.
  */
 public interface DeploymentListener
 {
@@ -21,22 +19,22 @@ public interface DeploymentListener
     /**
      * Notifies that a deploy for a given application has started.
      *
-     * @param application the application being deployed
+     * @param appName the name of the application being deployed
      */
-    void onDeploymentStart(Application application);
+    void onDeploymentStart(String appName);
 
     /**
      * Notifies that a deploy for a given application has successfully finished.
      *
-     * @param application the application that was deployed
+     * @param appName the name of the application being deployed
      */
-    void onDeploymentSuccess(Application application);
+    void onDeploymentSuccess(String appName);
 
     /**
      * Notifies that a deploy for a given application has finished with a failure.
      *
-     * @param application the application being deployed
+     * @param appName the name of the application being deployed
      * @param cause       the cause of the failure
      */
-    void onDeploymentFailure(Application application, Throwable cause);
+    void onDeploymentFailure(String appName, Throwable cause);
 }

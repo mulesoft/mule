@@ -22,9 +22,9 @@ public class StartupSummaryDeploymentListener implements DeploymentService.Start
 {
     protected transient final Log logger = LogFactory.getLog(getClass());
 
-    protected ApplicationStatusTracker tracker;
+    protected DeploymentStatusTracker tracker;
 
-    public StartupSummaryDeploymentListener(ApplicationStatusTracker tracker)
+    public StartupSummaryDeploymentListener(DeploymentStatusTracker tracker)
     {
         this.tracker = tracker;
     }
@@ -36,7 +36,7 @@ public class StartupSummaryDeploymentListener implements DeploymentService.Start
             return;
         }
 
-        Map<String, ApplicationStatusTracker.ApplicationDeploymentState> applicationStates = tracker.getApplicationStates();
+        Map<String, DeploymentStatusTracker.DeploymentState> applicationStates = tracker.getDeploymentStates();
 
         if (applicationStates.isEmpty())
         {

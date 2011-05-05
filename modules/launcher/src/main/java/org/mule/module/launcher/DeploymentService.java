@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -68,14 +69,12 @@ public class DeploymentService
 
     private List<StartupListener> startupListeners = new ArrayList<StartupListener>();
 
-    private final ApplicationStatusTracker applicationStatusTracker;
+    private List<DeploymentListener> deploymentListeners = new CopyOnWriteArrayList<DeploymentListener>();
 
     public DeploymentService()
     {
-        applicationStatusTracker = new ApplicationStatusTracker();
-        deployer = new DefaultMuleDeployer(this, applicationStatusTracker);
+        deployer = new DefaultMuleDeployer(this);
         appFactory = new ApplicationFactory(this);
-        addStartupListener(new StartupSummaryDeploymentListener(applicationStatusTracker));
     }
 
     public void start()
@@ -99,6 +98,12 @@ public class DeploymentService
         // mule -app app1:app2:app3 will restrict deployment only to those specified apps
         final boolean explicitAppSet = appString != null;
 
+        DeploymentStatusTracker deploymentStatusTracker = new DeploymentStatusTracker();
+        addDeploymentListener(deploymentStatusTracker);
+
+        StartupSummaryDeploymentListener summaryDeploymentListener = new StartupSummaryDeploymentListener(deploymentStatusTracker);
+        addStartupListener(summaryDeploymentListener);
+
         if (!explicitAppSet)
         {
             // explode any app zips first
@@ -106,6 +111,8 @@ public class DeploymentService
             Arrays.sort(zips);
             for (String zip : zips)
             {
+                String appName = StringUtils.removeEnd(zip, ".zip");
+
                 try
                 {
                     // we don't care about the returned app object on startup
@@ -115,7 +122,7 @@ public class DeploymentService
                 {
                     logger.error(String.format("Failed to install app from archive '%s'", zip), t);
 
-                    applicationStatusTracker.addZombie(StringUtils.removeEnd(zip, ".zip"));
+                    fireOnDeploymentFailure(appName, t);
 
                     File appFile = new File(appsDir, zip);
                     try
@@ -144,8 +151,6 @@ public class DeploymentService
 
         for (String app : apps)
         {
-            applicationStatusTracker.addApplication(app);
-
             final Application a;
             try
             {
@@ -173,10 +178,14 @@ public class DeploymentService
         {
             try
             {
+                fireOnDeploymentStart(application.getAppName());
                 deployer.deploy(application);
+                fireOnDeploymentSuccess(application.getAppName());
             }
             catch (Throwable t)
             {
+                fireOnDeploymentFailure(application.getAppName(), t);
+
                 // error text has been created by the deployer already
                 final String msg = miniSplash(String.format("Failed to deploy app '%s', see below", application.getAppName()));
                 logger.error(msg);
@@ -206,7 +215,7 @@ public class DeploymentService
         {
             if (logger.isInfoEnabled())
             {
-                logger.info(miniSplash("Mule is up and running in a single app mode"));
+                logger.info(miniSplash("Mule is up and running in a fixed app set mode"));
             }
         }
     }
@@ -275,8 +284,6 @@ public class DeploymentService
     {
         return zombieMap;
     }
-
-
 
     protected MuleDeployer getDeployer()
     {
@@ -365,9 +372,78 @@ public class DeploymentService
         this.startupListeners.remove(listener);
     }
 
-    public ApplicationStatusTracker getApplicationStatusTracker()
+    public void addDeploymentListener(DeploymentListener listener)
     {
-        return applicationStatusTracker;
+        this.deploymentListeners.add(listener);
+    }
+
+    public void removeDeploymentListener(DeploymentListener listener)
+    {
+        this.deploymentListeners.remove(listener);
+    }
+
+    /**
+     * Notifies all deployment listeners that the deploy for a given application
+     * has just started.
+     *
+     * @param appName the name of the application being deployed.
+     */
+    protected void fireOnDeploymentStart(String appName)
+    {
+        for (DeploymentListener listener : deploymentListeners)
+        {
+            try
+            {
+                listener.onDeploymentStart(appName);
+            }
+            catch (Throwable t)
+            {
+                logger.error("Listener failed to process onDeploymentStart notification", t);
+            }
+        }
+    }
+
+    /**
+     * Notifies all deployment listeners that the deploy for a given application
+     * has successfully finished.
+     *
+     * @param appName the name of the deployed application.
+     */
+    protected void fireOnDeploymentSuccess(String appName)
+    {
+        for (DeploymentListener listener : deploymentListeners)
+        {
+            try
+            {
+                listener.onDeploymentSuccess(appName);
+            }
+            catch (Throwable t)
+            {
+                logger.error("Listener failed to process onDeploymentSuccess notification", t);
+            }
+        }
+    }
+
+    /**
+     * Notifies all deployment listeners that the deploy for a given application
+     * has finished with a failure.
+     *
+     * @param appName the name of the deployed application.
+     * @param cause the cause of the deployment failure.
+     */
+    protected void fireOnDeploymentFailure(String appName, Throwable cause)
+    {
+        for (DeploymentListener listener : deploymentListeners)
+        {
+            try
+            {
+                listener.onDeploymentFailure(appName, cause);
+            }
+            catch (Throwable t)
+            {
+                logger.error("Listener failed to process onDeploymentFailure notification", t);
+            }
+        }
     }
 
     public interface StartupListener
