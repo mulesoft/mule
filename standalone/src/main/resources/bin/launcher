@@ -1,10 +1,12 @@
 #! /bin/sh
 
-groovyJar=`ls $MULE_HOME/lib/opt/groovy-all*`
-commonsCliJar=`ls $MULE_HOME/lib/boot/commons-cli-*.jar`
+groovyJar=`ls "$MULE_HOME"/lib/opt/groovy-all*`
+commonsCliJar=`ls "$MULE_HOME"/lib/boot/commons-cli-*.jar`
 
 cp=.:${MULE_HOME}/conf
 cp=${cp}:${groovyJar}
 cp=${cp}:${commonsCliJar}
 
-java -Dmule.home=${MULE_HOME} -cp "${cp}" org.codehaus.groovy.tools.GroovyStarter --main groovy.ui.GroovyMain --conf ${MULE_HOME}/bin/launcher.conf "$@"
+# The string passed to eval must handle spaces in paths correctly.
+COMMAND_LINE="java -Dmule.home=\"${MULE_HOME}\" -cp \"${cp}\" org.codehaus.groovy.tools.GroovyStarter --main groovy.ui.GroovyMain --conf \"${MULE_HOME}/bin/launcher.conf\" $@"
+eval $COMMAND_LINE
