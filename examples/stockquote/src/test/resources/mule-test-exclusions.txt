@@ -1,6 +1,3 @@
 #
 # Test cases listed in this file are not run.
 #
-
-# Requires tools.jar on the classpath for dynamic client compilation
-org.mule.example.stockquote.WsdlStockQuoteFunctionalTestCase
