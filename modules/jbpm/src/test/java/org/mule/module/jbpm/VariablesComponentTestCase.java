@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class VariablesComponentTestCase extends FunctionalTestCase
 {
-    private final int TIMEOUT = 5000;
+    private final int TIMEOUT = 10000;
     
     @Override
     protected String getConfigResources()
