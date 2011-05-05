@@ -48,6 +48,7 @@ import org.mule.util.ClassUtils;
 import org.mule.util.CollectionUtils;
 import org.mule.util.MuleUrlStreamHandlerFactory;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -56,6 +57,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.axis.AxisProperties;
 import org.apache.axis.client.Call;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.deployment.wsdd.WSDDConstants;
@@ -512,7 +514,24 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
     @Override
     protected void doDispose()
     {
-        // template method
+        // clear static references to classloaders to prevent loading classes from
+        // closed jars and avoid memory leaks on application redeploy.
+        try
+        {
+            Field field = AxisProperties.class.getDeclaredField("loaders");
+            field.setAccessible(true);
+            field.set(null, null);
+
+            field = AxisProperties.class.getDeclaredField("nameDiscoverer");
+            field.setAccessible(true);
+            field.set(null, null);
+        }
+        catch (Exception e)
+        {
+            logger.error(
+                "Error disposing AxisConnector, this may cause a memory leak. Error is: " + e.getMessage(), e);
+        }
+
     }
 
     public String getServerConfig()
