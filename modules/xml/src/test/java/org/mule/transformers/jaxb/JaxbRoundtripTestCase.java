@@ -26,7 +26,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 
 public class JaxbRoundtripTestCase extends AbstractTransformerTestCase
 {
-    private JAXBContext ctx;
+    protected JAXBContext ctx;
 
     @Override
     protected void doSetUp() throws Exception
@@ -38,7 +38,7 @@ public class JaxbRoundtripTestCase extends AbstractTransformerTestCase
     @Override
     public Transformer getTransformer() throws Exception
     {
-     JAXBUnmarshallerTransformer t = new JAXBUnmarshallerTransformer(ctx, DataTypeFactory.create(Person.class));
+        JAXBUnmarshallerTransformer t = new JAXBUnmarshallerTransformer(ctx, DataTypeFactory.create(Person.class));
         initialiseObject(t);
         return t;
     }
