@@ -12,6 +12,8 @@ package org.mule.transport.http;
 
 import org.mule.transport.http.i18n.HttpMessages;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
@@ -68,7 +70,7 @@ public class RequestLine
             throw new IllegalArgumentException("HTTP version may not be null");
         }
         this.method = method;
-        this.uri = uri;
+        this.uri = encodeIfNeeded(uri);
         this.httpversion = httpversion;
     }
 
@@ -76,6 +78,26 @@ public class RequestLine
         throws ProtocolException
     {
         this(method, uri, HttpVersion.parse(httpversion));
+    }
+
+    /*
+     * prevents XSS attacks
+     */
+    private String encodeIfNeeded(String uri)
+    {
+        if (uri.contains("<") || uri.contains(">"))
+        {
+            try
+            {
+                return URLEncoder.encode(uri, "UTF-8");
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                // This exception will never occur as long as the JRE supports UTF-8
+                throw new RuntimeException(e);
+            }
+        }
+        return uri;
     }
 
     public String getMethod()
