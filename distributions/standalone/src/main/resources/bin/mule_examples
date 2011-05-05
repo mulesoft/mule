@@ -66,20 +66,20 @@ if [ -z "$MULE_HOME" ] ; then
 
     # REALDIR points to $MULE_HOME/bin now, strip off the bin part so
     # we get a proper MULE_HOME instead of a relative path
-    MULE_HOME="`dirname ${REALDIR}`"
+    MULE_HOME="`dirname "${REALDIR}"`"
 fi
 
 # strip a potential trailing slash in MULE_HOME. This is required to build a
 # valid path for WRAPPER_CMD below which is used when running the stop
 # command
-MULE_HOME=`echo ${MULE_HOME} | sed -e 's/\/$//'`
+MULE_HOME=`echo "${MULE_HOME}" | sed -e 's/\/$//'`
 export MULE_HOME
 
 ######################################################################
 # Deploy examples and launch Mule ESB
 ######################################################################
 
-$MULE_HOME/bin/launcher $MULE_HOME/bin/mule_examples.groovy "${URL}"
+"$MULE_HOME/bin/launcher" \"$MULE_HOME/bin/mule_examples.groovy\" "${URL}"
 EXIT_STATUS=$?
 
 if [ "$EXIT_STATUS" -ne "0" ] ; then

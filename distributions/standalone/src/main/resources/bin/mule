@@ -66,7 +66,7 @@ REALDIR=`pwd`
 if [ -z "$MULE_HOME" ] ; then
     # REALDIR points to $MULE_HOME/bin now, strip off the bin part so
     # we get a proper MULE_HOME instead of a relative path
-    MULE_HOME="`dirname ${REALDIR}`"
+    MULE_HOME="`dirname "${REALDIR}"`"
 fi
 
 # strip a potential trailing slash in MULE_HOME. This is required to build a
@@ -621,7 +621,8 @@ dump() {
 }
 
 checkAdditionalJvmParams() {
-    $MULE_HOME/bin/launcher $MULE_HOME/bin/additional.groovy $WRAPPER_CONF "$JPDA_OPTS" "$MULE_ENDORSED" $@
+    # The string passed to eval must handle spaces in paths correctly.
+    "$MULE_HOME/bin/launcher" \"$MULE_HOME/bin/additional.groovy\" \"$WRAPPER_CONF\" \"$JPDA_OPTS\" \"$MULE_ENDORSED\" $@
 }
 
 case "$1" in
