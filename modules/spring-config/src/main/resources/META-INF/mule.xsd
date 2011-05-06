@@ -5233,6 +5233,15 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="sequence-router" type="multipleEndpointFilteringOutboundRouterType"
+                 substitutionGroup="abstract-outbound-router">
+        <xsd:annotation>
+            <xsd:documentation>
+                Sends the same message sequentially over multiple endpoints. Stops the routing process if receives a null or an exception message as a partial response from a synchronous endpoint.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:element name="endpoint-selector-router" type="endpointSelectorRouterType"
                  substitutionGroup="abstract-outbound-router">
         <xsd:annotation>
