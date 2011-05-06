@@ -10,7 +10,7 @@
 
 package org.mule.transport.quartz;
 
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CountdownCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -22,6 +22,7 @@ import java.util.Map;
 
 public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "quartz-receive-dispatch-delegating-job.xml";
@@ -34,17 +35,16 @@ public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
         CountdownCallback count = new CountdownCallback(1);
         component.setEventCallback(count);
 
-        MuleClient client = new MuleClient(muleContext);
-
         Map<String, Object> props = new HashMap<String, Object>();
         ScheduledDispatchJobConfig jobConfig = new ScheduledDispatchJobConfig();
         jobConfig.setMuleContext(muleContext);
         jobConfig.setEndpointRef("vm://quartz.in");
         props.put(QuartzConnector.PROPERTY_JOB_CONFIG, jobConfig);
 
-        client.send("vm://quartz.scheduler1", NullPayload.getInstance(), props);
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://quartz.scheduler1", NullPayload.getInstance(), props);
         assertTrue(count.await(7000));
-        
+
         // now that the scheduler sent the event, null out the event callback to avoid CountdownCallback
         // report more messages than requested during shutdown of the test/Mule server
         component.setEventCallback(null);
@@ -57,13 +57,12 @@ public class QuartzCustomJobFromMessageTestCase extends FunctionalTestCase
         CountdownCallback count = new CountdownCallback(1);
         component.setEventCallback(count);
 
-        MuleClient client = new MuleClient(muleContext);
-
         ScheduledDispatchJobConfig jobConfig = new ScheduledDispatchJobConfig();
         jobConfig.setMuleContext(muleContext);
         jobConfig.setEndpointRef("vm://quartz.in");
 
-        client.send("vm://quartz.scheduler2", jobConfig, null);
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://quartz.scheduler2", jobConfig, null);
         assertTrue(count.await(7000));
 
         // now that the scheduler sent the event, null out the event callback to avoid CountdownCallback

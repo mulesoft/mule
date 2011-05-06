@@ -21,23 +21,23 @@ import java.util.Map;
 public class QuartzDispatchJobTestCase extends FunctionalTestCase
 {
     @Override
-    protected String getConfigResources() 
+    protected String getConfigResources()
     {
         return "quartz-dispatch.xml";
     }
 
-    public void testMuleClientDispatchJob() throws Exception 
+    public void testMuleClientDispatchJob() throws Exception
     {
         FunctionalTestComponent component = getFunctionalTestComponent("scheduledService");
         assertNotNull(component);
         CountdownCallback count = new CountdownCallback(3);
         component.setEventCallback(count);
 
-        new MuleClient(muleContext).send("vm://quartz.scheduler", "quartz test", null);
+        new MuleClient(muleContext).dispatch("vm://quartz.scheduler", "quartz test", null);
         assertTrue(count.await(5000));
     }
 
-    public void testMuleClientDispatchJobWithExpressionAddress() throws Exception 
+    public void testMuleClientDispatchJobWithExpressionAddress() throws Exception
     {
         FunctionalTestComponent component = getFunctionalTestComponent("expressionScheduledService");
         assertNotNull(component);
@@ -47,7 +47,7 @@ public class QuartzDispatchJobTestCase extends FunctionalTestCase
         Map<String,String> props = new HashMap<String,String>();
         props.put("ENDPOINT_NAME", "quartz.expression.in");
 
-        new MuleClient(muleContext).send("vm://quartz.expression.scheduler", "quartz test", props);
+        new MuleClient(muleContext).dispatch("vm://quartz.expression.scheduler", "quartz test", props);
         assertTrue(count.await(5000));
     }
 }
