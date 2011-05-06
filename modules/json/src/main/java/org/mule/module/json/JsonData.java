@@ -10,9 +10,6 @@
 
 package org.mule.module.json;
 
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -20,7 +17,11 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * A wrapper for the {@link org.codehaus.jackson.JsonNode} object that
@@ -90,6 +91,16 @@ public class JsonData implements Serializable
     public boolean isArray()
     {
         return node.isArray();
+    }
+    
+    public JsonNode[] toArray() 
+    {
+        List<JsonNode> children = new ArrayList<JsonNode>();
+        for (Iterator<JsonNode> itr = node.getElements(); itr.hasNext();) 
+        {
+            children.add(itr.next());
+        }
+        return children.toArray(new JsonNode[children.size()]);
     }
 
     public JsonNode get(String expression)
