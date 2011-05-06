@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:jbossts="http://www.mulesoft.org/schema/mule/jbossts"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/3.2/mule-jbossts.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+
+    <jms:activemq-connector name="simpleJmsConnector" brokerURL="tcp://localhost:61616" specification="1.1"
+                            disableTemporaryReplyToDestinations="true"/>
+    <jms:activemq-xa-connector name="transactedJmsConnector" brokerURL="tcp://localhost:61616" specification="1.1" maxRedelivery="2"
+                               disableTemporaryReplyToDestinations="true"/>
+
+    <jbossts:transaction-manager/>
+
+    <flow name="InboundFlow">
+        <jms:inbound-endpoint queue="Myflow.input" connector-ref="simpleJmsConnector"/>
+        <jms:outbound-endpoint queue="Myflow.process" connector-ref="simpleJmsConnector"/>
+    </flow>
+
+    <flow name="ProcessFlow">
+        <jms:inbound-endpoint queue="Myflow.process" connector-ref="transactedJmsConnector">
+            <xa-transaction action="ALWAYS_BEGIN"/>
+        </jms:inbound-endpoint>
+        <logger message="Logger received a TX message"/>
+        <all>
+            <jms:outbound-endpoint queue="Myflow.finishedAndTransformed" connector-ref="transactedJmsConnector">
+                <xa-transaction action="ALWAYS_JOIN"/>
+            </jms:outbound-endpoint>
+            <jms:outbound-endpoint queue="Myflow.finishedOriginal" connector-ref="transactedJmsConnector">
+                <xa-transaction action="ALWAYS_JOIN"/>
+            </jms:outbound-endpoint>
+        </all>
+    </flow>
+
+</mule>
