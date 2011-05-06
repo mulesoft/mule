@@ -29,10 +29,10 @@ public class PreferredObjectSelector<T>
         {
             private PreferredComparator preferredComparator = new PreferredComparator();
 
-            public int compare(T threadPoolFactory, T threadPoolFactory1)
+            public int compare(T candidate1, T candidate2)
             {
-                final Preferred preferred = threadPoolFactory.getClass().getAnnotation(Preferred.class);
-                final Preferred preferred1 = threadPoolFactory1.getClass().getAnnotation(Preferred.class);
+                final Preferred preferred = candidate1.getClass().getAnnotation(Preferred.class);
+                final Preferred preferred1 = candidate2.getClass().getAnnotation(Preferred.class);
 
                 return preferredComparator.compare(preferred, preferred1);
             }
