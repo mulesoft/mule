@@ -70,7 +70,8 @@ public abstract class AbstractAggregator extends AbstractInterceptingMessageProc
         eventCorrelator.setFailOnTimeout(isFailOnTimeout());
     }
 
-    public void start() throws MuleException {
+    public void start() throws MuleException 
+    {
         if (timeout != 0)
         {
             eventCorrelator.start();

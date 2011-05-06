@@ -183,6 +183,7 @@ import org.mule.transformer.simple.BeanToMap;
 import org.mule.transformer.simple.ByteArrayToHexString;
 import org.mule.transformer.simple.ByteArrayToObject;
 import org.mule.transformer.simple.ByteArrayToSerializable;
+import org.mule.transformer.simple.CombineCollectionsTransformer;
 import org.mule.transformer.simple.HexStringToByteArray;
 import org.mule.transformer.simple.MapToBean;
 import org.mule.transformer.simple.ObjectToByteArray;
@@ -277,6 +278,8 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("map-to-bean-transformer", new MessageProcessorDefinitionParser(MapToBean.class));
         registerBeanDefinitionParser("bean-to-map-transformer", new MessageProcessorDefinitionParser(BeanToMap.class));
 
+        registerBeanDefinitionParser("combine-collections-transformer", new MessageProcessorDefinitionParser(CombineCollectionsTransformer.class));
+        
         //Transaction Managers
         registerBeanDefinitionParser("custom-transaction-manager", new TransactionManagerDefinitionParser());
         registerBeanDefinitionParser("jndi-transaction-manager", new TransactionManagerDefinitionParser(GenericTransactionManagerLookupFactory.class));
