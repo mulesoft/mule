@@ -10,7 +10,7 @@ function doChangeMachine() {
 }
 
 function rpcChangeMachineResponse(message) {
-	$("#response-output").html(getJsonResponse(message.data));
+    $("#response-output").html(getJsonResponse(message.data));
 
 }
 
@@ -20,20 +20,20 @@ function rpcChangeMachineResponse(message) {
 <p class="example-text">Select a currency, enter an amount and press <b>Get Change</b>.</p>
 
 <form name="changeMachineForm" id="changeMachineForm" action="">
-	<table cellspacing="2px" cellpadding="1px" border="0">
-	<tr>
-	    <td align="right" class="formLabel" valign="middle">Currency:</td>
-	    <td nowrap="nowrap" valign="middle">
-	        <input type="radio" name="currency" value="USD" checked="checked"/> USD
-	        <input type="radio" name="currency" value="GBP"/> GBP
-	    </td>
-	    <td align="right" class="formLabel" valign="middle">Amount:</td>
-	    <td nowrap="nowrap" valign="middle">
-	        <input type="text" id="amount" name="amount">
-	    </td>
-	    <td valign="middle"><input type="button" value="Get Change" onclick="doChangeMachine();"></td>
-	</tr>
-	</table>
+    <table cellspacing="2px" cellpadding="1px" border="0">
+    <tr>
+        <td align="right" class="formLabel" valign="middle">Currency:</td>
+        <td nowrap="nowrap" valign="middle">
+            <input type="radio" name="currency" value="USD" checked="checked"/> USD
+            <input type="radio" name="currency" value="GBP"/> GBP
+        </td>
+        <td align="right" class="formLabel" valign="middle">Amount:</td>
+        <td nowrap="nowrap" valign="middle">
+            <input type="text" id="amount" name="amount">
+        </td>
+        <td valign="middle"><input type="button" value="Get Change" onclick="doChangeMachine();"></td>
+    </tr>
+    </table>
 </form>
 
 <p class="example-text"><b>Response:</b></p>

@@ -10,7 +10,7 @@ function doGetQuote() {
 }
 
 function rpcGetQuoteResponse(message) {
-	$("#response-output").html(getJsonResponse(message.data));
+    $("#response-output").html(getJsonResponse(message.data));
 
 }
 
@@ -20,21 +20,21 @@ function rpcGetQuoteResponse(message) {
 <p class="example-text">Enter stock symbol and preferred method and press <b>Get Quote</b>.</p>
 
 <form name="getQuoteForm" id="getQuoteForm" action="">
-	<table cellspacing="2px" cellpadding="1px" border="0">
-	<tr>
-	    <td align="right" class="formLabel" valign="middle">Enter Symbol:</td>
-	    <td nowrap="nowrap" valign="middle">
-		    <input type="text" name="symbol" value="IBM">
-	    </td>
-	    <td align="right" class="formLabel" valign="middle">Select Method:</td>
-	    <td nowrap="nowrap" valign="middle">
-		    <input type="radio" name="method" value="REST" checked="checked">REST
-		    <input type="radio" name="method" value="SOAP">SOAP
-		    <input type="radio" name="method" value="WSDL">WSDL
-	    </td>
-	    <td valign="middle"><input type="button" value="Get Quote" onclick="doGetQuote();"></td>
-	</tr>
-	</table>
+    <table cellspacing="2px" cellpadding="1px" border="0">
+    <tr>
+        <td align="right" class="formLabel" valign="middle">Enter Symbol:</td>
+        <td nowrap="nowrap" valign="middle">
+            <input type="text" name="symbol" value="IBM">
+        </td>
+        <td align="right" class="formLabel" valign="middle">Select Method:</td>
+        <td nowrap="nowrap" valign="middle">
+            <input type="radio" name="method" value="REST" checked="checked">REST
+            <input type="radio" name="method" value="SOAP">SOAP
+            <input type="radio" name="method" value="WSDL">WSDL
+        </td>
+        <td valign="middle"><input type="button" value="Get Quote" onclick="doGetQuote();"></td>
+    </tr>
+    </table>
 </form>
 
 <p class="example-text"><b>Response:</b></p>

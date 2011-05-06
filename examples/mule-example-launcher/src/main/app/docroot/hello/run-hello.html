@@ -1,16 +1,16 @@
 <script type="text/javascript">
-	function doHelloWorld() {
-	    var data = new Object();
-	    data.url = 'http://localhost:8888/?name=' + escape(document.getElementById('name').value);
-	    data.method = 'GET';
-	    mule.rpc("/examples/ajaxproxy", data, rpcHelloWorldResponse);
-	}
-	
-	function rpcHelloWorldResponse(message) {
-		$("#response-output").html(getJsonResponse(message.data));
-	}
+    function doHelloWorld() {
+        var data = new Object();
+        data.url = 'http://localhost:8888/?name=' + escape(document.getElementById('name').value);
+        data.method = 'GET';
+        mule.rpc("/examples/ajaxproxy", data, rpcHelloWorldResponse);
+    }
+
+    function rpcHelloWorldResponse(message) {
+        $("#response-output").html(getJsonResponse(message.data));
+    }
 </script>
-<p class="example-title">Running the example</p>	
+<p class="example-title">Running the example</p>
 <p class="example-strong-text">Instructions:</p>
 <p class="example-text">Enter your name below and press <b>Say hello!</b>.</p>
 

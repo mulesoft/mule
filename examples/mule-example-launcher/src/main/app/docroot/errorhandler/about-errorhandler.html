@@ -20,7 +20,7 @@ The sample consists of two services: ExceptionManager and BusinessErrorManager. 
 The ExceptionManager is a service that receives exception messages and performs some action depending on the type of exception. For example, if a fatal exception is received, an email is sent to the system administrator. If a standard system exception is received, it is logged to a file on the local file system. The purpose of this example isn't to implement an exception handler, but to demonstrate the following features:
 
 <ul class="example-text">
-	<li>All the service components in the error handler are configured as Spring beans in the same Mule configuration file</li>
+    <li>All the service components in the error handler are configured as Spring beans in the same Mule configuration file</li>
     <li>The error manager has multiple outbound endpoints configured on it, and the example demonstrates how to dispatch to different endpoints</li>
     <li>The messages in the system are Java objects and need to be converted to and from XML. The example demonstrates chaining multiple transformers together</li>
  </ul>

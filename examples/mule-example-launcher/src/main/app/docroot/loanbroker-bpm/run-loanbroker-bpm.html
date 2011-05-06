@@ -10,7 +10,7 @@ function doGetLoanBrokerBPM() {
 }
 
 function rpcGetLoanBrokerBPMResponse(message) {
-	$("#response-output").html(getJsonResponse(message.data));
+    $("#response-output").html(getJsonResponse(message.data));
 
 }
 
@@ -20,15 +20,15 @@ function rpcGetLoanBrokerBPMResponse(message) {
 <p class="example-text">Enter the preferred amount and press <b>Execute</b>. You will be able to check the returned rate in Mule ESB log file <i>$MULE_HOME/logs/mule.log</i></p>
 
 <form name="loanBrokerBPMForm" id="loanBrokerBPMForm" action="">
-	<table cellspacing="2px" cellpadding="1px" border="0">
-	<tr>
-	    <td align="right" class="formLabel" valign="middle">Enter Amount:</td>
-	    <td nowrap="nowrap" valign="middle">
-		    <input type="text" name="amount" value="100">
-	    </td>
-	    <td valign="middle"><input type="button" value="Execute" onclick="doGetLoanBrokerBPM();"></td>
-	</tr>
-	</table>
+    <table cellspacing="2px" cellpadding="1px" border="0">
+    <tr>
+        <td align="right" class="formLabel" valign="middle">Enter Amount:</td>
+        <td nowrap="nowrap" valign="middle">
+            <input type="text" name="amount" value="100">
+        </td>
+        <td valign="middle"><input type="button" value="Execute" onclick="doGetLoanBrokerBPM();"></td>
+    </tr>
+    </table>
 </form>
 
 <p class="example-text"><b>Response:</b></p>

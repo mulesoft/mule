@@ -100,7 +100,7 @@
 
    <target name="deploy" 
            depends="package" 
-           description="Deploy the application to the Mule server">   	
+           description="Deploy the application to the Mule server">
         <muleDeploy applicationFile="${app.file}" />
    </target>
 

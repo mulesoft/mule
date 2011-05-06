@@ -11,12 +11,12 @@
 
     <ajax:connector name="ajaxServer" jsonCommented="false" serverUrl="http://0.0.0.0:18082/examples" resourceBase="${app.home}/docroot"/>
 
-	<json:json-to-object-transformer name="JsonToObject"/>
-	
-	<flow name="ajaxProxyFlow">
-		<ajax:inbound-endpoint channel="/examples/ajaxproxy" connector-ref="ajaxServer" transformer-refs="JsonToObject"/>
+    <json:json-to-object-transformer name="JsonToObject"/>
+
+    <flow name="ajaxProxyFlow">
+        <ajax:inbound-endpoint channel="/examples/ajaxproxy" connector-ref="ajaxServer" transformer-refs="JsonToObject"/>
         <component>
             <singleton-object class="org.mule.example.launcher.SimpleHTTPClient"/>
         </component>
-	</flow>
+    </flow>
 </mule>

@@ -59,10 +59,10 @@
             <version>${version}</version>
             <type>zip</type>
             <exclusions>
-	            <exclusion>
-	                <groupId>org.apache.derby</groupId>
-	                <artifactId>derby</artifactId>
-	            </exclusion>
+                <exclusion>
+                    <groupId>org.apache.derby</groupId>
+                    <artifactId>derby</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

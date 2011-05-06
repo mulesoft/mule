@@ -14,7 +14,7 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
        http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.2/mule-ajax.xsd">
 
-	<spring:bean name="companies" class="org.mule.example.cep.CompanyRegistry" factory-method="getCompanies" />
+    <spring:bean name="companies" class="org.mule.example.cep.CompanyRegistry" factory-method="getCompanies" />
 
     <bpm:drools />
 
@@ -28,22 +28,22 @@
     <vm:endpoint name="alerts" path="stock.alerts" />
     
     <flow name="generateStockTicks">
-	    <quartz:inbound-endpoint jobName="eventTimer" repeatInterval="2000">
-	        <quartz:event-generator-job>
-	        	<quartz:payload>tick-tock</quartz:payload>
-	        </quartz:event-generator-job>
-	    </quartz:inbound-endpoint>
+        <quartz:inbound-endpoint jobName="eventTimer" repeatInterval="2000">
+            <quartz:event-generator-job>
+                <quartz:payload>tick-tock</quartz:payload>
+            </quartz:event-generator-job>
+        </quartz:inbound-endpoint>
         <component>
-        	<singleton-object class="org.mule.example.cep.TickFeed" />
-       	</component>
+            <singleton-object class="org.mule.example.cep.TickFeed" />
+           </component>
         <outbound-endpoint ref="stockTick" />
     </flow>
 
     <flow name="processStockTicks">
-    	<composite-source>
-	        <inbound-endpoint ref="stockTick" />
-	        <ajax:inbound-endpoint channel="/services/cepExample/thresholdChange" />
-    	</composite-source>
+        <composite-source>
+            <inbound-endpoint ref="stockTick" />
+            <ajax:inbound-endpoint channel="/services/cepExample/thresholdChange" />
+        </composite-source>
         <all>
             <ajax:outbound-endpoint channel="/services/cepExample/stockTick" />
             <bpm:rules rulesDefinition="broker.drl" cepMode="true" entryPoint="StockTick stream" initialFacts-ref="companies" />
