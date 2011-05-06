@@ -10,7 +10,9 @@
 
 package org.mule.transport.quartz.jobs;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.NullPayload;
 import org.mule.transport.quartz.QuartzConnector;
@@ -24,6 +26,8 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.SchedulerContext;
+import org.quartz.SchedulerException;
 
 /**
  * Will dispatch the current message to a Mule endpoint at a later time.
@@ -55,19 +59,25 @@ public class ScheduledDispatchJob implements Job, Serializable
 
         try
         {
-            MuleClient client = new MuleClient(config.getMuleContext());
+            SchedulerContext schedulerContext = jobExecutionContext.getScheduler().getContext();
+            MuleContext muleContext = (MuleContext) schedulerContext.get(MuleProperties.MULE_CONTEXT_PROPERTY);
 
             String endpointRef = config.getEndpointRef();
-            if (jobDataMap.containsKey("endpointRef")) 
+            if (jobDataMap.containsKey("endpointRef"))
             {
                 endpointRef = (String) jobDataMap.get("endpointRef");
             }
 
             logger.debug("Dispatching payload on: " + config.getEndpointRef());
 
+            MuleClient client = new MuleClient(muleContext);
             client.dispatch(endpointRef, payload, jobDataMap);
         }
         catch (MuleException e)
+        {
+            throw new JobExecutionException(e);
+        }
+        catch (SchedulerException e)
         {
             throw new JobExecutionException(e);
         }
