@@ -12,13 +12,11 @@
     <description>A Mule transport for Quartz. This transport supplies a receiver for jobs scheduled with Quartz.</description>
 
     <dependencies>
-        
        <dependency>
             <groupId>quartz</groupId>
             <artifactId>quartz-all</artifactId>
-            <version>${quartzVersion}-osgi</version>
+            <version>${quartzVersion}</version>
         </dependency>
-        
         <!-- The Mule client is needed for EndpointPollingJob and ScheduledDispatchJob -->
         <dependency>
             <groupId>org.mule.modules</groupId>
