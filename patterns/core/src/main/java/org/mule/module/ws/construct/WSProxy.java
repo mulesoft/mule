@@ -36,6 +36,7 @@ import org.mule.util.StringUtils;
 
 import java.net.InetAddress;
 import java.net.URI;
+import java.net.UnknownHostException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -114,6 +115,7 @@ public class WSProxy extends AbstractFlowConstruct
         }
 
         this.outboundEndpoint = outboundEndpoint;
+        proxyMessageProcessor.setOutboundAddress((outboundEndpoint.getAddress()));
 
         this.proxyMessageProcessor = proxyMessageProcessor;
     }
@@ -172,8 +174,16 @@ public class WSProxy extends AbstractFlowConstruct
         private static final String HTTP_REQUEST = "http.request";
         private static final String WSDL_PARAM_1 = "?wsdl";
         private static final String WSDL_PARAM_2 = "&wsdl";
+        private static final String LOCALHOST = "localhost";
 
         protected final Log logger = LogFactory.getLog(WSProxy.class);
+
+        private String outboundAddress;
+
+        protected void setOutboundAddress(String outboundAddress)
+        {
+            this.outboundAddress = outboundAddress;
+        }
 
         public MuleEvent process(MuleEvent event) throws MuleException
         {
@@ -194,7 +204,8 @@ public class WSProxy extends AbstractFlowConstruct
         {
             try
             {
-                final String wsdlContents = getWsdlContents(event);
+                String wsdlContents = getWsdlContents(event);
+                wsdlContents = modifyServiceAddress(wsdlContents, event);
                 event.getMessage().setPayload(wsdlContents);
 
                 // the processing is stopped so that the result is not passed through
@@ -208,6 +219,25 @@ public class WSProxy extends AbstractFlowConstruct
                     MessageFactory.createStaticMessage("Impossible to retrieve WSDL for proxied service"),
                     event, e);
             }
+        }
+
+        private String modifyServiceAddress(String wsdlContents, MuleEvent event) throws UnknownHostException
+        {
+            // create a new mule message with the new WSDL
+            String inboundAddress = event.getEndpoint().getAddress();
+            wsdlContents = wsdlContents.replaceAll(outboundAddress, inboundAddress);
+
+            if (wsdlContents.indexOf(LOCALHOST) > -1)
+            {
+                wsdlContents = wsdlContents.replaceAll(LOCALHOST, InetAddress.getLocalHost().getHostName());
+            }
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("WSDL modified successfully");
+            }
+            
+            return wsdlContents;
         }
 
         private boolean isWsdlRequest(MuleEvent event) throws MuleException
@@ -273,7 +303,6 @@ public class WSProxy extends AbstractFlowConstruct
             String get(MuleEvent event);
         }
 
-        private static final String LOCALHOST = "localhost";
         private final WsdlAddressProvider wsdlAddressProvider;
 
         /**
@@ -375,21 +404,6 @@ public class WSProxy extends AbstractFlowConstruct
 
             final MuleMessage replyWSDL = webServiceEndpoint.request(event.getTimeout());
             wsdlString = replyWSDL.getPayloadAsString();
-
-            // create a new mule message with the new WSDL
-            final String realWsdlAddress = wsdlAddress.split("\\?")[0];
-            final String proxyWsdlAddress = event.getEndpoint().getEndpointURI().getUri().toString();
-            wsdlString = wsdlString.replaceAll(realWsdlAddress, proxyWsdlAddress);
-
-            if (wsdlString.indexOf(LOCALHOST) > -1)
-            {
-                wsdlString = wsdlString.replaceAll(LOCALHOST, InetAddress.getLocalHost().getHostName());
-            }
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("WSDL retrieved successfully");
-            }
 
             return wsdlString;
         }
