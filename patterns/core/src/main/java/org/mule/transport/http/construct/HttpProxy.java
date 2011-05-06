@@ -29,7 +29,7 @@ import org.mule.construct.AbstractConfigurationPattern;
 import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.endpoint.DynamicURIOutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.pattern.core.construct.CopyInboundToOutboundPropertiesTransformerCallback;
+import org.mule.pattern.core.support.CopyInboundToOutboundPropertiesTransformerCallback;
 import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.transformer.TransformerTemplate;
 import org.mule.transformer.TransformerTemplate.TransformerCallback;

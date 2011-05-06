@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.pattern.core.construct;
+package org.mule.pattern.core.support;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
