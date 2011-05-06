@@ -80,12 +80,17 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
             }
             else
             {
+                // MessageProcessor returned null
+                // We need to determine what we should use as input for next processor
                 if (flowConstruct instanceof SimpleFlowConstruct)
                 {
+                    // In a flow when a MessageProcessor returns null the next processor acts as an implicit 
+                    // branch receiving a copy of the message used for previous MessageProcessor
                     currentEvent = OptimizedRequestContext.criticalSetEvent(currentEvent);
                 }
                 else
                 {
+                    // But in a service we don't do any implicit branching.
                     return null;
                 }
             }
