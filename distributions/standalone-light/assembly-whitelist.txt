@@ -178,7 +178,7 @@ mx4j-remote-2.1.1-osgi
 neethi-2.0.4
 ognl-2.7.3-osgi
 oro-2.0.8-osgi
-quartz-all-1.6.0-osgi
+quartz-all-1.6.6
 relaxngDatatype-20020414
 rome-0.9
 saaj-api-1.3-osgi
