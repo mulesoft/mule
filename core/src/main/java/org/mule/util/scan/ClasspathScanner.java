@@ -106,7 +106,7 @@ public class ClasspathScanner
                 }
                 else if (url.getProtocol().equalsIgnoreCase("bundleresource"))
                 {
-                    logger.debug("Classpath contains an OSGi bundle resource which Mule does not know how to access, therefore this resource will be ignored.");
+                    logger.debug("Classpath contains an OSGi bundle resource which Mule does not know how to access, therefore this resource will be ignored: + " + url.toString());
                 }
                 else
                 {
