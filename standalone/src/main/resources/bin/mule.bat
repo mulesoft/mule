@@ -98,6 +98,9 @@ set MULE_OPTS=set.MULE_APP=%MULE_APP% set.MULE_APP_LONG=%MULE_APP_LONG% set.MULE
 rem Adding additional jvm arguments to wrapper configuration if needed
 call "%MULE_HOME%\bin\launcher.bat" "%MULE_HOME%\bin\additional.groovy" %_WRAPPER_CONF% "%JPDA_OPTS%" "%MULE_ENDORSED%" %*
 
+if not ERRORLEVEL 1 goto run
+goto :eof
+
 :run
 
 rem ###############################################################
