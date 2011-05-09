@@ -103,7 +103,7 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
             send("://localhost/TestService?method=foo", "hello");
             fail("exception expected");
         }
-        catch (DispatchException e)
+        catch (Exception e)
         {
             assertTrue(e.getCause() instanceof NoSuchMethodException);
         }
@@ -118,10 +118,10 @@ public abstract class AbstractFunctionalTestCase extends FunctionalTestCase
     {
         try
         {
-            new MuleClient(muleContext).send("BadType", "hello", null);
+            muleContext.getClient().send("BadType", "hello", null);
             fail("exception expected");
         }
-        catch (DispatchException e)
+        catch (Exception e)
         {
             assertTrue(e.getCause() instanceof NoSuchMethodException);
         }

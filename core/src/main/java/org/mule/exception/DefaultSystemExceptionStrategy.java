@@ -14,7 +14,9 @@ import org.mule.RequestContext;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.exception.SystemExceptionHandler;
+import org.mule.api.security.SecurityException;
 import org.mule.context.notification.ExceptionNotification;
+import org.mule.context.notification.SecurityNotification;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.ConnectException;
@@ -26,6 +28,12 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class DefaultSystemExceptionStrategy extends AbstractExceptionListener implements SystemExceptionHandler
 {
+    /**
+     * Redeliver the source message again after it has been handled by this exception handler?
+     */
+    // TODO This should eventually default to true, but we need to update affected test cases.
+    private boolean redeliver = false;
+    
     /** 
      * For IoC only 
      * @deprecated Use DefaultSystemExceptionStrategy(MuleContext muleContext) instead 
@@ -60,7 +68,14 @@ public class DefaultSystemExceptionStrategy extends AbstractExceptionListener im
 
         if (enableNotifications)
         {
-            fireNotification(new ExceptionNotification(e));
+                if (e instanceof SecurityException)
+                {
+                    fireNotification(new SecurityNotification((SecurityException) e, SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
+                }
+                else
+                {
+                    fireNotification(new ExceptionNotification(e));
+                }
         }
 
         if (e instanceof ConnectException &&
@@ -104,5 +119,15 @@ public class DefaultSystemExceptionStrategy extends AbstractExceptionListener im
                 logger.error(e2.getMessage());
             }
         }
+    }
+
+    public boolean isRedeliver()
+    {
+        return redeliver;
+    }
+
+    public void setRedeliver(boolean redeliver)
+    {
+        this.redeliver = redeliver;
     }
 }

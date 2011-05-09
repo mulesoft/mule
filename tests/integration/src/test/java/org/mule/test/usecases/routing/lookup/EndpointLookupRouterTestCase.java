@@ -35,10 +35,15 @@ public class EndpointLookupRouterTestCase extends FunctionalTestCase
 
     public void testRouterFailure() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage reply = client.send("vm://routerBad", "GetID", null);
-        assertNotNull(reply);
-        assertFalse(reply.getPayloadAsString().contains("<ErrorStatus>Success</ErrorStatus>"));
+        try
+        {
+            muleContext.getClient().send("vm://routerBad", "GetID", null);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 }
 

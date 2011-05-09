@@ -39,7 +39,14 @@ public class CustomSecurityFilterTestCase extends FunctionalTestCase
         assertNull(result.getExceptionPayload());
         
         props.put("pass", "badpass");
-        result = client.send("vm://test", "hi", props);
-        assertNotNull(result.getExceptionPayload());
+        try
+        {
+            client.send("vm://test", "hi", props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 }

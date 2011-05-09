@@ -56,13 +56,16 @@ public class SecurityFilterMessageProcessorTestCase extends AbstractMessageProce
         // Need event in RequestContext :-(
         RequestContext.setEvent(inEvent);
 
-        MuleEvent resultEvent = mp.process(inEvent);
+        try
+        {
+            MuleEvent resultEvent = mp.process(inEvent);
+            fail("Exception expected");
+        }
+        catch (TestSecurityFilter.StaticMessageUnauthorisedException e)
+        {
+            // expected
+        }
+        
         assertNull(listner.sensedEvent);
-
-        assertNotNull(resultEvent);
-        assertEquals(TestSecurityFilter.SECURITY_EXCEPTION_MESSAGE, resultEvent.getMessageAsString());
-        assertNotNull(resultEvent.getMessage().getExceptionPayload());
-        assertTrue(resultEvent.getMessage().getExceptionPayload().getException() instanceof TestSecurityFilter.StaticMessageUnauthorisedException);
     }
-
 }

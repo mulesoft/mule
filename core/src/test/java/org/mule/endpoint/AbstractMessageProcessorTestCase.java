@@ -292,6 +292,11 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
             event.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
             return event;
         }
+
+        public boolean isRedeliver()
+        {
+            return false;
+        }
     }
 
     public class ObjectAwareProcessor implements MessageProcessor, EndpointAware, MuleContextAware

@@ -34,4 +34,9 @@ public class QuietExceptionStrategy extends AbstractMessagingExceptionStrategy
     {
         logger.debug("Ignoring", t);
     }
+
+    public boolean isRedeliver()
+    {
+        return false;
+    }
 }

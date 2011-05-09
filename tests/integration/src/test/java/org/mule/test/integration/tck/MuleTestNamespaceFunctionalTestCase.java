@@ -13,7 +13,7 @@ package org.mule.test.integration.tck;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.exceptions.FunctionalTestException;
+import org.mule.util.ExceptionUtils;
 
 import java.io.FileNotFoundException;
 
@@ -54,19 +54,25 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
 
     public void testService4() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://service4", "foo", null);
-        assertNotNull(message);
-        assertNotNull(message.getExceptionPayload());
-        assertEquals(FunctionalTestException.EXCEPTION_MESSAGE, message.getExceptionPayload().getMessage());
+        try
+        {
+            muleContext.getClient().send("vm://service4", "foo", null);
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 
     public void testService5() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://service5", "foo", null);
-        assertNotNull(message);
-        assertNotNull(message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getRootException() instanceof FileNotFoundException);
+        try
+        {
+            muleContext.getClient().send("vm://service5", "foo", null);
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof FileNotFoundException);
+        }
     }
 }

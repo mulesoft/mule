@@ -10,7 +10,6 @@
 
 package org.mule.test.routing;
 
-import org.mule.api.ExceptionPayload;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -33,11 +32,15 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
         assertEquals("9 is an integer", response.getPayloadAsString());
         response = client.send("vm://input", Long.valueOf(42), null);
         assertEquals("42 is a number", response.getPayloadAsString());
-        response = client.send("vm://input", Boolean.TRUE, null);
-        ExceptionPayload ep = response.getExceptionPayload();
-        assertNotNull(ep);
-        Throwable ex = ep.getException();
-        assertTrue(ex instanceof MessagingException);
+        try
+        {
+            client.send("vm://input", Boolean.TRUE, null);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(e instanceof MessagingException);
+        }
     }
 
     public void testFirstSuccessfulWithExpression() throws Exception
@@ -49,12 +52,14 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
 
     public void testFirstSuccessfulWithExpressionAllFail() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage response = client.send("vm://input3", "XYZ", null);
-        ExceptionPayload ep = response.getExceptionPayload();
-        assertNotNull(ep);
-        Throwable ex = ep.getException();
-        assertTrue(ex instanceof MessagingException);
+        try
+        {
+            muleContext.getClient().send("vm://input3", "XYZ", null);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(e instanceof MessagingException);
+        }
     }
-
 }

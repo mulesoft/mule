@@ -78,7 +78,16 @@ public abstract class AbstractInterceptingMessageProcessor
                 fireNotification(event.getFlowConstruct(), event, next,
                     MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
             }
-            final MuleEvent result = next.process(event);
+            final MuleEvent result;
+            try
+            {
+                result = next.process(event);
+            }
+            catch (MuleException e)
+            {
+                event.getSession().setValid(false);
+                throw e;
+            }
             if (fireNotification)
             {
                 fireNotification(event.getFlowConstruct(), result, next,

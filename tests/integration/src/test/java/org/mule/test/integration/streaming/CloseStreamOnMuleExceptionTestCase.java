@@ -16,6 +16,7 @@ import org.mule.module.xml.stax.DelegateXMLStreamReader;
 import org.mule.module.xml.stax.StaxSource;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -28,11 +29,14 @@ import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
+import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
 import org.xml.sax.InputSource;
 
 public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
 {
-
+    private static Latch inputStreamLatch = new Latch();
+    private static Latch streamReaderLatch = new Latch();
     private String xmlText = "<test attribute=\"1\"/>";
     private TestByteArrayInputStream inputStream;
     MuleClient client;
@@ -47,8 +51,8 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
 
     public void testCloseStreamOnComponentException() throws MuleException, InterruptedException, IOException
     {
-
-        client.send("vm://inEcho?connector=vm", inputStream, null);
+        client.dispatch("vm://inEcho?connector=vm", inputStream, null);
+        streamReaderLatch.await(1L, TimeUnit.SECONDS);
         assertTrue(inputStream.isClosed());
     }
 
@@ -57,8 +61,9 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     {
         InputSource stream = new InputSource(inputStream);
 
-        client.send("vm://inEcho?connector=vm", stream, null);
+        client.dispatch("vm://inEcho?connector=vm", stream, null);
 
+        streamReaderLatch.await(1L, TimeUnit.SECONDS);
         assertTrue(((TestByteArrayInputStream) stream.getByteStream()).isClosed());
     }
 
@@ -66,8 +71,9 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     {
         Source stream = XMLUtils.toXmlSource(XMLInputFactory.newInstance(), false, inputStream);
 
-        client.send("vm://inEcho?connector=vm", stream, null);
+        client.dispatch("vm://inEcho?connector=vm", stream, null);
 
+        streamReaderLatch.await(1L, TimeUnit.SECONDS);
         assertTrue(((TestByteArrayInputStream) ((StreamSource) stream).getInputStream()).isClosed());
     }
 
@@ -78,8 +84,9 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
         TestXMLStreamReader stream = new TestXMLStreamReader(XMLInputFactory.newInstance()
             .createXMLStreamReader(inputStream));
 
-        client.send("vm://inEcho?connector=vm", stream, null);
+        client.dispatch("vm://inEcho?connector=vm", stream, null);
 
+        streamReaderLatch.await(1L, TimeUnit.SECONDS);
         assertTrue(stream.isClosed());
     }
 
@@ -89,8 +96,9 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     {
         SAXSource stream = new SAXSource(new InputSource(inputStream));
 
-        client.send("vm://inEcho?connector=vm", stream, null);
+        client.dispatch("vm://inEcho?connector=vm", stream, null);
 
+        Thread.sleep(1000);
         assertTrue(((TestByteArrayInputStream) stream.getInputSource().getByteStream()).isClosed());
     }
 
@@ -102,8 +110,9 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
         StaxSource stream = new StaxSource(new TestXMLStreamReader(XMLInputFactory.newInstance()
             .createXMLStreamReader(inputStream)));
 
-        client.send("vm://inEcho?connector=vm", stream, null);
+        client.dispatch("vm://inEcho?connector=vm", stream, null);
 
+        Thread.sleep(1000);
         assertTrue(((TestXMLStreamReader) stream.getXMLStreamReader()).isClosed());
     }
 
@@ -164,6 +173,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
         {
             super.close();
             closed = true;
+            inputStreamLatch.countDown();
         }
     }
 
@@ -186,6 +196,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
         {
             super.close();
             closed = true;
+            streamReaderLatch.countDown();
         }
     }
 

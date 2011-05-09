@@ -13,6 +13,7 @@ package org.mule.transport.file;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
@@ -181,6 +182,11 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
                     processFile(file);
                 }
             }
+        }
+        catch (MessagingException e)
+        {
+            MuleEvent event = ((MessagingException) e).getEvent();
+            event.getFlowConstruct().getExceptionListener().handleException(e, event);
         }
         catch (Exception e)
         {

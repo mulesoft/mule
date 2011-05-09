@@ -14,6 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.ExceptionUtils;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
@@ -52,9 +53,14 @@ public class PayloadAnnotationTestCase extends FunctionalTestCase
     public void testPayloadFailedTransform() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://payload3", null, null);
-        assertNotNull("return message from MuleClient.send() should not be null", message);
-        assertNotNull(message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getRootException() instanceof TransformerException);
+        try
+        {
+            client.send("vm://payload3", null, null);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof TransformerException);
+        }
     }
 }

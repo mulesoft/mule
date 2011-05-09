@@ -78,7 +78,7 @@ public class BasicJerseyTestCase extends FunctionalTestCase
 
     public void testThrowException() throws Exception
     {
-    	callThrowException(500, "");
+    	callThrowException(500, "Failed to invoke JerseyResourcesComponent{helloWorldResource.commponent}. Component that caused exception is: JerseyResourcesComponent{helloWorldResource.commponent}. Message payload is of type: String");
     }
 
     protected void callThrowException(Integer expectedErrorCode, String expectedData) throws Exception

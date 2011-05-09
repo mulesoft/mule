@@ -14,6 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.ExceptionUtils;
 import org.mule.util.StringDataSource;
 
 import java.util.HashMap;
@@ -92,11 +93,14 @@ public class MixedAnnotationsTestCase extends FunctionalTestCase
     public void testPayloadNotAnnotated() throws Exception
     {
         //When using param annotations every param needs t obe annotated
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://someAnnotated", muleMessage);
-        assertNotNull("return message from MuleClient.send() should not be null", message);
-        assertNotNull(message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getRootException() instanceof IllegalArgumentException);
-        assertEquals("wrong number of arguments", message.getExceptionPayload().getRootException().getMessage());
+        try
+        {
+            muleContext.getClient().send("vm://someAnnotated", muleMessage);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof IllegalArgumentException);
+        }
     }
 }

@@ -112,13 +112,17 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         testOutboundEvent = createTestOutboundEvent(endpoint);
         RequestContext.setEvent(testOutboundEvent);
-        MuleEvent result = endpoint.process(testOutboundEvent);
+        try
+        {
+            MuleEvent result = endpoint.process(testOutboundEvent);
+            fail("Exception expected");
+        }
+        catch (TestSecurityFilter.StaticMessageUnauthorisedException e)
+        {
+            testOutboundEvent.getFlowConstruct().getExceptionListener().handleException(e, testOutboundEvent);
+        }
 
         assertMessageNotSent();
-        assertNotNull(result);
-        assertEquals(TestSecurityFilter.SECURITY_EXCEPTION_MESSAGE, result.getMessage().getPayloadAsString());
-        assertNotNull(result.getMessage().getExceptionPayload());
-        assertTrue(result.getMessage().getExceptionPayload().getException() instanceof TestSecurityFilter.StaticMessageUnauthorisedException);
 
         assertTrue(securityNotificationListener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(SecurityNotification.SECURITY_AUTHENTICATION_FAILED,

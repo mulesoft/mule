@@ -35,6 +35,12 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
     /** Stop the flow/service when an exception occurs.  You will need to restart the flow/service manually after this (e.g, using JMX). */
     private boolean stopMessageProcessing;
 
+    /**
+     * Redeliver the source message again after it has been handled by this exception handler?
+     */
+    // TODO This should eventually default to true, but we need to update affected test cases.
+    private boolean redeliver = false;
+    
     /** 
      * For IoC only 
      * @deprecated Use DefaultServiceExceptionStrategy(MuleContext muleContext) instead
@@ -153,5 +159,15 @@ public class DefaultServiceExceptionStrategy extends AbstractMessagingExceptionS
     public void setStopMessageProcessing(boolean stopMessageProcessing)
     {
         this.stopMessageProcessing = stopMessageProcessing;
+    }
+
+    public boolean isRedeliver()
+    {
+        return redeliver;
+    }
+
+    public void setRedeliver(boolean redeliver)
+    {
+        this.redeliver = redeliver;
     }
 }

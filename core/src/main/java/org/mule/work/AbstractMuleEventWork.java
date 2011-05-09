@@ -33,7 +33,7 @@ public abstract class AbstractMuleEventWork implements Work
         this.event = event;
     }
 
-    public void run()
+    public final void run()
     {
         // Create a new MuleEvent copy, set it in RequestContext and make it
         // available via locally too.

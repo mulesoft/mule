@@ -14,6 +14,8 @@ import org.mule.api.MuleMessage;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
+// TODO This test case is illogical because if the request is end-to-end synchronous, no exception strategy 
+// will be called, the exception is simple returned to the client.
 public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExceptionStrategyTestCase
 {
     @Override

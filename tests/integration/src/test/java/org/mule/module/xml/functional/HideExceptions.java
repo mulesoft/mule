@@ -26,5 +26,10 @@ public class HideExceptions implements MessagingExceptionHandler
         logger.debug("(see config for test - some exceptions expected)");
         return null;
     }
+
+    public boolean isRedeliver()
+    {
+        return false;
+    }
 }
 

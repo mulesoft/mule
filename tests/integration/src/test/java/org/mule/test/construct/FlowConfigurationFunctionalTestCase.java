@@ -17,6 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.SimpleFlowConstruct;
 import org.mule.endpoint.DefaultInboundEndpoint;
@@ -284,10 +285,15 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
     public void testAsyncTransactionalEndpoint() throws MuleException, Exception
     {
-        MuleMessage response = muleContext.getClient().send("vm://async-tx-in",
-            new DefaultMuleMessage("0", muleContext));
-        assertNotNull(response);
-        assertNotNull(response.getExceptionPayload());
+        try
+        {
+            muleContext.getClient().send("vm://async-tx-in", new DefaultMuleMessage("0", muleContext));
+            fail("Exception expected");
+        }
+        catch (DispatchException e)
+        {
+            // expected
+        }
 
         final MuleMessage result = muleContext.getClient().request("vm://async-requestresponse-out",
             RECEIVE_TIMEOUT);
@@ -433,7 +439,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         muleContext.getClient().send("vm://loggerheader-in", message);
     }
 
-    static class Pojo
+    public static class Pojo
     {
 
         public void method()

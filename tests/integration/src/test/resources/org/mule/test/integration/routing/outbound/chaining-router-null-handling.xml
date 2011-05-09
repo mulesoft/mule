@@ -68,7 +68,7 @@
             <inbound>
                 <inbound-endpoint address="vm://component1Fail" exchange-pattern="request-response"/>
             </inbound>
-            <test:component throwException="true"/>
+            <test:component throwException="true" exceptionToThrow="org.mule.test.integration.routing.outbound.Component1Exception" />
         </service>
 
         <service name="component2Pass">
@@ -82,7 +82,7 @@
             <inbound>
                 <inbound-endpoint address="vm://component2Fail" exchange-pattern="request-response"/>
             </inbound>
-            <test:component throwException="true"/>
+            <test:component throwException="true" exceptionToThrow="org.mule.test.integration.routing.outbound.Component2Exception" />
         </service>
     </model>
 </mule>

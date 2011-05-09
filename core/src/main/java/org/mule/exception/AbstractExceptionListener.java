@@ -18,6 +18,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
@@ -25,7 +26,6 @@ import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.util.StreamCloserService;
 import org.mule.config.ExceptionHelper;
-import org.mule.context.notification.ExceptionNotification;
 import org.mule.message.ExceptionMessage;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.routing.filters.WildcardFilter;
@@ -295,7 +295,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
      * 
      * @param notification the notification to fire.
      */
-    protected void fireNotification(ExceptionNotification notification)
+    protected void fireNotification(ServerNotification notification)
     {
         if (muleContext != null)
         {

@@ -35,7 +35,6 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.ServiceException;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
-import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReceiveException;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
@@ -45,7 +44,6 @@ import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.module.client.i18n.ClientMessages;
 import org.mule.security.MuleCredentials;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.session.DefaultMuleSession;
@@ -271,19 +269,7 @@ public class MuleClient implements Disposable
     {
         OutboundEndpoint endpoint = getOutboundEndpoint(url, MessageExchangePattern.ONE_WAY, null);
         MuleEvent event = getEvent(message, endpoint);
-        try
-        {
-            endpoint.process(event);
-        }
-        catch (MuleException e)
-        {
-            throw e;
-        }
-        catch (Exception e)
-        {
-            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event,
-                endpoint, e);
-        }
+        endpoint.process(event);
     }
 
     /**
@@ -643,22 +629,7 @@ public class MuleClient implements Disposable
         MuleEvent response = endpoint.process(event);
         if (response != null)
         {
-//            if (response.getMessage().getExceptionPayload() == null)
-//            {
-                return response.getMessage();
-//            }
-//            else
-//            {
-//                Throwable e = response.getMessage().getExceptionPayload().getException();
-//                if (e instanceof MuleException)
-//                {
-//                    throw (MuleException) e;
-//                }
-//                else
-//                {
-//                    throw new MessagingException(message, e);
-//                }
-//            }
+            return response.getMessage();
         }
         else
         {
@@ -856,19 +827,7 @@ public class MuleClient implements Disposable
         OutboundEndpoint endpoint = 
             getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, null);
         MuleEvent event = getEvent(message, endpoint);
-        try
-        {
-            endpoint.process(event);
-        }
-        catch (MuleException e)
-        {
-            throw e;
-        }
-        catch (Exception e)
-        {
-            throw new DispatchException(ClientMessages.failedToDispatchClientEvent(), event,
-                endpoint, e);
-        }
+        endpoint.process(event);
     }
 
     /**
@@ -900,8 +859,6 @@ public class MuleClient implements Disposable
         throws MuleException
     {
         throw new UnsupportedOperationException("registerComponent");
-        // builder.registerComponentInstance(service, name, listenerEndpoint,
-        // null);
     }
 
     /**
@@ -926,32 +883,8 @@ public class MuleClient implements Disposable
                                   MuleEndpointURI sendEndpoint) throws MuleException
     {
         throw new UnsupportedOperationException("registerComponent");
-        // builder.registerComponentInstance(service, name, listenerEndpoint,
-        // sendEndpoint);
     }
 
-    /**
-     * Registers a user configured MuleDescriptor of a components to the server. If
-     * users want to register object instances with the server rather than class
-     * names that get created at runtime or reference to objects in the container,
-     * the user must call the descriptors setImplementationInstance() method - <code>
-     * MyBean implementation = new MyBean();
-     * descriptor.setImplementationInstance(implementation);
-     * </code>
-     * Calling this method is equivilent to calling Model.registerComponent(..)
-     * 
-     * @param descriptor the componet descriptor to register
-     * @throws MuleException the descriptor is invalid or cannot be initialised or
-     *             started
-     * @see org.mule.api.model.Model
-     * @deprecated Use the RegistryContext to get the registry and register the
-     *             service there
-     */
-    // public void registerComponent(UMODescriptor descriptor) throws MuleException
-    // {
-    // throw new UnsupportedOperationException("registerComponent");
-    // //builder.registerComponent(descriptor);
-    // }
     /**
      * Unregisters a previously register components. This will also unregister any
      * listeners for the components Calling this method is equivilent to calling
@@ -970,8 +903,6 @@ public class MuleClient implements Disposable
     public void unregisterComponent(String name) throws MuleException
     {
         throw new UnsupportedOperationException("registerComponent");
-
-        // builder.unregisterComponent(name);
     }
 
     public RemoteDispatcher getRemoteDispatcher(String serverEndpoint) throws MuleException

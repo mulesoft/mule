@@ -76,14 +76,15 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        MuleMessage m = client.send("vm://test", "Test", props);
-
-        assertNotNull(m);
-        assertTrue(m.getPayload() instanceof String);
-        assertFalse(m.getPayloadAsString().equals("Test Received"));
-        
-        assertExceptionPayload(m, "Authentication failed for principal Marie.Rizzo. Message payload is of type: String");
-        
+        try
+        {
+            client.send("vm://test", "Test", props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 
     public void testCaseBadUserName() throws Exception
@@ -95,13 +96,15 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Evil", "dragon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        MuleMessage m = client.send("vm://test", "Test", props);
-
-        assertNotNull(m);
-        assertTrue(m.getPayload() instanceof String);
-        assertFalse(m.getPayloadAsString().equals("Test Received"));
-        
-        assertExceptionPayload(m, "Authentication failed for principal Evil. Message payload is of type: String");
+        try
+        {
+            client.send("vm://test", "Test", props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 
     public void testCaseBadPassword() throws Exception
@@ -113,13 +116,15 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "evil", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        MuleMessage m = client.send("vm://test", "Test", props);
-
-        assertNotNull(m);
-        assertTrue(m.getPayload() instanceof String);
-        assertFalse(m.getPayloadAsString().equals("Test Received"));
-        
-        assertExceptionPayload(m, "Authentication failed for principal Marie.Rizzo. Message payload is of type: String");
+        try
+        {
+            client.send("vm://test", "Test", props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 
     protected String getConfigResources()

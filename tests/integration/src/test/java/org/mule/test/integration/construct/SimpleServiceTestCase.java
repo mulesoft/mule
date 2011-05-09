@@ -10,16 +10,17 @@
 
 package org.mule.test.integration.construct;
 
-import java.io.InputStream;
-
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleException;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.construct.SimpleService;
 import org.mule.tck.DynamicPortTestCase;
 import org.mule.test.integration.tck.WeatherForecaster;
 import org.mule.util.StringUtils;
+
+import java.io.InputStream;
+
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.math.RandomUtils;
 import org.springframework.util.FileCopyUtils;
 
 public class SimpleServiceTestCase extends DynamicPortTestCase
@@ -92,8 +93,15 @@ public class SimpleServiceTestCase extends DynamicPortTestCase
 
     public void testInheritedExceptionStrategy() throws Exception
     {
-        final String result = muleClient.send("vm://iexst.in", "ignored", null).getPayloadAsString();
-        assertEquals("Ka-boom!", result);
+        try
+        {
+            muleClient.send("vm://iexst.in", "ignored", null).getPayloadAsString();
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 
     public void testJaxWsService() throws Exception

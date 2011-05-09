@@ -10,7 +10,6 @@
 
 package org.mule.module.jbpm;
 
-import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.FunctionalTestCase;
@@ -36,11 +35,16 @@ public class MessagingExceptionComponentTestCase extends FunctionalTestCase
 
     public void testExceptionInService() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        
-        MuleMessage response = client.send("vm://exception", "testExceptionInService", null);                      
-        assertNotNull("Should have thrown an exception", response.getExceptionPayload());
-        assertTrue(ExceptionUtils.getRootCause(response.getExceptionPayload().getException()) instanceof FunctionalTestException);
+        MuleClient client = muleContext.getClient();        
+        try
+        {
+            client.send("vm://exception", "testExceptionInService", null);                      
+            fail("Should have thrown an exception");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof FunctionalTestException);
+        }
         
         // The first message should have been sent, but not the second one.
         assertNotNull(client.request("vm://queueC", 1000));            
@@ -51,9 +55,15 @@ public class MessagingExceptionComponentTestCase extends FunctionalTestCase
     {
         MuleClient client = muleContext.getClient();
         
-        MuleMessage response = client.send("vm://exception", "testExceptionInTransformer", null);                      
-        assertNotNull("Should have thrown an exception", response.getExceptionPayload());
-        assertTrue(ExceptionUtils.getRootCause(response.getExceptionPayload().getException()) instanceof TransformerException);
+        try
+        {
+            client.send("vm://exception", "testExceptionInTransformer", null);
+            fail("Should have thrown an exception");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof TransformerException);
+        }
         
         // The first message should have been sent, but not the second one.
         assertNotNull(client.request("vm://queueC", 1000));            

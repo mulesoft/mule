@@ -30,4 +30,9 @@ public class RollbackRoutingExceptionStrategy extends AbstractMessagingException
         routeException(event, endpoint, e);
     }
 
+    public boolean isRedeliver()
+    {
+        return false;
+    }
+
 }

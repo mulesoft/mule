@@ -16,6 +16,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.model.resolvers.EntryPointNotFoundException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.ExceptionUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,19 +31,29 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
 
     public void testTooManySatisfiableMethods() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://service", "hello", null);
-        assertNotNull(message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getException().getCause() instanceof EntryPointNotFoundException);
-        assertTrue(message.getExceptionPayload().getException().getCause().getMessage().indexOf("Found too many possible methods on object") > -1);
+        try
+        {
+            muleContext.getClient().send("vm://service", "hello", null);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof EntryPointNotFoundException);
+            assertTrue(ExceptionUtils.getRootCauseMessage(e).indexOf("Found too many possible methods on object") > -1);
+        }
     }
 
     public void testBadMethodName() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://service?method=foo", "hello", null);
-        assertNotNull(message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getException().getCause() instanceof EntryPointNotFoundException);
+        try
+        {
+            muleContext.getClient().send("vm://service?method=foo", "hello", null);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof EntryPointNotFoundException);
+        }
     }
 
     public void testValidCallToReverse() throws Exception

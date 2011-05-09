@@ -12,9 +12,9 @@ package org.mule.transport.http.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
+import org.mule.util.ExceptionUtils;
 
 import java.net.SocketTimeoutException;
 import java.util.Date;
@@ -56,15 +56,20 @@ public class HttpResponseTimeoutTestCase extends DynamicPortTestCase
     public void testDecreaseOutboundEndpointResponseTimeout() throws Exception
     {
         Date beforeCall = new Date();
-        MuleMessage message = muleClient.send("vm://decreaseTimeoutRequest", getPayload(), null);
-        Date afterCall = new Date();
+        try
+        {
+            muleClient.send("vm://decreaseTimeoutRequest", getPayload(), null);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof SocketTimeoutException);
+        }
 
         // If everything is good the connection will timeout after 5s and throw an
         // exception. The original unprocessed message is returned in the response
         // message.
-        assertNotNull(message);
-        assertNotNull(getPayload(), message.getPayloadAsString());
-        assertTrue(message.getExceptionPayload().getRootException() instanceof SocketTimeoutException);
+        Date afterCall = new Date();
         assertTrue((afterCall.getTime() - beforeCall.getTime()) < DEFAULT_RESPONSE_TIMEOUT);
     }
 
@@ -93,10 +98,11 @@ public class HttpResponseTimeoutTestCase extends DynamicPortTestCase
             muleClient.send(((InboundEndpoint) muleClient.getMuleContext().getRegistry().lookupObject("inDelayService")).getAddress(), getPayload(), null, 1000);
             fail("SocketTimeoutException expected");
         }
-        catch (DispatchException e)
+        catch (Exception e)
         {
-            assertTrue(e.getCause() instanceof SocketTimeoutException);
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof SocketTimeoutException);
         }
+
         // Exception should have been thrown after timeout specified which is
         // less than default.
         afterCall = new Date();

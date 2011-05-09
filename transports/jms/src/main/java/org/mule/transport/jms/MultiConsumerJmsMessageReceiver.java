@@ -12,7 +12,6 @@ package org.mule.transport.jms;
 
 import org.mule.api.MessagingException;
 import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
@@ -25,6 +24,7 @@ import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.AbstractReceiverWorker;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
+import org.mule.transport.jms.redelivery.MessageRedeliveredException;
 import org.mule.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.util.ClassUtils;
 
@@ -56,6 +56,7 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
     protected final int receiversCount;
 
     private final JmsConnector jmsConnector;
+    private Session session;
 
     public MultiConsumerJmsMessageReceiver(Connector connector, FlowConstruct flowConstruct, InboundEndpoint endpoint)
             throws CreateException
@@ -156,6 +157,8 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
     @Override
     protected void doDispose()
     {
+        jmsConnector.closeQuietly(session);
+        session = null;
         logger.debug("doDispose()");
     }
 
@@ -163,7 +166,6 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
     {
         private final Log subLogger = LogFactory.getLog(getClass());
 
-        private volatile Session session;
         private volatile MessageConsumer consumer;
 
         protected volatile boolean connected;
@@ -198,8 +200,6 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         {
             jmsConnector.closeQuietly(consumer);
             consumer = null;
-            jmsConnector.closeQuietly(session);
-            session = null;
         }
 
         protected void doStart() throws MuleException
@@ -320,20 +320,32 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 JmsWorker worker = new JmsWorker(message, MultiConsumerJmsMessageReceiver.this, this);
                 worker.processMessages();
-                // Just in case we're not using AUTO_ACKNOWLEDGE (which is the default)
-                message.acknowledge();
-            }
-            catch (MessagingException e)
-            {
-                getFlowConstruct().getExceptionListener().handleException(e, e.getEvent());
-                // This will cause a negative ack for JMS
-                throw new MuleRuntimeException(e);
             }
             catch (Exception e)
             {
-                getConnector().getMuleContext().getExceptionListener().handleException(e);
-                // This will cause a negative ack for JMS
-                throw new MuleRuntimeException(e);
+                boolean redeliver;
+                if (e instanceof MessagingException)
+                {
+                    getFlowConstruct().getExceptionListener().handleException(e, ((MessagingException) e).getEvent());
+                    redeliver = getFlowConstruct().getExceptionListener().isRedeliver();
+                }
+                else
+                {
+                    getConnector().getMuleContext().getExceptionListener().handleException(e);
+                    redeliver = getConnector().getMuleContext().getExceptionListener().isRedeliver();
+                }
+                
+                if (redeliver && !(e instanceof MessageRedeliveredException))
+                {
+                    try
+                    {
+                        session.recover();
+                    }
+                    catch (JMSException jmsEx)
+                    {
+                        logger.error(jmsEx);
+                    }
+                }
             }
         }
     }
@@ -394,9 +406,9 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("Binding " + subReceiver.session + " to " + jmsConnector.getConnection());
+                    logger.debug("Binding " + session + " to " + jmsConnector.getConnection());
                 }
-                tx.bindResource(jmsConnector.getConnection(), subReceiver.session);
+                tx.bindResource(jmsConnector.getConnection(), session);
             }
             else
             {

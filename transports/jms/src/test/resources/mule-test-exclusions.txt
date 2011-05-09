@@ -4,3 +4,7 @@
 
 # MULE-3682
 org.mule.transport.jms.integration.JmsXATransactionComponentTestCase
+
+# Redelivery behaviour changed after work on BL-412
+org.mule.transport.jms.JmsRedeliveryTestCase
+org.mule.transport.jms.integration.JmsExceptionStrategyTestCase

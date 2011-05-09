@@ -10,8 +10,6 @@
 
 package org.mule.test.integration.exceptions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -20,6 +18,9 @@ import org.mule.message.ExceptionMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class ExceptionStrategyConstructsTestCase extends FunctionalTestCase
 {
@@ -50,6 +51,10 @@ public class ExceptionStrategyConstructsTestCase extends FunctionalTestCase
         // request one more time to ensure the model's exception strategy did not run
         assertNull(mc.request("vm://modelout", RECEIVE_TIMEOUT));
 
+        // The following tests no longer apply because if the exchange is synchronous 
+        // (which is hard-coded for <pattern:simple-service>), then the exception will be 
+        // thrown back to the caller and no exception strategy will be invoked.
+        /*
         mc.send("vm://inss1", "test", null);
         assertExceptionMessage(mc.request("vm://ss1out", RECEIVE_TIMEOUT));
 
@@ -61,10 +66,12 @@ public class ExceptionStrategyConstructsTestCase extends FunctionalTestCase
 
         // This should not be null.  MULE-5087
         assertEquals(null, modelError);
+        */
     }
 
     private void assertExceptionMessage(MuleMessage out)
     {
+        assertNotNull(out);
         assertTrue(out.getPayload() instanceof ExceptionMessage);
         ExceptionMessage exceptionMessage = (ExceptionMessage) out.getPayload();
         assertTrue(exceptionMessage.getException().getClass() == FunctionalTestException.class ||

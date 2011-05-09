@@ -115,10 +115,15 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
 
-        result = mpChain.process(requestEvent);
-        assertNotNull(result);
-        assertNotNull("Filter should have thrown a FilterException", result.getMessage().getExceptionPayload());
-        assertTrue(result.getMessage().getExceptionPayload().getException() instanceof FilterUnacceptedException);
+        try
+        {
+            result = mpChain.process(requestEvent);
+            fail("Filter should have thrown a FilterException");
+        }
+        catch (FilterUnacceptedException e)
+        {
+            // expected
+        }
 
         assertMessageNotSent();
     }
@@ -154,14 +159,16 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         
         // Required for UnauthorisedException creation
         RequestContext.setEvent(requestEvent);
-        
-        result = mpChain.process(requestEvent);
 
-        assertMessageNotSent();
-        assertNotNull(result);
-        assertEquals(TestSecurityFilter.SECURITY_EXCEPTION_MESSAGE, result.getMessage().getPayloadAsString());
-        assertNotNull(result.getMessage().getExceptionPayload());
-        assertTrue(result.getMessage().getExceptionPayload().getException() instanceof TestSecurityFilter.StaticMessageUnauthorisedException);
+        try
+        {
+            result = mpChain.process(requestEvent);
+            fail("Exception expected");
+        }
+        catch (TestSecurityFilter.StaticMessageUnauthorisedException e)
+        {
+            requestEvent.getFlowConstruct().getExceptionListener().handleException(e, requestEvent);
+        }
 
         assertTrue(securityNotificationListener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(SecurityNotification.SECURITY_AUTHENTICATION_FAILED,
@@ -185,10 +192,15 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
 
-        result = mpChain.process(requestEvent);
-        assertNotNull(result);
-        assertNotNull("Filter should have thrown a FilterException", result.getMessage().getExceptionPayload());
-        assertTrue(result.getMessage().getExceptionPayload().getException() instanceof FilterUnacceptedException);
+        try
+        {
+            result = mpChain.process(requestEvent);
+            fail("Filter should have thrown a FilterException");
+        }
+        catch (FilterUnacceptedException e)
+        {
+            // expected
+        }
 
         assertFalse(securityFilter.wasCalled());
         assertMessageNotSent();
@@ -225,18 +237,18 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         
         // Required for UnauthorisedException creation
         RequestContext.setEvent(requestEvent);
-        
-        result = mpChain.process(requestEvent);
+
+        try
+        {
+            result = mpChain.process(requestEvent);
+            fail("Exception expected");
+        }
+        catch (TestSecurityFilter.StaticMessageUnauthorisedException e)
+        {
+            // expected
+        }
 
         assertMessageNotSent();
-        assertNotNull(result);
-        assertEquals(TestSecurityFilter.SECURITY_EXCEPTION_MESSAGE + ResponseAppendTransformer.APPEND_STRING,
-            result.getMessage().getPayloadAsString());
-        final int status = result.getMessage().getOutboundProperty("status", 0);
-        assertEquals(403, status);
-
-        assertNotNull(result.getMessage().getExceptionPayload());
-        assertTrue(result.getMessage().getExceptionPayload().getException() instanceof TestSecurityFilter.StaticMessageUnauthorisedException);
     }
 
     public void testNotfication() throws Exception

@@ -10,6 +10,8 @@
 
 package org.mule.transport;
 
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.ThreadingProfile;
@@ -179,6 +181,11 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             try
             {
                 tt.execute(this);
+            }
+            catch (MessagingException e)
+            {
+                MuleEvent event = ((MessagingException) e).getEvent();
+                event.getFlowConstruct().getExceptionListener().handleException(e, event);
             }
             catch (Exception e)
             {

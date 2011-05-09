@@ -10,12 +10,13 @@
 
 package org.mule.transport.vm.functional.transactions;
 
-import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.module.client.MuleClient;
+import org.mule.transaction.IllegalTransactionStateException;
 import org.mule.transaction.TransactionTemplate;
+import org.mule.util.ExceptionUtils;
 
 import javax.transaction.Transaction;
 
@@ -315,9 +316,9 @@ public class ExternalTransactionTestCase extends AbstractExternalTransactionTest
             client.send("vm://entry?connector=vm-normal", "OK", null);
             fail("Exception expected");
         }
-        catch (MessagingException e)
+        catch (Exception e)
         {
-            // expected
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof IllegalTransactionStateException);
         }
     }
 }

@@ -15,7 +15,7 @@ import org.mule.api.MuleEvent;
 /**
  * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
  */
-public interface MessagingExceptionHandler
+public interface MessagingExceptionHandler extends ExceptionHandler
 {
     /**
      * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).

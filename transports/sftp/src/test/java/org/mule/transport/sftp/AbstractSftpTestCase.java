@@ -374,6 +374,11 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                     exceptionHolder.value = e;
                     latch.countDown();
                 }
+
+                public boolean isRedeliver()
+                {
+                    return false;
+                }
             });
 
             if (serviceName != null && !(serviceName.length() == 0))
@@ -387,6 +392,11 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                             exceptionHolder.value = e;
                             latch.countDown();
                             return event;
+                        }
+
+                        public boolean isRedeliver()
+                        {
+                            return false;
                         }
                     });
             }
@@ -726,7 +736,6 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
             // sftp-connector
             listener = new SystemExceptionHandler()
             {
-
                 public void handleException(Exception e)
                 {
                     exceptionHolder.value = e;
@@ -734,6 +743,11 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                         logger.debug("Expected exception occurred: " + e.getMessage()
                                      + ", time to countdown the latch");
                     latch.countDown();
+                }
+
+                public boolean isRedeliver()
+                {
+                    return false;
                 }
             };
 
@@ -747,6 +761,11 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                                      + ", time to countdown the latch");
                     latch.countDown();
                     return event;
+                }
+
+                public boolean isRedeliver()
+                {
+                    return false;
                 }
             };
 

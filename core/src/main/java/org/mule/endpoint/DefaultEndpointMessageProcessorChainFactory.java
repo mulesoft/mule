@@ -32,7 +32,6 @@ import org.mule.endpoint.outbound.OutboundResponsePropertiesMessageProcessor;
 import org.mule.endpoint.outbound.OutboundRewriteResponseEventMessageProcessor;
 import org.mule.endpoint.outbound.OutboundSessionHandlerMessageProcessor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
-import org.mule.processor.ExceptionHandlingMessageProcessor;
 import org.mule.processor.TransactionalInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 
@@ -46,7 +45,6 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     {
         List<MessageProcessor> list = new ArrayList<MessageProcessor>();
 
-        list.add(new ExceptionHandlingMessageProcessor());
         list.add(new InboundEndpointMimeTypeCheckingMessageProcessor(endpoint));
         list.add(new InboundEndpointPropertyMessageProcessor(endpoint));
         list.add(new InboundNotificationMessageProcessor(endpoint));
@@ -60,7 +58,6 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
     {
         List<MessageProcessor> list = new ArrayList<MessageProcessor>();
 
-        list.add(new ExceptionHandlingMessageProcessor());
         list.add(new InboundExceptionDetailsMessageProcessor(endpoint.getConnector()));
         
         return list;

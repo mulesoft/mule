@@ -14,6 +14,8 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
+// TODO This test case is illogical because if the request is end-to-end synchronous, no exception strategy 
+// will be called, the exception is simple returned to the client.
 public class ExceptionStrategyReturnMessageTestCase extends FunctionalTestCase
 {
     @Override

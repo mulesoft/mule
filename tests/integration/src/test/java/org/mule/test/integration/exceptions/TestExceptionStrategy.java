@@ -22,4 +22,9 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
         result.getMessage().setPayload("Ka-boom!");
         return result;
     }
+
+    public boolean isRedeliver()
+    {
+        return false;
+    }
 }

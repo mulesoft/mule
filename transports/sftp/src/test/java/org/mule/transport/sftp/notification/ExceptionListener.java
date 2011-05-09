@@ -24,4 +24,9 @@ public class ExceptionListener implements SystemExceptionHandler
         logger.debug(e.getLocalizedMessage());
     }
 
+    public boolean isRedeliver()
+    {
+        return false;
+    }
+
 }

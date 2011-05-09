@@ -12,11 +12,9 @@ package org.mule.test.integration.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.api.component.Component;
-import org.mule.component.ComponentException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.NullPayload;
+import org.mule.util.ExceptionUtils;
 
 public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
 {
@@ -38,34 +36,29 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
 
     public void testLastComponentFails() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
         MuleMessage message = new DefaultMuleMessage("thePayload", muleContext);
-        MuleMessage result = muleClient.send("vm://incomingLastFail", message);
-        assertNotNull("Should be a NullPayload instead.", result);
-        assertEquals("Should be a NullPayload instead.", NullPayload.getInstance(), result.getPayload());
-        assertNotNull("Should've contained an exception payload", result.getExceptionPayload());
-        Throwable exception = result.getExceptionPayload().getException();
-        assertNotNull("Exception required", exception);
-        assertTrue("Wrong exception", exception instanceof ComponentException);
-        Component component = ((ComponentException) exception).getComponent();
-        assertEquals("Exception raised in wrong service", muleContext.getRegistry().lookupService(
-            "component2Fail").getComponent(), component);
+        try
+        {
+            muleContext.getClient().send("vm://incomingLastFail", message);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue("Exception raised in wrong service", ExceptionUtils.getRootCause(e) instanceof Component2Exception);
+        }
     }
 
     public void testFirstComponentFails() throws Exception
     {
-        MuleClient muleClient = new MuleClient(muleContext);
         MuleMessage message = new DefaultMuleMessage("thePayload", muleContext);
-        MuleMessage result = muleClient.send("vm://incomingFirstFail", message);
-        assertNotNull("Should be a NullPayload instead.", result);
-        assertEquals("Should be a NullPayload instead.", NullPayload.getInstance(), result.getPayload());
-        assertNotNull("Should've contained an exception payload", result.getExceptionPayload());
-        Throwable exception = result.getExceptionPayload().getException();
-        assertNotNull("Exception required", exception);
-        assertTrue("Wrong exception", exception instanceof ComponentException);
-        Component component = ((ComponentException) exception).getComponent();
-        assertEquals("Exception raised in wrong service", muleContext.getRegistry().lookupService(
-        "component1Fail").getComponent(), component);
+        try
+        {
+            muleContext.getClient().send("vm://incomingFirstFail", message);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue("Exception raised in wrong service", ExceptionUtils.getRootCause(e) instanceof Component1Exception);
+        }
     }
-
 }

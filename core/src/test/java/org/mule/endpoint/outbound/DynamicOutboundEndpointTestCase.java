@@ -133,16 +133,28 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
         testOutboundEvent = createTestOutboundEvent(endpoint);
         //First Request creates the real endpoint
-        endpoint.process(testOutboundEvent);
+        try
+        {
+            endpoint.process(testOutboundEvent);
+            fail("Exception expected");
+        }
+        catch (TestSecurityFilter.StaticMessageUnauthorisedException e)
+        {
+            testOutboundEvent.getFlowConstruct().getExceptionListener().handleException(e, testOutboundEvent);
+        }
 
         setUpFakeDispatcher(endpoint);
-        MuleEvent result = endpoint.process(testOutboundEvent);
+        try
+        {
+            endpoint.process(testOutboundEvent);
+            fail("Exception expected");
+        }
+        catch (TestSecurityFilter.StaticMessageUnauthorisedException e)
+        {
+            testOutboundEvent.getFlowConstruct().getExceptionListener().handleException(e, testOutboundEvent);
+        }
 
         assertMessageNotSent();
-        assertNotNull(result);
-        assertEquals(TestSecurityFilter.SECURITY_EXCEPTION_MESSAGE, result.getMessage().getPayloadAsString());
-        assertNotNull(result.getMessage().getExceptionPayload());
-        assertTrue(result.getMessage().getExceptionPayload().getException() instanceof TestSecurityFilter.StaticMessageUnauthorisedException);
 
         assertTrue(securityNotificationListener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(SecurityNotification.SECURITY_AUTHENTICATION_FAILED,

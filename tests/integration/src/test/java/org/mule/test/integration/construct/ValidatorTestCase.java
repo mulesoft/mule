@@ -10,7 +10,6 @@
 
 package org.mule.test.integration.construct;
 
-import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.module.client.MuleClient;
@@ -20,6 +19,8 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang.math.RandomUtils;
 
 public class ValidatorTestCase extends FunctionalTestCase
 {
@@ -59,8 +60,15 @@ public class ValidatorTestCase extends FunctionalTestCase
         doTestValidMessage("validator-with-exception-strategy");
 
         // ensure the exception strategy kicked in
-        assertEquals("Ka-boom!", muleClient.send("vm://validator-with-exception-strategy.in", "abc", null)
-            .getPayload());
+        try
+        {
+            muleClient.send("vm://validator-with-exception-strategy.in", "abc", null);
+            fail("Exception expected");            
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 
     public void testInheritance() throws Exception

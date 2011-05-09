@@ -132,4 +132,9 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
             }
         }
     }
+
+    public boolean isRedeliver()
+    {
+        return false;
+    }
 }

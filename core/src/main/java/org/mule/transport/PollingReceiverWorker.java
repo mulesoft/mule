@@ -11,6 +11,8 @@
 package org.mule.transport;
 
 import org.mule.RequestContext;
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 
 import javax.resource.spi.work.Work;
@@ -51,7 +53,7 @@ public class PollingReceiverWorker implements Work
             }
             catch (InterruptedException e)
             {
-               // stop polling
+                // stop polling
                 try
                 {
                     receiver.stop();
@@ -60,6 +62,11 @@ public class PollingReceiverWorker implements Work
                 {
                     receiver.getConnector().getMuleContext().getExceptionListener().handleException(e1);
                 }
+            }
+            catch (MessagingException e)
+            {
+                MuleEvent event = ((MessagingException) e).getEvent();
+                event.getFlowConstruct().getExceptionListener().handleException(e, event);
             }
             catch (Exception e)
             {

@@ -16,7 +16,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.security.MuleCredentials;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.NullPayload;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -65,8 +64,15 @@ public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        MuleMessage m = client.send("vm://test", "Marie", props);
-        assertEquals(NullPayload.getInstance(), m.getPayload());
+        try
+        {
+            client.send("vm://test", "Marie", props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 
     public void testCaseBadAuthentication() throws Exception
@@ -79,8 +85,15 @@ public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        MuleMessage m = client.send("vm://test", "Marie", props);
-        assertNotNull(m.getPayload());
+        try
+        {
+            client.send("vm://test", "Marie", props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 
 }

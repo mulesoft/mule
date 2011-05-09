@@ -18,6 +18,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.util.ExceptionUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -106,11 +107,15 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
     public void testMapHeadersMissing() throws Exception
     {
         props.remove("foo");
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://headers", null, props);
-        assertNotNull("return message from MuleClient.send() should not be null", message);
-        assertNotNull(message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getRootException() instanceof RequiredValueException);
+        try
+        {
+            muleContext.getClient().send("vm://headers", null, null);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof RequiredValueException);
+        }
     }
 
     public void testMapSingleHeader() throws Exception
@@ -156,12 +161,15 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
 
     public void testMapHeadersUnmodifiable() throws Exception
     {
-
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://headersUnmodifiable", null, props);
-        assertNotNull("return message from MuleClient.send() should not be null", message);
-        assertNotNull("Exception should have been thrown", message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getRootException() instanceof UnsupportedOperationException);
+        try
+        {
+            muleContext.getClient().send("vm://headersUnmodifiable", null, props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof UnsupportedOperationException);
+        }
     }
 
     public void testMapHeadersAll() throws Exception
@@ -261,11 +269,15 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
     public void testListHeadersWithMissing() throws Exception
     {
         props.remove("bar");
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://headersListOptional", null, props);
-        assertNotNull("return message from MuleClient.send() should not be null", message);
-        assertNotNull(message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getRootException() instanceof RequiredValueException);
+        try
+        {
+            muleContext.getClient().send("vm://headersListOptional", null, props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof RequiredValueException);
+        }
     }
 
     public void testSingleListHeader() throws Exception
@@ -281,11 +293,15 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
 
     public void testListHeadersUnmodifiable() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://headersListUnmodifiable", null, props);
-        assertNotNull("return message from MuleClient.send() should not be null", message);
-        assertNotNull("Exception should have been thrown", message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getRootException() instanceof UnsupportedOperationException);
+        try
+        {
+            muleContext.getClient().send("vm://headersListUnmodifiable", null, props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof UnsupportedOperationException);
+        }
     }
 
     public void testListHeadersAll() throws Exception

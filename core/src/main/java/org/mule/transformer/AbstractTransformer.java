@@ -117,9 +117,9 @@ public abstract class AbstractTransformer implements Transformer, MuleContextNot
             {
                 event.getMessage().applyTransformers(event, this);
             }
-            catch (TransformerException e)
+            catch (Exception e)
             {
-                throw new TransformerMessagingException(e.getI18nMessage(), event, this, e);
+                throw new TransformerMessagingException(event, this, e);
             }
         }
         return event;

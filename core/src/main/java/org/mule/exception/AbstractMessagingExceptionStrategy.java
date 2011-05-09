@@ -16,7 +16,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
+import org.mule.api.security.SecurityException;
 import org.mule.context.notification.ExceptionNotification;
+import org.mule.context.notification.SecurityNotification;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.transport.NullPayload;
 
@@ -34,7 +36,14 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
     {
         if (enableNotifications)
         {
-            fireNotification(new ExceptionNotification(e));
+            if (e instanceof SecurityException)
+            {
+                fireNotification(new SecurityNotification((SecurityException) e, SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
+            }
+            else
+            {
+                fireNotification(new ExceptionNotification(e));
+            }
         }
 
         logException(e);

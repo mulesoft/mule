@@ -45,8 +45,14 @@ public class AuthenticateVmTransportTest extends FunctionalTestCase
         assertNull(result.getExceptionPayload());
         
         props.put("password", "badpass");
-        result = client.send(endpoint, "hi", props);
-        assertNotNull(result.getExceptionPayload());
-        
+        try
+        {
+            client.send(endpoint, "hi", props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }        
     }
 }

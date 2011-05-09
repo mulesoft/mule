@@ -14,7 +14,7 @@ package org.mule.api.exception;
 /**
  * Take some action when a system exception has occurred (i.e., there was no message in play when the exception occurred).
  */
-public interface SystemExceptionHandler
+public interface SystemExceptionHandler extends ExceptionHandler
 {
     /**
      * Take some action when a system exception has occurred (i.e., there was no message in play when the exception occurred).

@@ -72,8 +72,8 @@ public class AsynchronousMessagingExceptionStrategyTestCase extends AbstractExce
     {
         client.dispatch("vm://in6", TEST_MESSAGE, null);
         latch.await(LATCH_AWAIT_TIMEOUT, TimeUnit.MILLISECONDS); 
-        assertEquals(1, serviceExceptionCounter.get());
-        assertEquals(0, systemExceptionCounter.get());
+        assertEquals(0, serviceExceptionCounter.get());
+        assertEquals(1, systemExceptionCounter.get());
     }
     
     public void testOutboundRouter() throws Exception

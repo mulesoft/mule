@@ -13,6 +13,7 @@ package org.mule.api.annotations.param;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.ExceptionUtils;
 
 import java.util.Map;
 
@@ -52,10 +53,14 @@ public class OutboundHeadersAnnotationTestCase extends FunctionalTestCase
 
     public void testInvalidParamType() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://invalid", null, null);
-        assertNotNull("return message from MuleClient.send() should not be null", message);
-        assertNotNull(message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getRootException() instanceof IllegalArgumentException);
+        try
+        {
+            muleContext.getClient().send("vm://invalid", null, null);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof IllegalArgumentException);
+        }
     }
 }

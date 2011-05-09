@@ -16,6 +16,7 @@ import org.mule.api.expression.RequiredValueException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transformer.types.DataTypeFactory;
+import org.mule.util.ExceptionUtils;
 import org.mule.util.StringDataSource;
 
 import java.util.HashMap;
@@ -133,12 +134,15 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
     {
         //clear attachments
         muleMessage = createMessage(null, new HashMap<String, DataHandler>());
-
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://attachments", muleMessage);
-        assertNotNull("return message from MuleClient.send() should not be null", message);
-        assertNotNull(message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getRootException() instanceof RequiredValueException);
+        try
+        {
+            muleContext.getClient().send("vm://attachments", muleMessage);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof RequiredValueException);
+        }
     }
 
     public void testMapSingleAttachment() throws Exception
@@ -188,11 +192,15 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 
     public void testMapAttachmentsUnmodifiable() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://attachmentsUnmodifiable", muleMessage);
-        assertNotNull("return message from MuleClient.send() should not be null", message);
-        assertNotNull("Exception should have been thrown", message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getRootException() instanceof UnsupportedOperationException);
+        try
+        {
+            muleContext.getClient().send("vm://attachmentsUnmodifiable", muleMessage);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof UnsupportedOperationException);
+        }
     }
 
     public void testMapAttachmentsAll() throws Exception
@@ -289,11 +297,15 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         attachments.put("foo", new DataHandler(new StringDataSource("fooValue")));
         attachments.put("baz", new DataHandler(new StringDataSource("bazValue")));
         muleMessage = createMessage(null, attachments);
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://attachmentsListOptional", muleMessage);
-        assertNotNull("return message from MuleClient.send() should not be null", message);
-        assertNotNull(message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getRootException() instanceof RequiredValueException);
+        try
+        {
+            muleContext.getClient().send("vm://attachmentsListOptional", muleMessage);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof RequiredValueException);
+        }
     }
 
     public void testSingleListAttachment() throws Exception
@@ -309,11 +321,15 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 
     public void testListAttachmentsUnmodifiable() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://attachmentsListUnmodifiable", muleMessage);
-        assertNotNull("return message from MuleClient.send() should not be null", message);
-        assertNotNull("Exception should have been thrown", message.getExceptionPayload());
-        assertTrue(message.getExceptionPayload().getRootException() instanceof UnsupportedOperationException);
+        try
+        {
+            muleContext.getClient().send("vm://attachmentsListUnmodifiable", muleMessage);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof UnsupportedOperationException);
+        }
     }
 
     public void testListAttachmentsAll() throws Exception

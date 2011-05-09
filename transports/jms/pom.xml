@@ -94,6 +94,12 @@
             <artifactId>activemq-core</artifactId>
             <scope>test</scope>
         </dependency>
+		<!-- Used by ActiveMQ if persistent=true -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>mockobjects</groupId>
             <artifactId>mockobjects-core</artifactId>

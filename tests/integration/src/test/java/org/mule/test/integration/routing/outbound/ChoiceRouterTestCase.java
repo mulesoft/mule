@@ -10,11 +10,10 @@
 
 package org.mule.test.integration.routing.outbound;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.ExceptionUtils;
 
 public class ChoiceRouterTestCase extends FunctionalTestCase
 {
@@ -39,11 +38,15 @@ public class ChoiceRouterTestCase extends FunctionalTestCase
 
     public void testNoRouteFound() throws Exception
     {
-        final MuleMessage result = muleClient.send(WITHOUT_DEFAULT_ROUTE_CHANNEL, "bad", null);
-        assertNotNull(result);
-        assertNotNull("should have got a MuleException", result.getExceptionPayload());
-        assertNotNull(result.getExceptionPayload().getException() instanceof MuleException);
-        assertNotNull(result.getExceptionPayload().getRootException() instanceof RoutePathNotFoundException);
+        try
+        {
+            muleClient.send(WITHOUT_DEFAULT_ROUTE_CHANNEL, "bad", null);
+            fail("should have got a MuleException");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof RoutePathNotFoundException);
+        }
     }
 
     public void testRoutesFound() throws Exception

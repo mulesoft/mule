@@ -25,6 +25,10 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.routing.RoutePathNotFoundException;
+import org.mule.api.routing.filter.FilterUnacceptedException;
+import org.mule.api.security.NotPermittedException;
+import org.mule.api.security.UnauthorisedException;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.PropertyScope;
@@ -164,8 +168,33 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                     }
                     catch (Exception e)
                     {
-                        conn.writeResponse(buildFailureResponse(request.getRequestLine().getHttpVersion(), HttpConstants.SC_INTERNAL_SERVER_ERROR, e.getMessage()));
-                        getConnector().getMuleContext().getExceptionListener().handleException(e);                        
+                        int httpStatus;
+                        if (e instanceof NotPermittedException)
+                        {
+                            httpStatus = HttpConstants.SC_METHOD_NOT_ALLOWED;
+                        }
+                        else if (e instanceof UnauthorisedException)
+                        {
+                            httpStatus = HttpConstants.SC_UNAUTHORIZED;
+                        }
+                        else if (e instanceof FilterUnacceptedException || e instanceof RoutePathNotFoundException)
+                        {
+                            httpStatus = HttpConstants.SC_NOT_ACCEPTABLE;
+                        }
+                        else
+                        {
+                            httpStatus = HttpConstants.SC_INTERNAL_SERVER_ERROR;
+                        }
+                        conn.writeResponse(buildFailureResponse(request.getRequestLine().getHttpVersion(), httpStatus, e.getMessage()));
+                        if (e instanceof MessagingException)
+                        {
+                            MuleEvent event = ((MessagingException) e).getEvent();
+                            event.getFlowConstruct().getExceptionListener().handleException(e, event);
+                        }
+                        else
+                        {
+                            getConnector().getMuleContext().getExceptionListener().handleException(e);                        
+                        }
                         break;
                     }
                     finally

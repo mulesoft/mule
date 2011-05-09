@@ -13,7 +13,6 @@ package org.mule.transport.http.components;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
-import org.mule.transport.NullPayload;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,9 +29,15 @@ public class RestServiceWrapperFunctionalTestCase extends DynamicPortTestCase
 
     public void testErrorExpressionOnRegexFilterFail() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage result = client.send("restServiceEndpoint", TEST_REQUEST, null);
-        assertTrue(result.getPayload() instanceof NullPayload);
+        try
+        {
+            muleContext.getClient().send("restServiceEndpoint", TEST_REQUEST, null);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 
     public void testErrorExpressionOnRegexFilterPass() throws Exception
@@ -66,9 +71,15 @@ public class RestServiceWrapperFunctionalTestCase extends DynamicPortTestCase
         MuleClient client = new MuleClient(muleContext);
         Map<String, Object> props = new HashMap<String, Object>();
 
-        MuleMessage result = client.send("restServiceEndpoint3", null, props);
-        assertEquals(NullPayload.getInstance(),result.getPayload());
-        assertNotNull(result.getExceptionPayload());
+        try
+        {
+            muleContext.getClient().send("restServiceEndpoint3", null, props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 
     public void testRestServiceComponentInFlow() throws Exception

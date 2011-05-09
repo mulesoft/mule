@@ -10,11 +10,10 @@
 
 package org.mule.test.integration.routing.nested;
 
-import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.ExceptionUtils;
 
 public class BindingExceptionOnInterfaceMethodTestCase extends FunctionalTestCase
 {
@@ -29,12 +28,15 @@ public class BindingExceptionOnInterfaceMethodTestCase extends FunctionalTestCas
     
     public void testExceptionOnBinding() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage reply = client.send("vm://invoker.in", TEST_MESSAGE, null);
-        assertNotNull(reply);
-        String payload = reply.getPayloadAsString();
-        assertTrue(payload.contains("MuleRuntimeException"));
-        assertTrue(payload.contains(PREFIX));
+        try
+        {
+            muleContext.getClient().send("vm://invoker.in", TEST_MESSAGE, null);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof MuleRuntimeException);
+        }
     }
 
     public static class Component

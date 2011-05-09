@@ -11,7 +11,6 @@
 package org.mule.module.jaas;
 
 import org.mule.api.EncryptionStrategy;
-import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
@@ -68,16 +67,15 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends FunctionalTestC
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "anon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        MuleMessage m = client.send("vm://test", "Test", props);
-
-        assertNotNull(m);
-        assertTrue(m.getPayload() instanceof String);
-        assertFalse(m.getPayloadAsString().equals("Test Received"));
-        
-        //assert exception
-        ExceptionPayload exceptionPayload = m.getExceptionPayload();
-        assertNotNull(exceptionPayload);
-        assertEquals("Authentication failed for principal Marie.Rizzo. Message payload is of type: String", exceptionPayload.getMessage());
+        try
+        {
+            client.send("vm://test", "Test", props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 
     public void testCaseBadUserName() throws Exception
@@ -89,17 +87,15 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends FunctionalTestC
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Evil", "dragon", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        MuleMessage m = client.send("vm://test", "Test", props);
-
-        assertNotNull(m);
-        assertTrue(m.getPayload() instanceof String);
-        assertFalse(m.getPayloadAsString().equals("Test Received"));
-        
-        //assert exception
-        ExceptionPayload exceptionPayload = m.getExceptionPayload();
-        assertNotNull(exceptionPayload);
-        assertEquals("Authentication failed for principal Evil. Message payload is of type: String", exceptionPayload.getMessage());
-        
+        try
+        {
+            client.send("vm://test", "Test", props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 
     public void testCaseBadPassword() throws Exception
@@ -111,18 +107,15 @@ public class JaasAutenticationWithJaasConfigFileTestCase extends FunctionalTestC
             .getEncryptionStrategy("PBE");
         String header = MuleCredentials.createHeader("Marie.Rizzo", "evil", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        MuleMessage m = client.send("vm://test", "Test", props);
-
-        assertNotNull(m);
-        assertTrue(m.getPayload() instanceof String);
-        assertFalse(m.getPayloadAsString().equals("Test Received"));
-  
-        //assert exception
-        ExceptionPayload exceptionPayload = m.getExceptionPayload();
-        assertNotNull(exceptionPayload);
-        assertEquals("Authentication failed for principal Marie.Rizzo. Message payload is of type: String", exceptionPayload.getMessage());
-        
-        
+        try
+        {
+            client.send("vm://test", "Test", props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
     }
 
     protected String getConfigResources()

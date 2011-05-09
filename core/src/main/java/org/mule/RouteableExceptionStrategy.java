@@ -344,4 +344,9 @@ public class RouteableExceptionStrategy extends AbstractMessagingExceptionStrate
             router.stop();
         }
     }
+
+    public boolean isRedeliver()
+    {
+        return false;
+    }
 }

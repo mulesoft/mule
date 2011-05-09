@@ -14,16 +14,17 @@ import org.mule.api.EncryptionStrategy;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.security.CredentialsNotSetException;
-import org.mule.api.security.UnauthorisedException;
-import org.mule.config.ExceptionHelper;
 import org.mule.module.client.MuleClient;
 import org.mule.security.MuleCredentials;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
+import org.mule.util.ExceptionUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.security.authentication.BadCredentialsException;
 
 public class EncryptionFunctionalTestCase extends FunctionalTestCase
 {
@@ -35,12 +36,15 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
 
     public void testAuthenticationFailureNoContext() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage m = client.send("vm://my.queue", "foo", null);
-        assertNotNull(m);
-        assertNotNull(m.getExceptionPayload());
-        assertEquals(ExceptionHelper.getErrorCode(CredentialsNotSetException.class), m.getExceptionPayload()
-            .getCode());
+        try
+        {
+            muleContext.getClient().send("vm://my.queue", "foo", null);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof CredentialsNotSetException);
+        }
     }
 
     public void testAuthenticationFailureBadCredentials() throws Exception
@@ -53,11 +57,15 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
         String header = MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
         props.put(MuleProperties.MULE_USER_PROPERTY, header);
 
-        MuleMessage m = client.send("vm://my.queue", "foo", props);
-        assertNotNull(m);
-        assertNotNull(m.getExceptionPayload());
-        assertEquals(ExceptionHelper.getErrorCode(UnauthorisedException.class), m.getExceptionPayload()
-            .getCode());
+        try
+        {
+            muleContext.getClient().send("vm://my.queue", "foo", props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof BadCredentialsException);
+        }
     }
 
     public void testAuthenticationAuthorised() throws Exception

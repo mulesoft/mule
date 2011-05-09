@@ -37,7 +37,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
         assertNotNull(result);
         ExceptionPayload exceptionPayload = result.getExceptionPayload();
         assertNotNull(exceptionPayload);
-        assertTrue(exceptionPayload.getException() instanceof TransformerMessagingException);
+        assertTrue(exceptionPayload.getException().getCause().getCause() instanceof TransformerMessagingException);
         assertTrue(exceptionPayload.getRootException() instanceof Exception);
     }
 

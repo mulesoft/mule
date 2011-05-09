@@ -14,6 +14,7 @@ import org.mule.api.client.MuleClient;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.ExceptionUtils;
 
 import org.w3c.dom.Document;
 
@@ -66,20 +67,28 @@ public class IBeansHostIpFunctionalTestCase extends FunctionalTestCase
     public void testHostIpWrongNumberOfArguments() throws Exception
     {
         Object[] params = new Object[]{"192.215.42.198", new Integer(12)};
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://in", params, null);
-        assertNotNull(response.getExceptionPayload());
-        assertTrue(response.getExceptionPayload().getException() instanceof DispatchException);        
-        assertTrue(response.getExceptionPayload().getRootException() instanceof NoSuchMethodException);
+        try
+        {
+            muleContext.getClient().send("vm://in", params, null);
+            fail("exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof NoSuchMethodException);
+        }
     }
 
     public void testHostIpBadArgumentType() throws Exception
     {
-        MuleClient client = muleContext.getClient();
-        MuleMessage response = client.send("vm://in", new StringBuffer(), null);
-        assertNotNull(response.getExceptionPayload());
-        assertTrue(response.getExceptionPayload().getException() instanceof DispatchException);
-        assertTrue(response.getExceptionPayload().getRootException() instanceof NoSuchMethodException);
+        try
+        {
+            muleContext.getClient().send("vm://in", new StringBuffer(), null);
+            fail("exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.getRootCause(e) instanceof NoSuchMethodException);
+        }
     }
 
     public void testHostIpWrongNumberOfArgumentsDirectClient() throws Exception

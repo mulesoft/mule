@@ -11,6 +11,7 @@
 package org.mule.module.spring.security;
 
 import org.mule.tck.FunctionalTestCase;
+import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -27,12 +28,12 @@ public class AuthorizationFilterTestCase extends FunctionalTestCase
 
     public void testAuthenticatedButNotAuthorized() throws Exception
     {
-        doRequest(null, "localhost", "anon", "anon", getUrl(), true, false, 405);
+        doRequest(null, "localhost", "anon", "anon", getUrl(), false, 405);
     }
     
     public void testAuthorized() throws Exception
     {
-        doRequest(null, "localhost", "ross", "ross", getUrl(), true, false, 200);
+        doRequest(null, "localhost", "ross", "ross", getUrl(), false, 200);
     }
 
     protected String getUrl()
@@ -46,11 +47,10 @@ public class AuthorizationFilterTestCase extends FunctionalTestCase
                            String pass,
                            String url,
                            boolean handshake,
-                           boolean preemtive,
                            int result) throws Exception
     {
         HttpClient client = new HttpClient();
-        client.getParams().setAuthenticationPreemptive(preemtive);
+        client.getParams().setAuthenticationPreemptive(true);
         client.getState().setCredentials(new AuthScope(host, -1, realm),
             new UsernamePasswordCredentials(user, pass));
         GetMethod get = new GetMethod(url);
@@ -59,6 +59,18 @@ public class AuthorizationFilterTestCase extends FunctionalTestCase
         try
         {
             int status = client.executeMethod(get);
+            if (status == HttpConstants.SC_UNAUTHORIZED && handshake == true)
+            {
+                // doAuthentication = true means that if the request returns 401, 
+                // the HttpClient will resend the request with credentials
+                status = client.executeMethod(get);
+                if (status == HttpConstants.SC_UNAUTHORIZED && handshake == true)
+                {
+                    // doAuthentication = true means that if the request returns 401, 
+                    // the HttpClient will resend the request with credentials
+                    status = client.executeMethod(get);
+                }
+            }
             assertEquals(result, status);
         }
         finally

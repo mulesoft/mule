@@ -13,9 +13,9 @@ package org.mule.transport.vm.functional;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.PropertyScope;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
 import java.util.HashMap;
@@ -34,11 +34,17 @@ public class EndpointContentTypeTestCase extends FunctionalTestCase
         MuleMessage response;
         Map<String, Object> messageProperties = new HashMap<String, Object>();
         messageProperties.put("content-type", "text/xml");
-        MuleClient client = new MuleClient(muleContext);
-        response = client.send("vm://in1?connector=vm-in1", "<OK/>", messageProperties);
-        assertNotNull(response);
-        assertNotNull("Invalid mime type was not rejected", response.getExceptionPayload());
-        assertTrue(response.getExceptionPayload().getException() instanceof MessagingException);
+        MuleClient client = muleContext.getClient();
+        try
+        {
+            client.send("vm://in1?connector=vm-in1", "<OK/>", messageProperties);
+            fail("Invalid mime type was not rejected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(e instanceof MessagingException);
+        }
+
         messageProperties.put("content-type", "text/plain");
         EchoComponent.setExpectedContentType("text/plain");
         response = client.send("vm://in1?connector=vm-in1", "OK", messageProperties);
