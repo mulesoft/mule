@@ -623,6 +623,11 @@ dump() {
 checkAdditionalJvmParams() {
     # The string passed to eval must handle spaces in paths correctly.
     "$MULE_HOME/bin/launcher" \"$MULE_HOME/bin/additional.groovy\" \"$WRAPPER_CONF\" \"$JPDA_OPTS\" \"$MULE_ENDORSED\" $@
+    EXIT_STATUS=$?
+
+    if [ "$EXIT_STATUS" -ne "0" ] ; then        
+        exit $EXIT_STATUS
+    fi
 }
 
 case "$1" in
