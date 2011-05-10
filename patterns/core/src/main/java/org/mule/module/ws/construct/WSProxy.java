@@ -19,6 +19,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
@@ -225,7 +226,20 @@ public class WSProxy extends AbstractFlowConstruct
         {
             // create a new mule message with the new WSDL
             String inboundAddress = event.getEndpoint().getAddress();
-            wsdlContents = wsdlContents.replaceAll(outboundAddress, inboundAddress);
+            try
+            {
+                String substitutedAddress = outboundAddress;
+                if (outboundAddress.contains("#["))
+                {
+                    substitutedAddress = event.getMuleContext().getExpressionManager().parse(outboundAddress, event.getMessage(), true);
+                }
+                wsdlContents = wsdlContents.replaceAll(substitutedAddress, inboundAddress);
+            }
+            catch (ExpressionRuntimeException ex)
+            {
+                logger.warn("Unable to construct outbound address for WSDL request to proxied dynamic endpoint " + outboundAddress);    
+            }
+
 
             if (wsdlContents.indexOf(LOCALHOST) > -1)
             {
