@@ -19,6 +19,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstructInvalidException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.expression.ExpressionManager;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
@@ -229,9 +230,10 @@ public class WSProxy extends AbstractFlowConstruct
             try
             {
                 String substitutedAddress = outboundAddress;
-                if (outboundAddress.contains("#["))
-                {
-                    substitutedAddress = event.getMuleContext().getExpressionManager().parse(outboundAddress, event.getMessage(), true);
+                ExpressionManager expressionManager = event.getMuleContext().getExpressionManager();
+                if (expressionManager.isValidExpression(outboundAddress))
+                {                    
+                    substitutedAddress = expressionManager.parse(outboundAddress, event.getMessage(), true);
                 }
                 wsdlContents = wsdlContents.replaceAll(substitutedAddress, inboundAddress);
             }
