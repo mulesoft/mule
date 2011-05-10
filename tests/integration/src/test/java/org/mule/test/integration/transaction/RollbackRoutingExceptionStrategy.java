@@ -25,7 +25,6 @@ public class RollbackRoutingExceptionStrategy extends AbstractMessagingException
     {
         MessageProcessor endpoint = ((RoutingException) e).getRoute();
         logger.debug("handleRoutingException: endpoint=" + endpoint + " message=" + event.getMessage());
-        doHandleException(e, event);
         handleTransaction(e);
         routeException(event, endpoint, e);
     }
