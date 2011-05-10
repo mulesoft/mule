@@ -17,6 +17,7 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.util.UUID;
+import org.mule.util.store.DefaultInMemoryObjectStore;
 import org.mule.util.store.SimpleMemoryObjectStore;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;
@@ -57,7 +58,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         if (this.defaultQueueConfiguration == null)
         {
             this.defaultQueueConfiguration =
-                new QueueConfiguration(getMuleContext(), 0, MuleProperties.OBJECT_STORE_IN_MEMORY_NAME);
+                new QueueConfiguration(getMuleContext(), 0, new DefaultInMemoryObjectStore());
         }
         return this.defaultQueueConfiguration;
     }

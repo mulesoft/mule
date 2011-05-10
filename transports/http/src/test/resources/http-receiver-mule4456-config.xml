@@ -36,7 +36,9 @@
                     <vm:outbound-endpoint path="out" connector-ref="vm" exchange-pattern="one-way"/>
                 </pass-through-router>
             </outbound>
-            <queue-profile storeName="_persistentQueueStore"/>
+            <queue-profile >
+                <default-persistent-queue-store/>
+            </queue-profile>
         </service>
     </model>
 </mule>

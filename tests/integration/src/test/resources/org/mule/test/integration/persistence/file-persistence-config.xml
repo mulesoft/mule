@@ -9,7 +9,9 @@
        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
 
     <vm:connector name="vmQueue">
-        <vm:queueProfile storeName="_persistentQueueStore" maxOutstandingMessages="1000"/>
+        <vm:queueProfile  maxOutstandingMessages="1000">
+            <default-persistent-queue-store/>
+        </vm:queueProfile>
     </vm:connector>
 
     <model name="main">

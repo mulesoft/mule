@@ -29,7 +29,9 @@
             </inbound>
             <test:component appendString=" Received"/>
 
-            <queue-profile storeName="_persistentQueueStore"/>
+            <queue-profile >
+                <default-persistent-queue-store/>
+            </queue-profile>
         </service>
     </model>
 </mule>

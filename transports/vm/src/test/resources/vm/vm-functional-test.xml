@@ -12,7 +12,9 @@
 
     <custom-queue-store class="org.mule.transport.vm.VMFunctionalTestCase$CustomObjectStore" name="custom-store"/>
     <vm:connector name="vm">
-        <vm:queue-profile storeName="custom-store"/>
+        <vm:queue-profile >
+            <queue-store ref="custom-store"/>
+        </vm:queue-profile>
     </vm:connector>
     <model>
         <service name="myAsyncService">

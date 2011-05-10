@@ -12,9 +12,11 @@
 		<default-threading-profile maxThreadsActive="4"/>
 	</configuration>
 
-	<vm:connector name="outPersistentConnector">
-		<vm:queueProfile storeName="_persistentQueueStore" />
-	</vm:connector>
+    <vm:connector name="outPersistentConnector">
+        <vm:queue-profile >
+            <default-persistent-queue-store/>
+        </vm:queue-profile>
+    </vm:connector>
 
 	<vm:endpoint name="out" path="out" exchange-pattern="one-way" />
 
@@ -43,10 +45,12 @@
 			<outbound>
 				<pass-through-router>
 					<vm:outbound-endpoint ref="out" />
-				</pass-through-router>
-			</outbound>
-			<queue-profile storeName="_persistentQueueStore" />
-		</service>
+                </pass-through-router>
+            </outbound>
+            <queue-profile>
+                <default-persistent-queue-store/>
+            </queue-profile>
+        </service>
 
 		<service name="PausedTestPersistentQueueService" initialState="paused">
 			<test:component waitTime="30" />
@@ -54,9 +58,11 @@
 				<pass-through-router>
 					<vm:outbound-endpoint ref="out" />
 				</pass-through-router>
-			</outbound>
-			<queue-profile storeName="_persistentQueueStore" />
-		</service>
+            </outbound>
+            <queue-profile >
+                <default-persistent-queue-store/>
+            </queue-profile>
+        </service>
 
 
 	</model>

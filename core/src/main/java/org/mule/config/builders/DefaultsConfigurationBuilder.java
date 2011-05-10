@@ -68,8 +68,9 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
 
         registry.registerObject(MuleProperties.OBJECT_SECURITY_MANAGER, new MuleSecurityManager());
 
-        registry.registerObject(MuleProperties.OBJECT_STORE_IN_MEMORY_NAME, new SimpleMemoryObjectStore<Serializable>());
-        registry.registerObject(MuleProperties.OBJECT_STORE_PERSISTENT_NAME, new QueuePersistenceObjectStore<Serializable>());
+        SimpleMemoryObjectStore<Serializable> memoryStore = new SimpleMemoryObjectStore<Serializable>();
+        registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, memoryStore);
+        registry.registerObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, new QueuePersistenceObjectStore<Serializable>());
 
         registry.registerObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY, new DefaultEndpointFactory());
         registry.registerObject(MuleProperties.OBJECT_MULE_STREAM_CLOSER_SERVICE, new DefaultStreamCloserService());
@@ -83,7 +84,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
 
     protected void configureQueueManager(MuleContext muleContext) throws RegistrationException
     {
-        ListableObjectStore<Serializable> store = muleContext.getObjectStore(MuleProperties.OBJECT_STORE_IN_MEMORY_NAME);
+        ListableObjectStore<Serializable> store = muleContext.getObjectStore(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
 
         QueueManager queueManager = new TransactionalQueueManager();
 

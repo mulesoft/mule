@@ -166,7 +166,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         // Asert existance of defauts in registry
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER));
-        assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_IN_MEMORY_NAME));
+        assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SYSTEM_MODEL));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY));
         assertNotNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));
@@ -177,7 +177,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         // Asert non-existance of defauts in registry
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_QUEUE_MANAGER));
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER));
-        assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_IN_MEMORY_NAME));
+        assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME));
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_SYSTEM_MODEL));
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_ENDPOINT_FACTORY));
         assertNull(context.getRegistry().lookupObject(MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP));

@@ -22,14 +22,10 @@ public class QueueConfiguration
     protected final int capacity;
     protected final ListableObjectStore objectStore;
 
-    public QueueConfiguration(MuleContext context, int capacity, String storeName)
+    public QueueConfiguration(MuleContext context, int capacity, ListableObjectStore objectStore)
     {
         this.capacity = capacity;
-        this.objectStore = context.getObjectStore(storeName);
-        if (this.objectStore == null)
-        {
-            throw new MuleRuntimeException(CoreMessages.objectStoreNotFound(storeName));
-        }
+        this.objectStore = objectStore;
     }
 
     public QueueConfiguration(int capacity, ListableObjectStore objectStore)

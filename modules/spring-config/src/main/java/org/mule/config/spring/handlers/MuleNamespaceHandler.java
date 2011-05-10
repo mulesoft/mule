@@ -74,6 +74,7 @@ import org.mule.config.spring.parsers.specific.NotificationDefinitionParser;
 import org.mule.config.spring.parsers.specific.NotificationDisableDefinitionParser;
 import org.mule.config.spring.parsers.specific.ObjectFactoryDefinitionParser;
 import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
+import org.mule.config.spring.parsers.specific.QueueStoreDefinitionParser;
 import org.mule.config.spring.parsers.specific.RegExFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ResponseDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
@@ -190,7 +191,11 @@ import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
+import org.mule.util.store.DefaultInMemoryObjectStore;
+import org.mule.util.store.DefaultPersistentObjectStore;
+import org.mule.util.store.FileObjectStore;
 import org.mule.util.store.InMemoryObjectStore;
+import org.mule.util.store.MemoryObjectStore;
 import org.mule.util.store.TextFileObjectStore;
 
 /**
@@ -219,8 +224,14 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("commit-transaction", new ExceptionTXFilterDefinitionParser("commitTxFilter"));
         registerBeanDefinitionParser("rollback-transaction", new ExceptionTXFilterDefinitionParser("rollbackTxFilter"));
         registerBeanDefinitionParser("custom-agent", new DefaultNameMuleOrphanDefinitionParser());
-        registerBeanDefinitionParser("custom-queue-store", new DefaultNameMuleOrphanDefinitionParser(true));
 
+        registerMuleBeanDefinitionParser("queue-store", new ParentDefinitionParser()).addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "queue-store");
+        registerMuleBeanDefinitionParser("custom-queue-store", new QueueStoreDefinitionParser()).addIgnored("name");
+        registerBeanDefinitionParser("default-in-memory-queue-store", new QueueStoreDefinitionParser(DefaultInMemoryObjectStore.class));
+        registerBeanDefinitionParser("default-persistent-queue-store", new QueueStoreDefinitionParser(DefaultPersistentObjectStore.class));
+        registerBeanDefinitionParser("simple-in-memory-queue-store", new QueueStoreDefinitionParser(MemoryObjectStore.class));
+        registerBeanDefinitionParser("file-queue-store", new QueueStoreDefinitionParser(FileObjectStore.class));
+        
         registerBeanDefinitionParser("routeable-exception-strategy", new ChildDefinitionParser("exceptionListener", RouteableExceptionStrategy.class));
         registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
         registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfile.class));

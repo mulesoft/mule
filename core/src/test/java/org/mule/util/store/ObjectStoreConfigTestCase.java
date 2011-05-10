@@ -23,7 +23,7 @@ public class ObjectStoreConfigTestCase extends AbstractMuleTestCase
 {
     public void testDefault()
     {
-        ObjectStore<?> store = muleContext.getObjectStore(MuleProperties.OBJECT_STORE_IN_MEMORY_NAME);
+        ObjectStore<?> store = muleContext.getObjectStore(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
         assertNotNull(store);
         assertTrue(store instanceof SimpleMemoryObjectStore);
     }
@@ -31,9 +31,9 @@ public class ObjectStoreConfigTestCase extends AbstractMuleTestCase
     public void testNonDefault() throws Exception
     {
         ObjectStore<?> store = new QueuePersistenceObjectStore<Serializable>();
-        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_PERSISTENT_NAME, store);
+        muleContext.getRegistry().registerObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, store);
 
-        store = muleContext.getObjectStore(MuleProperties.OBJECT_STORE_PERSISTENT_NAME);
+        store = muleContext.getObjectStore(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
         assertNotNull(store);
         assertTrue(store instanceof QueuePersistenceObjectStore);
     }

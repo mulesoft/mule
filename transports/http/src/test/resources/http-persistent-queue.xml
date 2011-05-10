@@ -18,6 +18,8 @@
             <test:component/>
         </service>
         
-        <queue-profile storeName="_persistentQueueStore"/>
+        <queue-profile >
+            <default-persistent-queue-store/>
+        </queue-profile>
     </model>
 </mule>

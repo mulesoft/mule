@@ -46,8 +46,8 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
     {
         Properties superProps = super.getStartUpProperties();
         Properties props = superProps == null ? new Properties() : new Properties(superProps);
-        props.put(MuleProperties.OBJECT_STORE_IN_MEMORY_NAME, new SimpleMemoryObjectStore());
-        props.put(MuleProperties.OBJECT_STORE_PERSISTENT_NAME, new QueuePersistenceObjectStore());
+        props.put(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, new SimpleMemoryObjectStore());
+        props.put(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, new QueuePersistenceObjectStore());
         return props;
     }
 }

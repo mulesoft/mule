@@ -10,11 +10,13 @@
 
 
     <vm:connector name="Connector1">
-        <vm:queueProfile storeName="_persistentQueueStore" maxOutstandingMessages="100000"/>
+        <vm:queueProfile maxOutstandingMessages="100000">
+            <default-persistent-queue-store/>
+        </vm:queueProfile>
     </vm:connector>
 
     <vm:connector name="Connector2">
-        <vm:queueProfile storeName="_persistentQueueStore" maxOutstandingMessages="100000"/>
+        <vm:queueProfile maxOutstandingMessages="100000"/>
     </vm:connector>
 
     <vm:endpoint name="VmReceiver1" path="receiver1" exchange-pattern="one-way"/>

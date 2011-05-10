@@ -10,7 +10,9 @@
 
 
     <vm:connector name="VMQueue">
-        <vm:queueProfile storeName="_persistentQueueStore" maxOutstandingMessages="10"/>
+        <vm:queueProfile maxOutstandingMessages="10">
+            <default-persistent-queue-store/>
+        </vm:queueProfile>
     </vm:connector>
 
     <custom-transformer name="testTransformer"

@@ -123,8 +123,10 @@ public class MuleProperties
     public static final String OBJECT_SECURITY_MANAGER = "_muleSecurityManager";
     public static final String OBJECT_TRANSACTION_MANAGER = "_muleTransactionManager";
     public static final String OBJECT_QUEUE_MANAGER = "_muleQueueManager";
-    public static final String OBJECT_STORE_IN_MEMORY_NAME = "_inMemoryQueueStore";
-    public static final String OBJECT_STORE_PERSISTENT_NAME = "_persistentQueueStore";
+    public static final String OBJECT_STORE_DEFAULT_IN_MEMORY_NAME = "_defaultInMemoryQueueStore";
+    public static final String OBJECT_STORE_DEFAULT_PERSISTENT_NAME = "_defaultPersistentQueueStore";
+    public static final String OBJECT_STORE_SIMPLE_MEMORY_NAME = "_simpleMemoryQueueStore";
+    public static final String OBJECT_STORE_FILE_NAME = "_fileQueueStore";
     public static final String OBJECT_MULE_APPLICATION_PROPERTIES = "_muleProperties";
     public static final String OBJECT_MULE_ENDPOINT_FACTORY = "_muleEndpointFactory";
     public static final String OBJECT_MULE_STREAM_CLOSER_SERVICE = "_muleStreamCloserService";

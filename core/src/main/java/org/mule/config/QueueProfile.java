@@ -11,10 +11,17 @@
 package org.mule.config;
 
 import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
+import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.ObjectStore;
 import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueManager;
+import org.mule.util.store.DefaultInMemoryObjectStore;
+import org.mule.util.store.DefaultPersistentObjectStore;
+import org.mule.util.store.FacadeObjectStore;
+
+import java.io.Serializable;
 
 /**
  * <code>QueueProfile</code> determines how an internal queue for a service will
@@ -24,8 +31,7 @@ import org.mule.util.queue.QueueManager;
 public class QueueProfile
 {
     private int maxOutstandingMessages = 0;
-    private String storeName;
-
+    private ListableObjectStore<Serializable> objectStore;
     public QueueProfile()
     {
         this(0, false);
@@ -34,13 +40,13 @@ public class QueueProfile
     public QueueProfile(int maxOutstandingMessages, boolean persistent)
     {
         this.maxOutstandingMessages = maxOutstandingMessages;
-        this.storeName = persistent ? MuleProperties.OBJECT_STORE_PERSISTENT_NAME : MuleProperties.OBJECT_STORE_IN_MEMORY_NAME;
+        this.objectStore = persistent ? new DefaultPersistentObjectStore() : new DefaultInMemoryObjectStore();
     }
 
     public QueueProfile(QueueProfile queueProfile)
     {
         this.maxOutstandingMessages = queueProfile.getMaxOutstandingMessages();
-        this.storeName = queueProfile.storeName;
+        this.objectStore = queueProfile.objectStore;
     }
 
     /**
@@ -67,24 +73,33 @@ public class QueueProfile
 
     public QueueConfiguration configureQueue(MuleContext context, String component, QueueManager queueManager) throws InitialisationException
     {
-        QueueConfiguration qc = new QueueConfiguration(context, maxOutstandingMessages, storeName);
+        if (objectStore instanceof MuleContextAware)
+        {
+            ((MuleContextAware) objectStore).setMuleContext(context);
+        }
+        QueueConfiguration qc = new QueueConfiguration(context, maxOutstandingMessages, objectStore);
         queueManager.setQueueConfiguration(component, qc);
         return qc;
     }
 
-    public String getStoreName()
+    public ListableObjectStore<Serializable> getObjectStore()
     {
-        return storeName;
+        return objectStore;
     }
 
-    public void setStoreName(String storeName)
+    public void setQueueStore(ListableObjectStore<Serializable> objectStore)
     {
-        this.storeName = storeName;
+        this.objectStore = objectStore;
+    }
+
+    public void addQueueStore(ListableObjectStore<Serializable> objectStore)
+    {
+        this.objectStore = objectStore;
     }
 
     public String toString()
     {
-        return "QueueProfile{maxOutstandingMessage=" + maxOutstandingMessages + ", storeName="
-               + storeName + "}";
+        return "QueueProfile{maxOutstandingMessage=" + maxOutstandingMessages + ", storeType="
+               + objectStore.getClass() + "}";
     }
 }

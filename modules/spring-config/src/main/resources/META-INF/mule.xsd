@@ -131,7 +131,7 @@
             <xsd:element ref="custom-processor"/>
             <xsd:element ref="invoke"/>
             <xsd:element ref="message-filter"/>
-            <xsd:element ref="custom-queue-store" maxOccurs="unbounded"/>
+            <xsd:element ref="custom-queue-store" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
     </xsd:group>
 
@@ -209,15 +209,54 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="custom-queue-store" type="customQueueStore" />
-    <xsd:complexType name="customQueueStore">
+    <xsd:element name="abstract-queue-store" abstract="true" type="abstractQueueStoreType">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for queue store elements.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractQueueStoreType" abstract="true">
         <xsd:complexContent>
-            <xsd:extension base="annotatedType">
+            <xsd:extension base="annotatedType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="defaultQueueStoreType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractQueueStoreType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="queue-store" type="refQueueStoreType" substitutionGroup="abstract-queue-store">
+        <xsd:annotation>
+            <xsd:documentation>
+                A reference to a queue store defined elsewhere.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="refQueueStoreType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractQueueStoreType">
+                <xsd:attribute name="ref" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The name of the queue store to use.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="custom-queue-store" type="customQueueStoreType" substitutionGroup="abstract-queue-store"/>
+    <xsd:complexType name="customQueueStoreType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractQueueStoreType">
                 <xsd:sequence>
                     <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
                 <xsd:attribute name="class" type="substitutableClass" use="required"/>
-                <xsd:attribute name="name" type="substitutableName" use="required">
+                <xsd:attribute name="name" type="substitutableName" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
                             Identifies the store in the registry.
@@ -227,6 +266,38 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:element name="default-in-memory-queue-store" type="defaultQueueStoreType" substitutionGroup="abstract-queue-store">
+        <xsd:annotation>
+            <xsd:documentation>
+                The default in-memory queue store for the application.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="default-persistent-queue-store" type="defaultQueueStoreType" substitutionGroup="abstract-queue-store">
+        <xsd:annotation>
+            <xsd:documentation>
+                The default persistent queue store for the application.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="simple-in-memory-queue-store" type="defaultQueueStoreType" substitutionGroup="abstract-queue-store">
+        <xsd:annotation>
+            <xsd:documentation>
+                A simple in-memeory queue store.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="file-queue-store" type="defaultQueueStoreType" substitutionGroup="abstract-queue-store">
+        <xsd:annotation>
+            <xsd:documentation>
+                A simple file-based queue store.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:element name="abstract-global-endpoint" abstract="true" type="abstractGlobalEndpointType">
         <xsd:annotation>
@@ -3823,17 +3894,19 @@
     <xsd:complexType name="queueProfileType">
         <xsd:complexContent>
             <xsd:extension base="abstractQueueProfileType">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-queue-store" minOccurs="0">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The queue store that stortes the queue's elements.  If not specified, this will be the default-in-memory-queue-store.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
                 <xsd:attribute name="maxOutstandingMessages" type="substitutableInt">
                     <xsd:annotation>
                         <xsd:documentation>
                             Defines the maximum number of messages that can be queued.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="storeName" type="xsd:string" default="false">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name of the object store used to store the queue's entries.  This can be defined in the configuration, or one of the predefined queue stores: "_inMemoryQueueStore" (the default) and "_persistentQueueStore".
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
