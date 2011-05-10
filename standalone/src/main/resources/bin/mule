@@ -617,7 +617,8 @@ dump() {
 }
 
 checkAdditionalJvmParams() {
-    $MULE_HOME/bin/launcher $MULE_HOME/bin/additional.groovy $WRAPPER_CONF "$JPDA_OPTS" "$MULE_ENDORSED" $@
+    # The string passed to eval must handle spaces in paths correctly.
+    "$MULE_HOME/bin/launcher" \"$MULE_HOME\"/bin/additional.groovy \"$WRAPPER_CONF\" \"$JPDA_OPTS\" \"$MULE_ENDORSED\" $@
 }
 
 ######################################################################
