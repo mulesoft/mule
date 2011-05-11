@@ -61,7 +61,9 @@ echo * If it is already installed, configure the system variables PATH or *
 echo * JAVA_HOME appropriately.                                           *
 echo **********************************************************************
 
-goto :eof
+rem Exit the batch file only, not the entire cmd.exe process
+pause
+exit /b 1
 
 :HAS_JAVA_HOME
 
