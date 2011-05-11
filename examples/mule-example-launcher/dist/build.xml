@@ -9,6 +9,7 @@
 
     <property name="dir.mule.home" value="${basedir}/../.."/>
     <property name="dir.user.lib" value="${dir.mule.home}/lib/user/"/>
+    <property name="dir.mule.lib" value="${dir.mule.home}/lib/mule/"/>
     <property name="dir.opt.lib" value="${dir.mule.home}/lib/opt/"/>
     
     <property name="dir.java" value="src"/>
@@ -25,7 +26,7 @@
     <property name="url.maven.repo" value="http://repo1.maven.org/maven2"/>
     
     <path id="anttasks.path">
-        <fileset dir="${dir.opt.lib}" includes="mule-tools-anttasks-*.jar"/>
+        <fileset dir="${dir.mule.lib}" includes="mule-tools-anttasks-*.jar"/>
     </path>
     <taskdef resource="org/mule/mulePackagingTasks.properties"
               classpathref="anttasks.path"/>
