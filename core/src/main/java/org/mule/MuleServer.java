@@ -16,10 +16,12 @@ import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleConfiguration;
+import org.mule.api.context.MuleContextBuilder;
+import org.mule.api.context.MuleContextFactory;
 import org.mule.config.ExceptionHelper;
+import org.mule.config.PropertiesMuleConfigurationFactory;
 import org.mule.config.StartupContext;
 import org.mule.config.builders.SimpleConfigurationBuilder;
-import org.mule.config.PropertiesMuleConfigurationFactory;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
 import org.mule.context.DefaultMuleContextBuilder;
@@ -31,6 +33,7 @@ import org.mule.util.PropertiesUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -297,7 +300,7 @@ public class MuleServer implements Runnable
     {
         if (builderClassName != null)
         {
-            Class cls = ClassUtils.loadClass(builderClassName, MuleServer.class);
+            Class<?> cls = ClassUtils.loadClass(builderClassName, MuleServer.class);
             if (ConfigurationBuilder.class.isAssignableFrom(cls))
             {
                 MuleServer.configBuilderClassName = builderClassName;
@@ -346,50 +349,80 @@ public class MuleServer implements Runnable
             configurationResources = DEFAULT_CONFIGURATION;
         }
 
-        ConfigurationBuilder cfgBuilder;
+        // create a new ConfigurationBuilder that is disposed afterwards
+        ConfigurationBuilder cfgBuilder = createConfigurationBuilder();
 
+        if (!cfgBuilder.isConfigured())
+        {
+            List<ConfigurationBuilder> configBuilders = new ArrayList<ConfigurationBuilder>(3);
+            
+            // need to add the annotations config builder before Spring so we can use Mule 
+            // annotations in Spring
+            addAnnotationsConfigBuilder(configBuilders);
+            addStartupPropertiesConfigBuilder(configBuilders);
+            configBuilders.add(cfgBuilder);
+
+            MuleConfiguration configuration = createMuleConfiguration();
+
+            MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
+            contextBuilder.setMuleConfiguration(configuration);
+
+            MuleContextFactory contextFactory = new DefaultMuleContextFactory();
+            muleContext = contextFactory.createMuleContext(configBuilders, contextBuilder);
+        }
+    }
+
+    protected ConfigurationBuilder createConfigurationBuilder() throws ConfigurationException
+    {
         try
         {
-            // create a new ConfigurationBuilder that is disposed afterwards
-            cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(getConfigBuilderClassName(),
-                    new Object[]{configurationResources}, MuleServer.class);
+            return (ConfigurationBuilder) ClassUtils.instanciateClass(getConfigBuilderClassName(),
+                    new Object[]{ configurationResources }, MuleServer.class);
         }
         catch (Exception e)
         {
             throw new ConfigurationException(CoreMessages.failedToLoad(getConfigBuilderClassName()), e);
         }
+    }
 
-        if (!cfgBuilder.isConfigured())
+    /**
+     * If the annotations module is on the classpath, add the annotations config builder to the 
+     * list. This will enable annotations config for this instance.
+     */
+    protected void addAnnotationsConfigBuilder(List<ConfigurationBuilder> builders) throws Exception
+    {
+        if (ClassUtils.isClassOnPath(CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
         {
-            List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(2);
-
-            // If the annotations module is on the classpath, add the annotations config builder to the list
-            // This will enable annotations config for this instance
-            //We need to add this builder before spring so that we can use Mule annotations in Spring
-            if (ClassUtils.isClassOnPath(CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
-            {
-                Object configBuilder = ClassUtils.instanciateClass(
-                    CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, ClassUtils.NO_ARGS, getClass());
-                builders.add((ConfigurationBuilder) configBuilder);
-            }
-
-
-            Properties startupProperties = null;
-            if (getStartupPropertiesFile() != null)
-            {
-                startupProperties = PropertiesUtils.loadProperties(getStartupPropertiesFile(), getClass());
-            }
-            builders.add(new SimpleConfigurationBuilder(startupProperties));
-
-            builders.add(cfgBuilder);
-
-            DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-            String muleAppConfig = this.appConfigurationResource == null
-                ? PropertiesMuleConfigurationFactory.getMuleAppConfiguration(this.configurationResources)
-                : this.appConfigurationResource;
-            MuleConfiguration configuration = new PropertiesMuleConfigurationFactory(muleAppConfig).createConfiguration();
-            muleContext = muleContextFactory.createMuleContext(cfgBuilder, new Properties(), configuration);
+            Object configBuilder = ClassUtils.instanciateClass(CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, 
+                ClassUtils.NO_ARGS, getClass());
+            builders.add((ConfigurationBuilder) configBuilder);
         }
+    }
+
+    protected void addStartupPropertiesConfigBuilder(List<ConfigurationBuilder> builders) throws IOException
+    {
+        Properties startupProperties = null;
+        if (getStartupPropertiesFile() != null)
+        {
+            startupProperties = PropertiesUtils.loadProperties(getStartupPropertiesFile(), getClass());
+        }
+       
+        builders.add(new SimpleConfigurationBuilder(startupProperties));
+    }
+
+    protected MuleConfiguration createMuleConfiguration()
+    {
+        String appPropertiesFile = null;
+        if (this.appConfigurationResource == null)
+        {
+            appPropertiesFile = PropertiesMuleConfigurationFactory.getMuleAppConfiguration(this.configurationResources);
+        }
+        else
+        {
+            appPropertiesFile = this.appConfigurationResource;
+        }
+        
+        return new PropertiesMuleConfigurationFactory(appPropertiesFile).createConfiguration();
     }
 
     /**
@@ -424,8 +457,6 @@ public class MuleServer implements Runnable
         logger.fatal(shutdownMessage);
 
         System.exit(exitCode);
-
-
     }
 
     /**
