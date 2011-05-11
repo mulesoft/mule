@@ -30,6 +30,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
+import org.mule.routing.filters.WildcardFilter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.transport.sftp.util.ValueHolder;
@@ -374,6 +375,16 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                     exceptionHolder.value = e;
                     latch.countDown();
                 }
+
+                public WildcardFilter getCommitTxFilter()
+                {
+                    return null;
+                }
+
+                public WildcardFilter getRollbackTxFilter()
+                {
+                    return null;
+                }
             });
 
             if (serviceName != null && !(serviceName.length() == 0))
@@ -387,6 +398,16 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                             exceptionHolder.value = e;
                             latch.countDown();
                             return event;
+                        }
+
+                        public WildcardFilter getCommitTxFilter()
+                        {
+                            return null;
+                        }
+
+                        public WildcardFilter getRollbackTxFilter()
+                        {
+                            return null;
                         }
                     });
             }
@@ -735,6 +756,16 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                                      + ", time to countdown the latch");
                     latch.countDown();
                 }
+
+                public WildcardFilter getCommitTxFilter()
+                {
+                    return null;
+                }
+
+                public WildcardFilter getRollbackTxFilter()
+                {
+                    return null;
+                }
             };
 
             messagingListener = new MessagingExceptionHandler()
@@ -747,6 +778,16 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                                      + ", time to countdown the latch");
                     latch.countDown();
                     return event;
+                }
+
+                public WildcardFilter getCommitTxFilter()
+                {
+                    return null;
+                }
+
+                public WildcardFilter getRollbackTxFilter()
+                {
+                    return null;
                 }
             };
 

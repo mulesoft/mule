@@ -12,6 +12,7 @@ package org.mule.module.xml.functional;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.routing.filters.WildcardFilter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,6 +25,16 @@ public class HideExceptions implements MessagingExceptionHandler
     {
         logger.debug("Hiding exception: " + exception);
         logger.debug("(see config for test - some exceptions expected)");
+        return null;
+    }
+
+    public WildcardFilter getCommitTxFilter()
+    {
+        return null;
+    }
+
+    public WildcardFilter getRollbackTxFilter()
+    {
         return null;
     }
 }

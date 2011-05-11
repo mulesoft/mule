@@ -10,20 +10,26 @@
 
 package org.mule.transaction;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
+import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.transaction.ExternalTransactionAwareTransactionFactory;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transaction.TransactionFactory;
+import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.routing.filters.WildcardFilter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class TransactionTemplate<T>
 {
+
     private static final Log logger = LogFactory.getLog(TransactionTemplate.class);
 
     private final TransactionConfig config;
@@ -59,7 +65,7 @@ public class TransactionTemplate<T>
         }
 
         Transaction suspendedXATx = null;
-        
+
         if (action == TransactionConfig.ACTION_NEVER && tx != null)
         {
             throw new IllegalTransactionStateException(
@@ -129,17 +135,7 @@ public class TransactionTemplate<T>
             tx = TransactionCoordination.getInstance().getTransaction();
             if (tx != null)
             {
-                tx.setRollbackOnly();
-
-                // The exception strategy can choose to route exception
-                // messages as part of the current transaction. So only rollback the
-                // tx if it has been marked for rollback (which is the default
-                // case in the AbstractExceptionListener)
-                if (tx.isRollbackOnly())
-                {
-                    logger.debug("Exception caught: rollback transaction", e);
-                }
-                resolveTransaction(tx);
+                resolveTransaction(tx, e);
             }
             if (suspendedXATx != null)
             {
@@ -162,7 +158,49 @@ public class TransactionTemplate<T>
         finally
         {
             if (joinedExternal != null)
+            {
                 TransactionCoordination.getInstance().unbindTransaction(joinedExternal);
+            }
+        }
+    }
+
+    protected void resolveTransaction(Transaction tx, Exception e) throws TransactionException
+    {
+        if (e instanceof MessagingException)
+        {
+            MessagingExceptionHandler exceptionListener = ((MessagingException) e).getEvent().getFlowConstruct().getExceptionListener();
+
+            applyFiltersToTransaction(e, tx, exceptionListener.getCommitTxFilter(), exceptionListener.getRollbackTxFilter());
+        }
+        else
+        {
+            SystemExceptionHandler exceptionListener = context.getExceptionListener();
+
+            applyFiltersToTransaction(e, tx, exceptionListener.getCommitTxFilter(), exceptionListener.getRollbackTxFilter());
+        }
+
+        resolveTransaction(tx);
+    }
+
+    protected void applyFiltersToTransaction(Exception e, Transaction tx, WildcardFilter commitTxFilter, WildcardFilter rollbackTxFilter) throws TransactionException
+    {
+        // Work with the root exception, not anything that wraps it
+        Throwable t = ExceptionHelper.getRootException(e);
+
+        if (rollbackTxFilter == null && commitTxFilter == null)
+        {
+            // By default, rollback the transaction
+            tx.setRollbackOnly();
+        }
+        else if (rollbackTxFilter != null && rollbackTxFilter.accept(t.getClass().getName()))
+        {
+            // the rollback filter take precedence over the commit filter
+            tx.setRollbackOnly();
+        }
+        else if (commitTxFilter != null && !commitTxFilter.accept(t.getClass().getName()))
+        {
+            // we only have to rollback if the commitTxFilter does NOT match
+            tx.setRollbackOnly();
         }
     }
 

@@ -41,6 +41,7 @@ import org.mule.context.notification.ServerNotificationManager;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.routing.MessageFilter;
+import org.mule.routing.filters.WildcardFilter;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.Latch;
@@ -291,6 +292,16 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
             event.getMessage().setPayload(NullPayload.getInstance());
             event.getMessage().setExceptionPayload(new DefaultExceptionPayload(exception));
             return event;
+        }
+
+        public WildcardFilter getCommitTxFilter()
+        {
+            return null;
+        }
+
+        public WildcardFilter getRollbackTxFilter()
+        {
+            return null;
         }
     }
 

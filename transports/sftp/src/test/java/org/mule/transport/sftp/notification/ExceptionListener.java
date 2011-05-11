@@ -11,6 +11,7 @@
 package org.mule.transport.sftp.notification;
 
 import org.mule.api.exception.SystemExceptionHandler;
+import org.mule.routing.filters.WildcardFilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,16 @@ public class ExceptionListener implements SystemExceptionHandler
     public void handleException(Exception e)
     {
         logger.debug(e.getLocalizedMessage());
+    }
+
+    public WildcardFilter getCommitTxFilter()
+    {
+        return null;
+    }
+
+    public WildcardFilter getRollbackTxFilter()
+    {
+        return null;
     }
 
 }

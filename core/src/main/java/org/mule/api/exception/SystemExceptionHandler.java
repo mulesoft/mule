@@ -11,6 +11,8 @@
 package org.mule.api.exception;
 
 
+import org.mule.routing.filters.WildcardFilter;
+
 /**
  * Take some action when a system exception has occurred (i.e., there was no message in play when the exception occurred).
  */
@@ -22,6 +24,22 @@ public interface SystemExceptionHandler
      * @param exception which occurred
      */
     void handleException(Exception exception);
+
+    /**
+     * Returns the filter that given an exception class will determine if a
+     * transaction should be committed or not.
+     *
+     * @return the exception filter configured for commit of transactions
+     */
+    WildcardFilter getCommitTxFilter();
+
+    /**
+     * Returns the filter that given an exception class will determine if a
+     * transaction should be rollbacked or not.
+     *
+     * @return the exception filter configured for rollback of transactions
+     */
+    WildcardFilter getRollbackTxFilter();
 }
 
 

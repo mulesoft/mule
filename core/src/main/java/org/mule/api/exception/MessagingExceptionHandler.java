@@ -11,6 +11,7 @@
 package org.mule.api.exception;
 
 import org.mule.api.MuleEvent;
+import org.mule.routing.filters.WildcardFilter;
 
 /**
  * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
@@ -25,6 +26,22 @@ public interface MessagingExceptionHandler
      * @return new event to route on to the rest of the flow, generally with ExceptionPayload set on the message
      */
     MuleEvent handleException(Exception exception, MuleEvent event);
+
+    /**
+     * Returns the filter that given an exception class will determine if a
+     * transaction should be committed or not.
+     *
+     * @return the exception filter configured for commit of transactions
+     */
+    WildcardFilter getCommitTxFilter();
+
+    /**
+     * Returns the filter that given an exception class will determine if a
+     * transaction should be rollbacked or not.
+     *
+     * @return the exception filter configured for rollback of transactions
+     */
+    WildcardFilter getRollbackTxFilter();
 }
 
 
