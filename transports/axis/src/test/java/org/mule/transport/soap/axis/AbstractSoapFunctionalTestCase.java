@@ -132,19 +132,23 @@ public abstract class AbstractSoapFunctionalTestCase extends DynamicPortTestCase
         assertEquals("Rubble", ((Person)result.getPayload()).getLastName());
     }
 
-    // This test causes an infinite loop in the method org.apache.axis.encoding.SerializationContext.serialize()
-    //public void testException() throws Exception
-    //{
-    //    try
-    //    {
-    //        muleContext.getClient().send(getTestExceptionEndpoint(), new Person("Ross", "Mason"), null);
-    //        fail("A nested Fault should have been raised");
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        // expected
-    //    }
-    //}
+    // TODO This test causes an infinite loop in the method org.apache.axis.encoding.SerializationContext.serialize()
+    public void testException() throws Exception
+    {
+        try
+        {
+            muleContext.getClient().send(getTestExceptionEndpoint(), new Person("Ross", "Mason"), null);
+            fail("A nested Fault should have been raised");
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
+        catch (Error e)
+        {
+            // expected
+        }
+    }
 
     public void testLocationUrlInWSDL() throws Exception
     {
