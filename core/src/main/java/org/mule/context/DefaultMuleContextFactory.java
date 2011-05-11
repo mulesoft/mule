@@ -10,7 +10,6 @@
 
 package org.mule.context;
 
-import org.mule.MuleServer;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
@@ -30,8 +29,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Default implementation that stores MuleContext in {@link MuleServer} static and
- * uses {@link DefaultMuleContextBuilder} to build new {@link MuleContext} instances.
+ * Default implementation that uses {@link DefaultMuleContextBuilder} to build new 
+ * {@link MuleContext} instances.
  */
 public class DefaultMuleContextFactory implements MuleContextFactory
 {
@@ -125,11 +124,6 @@ public class DefaultMuleContextFactory implements MuleContextFactory
      * determine the {@link ConfigurationBuilder} that should be used. Properties if
      * provided are used to replace "property placeholder" value in configuration
      * files.
-     * 
-     * @param configResources
-     * @param properties
-     * @throws InitialisationException
-     * @throws ConfigurationException
      */
     public MuleContext createMuleContext(String configResources, Properties properties)
         throws InitialisationException, ConfigurationException
@@ -154,11 +148,6 @@ public class DefaultMuleContextFactory implements MuleContextFactory
      * Creates a new MuleContext using the given configurationBuilder. Properties if
      * provided are used to replace "property placeholder" value in configuration
      * files.
-     * 
-     * @param configurationBuilder
-     * @param properties
-     * @throws InitialisationException
-     * @throws ConfigurationException
      */
     public MuleContext createMuleContext(ConfigurationBuilder configurationBuilder, Properties properties)
         throws InitialisationException, ConfigurationException
@@ -170,13 +159,6 @@ public class DefaultMuleContextFactory implements MuleContextFactory
      * Creates a new MuleContext using the given configurationBuilder and configuration. Properties if
      * provided are used to replace "property placeholder" value in configuration
      * files.
-     * 
-     * @param configurationBuilder
-     * @param properties
-     * @param configuration
-     * @return
-     * @throws InitialisationException
-     * @throws ConfigurationException
      */
     public MuleContext createMuleContext(ConfigurationBuilder configurationBuilder,
                                          Properties properties,
