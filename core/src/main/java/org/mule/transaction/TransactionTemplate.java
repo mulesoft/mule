@@ -187,19 +187,11 @@ public class TransactionTemplate<T>
         // Work with the root exception, not anything that wraps it
         Throwable t = ExceptionHelper.getRootException(e);
 
-        if (rollbackTxFilter == null && commitTxFilter == null)
-        {
-            // By default, rollback the transaction
-            tx.setRollbackOnly();
-        }
-        else if (rollbackTxFilter != null && rollbackTxFilter.accept(t.getClass().getName()))
-        {
-            // the rollback filter take precedence over the commit filter
-            tx.setRollbackOnly();
-        }
-        else if (commitTxFilter != null && !commitTxFilter.accept(t.getClass().getName()))
-        {
-            // we only have to rollback if the commitTxFilter does NOT match
+        boolean rollbackFilterApplies = rollbackTxFilter != null && rollbackTxFilter.accept(t.getClass().getName());
+        boolean commitFilterApplies = commitTxFilter != null && commitTxFilter.accept(t.getClass().getName());
+
+        // Only commits when the rollback filter did not apply and the commit filter applied
+        if (rollbackFilterApplies || !commitFilterApplies){
             tx.setRollbackOnly();
         }
     }

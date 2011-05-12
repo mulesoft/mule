@@ -31,7 +31,8 @@ public interface MessagingExceptionHandler
      * Returns the filter that given an exception class will determine if a
      * transaction should be committed or not.
      *
-     * @return the exception filter configured for commit of transactions
+     * @return the exception filter configured for commit of transactions or
+     *         null if there is no filter.
      */
     WildcardFilter getCommitTxFilter();
 
@@ -39,7 +40,8 @@ public interface MessagingExceptionHandler
      * Returns the filter that given an exception class will determine if a
      * transaction should be rollbacked or not.
      *
-     * @return the exception filter configured for rollback of transactions
+     * @return the exception filter configured for rollback of transactions or
+     *         null if there is no filter.
      */
     WildcardFilter getRollbackTxFilter();
 }
