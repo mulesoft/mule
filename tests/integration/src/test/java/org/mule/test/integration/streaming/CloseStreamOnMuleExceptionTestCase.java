@@ -49,7 +49,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
         inputStream = new TestByteArrayInputStream(xmlText.getBytes());
     }
 
-    public void testCloseStreamOnComponentException() throws MuleException, InterruptedException, IOException
+    public void testCloseStreamOnComponentException() throws MuleException, InterruptedException
     {
         client.dispatch("vm://inEcho?connector=vm", inputStream, null);
         streamReaderLatch.await(1L, TimeUnit.SECONDS);
@@ -57,7 +57,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     }
 
     public void testCloseXMLInputSourceOnComponentException()
-        throws MuleException, InterruptedException, IOException
+        throws MuleException, InterruptedException
     {
         InputSource stream = new InputSource(inputStream);
 
@@ -78,7 +78,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     }
 
     public void testCloseXMLStreamReaderOnComponentException()
-        throws MuleException, InterruptedException, IOException, XMLStreamException,
+        throws MuleException, InterruptedException, XMLStreamException,
         FactoryConfigurationError
     {
         TestXMLStreamReader stream = new TestXMLStreamReader(XMLInputFactory.newInstance()
@@ -91,8 +91,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     }
 
     public void testCloseSaxSourceOnComponentException()
-        throws MuleException, InterruptedException, IOException, XMLStreamException,
-        FactoryConfigurationError
+        throws MuleException, InterruptedException, FactoryConfigurationError
     {
         SAXSource stream = new SAXSource(new InputSource(inputStream));
 
@@ -103,7 +102,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     }
 
     public void testCloseStaxSourceOnComponentException()
-        throws MuleException, InterruptedException, IOException, XMLStreamException,
+        throws MuleException, InterruptedException, XMLStreamException,
         FactoryConfigurationError
     {
 
@@ -116,14 +115,13 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
         assertTrue(((TestXMLStreamReader) stream.getXMLStreamReader()).isClosed());
     }
 
-    //TODO fix
-//    public void testCloseStreamOnDispatcherException()
-//        throws MuleException, InterruptedException, IOException
-//    {
-//        client.send("vm://dispatcherExceptionBridge?connector=vm", inputStream, null);
-//
-//        assertTrue(inputStream.isClosed());
-//    }
+    public void testCloseStreamOnDispatcherException()
+        throws MuleException, InterruptedException
+    {
+        client.dispatch("vm://dispatcherExceptionBridge?connector=vm", inputStream, null);
+        Thread.sleep(1000);
+        assertTrue(inputStream.isClosed());
+    }
 
     // TODO MULE-3558 Streams are not closed if there are exceptions in the message
     // receiver. Protocol/Transport workers should clean up after themselves if there
@@ -133,11 +131,11 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     // is not available in the AbstractExceptionListener and cannot be closed.
 
 //    public void testCloseStreamOnInboundFilterException()
-//        throws MuleException, InterruptedException, IOException
+//        throws MuleException, InterruptedException
 //    {
 //        client.dispatch("vm://inboundFilterExceptionBridge?connector=vm", inputStream, null);
 //
-//        Thread.sleep(200);
+//        Thread.sleep(1000);
 //
 //        assertTrue(((TestByteArrayInputStream) inputStream).isClosed());
 //    }
