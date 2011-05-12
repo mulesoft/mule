@@ -33,7 +33,7 @@ public class JaxbTransformerTestCase extends AbstractMuleTestCase
     public void testCustomTransform() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(PERSON_XML, muleContext);
-        Person person = (Person) message.getPayload(DataTypeFactory.create(Person.class));
+        Person person = message.getPayload(DataTypeFactory.create(Person.class));
         assertNotNull(person);
         assertEquals("John Doe", person.getName());
         assertEquals("01/01/1970", person.getDob());
@@ -49,7 +49,6 @@ public class JaxbTransformerTestCase extends AbstractMuleTestCase
         ByteArrayInputStream in = new ByteArrayInputStream(PERSON_XML.getBytes());
         DefaultMuleMessage msg = new DefaultMuleMessage(in, muleContext);
         msg.setInboundProperty("foo", "fooValue");
-        //List<EmailAddress> emailAddresses = iBeansContext.transform(msg, new ListDataType<List<EmailAddress>>(EmailAddress.class));
         List<EmailAddress> emailAddresses = msg.getPayload(new ListDataType<List<EmailAddress>>(EmailAddress.class));
         assertNotNull(emailAddresses);
         assertEquals(2, emailAddresses.size());
@@ -58,6 +57,4 @@ public class JaxbTransformerTestCase extends AbstractMuleTestCase
         assertEquals("work", emailAddresses.get(1).getType());
         assertEquals("jdoe@bigco.com", emailAddresses.get(1).getAddress());
     }
-
-    
 }

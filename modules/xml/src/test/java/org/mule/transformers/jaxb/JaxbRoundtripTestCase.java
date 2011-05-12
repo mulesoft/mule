@@ -17,8 +17,7 @@ import org.mule.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
 import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import javax.xml.bind.JAXBContext;
 
@@ -38,7 +37,7 @@ public class JaxbRoundtripTestCase extends AbstractTransformerTestCase
     @Override
     public Transformer getTransformer() throws Exception
     {
-     JAXBUnmarshallerTransformer t = new JAXBUnmarshallerTransformer(ctx, DataTypeFactory.create(Person.class));
+        JAXBUnmarshallerTransformer t = new JAXBUnmarshallerTransformer(ctx, DataTypeFactory.create(Person.class));
         initialiseObject(t);
         return t;
     }
@@ -63,16 +62,11 @@ public class JaxbRoundtripTestCase extends AbstractTransformerTestCase
         Person p = new Person();
         p.setName("John Doe");
         p.setDob("01/01/1970");
-        List<EmailAddress> emailAddresses = new ArrayList<EmailAddress>(1);
-        EmailAddress ea = new EmailAddress();
-        ea.setType("home");
-        ea.setAddress("john.doe@gmail.com");
-        emailAddresses.add(ea);
-        EmailAddress ea2 = new EmailAddress();
-        ea2.setType("work");
-        ea2.setAddress("jdoe@bigco.com");
-        emailAddresses.add(ea2);
-        p.setEmailAddresses(emailAddresses);
+
+        EmailAddress ea = new EmailAddress("john.doe@gmail.com", "home");
+        EmailAddress ea2 = new EmailAddress("jdoe@bigco.com", "work");
+        p.setEmailAddresses(Arrays.asList(ea, ea2));
+
         return p;
     }
 

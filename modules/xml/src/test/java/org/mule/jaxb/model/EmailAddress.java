@@ -23,6 +23,18 @@ public class EmailAddress
     private String type;
     private String address;
 
+    public EmailAddress()
+    {
+        super();
+    }
+
+    public EmailAddress(String address, String type)
+    {
+        super();
+        this.address = address;
+        this.type = type;
+    }
+
     public String getType()
     {
         return type;
