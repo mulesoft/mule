@@ -12,12 +12,11 @@ package org.mule.module.scripting.builders;
 
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
-import org.mule.module.scripting.builders.ScriptConfigurationBuilder;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
 
 public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
-
+    @Override
     public String getConfigResources()
     {
         return "mule-config.groovy";
@@ -36,5 +35,4 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
             return null;
         }
     }
-
 }
