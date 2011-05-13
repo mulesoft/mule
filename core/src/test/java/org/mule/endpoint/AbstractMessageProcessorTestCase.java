@@ -33,6 +33,7 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.security.SecurityFilter;
 import org.mule.api.service.Service;
+import org.mule.api.transaction.RollbackMethod;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.context.notification.EndpointMessageNotification;
@@ -285,7 +286,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
     {
         public Exception sensedException;
 
-        public MuleEvent handleException(Exception exception, MuleEvent event)
+        public MuleEvent handleException(Exception exception, MuleEvent event, RollbackMethod rollbackMethod)
         {
             sensedException = exception;
             event.getMessage().setPayload(NullPayload.getInstance());
@@ -293,9 +294,9 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
             return event;
         }
 
-        public boolean isRedeliver()
+        public MuleEvent handleException(Exception exception, MuleEvent event)
         {
-            return false;
+            return handleException(exception, event, null);
         }
     }
 

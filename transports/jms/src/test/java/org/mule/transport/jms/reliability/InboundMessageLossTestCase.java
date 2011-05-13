@@ -11,10 +11,9 @@
 package org.mule.transport.jms.reliability;
 
 import org.mule.api.context.notification.ExceptionNotificationListener;
-import org.mule.api.model.Model;
 import org.mule.context.notification.ExceptionNotification;
-import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.exception.DefaultSystemExceptionStrategy;
+import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.jms.redelivery.MessageRedeliveredException;
 import org.mule.util.concurrent.Latch;
 
@@ -23,7 +22,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
 {
     private Latch messageRedelivered;
-    private final int latchTimeout = getTestTimeoutSecs() * 1000 / 4;
+    private final int latchTimeout = 1000;
     
     @Override
     protected String getConfigResources()
@@ -36,12 +35,8 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
     {
         super.doSetUp();
         
-        // Set SystemExceptionStrategy to redeliver messages
-        ((DefaultSystemExceptionStrategy) muleContext.getExceptionListener()).setRedeliver(true);
-        
-        // Set ServiceExceptionStrategy to redeliver messages
-        Model model = muleContext.getRegistry().lookupModel("default");
-        ((DefaultServiceExceptionStrategy) model.getExceptionListener()).setRedeliver(true);
+        // Set SystemExceptionStrategy to redeliver messages (this can only be configured programatically for now)
+        ((DefaultSystemExceptionStrategy) muleContext.getExceptionListener()).setRollbackTxFilter(new WildcardFilter("*"));
         
         // Tell us when a MessageRedeliverdException has been handled
         messageRedelivered = new Latch();

@@ -11,6 +11,7 @@
 package org.mule.transport.sftp.notification;
 
 import org.mule.api.exception.SystemExceptionHandler;
+import org.mule.api.transaction.RollbackMethod;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +25,8 @@ public class ExceptionListener implements SystemExceptionHandler
         logger.debug(e.getLocalizedMessage());
     }
 
-    public boolean isRedeliver()
+    public void handleException(Exception exception, RollbackMethod rollbackMethod)
     {
-        return false;
+        handleException(exception);
     }
-
 }

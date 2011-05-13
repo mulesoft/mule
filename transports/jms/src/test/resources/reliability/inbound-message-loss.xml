@@ -9,7 +9,10 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd">
 
-    <model name="default">
+    <model>
+    	<default-exception-strategy>
+    		<rollback-transaction exception-pattern="*" />
+    	</default-exception-strategy>
         <service name="NoException">
             <inbound>
                 <jms:inbound-endpoint queue="noException" />

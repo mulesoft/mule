@@ -12,6 +12,7 @@ package org.mule.module.xml.functional;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.transaction.RollbackMethod;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,16 +21,16 @@ public class HideExceptions implements MessagingExceptionHandler
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public MuleEvent handleException(Exception exception, MuleEvent event)
+    public MuleEvent handleException(Exception exception, MuleEvent event, RollbackMethod rollbackMethod)
     {
         logger.debug("Hiding exception: " + exception);
         logger.debug("(see config for test - some exceptions expected)");
         return null;
     }
 
-    public boolean isRedeliver()
+    public MuleEvent handleException(Exception exception, MuleEvent event)
     {
-        return false;
+        return handleException(exception, event, null);
     }
 }
 

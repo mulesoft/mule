@@ -25,7 +25,7 @@ import org.mule.api.processor.MessageProcessor;
 import java.util.List;
 
 /**
- * An object that owns message processors and delegates startup/shoutdown events to them
+ * An object that owns message processors and delegates startup/shutdown events to them.
  */
 public abstract class AbstractMessageProcessorOwner implements Lifecycle, MuleContextAware, FlowConstructAware
 {

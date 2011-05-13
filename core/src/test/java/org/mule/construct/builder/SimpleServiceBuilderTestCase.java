@@ -16,7 +16,7 @@ import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.component.simple.EchoComponent;
 import org.mule.construct.SimpleService;
 import org.mule.construct.SimpleService.Type;
-import org.mule.exception.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.services.SimpleMathsComponent;
 import org.mule.transformer.compression.GZipCompressTransformer;
@@ -33,7 +33,7 @@ public class SimpleServiceBuilderTestCase extends AbstractMuleTestCase
             .responseTransformers(new ObjectToByteArray(), new GZipCompressTransformer())
             .component(EchoComponent.class)
             .type(Type.DIRECT)
-            .exceptionStrategy(new DefaultServiceExceptionStrategy(muleContext))
+            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext))
             .build(muleContext);
 
         assertEquals("test-simple-service-full", simpleService.getName());

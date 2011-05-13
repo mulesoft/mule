@@ -4,7 +4,7 @@
 
 package ${patternBuilderPackageName};
 
-import org.mule.exception.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 
 import ${patternFQCN};
@@ -27,7 +27,7 @@ public class ${patternBuilderClassName}TestCase extends AbstractMuleTestCase
 #if($patternType == "siso")
             .outboundAddress("test://foo.out")
 #end
-        	.exceptionStrategy(new DefaultServiceExceptionStrategy(muleContext))
+        	.exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext))
         	.build(muleContext);
 
         assertEquals(patternName, ${patternVariableName}.getName());

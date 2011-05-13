@@ -10,9 +10,9 @@
 
 package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MuleEvent;
 import org.mule.api.exception.SystemExceptionHandler;
-import org.mule.exception.AbstractMessagingExceptionStrategy;
+import org.mule.api.transaction.RollbackMethod;
+import org.mule.exception.AbstractSystemExceptionStrategy;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
  * replacement of the {@link org.mule.exception.AbstractMessagingExceptionStrategy}.
  * This is used to test that overriding the default Exception strategy works.
  */
-public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
+public class TestExceptionStrategy extends AbstractSystemExceptionStrategy
     implements SystemExceptionHandler
 {
     /**
@@ -58,7 +58,7 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
     }
 
     @Override
-    public MuleEvent handleException(Exception exception, MuleEvent event)
+    public void handleException(Exception exception, RollbackMethod rollbackMethod)
     {
         ExceptionCallback callback = null;
         synchronized (callbackLock)
@@ -85,7 +85,6 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
         {
             logger.info("Exception caught on TestExceptionStrategy but there was no callback set.", exception);
         }
-        return event;
     }
 
     public void handleException(Exception exception)

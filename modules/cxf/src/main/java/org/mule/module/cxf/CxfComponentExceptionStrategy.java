@@ -12,7 +12,8 @@ package org.mule.module.cxf;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.exception.DefaultServiceExceptionStrategy;
+import org.mule.api.transaction.RollbackMethod;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 
 import org.apache.cxf.interceptor.Fault;
 
@@ -21,7 +22,7 @@ import org.apache.cxf.interceptor.Fault;
  * to be passed as-is, not wrapped in a Mule exception object. This ensures the Cxf
  * serialiser/deserialiser can send the correct exception object to the client.
  */
-public class CxfComponentExceptionStrategy extends DefaultServiceExceptionStrategy
+public class CxfComponentExceptionStrategy extends DefaultMessagingExceptionStrategy
 {
     public CxfComponentExceptionStrategy(MuleContext context)
     {
@@ -29,15 +30,15 @@ public class CxfComponentExceptionStrategy extends DefaultServiceExceptionStrate
     }
     
     @Override
-    protected void doHandleException(Exception e, MuleEvent event)
+    protected void doHandleException(Exception e, MuleEvent event, RollbackMethod rollbackMethod)
     {
         if (e.getCause() instanceof Fault)
         {
-            super.doHandleException((Exception) e.getCause(), event);
+            super.doHandleException((Exception) e.getCause(), event, rollbackMethod);
         }
         else
         {
-            super.doHandleException(e, event);
+            super.doHandleException(e, event, rollbackMethod);
         }
     }
 }

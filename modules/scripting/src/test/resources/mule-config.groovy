@@ -11,7 +11,7 @@ import org.mule.component.DefaultJavaComponent
 import org.mule.config.ChainedThreadingProfile
 import org.mule.endpoint.DefaultEndpointFactory
 import org.mule.endpoint.EndpointURIEndpointBuilder
-import org.mule.exception.DefaultServiceExceptionStrategy
+import org.mule.exception.DefaultMessagingExceptionStrategy
 import org.mule.interceptor.InterceptorStack
 import org.mule.model.seda.SedaModel
 import org.mule.model.seda.SedaService
@@ -205,7 +205,7 @@ service.asyncReplyMessageSource.addMessageProcessor(responseAggregator);
 service.asyncReplyMessageSource.timeout = 10001
 
 //Exception Strategy
-dces = new DefaultServiceExceptionStrategy();
+dces = new DefaultMessagingExceptionStrategy();
 dces.addEndpoint(createOutboundEndpoint("test://orange.exceptions", null));
 service.exceptionListener = dces
 

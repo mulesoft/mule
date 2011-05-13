@@ -179,7 +179,9 @@
 
     <flow name="async-tx">
         <vm:inbound-endpoint path="async-tx-in" exchange-pattern="request-response">
+            <!-- Not supported
         	<vm:transaction action="ALWAYS_BEGIN"/>
+        	-->
         </vm:inbound-endpoint>
         <append-string-transformer message="a" />
         <async>

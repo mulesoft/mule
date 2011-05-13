@@ -12,9 +12,8 @@ package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.TransactionException;
-import org.mule.exception.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
@@ -62,7 +61,7 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase
 
     }
 
-    static class AssertRollbackServiceExceptionStrategy extends DefaultServiceExceptionStrategy
+    static class AssertRollbackServiceExceptionStrategy extends DefaultMessagingExceptionStrategy
     {
         private int visits = 0;
 
@@ -72,9 +71,9 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase
         }
         
         @Override
-        protected void routeException(MuleEvent event, MessageProcessor target, Throwable t)
+        protected void routeException(MuleEvent event, Throwable t)
         {
-            super.routeException(event, target, t);
+            super.routeException(event, t);
 
             if (visits++ > 1)
             {

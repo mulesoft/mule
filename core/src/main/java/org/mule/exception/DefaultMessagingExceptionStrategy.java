@@ -13,20 +13,22 @@ package org.mule.exception;
 import org.mule.api.MuleContext;
 
 /**
- * Log exception, fire a notification, and clean up transaction if any.
+ * <code>DefaultServiceExceptionStrategy</code> is the default exception handler
+ * for flows. The handler logs errors and will forward the message and exception
+ * to an exception endpointUri if one is set on this Exception strategy
  */
-public class DefaultSystemExceptionStrategy extends AbstractSystemExceptionStrategy
+public class DefaultMessagingExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
     /** 
      * For IoC only 
-     * @deprecated Use DefaultSystemExceptionStrategy(MuleContext muleContext) instead
+     * @deprecated Use DefaultServiceExceptionStrategy(MuleContext muleContext) instead
      */
-    public DefaultSystemExceptionStrategy()
+    public DefaultMessagingExceptionStrategy()
     {
         super();
     }
 
-    public DefaultSystemExceptionStrategy(MuleContext muleContext)
+    public DefaultMessagingExceptionStrategy(MuleContext muleContext)
     {
         super();
         setMuleContext(muleContext);

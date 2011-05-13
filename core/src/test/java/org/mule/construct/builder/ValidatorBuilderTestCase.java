@@ -11,7 +11,7 @@
 package org.mule.construct.builder;
 
 import org.mule.construct.Validator;
-import org.mule.exception.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.AbstractMuleTestCase;
 
@@ -25,7 +25,7 @@ public class ValidatorBuilderTestCase extends AbstractMuleTestCase
             .ackExpression("#[string:GOOD:#[message:payload]]")
             .nackExpression("#[string:BAD:#[message:payload]]")
             .outboundAddress("test://foo.out")
-            .exceptionStrategy(new DefaultServiceExceptionStrategy(muleContext))
+            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext))
             .build(muleContext);
 
         assertEquals("test-validator-no-error", validator.getName());
@@ -40,7 +40,7 @@ public class ValidatorBuilderTestCase extends AbstractMuleTestCase
             .nackExpression("#[string:BAD:#[message:payload]]")
             .errorExpression("#[string:ERROR:#[message:payload]]")
             .outboundAddress("test://foo.out")
-            .exceptionStrategy(new DefaultServiceExceptionStrategy(muleContext))
+            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext))
             .build(muleContext);
 
         assertEquals("test-validator-full", validator.getName());

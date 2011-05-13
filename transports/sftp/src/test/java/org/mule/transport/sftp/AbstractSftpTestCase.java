@@ -27,13 +27,13 @@ import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.model.Model;
 import org.mule.api.service.Service;
+import org.mule.api.transaction.RollbackMethod;
 import org.mule.api.transport.Connector;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.transport.sftp.util.ValueHolder;
-import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 import org.mule.util.StringMessageUtils;
 
@@ -368,16 +368,16 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
             // and count down the latch after saving the thrown exception
             muleContext.setExceptionListener(new SystemExceptionHandler()
             {
-                public void handleException(Exception e)
+                public void handleException(Exception e, RollbackMethod rollbackMethod)
                 {
                     if (logger.isInfoEnabled()) logger.info("expected exception occurred: " + e, e);
                     exceptionHolder.value = e;
                     latch.countDown();
                 }
 
-                public boolean isRedeliver()
+                public void handleException(Exception exception)
                 {
-                    return false;
+                    handleException(exception, null);
                 }
             });
 
@@ -386,7 +386,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                 muleContext.getRegistry().lookupService(serviceName).setExceptionListener(
                     new MessagingExceptionHandler()
                     {
-                        public MuleEvent handleException(Exception e, MuleEvent event)
+                        public MuleEvent handleException(Exception e, MuleEvent event, RollbackMethod rollbackMethod)
                         {
                             if (logger.isInfoEnabled()) logger.info("expected exception occurred: " + e, e);
                             exceptionHolder.value = e;
@@ -394,9 +394,9 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                             return event;
                         }
 
-                        public boolean isRedeliver()
+                        public MuleEvent handleException(Exception exception, MuleEvent event)
                         {
-                            return false;
+                            return handleException(exception, event, null);
                         }
                     });
             }
@@ -736,7 +736,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
             // sftp-connector
             listener = new SystemExceptionHandler()
             {
-                public void handleException(Exception e)
+                public void handleException(Exception e, RollbackMethod rollbackMethod)
                 {
                     exceptionHolder.value = e;
                     if (logger.isDebugEnabled())
@@ -745,15 +745,15 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                     latch.countDown();
                 }
 
-                public boolean isRedeliver()
+                public void handleException(Exception exception)
                 {
-                    return false;
+                    handleException(exception, null);
                 }
             };
 
             messagingListener = new MessagingExceptionHandler()
             {
-                public MuleEvent handleException(Exception e, MuleEvent event)
+                public MuleEvent handleException(Exception e, MuleEvent event, RollbackMethod rollbackMethod)
                 {
                     exceptionHolder.value = e;
                     if (logger.isDebugEnabled())
@@ -763,9 +763,9 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                     return event;
                 }
 
-                public boolean isRedeliver()
+                public MuleEvent handleException(Exception exception, MuleEvent event)
                 {
-                    return false;
+                    return handleException(exception, event, null);
                 }
             };
 

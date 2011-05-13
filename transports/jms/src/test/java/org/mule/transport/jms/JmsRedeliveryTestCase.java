@@ -54,6 +54,7 @@ public class JmsRedeliveryTestCase extends FunctionalTestCase
         {
             public void onNotification(ExceptionNotification notification)
             {
+                logger.debug("onNotification() = " + notification.getException().getClass().getName());
                 if (notification.getException() instanceof MessageRedeliveredException)
                 {
                     mrexFired.countDown();

@@ -54,7 +54,6 @@
                 </chaining-router>
             </outbound>
             <custom-exception-strategy class="org.mule.test.integration.exceptions.ExceptionStrategyTransactionTestCase$AssertRollbackServiceExceptionStrategy">
-                <rollback-transaction exception-pattern="*"/>
                 <jms:outbound-endpoint ref="ExceptionQueue">
                 	<transformer ref="ObjectToString" />
                 </jms:outbound-endpoint>
@@ -72,7 +71,6 @@
                 </chaining-router>
             </outbound>
             <custom-exception-strategy class="org.mule.test.integration.exceptions.ExceptionStrategyTransactionTestCase$AssertRollbackServiceExceptionStrategy">
-                <rollback-transaction exception-pattern="*"/>
                 <vm:outbound-endpoint path="nonexistant" exchange-pattern="request-response">
                     <vm:transaction action="NONE"/>
                 </vm:outbound-endpoint>

@@ -16,6 +16,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.lifecycle.LifecycleException;
+import org.mule.api.transaction.RollbackMethod;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.transport.Connector;
@@ -24,7 +25,6 @@ import org.mule.transport.AbstractMessageReceiver;
 import org.mule.transport.AbstractReceiverWorker;
 import org.mule.transport.ConnectException;
 import org.mule.transport.jms.filters.JmsSelectorFilter;
-import org.mule.transport.jms.redelivery.MessageRedeliveredException;
 import org.mule.transport.jms.redelivery.RedeliveryHandler;
 import org.mule.util.ClassUtils;
 
@@ -318,33 +318,35 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
         {
             try
             {
+                // Note: Despite the name "Worker", there is no new thread created here in order to maintain synchronicity for exception handling.  
                 JmsWorker worker = new JmsWorker(message, MultiConsumerJmsMessageReceiver.this, this);
                 worker.processMessages();
             }
             catch (Exception e)
             {
-                boolean redeliver;
+                // Use this rollback method in case a transaction has not been configured on the endpoint.
+                RollbackMethod rollbackMethod = new RollbackMethod()
+                {                    
+                    public void rollback()
+                    {
+                        try
+                        {
+                            session.recover();
+                        }
+                        catch (JMSException jmsEx)
+                        {
+                            logger.error(jmsEx);
+                        }
+                    }
+                };
+                
                 if (e instanceof MessagingException)
                 {
-                    getFlowConstruct().getExceptionListener().handleException(e, ((MessagingException) e).getEvent());
-                    redeliver = getFlowConstruct().getExceptionListener().isRedeliver();
+                    getFlowConstruct().getExceptionListener().handleException(e, ((MessagingException) e).getEvent(), rollbackMethod);
                 }
                 else
                 {
-                    getConnector().getMuleContext().getExceptionListener().handleException(e);
-                    redeliver = getConnector().getMuleContext().getExceptionListener().isRedeliver();
-                }
-                
-                if (redeliver && !(e instanceof MessageRedeliveredException))
-                {
-                    try
-                    {
-                        session.recover();
-                    }
-                    catch (JMSException jmsEx)
-                    {
-                        logger.error(jmsEx);
-                    }
+                    getConnector().getMuleContext().getExceptionListener().handleException(e, rollbackMethod);
                 }
             }
         }

@@ -21,7 +21,7 @@ import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.EntryPointResolverSet;
 import org.mule.api.model.Model;
 import org.mule.component.DefaultComponentLifecycleAdapterFactory;
-import org.mule.exception.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.lifecycle.EmptyLifecycleCallback;
 import org.mule.model.resolvers.DefaultEntryPointResolverSet;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
@@ -45,7 +45,7 @@ public abstract class AbstractModel implements Model
     private String name = DEFAULT_MODEL_NAME;
     private EntryPointResolverSet entryPointResolverSet = null; // values are supplied below as required
     private LifecycleAdapterFactory lifecycleAdapterFactory = new DefaultComponentLifecycleAdapterFactory();
-    private MessagingExceptionHandler exceptionListener = new DefaultServiceExceptionStrategy();
+    private MessagingExceptionHandler exceptionListener = new DefaultMessagingExceptionStrategy();
 
     protected transient Log logger = LogFactory.getLog(getClass());
     protected MuleContext muleContext;

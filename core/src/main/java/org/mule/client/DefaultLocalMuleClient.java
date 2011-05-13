@@ -28,7 +28,7 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.transport.ReceiveException;
 import org.mule.endpoint.SimpleEndpointCache;
-import org.mule.exception.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.session.DefaultMuleSession;
 
@@ -172,7 +172,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
         public MessagingExceptionHandler getExceptionListener()
         {
-            return new DefaultServiceExceptionStrategy(muleContext);
+            return new DefaultMessagingExceptionStrategy(muleContext);
         }
 
         public LifecycleState getLifecycleState()

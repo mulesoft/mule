@@ -105,65 +105,26 @@ public class TransactionTemplate<T>
             tx = null;
         }
 
-        try
+        T result = callback.doInTransaction();
+        if (tx != null)
         {
-            T result = callback.doInTransaction();
-            if (tx != null)
-            {
-                //verify that transaction is still active
-                tx = TransactionCoordination.getInstance().getTransaction();
-            }
-            if (tx != null)
-            {
-                resolveTransaction(tx);
-            }
-            if (suspendedXATx != null)
-            {
-                resumeXATransaction(suspendedXATx);
-                tx = suspendedXATx;
-            }
-            return result;
-        }
-        catch (Exception e)
-        {
+            //verify that transaction is still active
             tx = TransactionCoordination.getInstance().getTransaction();
-            if (tx != null)
-            {
-                tx.setRollbackOnly();
-
-                // The exception strategy can choose to route exception
-                // messages as part of the current transaction. So only rollback the
-                // tx if it has been marked for rollback (which is the default
-                // case in the AbstractExceptionListener)
-                if (tx.isRollbackOnly())
-                {
-                    logger.debug("Exception caught: rollback transaction", e);
-                }
-                resolveTransaction(tx);
-            }
-            if (suspendedXATx != null)
-            {
-                resumeXATransaction(suspendedXATx);
-                // we've handled this exception above. just return null now, this way we isolate
-                // the context delimited by XA's ALWAYS_BEGIN
-                return null;
-            }
-            throw e;
         }
-        catch (Error e)
+        if (tx != null)
         {
-            if (tx != null)
-            {
-                logger.info("Error caught, rolling back TX " + tx, e);
-                tx.rollback();
-            }
-            throw e;
+            resolveTransaction(tx);
         }
-        finally
+        if (suspendedXATx != null)
         {
-            if (joinedExternal != null)
-                TransactionCoordination.getInstance().unbindTransaction(joinedExternal);
+            resumeXATransaction(suspendedXATx);
+            tx = suspendedXATx;
         }
+        if (joinedExternal != null)
+        {
+            TransactionCoordination.getInstance().unbindTransaction(joinedExternal);
+        }
+        return result;
     }
 
     protected void resolveTransaction(Transaction tx) throws TransactionException

@@ -11,6 +11,7 @@
 package org.mule.tck.functional;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.transaction.RollbackMethod;
 import org.mule.exception.AbstractMessagingExceptionStrategy;
 
 import org.apache.commons.logging.Log;
@@ -24,7 +25,7 @@ public class QuietExceptionStrategy extends AbstractMessagingExceptionStrategy
     protected transient Log logger = LogFactory.getLog(getClass());
 
     @Override
-    protected void doHandleException(Exception e, MuleEvent event)
+    protected void doHandleException(Exception e, MuleEvent event, RollbackMethod rollbackMethod)
     {
         logger.debug("Ignoring", e);
     }

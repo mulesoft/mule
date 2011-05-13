@@ -11,15 +11,9 @@
 package org.mule.api.exception;
 
 
-/**
- * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
- */
 public interface ExceptionHandler 
 {
-    /**
-     * Redeliver the source message again after it has been handled by this exception handler?
-     */
-    boolean isRedeliver();
+    // empty
 }
 
 

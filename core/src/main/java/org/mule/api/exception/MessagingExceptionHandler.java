@@ -11,12 +11,23 @@
 package org.mule.api.exception;
 
 import org.mule.api.MuleEvent;
+import org.mule.api.transaction.RollbackMethod;
 
 /**
  * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
  */
 public interface MessagingExceptionHandler extends ExceptionHandler
 {
+    /**
+     * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
+     * 
+     * @param exception which occurred
+     * @param event which was being processed when the exception occurred
+     * @param rollbackMethod will be called if transactions are not used in order to achieve atomic message delivery 
+     * @return new event to route on to the rest of the flow, generally with ExceptionPayload set on the message
+     */
+    MuleEvent handleException(Exception exception, MuleEvent event, RollbackMethod rollbackMethod);
+
     /**
      * Take some action when a messaging exception has occurred (i.e., there was a message in play when the exception occurred).
      * 

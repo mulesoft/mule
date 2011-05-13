@@ -22,15 +22,22 @@ import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.security.SecurityException;
+import org.mule.api.transaction.RollbackMethod;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.api.util.StreamCloserService;
 import org.mule.config.ExceptionHelper;
+import org.mule.context.notification.ExceptionNotification;
+import org.mule.context.notification.SecurityNotification;
+import org.mule.management.stats.FlowConstructStatistics;
+import org.mule.management.stats.ServiceStatistics;
 import org.mule.message.ExceptionMessage;
 import org.mule.processor.AbstractMessageProcessorOwner;
 import org.mule.routing.filters.WildcardFilter;
 import org.mule.routing.outbound.MulticastingRouter;
 import org.mule.transaction.TransactionCoordination;
+import org.mule.util.CollectionUtils;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -40,17 +47,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <code>AbstractExceptionListener</code> is a base implementation that custom
- * Exception Listeners can override. It provides template methods for handling the
- * for base types of exceptions plus allows multiple targets to be associated with
- * this exception listener and provides an implementation for dispatching exception
- * events from this Listener.
+ * This is the base class for exception strategies which contains several helper methods.  However, you should 
+ * probably inherit from <code>AbstractMessagingExceptionStrategy</code> (if you are creating a Messaging Exception Strategy) 
+ * or <code>AbstractSystemExceptionStrategy</code> (if you are creating a System Exception Strategy) rather than directly from this class.
  */
-public abstract class AbstractExceptionListener extends AbstractMessageProcessorOwner
+public abstract class AbstractExceptionStrategy extends AbstractMessageProcessorOwner
 {
-    /**
-     * logger used by this class
-     */
     protected transient Log logger = LogFactory.getLog(getClass());
 
     @SuppressWarnings("unchecked")
@@ -63,6 +65,12 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
 
     protected boolean enableNotifications = true;
 
+    protected boolean isRollback(Throwable t)
+    {
+        return (rollbackTxFilter != null && rollbackTxFilter.accept(t.getClass().getName())) ||
+            (commitTxFilter != null && !commitTxFilter.accept(t.getClass().getName()));
+    }
+    
     public List<MessageProcessor> getMessageProcessors()
     {
         return messageProcessors;
@@ -132,52 +140,18 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
         logger.info("Initialising exception listener: " + toString());
     }
 
-    /**
-     * If there is a current transaction this method will mark it for rollback This
-     * method should not be called if an event is routed from this exception handler
-     * to an endpoint that should take part in the current transaction
-     */
-    protected void handleTransaction(Throwable t)
+    protected void fireNotification(Exception ex)
     {
-        Transaction tx = TransactionCoordination.getInstance().getTransaction();
-
-        if (tx == null)
+        if (enableNotifications)
         {
-            return;
-        }
-        // Work with the root exception, not anything thaat wraps it
-        t = ExceptionHelper.getRootException(t);
-
-        if (rollbackTxFilter == null && commitTxFilter == null)
-        {
-            // By default, rollback the transaction
-            rollbackTransaction();
-        }
-        else if (rollbackTxFilter != null && rollbackTxFilter.accept(t.getClass().getName()))
-        {
-            // the rollback filter take preceedence over th ecommit filter
-            rollbackTransaction();
-        }
-        else if (commitTxFilter != null && !commitTxFilter.accept(t.getClass().getName()))
-        {
-            // we only have to rollback if the commitTxFilter does NOT match
-            rollbackTransaction();
-        }
-    }
-
-    protected void rollbackTransaction()
-    {
-        Transaction tx = TransactionCoordination.getInstance().getTransaction();
-        try
-        {
-            if (tx != null)
+            if (ex instanceof SecurityException)
             {
-                tx.setRollbackOnly();
+                fireNotification(new SecurityNotification((SecurityException) ex, SecurityNotification.SECURITY_AUTHENTICATION_FAILED));
             }
-        }
-        catch (TransactionException e)
-        {
-            logException(e);
+            else
+            {
+                fireNotification(new ExceptionNotification(ex));
+            }
         }
     }
 
@@ -196,7 +170,7 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
      * @param t the exception thrown. This will be sent with the ExceptionMessage
      * @see ExceptionMessage
      */
-    protected void routeException(MuleEvent event, MessageProcessor target, Throwable t)
+    protected void routeException(MuleEvent event, Throwable t)
     {
         if (!messageProcessors.isEmpty())
         {
@@ -233,6 +207,68 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
             {
                 logFatal(event, e);
             }
+        }
+        
+        List<MessageProcessor> processors = getMessageProcessors();
+        FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
+        if (CollectionUtils.isNotEmpty(processors) && statistics instanceof ServiceStatistics)
+        {
+            if (statistics.isEnabled())
+            {
+                for (MessageProcessor endpoint : processors)
+                {
+                    ((ServiceStatistics) statistics).getOutboundRouterStat().incrementRoutedMessage(endpoint);
+                }
+            }
+        }
+    }
+
+    protected void commit()
+    {
+        Transaction tx = TransactionCoordination.getInstance().getTransaction();
+        if (tx != null)
+        {
+            try
+            {
+                tx.commit();
+            }
+            catch (TransactionException e)
+            {
+                logger.error(e);
+            }
+        }
+    }
+
+    protected void rollback(RollbackMethod rollbackMethod)
+    {
+        Transaction tx = TransactionCoordination.getInstance().getTransaction();
+        if (tx != null)
+        {
+            try
+            {
+                tx.rollback();
+                
+                // TODO The following was in the catch clause of TransactionTemplate previously.  
+                // Do we need to do this here?  If so, where can we store these variables (suspendedXATx, joinedExternal)
+                // so that they are available to us in the exception handler?
+                //
+                //if (suspendedXATx != null)
+                //{
+                //  resumeXATransaction(suspendedXATx);
+                //}
+                //if (joinedExternal != null)
+                //{
+                //    TransactionCoordination.getInstance().unbindTransaction(joinedExternal);
+                //}
+            }
+            catch (TransactionException e)
+            {
+                logger.error(e);
+            }
+        }
+        else if (rollbackMethod != null)
+        {
+            rollbackMethod.rollback();
         }
     }
 
@@ -278,6 +314,12 @@ public abstract class AbstractExceptionListener extends AbstractMessageProcessor
      */
     protected void logFatal(MuleEvent event, Throwable t)
     {
+        FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
+        if (statistics != null && statistics.isEnabled())
+        {
+            statistics.incFatalError();
+        }
+
         logger.fatal(
             "Failed to dispatch message to error queue after it failed to process.  This may cause message loss."
                             + (event.getMessage() == null ? "" : "Logging Message here: \n" + event.getMessage().toString()), t);

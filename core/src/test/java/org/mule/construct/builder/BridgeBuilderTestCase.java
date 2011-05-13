@@ -12,7 +12,7 @@ package org.mule.construct.builder;
 
 import org.mule.MessageExchangePattern;
 import org.mule.construct.Bridge;
-import org.mule.exception.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.compression.GZipCompressTransformer;
 import org.mule.transformer.simple.ObjectToByteArray;
@@ -29,7 +29,7 @@ public class BridgeBuilderTestCase extends AbstractMuleTestCase
             .outboundAddress("test://foo.out")
             .exchangePattern(MessageExchangePattern.REQUEST_RESPONSE)
             .transacted(false)
-            .exceptionStrategy(new DefaultServiceExceptionStrategy(muleContext))
+            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext))
             .build(muleContext);
 
         assertEquals("test-bridge-full", bridge.getName());

@@ -16,7 +16,7 @@ import java.net.URISyntaxException;
 
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
-import org.mule.exception.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.module.ws.construct.WSProxy;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transformer.compression.GZipCompressTransformer;
@@ -50,7 +50,7 @@ public class WSProxyBuilderTestCase extends AbstractMuleTestCase
             .outboundAddress("test://bar")
             .transformers(new StringAppendTransformer("bar"))
             .responseTransformers(new ObjectToByteArray(), new GZipCompressTransformer())
-            .exceptionStrategy(new DefaultServiceExceptionStrategy(muleContext))
+            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext))
             .build(muleContext);
 
         assertEquals("test-ws-proxy-full-file-wsdl", wsProxy.getName());

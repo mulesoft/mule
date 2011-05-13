@@ -33,7 +33,7 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.source.MessageSource;
-import org.mule.exception.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
@@ -84,7 +84,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         this.muleContext = muleContext;
         this.name = name;
         this.lifecycleManager = new FlowConstructLifecycleManager(this, muleContext);
-        this.exceptionListener = new DefaultServiceExceptionStrategy(muleContext);
+        this.exceptionListener = new DefaultMessagingExceptionStrategy(muleContext);
     }
 
     public final void initialise() throws InitialisationException

@@ -23,7 +23,7 @@ import org.mule.api.routing.OutboundRouter;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
-import org.mule.exception.AbstractExceptionListener;
+import org.mule.exception.AbstractExceptionStrategy;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
 import org.mule.routing.ForwardingCatchAllStrategy;
 import org.mule.routing.filters.MessagePropertyFilter;
@@ -111,8 +111,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(muleContext.getRegistry().lookupModel("main").getExceptionListener());
         assertNotNull(service.getExceptionListener());
 
-        assertTrue(((AbstractExceptionListener) service.getExceptionListener()).getMessageProcessors().size() > 0);
-        OutboundEndpoint ep = (OutboundEndpoint) ((AbstractExceptionListener) service.getExceptionListener()).getMessageProcessors().get(0);
+        assertTrue(((AbstractExceptionStrategy) service.getExceptionListener()).getMessageProcessors().size() > 0);
+        OutboundEndpoint ep = (OutboundEndpoint) ((AbstractExceptionStrategy) service.getExceptionListener()).getMessageProcessors().get(0);
 
         assertEquals("test://orange.exceptions", ep.getEndpointURI().toString());
     }
@@ -141,8 +141,8 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         }
         assertTrue(model.getExceptionListener() instanceof TestExceptionStrategy);
 
-        assertTrue(((AbstractExceptionListener) model.getExceptionListener()).getMessageProcessors().size() > 0);
-        OutboundEndpoint ep = (OutboundEndpoint) ((AbstractExceptionListener) model.getExceptionListener()).getMessageProcessors().get(0);
+        assertTrue(((AbstractExceptionStrategy) model.getExceptionListener()).getMessageProcessors().size() > 0);
+        OutboundEndpoint ep = (OutboundEndpoint) ((AbstractExceptionStrategy) model.getExceptionListener()).getMessageProcessors().get(0);
 
         assertEquals("test://component.exceptions", ep.getEndpointURI().toString());
 

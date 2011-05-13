@@ -10,7 +10,6 @@
 
 package org.mule.config.spring.handlers;
 
-import org.mule.RouteableExceptionStrategy;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.LoggerMessageProcessor;
 import org.mule.component.DefaultInterfaceBinding;
@@ -97,7 +96,7 @@ import org.mule.context.notification.ListenerSubscriptionPair;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
-import org.mule.exception.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.BeanBuilderTransformer;
 import org.mule.expression.transformers.ExpressionArgument;
@@ -219,8 +218,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("default-service-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE));
         registerBeanDefinitionParser("threading-profile", new ThreadingProfileDefinitionParser("threadingProfile", MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE));
         registerBeanDefinitionParser("custom-exception-strategy", new ChildDefinitionParser("exceptionListener", null));
-        registerBeanDefinitionParser("default-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultServiceExceptionStrategy.class));
-        registerDeprecatedBeanDefinitionParser("default-service-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultServiceExceptionStrategy.class), "Use default-exception-strategy instead.");
+        registerBeanDefinitionParser("default-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultMessagingExceptionStrategy.class));
         registerBeanDefinitionParser("commit-transaction", new ExceptionTXFilterDefinitionParser("commitTxFilter"));
         registerBeanDefinitionParser("rollback-transaction", new ExceptionTXFilterDefinitionParser("rollbackTxFilter"));
         registerBeanDefinitionParser("custom-agent", new DefaultNameMuleOrphanDefinitionParser());
@@ -232,7 +230,6 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("simple-in-memory-queue-store", new QueueStoreDefinitionParser(MemoryObjectStore.class));
         registerBeanDefinitionParser("file-queue-store", new QueueStoreDefinitionParser(FileObjectStore.class));
         
-        registerBeanDefinitionParser("routeable-exception-strategy", new ChildDefinitionParser("exceptionListener", RouteableExceptionStrategy.class));
         registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
         registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
         registerMuleBeanDefinitionParser("notifications", new NamedDefinitionParser(MuleProperties.OBJECT_NOTIFICATION_MANAGER)).addAlias("dynamic", "notificationDynamic");

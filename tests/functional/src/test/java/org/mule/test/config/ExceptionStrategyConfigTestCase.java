@@ -11,7 +11,7 @@
 package org.mule.test.config;
 
 import org.mule.api.service.Service;
-import org.mule.exception.DefaultServiceExceptionStrategy;
+import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.tck.FunctionalTestCase;
 
 public class ExceptionStrategyConfigTestCase extends FunctionalTestCase
@@ -26,9 +26,9 @@ public class ExceptionStrategyConfigTestCase extends FunctionalTestCase
         Service service = muleContext.getRegistry().lookupService("testService1");
         assertNotNull(service);
         assertNotNull(service.getExceptionListener());
-        assertTrue(service.getExceptionListener() instanceof DefaultServiceExceptionStrategy);
+        assertTrue(service.getExceptionListener() instanceof DefaultMessagingExceptionStrategy);
 
-        DefaultServiceExceptionStrategy es = (DefaultServiceExceptionStrategy)service.getExceptionListener();
+        DefaultMessagingExceptionStrategy es = (DefaultMessagingExceptionStrategy)service.getExceptionListener();
         assertFalse(es.isEnableNotifications());
         assertNotNull(es.getCommitTxFilter());
         assertEquals("java.io.*", es.getCommitTxFilter().getPattern());
