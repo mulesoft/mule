@@ -10,11 +10,6 @@
 
 package org.mule.module.pgp;
 
-import org.mule.api.lifecycle.Initialisable;
-import org.mule.api.lifecycle.InitialisationException;
-import org.mule.config.i18n.CoreMessages;
-import org.mule.util.IOUtils;
-
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,7 +21,13 @@ import org.bouncycastle.openpgp.PGPPublicKey;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
+import org.mule.api.lifecycle.Initialisable;
+import org.mule.api.lifecycle.InitialisationException;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.module.pgp.i18n.PGPMessages;
+import org.mule.util.IOUtils;
 
 public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
 {
@@ -67,7 +68,7 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         InputStream in = IOUtils.getResourceAsStream(getPublicKeyRingFileName(), getClass());
         PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(in);
         in.close();
-        
+
         for (Iterator iterator = collection.getKeyRings(); iterator.hasNext();)
         {
             PGPPublicKeyRing ring = (PGPPublicKeyRing) iterator.next();
@@ -76,7 +77,8 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
             {
                 PGPPublicKey publicKey = (PGPPublicKey) iterator2.next();
                 Iterator userIDs = publicKey.getUserIDs();
-                if (userIDs.hasNext()) {
+                if (userIDs.hasNext())
+                {
                     userID = (String) userIDs.next();
                 }
                 principalsKeyBundleMap.put(userID, publicKey);
@@ -90,6 +92,27 @@ public class PGPKeyRingImpl implements PGPKeyRing, Initialisable
         PGPSecretKeyRingCollection collection = new PGPSecretKeyRingCollection(in);
         in.close();
         secretKey = collection.getSecretKey(Long.valueOf(getSecretAliasId()));
+        
+        if (secretKey == null)
+        {
+            StringBuffer message = new StringBuffer();
+            message.append('\n');
+            Iterator iterator = collection.getKeyRings();
+            while (iterator.hasNext())
+            {
+                PGPSecretKeyRing ring = (PGPSecretKeyRing) iterator.next();
+                Iterator secretKeysIterator = ring.getSecretKeys();
+                while (secretKeysIterator.hasNext())
+                {
+                    PGPSecretKey k = (PGPSecretKey) secretKeysIterator.next();
+                    message.append("Key: ");
+                    message.append(k.getKeyID());
+                    message.append('\n');
+                }
+            }
+            throw new InitialisationException(PGPMessages.noSecretKeyFoundButAvailable(message.toString()),
+                this);
+        }
     }
 
     public String getSecretKeyRingFileName()
