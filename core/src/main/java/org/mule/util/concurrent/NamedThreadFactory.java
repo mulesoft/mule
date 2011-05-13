@@ -56,7 +56,7 @@ public class NamedThreadFactory implements ThreadFactory
 
     protected void doConfigureThread(Thread t)
     {
-        t.setName(name + '.' + counter.getAndIncrement());
+        t.setName(String.format("%s.%02d", name, counter.getAndIncrement()));
     }
 
     public ClassLoader getContextClassLoader()

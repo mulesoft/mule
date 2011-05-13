@@ -37,7 +37,7 @@ public class NamedThreadFactoryTestCase extends AbstractMuleTestCase
 
             public void run()
             {
-                assertEquals(testThreadName + ".1", Thread.currentThread().getName());
+                assertEquals(testThreadName + ".01", Thread.currentThread().getName());
                 assertEquals(testClassLoader, Thread.currentThread().getContextClassLoader());
                 latch.countDown();
             }
@@ -50,11 +50,11 @@ public class NamedThreadFactoryTestCase extends AbstractMuleTestCase
     {
         NamedThreadFactory threadFactory = new NamedThreadFactory(testThreadName);
         Thread t = threadFactory.newThread(nullRunnable);
-        assertEquals(testThreadName + ".1", t.getName());
+        assertEquals(testThreadName + ".01", t.getName());
         t = threadFactory.newThread(nullRunnable);
-        assertEquals(testThreadName + ".2", t.getName());
+        assertEquals(testThreadName + ".02", t.getName());
         t = threadFactory.newThread(nullRunnable);
-        assertEquals(testThreadName + ".3", t.getName());
+        assertEquals(testThreadName + ".03", t.getName());
     }
 
 }
