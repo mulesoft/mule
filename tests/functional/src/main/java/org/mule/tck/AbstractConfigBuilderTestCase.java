@@ -29,7 +29,6 @@ import org.mule.component.AbstractComponent;
 import org.mule.component.PooledJavaComponent;
 import org.mule.config.PoolingProfile;
 import org.mule.config.QueueProfile;
-import org.mule.exception.AbstractMessagingExceptionStrategy;
 import org.mule.interceptor.InterceptorStack;
 import org.mule.interceptor.LoggingInterceptor;
 import org.mule.interceptor.TimerInterceptor;
@@ -114,7 +113,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     {
         Service service = muleContext.getRegistry().lookupService("appleComponent");
         assertNotNull(service.getExceptionListener());
-        assertTrue(AbstractMessagingExceptionStrategy.class.isAssignableFrom(service.getExceptionListener().getClass()));
+        assertTrue(service.getExceptionListener() instanceof MessagingExceptionHandler);
     }
 
     @Override

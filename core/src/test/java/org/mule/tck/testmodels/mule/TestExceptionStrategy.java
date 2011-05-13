@@ -12,8 +12,9 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
+import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.transaction.RollbackMethod;
-import org.mule.exception.AbstractMessagingExceptionStrategy;
+import org.mule.exception.AbstractExceptionStrategy;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -27,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  * replacement of the {@link org.mule.exception.AbstractMessagingExceptionStrategy}.
  * This is used to test that overriding the default Exception strategy works.
  */
-public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy implements MessagingExceptionHandler
+public class TestExceptionStrategy extends AbstractExceptionStrategy implements MessagingExceptionHandler, SystemExceptionHandler
 {
     /**
      * logger used by this class
@@ -57,7 +58,6 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy im
         this.testProperty = testProperty;
     }
 
-    @Override
     public MuleEvent handleException(Exception exception, MuleEvent event, RollbackMethod rollbackMethod)
     {
         ExceptionCallback callback = null;
@@ -91,6 +91,16 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy im
     public MuleEvent handleException(Exception exception, MuleEvent event)
     {
         return handleException(exception, event, null);
+    }
+
+    public void handleException(Exception exception, RollbackMethod rollbackMethod)
+    {
+        handleException(exception, null, rollbackMethod);
+    }
+
+    public void handleException(Exception exception)
+    {
+        handleException(exception, null, null);
     }
 
     public interface ExceptionCallback
@@ -131,10 +141,5 @@ public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy im
                 callback.onException(exception);
             }
         }
-    }
-
-    public boolean isRedeliver()
-    {
-        return false;
     }
 }
