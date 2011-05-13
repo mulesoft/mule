@@ -11,6 +11,8 @@
 package org.mule.routing;
 
 import java.io.Serializable;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -53,8 +55,26 @@ public class UntilSuccessful extends AbstractOutboundRouter
             this.event = threadSafeCopy(event);
         }
 
+        private synchronized String acquireMutex()
+        {
+            String eventId = event.getId();
+            if (eventProcessMutex.contains(eventId))
+            {
+                return null;
+            }
+            eventProcessMutex.add(eventId);
+            return eventId;
+        }
+
         public void run()
         {
+            String mutex = acquireMutex();
+            if (mutex == null)
+            {
+                // processing is already under way for this event
+                return;
+            }
+
             try
             {
                 if (processEvent())
@@ -78,6 +98,10 @@ public class UntilSuccessful extends AbstractOutboundRouter
             catch (final ObjectStoreException ose)
             {
                 logger.error("Error when dealing with the object store while processing event: " + event, ose);
+            }
+            finally
+            {
+                eventProcessMutex.remove(mutex);
             }
         }
 
@@ -148,7 +172,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
 
                     if (isDueForRedelivery(event))
                     {
-                        getMuleContext().getWorkManager().scheduleWork(new PendingEventWorker(event));
+                        triggerProcessing(event);
                     }
                 }
             }
@@ -159,12 +183,13 @@ public class UntilSuccessful extends AbstractOutboundRouter
     public static final String NEXT_DELIVERY_ATTEMPT_TIME_PROPERTY_NAME = "delivery.next.attempt.time";
 
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private final Set<String> eventProcessMutex = new CopyOnWriteArraySet<String>();
     private String eventKeyPrefix;
     private ExpressionFilter failureExpressionFilter;
 
     private ListableObjectStore<MuleEvent> objectStore;
     private int maxProcessingAttempts = 5;
-    private long secondsBetweenProcessingAttempts = 10L;
+    private long secondsBetweenProcessingAttempts = 60L;
     private String failureExpression;
     private String ackExpression;
 
@@ -252,6 +277,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
         try
         {
             scheduleForProcessing(event);
+            triggerProcessing(event);
 
             if (ackExpression == null)
             {
@@ -264,10 +290,10 @@ public class UntilSuccessful extends AbstractOutboundRouter
             return new DefaultMuleEvent(new DefaultMuleMessage(ackResponsePayload, event.getMessage(),
                 muleContext), event);
         }
-        catch (ObjectStoreException ose)
+        catch (Exception e)
         {
             throw new MessagingException(
-                MessageFactory.createStaticMessage("Failed to schedule the event for processing"), event, ose);
+                MessageFactory.createStaticMessage("Failed to schedule the event for processing"), event, e);
         }
     }
 
@@ -320,6 +346,11 @@ public class UntilSuccessful extends AbstractOutboundRouter
             NEXT_DELIVERY_ATTEMPT_TIME_PROPERTY_NAME, 0L);
 
         return System.currentTimeMillis() >= nextDeliveryAttemptTime;
+    }
+
+    private void triggerProcessing(final MuleEvent event) throws WorkException
+    {
+        getMuleContext().getWorkManager().scheduleWork(new PendingEventWorker(event));
     }
 
     private void deschedule(final MuleEvent event) throws ObjectStoreException

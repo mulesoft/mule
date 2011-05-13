@@ -4857,6 +4857,16 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    <xsd:complexType name="processorWithExactlyOneTargetType" >
+        <xsd:complexContent>
+            <xsd:extension base="abstractRoutingMessageProcessorType">
+                <xsd:sequence>
+                    <xsd:group ref="messageProcessorOrOutboundEndpoint" minOccurs="1" maxOccurs="1"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:element name="first-successful" substitutionGroup="abstract-routing-message-processor">
         <xsd:annotation>
@@ -4872,6 +4882,58 @@
                         <xsd:annotation>
                             <xsd:documentation>
                                 Specifies an expression that when evaluated as determines if the processing of one a route was a failure or not.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="until-successful" substitutionGroup="abstract-routing-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                Attempts to route a message to the message processor it contains in an asynchronous manner.
+                Routing is considered successful if no exception has been raised and, optionally, if the response matches an expression
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="processorWithExactlyOneTargetType">
+                    <xsd:attribute name="objectStore-ref" type="xsd:string" use="required">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Reference to the org.mule.api.store.ListableObjectStore that will be used to store events pending (re)processing.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="maxProcessingAttempts" type="substitutableInt" use="optional" default="5">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Specifies the maximum number of processing attempts that will be performed.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="secondsBetweenProcessingAttempts" type="substitutableInt" use="optional" default="60">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Specifies the minimum time interval between two process attempts.
+                                The actual time interval depends on the previous execution but should not exceed twice this number.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="failureExpression" type="xsd:string" use="optional">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Specifies an expression that when evaluated determines if the processing of one a route was a failure or not.
+                                If no expression is specified, only exceptions will be considered as processing failures.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                    <xsd:attribute name="ackExpression" type="xsd:string" use="optional">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Specifies an expression that when evaluated determines the synchronous response of until-successful.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>

@@ -113,13 +113,13 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
 
         final MuleEvent testEvent = getTestEvent("test_data");
         assertEquals("ACK", untilSuccessful.process(testEvent).getMessageAsString());
-        assertEquals(1, objectStore.allKeys().size());
+        assertEquals(0, objectStore.allKeys().size());
         ponderUntilEventProcessed(testEvent);
     }
 
     public void testSuccessfulDeliveryFailureExpression() throws Exception
     {
-        untilSuccessful.setFailureExpression("#[regex: (?i)error]");
+        untilSuccessful.setFailureExpression("#[regex:(?i)error]");
         untilSuccessful.initialise();
         untilSuccessful.start();
 

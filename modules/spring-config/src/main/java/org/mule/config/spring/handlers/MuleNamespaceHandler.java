@@ -132,6 +132,7 @@ import org.mule.routing.MessageFilter;
 import org.mule.routing.Resequencer;
 import org.mule.routing.RoundRobin;
 import org.mule.routing.SimpleCollectionAggregator;
+import org.mule.routing.UntilSuccessful;
 import org.mule.routing.WireTap;
 import org.mule.routing.filters.EqualsFilter;
 import org.mule.routing.filters.ExceptionTypeFilter;
@@ -469,6 +470,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 
         registerBeanDefinitionParser("request-reply", new ChildDefinitionParser("messageProcessor", SimpleAsyncRequestReplyRequester.class));
         registerBeanDefinitionParser("first-successful", new ChildDefinitionParser("messageProcessor", FirstSuccessful.class));
+        registerBeanDefinitionParser("until-successful", new ChildDefinitionParser("messageProcessor", UntilSuccessful.class));
         registerBeanDefinitionParser("round-robin", new ChildDefinitionParser("messageProcessor", RoundRobin.class));
 
         registerBeanDefinitionParser("custom-router", new ChildDefinitionParser("messageProcessor"));
