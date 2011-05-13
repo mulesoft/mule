@@ -10,6 +10,8 @@
 
 package org.mule.routing;
 
+import java.io.ByteArrayInputStream;
+
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
@@ -23,10 +25,15 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
     {
         private volatile int eventCount;
         private volatile MuleEvent event;
+        private volatile int numberOfFailuresToSimulate;
 
         public MuleEvent process(final MuleEvent event) throws MuleException
         {
             eventCount++;
+            if (numberOfFailuresToSimulate-- > 0)
+            {
+                throw new RuntimeException("simulated problem");
+            }
             this.event = event;
             return event;
         }
@@ -39,6 +46,11 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         public int getEventCount()
         {
             return eventCount;
+        }
+
+        public void setNumberOfFailuresToSimulate(int numberOfFailuresToSimulate)
+        {
+            this.numberOfFailuresToSimulate = numberOfFailuresToSimulate;
         }
     }
 
@@ -55,7 +67,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         untilSuccessful = new UntilSuccessful();
         untilSuccessful.setMuleContext(muleContext);
         untilSuccessful.setFlowConstruct(getTestService());
-        untilSuccessful.setMaxProcessingAttempts(2);
+        untilSuccessful.setMaxProcessingAttempts(3);
         untilSuccessful.setSecondsBetweenProcessingAttempts(1);
 
         objectStore = new SimpleMemoryObjectStore<MuleEvent>();
@@ -77,6 +89,17 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         untilSuccessful.start();
 
         final MuleEvent testEvent = getTestEvent("test_data");
+        assertNull(untilSuccessful.process(testEvent));
+        assertEquals(1, objectStore.allKeys().size());
+        ponderUntilEventProcessed(testEvent);
+    }
+
+    public void testSuccessfulDeliveryStreamPayload() throws Exception
+    {
+        untilSuccessful.initialise();
+        untilSuccessful.start();
+
+        final MuleEvent testEvent = getTestEvent(new ByteArrayInputStream("test_data".getBytes()));
         assertNull(untilSuccessful.process(testEvent));
         assertEquals(1, objectStore.allKeys().size());
         ponderUntilEventProcessed(testEvent);
@@ -106,6 +129,19 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         ponderUntilEventProcessed(testEvent);
     }
 
+    public void testPermanentDeliveryFailure() throws Exception
+    {
+        targetMessageProcessor.setNumberOfFailuresToSimulate(Integer.MAX_VALUE);
+
+        untilSuccessful.initialise();
+        untilSuccessful.start();
+
+        final MuleEvent testEvent = getTestEvent("ERROR");
+        assertNull(untilSuccessful.process(testEvent));
+        assertEquals(1, objectStore.allKeys().size());
+        ponderUntilEventAborted(testEvent);
+    }
+
     public void testPermanentDeliveryFailureExpression() throws Exception
     {
         untilSuccessful.setFailureExpression("#[regex:(?i)error]");
@@ -118,7 +154,19 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         ponderUntilEventAborted(testEvent);
     }
 
-    // TODO (DDO) test redeliveries eventually successful
+    public void testTemporaryDeliveryFailure() throws Exception
+    {
+        targetMessageProcessor.setNumberOfFailuresToSimulate(untilSuccessful.getMaxProcessingAttempts() - 1);
+
+        untilSuccessful.initialise();
+        untilSuccessful.start();
+
+        final MuleEvent testEvent = getTestEvent("ERROR");
+        assertNull(untilSuccessful.process(testEvent));
+        assertEquals(1, objectStore.allKeys().size());
+        ponderUntilEventProcessed(testEvent);
+        assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxProcessingAttempts());
+    }
 
     private void ponderUntilEventProcessed(final MuleEvent testEvent)
         throws InterruptedException, MuleException
@@ -143,7 +191,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         }
 
         assertEquals(0, objectStore.allKeys().size());
-        assertLogicallyEqualEvents(testEvent, targetMessageProcessor.getEventReceived());
+        assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxProcessingAttempts());
     }
 
     private void assertLogicallyEqualEvents(final MuleEvent testEvent, MuleEvent eventReceived)
