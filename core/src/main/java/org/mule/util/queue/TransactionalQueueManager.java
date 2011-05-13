@@ -18,6 +18,7 @@ import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.util.UUID;
 import org.mule.util.store.DefaultInMemoryObjectStore;
+import org.mule.util.store.FacadeObjectStore;
 import org.mule.util.store.SimpleMemoryObjectStore;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;
@@ -25,6 +26,7 @@ import org.mule.util.xa.ResourceManagerException;
 import org.mule.util.xa.ResourceManagerSystemException;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -66,13 +68,13 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     public synchronized void setDefaultQueueConfiguration(QueueConfiguration config)
     {
         this.defaultQueueConfiguration = config;
-        stores.add(config.objectStore);
+        addStore(config.objectStore);
     }
 
     public synchronized void setQueueConfiguration(String queueName, QueueConfiguration config)
     {
         getQueue(queueName).config = config;
-        stores.add(config.objectStore);
+        addStore(config.objectStore);
     }
 
     protected synchronized QueueInfo getQueue(String name)
@@ -274,7 +276,10 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     {
         if (muleContext != null)
         {
-            stores.addAll(muleContext.getRegistry().lookupByType(ListableObjectStore.class).values());
+            for (ListableObjectStore store: muleContext.getRegistry().lookupByType(ListableObjectStore.class).values())
+            {
+                addStore(store);
+            }
         }
     }
 
@@ -291,5 +296,19 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     public void setPersistentObjectStore(Object o)
     {
         System.out.println(o.getClass());   
+    }
+
+    private void addStore(ListableObjectStore store)
+    {
+        stores.add(getActualStore(store));
+    }
+
+    private ListableObjectStore getActualStore(ListableObjectStore store)
+    {
+        while (store instanceof FacadeObjectStore)
+        {
+            store = ((FacadeObjectStore)store).getDelegate();
+        }
+        return store;
     }
 }

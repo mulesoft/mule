@@ -88,7 +88,7 @@ public abstract class FacadeObjectStore <T extends Serializable> implements List
     /**
      * Locate the global store in the registry
      */
-    private ListableObjectStore<T> getDelegate()
+    public ListableObjectStore<T> getDelegate()
     {
         if (delegate == null)
         {
