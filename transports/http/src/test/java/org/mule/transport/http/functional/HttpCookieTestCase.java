@@ -23,7 +23,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
 {
-    //private static final int LISTEN_PORT = 60212;
     private static final String COOKIE_HEADER = "Cookie:";
 
     private CountDownLatch latch = new CountDownLatch(1);
@@ -34,6 +33,12 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
     protected String getConfigResources()
     {
         return "http-cookie-test.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
     @Override
@@ -85,16 +90,16 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
             String line = reader.readLine();
             while (line != null)
             {
-                // Check that we receive a 'Cookie:' header as it would be 
+                // Check that we receive a 'Cookie:' header as it would be
                 // send by a regular http client
                 if (line.indexOf(COOKIE_HEADER) > -1)
                 {
                     cookieFound = true;
                     cookieHeaders.add(line);
                 }
-    
+
                 line = reader.readLine();
-                // only read the header, i.e. if we encounter an empty line 
+                // only read the header, i.e. if we encounter an empty line
                 // stop reading (we're only interested in the headers anyway)
                 if (line.trim().length() == 0)
                 {
@@ -102,11 +107,5 @@ public class HttpCookieTestCase extends AbstractMockHttpServerTestCase
                 }
             }
         }
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 }
