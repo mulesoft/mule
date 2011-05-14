@@ -9,13 +9,30 @@
  */
 package org.mule.module.rss;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
+import org.mule.util.IOUtils;
 
-public class FeedConsumeAndSplitExplicitTestCase extends FunctionalTestCase
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.simpleframework.http.Request;
+import org.simpleframework.http.Response;
+import org.simpleframework.http.core.Container;
+
+public class FeedConsumeAndSplitExplicitTestCase extends DynamicPortTestCase
 {
+    private static final int ENTRIES_IN_RSS_FEED = 25;
+
     private final CounterCallback counter = new CounterCallback();
+    private SimpleHttpServer httpServer;
+    private AtomicInteger pollCount = new AtomicInteger(0);
 
     @Override
     protected String getConfigResources()
@@ -24,20 +41,115 @@ public class FeedConsumeAndSplitExplicitTestCase extends FunctionalTestCase
     }
 
     @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
+    }
+
+    @Override
     protected void doSetUp() throws Exception
     {
-        FunctionalTestComponent comp = (FunctionalTestComponent)getComponent("feedConsumer");
+        // start the HTTP server before Mule is started
+        startHttpServer();
+
+        super.doSetUp();
+        addCounterToFeedConsumerComponent();
+    }
+
+    private void startHttpServer() throws IOException
+    {
+        int port = getPorts().get(0).intValue();
+        httpServer = new SimpleHttpServer(port, new RssFeeder());
+        httpServer.start();
+    }
+
+    private void addCounterToFeedConsumerComponent() throws Exception
+    {
+        FunctionalTestComponent comp = (FunctionalTestComponent) getComponent("feedConsumer");
         comp.setEventCallback(counter);
     }
 
-    public void testConsume() throws Exception {
+    // shut down the http server after Mule has stopped to avoid exceptions during Mule shutdown
+    // because it tries to access the already stopped server
+    @Override
+    protected void disposeManager()
+    {
+        super.disposeManager();
+        stopHttpServer();
+    }
 
-        Thread.sleep(4000);
-        int count = counter.getCallbackCount();
-        assertTrue(count > 0);
-        Thread.sleep(3000);
-        //We should only receive entries once
-        assertEquals(count, counter.getCallbackCount());
+    private void stopHttpServer()
+    {
+        if (httpServer != null)
+        {
+            httpServer.stop();
+        }
+    }
 
+    public void testConsume() throws Exception
+    {
+        waitForAllEntriesFromSampleFeedToArrive();
+        waitForTheNextPoll();
+
+        // We should only receive entries once
+        assertEquals(ENTRIES_IN_RSS_FEED, counter.getCallbackCount());
+    }
+
+    private void waitForAllEntriesFromSampleFeedToArrive()
+    {
+        Prober prober = new PollingProber(10000, 100);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                return counter.getCallbackCount() == ENTRIES_IN_RSS_FEED;
+            }
+
+            public String describeFailure()
+            {
+                return String.format("Did not receive %d feed entries (only got %d)",
+                    ENTRIES_IN_RSS_FEED, counter.getCallbackCount());
+            }
+        });
+    }
+
+    private void waitForTheNextPoll()
+    {
+        final int currentPollCount = pollCount.get();
+        Prober prober = new PollingProber(2000, 100);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                return pollCount.get() > currentPollCount;
+            }
+
+            public String describeFailure()
+            {
+                return "Poll count did not increment in time";
+            }
+        });
+    }
+
+    private class RssFeeder implements Container
+    {
+        public void handle(Request request, Response response)
+        {
+            InputStream rssFeed = getClass().getClassLoader().getResourceAsStream("sample-feed.rss");
+            assertNotNull(rssFeed);
+
+            try
+            {
+                OutputStream responseStream = response.getOutputStream();
+                IOUtils.copy(rssFeed, responseStream);
+                responseStream.close();
+            }
+            catch (IOException e)
+            {
+                fail();
+            }
+
+            pollCount.incrementAndGet();
+        }
     }
 }

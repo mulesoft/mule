@@ -9,8 +9,8 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.1/mule-test.xsd">
 
     <flow name="feedConsumer">
-        <rss:inbound-endpoint address="http://feeds.feedburner.com/muleblog?format=xml" splitFeed="false">
-            <rss:feed-splitter/>            
+        <rss:inbound-endpoint address="http://localhost:${port1}/" splitFeed="false">
+            <rss:feed-splitter/>
         </rss:inbound-endpoint>
 
         <test:component/>
