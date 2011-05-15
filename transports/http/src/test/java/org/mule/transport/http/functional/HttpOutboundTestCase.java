@@ -22,7 +22,6 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
 {
-    //private static final int LISTEN_PORT = 60215;
     private Latch testLatch = new Latch();
     private String httpMethod;
 
@@ -31,16 +30,24 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
         setDisposeManagerPerSuite(true);
     }
 
+    @Override
     protected MockHttpServer getHttpServer(CountDownLatch latch)
     {
         return new SimpleHttpServer(getPorts().get(0), latch, testLatch);
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "http-outbound-config.xml";
     }
-    
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
+    }
+
     public void testOutboundDelete() throws Exception
     {
         sendHttpRequest("vm://doDelete", HttpConstants.METHOD_DELETE);
@@ -80,11 +87,11 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
     {
         MuleClient client = new MuleClient(muleContext);
         client.dispatch(endpoint, TEST_MESSAGE, null);
-        
+
         assertTrue(testLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertEquals(expectedHttpMethod, httpMethod);
     }
-    
+
     private class SimpleHttpServer extends MockHttpServer
     {
         public SimpleHttpServer(int listenPort, CountDownLatch startupLatch, CountDownLatch testCompleteLatch)
@@ -97,13 +104,7 @@ public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
         {
             // first line is the HTTP request
             String line = reader.readLine();
-            httpMethod = new StringTokenizer(line).nextToken();            
+            httpMethod = new StringTokenizer(line).nextToken();
         }
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 }
