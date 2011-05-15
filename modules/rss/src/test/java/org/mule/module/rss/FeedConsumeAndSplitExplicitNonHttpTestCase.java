@@ -9,13 +9,17 @@
  */
 package org.mule.module.rss;
 
-import org.mule.api.client.LocalMuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 
 public class FeedConsumeAndSplitExplicitNonHttpTestCase extends FunctionalTestCase
 {
+    private static final int ENTRIES_IN_RSS_FEED = 25;
+
     private final CounterCallback counter = new CounterCallback();
 
     @Override
@@ -33,11 +37,22 @@ public class FeedConsumeAndSplitExplicitNonHttpTestCase extends FunctionalTestCa
 
     public void testConsume() throws Exception
     {
-        LocalMuleClient client = muleContext.getClient();
         String feed = loadResourceAsString("sample-feed.rss");
-        client.dispatch("vm://feed.in", feed, null);
-        Thread.sleep(2000);
-        int count = counter.getCallbackCount();
-        assertEquals(25, count);
+        muleContext.getClient().dispatch("vm://feed.in", feed, null);
+
+        Prober prober = new PollingProber(10000, 100);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                return counter.getCallbackCount() == ENTRIES_IN_RSS_FEED;
+            }
+
+            public String describeFailure()
+            {
+                return String.format("Did not receive %d feed entries (only got %d)",
+                    ENTRIES_IN_RSS_FEED, counter.getCallbackCount());
+            }
+        });
     }
 }
