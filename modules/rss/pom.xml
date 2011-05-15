@@ -76,10 +76,16 @@
             <type>test-jar</type>
         </dependency>
         <dependency>
-            <artifactId>mule-tests-functional</artifactId>
             <groupId>org.mule.tests</groupId>
-            <scope>test</scope>
+            <artifactId>mule-tests-functional</artifactId>
             <version>${version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.simpleframework</groupId>
+            <artifactId>simple</artifactId>
+            <version>4.1.21</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

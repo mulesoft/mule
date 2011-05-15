@@ -13,9 +13,10 @@
     <http:polling-connector name="httpPoll" pollingFrequency="1000"/>
 
     <flow name="feedConsumer">
-        <http:inbound-endpoint address="http://feeds.feedburner.com/muleblog?format=xml">
+        <http:inbound-endpoint address="http://localhost:${port1}/">
             <rss:feed-splitter/>
         </http:inbound-endpoint>
+
         <test:component/>
     </flow>
 </mule>
