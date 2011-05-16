@@ -15,7 +15,6 @@ import javax.transaction.xa.Xid;
 
 public class XAResourceWrapper implements XAResource
 {
-
     private XAResource xaResource;
     private SessionInvocationHandler sessionInvocationHandler;
     private Boolean sameRMOverrideValue;
@@ -49,11 +48,7 @@ public class XAResourceWrapper implements XAResource
         {
             other = ((XAResourceWrapper) other).xaResource;
         }
-        final boolean isSame = this.xaResource.isSameRM(other);
-
-        System.out.println("\n\n\nisSame = " + isSame);
-
-        return isSame;
+        return this.xaResource.isSameRM(other);
     }
 
     public Xid[] recover(int i) throws XAException
@@ -92,6 +87,7 @@ public class XAResourceWrapper implements XAResource
         xaResource.commit(xid, b);
     }
 
+    @Override
     public String toString()
     {
         return xaResource.toString();
