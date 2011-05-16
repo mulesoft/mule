@@ -21,6 +21,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.component.JavaComponent;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
@@ -38,6 +39,7 @@ import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.api.transport.MuleMessageFactory;
 import org.mule.component.DefaultJavaComponent;
+import org.mule.construct.SimpleFlowConstruct;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.model.seda.SedaModel;
@@ -415,6 +417,12 @@ public final class MuleTestUtils
         return getTestEvent(data, getTestService(context), mep, context);
     }
 
+    public static MuleEvent getTestEventUsingFlow(Object data, MessageExchangePattern mep, MuleContext context)
+        throws Exception
+    {
+        return getTestEvent(data, getTestFlow(context), mep, context);
+    }
+    
     public static MuleEvent getTestInboundEvent(Object data, MuleContext context) throws Exception
     {
         return getTestInboundEvent(data, getTestService(context), MessageExchangePattern.REQUEST_RESPONSE,
@@ -435,11 +443,11 @@ public final class MuleTestUtils
     }
 
     public static MuleEvent getTestEvent(Object data,
-                                         Service service,
+                                         FlowConstruct flowConstruct,
                                          MessageExchangePattern mep,
                                          MuleContext context) throws Exception
     {
-        return getTestEvent(data, service, getTestOutboundEndpoint("test1", mep, context), context);
+        return getTestEvent(data, flowConstruct, getTestOutboundEndpoint("test1", mep, context), context);
     }
 
     public static MuleEvent getTestInboundEvent(Object data, Service service, MuleContext context)
@@ -465,11 +473,11 @@ public final class MuleTestUtils
     }
 
     public static MuleEvent getTestEvent(Object data,
-                                         Service service,
+                                         FlowConstruct flowConstruct,
                                          ImmutableEndpoint endpoint,
                                          MuleContext context) throws Exception
     {
-        final MuleSession session = getTestSession(service, context);
+        final MuleSession session = getTestSession(flowConstruct, context);
 
         final MuleMessageFactory factory = endpoint.getConnector().createMuleMessageFactory();
         final MuleMessage message = factory.create(data, endpoint.getEncoding());
@@ -511,9 +519,9 @@ public final class MuleTestUtils
         return t;
     }
 
-    public static MuleSession getTestSession(Service service, MuleContext context)
+    public static MuleSession getTestSession(FlowConstruct flowConstruct, MuleContext context)
     {
-        return new DefaultMuleSession(service, context);
+        return new DefaultMuleSession(flowConstruct, context);
     }
 
     public static MuleSession getTestSession(MuleContext context)
@@ -533,6 +541,11 @@ public final class MuleTestUtils
     {
         return getTestService("appleService", Apple.class, context);
     }
+    
+    public static SimpleFlowConstruct getTestFlow(MuleContext context) throws Exception
+    {
+        return getTestFlow("appleFlow", context);
+    }
 
     public static Service getTestService(String name, Class<?> clazz, MuleContext context) throws Exception
     {
@@ -543,6 +556,11 @@ public final class MuleTestUtils
         throws Exception
     {
         return getTestService(name, clazz, props, context, true);
+    }
+
+    public static SimpleFlowConstruct getTestFlow(String name, MuleContext context) throws Exception
+    {
+        return getTestFlow(name, context, true);
     }
 
     public static Service getTestService(String name,
@@ -569,6 +587,18 @@ public final class MuleTestUtils
         }
 
         return service;
+    }
+    
+    public static SimpleFlowConstruct getTestFlow(String name, MuleContext context, boolean initialize)
+        throws Exception
+    {
+        final SimpleFlowConstruct flow = new SimpleFlowConstruct(name, context);
+        if (initialize)
+        {
+            context.getRegistry().registerFlowConstruct(flow);
+        }
+
+        return flow;
     }
 
     public static TestAgent getTestAgent() throws Exception

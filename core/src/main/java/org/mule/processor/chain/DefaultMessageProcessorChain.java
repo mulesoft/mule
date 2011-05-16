@@ -13,13 +13,18 @@ package org.mule.processor.chain;
 import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.transformer.Transformer;
 import org.mule.construct.SimpleFlowConstruct;
 import org.mule.context.notification.MessageProcessorNotification;
+import org.mule.routing.MessageFilter;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
@@ -65,9 +70,20 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
         FlowConstruct flowConstruct = event.getFlowConstruct();
         MuleEvent currentEvent = event;
         MuleEvent resultEvent;
-        for (MessageProcessor processor : processors)
+        MuleEvent copy = null;
+        Iterator<MessageProcessor> processorIterator = processors.iterator();
+        while (processorIterator.hasNext())
         {
-            fireNotification(event.getFlowConstruct(), event, processor, MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+            MessageProcessor processor = processorIterator.next();
+
+            fireNotification(event.getFlowConstruct(), event, processor,
+                MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
+
+            if (flowConstruct instanceof SimpleFlowConstruct && processorIterator.hasNext()
+                && processorMayReturnNull(processor))
+            {
+                copy = OptimizedRequestContext.criticalSetEvent(currentEvent);
+            }
 
             resultEvent = processor.process(currentEvent);
 
@@ -78,19 +94,46 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
             {
                 currentEvent = resultEvent;
             }
-            else
+            else if (flowConstruct instanceof SimpleFlowConstruct && processorIterator.hasNext())
             {
-                if (flowConstruct instanceof SimpleFlowConstruct)
+                // // In a flow when a MessageProcessor returns null the next
+                // processor acts as an implicit
+                // // branch receiving a copy of the message used for previous
+                // MessageProcessor
+                if (copy != null)
                 {
-                    currentEvent = OptimizedRequestContext.criticalSetEvent(currentEvent);
+                    currentEvent = copy;
                 }
                 else
                 {
-                    return null;
+                    // this should not happen
+                    currentEvent = OptimizedRequestContext.criticalSetEvent(currentEvent);
                 }
+            }
+            else
+            {
+                // But in a service we don't do any implicit branching.
+                return null;
             }
         }
         return currentEvent;
+    }
+
+    protected boolean processorMayReturnNull(MessageProcessor processor)
+    {
+        if (processor instanceof OutboundEndpoint)
+        {
+            return !((OutboundEndpoint) processor).getExchangePattern().hasResponse();
+        }
+        else if (processor instanceof Component || processor instanceof Transformer
+                 || processor instanceof MessageFilter)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
 }

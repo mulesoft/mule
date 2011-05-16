@@ -17,7 +17,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.processor.AsyncInterceptingMessageProcessor;
+import org.mule.processor.AsyncDelegateMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.util.concurrent.ThreadNameHelper;
 
@@ -61,10 +61,9 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
         final MuleConfiguration config = muleContext.getConfiguration();
         final String threadPrefix = ThreadNameHelper.asyncProcessor(muleContext, name);
 
-        AsyncInterceptingMessageProcessor asyncProcessor = new AsyncInterceptingMessageProcessor(threadingProfile,
+        AsyncDelegateMessageProcessor asyncProcessor = new AsyncDelegateMessageProcessor(threadingProfile,
                                                                                                  threadPrefix,
                                                                                                  config.getShutdownTimeout());
-        builder.chain(asyncProcessor);
         for (Object processor : messageProcessors)
         {
             if (processor instanceof MessageProcessor)
@@ -81,7 +80,8 @@ public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleConte
                     "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
             }
         }
-        return builder.build();
+        asyncProcessor.setDelegate(builder.build());
+        return  asyncProcessor;
     }
 
     public boolean isSingleton()

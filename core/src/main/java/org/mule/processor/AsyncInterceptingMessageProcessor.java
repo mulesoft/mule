@@ -13,7 +13,6 @@ package org.mule.processor;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.MuleRuntimeException;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
@@ -25,9 +24,6 @@ import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.work.AbstractMuleEventWork;
 import org.mule.work.MuleWorkManager;
 
-import javax.resource.spi.work.WorkEvent;
-import javax.resource.spi.work.WorkListener;
-
 /**
  * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to
  * schedule asynchronous processing of the next {@link MessageProcessor}. The next
@@ -36,7 +32,7 @@ import javax.resource.spi.work.WorkListener;
  * present then an exception is thrown.
  */
 public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessageProcessor
-    implements WorkListener, Startable, Stoppable
+    implements Startable, Stoppable
 {
     protected WorkManagerSource workManagerSource;
     protected boolean doThreading = true;
@@ -144,57 +140,13 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
         try
         {
             workManagerSource.getWorkManager().scheduleWork(new AsyncMessageProcessorWorker(event),
-                WorkManager.INDEFINITE, null, this);
+                WorkManager.INDEFINITE, null, new AsyncWorkListener(next));
         }
         catch (Exception e)
         {
             new MessagingException(CoreMessages.errorSchedulingMessageProcessorForAsyncInvocation(next),
                 event, e);
         }
-    }
-
-    public void workAccepted(WorkEvent event)
-    {
-        this.handleWorkException(event, "workAccepted");
-    }
-
-    public void workRejected(WorkEvent event)
-    {
-        this.handleWorkException(event, "workRejected");
-    }
-
-    public void workStarted(WorkEvent event)
-    {
-        this.handleWorkException(event, "workStarted");
-    }
-
-    public void workCompleted(WorkEvent event)
-    {
-        this.handleWorkException(event, "workCompleted");
-    }
-
-    protected void handleWorkException(WorkEvent event, String type)
-    {
-        if (event == null)
-        {
-            return;
-        }
-
-        Throwable e = event.getException();
-
-        if (e == null)
-        {
-            return;
-        }
-
-        if (e.getCause() != null)
-        {
-            e = e.getCause();
-        }
-
-        logger.error("Work caused exception on '" + type + "'. Work being executed was: "
-                     + event.getWork().toString());
-        throw new MuleRuntimeException(CoreMessages.errorInvokingMessageProcessorAsynchronously(next), e);
     }
 
     class AsyncMessageProcessorWorker extends AbstractMuleEventWork

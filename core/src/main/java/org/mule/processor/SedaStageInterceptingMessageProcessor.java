@@ -43,14 +43,13 @@ import java.text.MessageFormat;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
-import javax.resource.spi.work.WorkListener;
 
 /**
  * Processes {@link MuleEvent}'s asynchronously using a {@link MuleWorkManager} to
  * schedule asynchronous processing of the next {@link MessageProcessor}.
  */
 public class SedaStageInterceptingMessageProcessor extends OptionalAsyncInterceptingMessageProcessor
-    implements WorkListener, Work, Lifecycle, Pausable, Resumable
+    implements Work, Lifecycle, Pausable, Resumable
 {
     protected static final String QUEUE_NAME_PREFIX = "seda.queue";
 
@@ -253,7 +252,7 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
                     if (doThreading)
                     {
                         workManagerSource.getWorkManager().scheduleWork(work, WorkManager.INDEFINITE, null,
-                            this);
+                            new AsyncWorkListener(next));
                     }
                     else
                     {
@@ -366,7 +365,7 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
                 {
                     workManagerSource.getWorkManager().scheduleWork(
                         SedaStageInterceptingMessageProcessor.this, WorkManager.INDEFINITE, null,
-                        SedaStageInterceptingMessageProcessor.this);
+                        new AsyncWorkListener(next));
                 }
                 catch (WorkException e)
                 {

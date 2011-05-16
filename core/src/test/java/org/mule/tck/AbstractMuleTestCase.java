@@ -727,6 +727,11 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
     }
+    
+    public static MuleEvent getTestEventUsingFlow(Object data) throws Exception
+    {
+        return MuleTestUtils.getTestEventUsingFlow(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
+    }
 
     public static MuleEvent getTestEvent(Object data, MessageExchangePattern mep) throws Exception
     {
