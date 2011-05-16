@@ -66,8 +66,10 @@
         <component>
             <singleton-object class="org.mule.example.bookstore.OrderServiceImpl" />
         </component>
-        <vm:outbound-endpoint path="emailNotification" exchange-pattern="one-way" />
-        <vm:outbound-endpoint path="dataWarehouse" exchange-pattern="one-way" />
+        <async>
+            <vm:outbound-endpoint path="emailNotification" exchange-pattern="one-way" />
+            <vm:outbound-endpoint path="dataWarehouse" exchange-pattern="one-way" />
+        </async>
     </flow>
 
     <flow name="EmailNotificationService">

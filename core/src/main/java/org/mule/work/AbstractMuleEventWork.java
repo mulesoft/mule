@@ -10,8 +10,9 @@
 
 package org.mule.work;
 
-import org.mule.RequestContext;
+import org.mule.OptimizedRequestContext;
 import org.mule.api.MuleEvent;
+import org.mule.api.ThreadSafeAccess;
 
 import javax.resource.spi.work.Work;
 
@@ -30,14 +31,15 @@ public abstract class AbstractMuleEventWork implements Work
 
     public AbstractMuleEventWork(MuleEvent event)
     {
-        this.event = event;
+        // Event must be copied here rather than once work is executed, so main flow can't mutate the message
+        // before work execution
+        this.event = (MuleEvent) ((ThreadSafeAccess) event).newThreadCopy();
     }
 
-    public void run()
+    public final void run()
     {
-        // Create a new MuleEvent copy, set it in RequestContext and make it
-        // available via locally too.
-        event = RequestContext.setEvent(event);
+        // Set event in RequestContext now we are in new thread (fresh copy already made in constructor)
+        OptimizedRequestContext.unsafeSetEvent(event);
         doRun();
     }
 
