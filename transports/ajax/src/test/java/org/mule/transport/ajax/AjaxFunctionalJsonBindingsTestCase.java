@@ -18,8 +18,6 @@ import org.mule.util.concurrent.Latch;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import java.lang.IllegalStateException;
-
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -62,9 +60,9 @@ public class AjaxFunctionalJsonBindingsTestCase extends DynamicPortTestCase
         //client.stop();
         // TODO DZ: it seems like you would want to do this, maybe causing port locking issues?
         try
-            {
-                client.stop();
-            }
+        {
+            client.stop();
+        }
         catch (IllegalStateException e)
         {
             logger.info("caught an IllegalStateException during tearDown", e);
@@ -96,7 +94,7 @@ public class AjaxFunctionalJsonBindingsTestCase extends DynamicPortTestCase
 
         MuleClient muleClient = new MuleClient(muleContext);
         muleClient.dispatch("vm://in1", "Ross", null);
-        latch.await(10, TimeUnit.SECONDS);
+        assertTrue("data did not arrive in 10 seconds", latch.await(10, TimeUnit.SECONDS));
 
         assertNotNull(data.get());
 
