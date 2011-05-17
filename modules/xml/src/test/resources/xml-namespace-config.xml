@@ -34,10 +34,17 @@
 
     <mulexml:jaxb-context name="myJaxb" packageNames="org.mule.jaxb.model"/>
 
-    <!-- The above is equivalent to the following Spting config
+    <!-- The above is equivalent to the following Spring config
     <spring:bean name="myJaxb" class="javax.xml.bind.JAXBContext" factory-method="newInstance">
          <!- comma-separated list of package names where JAXB classes exist ->
         <spring:constructor-arg value="org.mule.jaxb.model"/>
     </spring:bean>
     -->
+    
+    <spring:bean name="resourceResolver" class="org.mule.module.xml.config.XmlNamespaceTestCase$MockResourceResolver"/>
+    <spring:bean name="errorHandler" class="org.mule.module.xml.config.XmlNamespaceTestCase$MockErrorHandler"/>
+    
+    <mulexml:schema-validation-filter name="SchemaValidationWithResourceResolver" 
+        schemaLocations="schema1.xsd" resourceResolver-ref="resourceResolver" 
+        errorHandler-ref="errorHandler" returnResult="false"/>
 </mule>

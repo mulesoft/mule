@@ -11,14 +11,23 @@ package org.mule.module.xml.config;
 
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.routing.filter.Filter;
+import org.mule.api.transformer.Transformer;
 import org.mule.jaxb.model.Person;
 import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.module.xml.filters.JaxenFilter;
+import org.mule.module.xml.filters.SchemaValidationFilter;
 import org.mule.module.xml.transformer.JXPathExtractor;
 import org.mule.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
 import org.mule.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.tck.FunctionalTestCase;
+
+import org.w3c.dom.ls.LSInput;
+import org.w3c.dom.ls.LSResourceResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 public class XmlNamespaceTestCase extends FunctionalTestCase
 {
@@ -27,6 +36,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         setDisposeManagerPerSuite(true);
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "xml-namespace-config.xml";
@@ -68,8 +78,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
 
     public void testJXPathExtractor() throws Exception
     {
-        JXPathExtractor transformer = (JXPathExtractor)muleContext.getRegistry().lookupTransformer("jxpath-extractor");
-        assertNotNull(transformer);
+        JXPathExtractor transformer = (JXPathExtractor) lookupTransformer("jxpath-extractor");
         assertNotNull(transformer.getNamespaces());
         assertEquals(6, transformer.getNamespaces().size());
         assertNotNull(transformer.getNamespaces().get("foo"));
@@ -78,13 +87,61 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
 
     public void testJaxbConfig() throws Exception
     {
-        JAXBMarshallerTransformer t = (JAXBMarshallerTransformer)muleContext.getRegistry().lookupTransformer("ObjectToXml");
-        assertNotNull(t);
+        JAXBMarshallerTransformer t = (JAXBMarshallerTransformer) lookupTransformer("ObjectToXml");
         assertNotNull(t.getJaxbContext());
 
-        JAXBUnmarshallerTransformer t2 = (JAXBUnmarshallerTransformer)muleContext.getRegistry().lookupTransformer("XmlToObject");
-        assertNotNull(t2);
+        JAXBUnmarshallerTransformer t2 = (JAXBUnmarshallerTransformer) lookupTransformer("XmlToObject");
         assertEquals(Person.class, t2.getReturnDataType().getType());
         assertNotNull(t2.getJaxbContext());
+    }
+    
+    public void testSchemaValidationFilterWithCustomResourceResolver()
+    {
+        SchemaValidationFilter filter = (SchemaValidationFilter) lookupFilter("SchemaValidationWithResourceResolver");
+        assertEquals("schema1.xsd", filter.getSchemaLocations());
+        assertTrue(filter.getResourceResolver() instanceof MockResourceResolver);
+        assertTrue(filter.getErrorHandler() instanceof MockErrorHandler);
+        assertFalse(filter.isReturnResult());
+    }
+    
+    private Transformer lookupTransformer(String name)
+    {
+        Transformer transformer = muleContext.getRegistry().lookupTransformer(name);
+        assertNotNull(transformer);
+        return transformer;
+    }
+    
+    private Filter lookupFilter(String name)
+    {
+        Filter filter = muleContext.getRegistry().lookupObject(name);
+        assertNotNull(filter);
+        return filter;
+    }
+    
+    private static class MockResourceResolver implements LSResourceResolver
+    {
+        public LSInput resolveResource(String type, String namespaceURI, String publicId, 
+            String systemId, String baseURI)
+        {
+            return null;
+        }
+    }
+    
+    private static class MockErrorHandler implements ErrorHandler
+    {
+        public void error(SAXParseException exception) throws SAXException
+        {
+            // does nothing
+        }
+
+        public void fatalError(SAXParseException exception) throws SAXException
+        {
+            // does nothing
+        }
+
+        public void warning(SAXParseException exception) throws SAXException
+        {
+            // does nothing
+        }
     }
 }

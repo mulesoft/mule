@@ -194,6 +194,20 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="resourceResolver-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to a Spring bean that implements <code>org.w3c.dom.ls.LSResourceResolver</code>.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="errorHandler-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Reference to a Spring bean that implements <code>org.xml.sax.ErrorHandler</code>.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
