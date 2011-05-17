@@ -285,6 +285,19 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <xsd:element name="abstract-observer-message-processor" abstract="true" type="abstractObserverMessageProcessorType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for message processors that observe the message but do not mutate it used for exmaple for logging.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractObserverMessageProcessorType">
+        <xsd:complexContent>
+        	<xsd:extension base="abstractMessageProcessorType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <xsd:group name="messageProcessorOrOutboundEndpoint">
         <xsd:choice>
             <xsd:element ref="abstract-message-processor">
@@ -564,7 +577,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="logger" type="loggerType" substitutionGroup="abstract-message-processor">
+    <xsd:element name="logger" type="loggerType" substitutionGroup="abstract-observer-message-processor">
         <xsd:annotation>
     <xsd:documentation>
         Performs logging using an expression that determines what should be logged. By default the current messages is
@@ -575,7 +588,7 @@
     </xsd:element>
     <xsd:complexType name="loggerType">
         <xsd:complexContent>
-            <xsd:extension base="abstractMessageProcessorType">
+            <xsd:extension base="abstractObserverMessageProcessorType">
                 <xsd:attribute name="message" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
