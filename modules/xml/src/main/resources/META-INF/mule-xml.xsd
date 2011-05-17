@@ -747,6 +747,13 @@ The Jaxen filter allows you to route messages based on XPath expressions. The Ja
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="newLineAfterDeclaration" type="mule:substitutableBoolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Whether a new line is printed after the XML declaration (assuming it is not supressed).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="omitEncoding" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
