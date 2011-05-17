@@ -12,6 +12,7 @@ package org.mule.processor;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.ThreadSafeAccess;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.context.MuleContextAware;
@@ -48,13 +49,26 @@ public class ResponseMessageProcessorAdapter extends AbstractResponseMessageProc
     @Override
     protected MuleEvent processResponse(MuleEvent event) throws MuleException
     {
-        if (responseProcessor == null)
+        if (responseProcessor == null || event == null)
         {
             return event;
         }
         else
         {
-            return responseProcessor.process(event);
+            MuleEvent copy = (MuleEvent) ((ThreadSafeAccess) event).newThreadCopy();
+            MuleEvent result = responseProcessor.process(event);
+            if (result == null)
+            {
+                // If <response> returns null then it acts as an implicit branch like in flows, the different
+                // here is that what's next, it's not another message processor that follows this one in the
+                // configuration file but rather the response phase of the inbound endpoint, or optionally
+                // other response processing on the way back to the inbound endpoint.
+                return copy;
+            }
+            else
+            {
+                return result;
+            }
         }
     }
 

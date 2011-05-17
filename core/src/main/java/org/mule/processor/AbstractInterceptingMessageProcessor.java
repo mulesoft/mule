@@ -63,6 +63,15 @@ public abstract class AbstractInterceptingMessageProcessor
         {
             return event;
         }
+        else if (event == null)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.trace("MuleEvent is null.  Next MessageProcessor '" + next.getClass().getName()
+                             + "' will not be invoked.");
+            }
+            return null;
+        }
         else
         {
             if (logger.isTraceEnabled())
