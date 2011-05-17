@@ -15,7 +15,14 @@ import org.mule.tck.FunctionalTestCase;
 
 public class XmlPrettyPrinterConfigurationTestCase extends FunctionalTestCase
 {
+    public XmlPrettyPrinterConfigurationTestCase()
+    {
+        super();
+        // no need to waste cycles starting the MuleContext
+        setStartContext(false);
+    }
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/module/xml/xml-prettyprinter-config.xml";
@@ -33,11 +40,11 @@ public class XmlPrettyPrinterConfigurationTestCase extends FunctionalTestCase
         assertEquals("\\n\\n", pp.getLineSeparator());
         assertEquals(1, pp.getNewLineAfterNTags());
         assertFalse(pp.isNewlines());
+        assertFalse(pp.isNewLineAfterDeclaration());
         assertFalse(pp.isOmitEncoding());
         assertFalse(pp.isPadText());
         assertFalse(pp.isTrimText());
         assertFalse(pp.isSuppressDeclaration());
         assertTrue(pp.isXHTML());
     }
-
 }

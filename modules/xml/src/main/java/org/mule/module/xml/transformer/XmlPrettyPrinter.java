@@ -41,7 +41,7 @@ public class XmlPrettyPrinter extends AbstractTransformer
     }
 
     @Override
-    protected Object doTransform(Object src, String encoding) throws TransformerException
+    protected Object doTransform(Object src, String outputEncoding) throws TransformerException
     {
         try
         {
@@ -52,7 +52,7 @@ public class XmlPrettyPrinter extends AbstractTransformer
                 XMLWriter writer = new XMLWriter(resultStream, this.getOutputFormat());
                 writer.write(document);
                 writer.close();
-                return resultStream.toString(encoding);
+                return resultStream.toString(outputEncoding);
             }
             else
             {
@@ -193,6 +193,22 @@ public class XmlPrettyPrinter extends AbstractTransformer
     public synchronized void setNewlines(boolean newlines)
     {
         outputFormat.setNewlines(newlines);
+    }
+
+    /**
+     * @see OutputFormat#isNewLineAfterDeclaration()
+     */
+    public synchronized boolean isNewLineAfterDeclaration()
+    {
+        return outputFormat.isNewLineAfterDeclaration();
+    }
+
+    /**
+     * @see OutputFormat#setNewLineAfterDeclaration(boolean)
+     */
+    public synchronized void setNewLineAfterDeclaration(boolean newline)
+    {
+        outputFormat.setNewLineAfterDeclaration(newline);
     }
 
     /**
