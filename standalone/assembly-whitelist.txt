@@ -15,11 +15,11 @@ aspectjrt-1.5.4
 aspectjweaver-1.6.8
 axiom-api-1.2.5
 axiom-impl-1.2.5
-bcmail-jdk15-1.45
-bcpg-jdk15-1.45
-bcprov-ext-jdk15-1.45
-bcprov-jdk15-1.45
-bctsp-jdk15-1.45
+bcmail-jdk16-1.46
+bcpg-jdk16-1.46
+bcprov-ext-jdk16-1.46
+bcprov-jdk16-1.46
+bctsp-jdk16-1.46
 cglib-nodep-2.2
 cometd-api-1.1.1
 cometd-server-6.1.26
