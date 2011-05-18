@@ -95,6 +95,7 @@
 
     <profiles>
         <profile>
+            <!-- TODO probably can be dropped now completely with sources (Mule is on Java 6) -->
             <id>jdk5</id>
             <activation>
                 <jdk>1.5</jdk>
