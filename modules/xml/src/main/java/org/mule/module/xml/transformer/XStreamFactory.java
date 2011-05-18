@@ -112,8 +112,7 @@ public class XStreamFactory
         public boolean canConvert(Class aClass)
         {
             String className = aClass.getName();
-            return className.equals("java.util.concurrent.ConcurrentHashMap")
-                            || className.equals("java.util.concurrent.ConcurrentHashMap");
+            return className.equals("java.util.concurrent.ConcurrentHashMap");
         }
     }
 }
