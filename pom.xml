@@ -79,7 +79,7 @@
         <jdk6Name>JavaSE-1.6</jdk6Name>
         <jdk7Name>JavaSE-1.7</jdk7Name>
 
-        <activemqVersion>4.1.2</activemqVersion>
+        <activemqVersion>5.5.0</activemqVersion>
         <antVersion>1.6.5</antVersion>
         <antlrVersion>3.1.1</antlrVersion>
         <asmVersion>3.1</asmVersion>
