@@ -22,9 +22,6 @@ Assembly descriptor for the YourKit Profiler distribution.
         <dependencySet>
             <outputDirectory>lib/user</outputDirectory>
             <scope>runtime</scope>
-            <excludes>
-                <exclude>backport-util-concurrent:backport-util-concurrent</exclude>
-            </excludes>
         </dependencySet>
     </dependencySets>
 
