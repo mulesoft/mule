@@ -13,7 +13,6 @@ package org.mule.module.jboss.transaction;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.transaction.TransactionManagerFactory;
 
-import com.arjuna.ats.arjuna.common.Environment;
 import com.arjuna.ats.arjuna.common.arjPropertyManager;
 
 import java.net.InetAddress;
@@ -26,6 +25,9 @@ import javax.transaction.TransactionManager;
 
 public class JBossArjunaTransactionManagerFactory implements TransactionManagerFactory
 {
+
+    public static final String PROPERTY_OBJECTSTORE_DIR = "com.arjuna.ats.arjuna.objectstore.objectStoreDir";
+    public static final String PROPERTY_NODE_IDENTIFIER = "com.arjuna.ats.arjuna.nodeIdentifier";
 
     private Map<String, String> properties = new HashMap<String, String>();
 
@@ -51,20 +53,20 @@ public class JBossArjunaTransactionManagerFactory implements TransactionManagerF
         if (tm == null)
         {
             // let the user override those in the config
-            if (!properties.containsKey(Environment.OBJECTSTORE_DIR))
+            if (!properties.containsKey(PROPERTY_OBJECTSTORE_DIR))
             {
                 final String muleInternalDir = config.getWorkingDirectory();
-                arjPropertyManager.propertyManager.setProperty(Environment.OBJECTSTORE_DIR, muleInternalDir + "/transaction-log");
+                arjPropertyManager.getObjectStoreEnvironmentBean().setObjectStoreDir(muleInternalDir + "/transaction-log");
             }
 
-            if (!properties.containsKey(Environment.XA_NODE_IDENTIFIER))
+            if (!properties.containsKey(PROPERTY_NODE_IDENTIFIER))
             {
                 try
                 {
                     InetAddress address = InetAddress.getLocalHost();
                     final String xaNodeId = MessageFormat.format("Mule[{0}/{1}]",
                                                                  address.getHostName(), address.getHostAddress());
-                    properties.put(Environment.XA_NODE_IDENTIFIER, xaNodeId);
+                    arjPropertyManager.getCoreEnvironmentBean().setNodeIdentifier(xaNodeId);
                 }
                 catch (UnknownHostException e)
                 {
@@ -73,10 +75,11 @@ public class JBossArjunaTransactionManagerFactory implements TransactionManagerF
             }
 
 
-            for (Map.Entry<String, String> entry : properties.entrySet())
+            // TODO JBossTS now uses different configuration approach, broke props into 3 javabeans, update
+            /*for (Map.Entry<String, String> entry : properties.entrySet())
             {
                 arjPropertyManager.propertyManager.setProperty(entry.getKey(), entry.getValue());
-            }
+            }*/
             tm = com.arjuna.ats.jta.TransactionManager.transactionManager();
 
         }

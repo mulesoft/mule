@@ -8,6 +8,7 @@
        http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/3.2/mule-jbossts.xsd">
 
     <jbossts:transaction-manager>
+        <!-- TODO TODO JBossTS now uses different configuration approach, broke props into 3 javabeans, update -->
         <property key="test" value="TEST"/>
     </jbossts:transaction-manager>
 

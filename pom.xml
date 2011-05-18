@@ -106,6 +106,7 @@
         <dom4jVersion>1.6.1</dom4jVersion>
         <flatpackVersion>3.1.1</flatpackVersion>
         <geronimoSpecsVersion>1.1</geronimoSpecsVersion>
+        <geronimoSpecsJtaVersion>1.1.1</geronimoSpecsJtaVersion>
         <geronimoSpecsAnnotationVersion>1.1.1</geronimoSpecsAnnotationVersion>
         <geronimoSpecsStaxVersion>1.0.1</geronimoSpecsStaxVersion>
         <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
@@ -121,7 +122,7 @@
         <javaXmlBindVersion>2.1.9</javaXmlBindVersion>
         <javaXmlWsVersion>2.2.1</javaXmlWsVersion>
         <jaxenVersion>1.1.1</jaxenVersion>
-        <jbossTsVersion>4.2.3-SP5</jbossTsVersion>
+        <jbossTsVersion>4.15.0.Final</jbossTsVersion>
         <jbpmVersion>4.4</jbpmVersion>
         <jcrVersion>1.0</jcrVersion>
         <jdomVersion>1.1.1</jdomVersion>
@@ -557,8 +558,8 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-jta_1.0.1B_spec</artifactId>
-                <version>${geronimoSpecsVersion}-osgi</version>
+                <artifactId>geronimo-jta_1.1_spec</artifactId>
+                <version>${geronimoSpecsJtaVersion}</version>
             </dependency>
             <dependency>
                 <groupId>javax.activation</groupId>
