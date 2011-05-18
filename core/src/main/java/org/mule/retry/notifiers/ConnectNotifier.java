@@ -45,6 +45,10 @@ public class ConnectNotifier implements RetryNotifier
             msg.append("Failed to connect/reconnect: ").append(context.getDescription());
             Throwable t = ExceptionHelper.getRootException(e);
             msg.append(". Root Exception was: ").append(ExceptionHelper.writeException(t));
+            if (logger.isTraceEnabled())
+            {
+                t.printStackTrace();
+            }
             logger.error(msg.toString());
         }
     }

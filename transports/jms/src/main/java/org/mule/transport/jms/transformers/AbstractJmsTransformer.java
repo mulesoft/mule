@@ -18,11 +18,13 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.Connector;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transport.ConnectException;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsConstants;
 import org.mule.transport.jms.JmsMessageUtils;
 import org.mule.util.ClassUtils;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 import javax.jms.Destination;
@@ -48,7 +50,7 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
 
     protected abstract void declareInputOutputClasses();
     
-    protected Message transformToMessage(MuleMessage message) throws TransformerException
+    protected Message transformToMessage(MuleMessage message) throws Exception
     {
         Session session = null;
         try
@@ -72,6 +74,11 @@ public abstract class AbstractJmsTransformer extends AbstractMessageTransformer 
         }
         catch (Exception e)
         {
+            if (e instanceof EOFException)
+            {
+                // Trigger reconnection on certain exception types
+                e = new ConnectException(e, getEndpoint().getConnector());
+            }
             throw new TransformerException(this, e);
         }
         finally

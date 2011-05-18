@@ -123,6 +123,12 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             throw new IllegalStateException("List should be empty, there may be a concurrency issue here (see EE-1275)");
         }
         
+        // Create session if none exists
+        if (session == null)
+        {
+            session = jmsConnector.getSession(endpoint);
+        }
+
         SubReceiver sub;
         for (int i = 0; i < receiversCount; i++)
         {
@@ -151,14 +157,43 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             }
         }
         consumers.clear();
+        if (session != null)
+        {
+            try
+            {
+                session.close();
+            }
+            catch (Exception e)
+            {
+                logger.warn("Failed to close jms session: " + e.getMessage());
+            }
+            finally
+            {
+                session = null;
+            }
+        }
     }
 
     @Override
     protected void doDispose()
     {
-        jmsConnector.closeQuietly(session);
-        session = null;
         logger.debug("doDispose()");
+        // Note: the session was probably already disposed by doDisconnect()
+        if (session != null)
+        {
+            try
+            {
+                session.close();
+            }
+            catch (Exception e)
+            {
+                logger.warn("Failed to close jms session: " + e.getMessage());
+            }
+            finally
+            {
+                session = null;
+            }
+        }
     }
 
     private class SubReceiver implements MessageListener
@@ -262,12 +297,6 @@ public class MultiConsumerJmsMessageReceiver extends AbstractMessageReceiver
             {
                 JmsSupport jmsSupport = jmsConnector.getJmsSupport();
                 boolean topic = jmsConnector.getTopicResolver().isTopic(endpoint, true);
-
-                // Create session if none exists
-                if (session == null)
-                {
-                    session = jmsConnector.getSession(endpoint);
-                }
 
                 // Create destination
                 Destination dest = jmsSupport.createDestination(session, endpoint);

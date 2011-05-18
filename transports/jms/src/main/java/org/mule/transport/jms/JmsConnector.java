@@ -476,8 +476,7 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
         if (receiverReportedExceptionCount.incrementAndGet() >= expectedReceiverCount)
         {
             receiverReportedExceptionCount.set(0);
-
-            throw new MuleRuntimeException(new ConnectException(jmsException, this));
+            muleContext.getExceptionListener().handleException(new ConnectException(jmsException, this));
         }
     }
 
@@ -786,13 +785,20 @@ public class JmsConnector extends AbstractConnector implements ExceptionListener
      */
     public void closeQuietly(Session session)
     {
-        try
+        if (session != null)
         {
-            close(session);
-        }
-        catch (JMSException e)
-        {
-            logger.warn("Failed to close jms session consumer: " + e.getMessage());
+            try
+            {
+                close(session);
+            }
+            catch (JMSException e)
+            {
+                logger.warn("Failed to close jms session consumer: " + e.getMessage());
+            }
+            finally
+            {
+                session = null;
+            }
         }
     }
 
