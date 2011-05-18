@@ -29,15 +29,14 @@ import org.mule.util.ClassUtils;
 import org.mule.util.MapUtils;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
 
 public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageReceiver
 {

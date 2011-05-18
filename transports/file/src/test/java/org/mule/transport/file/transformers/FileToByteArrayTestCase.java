@@ -18,8 +18,7 @@ import org.mule.util.SystemUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
+import java.util.Arrays;
 
 public class FileToByteArrayTestCase extends AbstractTransformerTestCase
 {

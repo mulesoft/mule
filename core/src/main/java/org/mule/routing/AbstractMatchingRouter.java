@@ -28,8 +28,7 @@ import org.mule.config.i18n.CoreMessages;
 
 import java.util.Iterator;
 import java.util.List;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

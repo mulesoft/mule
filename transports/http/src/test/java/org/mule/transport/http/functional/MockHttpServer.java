@@ -16,8 +16,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CountDownLatch;
 
 public abstract class MockHttpServer extends Object implements Runnable
 {

@@ -30,9 +30,9 @@ package org.mule.work;
 import org.mule.api.work.WorkExecutor;
 import org.mule.util.concurrent.Latch;
 
-import javax.resource.spi.work.WorkException;
+import java.util.concurrent.Executor;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+import javax.resource.spi.work.WorkException;
 
 public class StartWorkExecutor implements WorkExecutor
 {

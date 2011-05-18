@@ -19,8 +19,7 @@ import org.mule.util.IOUtils;
 
 import java.util.Collection;
 import java.util.Iterator;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.custommonkey.xmlunit.XMLAssert;
 

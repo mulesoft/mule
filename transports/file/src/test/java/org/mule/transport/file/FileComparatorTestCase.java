@@ -16,9 +16,8 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.FileUtils;
 
 import java.io.File;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class FileComparatorTestCase extends FunctionalTestCase
 {

@@ -41,6 +41,7 @@ import org.mule.util.BeanUtils;
 
 import java.text.MessageFormat;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -54,8 +55,6 @@ import javax.jms.TemporaryTopic;
 import javax.jms.XAConnectionFactory;
 import javax.naming.CommunicationException;
 import javax.naming.NamingException;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <code>JmsConnector</code> is a JMS 1.0.2b compliant connector that can be used

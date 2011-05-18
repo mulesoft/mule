@@ -18,9 +18,8 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
 import org.mule.util.concurrent.Latch;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class CxfAndXslTransformerOnSoapTestCase extends FunctionalTestCase
 {

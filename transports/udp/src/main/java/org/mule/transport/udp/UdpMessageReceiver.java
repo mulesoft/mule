@@ -34,12 +34,11 @@ import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 /** <code>UdpMessageReceiver</code> receives UDP message packets. */
 public class UdpMessageReceiver extends AbstractMessageReceiver implements Work

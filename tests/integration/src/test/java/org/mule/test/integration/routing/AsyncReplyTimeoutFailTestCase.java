@@ -16,8 +16,8 @@ import org.mule.routing.correlation.CorrelationTimeoutException;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.ExceptionUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class AsyncReplyTimeoutFailTestCase extends FunctionalTestCase
 {

@@ -33,12 +33,11 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.resource.spi.work.Work;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * Test for SSL handshake timeouts. Unfortunately, there is no easy way to blackbox-test this

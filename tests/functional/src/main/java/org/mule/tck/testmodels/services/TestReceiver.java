@@ -13,7 +13,8 @@ package org.mule.tck.testmodels.services;
 import org.mule.RequestContext;
 import org.mule.util.StringMessageUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

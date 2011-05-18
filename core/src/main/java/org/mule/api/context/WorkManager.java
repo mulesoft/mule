@@ -13,7 +13,7 @@ package org.mule.api.context;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Startable;
 
-import edu.emory.mathcs.backport.java.util.concurrent.Executor;
+import java.util.concurrent.Executor;
 
 /**
  * <code>WorkManager</code> extends the standard JCA WorkManager with lifecycle

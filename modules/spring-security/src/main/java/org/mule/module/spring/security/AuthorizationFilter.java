@@ -25,10 +25,9 @@ import org.mule.module.spring.security.i18n.SpringSecurityMessages;
 import org.mule.security.AbstractSecurityFilter;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

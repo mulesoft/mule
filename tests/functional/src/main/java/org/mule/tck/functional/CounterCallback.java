@@ -11,7 +11,7 @@ package org.mule.tck.functional;
 
 import org.mule.api.MuleEventContext;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A test callback that counts the number of messages received.

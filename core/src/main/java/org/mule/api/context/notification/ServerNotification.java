@@ -20,8 +20,7 @@ import org.mule.util.ClassUtils;
 
 import java.util.EventObject;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <code>ServerNotification</code> is an event triggered by something happening in

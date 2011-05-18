@@ -10,7 +10,7 @@
 
 package org.mule.management.stats;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class FlowConstructStatistics extends AbstractFlowConstructStatistics
 {

@@ -28,8 +28,7 @@ import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.util.concurrent.Latch;
 
 import java.io.File;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCase
 {

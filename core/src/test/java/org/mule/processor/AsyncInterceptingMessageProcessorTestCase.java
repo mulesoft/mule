@@ -24,8 +24,7 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.util.concurrent.Latch;
 
 import java.beans.ExceptionListener;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestCase
     implements ExceptionListener

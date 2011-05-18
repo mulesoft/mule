@@ -13,12 +13,12 @@ package org.mule.module.jca;
 import org.mule.api.MuleException;
 import org.mule.config.ImmutableThreadingProfile;
 
+import java.util.concurrent.RejectedExecutionException;
+
 import javax.resource.spi.work.ExecutionContext;
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
-
-import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
 
 /**
  * <code>DelegateWorkManager</code> is a wrapper around a WorkManager provided by a

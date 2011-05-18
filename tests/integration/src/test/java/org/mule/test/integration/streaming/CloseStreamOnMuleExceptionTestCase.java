@@ -20,6 +20,7 @@ import org.mule.util.concurrent.Latch;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
@@ -28,8 +29,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.xml.sax.InputSource;
 

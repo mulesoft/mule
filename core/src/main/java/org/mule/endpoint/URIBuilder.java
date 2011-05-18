@@ -24,8 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This has the following logic:

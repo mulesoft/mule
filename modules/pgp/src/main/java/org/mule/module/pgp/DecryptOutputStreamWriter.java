@@ -16,8 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.NoSuchProviderException;
 import java.util.Iterator;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.bouncycastle.openpgp.PGPCompressedData;
 import org.bouncycastle.openpgp.PGPEncryptedDataList;

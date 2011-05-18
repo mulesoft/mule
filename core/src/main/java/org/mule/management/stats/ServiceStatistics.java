@@ -10,11 +10,10 @@
 
 package org.mule.management.stats;
 
-import java.io.PrintWriter;
-
 import org.mule.management.stats.printers.SimplePrinter;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
+import java.io.PrintWriter;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class ServiceStatistics extends FlowConstructStatistics implements QueueStatistics
 {

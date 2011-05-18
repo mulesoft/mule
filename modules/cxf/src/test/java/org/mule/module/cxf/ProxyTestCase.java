@@ -22,8 +22,7 @@ import org.mule.util.concurrent.Latch;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class ProxyTestCase extends DynamicPortTestCase
 {

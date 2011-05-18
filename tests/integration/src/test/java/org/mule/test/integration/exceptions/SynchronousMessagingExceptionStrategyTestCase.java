@@ -12,7 +12,7 @@ package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleMessage;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 // TODO This test case is illogical because if the request is end-to-end synchronous, no exception strategy 
 // will be called, the exception is simple returned to the client.

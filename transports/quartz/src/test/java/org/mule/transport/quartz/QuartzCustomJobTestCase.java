@@ -12,8 +12,8 @@ package org.mule.transport.quartz;
 
 import org.mule.tck.FunctionalTestCase;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;

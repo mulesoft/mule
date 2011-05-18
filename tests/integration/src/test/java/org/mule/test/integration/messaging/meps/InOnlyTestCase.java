@@ -10,13 +10,13 @@
 
 package org.mule.test.integration.messaging.meps;
 
+import org.mule.api.context.notification.ServerNotification;
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
-import org.mule.module.client.MuleClient;
-import org.mule.api.context.notification.ServerNotification;
 import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 // START SNIPPET: full-class
 public class InOnlyTestCase extends FunctionalTestCase

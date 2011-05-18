@@ -10,7 +10,7 @@
 
 package org.mule.tck;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public interface TestCaseWatchdogTimeoutHandler
 {

@@ -12,8 +12,8 @@ package org.mule.transport.http.functional;
 
 import org.mule.tck.DynamicPortTestCase;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractMockHttpServerTestCase extends DynamicPortTestCase
 {

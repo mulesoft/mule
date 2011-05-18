@@ -17,7 +17,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase
 {

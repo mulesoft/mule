@@ -18,7 +18,7 @@ import org.mule.api.ThreadSafeAccess;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Test case to reproduce issue described in MULE-4407 and validate fix.

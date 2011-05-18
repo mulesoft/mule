@@ -20,8 +20,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
+import java.util.Arrays;
 
 public class UdpRoundTripTestCase extends FunctionalTestCase
 {

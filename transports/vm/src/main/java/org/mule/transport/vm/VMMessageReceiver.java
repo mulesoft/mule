@@ -18,7 +18,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.transport.Connector;
 import org.mule.transport.ContinuousPollingReceiverWorker;
 import org.mule.transport.PollingReceiverWorker;
@@ -29,8 +28,7 @@ import org.mule.util.queue.QueueSession;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * <code>VMMessageReceiver</code> is a listener for events from a Mule service which then simply passes

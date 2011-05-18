@@ -34,7 +34,7 @@ import org.mule.service.AbstractService;
 import org.mule.tck.functional.EventCallback;
 import org.mule.transaction.MuleTransactionConfig;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractJdbcTransactionalFunctionalTestCase extends AbstractJdbcFunctionalTestCase  implements TransactionNotificationListener<TransactionNotification>
 {

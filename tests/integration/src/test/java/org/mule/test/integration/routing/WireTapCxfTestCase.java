@@ -14,11 +14,10 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
 import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class WireTapCxfTestCase extends DynamicPortTestCase
 {

@@ -13,7 +13,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.transaction.TransactionException;
 import org.mule.transaction.AbstractSingleResourceTransaction;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A test transaction that does nothing on commit or rollback. The transaction does retain a status so that

@@ -18,8 +18,7 @@ import org.mule.tck.functional.FunctionalTestComponent;
 
 import java.util.Arrays;
 import java.util.List;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CollectionAggregatorRouterTimeoutTestCase extends FunctionalTestCase
 {

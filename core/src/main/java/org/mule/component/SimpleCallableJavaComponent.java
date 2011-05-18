@@ -29,7 +29,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.transformer.TransformerTemplate;
 
-import edu.emory.mathcs.backport.java.util.Collections;
+import java.util.Collections;
 
 /**
  * Simple {@link JavaComponent} implementation to be used when

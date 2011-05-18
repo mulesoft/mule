@@ -46,10 +46,9 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.Latch;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestCase
 {
@@ -115,11 +114,11 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
         }
         if (transformer != null)
         {
-            endpointBuilder.setMessageProcessors(Collections.singletonList(transformer));
+            endpointBuilder.setMessageProcessors(Collections.<MessageProcessor>singletonList(transformer));
         }
         if (responseTransformer != null)
         {
-            endpointBuilder.setResponseMessageProcessors(Collections.singletonList(responseTransformer));
+            endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor>singletonList(responseTransformer));
         }
         endpointBuilder.setExchangePattern(exchangePattern);
         endpointBuilder.setTransactionConfig(txConfig);
@@ -183,11 +182,11 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
         }
         if (transformer != null)
         {
-            endpointBuilder.setMessageProcessors(Collections.singletonList(transformer));
+            endpointBuilder.setMessageProcessors(Collections.<MessageProcessor>singletonList(transformer));
         }
         if (responseTransformer != null)
         {
-            endpointBuilder.setResponseMessageProcessors(Collections.singletonList(responseTransformer));
+            endpointBuilder.setResponseMessageProcessors(Collections.<MessageProcessor>singletonList(responseTransformer));
         }
         endpointBuilder.setExchangePattern(exchangePattern);
         endpointBuilder.setTransactionConfig(txConfig);

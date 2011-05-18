@@ -22,8 +22,7 @@ import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ConcurrentHashSet/* <E> */extends AbstractSet/* <E> */implements Set/* <E> */, Serializable
 {

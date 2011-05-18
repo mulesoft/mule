@@ -47,10 +47,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.resource.spi.work.Work;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;

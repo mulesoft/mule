@@ -21,15 +21,14 @@ import org.mule.transport.tcp.TcpMessageReceiver;
 import java.io.IOException;
 import java.net.Socket;
 import java.security.cert.Certificate;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSocket;
 import javax.resource.spi.work.Work;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 
 public class SslMessageReceiver extends TcpMessageReceiver implements HandshakeCompletedListener

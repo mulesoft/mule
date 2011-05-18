@@ -30,6 +30,8 @@ import org.mule.util.NumberUtils;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.concurrent.WaitableBoolean;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -40,8 +42,6 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import javax.jms.TemporaryTopic;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * <code>JmsMessageDispatcher</code> is responsible for dispatching messages to JMS

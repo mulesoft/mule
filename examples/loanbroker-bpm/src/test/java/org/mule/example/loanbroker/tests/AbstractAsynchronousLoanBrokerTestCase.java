@@ -21,8 +21,7 @@ import org.mule.util.ExceptionHolder;
 import org.mule.util.StringMessageUtils;
 
 import java.beans.ExceptionListener;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.lang.time.StopWatch;
 

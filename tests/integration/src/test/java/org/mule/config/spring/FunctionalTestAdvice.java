@@ -10,13 +10,13 @@
 
 package org.mule.config.spring;
 
-import org.mule.util.concurrent.Latch;
 import org.mule.api.MuleEventContext;
+import org.mule.util.concurrent.Latch;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.aop.MethodBeforeAdvice;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class FunctionalTestAdvice implements MethodBeforeAdvice
 {

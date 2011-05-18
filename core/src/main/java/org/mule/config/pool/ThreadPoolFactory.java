@@ -18,10 +18,9 @@ import org.mule.config.PreferredObjectSelector;
 import org.mule.config.i18n.MessageFactory;
 
 import java.util.Iterator;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.imageio.spi.ServiceRegistry;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Uses a standard JDK's

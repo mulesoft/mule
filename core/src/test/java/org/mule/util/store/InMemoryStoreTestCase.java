@@ -13,8 +13,8 @@ package org.mule.util.store;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.tck.AbstractMuleTestCase;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class InMemoryStoreTestCase extends AbstractMuleTestCase
 {

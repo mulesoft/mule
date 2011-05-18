@@ -10,9 +10,6 @@
 
 package org.mule.construct;
 
-import java.lang.reflect.Method;
-import java.util.List;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -29,7 +26,9 @@ import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.util.ClassUtils;
 
-import edu.emory.mathcs.backport.java.util.Collections;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * In-out SOA-style simple service, with no outbound router. Always fully synchronous.

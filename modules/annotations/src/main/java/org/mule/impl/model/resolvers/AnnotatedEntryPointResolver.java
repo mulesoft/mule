@@ -27,9 +27,8 @@ import org.mule.util.annotation.AnnotationUtils;
 
 import java.lang.reflect.Method;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.sf.cglib.proxy.Enhancer;
 

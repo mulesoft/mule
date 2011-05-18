@@ -10,10 +10,10 @@
 
 package org.mule.util.concurrent;
 
-import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
-import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A handler for unexecutable tasks that waits until the task can be submitted for

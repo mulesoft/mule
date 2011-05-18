@@ -18,7 +18,7 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.test.integration.spring.events.Order;
 import org.mule.test.integration.spring.events.OrderManagerBean;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <code>SpringEventsJmsExampleTestCase</code> is a testcase used to test the

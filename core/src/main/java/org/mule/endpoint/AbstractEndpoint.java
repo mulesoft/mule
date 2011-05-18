@@ -32,14 +32,13 @@ import org.mule.routing.MessageFilter;
 import org.mule.util.ClassUtils;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

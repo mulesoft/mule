@@ -18,7 +18,7 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class OutboundNotificationMessageProcessorTestCase extends AbstractMessageProcessorTestCase
 {

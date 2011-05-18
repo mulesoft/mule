@@ -29,8 +29,7 @@ import org.mule.message.DefaultExceptionPayload;
 import org.mule.tck.AbstractMuleTestCase;
 
 import java.io.OutputStream;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RequestContextTestCase extends AbstractMuleTestCase
 {

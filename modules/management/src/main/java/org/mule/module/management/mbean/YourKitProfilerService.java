@@ -10,13 +10,14 @@
 
 package org.mule.module.management.mbean;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.module.management.i18n.ManagementMessages;
 
 import com.yourkit.api.Controller;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class YourKitProfilerService implements YourKitProfilerServiceMBean
 {

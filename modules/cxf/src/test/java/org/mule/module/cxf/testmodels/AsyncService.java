@@ -10,12 +10,12 @@
 
 package org.mule.module.cxf.testmodels;
 
+import java.util.concurrent.CountDownLatch;
+
 import javax.jws.Oneway;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
 @WebService
 public class AsyncService

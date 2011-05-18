@@ -15,7 +15,6 @@ aspectjrt-1.5.4
 aspectjweaver-1.6.8
 axiom-api-1.2.5
 axiom-impl-1.2.5
-backport-util-concurrent-3.1-osgi
 bcmail-jdk15-1.45
 bcpg-jdk15-1.45
 bcprov-ext-jdk15-1.45

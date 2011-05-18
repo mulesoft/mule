@@ -10,15 +10,15 @@
 
 package org.mule.test.transformers;
 
+import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.testmodels.fruit.FruitBasket;
-import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
-import org.mule.module.client.MuleClient;
+import org.mule.tck.testmodels.fruit.FruitBasket;
+import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class AutoTransformerTestCase extends FunctionalTestCase
 {

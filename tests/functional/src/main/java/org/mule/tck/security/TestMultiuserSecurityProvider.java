@@ -16,8 +16,7 @@ import org.mule.api.security.SecurityException;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A security provider which holds authentications for multiple users concurrently.

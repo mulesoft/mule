@@ -13,9 +13,8 @@ package org.mule.transport.ajax;
 import org.mule.tck.DynamicPortTestCase;
 import org.mule.util.concurrent.Latch;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.cometd.Client;
 import org.cometd.Message;

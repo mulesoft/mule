@@ -13,7 +13,7 @@ package org.mule.test.integration.exceptions;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.tck.testmodels.mule.TestConnector;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class SystemExceptionStrategyTestCase extends AbstractExceptionStrategyTestCase
 {

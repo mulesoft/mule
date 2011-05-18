@@ -16,9 +16,8 @@ import org.mule.tck.DynamicPortTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.cometd.Client;

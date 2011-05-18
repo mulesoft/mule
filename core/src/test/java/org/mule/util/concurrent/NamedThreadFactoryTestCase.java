@@ -12,7 +12,7 @@ package org.mule.util.concurrent;
 
 import org.mule.tck.AbstractMuleTestCase;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class NamedThreadFactoryTestCase extends AbstractMuleTestCase
 {

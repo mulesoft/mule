@@ -24,12 +24,11 @@ import org.mule.management.stats.QueueStatistics;
 import org.mule.service.Pausable;
 
 import java.beans.ExceptionListener;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 
 public class SedaStageInterceptingMessageProcessorTestCase extends
     OptionalAsyncInterceptingMessageProcessorTestCase implements ExceptionListener

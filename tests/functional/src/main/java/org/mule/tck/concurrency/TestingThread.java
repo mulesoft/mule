@@ -12,7 +12,7 @@ package org.mule.tck.concurrency;
 
 import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class is very useful for test cases which need to make assertions 

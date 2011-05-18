@@ -39,8 +39,7 @@ import org.mule.transaction.TransactionCoordination;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.OutputStream;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Callable;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

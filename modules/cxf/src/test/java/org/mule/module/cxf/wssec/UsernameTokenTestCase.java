@@ -12,7 +12,7 @@ package org.mule.module.cxf.wssec;
 import org.mule.tck.DynamicPortTestCase;
 import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class UsernameTokenTestCase extends DynamicPortTestCase
 {

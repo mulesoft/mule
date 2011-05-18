@@ -16,12 +16,12 @@ import org.mule.api.service.Service;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsSupport;
 
+import java.util.concurrent.CountDownLatch;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
 public class ServiceInFlightMessagesJMSTestCase extends ServiceInFlightMessagesTestCase
 {

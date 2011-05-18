@@ -17,7 +17,7 @@ import org.mule.transport.NullPayload;
 import org.mule.transport.xmpp.JabberSender.Callback;
 import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;

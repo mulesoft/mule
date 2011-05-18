@@ -17,11 +17,11 @@ import org.mule.transport.email.GreenMailUtilities;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.internet.MimeMessage;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Start a (greenmail) mail server with a known message, for use in subclasses.

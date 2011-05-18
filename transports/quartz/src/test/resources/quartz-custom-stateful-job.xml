@@ -13,7 +13,7 @@
     <!-- 
         This latch is used in the test's code to determine if the custom job did its work
     -->
-    <spring:bean id="latch" class="edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch">
+    <spring:bean id="latch" class="java.util.concurrent.CountDownLatch">
         <spring:constructor-arg type="int" value="1" />
     </spring:bean>
 

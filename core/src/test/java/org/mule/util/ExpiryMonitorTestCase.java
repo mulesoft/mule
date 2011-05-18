@@ -14,7 +14,7 @@ import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class ExpiryMonitorTestCase extends AbstractMuleTestCase
 {

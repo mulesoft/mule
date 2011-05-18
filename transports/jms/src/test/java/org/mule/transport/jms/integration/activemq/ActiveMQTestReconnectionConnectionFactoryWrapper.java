@@ -18,13 +18,12 @@ import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.QueueConnection;
 import javax.jms.TopicConnection;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.Closeable;

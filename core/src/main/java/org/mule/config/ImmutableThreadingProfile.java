@@ -17,9 +17,9 @@ import org.mule.api.context.WorkManager;
 import org.mule.config.pool.ThreadPoolFactory;
 import org.mule.work.MuleWorkManager;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadFactory;
 
 
 public class ImmutableThreadingProfile implements ThreadingProfile

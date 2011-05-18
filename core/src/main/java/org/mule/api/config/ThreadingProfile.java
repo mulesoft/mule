@@ -18,10 +18,9 @@ import org.mule.config.ImmutableThreadingProfile;
 import org.mule.config.pool.ThreadPoolFactory;
 
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadFactory;
 
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 

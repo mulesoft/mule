@@ -21,11 +21,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Factory class used to create {@link DataType} objects based on the parameter types passed into

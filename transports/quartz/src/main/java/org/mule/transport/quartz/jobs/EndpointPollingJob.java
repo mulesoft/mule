@@ -28,7 +28,8 @@ import org.mule.transport.quartz.QuartzConnector;
 import org.mule.transport.quartz.QuartzMessageReceiver;
 import org.mule.transport.quartz.i18n.QuartzMessages;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;

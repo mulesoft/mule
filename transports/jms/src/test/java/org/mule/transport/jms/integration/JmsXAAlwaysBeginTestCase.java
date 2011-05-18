@@ -11,13 +11,13 @@
 package org.mule.transport.jms.integration;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.transaction.Transaction;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Ignore;

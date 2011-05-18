@@ -23,9 +23,8 @@ import org.mule.transport.email.transformers.EmailMessageToString;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Given an endpoint ({@link #getTestEndpointURI()}) this waits for up to 10 seconds,

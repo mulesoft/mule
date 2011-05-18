@@ -17,8 +17,7 @@ import org.mule.util.StringUtils;
 import com.thoughtworks.xstream.XStream;
 
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class XStreamFactoryTestCase extends AbstractMuleTestCase
 {

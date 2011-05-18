@@ -23,8 +23,7 @@ import org.mule.transport.NullPayload;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <code>IBeansMessageReceiver</code> TODO document

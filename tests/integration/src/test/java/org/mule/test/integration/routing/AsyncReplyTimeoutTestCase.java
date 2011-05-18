@@ -17,8 +17,8 @@ import org.mule.context.notification.RoutingNotification;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class AsyncReplyTimeoutTestCase extends FunctionalTestCase
 {

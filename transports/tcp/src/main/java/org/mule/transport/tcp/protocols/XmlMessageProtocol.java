@@ -13,9 +13,8 @@ package org.mule.transport.tcp.protocols;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * <p>

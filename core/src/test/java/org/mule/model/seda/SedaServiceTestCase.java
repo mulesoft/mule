@@ -27,8 +27,10 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.queue.QueueManager;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
+
 import junit.framework.AssertionFailedError;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

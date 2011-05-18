@@ -21,8 +21,7 @@ import org.mule.util.UUID;
 import org.mule.util.concurrent.Latch;
 
 import java.util.Properties;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;

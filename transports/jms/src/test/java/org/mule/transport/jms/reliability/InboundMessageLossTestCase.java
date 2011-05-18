@@ -17,7 +17,7 @@ import org.mule.routing.filters.WildcardFilter;
 import org.mule.transport.jms.redelivery.MessageRedeliveredException;
 import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
 {

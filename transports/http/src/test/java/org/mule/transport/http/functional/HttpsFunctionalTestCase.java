@@ -21,8 +21,7 @@ import org.mule.transport.http.HttpsConnector;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HttpsFunctionalTestCase extends HttpFunctionalTestCase
 {

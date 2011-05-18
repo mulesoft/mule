@@ -17,8 +17,8 @@ import org.mule.api.transaction.TransactionException;
 import org.mule.context.notification.TransactionNotification;
 import org.mule.tck.AbstractMuleTestCase;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class TransactionNotificationsTestCase extends AbstractMuleTestCase
 {

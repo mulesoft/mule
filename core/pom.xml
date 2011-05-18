@@ -49,10 +49,6 @@
             <version>2.0.0</version>
             <classifier>asl</classifier>
         </dependency>
-        <dependency>
-            <groupId>backport-util-concurrent</groupId>
-            <artifactId>backport-util-concurrent</artifactId>
-        </dependency>
         <!--
             TODO MULE-1947 Remove this since command-line parsing is limited to
             mule-module-boot

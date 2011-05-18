@@ -16,7 +16,8 @@ import org.mule.example.loanbroker.messages.CustomerQuoteRequest;
 import org.mule.example.loanbroker.messages.LoanBrokerQuoteRequest;
 import org.mule.example.loanbroker.messages.LoanQuote;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

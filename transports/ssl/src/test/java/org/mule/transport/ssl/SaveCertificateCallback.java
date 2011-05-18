@@ -13,8 +13,8 @@ package org.mule.transport.ssl;
 import org.mule.api.MuleEventContext;
 import org.mule.tck.functional.EventCallback;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class SaveCertificateCallback implements EventCallback
 {

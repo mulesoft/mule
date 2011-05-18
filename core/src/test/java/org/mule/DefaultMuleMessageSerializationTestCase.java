@@ -21,10 +21,9 @@ import org.mule.util.store.DeserializationPostInitialisable;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import javax.activation.DataHandler;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 import org.apache.commons.lang.SerializationUtils;
 

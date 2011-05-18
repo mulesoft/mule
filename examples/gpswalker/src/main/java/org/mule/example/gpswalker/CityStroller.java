@@ -9,9 +9,7 @@
  */
 package org.mule.example.gpswalker;
 
-import org.mule.api.annotations.Schedule;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Generates a random walk around a city

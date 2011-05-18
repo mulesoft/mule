@@ -10,7 +10,7 @@
 
 package org.mule.util.concurrent;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CountDownLatch;
 
 // @ThreadSafe
 public class Latch extends CountDownLatch

@@ -36,8 +36,7 @@ import org.mule.transformer.simple.ResponseAppendTransformer;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 {

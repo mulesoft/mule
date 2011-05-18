@@ -16,9 +16,9 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.context.WorkManager;
 import org.mule.config.pool.ThreadPoolFactory;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
-import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionHandler;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * This was written (perhaps too far in advance) with an eye to how we will manage default values

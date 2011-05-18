@@ -36,7 +36,7 @@ import org.mule.transformer.simple.ResponseAppendTransformer;
 import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Tests flow of messages from {@link OutboundEndpoint#process(MuleEvent)} down to

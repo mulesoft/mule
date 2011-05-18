@@ -15,7 +15,7 @@ import org.mule.api.lifecycle.Lifecycle;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class RegisteredObjectLifecycleTestCase extends AbstractMuleTestCase
 {

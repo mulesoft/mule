@@ -10,11 +10,6 @@
 
 package org.mule.test.integration.construct;
 
-import java.util.Collections;
-import java.util.Map;
-
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -25,7 +20,12 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.Latch;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.math.RandomUtils;
 
 public class BridgeTestCase extends FunctionalTestCase {
     private MuleClient muleClient;

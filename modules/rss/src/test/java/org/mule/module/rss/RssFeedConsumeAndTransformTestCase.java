@@ -21,8 +21,7 @@ import org.mule.util.concurrent.Latch;
 import com.sun.syndication.feed.synd.SyndFeed;
 
 import java.io.InputStream;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class RssFeedConsumeAndTransformTestCase extends FunctionalTestCase
 {

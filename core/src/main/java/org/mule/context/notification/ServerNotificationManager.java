@@ -24,17 +24,17 @@ import org.mule.util.ClassUtils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkListener;
 
-import edu.emory.mathcs.backport.java.util.Queue;
-import edu.emory.mathcs.backport.java.util.concurrent.BlockingDeque;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingDeque;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

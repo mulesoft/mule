@@ -17,10 +17,10 @@ import org.mule.transport.http.HttpMessageReceiver;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
+import javax.servlet.http.HttpServletRequest;
 
 public class JettyReceiverServlet extends MuleReceiverServlet
 {

@@ -15,9 +15,8 @@ import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
 import org.mule.util.ExceptionUtils;
 
 import java.util.Properties;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;

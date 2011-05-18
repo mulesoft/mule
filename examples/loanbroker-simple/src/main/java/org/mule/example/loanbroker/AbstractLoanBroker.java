@@ -16,7 +16,7 @@ import org.mule.example.loanbroker.model.CreditProfile;
 import org.mule.example.loanbroker.model.Customer;
 import org.mule.example.loanbroker.model.LoanQuote;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

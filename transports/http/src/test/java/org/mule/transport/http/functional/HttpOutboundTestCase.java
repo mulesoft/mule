@@ -16,9 +16,8 @@ import org.mule.util.concurrent.Latch;
 
 import java.io.BufferedReader;
 import java.util.StringTokenizer;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class HttpOutboundTestCase extends AbstractMockHttpServerTestCase
 {

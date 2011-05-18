@@ -10,9 +10,6 @@
 
 package org.mule.transport.sftp;
 
-import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_DISPATCHED;
-import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_SENT;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
@@ -50,14 +47,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_DISPATCHED;
+import static org.mule.context.notification.EndpointMessageNotification.MESSAGE_SENT;
 
 /**
  * @author Lennart Häggkvist, Magnus Larsson Date: Jun 8, 2009

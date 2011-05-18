@@ -12,7 +12,7 @@ package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleMessage;
 
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class AsynchronousMessagingExceptionStrategyTestCase extends AbstractExceptionStrategyTestCase
 {

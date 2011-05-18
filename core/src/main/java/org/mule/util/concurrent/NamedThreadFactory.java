@@ -12,10 +12,9 @@ package org.mule.util.concurrent;
 
 import org.mule.util.StringUtils;
 
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadFactory;
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicLong;
 
-public class NamedThreadFactory implements ThreadFactory
+public class NamedThreadFactory implements java.util.concurrent.ThreadFactory
 {
     private final String name;
     private final AtomicLong counter;

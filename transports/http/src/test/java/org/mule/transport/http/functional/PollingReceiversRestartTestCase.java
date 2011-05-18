@@ -13,7 +13,7 @@ import org.mule.tck.DynamicPortTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PollingReceiversRestartTestCase extends DynamicPortTestCase
 {

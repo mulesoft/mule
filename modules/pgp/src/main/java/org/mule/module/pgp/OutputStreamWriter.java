@@ -11,8 +11,7 @@
 package org.mule.module.pgp;
 
 import java.io.OutputStream;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A writer of {@link OutputStream}

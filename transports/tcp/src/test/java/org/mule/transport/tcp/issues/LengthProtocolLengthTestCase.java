@@ -14,7 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
+import java.util.Arrays;
 
 public class LengthProtocolLengthTestCase extends DynamicPortTestCase
 {

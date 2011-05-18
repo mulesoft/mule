@@ -23,10 +23,9 @@ import org.mule.api.transport.Connector;
 import org.mule.transaction.TransactionTemplate;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import javax.resource.spi.work.Work;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
 /**
  * The TransactedPollingMessageReceiver is an abstract receiver that handles polling

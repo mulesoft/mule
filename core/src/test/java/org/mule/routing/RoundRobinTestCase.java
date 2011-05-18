@@ -10,7 +10,6 @@
 
 package org.mule.routing;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
@@ -23,6 +22,7 @@ import org.mule.tck.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RoundRobinTestCase extends AbstractMuleTestCase
 {

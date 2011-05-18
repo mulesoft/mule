@@ -21,8 +21,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.Date;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * This property extractor doesn't actually extract a property from the message, instead it allows for certain functions

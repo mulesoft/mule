@@ -10,8 +10,9 @@
 
 package org.mule.management.stats;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 import org.mule.api.management.stats.Statistics;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Statistics common to flows and services

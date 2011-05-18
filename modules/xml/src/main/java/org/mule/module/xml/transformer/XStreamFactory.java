@@ -113,7 +113,7 @@ public class XStreamFactory
         {
             String className = aClass.getName();
             return className.equals("java.util.concurrent.ConcurrentHashMap")
-                            || className.equals("edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap");
+                            || className.equals("java.util.concurrent.ConcurrentHashMap");
         }
     }
 }

@@ -14,9 +14,8 @@ import org.mule.DefaultMuleMessage;
 import org.mule.module.client.MuleClient;
 
 import java.io.File;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
 {  

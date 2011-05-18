@@ -17,9 +17,8 @@ import org.mule.config.i18n.CoreMessages;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentSkipListMap;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <code>InMemoryObjectStore</code> implements an optionally bounded

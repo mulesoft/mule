@@ -18,8 +18,7 @@ import org.mule.util.StringMessageUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

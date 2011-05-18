@@ -19,8 +19,7 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.concurrent.Latch;
 
 import java.io.InputStream;
-
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.abdera.model.Feed;
 
