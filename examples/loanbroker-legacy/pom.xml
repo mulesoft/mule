@@ -16,7 +16,7 @@
         <module>common</module>
         <module>common-tests</module>
         <module>credit-agency</module>
-        <module>esb</module>
+        <!--<module>esb</module>-->
         <module>esn</module>
     </modules>
 
