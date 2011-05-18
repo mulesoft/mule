@@ -38,7 +38,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
         TransactionManagerFactory factory = getTransactionManagerFactory();
         tm = factory.create(muleContext.getConfiguration());
         assertNotNull("Transaction Manager should be available.", tm);
-        assertNull("There sould be no current transaction associated.", tm.getTransaction());
+        assertNull("There should be no current transaction associated.", tm.getTransaction());
     }
 
     public void testTxHandleCommitKeepsThreadAssociation() throws Exception
@@ -111,7 +111,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
     public void testAlwaysBeginXaTransactionSuspendResume() throws Exception
     {
         muleContext.setTransactionManager(tm);
-        assertNull("There sould be no current transaction associated.", tm.getTransaction());
+        assertNull("There should be no current transaction associated.", tm.getTransaction());
 
         // don't wait for ages, has to be set before TX is begun
         tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
@@ -194,7 +194,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
     public void testNoneXaTransactionSuspendResume() throws Exception
     {
         muleContext.setTransactionManager(tm);
-        assertNull("There sould be no current transaction associated.", tm.getTransaction());
+        assertNull("There should be no current transaction associated.", tm.getTransaction());
 
         // don't wait for ages, has to be set before TX is begun
         tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
@@ -260,7 +260,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
     public void testXaTransactionTermination() throws Exception
     {
         muleContext.setTransactionManager(tm);
-        assertNull("There sould be no current transaction associated.", tm.getTransaction());
+        assertNull("There should be no current transaction associated.", tm.getTransaction());
 
         // don't wait for ages, has to be set before TX is begun
         tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
@@ -288,7 +288,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
     public void testNoNestedTxStarted() throws Exception
     {
         muleContext.setTransactionManager(tm);
-        assertNull("There sould be no current transaction associated.", tm.getTransaction());
+        assertNull("There should be no current transaction associated.", tm.getTransaction());
 
         // don't wait for ages, has to be set before TX is begun
         tm.setTransactionTimeout(TRANSACTION_TIMEOUT_SECONDS);
