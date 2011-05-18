@@ -464,9 +464,9 @@ public class JdbcConnector extends AbstractConnector
         
         if (queryTimeout >= 0)
         {
-			ExtendedQueryRunner extendedQueryRunner = new ExtendedQueryRunner(
-					this.queryRunner.getDataSource(), queryTimeout);
-			return extendedQueryRunner;
+            ExtendedQueryRunner extendedQueryRunner = new ExtendedQueryRunner(
+                    this.queryRunner.getDataSource(), queryTimeout);
+            return extendedQueryRunner;
         }
         else
         {

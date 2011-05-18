@@ -28,10 +28,10 @@
         <service name="testComponent">
             <inbound>
                 <http:inbound-endpoint ref="clientEndpoint">
-                	<response>
+                    <response>
                         <message-properties-transformer name="setResponseType" 
                             mimeType="text/baz" encoding="UTF-16BE"/>
-                	</response>
+                    </response>
                 </http:inbound-endpoint>
             </inbound>
             <test:component appendString=" Received"/>

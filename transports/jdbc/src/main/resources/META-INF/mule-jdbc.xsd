@@ -252,7 +252,7 @@
         <xsd:complexContent>
             <xsd:extension base="mule:abstractObjectStoreType">
                 <xsd:sequence>
-	                <xsd:element ref="mule:abstract-transaction" minOccurs="0" maxOccurs="1"/>
+                    <xsd:element ref="mule:abstract-transaction" minOccurs="0" maxOccurs="1"/>
                 </xsd:sequence>
                 <xsd:attribute name="jdbcConnector-ref" type="xsd:string">
                     <xsd:annotation>

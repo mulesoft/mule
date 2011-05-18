@@ -18,7 +18,7 @@
         <service name="with-router">
             <inbound>
                 <vm:inbound-endpoint path="with-router-in" exchange-pattern="one-way">
-                	<transformer ref="fail"/>
+                    <transformer ref="fail"/>
                 </vm:inbound-endpoint>
                 <forwarding-router/>
             </inbound>
@@ -32,7 +32,7 @@
         <service name="without-router">
             <inbound>
                 <vm:inbound-endpoint path="without-router-in" exchange-pattern="one-way">
-                	<transformer ref="fail"/>
+                    <transformer ref="fail"/>
                 </vm:inbound-endpoint>
             </inbound>
             <outbound>

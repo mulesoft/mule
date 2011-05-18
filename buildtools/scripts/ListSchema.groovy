@@ -57,31 +57,31 @@ def otherxsd = /.*(\/|\\)(transports|modules|patterns)(\/|\\)([^\/]+)(\/|\\).*(\
 
 def parseArguments(def arguments)
 {
-	def cliBuilder = new CliBuilder()
-	cliBuilder.d(longOpt: "davmountpoint", args: 1, "mount point of the DAV filesystem")
-	cliBuilder.h(longOpt: "help", "show usage info")
-	cliBuilder.r(longOpt: "root", required: true, args: 1, "start scanning at this root folder")
+    def cliBuilder = new CliBuilder()
+    cliBuilder.d(longOpt: "davmountpoint", args: 1, "mount point of the DAV filesystem")
+    cliBuilder.h(longOpt: "help", "show usage info")
+    cliBuilder.r(longOpt: "root", required: true, args: 1, "start scanning at this root folder")
 
-	options = cliBuilder.parse(arguments)
-	if (!options)
-	{
-    	println ""
-	    println "Error parsing options " + args
-	    println ""
-	    System.exit(1)
-	}
+    options = cliBuilder.parse(arguments)
+    if (!options)
+    {
+        println ""
+        println "Error parsing options " + args
+        println ""
+        System.exit(1)
+    }
 
-	if (options.h)
-	{
-    	cliBuilder.usage()
-	    System.exit(0)
-	}
+    if (options.h)
+    {
+        cliBuilder.usage()
+        System.exit(0)
+    }
 
-	root = options.r
-	if (options.d)
-	{
-		davfs = options.d
-	}
+    root = options.r
+    if (options.d)
+    {
+        davfs = options.d
+    }
 }
 
 def scanForSchemaAndInferDestinations = {

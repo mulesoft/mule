@@ -18,7 +18,7 @@
             <inbound>
                 <http:inbound-endpoint name="httpEndpoint" host="localhost" port="${port1}"
                                        contentType="text/xml">
-                	<transformer ref="Xslt" />
+                    <transformer ref="Xslt" />
                 </http:inbound-endpoint>
                 <forwarding-router/>
             </inbound>

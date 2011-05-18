@@ -10,11 +10,11 @@
 
 package org.mule.transport.sftp.dataintegrity;
 
-import java.io.IOException;
-
 import org.mule.api.transport.DispatchException;
 import org.mule.module.client.MuleClient;
 import org.mule.transport.sftp.SftpClient;
+
+import java.io.IOException;
 
 /**
  * Tests that files are not deleted if the temp directory can't be created
@@ -92,7 +92,7 @@ public class SftpCantCreateTempDirectoryTestCase extends AbstractSftpDataIntegri
     //
     // dispatchAndWaitForDelivery(new DispatchParameters(INBOUND_ENDPOINT_NAME,
     // OUTBOUND_ENDPOINT_NAME));
-    //	
+    //
     // verifyInAndOutFiles(muleClient, INBOUND_ENDPOINT_NAME, OUTBOUND_ENDPOINT_NAME,
     // false, true);
     // }

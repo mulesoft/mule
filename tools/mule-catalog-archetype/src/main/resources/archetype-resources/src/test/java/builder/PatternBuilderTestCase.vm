@@ -17,7 +17,7 @@ public class ${patternBuilderClassName}TestCase extends AbstractMuleTestCase
 
         // TODO call any extra method on the builder
         final ${patternClassName} ${patternVariableName} = new ${patternBuilderClassName}()
-        	.name(patternName)
+            .name(patternName)
 #if($patternType == "ms")
             .messageSource(getTriggerableMessageSource())
 #end
@@ -27,8 +27,8 @@ public class ${patternBuilderClassName}TestCase extends AbstractMuleTestCase
 #if($patternType == "siso")
             .outboundAddress("test://foo.out")
 #end
-        	.exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext))
-        	.build(muleContext);
+            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext))
+            .build(muleContext);
 
         assertEquals(patternName, ${patternVariableName}.getName());
     }

@@ -75,10 +75,10 @@ public class XmlToOutputHandlerByteArrayTestCase extends AbstractXmlTransformerT
     @Override
     public boolean compareResults(Object expected, Object result)
     {
-    	if (result instanceof OutputHandler)
-    	{
-    		OutputHandler handler = (OutputHandler)result;
-    		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        if (result instanceof OutputHandler)
+        {
+            OutputHandler handler = (OutputHandler)result;
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
             try
             {
                 handler.write(null, bos);

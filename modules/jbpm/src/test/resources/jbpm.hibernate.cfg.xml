@@ -13,7 +13,7 @@
      <property name="hibernate.format_sql">true</property>
      <!-- This is a tweaked version of Hibernate's DriverManagerConnectionProvider which works with Mule's hot deployment -->
      <property name="hibernate.connection.provider_class">org.hibernate.connection.SimpleConnectionProvider</property>
-	     
+
      <!-- This property improves thread contention with Mule services a bit -->
      <property name="hibernate.transaction.flush_before_completion">true</property>
 

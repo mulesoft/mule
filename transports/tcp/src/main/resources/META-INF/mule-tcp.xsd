@@ -44,7 +44,7 @@
         </xsd:annotation>
     </xsd:element>
 
-	<xsd:complexType name="pollingTcpConnectorType">
+    <xsd:complexType name="pollingTcpConnectorType">
         <xsd:complexContent>
             <xsd:extension base="tcpConnectorType">
                 <xsd:attribute name="timeout" type="mule:substitutableLong">
@@ -57,7 +57,7 @@
                 <xsd:attribute name="pollingFrequency" type="mule:substitutableLong">
                     <xsd:annotation>
                         <xsd:documentation>
-                        	The time in milliseconds to wait between each request to the TCP server.
+                            The time in milliseconds to wait between each request to the TCP server.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
@@ -169,8 +169,8 @@
     <xsd:complexType name="abstractProtocolType">
         <xsd:attribute name="rethrowExceptionOnRead" type="mule:substitutableBoolean">
             <xsd:annotation>
-            	<xsd:documentation>
-                	Rethrow the exception if read fails
+                <xsd:documentation>
+                    Rethrow the exception if read fails
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

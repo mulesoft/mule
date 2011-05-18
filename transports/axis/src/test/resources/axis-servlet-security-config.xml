@@ -38,12 +38,12 @@
                 <axis:inbound-endpoint address="servlet://mycomponent" exchange-pattern="request-response">
                     <spring-sec:http-security-filter realm="mule-realm"/>
                     <response>
-                    	<transformer ref="ByteArrayToString" />
+                        <transformer ref="ByteArrayToString" />
                     </response>
                 </axis:inbound-endpoint>
             </inbound>
             <echo-component />
-	        <custom-exception-strategy class="org.mule.transport.soap.axis.UnitTestExceptionStrategy"/>
+            <custom-exception-strategy class="org.mule.transport.soap.axis.UnitTestExceptionStrategy"/>
         </service>
     </model>
 </mule>

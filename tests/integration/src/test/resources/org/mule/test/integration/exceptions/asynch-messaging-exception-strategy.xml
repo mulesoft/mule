@@ -29,7 +29,7 @@
         <service name="InboundTransformer">
             <inbound>
                 <vm:inbound-endpoint path="in1" exchange-pattern="one-way">
-                	<transformer ref="exceptionTransformer" />
+                    <transformer ref="exceptionTransformer" />
                 </vm:inbound-endpoint>
             </inbound>
             <log-component />
@@ -38,9 +38,9 @@
         <service name="InboundResponseTransformer">
             <inbound>
                 <vm:inbound-endpoint path="in2" exchange-pattern="one-way">
-                	<response>
-                		<transformer ref="exceptionTransformer" />
-                	</response>
+                    <response>
+                        <transformer ref="exceptionTransformer" />
+                    </response>
                 </vm:inbound-endpoint>
             </inbound>
             <log-component />
@@ -54,7 +54,7 @@
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="out3" exchange-pattern="one-way">
-                    	<transformer ref="exceptionTransformer" />
+                        <transformer ref="exceptionTransformer" />
                     </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -68,9 +68,9 @@
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="out4" exchange-pattern="one-way">
-                    	<response>
-                    		<transformer ref="exceptionTransformer" />
-                   		</response>
+                        <response>
+                            <transformer ref="exceptionTransformer" />
+                           </response>
                     </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -80,12 +80,12 @@
             <inbound>
                 <vm:inbound-endpoint path="in5" exchange-pattern="one-way" />
             </inbound>
-		    <script:component script-ref="throwException" />
+            <script:component script-ref="throwException" />
         </service>
 
         <service name="InboundRouter">
             <inbound>
-               	<vm:inbound-endpoint path="in6" exchange-pattern="one-way" />
+                   <vm:inbound-endpoint path="in6" exchange-pattern="one-way" />
                 <custom-inbound-router class="org.mule.test.integration.exceptions.ExceptionThrowingInboundRouter" />
             </inbound>
             <log-component />

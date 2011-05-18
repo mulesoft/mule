@@ -95,69 +95,69 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-	<xsd:element name="rules" type="rulesComponentType" substitutionGroup="mule:abstract-component">
-	    <xsd:annotation>
-	        <xsd:documentation>
-	            A service backed by a rules engine such as Drools.
-	        </xsd:documentation>
-	    </xsd:annotation>
-	</xsd:element>
-	<xsd:complexType name="rulesComponentType">
-	    <xsd:complexContent>
-	        <xsd:extension base="mule:abstractComponentType">
-	            <xsd:attribute name="rulesEngine-ref" type="xsd:string">
-	                <xsd:annotation>
-	                    <xsd:documentation>
-	                        A reference to the underlying Rules Engine. 
-	                    </xsd:documentation>
-	                </xsd:annotation>
-	            </xsd:attribute>
-	            <xsd:attribute name="rulesDefinition" type="xsd:string" use="required">
-	                <xsd:annotation>
-	                    <xsd:documentation>
-	                        The resource containing the rules definition.  This will be used to deploy the ruleset to the Rules Engine.
-	                    </xsd:documentation>
-	                </xsd:annotation>
-	            </xsd:attribute>
-	            <xsd:attribute name="initialFacts-ref" type="xsd:string">
-	                <xsd:annotation>
-	                    <xsd:documentation>
-	                        A reference to a collection of initial facts to be asserted at startup. 
-	                    </xsd:documentation>
-	                </xsd:annotation>
-	            </xsd:attribute>
-	            <xsd:attribute name="cepMode" type="xsd:boolean">
-	                <xsd:annotation>
-	                    <xsd:documentation>
-	                        Are we using the knowledge base for CEP (Complex Event Processing)? (default = false)
-	                    </xsd:documentation>
-	                </xsd:annotation>
-	            </xsd:attribute>
-	            <xsd:attribute name="entryPoint" type="xsd:string">
-	                <xsd:annotation>
-	                    <xsd:documentation>
-	                        Entry point for event stream (used by CEP).
-	                    </xsd:documentation>
-	                </xsd:annotation>
-	            </xsd:attribute>
-	        </xsd:extension>
-	    </xsd:complexContent>
-	</xsd:complexType>
-	
-	<xsd:element name="drools" type="droolsType" substitutionGroup="mule:abstract-extension" />
-	 
-	<xsd:complexType name="droolsType">
-	    <xsd:complexContent>
-	        <xsd:extension base="mule:abstractExtensionType">
-	             <xsd:attribute name="name" type="mule:substitutableName">
-	                 <xsd:annotation>
-	                     <xsd:documentation>
-	                         An optional name for this Rules Engine.  Refer to this from the "rulesEngine-ref" field of your component in case you have more than one Rules Engine configured.
-	                     </xsd:documentation>
-	                 </xsd:annotation>
-	             </xsd:attribute>
-	        </xsd:extension>
-	    </xsd:complexContent>
-	</xsd:complexType>
+    <xsd:element name="rules" type="rulesComponentType" substitutionGroup="mule:abstract-component">
+        <xsd:annotation>
+            <xsd:documentation>
+                A service backed by a rules engine such as Drools.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="rulesComponentType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractComponentType">
+                <xsd:attribute name="rulesEngine-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to the underlying Rules Engine.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="rulesDefinition" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The resource containing the rules definition.  This will be used to deploy the ruleset to the Rules Engine.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="initialFacts-ref" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            A reference to a collection of initial facts to be asserted at startup.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="cepMode" type="xsd:boolean">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Are we using the knowledge base for CEP (Complex Event Processing)? (default = false)
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="entryPoint" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Entry point for event stream (used by CEP).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="drools" type="droolsType" substitutionGroup="mule:abstract-extension" />
+
+    <xsd:complexType name="droolsType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                 <xsd:attribute name="name" type="mule:substitutableName">
+                     <xsd:annotation>
+                         <xsd:documentation>
+                             An optional name for this Rules Engine.  Refer to this from the "rulesEngine-ref" field of your component in case you have more than one Rules Engine configured.
+                         </xsd:documentation>
+                     </xsd:annotation>
+                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 </xsd:schema>
 

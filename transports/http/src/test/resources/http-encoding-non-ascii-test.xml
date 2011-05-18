@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	  xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:spring="http://www.springframework.org/schema/beans"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	  xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
@@ -12,45 +12,45 @@
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
         http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
 
-	<http:connector name="httpConnector" clientSoTimeout="300000" serverSoTimeout="300000" />
+    <http:connector name="httpConnector" clientSoTimeout="300000" serverSoTimeout="300000" />
 
-	<message-properties-transformer name="setResponseType">
-		<add-message-property key="Content-Type" value="text/plain;charset=EUC-JP" />
-	</message-properties-transformer>
+    <message-properties-transformer name="setResponseType">
+        <add-message-property key="Content-Type" value="text/plain;charset=EUC-JP" />
+    </message-properties-transformer>
 
     <custom-transformer name="ParamMapToString"
         class="org.mule.transport.http.functional.HttpEncodingNonAsciiFunctionalTestCase$ParamMapToString"/>
 
-	<model name="main">
-		<!-- case 1 : a string payload is sent via GET and return appended one. -->
-		<service name="testReceiveGET">
-			<inbound>
-				<http:inbound-endpoint address="http://localhost:${port1}/get" responseTransformer-refs="setResponseType">
+    <model name="main">
+        <!-- case 1 : a string payload is sent via GET and return appended one. -->
+        <service name="testReceiveGET">
+            <inbound>
+                <http:inbound-endpoint address="http://localhost:${port1}/get" responseTransformer-refs="setResponseType">
                     <http:body-to-parameter-map-transformer/>
                     <transformer ref="ParamMapToString"/>
-				</http:inbound-endpoint>
-			</inbound>
-			<test:component appendString=" Received" />
-		</service>
+                </http:inbound-endpoint>
+            </inbound>
+            <test:component appendString=" Received" />
+        </service>
 
-		<service name="testSendByPOST">
-			<inbound>
-				<vm:inbound-endpoint path="sendByPOST" exchange-pattern="request-response"/>
-			</inbound>
-			<outbound>
-				<pass-through-router>
-					<http:outbound-endpoint connector-ref="httpConnector" address="http://localhost:${port1}/post"
-						contentType="text/plain; charset=ISO-2022-JP" method="POST"/>
-				</pass-through-router>
-			</outbound>
-		</service>
-		<service name="testReceivePOST">
-			<inbound>
-				<http:inbound-endpoint connector-ref="httpConnector" address="http://localhost:${port1}/post"
-					responseTransformer-refs="setResponseType"/>
-			</inbound>
-			<test:component appendString=" Received" />
-		</service>
+        <service name="testSendByPOST">
+            <inbound>
+                <vm:inbound-endpoint path="sendByPOST" exchange-pattern="request-response"/>
+            </inbound>
+            <outbound>
+                <pass-through-router>
+                    <http:outbound-endpoint connector-ref="httpConnector" address="http://localhost:${port1}/post"
+                        contentType="text/plain; charset=ISO-2022-JP" method="POST"/>
+                </pass-through-router>
+            </outbound>
+        </service>
+        <service name="testReceivePOST">
+            <inbound>
+                <http:inbound-endpoint connector-ref="httpConnector" address="http://localhost:${port1}/post"
+                    responseTransformer-refs="setResponseType"/>
+            </inbound>
+            <test:component appendString=" Received" />
+        </service>
 
        <service name="testSendByPOSTMap">
            <inbound>
@@ -74,5 +74,5 @@
            </inbound>
            <test:component appendString=" Received" />
        </service>
-	</model>
+    </model>
 </mule>

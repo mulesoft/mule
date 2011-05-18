@@ -25,7 +25,7 @@ public class StreamingCapacityTestCase extends AbstractStreamingCapacityTestCase
 
     public StreamingCapacityTestCase()
     {
-    	super(10 * ONE_GB);
+        super(10 * ONE_GB);
     }
 
     protected String getConfigResources()

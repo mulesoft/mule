@@ -11,7 +11,7 @@
     <vm:endpoint name="in" address="vm://in" exchange-pattern="one-way"/>
     <endpoint name="direct" address="vm://direct" exchange-pattern="one-way"/>
     <vm:endpoint name="global-name-global-transformer" path="global-name-global-transformer" exchange-pattern="one-way">
-    	<transformer ref="transformer"/>
+        <transformer ref="transformer"/>
     </vm:endpoint>
     <endpoint name="global-name-local-transformer" address="vm://global-name-local-transformer" exchange-pattern="one-way" />
 
@@ -27,15 +27,15 @@
                     <outbound-endpoint ref="direct"/>
                     <outbound-endpoint ref="global-name-global-transformer"/>
                     <vm:outbound-endpoint name="local-name-local-transformer" address="vm://local-name-local-transformer" exchange-pattern="one-way">
-                    	<transformer ref="transformer"/>
+                        <transformer ref="transformer"/>
                     </vm:outbound-endpoint>
                     <!-- these two don't transform -->
                     <outbound-endpoint ref="global-name-local-transformer">
-                    	<transformer ref="transformer"/>
+                        <transformer ref="transformer"/>
                     </outbound-endpoint>
                     <vm:outbound-endpoint path="no-name-local-transformer" exchange-pattern="one-way"> 
-						<transformer ref="transformer"/>
-					</vm:outbound-endpoint>
+                        <transformer ref="transformer"/>
+                    </vm:outbound-endpoint>
                 </multicasting-router>
             </outbound>
         </service>

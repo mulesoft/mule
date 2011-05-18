@@ -59,9 +59,9 @@
         <service name="responseService1">
             <inbound>
                 <inbound-endpoint ref="response">
-                	<response>
-                		<transformer ref="appendResponse"/>
-                	</response>
+                    <response>
+                        <transformer ref="appendResponse"/>
+                    </response>
                 </inbound-endpoint>
             </inbound>
             <outbound>
@@ -76,7 +76,7 @@
                 <vm:inbound-endpoint path="echo2" exchange-pattern="request-response">
                     <object-to-string-transformer />
                     <response>
-                    	<transformer ref="appendResponse2" />
+                        <transformer ref="appendResponse2" />
                     </response>
                 </vm:inbound-endpoint>
             </inbound>
@@ -95,7 +95,7 @@
                    <object-to-string-transformer/>
                    <transformer ref="appendString" />
                    <response>
-                   		<transformer ref="appendResponse" />
+                           <transformer ref="appendResponse" />
                    </response>
                 </http:inbound-endpoint>
             </inbound>
@@ -112,7 +112,7 @@
                   <object-to-string-transformer />
                   <transformer ref="appendString2" />
                   <response>
-                  	<transformer ref="appendResponse2" />
+                      <transformer ref="appendResponse2" />
                   </response>
                 </vm:inbound-endpoint>
             </inbound>

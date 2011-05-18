@@ -23,30 +23,30 @@ import java.util.Locale;
 public class StringToObjectArrayTestCase extends AbstractTransformerTestCase
 {
 
-	private String encoding = "Windows-31J";
+    private String encoding = "Windows-31J";
 
-	@Override
-	public Object getResultData()
-	{
-		return new String[]{ getMessage("char0"), getMessage("char1"), getMessage("char2") };
-	}
+    @Override
+    public Object getResultData()
+    {
+        return new String[]{ getMessage("char0"), getMessage("char1"), getMessage("char2") };
+    }
 
-	@Override
-	public Object getTestData()
-	{
-	    try
-	    {
-		    return getMessage("message").getBytes(encoding);
-	    }
-	    catch (UnsupportedEncodingException e)
-	    {
-	    	throw new RuntimeException(e);
-	    }
-	}
+    @Override
+    public Object getTestData()
+    {
+        try
+        {
+            return getMessage("message").getBytes(encoding);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 
-	@Override
-	public Transformer getTransformer() throws Exception
-	{
+    @Override
+    public Transformer getTransformer() throws Exception
+    {
         Transformer trans = createObject(StringToObjectArray.class);
         trans.setReturnDataType(DataTypeFactory.create(Object[].class));
 
@@ -57,26 +57,26 @@ public class StringToObjectArrayTestCase extends AbstractTransformerTestCase
         trans.setEndpoint(endpoint);
 
         return trans;
-	}
+    }
 
-	@Override
-	public Transformer getRoundTripTransformer() throws Exception
-	{
-		return new ObjectArrayToString();
-	}
+    @Override
+    public Transformer getRoundTripTransformer() throws Exception
+    {
+        return new ObjectArrayToString();
+    }
 
-	@Override
-	public boolean compareResults(Object expected, Object result)
-	{
+    @Override
+    public boolean compareResults(Object expected, Object result)
+    {
         return super.compareResults(expected, result);
-	}
+    }
 
-	@Override
+    @Override
     public boolean compareRoundtripResults(Object expected, Object result)
-	{
+    {
         try
         {
-        	return super.compareRoundtripResults(expected, ((String)result).getBytes(encoding));
+            return super.compareRoundtripResults(expected, ((String)result).getBytes(encoding));
         }
         catch (UnsupportedEncodingException e)
         {

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
-	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-	xsi:schemaLocation="
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
         http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
 
-	<configuration>
-		<default-threading-profile maxThreadsActive="4"/>
-	</configuration>
+    <configuration>
+        <default-threading-profile maxThreadsActive="4"/>
+    </configuration>
 
     <vm:connector name="outPersistentConnector">
         <vm:queue-profile >
@@ -18,33 +18,33 @@
         </vm:queue-profile>
     </vm:connector>
 
-	<vm:endpoint name="out" path="out" exchange-pattern="one-way" />
+    <vm:endpoint name="out" path="out" exchange-pattern="one-way" />
 
-	<model name="TestModel">
+    <model name="TestModel">
 
-		<service name="TestService">
-			<test:component waitTime="30" />
-			<outbound>
-				<pass-through-router>
-					<vm:outbound-endpoint ref="out" />
-				</pass-through-router>
-			</outbound>
-		</service>
+        <service name="TestService">
+            <test:component waitTime="30" />
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint ref="out" />
+                </pass-through-router>
+            </outbound>
+        </service>
 
-		<service name="PausedTestService" initialState="paused">
-			<test:component waitTime="30" />
-			<outbound>
-				<pass-through-router>
-					<vm:outbound-endpoint ref="out" />
-				</pass-through-router>
-			</outbound>
-		</service>
+        <service name="PausedTestService" initialState="paused">
+            <test:component waitTime="30" />
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint ref="out" />
+                </pass-through-router>
+            </outbound>
+        </service>
 
-		<service name="TestPersistentQueueService">
-			<test:component waitTime="30" />
-			<outbound>
-				<pass-through-router>
-					<vm:outbound-endpoint ref="out" />
+        <service name="TestPersistentQueueService">
+            <test:component waitTime="30" />
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint ref="out" />
                 </pass-through-router>
             </outbound>
             <queue-profile>
@@ -52,12 +52,12 @@
             </queue-profile>
         </service>
 
-		<service name="PausedTestPersistentQueueService" initialState="paused">
-			<test:component waitTime="30" />
-			<outbound>
-				<pass-through-router>
-					<vm:outbound-endpoint ref="out" />
-				</pass-through-router>
+        <service name="PausedTestPersistentQueueService" initialState="paused">
+            <test:component waitTime="30" />
+            <outbound>
+                <pass-through-router>
+                    <vm:outbound-endpoint ref="out" />
+                </pass-through-router>
             </outbound>
             <queue-profile >
                 <default-persistent-queue-store/>
@@ -65,5 +65,5 @@
         </service>
 
 
-	</model>
+    </model>
 </mule>

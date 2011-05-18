@@ -29,14 +29,14 @@
                         <spring:property name="label" value="A" />
                     </custom-processor>
                     <message-filter>
-                    	<wildcard-filter pattern="*:A" />
+                        <wildcard-filter pattern="*:A" />
                     </message-filter>
-                	<processor ref="ProcessorB" />
+                    <processor ref="ProcessorB" />
                     <response>
-                    	<append-string-transformer message=":C" />
-	                    <message-filter>
-	                    	<wildcard-filter pattern="*:G:H*" />
-	                    </message-filter>
+                        <append-string-transformer message=":C" />
+                        <message-filter>
+                            <wildcard-filter pattern="*:G:H*" />
+                        </message-filter>
                         <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="D" />
                         </custom-processor>
@@ -54,7 +54,7 @@
                             <spring:property name="label" value="F" />
                         </custom-processor>
                         <response>
-		                	<processor ref="ProcessorG" />
+                            <processor ref="ProcessorG" />
                             <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                                 <spring:property name="label" value="H" />
                             </custom-processor>
@@ -83,16 +83,16 @@
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="out2" exchange-pattern="one-way">
-	                    <message-filter>
-	                    	<wildcard-filter pattern="*:service1" />
-	                    </message-filter>
-                    	<append-string-transformer message=":E" />
+                        <message-filter>
+                            <wildcard-filter pattern="*:service1" />
+                        </message-filter>
+                        <append-string-transformer message=":E" />
                         <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="F" />
                         </custom-processor>
                         <!-- These processors should get ignored because the endpoint is asynchronous -->
                         <response>
-		                	<processor ref="ProcessorG" />
+                            <processor ref="ProcessorG" />
                             <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                                 <spring:property name="label" value="H" />
                             </custom-processor>
@@ -116,13 +116,13 @@
                         <spring:property name="label" value="A" />
                     </custom-processor>
                     <message-filter>
-                    	<wildcard-filter pattern="*:A" />
+                        <wildcard-filter pattern="*:A" />
                     </message-filter>
                     <response>
-                    	<append-string-transformer message=":C" />
-	                    <message-filter>
-	                    	<wildcard-filter pattern="*:G:H*" />
-	                    </message-filter>
+                        <append-string-transformer message=":C" />
+                        <message-filter>
+                            <wildcard-filter pattern="*:G:H*" />
+                        </message-filter>
                     </response>
                 </vm:inbound-endpoint>
             </inbound>
@@ -134,7 +134,7 @@
                             <spring:property name="label" value="E" />
                         </custom-processor>
                         <response>
-		                	<processor ref="ProcessorG" />
+                            <processor ref="ProcessorG" />
                         </response>
                     </vm:outbound-endpoint>
                 </pass-through-router>
@@ -145,9 +145,9 @@
             <inbound>
                 <vm:inbound-endpoint path="in4" exchange-pattern="one-way">
                     <wire-tap>
-                    	<vm:outbound-endpoint path="wiretap1" exchange-pattern="one-way">
-	                    	<append-string-transformer message=" (tapped)" />
-		                </vm:outbound-endpoint>
+                        <vm:outbound-endpoint path="wiretap1" exchange-pattern="one-way">
+                            <append-string-transformer message=" (tapped)" />
+                        </vm:outbound-endpoint>
                     </wire-tap>
                     <custom-splitter class="org.mule.test.integration.endpoints.CommaSplitter" />
                     <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
@@ -160,15 +160,15 @@
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="out4" exchange-pattern="one-way">
-	                    <wire-tap>
-	                    	<vm:outbound-endpoint path="wiretap2" exchange-pattern="one-way">
-		                    	<append-string-transformer message=" (tapped)" />
-	                    	</vm:outbound-endpoint>
-	                    </wire-tap>
-	                    <message-filter>
-	                    	<wildcard-filter pattern="*:service1" />
-	                    </message-filter>
-                    	<append-string-transformer message=":E" />
+                        <wire-tap>
+                            <vm:outbound-endpoint path="wiretap2" exchange-pattern="one-way">
+                                <append-string-transformer message=" (tapped)" />
+                            </vm:outbound-endpoint>
+                        </wire-tap>
+                        <message-filter>
+                            <wildcard-filter pattern="*:service1" />
+                        </message-filter>
+                        <append-string-transformer message=":E" />
                         <custom-processor class="org.mule.tck.testmodels.mule.TestMessageProcessor">
                             <spring:property name="label" value="F" />
                         </custom-processor>

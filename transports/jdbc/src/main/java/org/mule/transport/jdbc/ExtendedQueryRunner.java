@@ -29,7 +29,7 @@ public class ExtendedQueryRunner extends QueryRunner
 
     public ExtendedQueryRunner(DataSource ds, int queryTimeout)
     {
-    	super (ds);
+        super (ds);
         this.queryTimeout = queryTimeout;
     }
 

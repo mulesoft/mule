@@ -54,7 +54,7 @@
                 </multicasting-router>
             </outbound>
             <default-exception-strategy>
-            	<rollback-transaction exception-pattern="*" />
+                <rollback-transaction exception-pattern="*" />
             </default-exception-strategy>
         </service>
         
@@ -74,7 +74,7 @@
                 </multicasting-router>
             </outbound>
             <default-exception-strategy>
-            	<rollback-transaction exception-pattern="*" />
+                <rollback-transaction exception-pattern="*" />
             </default-exception-strategy>
         </service>
     </model>

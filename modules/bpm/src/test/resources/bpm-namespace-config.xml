@@ -12,20 +12,20 @@
         <spring:property name="foo" value="bar"/>
     </spring:bean>
 
-	<model>
-		<service name="Service1">
-			<inbound>
-				<inbound-endpoint address="test://in1" />
-			</inbound>
-		    <bpm:process bpms-ref="testBpms" processName="test" processDefinition="test.def" />
-		</service>
+    <model>
+        <service name="Service1">
+            <inbound>
+                <inbound-endpoint address="test://in1" />
+            </inbound>
+            <bpm:process bpms-ref="testBpms" processName="test" processDefinition="test.def" />
+        </service>
 
-		<service name="Service2">
-			<inbound>
-				<inbound-endpoint address="test://in2" />
-			</inbound>
-		    <bpm:process processName="test" processDefinition="test.def" processIdField="myId" />
-		</service>
-	</model>
+        <service name="Service2">
+            <inbound>
+                <inbound-endpoint address="test://in2" />
+            </inbound>
+            <bpm:process processName="test" processDefinition="test.def" processIdField="myId" />
+        </service>
+    </model>
 
 </mule>

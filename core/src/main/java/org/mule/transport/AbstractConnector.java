@@ -1628,10 +1628,10 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
         try
         {
-	        if (isStarted() && !isStopping())
-    	    {
-        	    stop();
-	        }
+            if (isStarted() && !isStopping())
+            {
+                stop();
+            }
             this.doDisconnect();
             if (logger.isInfoEnabled())
             {

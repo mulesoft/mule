@@ -67,7 +67,7 @@
                 <xsd:attribute name="disableReplyTo" type="xsd:boolean" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
-                        	By default, an asynchronous reply to the inbound endpoint is sent back.  This can cause unwanted side effects in some cases, use this attribute to disable.
+                            By default, an asynchronous reply to the inbound endpoint is sent back.  This can cause unwanted side effects in some cases, use this attribute to disable.
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>

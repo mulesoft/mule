@@ -78,14 +78,14 @@ public class BasicJerseyTestCase extends FunctionalTestCase
 
     public void testThrowException() throws Exception
     {
-    	callThrowException(500, "Failed to invoke JerseyResourcesComponent{helloWorldResource.commponent}. Component that caused exception is: JerseyResourcesComponent{helloWorldResource.commponent}. Message payload is of type: String");
+        callThrowException(500, "Failed to invoke JerseyResourcesComponent{helloWorldResource.commponent}. Component that caused exception is: JerseyResourcesComponent{helloWorldResource.commponent}. Message payload is of type: String");
     }
 
     protected void callThrowException(Integer expectedErrorCode, String expectedData) throws Exception
     {
-    	MuleClient client = new MuleClient(muleContext);
+        MuleClient client = new MuleClient(muleContext);
 
-    	Map<String, String> props = new HashMap<String, String>();
+        Map<String, String> props = new HashMap<String, String>();
         props.put(HttpConnector.HTTP_METHOD_PROPERTY, HttpConstants.METHOD_GET);
         MuleMessage result = client.send("http://localhost:63081/helloworld/throwException", "", props);
         assertEquals(expectedErrorCode, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));

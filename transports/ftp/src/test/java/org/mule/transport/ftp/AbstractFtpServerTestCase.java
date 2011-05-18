@@ -10,17 +10,18 @@
 
 package org.mule.transport.ftp;
 
+import org.mule.tck.DynamicPortTestCase;
+import org.mule.transport.ftp.server.FTPTestClient;
+import org.mule.transport.ftp.server.MuleFtplet;
+import org.mule.transport.ftp.server.Server;
+import org.mule.util.FileUtils;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
 import org.apache.ftpserver.ftplet.Ftplet;
-import org.mule.tck.DynamicPortTestCase;
-import org.mule.transport.ftp.server.FTPTestClient;
-import org.mule.transport.ftp.server.MuleFtplet;
-import org.mule.transport.ftp.server.Server;
-import org.mule.util.FileUtils;
 
 /**
  * Abstract FTP test class. Sets up the ftp server and starts/stops it during the
@@ -29,7 +30,7 @@ import org.mule.util.FileUtils;
 public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase 
     implements MuleFtplet.Callback
 {
-	public static final String TEST_MESSAGE = "Test FTP message";
+    public static final String TEST_MESSAGE = "Test FTP message";
     
     private static final String DEFAULT_FTP_HOST = "localhost";
     private static int DEFAULT_TIMEOUT = 10000;
@@ -56,7 +57,7 @@ public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase
     
     public AbstractFtpServerTestCase(String ftpHost, int timeout)
     {        
-    	super();
+        super();
         this.ftpHost = ftpHost;
         this.timeout = timeout;
     }
@@ -173,7 +174,7 @@ public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase
     }
     
     @Override
-	protected int getNumPortsToFind() {
-		return 1;
-	}
+    protected int getNumPortsToFind() {
+        return 1;
+    }
 }

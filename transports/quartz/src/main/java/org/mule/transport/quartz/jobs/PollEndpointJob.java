@@ -26,7 +26,7 @@ public class PollEndpointJob implements Job, Lifecycle, MuleContextAware
 {
     private String inboundPollingEndpointName;
     private AbstractPollingMessageReceiver receiver;
-	private MuleContext muleContext;
+    private MuleContext muleContext;
     
     public PollEndpointJob(String inboundPollingEndpointName)
     {
@@ -69,7 +69,7 @@ public class PollEndpointJob implements Job, Lifecycle, MuleContextAware
         //DO NOTHING
     }
 
-	public void setMuleContext(MuleContext context) {
-		this.muleContext = context;
-	}
+    public void setMuleContext(MuleContext context) {
+        this.muleContext = context;
+    }
 }

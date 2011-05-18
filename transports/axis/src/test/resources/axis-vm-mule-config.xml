@@ -24,7 +24,7 @@
                     <axis:soap-service interface="org.mule.api.component.simple.EchoService"/>
                     <axis:soap-service interface="org.mule.tck.testmodels.services.DateService"/>
                 </axis:inbound-endpoint>
-            </inbound>	
+            </inbound>
             <component>
                 <singleton-object class="org.mule.tck.testmodels.services.TestServiceComponent"/>
             </component>

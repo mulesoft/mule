@@ -13,7 +13,7 @@
     <byte-array-to-string-transformer name="ByteArrayToString"/>
 
     <http:endpoint name="serverEndpoint" host="localhost" port="${port1}" exchange-pattern="request-response">
-    	<transformer ref="ByteArrayToString"/>
+        <transformer ref="ByteArrayToString"/>
     </http:endpoint>
 
     <vm:endpoint name="restServiceEndpoint" path="restservice" exchange-pattern="one-way"/>

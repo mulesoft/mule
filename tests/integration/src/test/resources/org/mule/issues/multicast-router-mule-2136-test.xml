@@ -34,7 +34,7 @@
             <outbound>
                 <multicasting-router>
                     <vm:outbound-endpoint ref="xml-object-out">
-                    	<transformer ref="xmlToObject"/>
+                        <transformer ref="xmlToObject"/>
                     </vm:outbound-endpoint>
                 </multicasting-router>
             </outbound>
@@ -48,10 +48,10 @@
                 <multicasting-router>
                     <vm:outbound-endpoint ref="object-out"/>
                     <vm:outbound-endpoint ref="object-xml-out">
-                    	<transformer ref="objectToXml"/>
+                        <transformer ref="objectToXml"/>
                     </vm:outbound-endpoint>
                     <vm:outbound-endpoint ref="xml-in">
-                    	<transformer ref="objectToXml"/>
+                        <transformer ref="objectToXml"/>
                     </vm:outbound-endpoint>
                 </multicasting-router>
             </outbound>

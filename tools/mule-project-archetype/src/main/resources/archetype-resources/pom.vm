@@ -275,7 +275,7 @@
 #end
 #elseif($item == 'rmi' || $item == 'jnp')
 #if($rmiDepSet == false)
-	    <dependency>
+        <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-rmi</artifactId>
             <version>${D}{mule.version}</version>

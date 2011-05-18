@@ -6,11 +6,11 @@
       xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
       xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
       xsi:schemaLocation="
-	http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/3.2/mule-jbossts.xsd
-	http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
-	http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
-	http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
-	http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd">
+    http://www.mulesoft.org/schema/mule/jbossts http://www.mulesoft.org/schema/mule/jbossts/3.2/mule-jbossts.xsd
+    http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+    http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+    http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
+    http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd">
 
     <jbossts:transaction-manager>
     </jbossts:transaction-manager>
@@ -56,16 +56,16 @@
                 <scripting:script engine="groovy"><![CDATA[
                     import org.mule.api.*;
 
-         			String jmsUrl = "jms://fcs.cache.update.queue?connector=jmsConnectorXA";
-		        	long timeout = 100L;
+                     String jmsUrl = "jms://fcs.cache.update.queue?connector=jmsConnectorXA";
+                    long timeout = 100L;
                     String result = "";
 
-			        MuleMessage muleMessage = eventContext.requestEvent(jmsUrl, timeout);
-			        while (muleMessage != null)
-			        {
-			            result = result + "message";
-				        muleMessage = eventContext.requestEvent(jmsUrl, timeout);
-			        }
+                    MuleMessage muleMessage = eventContext.requestEvent(jmsUrl, timeout);
+                    while (muleMessage != null)
+                    {
+                        result = result + "message";
+                        muleMessage = eventContext.requestEvent(jmsUrl, timeout);
+                    }
                     return result;
                 ]]>
                 </scripting:script>

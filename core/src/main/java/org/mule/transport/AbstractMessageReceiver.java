@@ -198,10 +198,10 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
 
         if (connector.isEnableMessageEvents() && endpoint.getExchangePattern().hasResponse())
         {
-			connector.fireNotification(new EndpointMessageNotification(
-					resultEvent.getMessage(), endpoint, resultEvent
-							.getFlowConstruct().getName(),
-					EndpointMessageNotification.MESSAGE_RESPONSE));
+            connector.fireNotification(new EndpointMessageNotification(
+                    resultEvent.getMessage(), endpoint, resultEvent
+                            .getFlowConstruct().getName(),
+                    EndpointMessageNotification.MESSAGE_RESPONSE));
         }
 
         return resultEvent;

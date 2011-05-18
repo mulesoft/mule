@@ -36,28 +36,28 @@ TAB = "   "
 if(args?.size() > 1)
 {
     usage()
-    System.exit(1)	
+    System.exit(1)
 }
 else if(args?.size() == 1)
 {
-	exampleLauncherAppUrl = args[0]
+    exampleLauncherAppUrl = args[0]
 }
 
 if (!exampleAppsBaseDir.isDirectory())
 {
-	println "${muleHome} is not a valid MULE_HOME or missing required folder ${exampleAppsBaseDir}."
-	System.exit(2)
+    println "${muleHome} is not a valid MULE_HOME or missing required folder ${exampleAppsBaseDir}."
+    System.exit(2)
 }
 
 // deploy examples
 def files = exampleAppsBaseDir.listFiles()
 for(currentFile in files)
 {
-	// examples are organized in directories
-	if(currentFile.isDirectory())
-	{
-		deployExample(currentFile)
-	}
+    // examples are organized in directories
+    if(currentFile.isDirectory())
+    {
+        deployExample(currentFile)
+    }
 }
 
 // start Mule
@@ -81,18 +81,18 @@ def loops = timeoutInMs / waitIntervalInMs
 
 while(!isExampleLauncherApplicationReady() && i < loops)
 {
-	print "."
-	sleep(waitIntervalInMs)
-	i++
+    print "."
+    sleep(waitIntervalInMs)
+    i++
 }
 
 print LF_CR
 
 if(i < loops)
 {
-	// launch browser
-	splash "Example launcher application is up and running.${LF_CR}${TAB}${TAB}Goto ${exampleLauncherAppUrl} to launch examples!"
-	System.exit(0)	
+    // launch browser
+    splash "Example launcher application is up and running.${LF_CR}${TAB}${TAB}Goto ${exampleLauncherAppUrl} to launch examples!"
+    System.exit(0)
 }
 else
 {
@@ -122,20 +122,20 @@ Usage: mule_examples [example launcher index URL]
 */
 def deployExample(exampleDir)
 {
-	if(enabledExamples.contains(exampleDir.name))
-	{
-		def exampleFiles = exampleDir.listFiles().grep(~/.*zip$/)
-		// this should be really one
-		for(exampleFile in exampleFiles)
-		{
-			if(exampleFile.isFile() && !isExampleDeployed(exampleFile))
-			{
-				// deploy (copy) application file to apps directory
-				splash "Deploying ${exampleFile.name}"
-				antBuilder.copy(file: exampleFile.getCanonicalPath(), tofile: "${deployDir}/${exampleFile.name}")
-			}
-		}
-	}
+    if(enabledExamples.contains(exampleDir.name))
+    {
+        def exampleFiles = exampleDir.listFiles().grep(~/.*zip$/)
+        // this should be really one
+        for(exampleFile in exampleFiles)
+        {
+            if(exampleFile.isFile() && !isExampleDeployed(exampleFile))
+            {
+                // deploy (copy) application file to apps directory
+                splash "Deploying ${exampleFile.name}"
+                antBuilder.copy(file: exampleFile.getCanonicalPath(), tofile: "${deployDir}/${exampleFile.name}")
+            }
+        }
+    }
 }
 
 /**
@@ -143,9 +143,9 @@ def deployExample(exampleDir)
 */
 def isExampleDeployed(exampleFile)
 {
-	def applicationName = exampleFile?.name?.lastIndexOf('.') >= 0 ? exampleFile.name[0 .. exampleFile?.name?.lastIndexOf('.') - 1] : exampleFile?.name
-	
-	return (new File("${deployDir}/${applicationName}")).exists()
+    def applicationName = exampleFile?.name?.lastIndexOf('.') >= 0 ? exampleFile.name[0 .. exampleFile?.name?.lastIndexOf('.') - 1] : exampleFile?.name
+
+    return (new File("${deployDir}/${applicationName}")).exists()
 }
 
 /**
@@ -153,7 +153,7 @@ def isExampleDeployed(exampleFile)
 */
 def isExampleLauncherApplicationReady()
 {
-	def connection
+    def connection
     try
     {
         def urlInfo = exampleLauncherAppUrl.toURL()
@@ -166,12 +166,12 @@ def isExampleLauncherApplicationReady()
     }
     catch(ConnectException ce)
     {
-    	// jetty is still down
-	    return false	
+        // jetty is still down
+        return false
     }
     finally
     {
-    	connection?.disconnect()
+        connection?.disconnect()
     }
 }
 

@@ -28,7 +28,7 @@ public class DomXmlTransformerEncodingByteArrayTestCase extends DomXmlTransforme
     @Override
     protected void doSetUp() throws Exception
     {
-    	InputStream resourceStream = IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass());
+        InputStream resourceStream = IOUtils.getResourceAsStream("cdcatalog-utf-8.xml", getClass());
         srcData = IOUtils.toString(resourceStream, "UTF-8").getBytes("UTF-8");
         
         resourceStream = IOUtils.getResourceAsStream("cdcatalog-us-ascii.xml", getClass());

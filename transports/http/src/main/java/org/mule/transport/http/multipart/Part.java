@@ -115,14 +115,14 @@ public interface Part {
      * The header name is case insensitive. You can use
      * this method with any request header.
      *
-     * @param name		a <code>String</code> specifying the
-     *				header name
+     * @param name        a <code>String</code> specifying the
+     *                header name
      *
-     * @return			a <code>String</code> containing the
-     *				value of the requested
-     *				header, or <code>null</code>
-     *				if the part does not
-     *				have a header of that name
+     * @return            a <code>String</code> containing the
+     *                value of the requested
+     *                header, or <code>null</code>
+     *                if the part does not
+     *                have a header of that name
      */
     public String getHeader(String name);
 

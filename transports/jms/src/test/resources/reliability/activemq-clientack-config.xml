@@ -10,8 +10,8 @@
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd">
 
     <jms:activemq-connector name="jmsConnector" 
-    	specification="1.1" 
-    	acknowledgementMode="CLIENT_ACKNOWLEDGE"
-    	maxRedelivery="0" 
-    	brokerURL="vm://localhost?broker.persistent=false&amp;broker.useJmx=false&amp;jms.redeliveryPolicy.maximumRedeliveries=0" />
+        specification="1.1"
+        acknowledgementMode="CLIENT_ACKNOWLEDGE"
+        maxRedelivery="0"
+        brokerURL="vm://localhost?broker.persistent=false&amp;broker.useJmx=false&amp;jms.redeliveryPolicy.maximumRedeliveries=0" />
 </mule>

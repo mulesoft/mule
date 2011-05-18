@@ -74,8 +74,8 @@ public class LocalSocketTcpMessageDispatcher extends TcpMessageDispatcher
                         return (MuleMessage) result;
                     }
 
-					return new DefaultMuleMessage(result, this.getConnector()
-							.getMuleContext());
+                    return new DefaultMuleMessage(result, this.getConnector()
+                            .getMuleContext());
                 }
                 catch (Exception ex)
                 {

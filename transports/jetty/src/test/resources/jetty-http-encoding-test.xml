@@ -26,9 +26,9 @@
         <custom-service name="testComponent" class="org.mule.tck.testmodels.mule.TestSedaService">
             <inbound>
                 <jetty:inbound-endpoint ref="serverEndpoint">
-                	<response>
-                		<transformer ref="setResponseType"/>
-                	</response>
+                    <response>
+                        <transformer ref="setResponseType"/>
+                    </response>
                 </jetty:inbound-endpoint>
             </inbound>
             <test:component appendString=" Received"/>

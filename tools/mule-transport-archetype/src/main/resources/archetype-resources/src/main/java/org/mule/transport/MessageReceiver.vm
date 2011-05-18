@@ -126,7 +126,7 @@ public class ${ModuleName}MessageReceiver extends #if( $isPollingReceiver == "y"
            into Mule by first creating a new MuleMesage with the object and 
            calling routeMessage i.e.
 
-			MuleMessage message = createMuleMessage(object);
+            MuleMessage message = createMuleMessage(object);
             routeMessage(message));
         */
 

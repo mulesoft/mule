@@ -92,12 +92,12 @@
         <vm:inbound-endpoint path="split-filter-aggregate-in" exchange-pattern="one-way" />
         <splitter evaluator="bean" expression="fruit" enableCorrelation="ALWAYS" />
         <message-filter throwOnUnaccepted="false">
-	        <not-filter>
-	            <or-filter>
-	                <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Banana" />
-	                <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Orange" />
-	            </or-filter>
-	        </not-filter>
+            <not-filter>
+                <or-filter>
+                    <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Banana" />
+                    <payload-type-filter expectedType="org.mule.tck.testmodels.fruit.Orange" />
+                </or-filter>
+            </not-filter>
         </message-filter>
         <collection-aggregator failOnTimeout="false" timeout="1000" />
         <vm:outbound-endpoint path="split-filter-aggregate-out" exchange-pattern="one-way" />
@@ -180,8 +180,8 @@
     <flow name="async-tx">
         <vm:inbound-endpoint path="async-tx-in" exchange-pattern="request-response">
             <!-- Not supported
-        	<vm:transaction action="ALWAYS_BEGIN"/>
-        	-->
+            <vm:transaction action="ALWAYS_BEGIN"/>
+            -->
         </vm:inbound-endpoint>
         <append-string-transformer message="a" />
         <async>
@@ -321,10 +321,10 @@
     </spring:bean>
 
 
-	<flow name="flow-threading-profile">
+    <flow name="flow-threading-profile">
         <vm:inbound-endpoint path="flow-threading-profile-in" exchange-pattern="request-response"/>
         <append-string-transformer message=" Hello foo" />
-		<threading-profile doThreading="true" maxThreadsActive="2" maxThreadsIdle="1" poolExhaustedAction="RUN"/>
+        <threading-profile doThreading="true" maxThreadsActive="2" maxThreadsIdle="1" poolExhaustedAction="RUN"/>
     </flow>
     
     <flow name="loggerMessage">

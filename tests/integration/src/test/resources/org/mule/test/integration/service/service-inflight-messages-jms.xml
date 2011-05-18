@@ -12,9 +12,9 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd">
 
-	<configuration>
-		<default-threading-profile maxThreadsActive="4"/>
-	</configuration>
+    <configuration>
+        <default-threading-profile maxThreadsActive="4"/>
+    </configuration>
 
     <jms:activemq-connector name="outPersistentConnector" persistentDelivery="true"/>
 

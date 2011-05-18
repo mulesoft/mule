@@ -211,7 +211,7 @@ public class MuleReceiverServlet extends AbstractReceiverServlet
     {
         try
         {
-        	if (this.useCachedHttpServletRequest)
+            if (this.useCachedHttpServletRequest)
             {
                 request = new CachedHttpServletRequest(request);
             }

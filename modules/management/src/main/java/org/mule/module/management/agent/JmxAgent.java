@@ -277,8 +277,8 @@ public class JmxAgent extends AbstractAgent
             }
             if (!credentials.isEmpty())
             {
-				connectorServerProperties.put(JMXConnectorServer.AUTHENTICATOR,
-						this.getJmxAuthenticator());
+                connectorServerProperties.put(JMXConnectorServer.AUTHENTICATOR,
+                        this.getJmxAuthenticator());
             }
             connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url,
                                                                               connectorServerProperties,

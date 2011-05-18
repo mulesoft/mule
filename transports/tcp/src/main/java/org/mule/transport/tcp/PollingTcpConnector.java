@@ -29,7 +29,7 @@ public class PollingTcpConnector extends TcpConnector
 
     public PollingTcpConnector(MuleContext context)
     {
-    	super(context);
+        super(context);
         serviceOverrides = new Properties();
         serviceOverrides.setProperty(MuleProperties.CONNECTOR_MESSAGE_RECEIVER_CLASS,
             PollingTcpMessageReceiver.class.getName());

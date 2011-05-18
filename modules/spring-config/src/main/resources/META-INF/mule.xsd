@@ -385,7 +385,7 @@
     </xsd:element>
     <xsd:complexType name="abstractObserverMessageProcessorType">
         <xsd:complexContent>
-        	<xsd:extension base="abstractMessageProcessorType"/>
+            <xsd:extension base="abstractMessageProcessorType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -923,13 +923,13 @@
     <xsd:complexType name="abstractFilterType">
         <xsd:complexContent>
             <xsd:extension base="abstractMessageProcessorType">
-		        <xsd:attribute name="name" type="substitutableName">
-		            <xsd:annotation>
-		                <xsd:documentation>
-		                    Identifies the filter so that other elements can reference it. Required if the filter is defined at the global level.
-		                </xsd:documentation>
-		            </xsd:annotation>
-		        </xsd:attribute>
+                <xsd:attribute name="name" type="substitutableName">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the filter so that other elements can reference it. Required if the filter is defined at the global level.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -2940,7 +2940,7 @@
         <xsd:attribute name="disableTransportTransformer" type="substitutableBoolean" use="optional">
             <xsd:annotation>
                 <xsd:documentation>
-                	Don't use the default inbound/outbound/response transformer which corresponds to this endpoint's transport, if any.
+                    Don't use the default inbound/outbound/response transformer which corresponds to this endpoint's transport, if any.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -3294,11 +3294,11 @@
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-	<xsd:complexType name="abstractInterceptorType">
-		<xsd:complexContent>
-			<xsd:extension base="abstractMessageProcessorType" />
-		</xsd:complexContent>
-	</xsd:complexType>
+    <xsd:complexType name="abstractInterceptorType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType" />
+        </xsd:complexContent>
+    </xsd:complexType>
 
     <xsd:group name="interceptorGroup">
         <xsd:sequence>
@@ -4416,7 +4416,7 @@
     </xsd:element>
     <xsd:complexType name="abstractInterceptingMessageProcessorType">
         <xsd:complexContent>
-        	<xsd:extension base="abstractMessageProcessorType"/>
+            <xsd:extension base="abstractMessageProcessorType"/>
         </xsd:complexContent>
     </xsd:complexType>
 
@@ -4505,36 +4505,36 @@
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
-	        <xsd:complexContent>
-	            <xsd:extension base="idempotentMessageFilterType">
+            <xsd:complexContent>
+                <xsd:extension base="idempotentMessageFilterType">
                     <xsd:attribute name="messageDigestAlgorithm" type="xsd:string">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            The secure hashing algorithm to use. If not set, the default is SHA-256.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:attribute>
-	            </xsd:extension>
-	        </xsd:complexContent>
-	    </xsd:complexType>
-	</xsd:element>
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The secure hashing algorithm to use. If not set, the default is SHA-256.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
 
-	<xsd:element name="wire-tap" substitutionGroup="abstract-intercepting-message-processor">
+    <xsd:element name="wire-tap" substitutionGroup="abstract-intercepting-message-processor">
         <xsd:annotation>
             <xsd:documentation>
                 The WireTap inbound router allows you to route certain messages to a different endpoint as well as to the component.
             </xsd:documentation>
         </xsd:annotation>
-	    <xsd:complexType>
-	        <xsd:complexContent>
-	            <xsd:extension base="abstractInterceptingMessageProcessorType">
-	                <xsd:sequence>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="abstractInterceptingMessageProcessorType">
+                    <xsd:sequence>
                         <xsd:group ref="messageProcessorOrOutboundEndpoint" maxOccurs="1"/>
                         <xsd:element ref="abstract-filter" minOccurs="0"/>
                     </xsd:sequence>
-	            </xsd:extension>
-	        </xsd:complexContent>
-	    </xsd:complexType>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="combine-collections-transformer" substitutionGroup="abstract-intercepting-message-processor">
@@ -4614,29 +4614,29 @@
                 Configures a custom message aggregator. Mule provides an abstract implementation that has a template method that performs the message aggregation. A common use of the aggregator router is to combine the results of multiple requests such as "ask this set of vendors for the best price of X".
             </xsd:documentation>
         </xsd:annotation>
-	    <xsd:complexType>
-	        <xsd:complexContent>
-	            <xsd:extension base="baseAggregatorType">
-	                <xsd:sequence>
-	                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
-	                        <xsd:annotation>
-	                            <xsd:documentation>
-	                                Spring-style property element for custom configuration.
-	                            </xsd:documentation>
-	                        </xsd:annotation>
-	                    </xsd:element>
-	                </xsd:sequence>
-	                <xsd:attribute name="class" type="substitutableClass" use="required">
-	                    <xsd:annotation>
-	                        <xsd:documentation>
-	                            Fully qualified class name of the custom correlation aggregator router to be used.
-	                        </xsd:documentation>
-	                    </xsd:annotation>
-	                </xsd:attribute>
-	            </xsd:extension>
-	        </xsd:complexContent>
-	    </xsd:complexType>
-	</xsd:element>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="baseAggregatorType">
+                    <xsd:sequence>
+                        <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded">
+                            <xsd:annotation>
+                                <xsd:documentation>
+                                    Spring-style property element for custom configuration.
+                                </xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:element>
+                    </xsd:sequence>
+                    <xsd:attribute name="class" type="substitutableClass" use="required">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                Fully qualified class name of the custom correlation aggregator router to be used.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
 
     <xsd:complexType name="baseSplitterType">
         <xsd:complexContent>
@@ -4655,13 +4655,13 @@
                 The simple splitter splits incoming message into parts using the configured expression passing on each part in turn to the next message processor
             </xsd:documentation>
         </xsd:annotation>
-	    <xsd:complexType>
-	        <xsd:complexContent>
-	            <xsd:extension base="baseSplitterType">
-	                <xsd:attributeGroup ref="expressionAttributes"/>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="baseSplitterType">
+                    <xsd:attributeGroup ref="expressionAttributes"/>
             </xsd:extension>
-	        </xsd:complexContent>
-	    </xsd:complexType>
+            </xsd:complexContent>
+        </xsd:complexType>
     </xsd:element>
 
     <xsd:element name="collection-splitter" substitutionGroup="abstract-intercepting-message-processor">

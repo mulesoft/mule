@@ -10,9 +10,9 @@
 
     <spring:bean id="processEngine" factory-method="buildProcessEngine" class="org.mule.module.jbpm.JbpmFactoryBean" />
 
-	<!-- 
- 	  Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
-	 -->
+    <!--
+       Deprecated: It is recommended to configure BPM as a component rather than a transport for 3.x
+     -->
     <bpm:jbpm-connector name="bpmConnector" processEngine-ref="processEngine">
         <bpm:process-definition name="simple" resource="simple-process.jpdl.xml" />
     </bpm:jbpm-connector>

@@ -37,17 +37,17 @@ public class MuleSendBinding extends JpdlBinding
         
         if (element.hasAttribute("expr"))
         {
-        	activity.setPayloadExpression(XmlUtil.attribute(element, "expr", parse));
+            activity.setPayloadExpression(XmlUtil.attribute(element, "expr", parse));
         }
         
         if (element.hasAttribute("var"))
         {
-        	activity.setResponseVariableName(XmlUtil.attribute(element, "var", parse));
+            activity.setResponseVariableName(XmlUtil.attribute(element, "var", parse));
         }
         
         if (element.hasAttribute("type"))
         {
-        	activity.setResponsePayloadClass(XmlUtil.attribute(element, "type", parse));
+            activity.setResponsePayloadClass(XmlUtil.attribute(element, "type", parse));
         }
 
         return activity;

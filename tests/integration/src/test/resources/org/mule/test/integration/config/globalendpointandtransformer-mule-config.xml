@@ -14,7 +14,7 @@
         <service name="Bridge">
             <inbound>
                 <inbound-endpoint ref="in">
-                	<transformer ref="StringtoByteArray"/>
+                    <transformer ref="StringtoByteArray"/>
                 </inbound-endpoint>
                 <forwarding-router/>
             </inbound>

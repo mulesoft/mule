@@ -17,15 +17,15 @@
         <service-overrides sessionHandler="org.mule.session.LegacySessionHandler" />
     </jms:activemq-connector>
 
-	<custom-transformer name="GetProperty" class="org.mule.test.integration.message.GetProperty" />
-	<custom-transformer name="SetProperty" class="org.mule.test.integration.message.SetProperty" />
+    <custom-transformer name="GetProperty" class="org.mule.test.integration.message.GetProperty" />
+    <custom-transformer name="SetProperty" class="org.mule.test.integration.message.SetProperty" />
 
     <model>
         <!-- Send old format, receive old format -->
         <service name="s1">
             <inbound>
                 <vm:inbound-endpoint path="in1" exchange-pattern="one-way">
-                	<transformer ref="SetProperty" />
+                    <transformer ref="SetProperty" />
                 </vm:inbound-endpoint>
             </inbound>
             <outbound>
@@ -43,7 +43,7 @@
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="out1" exchange-pattern="one-way">
-                    	<transformer ref="GetProperty" />
+                        <transformer ref="GetProperty" />
                     </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -53,7 +53,7 @@
         <service name="s2">
             <inbound>
                 <vm:inbound-endpoint path="in2" exchange-pattern="one-way">
-                	<transformer ref="SetProperty" />
+                    <transformer ref="SetProperty" />
                 </vm:inbound-endpoint>
             </inbound>
             <outbound>
@@ -71,7 +71,7 @@
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="out2" exchange-pattern="one-way">
-                    	<transformer ref="GetProperty" />
+                        <transformer ref="GetProperty" />
                     </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -81,7 +81,7 @@
         <service name="s3">
             <inbound>
                 <vm:inbound-endpoint path="in3" exchange-pattern="one-way">
-                	<transformer ref="SetProperty" />
+                    <transformer ref="SetProperty" />
                 </vm:inbound-endpoint>
             </inbound>
             <outbound>
@@ -99,7 +99,7 @@
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="out3" exchange-pattern="one-way">
-                    	<transformer ref="GetProperty" />
+                        <transformer ref="GetProperty" />
                     </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>
@@ -109,7 +109,7 @@
         <service name="s4">
             <inbound>
                 <vm:inbound-endpoint path="in4" exchange-pattern="one-way">
-                	<transformer ref="SetProperty" />
+                    <transformer ref="SetProperty" />
                 </vm:inbound-endpoint>
             </inbound>
             <outbound>
@@ -127,7 +127,7 @@
             <outbound>
                 <pass-through-router>
                     <vm:outbound-endpoint path="out4" exchange-pattern="one-way">
-                    	<transformer ref="GetProperty" />
+                        <transformer ref="GetProperty" />
                     </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>

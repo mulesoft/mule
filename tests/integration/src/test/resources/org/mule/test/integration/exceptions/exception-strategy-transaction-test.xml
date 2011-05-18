@@ -55,7 +55,7 @@
             </outbound>
             <custom-exception-strategy class="org.mule.test.integration.exceptions.ExceptionStrategyTransactionTestCase$AssertRollbackServiceExceptionStrategy">
                 <jms:outbound-endpoint ref="ExceptionQueue">
-                	<transformer ref="ObjectToString" />
+                    <transformer ref="ObjectToString" />
                 </jms:outbound-endpoint>
             </custom-exception-strategy>
         </service>
