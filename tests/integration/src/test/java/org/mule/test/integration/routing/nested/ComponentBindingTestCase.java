@@ -64,14 +64,4 @@ public class ComponentBindingTestCase extends FunctionalTestCase
         internalTest("jms://topic:t");
     }
 
-    public void testVmBindingReturnNull() throws Exception
-    {
-        internalNullTest("vm://");
-    }
-
-    public void testJmsQueueBindingReturnNull() throws Exception
-    {
-        internalNullTest("jms://");
-    }
-
 }
