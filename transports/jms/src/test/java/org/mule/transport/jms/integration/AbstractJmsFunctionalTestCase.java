@@ -670,7 +670,14 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         {
             if (connection != null)
             {
-                connection.close();
+                try
+                {
+                    connection.close();
+                }
+                catch (JMSException e)
+                {
+                    logger.warn("Failed to close jms connection: " + e.getMessage());
+                }
             }
         }
     }
@@ -718,7 +725,14 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                 {
                     s.close();
                 }
-                c.close();
+                try
+                {
+                    c.close();
+                }
+                catch (JMSException e)
+                {
+                    logger.warn("Failed to close jms connection: " + e.getMessage());
+                }
             }
         }
     }
@@ -801,7 +815,14 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
                 {
                     s.close();
                 }
-                c.close();
+                try
+                {
+                    c.close();
+                }
+                catch (JMSException e)
+                {
+                    logger.warn("Failed to close jms connection: " + e.getMessage());
+                }
             }
         }
         logger.debug("completed draining topic :" + topic);
