@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
 {
     private Latch messageRedelivered;
-    private final int latchTimeout = 1000;
+    private final int latchTimeout = 5000;
     
     @Override
     protected String getConfigResources()
@@ -57,8 +57,8 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
         putMessageOnQueue("noException");
 
         // Delivery was successful 
-        messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS);
-        assertEquals("Message should not have been redelivered", 1, messageRedelivered.getCount());
+        assertFalse("Message should not have been redelivered", 
+            messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }
     
     public void testTransformerException() throws Exception
@@ -66,8 +66,8 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
         putMessageOnQueue("transformerException");
 
         // Delivery failed so message should have been redelivered
-        messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS);
-        assertEquals("Message was not redelivered", 0, messageRedelivered.getCount());
+        assertTrue("Message was not redelivered", 
+            messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }
     
     public void testRouterException() throws Exception
@@ -75,8 +75,8 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
         putMessageOnQueue("routerException");
 
         // Delivery failed so message should have been redelivered
-        messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS);
-        assertEquals("Message was not redelivered", 0, messageRedelivered.getCount());
+        assertTrue("Message was not redelivered", 
+            messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }
     
     public void testComponentException() throws Exception
@@ -84,9 +84,7 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
         putMessageOnQueue("componentException");
         
         // A component exception occurs after the SEDA queue, so message should not have been redelivered
-        messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS);
-        assertEquals("Message should not have been redelivered", 1, messageRedelivered.getCount());
+        assertFalse("Message should not have been redelivered", 
+            messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }    
 }
-
-
