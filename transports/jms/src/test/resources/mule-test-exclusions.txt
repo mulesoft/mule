@@ -4,3 +4,6 @@
 
 # MULE-3682
 org.mule.transport.jms.integration.JmsXATransactionComponentTestCase
+
+# AMQ 5.5.0 regression https://issues.apache.org/jira/browse/AMQ-3330
+org.mule.transport.jms.integration.JmsMuleSideDurableTopicXATxTestCase

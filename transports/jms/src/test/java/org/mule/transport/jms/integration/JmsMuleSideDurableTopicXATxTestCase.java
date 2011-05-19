@@ -57,7 +57,7 @@ public class JmsMuleSideDurableTopicXATxTestCase extends AbstractJmsFunctionalTe
         logger.info("Received " + result.getPayload());
         result = client.request("vm://out", getTimeout());
         assertNotNull(result);
-        logger.info("!Received " + result.getPayload());
+        logger.info("Received " + result.getPayload());
         result = client.request("vm://out", getSmallTimeout());
         assertNull(result);
     }
