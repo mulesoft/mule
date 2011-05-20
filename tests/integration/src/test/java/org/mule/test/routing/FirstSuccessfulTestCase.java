@@ -57,4 +57,18 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
         assertTrue(ex instanceof MessagingException);
     }
 
+    /**
+     * Tests the First Successful message processor with one-way endpoints MULE-5377
+     * 
+     */
+    // public void testFirstSuccessfulWithOneWayEndpoints() throws Exception
+    // {
+    //     MuleClient client = new MuleClient(muleContext);
+    //     client.dispatch("vm://input4.in", "XYZ", null);
+    // 
+    //     MuleMessage response = client.request("vm://output4.out", RECEIVE_TIMEOUT);
+    //	   assertNotNull(response);
+    // 	   assertEquals(response.getPayload(), "XYZ");
+    // }
+
 }

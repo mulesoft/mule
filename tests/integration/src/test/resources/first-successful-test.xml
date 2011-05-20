@@ -51,4 +51,22 @@
         </first-successful>
     </flow>
 
+	<flow name="test-router4">
+		<vm:inbound-endpoint path="input4.in" />
+		<first-successful>
+			<vm:outbound-endpoint path="errorer4.in" />
+			<vm:outbound-endpoint path="handler4.in" />
+		</first-successful>
+	</flow>
+
+	<flow name="test-router4-errorer">
+		<vm:inbound-endpoint path="errorer4.in" />
+		<null-component />
+	</flow>
+
+	<flow name="test-router4-handler">
+		<vm:inbound-endpoint path="handler4.in"/>
+		<vm:outbound-endpoint path="output4.out"/>
+	</flow>
+
 </mule>
