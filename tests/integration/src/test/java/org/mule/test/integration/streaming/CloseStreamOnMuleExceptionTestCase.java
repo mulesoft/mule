@@ -34,11 +34,12 @@ import org.xml.sax.InputSource;
 
 public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
 {
+    private final int timeoutMs = 3000;
     private static Latch inputStreamLatch = new Latch();
     private static Latch streamReaderLatch = new Latch();
     private String xmlText = "<test attribute=\"1\"/>";
     private TestByteArrayInputStream inputStream;
-    MuleClient client;
+    private MuleClient client;
 
     @Override
     protected void doSetUp() throws Exception
@@ -51,7 +52,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
     public void testCloseStreamOnComponentException() throws MuleException, InterruptedException
     {
         client.dispatch("vm://inEcho?connector=vm", inputStream, null);
-        streamReaderLatch.await(1L, TimeUnit.SECONDS);
+        streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
         assertTrue(inputStream.isClosed());
     }
 
@@ -62,7 +63,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
 
         client.dispatch("vm://inEcho?connector=vm", stream, null);
 
-        streamReaderLatch.await(1L, TimeUnit.SECONDS);
+        streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
         assertTrue(((TestByteArrayInputStream) stream.getByteStream()).isClosed());
     }
 
@@ -72,7 +73,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
 
         client.dispatch("vm://inEcho?connector=vm", stream, null);
 
-        streamReaderLatch.await(1L, TimeUnit.SECONDS);
+        streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
         assertTrue(((TestByteArrayInputStream) ((StreamSource) stream).getInputStream()).isClosed());
     }
 
@@ -85,7 +86,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
 
         client.dispatch("vm://inEcho?connector=vm", stream, null);
 
-        streamReaderLatch.await(1L, TimeUnit.SECONDS);
+        streamReaderLatch.await(timeoutMs, TimeUnit.MILLISECONDS);
         assertTrue(stream.isClosed());
     }
 
@@ -96,7 +97,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
 
         client.dispatch("vm://inEcho?connector=vm", stream, null);
 
-        Thread.sleep(1000);
+        Thread.sleep(timeoutMs);
         assertTrue(((TestByteArrayInputStream) stream.getInputSource().getByteStream()).isClosed());
     }
 
@@ -110,7 +111,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
 
         client.dispatch("vm://inEcho?connector=vm", stream, null);
 
-        Thread.sleep(1000);
+        Thread.sleep(timeoutMs);
         assertTrue(((TestXMLStreamReader) stream.getXMLStreamReader()).isClosed());
     }
 
@@ -118,7 +119,7 @@ public class CloseStreamOnMuleExceptionTestCase extends FunctionalTestCase
         throws MuleException, InterruptedException
     {
         client.dispatch("vm://dispatcherExceptionBridge?connector=vm", inputStream, null);
-        Thread.sleep(1000);
+        Thread.sleep(timeoutMs);
         assertTrue(inputStream.isClosed());
     }
 
