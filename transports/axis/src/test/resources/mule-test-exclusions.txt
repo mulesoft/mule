@@ -20,3 +20,6 @@ org.mule.transport.soap.axis.functional.AxisSoapHeadersTestCase
 
 # Fix test case after BL-165
 org.mule.transport.soap.axis.AxisServletWithSecurityTestCase
+
+# AMQ 5.x seems to have broken temp topic replies
+org.mule.transport.soap.axis.AxisConnectorJmsTopicsFunctionalTestCase
