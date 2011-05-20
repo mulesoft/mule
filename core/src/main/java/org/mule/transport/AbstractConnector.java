@@ -264,9 +264,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     // TODO connect and disconnect are not part of lifecycle management right now
     private AtomicBoolean connected = new AtomicBoolean(false);
-
-    /** Is this connector currently undergoing a reconnection strategy? */
-    private AtomicBoolean reconnecting = new AtomicBoolean(false);
+    private AtomicBoolean connecting = new AtomicBoolean(false);
 
     /**
      * Indicates whether the connector should start upon connecting. This is
@@ -1507,15 +1505,9 @@ public abstract class AbstractConnector implements Connector, WorkListener
             throw new LifecycleException(CoreMessages.lifecycleErrorCannotUseConnector(getName(),
                     lifecycleManager.getCurrentPhase()), this);
         }
-
         if (isConnected())
         {
             return;
-        }
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Connecting: " + this);
         }
 
         RetryCallback callback = new RetryCallback()
@@ -1567,6 +1559,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 }
                 
                 setConnected(true);
+                setConnecting(false);
                 logger.info("Connected: " + getWorkDescription());
                 
                 if (startOnConnect && !isStarted() && !isStarting())
@@ -1581,7 +1574,14 @@ public abstract class AbstractConnector implements Connector, WorkListener
             }
         };
 
-        retryPolicyTemplate.execute(callback, muleContext.getWorkManager());
+        if (connecting.compareAndSet(false, true))
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Connecting: " + this);
+            }
+            retryPolicyTemplate.execute(callback, muleContext.getWorkManager());
+        }
     }
 
     /**
@@ -1665,14 +1665,14 @@ public abstract class AbstractConnector implements Connector, WorkListener
         connected.set(flag);
     }
 
-    public final void setReconnecting(boolean flag)
+    public final void setConnecting(boolean flag)
     {
-        reconnecting.set(flag);
+        connecting.set(flag);
     }
 
-    public final boolean isReconnecting()
+    public final boolean isConnecting()
     {
-        return reconnecting.get();
+        return connecting.get();
     }
 
     /**

@@ -64,18 +64,18 @@ public class AbstractSystemExceptionStrategy extends AbstractExceptionStrategy i
         AbstractConnector connector = (AbstractConnector) ex.getFailed();
 
         // Make sure the connector is not already being reconnected by another receiver thread.
-        if (connector.isReconnecting())
+        if (connector.isConnecting())
         {
             return;
         }
             
         logger.info("Exception caught is a ConnectException, attempting to reconnect...");
-        connector.setReconnecting(true);
         
         // Disconnect
         try
         {
             logger.debug("Disconnecting " + connector.getName());
+            connector.stop();
             connector.disconnect();
         }
         catch (Exception e1)
@@ -88,7 +88,7 @@ public class AbstractSystemExceptionStrategy extends AbstractExceptionStrategy i
         {
             logger.debug("Reconnecting " + connector.getName());
             connector.connect();
-            connector.setReconnecting(false);
+            connector.start();
         }
         catch (Exception e2)
         {
