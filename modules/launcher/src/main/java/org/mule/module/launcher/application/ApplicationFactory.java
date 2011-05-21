@@ -10,12 +10,14 @@
 
 package org.mule.module.launcher.application;
 
+import org.mule.MuleCoreExtension;
 import org.mule.module.launcher.AppBloodhound;
 import org.mule.module.launcher.DefaultAppBloodhound;
 import org.mule.module.launcher.DeploymentService;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Responsible for creating application objects. E.g. handles the default/priviledged app,
@@ -24,10 +26,12 @@ import java.io.IOException;
 public class ApplicationFactory
 {
     protected DeploymentService deploymentService;
+    protected Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions;
 
-    public ApplicationFactory(DeploymentService deploymentService)
+    public ApplicationFactory(DeploymentService deploymentService, Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions)
     {
         this.deploymentService = deploymentService;
+        this.coreExtensions = coreExtensions;
     }
 
     public Application createApp(String appName) throws IOException
@@ -38,6 +42,7 @@ public class ApplicationFactory
         {
             final PriviledgedMuleApplication delegate = new PriviledgedMuleApplication(appName);
             delegate.setDeploymentService(deploymentService);
+            delegate.setCoreExtensions(coreExtensions);
             return new ApplicationWrapper(delegate);
         }
         else

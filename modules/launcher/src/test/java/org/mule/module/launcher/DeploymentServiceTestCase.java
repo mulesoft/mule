@@ -10,6 +10,7 @@
 
 package org.mule.module.launcher;
 
+import org.mule.MuleCoreExtension;
 import org.mule.api.MuleContext;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.config.MuleProperties;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -66,7 +68,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         new File(muleHome, "lib/shared/default").mkdirs();
 
-        deploymentService = new DeploymentService();
+        deploymentService = new DeploymentService(new HashMap<Class<? extends MuleCoreExtension>, MuleCoreExtension>());
         deploymentService.setDeployer(new TestDeployer());
         installLatch = new Latch();
         deployLatch = new Latch();

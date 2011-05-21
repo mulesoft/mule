@@ -10,6 +10,7 @@
 
 package org.mule.module.launcher;
 
+import org.mule.MuleCoreExtension;
 import org.mule.config.StartupContext;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.application.Application;
@@ -71,10 +72,10 @@ public class DeploymentService
 
     private List<DeploymentListener> deploymentListeners = new CopyOnWriteArrayList<DeploymentListener>();
 
-    public DeploymentService()
+    public DeploymentService(Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions)
     {
         deployer = new DefaultMuleDeployer(this);
-        appFactory = new ApplicationFactory(this);
+        appFactory = new ApplicationFactory(this, coreExtensions);
     }
 
     public void start()
@@ -642,6 +643,7 @@ public class DeploymentService
                 dirty = false;
             }
         }
+
 
         /**
          * Determines if a given URL points to the same file that an existent

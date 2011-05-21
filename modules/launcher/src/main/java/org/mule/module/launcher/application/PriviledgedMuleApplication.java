@@ -10,10 +10,13 @@
 
 package org.mule.module.launcher.application;
 
+import org.mule.MuleCoreExtension;
 import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentService;
+
+import java.util.Map;
 
 /**
  *
@@ -22,8 +25,10 @@ public class PriviledgedMuleApplication extends DefaultMuleApplication
 {
 
     public static final String REGISTRY_KEY_DEPLOYMENT_SERVICE = "_deploymentService";
+    public static final String REGISTRY_KEY_CORE_EXTENSIONS = "_coreExtensions";
 
     protected DeploymentService deploymentService;
+    protected Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions;
 
     protected PriviledgedMuleApplication(String appName)
     {
@@ -45,6 +50,7 @@ public class PriviledgedMuleApplication extends DefaultMuleApplication
             if (getDescriptor().isPriviledged())
             {
                 getMuleContext().getRegistry().registerObject(REGISTRY_KEY_DEPLOYMENT_SERVICE, deploymentService);
+                getMuleContext().getRegistry().registerObject(REGISTRY_KEY_CORE_EXTENSIONS, coreExtensions);
             }
         }
         catch (RegistrationException e)
@@ -57,5 +63,10 @@ public class PriviledgedMuleApplication extends DefaultMuleApplication
     public void setDeploymentService(DeploymentService deploymentService)
     {
         this.deploymentService = deploymentService;
+    }
+
+    public void setCoreExtensions(Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions)
+    {
+        this.coreExtensions = coreExtensions;
     }
 }
