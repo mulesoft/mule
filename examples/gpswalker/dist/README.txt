@@ -6,7 +6,7 @@ the browser. This example uses other new features in Mule 3 including automatic
 JSON bindings, the @Schedule annotation and Flow.
 
 For more information, refer to 
-http://www.mulesoft.org/documentation/display/MULE3INTRO/GPS+Walker+Example
+http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/GPS+Walker+Example
 
 +---------------------+
 | Running the example |

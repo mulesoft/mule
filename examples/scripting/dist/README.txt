@@ -4,7 +4,7 @@
 This example demonstrates Mule's JSR-223 Scripting support.
 
 For more information, refer to 
-http://www.mulesoft.org/documentation/display/MULE3INTRO/Scripting+Example
+http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/Scripting+Example
 
 +---------------------+
 | Running the example |

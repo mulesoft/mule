@@ -6,7 +6,7 @@ writing transformers and filters in Groovy, and how to use CXF clients and
 services.
 
 For more information, refer to 
-http://www.mulesoft.org/documentation/display/MULE3INTRO/Loan+Broker+Example
+http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/Loan+Broker+Example
 
 +---------------------+
 | Running the example |

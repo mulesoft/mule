@@ -6,7 +6,7 @@ transform the result using XSLT and deserialise the result to a StockQuote
 JavaBean. The example demonstrates using REST and SOAP to invoke the service.
 
 For more information, refer 
-http://www.mulesoft.org/documentation/display/MULE3INTRO/Stock+Quote+Example
+http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/Stock+Quote+Example
 
 +---------------------+
 | Running the example |

@@ -5,7 +5,7 @@ This example demonstrates how to expose a Mule component over multiple
 transports, in this case as a CXF web sevice.
 
 For more information, refer to 
-http://www.mulesoft.org/documentation/display/MULE3INTRO/Echo+Example
+http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/Echo+Example
 
 +---------------------+
 | Running the example |

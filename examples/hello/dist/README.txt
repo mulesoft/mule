@@ -4,7 +4,7 @@
 This example uses two components to create a hello world message. 
 
 For more information, refer to 
-http://www.mulesoft.org/documentation/display/MULE3INTRO/Hello+World+Example
+http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/Hello+World+Example
 
 +---------------------+
 | Running the example |
