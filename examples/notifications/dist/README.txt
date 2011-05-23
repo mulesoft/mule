@@ -5,7 +5,7 @@ This example demonstrates capturing and firing notifications and uses AJAX to
 send notifications to the browser.
 
 For more information, refer to 
-http://www.mulesoft.org/documentation/display/MULE3INTRO/Notifications+Example
+http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/Notifications+Example
 
 +---------------------+
 | Running the example |

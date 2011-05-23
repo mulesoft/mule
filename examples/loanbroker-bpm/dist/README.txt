@@ -5,7 +5,7 @@ The BPM example uses a business process engine to orchestrate a loan broker
 application.
 
 For more information, refer to 
-http://www.mulesoft.org/documentation/display/MULE3INTRO/Loan+Broker+BPM+Example
+http://www.mulesoft.org/documentation/display/MULE3EXAMPLES/Loan+Broker+BPM+Example
 
 +---------------------+
 | Running the example |
