@@ -1264,9 +1264,9 @@
             </releases>
         </repository>
         <repository>
-            <id>jboss</id>
-            <name>JBoss Repository</name>
-            <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
+            <id>maven-central</id>
+            <name>Maven Central Repository</name>
+            <url>http://repo1.maven.org/maven2</url>
         </repository>
         <repository>
             <id>mule-deps</id>
