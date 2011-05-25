@@ -1269,9 +1269,9 @@
             </releases>
         </repository>
         <repository>
-            <id>maven-central</id>
-            <name>Maven Central Repository</name>
-            <url>http://repo1.maven.org/maven2</url>
+            <id>java-net</id>
+            <name>Java net repository</name>
+            <url>http://download.java.net/maven/2</url>
         </repository>
         <repository>
             <id>public-jboss</id>
