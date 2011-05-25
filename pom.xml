@@ -1269,6 +1269,11 @@
             <url>http://repo1.maven.org/maven2</url>
         </repository>
         <repository>
+            <id>public-jboss</id>
+            <name>JBoss Public Repository</name>
+            <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
+        </repository>
+        <repository>
             <id>mule-deps</id>
             <name>Mule Dependencies</name>
             <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
