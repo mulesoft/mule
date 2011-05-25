@@ -171,7 +171,7 @@
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
-            <version>2.7.1</version>
+            <version>${xalanVersion}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -179,6 +179,12 @@
                     <artifactId>xercesImpl</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>serializer</artifactId>
+            <version>${xalanVersion}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
