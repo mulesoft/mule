@@ -10,9 +10,6 @@
        http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/3.2/mule-ftp.xsd">
 
     <model>
-        <default-exception-strategy>
-            <rollback-transaction exception-pattern="*" />
-        </default-exception-strategy>
         <service name="NoException">
             <inbound>
                 <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}/noException" />                

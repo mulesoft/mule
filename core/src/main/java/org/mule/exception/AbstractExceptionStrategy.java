@@ -67,7 +67,8 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
 
     protected boolean isRollback(Throwable t)
     {
-        return (rollbackTxFilter != null && rollbackTxFilter.accept(t.getClass().getName())) ||
+        return (rollbackTxFilter == null && commitTxFilter == null) || 
+            (rollbackTxFilter != null && rollbackTxFilter.accept(t.getClass().getName())) ||
             (commitTxFilter != null && !commitTxFilter.accept(t.getClass().getName()));
     }
     
