@@ -111,6 +111,9 @@ public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase
     @Override
     protected void doTearDown() throws Exception
     {
+        // give Mule some time to disconnect from the FTP server
+        Thread.sleep(500);
+        
         ftpClient.disconnect(); // we dont need the connection anymore for this test
         stopServer();
 
@@ -124,6 +127,12 @@ public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase
         deleteFtpServerBaseDir();
         File ftpBaseDir = new File(FTP_SERVER_BASE_DIR);
         ftpBaseDir.mkdirs();
+    }
+
+    protected void createFtpServerDir(String directoryName)
+    {
+        File ftpDir = new File(FTP_SERVER_BASE_DIR, directoryName);
+        ftpDir.mkdirs();
     }
 
     private void deleteFtpServerBaseDir()
@@ -160,6 +169,12 @@ public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase
         outWriter.close();
     }
 
+    protected boolean fileExists(String fileName) 
+    {        
+        File file = new File(FTP_SERVER_BASE_DIR, fileName);
+        return file.exists();
+    }
+
     //
     // callback methods from MuleFtplet
     // 
@@ -174,7 +189,8 @@ public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase
     }
     
     @Override
-    protected int getNumPortsToFind() {
+    protected int getNumPortsToFind() 
+    {
         return 1;
     }
 }

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/3.2/mule-ftp.xsd">
+
+    <model>
+        <default-exception-strategy>
+            <rollback-transaction exception-pattern="*" />
+        </default-exception-strategy>
+        <service name="NoException">
+            <inbound>
+                <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}/noException" />                
+            </inbound>
+            <test:component />
+        </service>
+        <service name="TransformerException">
+            <inbound>
+                <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}/transformerException" />                
+                <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
+            </inbound>
+            <test:component />
+        </service>
+        <service name="RouterException">
+            <inbound>
+                <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}/routerException" />                
+                <custom-inbound-router class="org.mule.tck.testmodels.mule.FailingRouter" />
+            </inbound>
+            <test:component />
+        </service>
+        <service name="ComponentException">
+            <inbound>
+                <ftp:inbound-endpoint address="ftp://anonymous:password@localhost:${port1}/componentException" />                
+            </inbound>
+            <test:component throwException="true" />
+        </service>
+    </model>
+</mule>

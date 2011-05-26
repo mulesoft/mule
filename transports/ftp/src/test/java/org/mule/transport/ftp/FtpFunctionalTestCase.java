@@ -48,9 +48,6 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
         
         latch.await(getTimeout(), TimeUnit.MILLISECONDS);
         assertEquals(TEST_MESSAGE, message.get());                
-        
-        // give Mule some time to disconnect from the FTP server
-        Thread.sleep(500);
     }
 
     protected static class FunctionalEventCallback implements EventCallback

@@ -10,6 +10,8 @@
 
 package org.mule.transport.ftp;
 
+import org.mule.api.MessagingException;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -302,7 +304,15 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
             }
             catch (Exception e)
             {
-                getConnector().getMuleContext().getExceptionListener().handleException(e);
+                if (e instanceof MessagingException)
+                {
+                    MuleEvent event = ((MessagingException) e).getEvent();
+                    event.getFlowConstruct().getExceptionListener().handleException(e, event);
+                }
+                else
+                {
+                    getConnector().getMuleContext().getExceptionListener().handleException(e);
+                }
             }
             finally
             {
