@@ -10,9 +10,9 @@
 
 package org.mule.test.routing;
 
-import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
+import org.mule.api.client.MuleClient;
+import org.mule.api.transport.DispatchException;
 import org.mule.tck.FunctionalTestCase;
 
 public class FirstSuccessfulTestCase extends FunctionalTestCase
@@ -25,27 +25,30 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
 
     public void testFirstSuccessful() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://input", "XYZ", null);
         assertEquals("XYZ is a string", response.getPayloadAsString());
+
         response = client.send("vm://input", Integer.valueOf(9), null);
         assertEquals("9 is an integer", response.getPayloadAsString());
+
         response = client.send("vm://input", Long.valueOf(42), null);
         assertEquals("42 is a number", response.getPayloadAsString());
+
         try
         {
-            client.send("vm://input", Boolean.TRUE, null);
-            fail("Exception expected");
+            response = client.send("vm://input", Boolean.TRUE, null);
+            fail("DispatchException expected");
         }
-        catch (Exception e)
+        catch (DispatchException e)
         {
-            assertTrue(e instanceof MessagingException);
+            // this one was expected
         }
     }
 
     public void testFirstSuccessfulWithExpression() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://input2", "XYZ", null);
         assertEquals("XYZ is a string", response.getPayloadAsString());
     }
@@ -55,11 +58,21 @@ public class FirstSuccessfulTestCase extends FunctionalTestCase
         try
         {
             muleContext.getClient().send("vm://input3", "XYZ", null);
-            fail("Exception expected");
+            fail("DispatchException expected");
         }
-        catch (Exception e)
+        catch (DispatchException e)
         {
-            assertTrue(e instanceof MessagingException);
+            // this one was expected
         }
+    }
+
+    public void testFirstSuccessfulWithOneWayEndpoints() throws Exception
+    {
+        MuleClient client = muleContext.getClient();
+        client.dispatch("vm://input4.in", TEST_MESSAGE, null);
+
+        MuleMessage response = client.request("vm://output4.out", RECEIVE_TIMEOUT);
+        assertNotNull(response);
+        assertEquals(TEST_MESSAGE, response.getPayload());
     }
 }

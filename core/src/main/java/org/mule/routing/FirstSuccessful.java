@@ -105,6 +105,7 @@ public class FirstSuccessful extends AbstractOutboundRouter
         return toProcess;
     }
 
+    @Override
     public boolean isMatch(MuleMessage message) throws MuleException
     {
         return true;
