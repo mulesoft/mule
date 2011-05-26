@@ -21,6 +21,12 @@ import org.apache.commons.logging.LogFactory;
 
 public abstract class MessageFactory
 {
+
+    /**
+     * Default is {@link ReloadControl.Always}.
+     */
+    public static final ResourceBundle.Control DEFAULT_RELOAD_CONTROL = new ReloadControl.Always();
+
     /**
      * This error code is used for {@link Message} instances that are not read from a
      * resource bundles but are created only with a string.
@@ -29,8 +35,8 @@ public abstract class MessageFactory
     private static final transient Object[] EMPTY_ARGS = new Object[]{};
 
     protected transient Log logger = LogFactory.getLog(getClass());
-    // since java 6 only
-    //protected final ReloadControl control = new ReloadControl();
+
+    protected final ResourceBundle.Control reloadControl = DEFAULT_RELOAD_CONTROL;
 
     /**
      * Computes the bundle's full path 
@@ -208,7 +214,11 @@ public abstract class MessageFactory
         {
             logger.trace("Loading resource bundle: " + bundlePath + " for locale " + locale);
         }
-        ResourceBundle bundle = ResourceBundle.getBundle(bundlePath, locale, getClassLoader());
+        final ResourceBundle.Control control = getReloadControl();
+        ResourceBundle bundle = control != null
+                                            ? ResourceBundle.getBundle(bundlePath, locale, getClassLoader(), control)
+                                            : ResourceBundle.getBundle(bundlePath, locale, getClassLoader());
+
         return bundle;
     }
 
@@ -223,30 +233,17 @@ public abstract class MessageFactory
         return ccl == null ? getClass().getClassLoader() : ccl;
     }
 
-    // since java 6 only
-    /*static class ReloadControl extends ResourceBundle.Control
+    /**
+     * Subclasses should override to customize the bundle reload control. Implementations must
+     * save the instance in a field for stateful reload control. Return null to fallback to
+     * default JVM behavior (permanent cache).
+     *
+     * @see #DEFAULT_RELOAD_CONTROL
+     */
+    protected ResourceBundle.Control getReloadControl()
     {
-        boolean needsReload = true;
-
-        @Override
-        public boolean needsReload(String baseName, Locale locale, String format, ClassLoader loader, ResourceBundle bundle, long loadTime)
-        {
-            // TODO always for now
-            return true;
-        }
-
-        @Override
-        public long getTimeToLive(String baseName, Locale locale)
-        {
-            if (needsReload)
-            {
-                // must be zero, as other 'DONT_CACHE' constant doesn't work here, and is -1
-                return 0;
-            }
-
-            return ResourceBundle.Control.TTL_NO_EXPIRATION_CONTROL;
-        }
-    }*/
+        return reloadControl;
+    }
 }
 
 
