@@ -21,8 +21,8 @@ import java.util.concurrent.TimeUnit;
 
 public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
 {
-    private Latch messageRedelivered;
-    private final int latchTimeout = 5000;
+    protected Latch messageRedelivered;
+    protected final int latchTimeout = 5000;
     
     @Override
     protected String getConfigResources()

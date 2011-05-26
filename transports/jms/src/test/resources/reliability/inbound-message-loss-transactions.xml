@@ -15,27 +15,35 @@
         </default-exception-strategy>
         <service name="NoException">
             <inbound>
-                <jms:inbound-endpoint queue="noException" />
+                <jms:inbound-endpoint queue="noException">
+			        <jms:transaction action="ALWAYS_BEGIN" />
+                </jms:inbound-endpoint>
             </inbound>
             <test:component />
         </service>
         <service name="TransformerException">
             <inbound>
-                <jms:inbound-endpoint queue="transformerException" />
+                <jms:inbound-endpoint queue="transformerException">
+			        <jms:transaction action="ALWAYS_BEGIN" />
+                </jms:inbound-endpoint>
                 <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
             </inbound>
             <test:component />
         </service>
         <service name="RouterException">
             <inbound>
-                <jms:inbound-endpoint queue="routerException" />
+                <jms:inbound-endpoint queue="routerException">
+			        <jms:transaction action="ALWAYS_BEGIN" />
+                </jms:inbound-endpoint>
                 <custom-inbound-router class="org.mule.tck.testmodels.mule.FailingRouter" />
             </inbound>
             <test:component />
         </service>
         <service name="ComponentException">
             <inbound>
-                <jms:inbound-endpoint queue="componentException" />
+                <jms:inbound-endpoint queue="componentException">
+			        <jms:transaction action="ALWAYS_BEGIN" />
+                </jms:inbound-endpoint>
             </inbound>
             <test:component throwException="true" />
         </service>

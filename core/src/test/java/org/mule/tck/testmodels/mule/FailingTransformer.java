@@ -8,18 +8,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.transport.jms.reliability;
+package org.mule.tck.testmodels.mule;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleRuntimeException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.processor.AbstractFilteringMessageProcessor;
+import org.mule.transformer.AbstractTransformer;
 
-public class FailingRouter extends AbstractFilteringMessageProcessor
+public class FailingTransformer extends AbstractTransformer
 {
-    @Override
-    protected boolean accept(MuleEvent event)
+    protected Object doTransform(Object src, String encoding) throws TransformerException
     {
-        throw new MuleRuntimeException(MessageFactory.createStaticMessage("Failure"));
+        throw new TransformerException(MessageFactory.createStaticMessage("Failure"));
     }
 }

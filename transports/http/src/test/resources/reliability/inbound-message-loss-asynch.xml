@@ -2,12 +2,12 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:test="http://www.mulesoft.org/schema/mule/test"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
-       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd">
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd">
 
     <model>
         <default-exception-strategy>
@@ -15,29 +15,37 @@
         </default-exception-strategy>
         <service name="NoException">
             <inbound>
-                <jms:inbound-endpoint queue="noException" />
+                <http:inbound-endpoint address="http://localhost:${port1}/noException" exchange-pattern="one-way" />
             </inbound>
-            <test:component />
+            <test:component>
+            	<test:return-data>Here you go</test:return-data>
+            </test:component>
         </service>
         <service name="TransformerException">
             <inbound>
-                <jms:inbound-endpoint queue="transformerException" />
+                <http:inbound-endpoint address="http://localhost:${port1}/transformerException" exchange-pattern="one-way" />
                 <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
             </inbound>
-            <test:component />
+            <test:component>
+            	<test:return-data>Here you go</test:return-data>
+            </test:component>
         </service>
         <service name="RouterException">
             <inbound>
-                <jms:inbound-endpoint queue="routerException" />
+                <http:inbound-endpoint address="http://localhost:${port1}/routerException" exchange-pattern="one-way" />
                 <custom-inbound-router class="org.mule.tck.testmodels.mule.FailingRouter" />
             </inbound>
-            <test:component />
+            <test:component>
+            	<test:return-data>Here you go</test:return-data>
+            </test:component>
         </service>
         <service name="ComponentException">
             <inbound>
-                <jms:inbound-endpoint queue="componentException" />
+                <http:inbound-endpoint address="http://localhost:${port1}/componentException" exchange-pattern="one-way" />
             </inbound>
-            <test:component throwException="true" />
+            <test:component throwException="true">
+            	<test:return-data>Here you go</test:return-data>
+            </test:component>
         </service>
     </model>
 </mule>
