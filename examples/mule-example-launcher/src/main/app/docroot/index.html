@@ -6,30 +6,30 @@
 
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon"/>
 
-	<link type="text/css" href="css/smoothness/jquery-ui-1.8.6.custom.css" rel="stylesheet" />	
-	<link type="text/css" href="css/style.css" rel="stylesheet" media="all"/>
-	<link type="text/css" href="css/XMLDisplay.css" rel="stylesheet" />	
+    <link type="text/css" href="css/smoothness/jquery-ui-1.8.6.custom.css" rel="stylesheet" />    
+    <link type="text/css" href="css/style.css" rel="stylesheet" media="all"/>
+    <link type="text/css" href="css/XMLDisplay.css" rel="stylesheet" />    
 
-	<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
-	<script type="text/javascript" src="js/jquery-ui-1.8.6.custom.min.js"></script>
-	<script type="text/javascript" src="js/XMLDisplay.js"></script>
+    <script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui-1.8.6.custom.min.js"></script>
+    <script type="text/javascript" src="js/XMLDisplay.js"></script>
 
-	<script type="text/javascript">	
+    <script type="text/javascript">
 
-	function displayMenu()
-	{
-		jQuery.get('/examples/menu.html', 'script',
-			function(data, textStatus, xmlHttpRequest)
-			{
-				$("#examples-menu").html(data);
-			});
-	}
+    function displayMenu()
+    {
+        jQuery.get('/examples/menu.html', 'script',
+            function(data, textStatus, xmlHttpRequest)
+            {
+                $("#examples-menu").html(data);
+            });
+    }
 
-	function initExamples()
-	{
-		displayMenu();
-	}
-	</script>
+    function initExamples()
+    {
+        displayMenu();
+    }
+    </script>
 
 </head>
 
@@ -43,7 +43,7 @@
 
 <!-- START WRAPPER -->
 <div id="wrapper">
-	<!-- START HEADER -->
+    <!-- START HEADER -->
     <div id='banner'>
         <!-- Including common header -->
         <!--<script type="text/javascript" src="scripts/header.js"/>-->
@@ -56,7 +56,7 @@
         </div>
     </div>
     <!-- END HEADER -->
-    
+
     <!-- START BODY -->
     <div id="content-wrapper">
         <!-- START CONTENT -->
@@ -71,68 +71,66 @@
 
                                 <table class="layout-grid" cellspacing="0" cellpadding="0">
                                     <tr>
-                                    	<!-- START MENU -->
+                                        <!-- START MENU -->
                                         <td class="left-nav">
-                                        	<div id='examples-menu' nowrap="nowrap"></div>
+                                            <div id='examples-menu' nowrap="nowrap"></div>
                                         </td>
                                         <!-- END MENU -->
                                         
                                         <!-- START CONTENT PANEL -->
                                         <td class="normal">
                                             <div id="examples-content-panel">
-	                                            <div id="demo-header">
-	                                                <h2>Mule Examples Catalog</h2>
-	                                                <h4>Use these configuration examples to help you get started quickly
-	                                                    with
-	                                                    Mule</h4>
-	                                            </div>
-	                                            <div style="position: absolute; right: 27px" id="switcher"></div>
-	                                            <div id="demo-config">
-	                                                <div id="demo-frame-wrapper">
-	                                                    <table width="660" border="0" cellspacing="0" cellpadding="0">
-	                                                        <tr>
-	                                                            <td width="35"><img src="images/arrow.png" width="35"
-	                                                                                height="29" alt="arrow"
-	                                                                                style="margin:12px 20px 0px 0px;"></td>
-	                                                            <td width="495">
-	                                                                <div><img src="images/1.png" alt="Step 1"
-	                                                                          style="width:20px; padding:18px 10px 0px 0px; float:left;">
-	                                                                    <h5>&nbsp; </h5>
-	                                                                    <h5>Get started by selecting an example from the
-	                                                                        left-hand navigation menu.</h5>
-	                                                                </div>
-	                                                            </td>
-	                                                        </tr>
-	                                                        <tr>
-	                                                            <td>&nbsp;</td>
-	                                                            <td>
-	                                                                <div style="clear:both;"><img src="images/2.png"
-	                                                                                              alt="Step 2"
-	                                                                                              style="width:20px; padding:18px 10px 0px 0px; float:left;">
-	                                                                    <h5>Each example gives an <strong>overview</strong>,
-	                                                                        a
-	                                                                        view of the <strong>source code</strong>, and a
-	                                                                        chance to <strong>run it</strong></h5></div>
-	                                                            </td>
-	                                                        </tr>
-	                                                        <tr>
-	                                                            <td>&nbsp;</td>
-	                                                            <td><img src="images/example.png" width="600" height="100"
-	                                                                     alt="example"></td>
-	                                                        </tr>
-	                                                        <tr>
-	                                                            <td>&nbsp;</td>
-	                                                            <td><h5>For more information visit the examples documentation <a href="http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples">here</a>.</h5></td>
-	                                                        </tr>
-	                                                    </table>
-	
-	
-	                                                </div>
-	                                                <!-- End demo -->
-	
-	                                            </div>
-	
-	                                            <div id="demo-config-menu"></div>                                            
+                                                <div id="demo-header">
+                                                    <h2>Mule Examples Catalog</h2>
+                                                    <h4>Use these configuration examples to help you get started quickly
+                                                        with
+                                                        Mule</h4>
+                                                </div>
+                                                <div style="position: absolute; right: 27px" id="switcher"></div>
+                                                <div id="demo-config">
+                                                    <div id="demo-frame-wrapper">
+                                                        <table width="660" border="0" cellspacing="0" cellpadding="0">
+                                                            <tr>
+                                                                <td width="35"><img src="images/arrow.png" width="35"
+                                                                                    height="29" alt="arrow"
+                                                                                    style="margin:12px 20px 0px 0px;"></td>
+                                                                <td width="495">
+                                                                    <div><img src="images/1.png" alt="Step 1"
+                                                                              style="width:20px; padding:18px 10px 0px 0px; float:left;">
+                                                                        <h5>&nbsp; </h5>
+                                                                        <h5>Get started by selecting an example from the
+                                                                            left-hand navigation menu.</h5>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>&nbsp;</td>
+                                                                <td>
+                                                                    <div style="clear:both;"><img src="images/2.png"
+                                                                                                  alt="Step 2"
+                                                                                                  style="width:20px; padding:18px 10px 0px 0px; float:left;">
+                                                                        <h5>Each example gives an <strong>overview</strong>,
+                                                                            a
+                                                                            view of the <strong>source code</strong>, and a
+                                                                            chance to <strong>run it</strong></h5></div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>&nbsp;</td>
+                                                                <td><img src="images/example.png" width="600" height="100"
+                                                                         alt="example"></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>&nbsp;</td>
+                                                                <td><h5>For more information visit the examples documentation <a href="http://www.mulesoft.org/documentation/display/MULE3INTRO/Examples">here</a>.</h5></td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                    <!-- End demo -->
+
+                                                </div>
+
+                                                <div id="demo-config-menu"></div>
                                             </div>
                                         </td>
                                         <!-- END CONTENT PANEL -->

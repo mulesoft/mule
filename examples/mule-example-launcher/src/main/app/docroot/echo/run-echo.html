@@ -15,8 +15,8 @@ function doEcho() {
 }
 
 function rpcEchoResponse(message) {
-	$("#response-output").html('<pre class="prettyprint">' + html2entity(getJsonResponse(message.data)) + '</pre>');
-	prettyPrint();	
+    $("#response-output").html('<pre class="prettyprint">' + html2entity(getJsonResponse(message.data)) + '</pre>');
+    prettyPrint();
 }
 
 </script>
@@ -40,7 +40,7 @@ You can also consume this service by directly calling the CXF endpoint, opening 
     href="http://localhost:65082/services/EchoUMO/echo/text/hello"
     target="_blank">http://localhost:65082/services/EchoUMO/echo/text/hello</a>, replacing "hello" with the message you want to submit.
 </p>
-<p class="example-text">    
+<p class="example-text">
     Complete documentation for this example can be found <a
     href="http://www.mulesoft.org/documentation/display/MULE3INTRO/Echo+Example"
     target="_blank">here</a>.
