@@ -36,7 +36,7 @@ public abstract class MessageFactory
 
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    protected final ResourceBundle.Control reloadControl = DEFAULT_RELOAD_CONTROL;
+    protected ResourceBundle.Control reloadControl = DEFAULT_RELOAD_CONTROL;
 
     /**
      * Computes the bundle's full path 
