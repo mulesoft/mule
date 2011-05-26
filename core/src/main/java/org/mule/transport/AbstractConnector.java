@@ -1936,8 +1936,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     {
         // Use connector's classloader so that other temporary classloaders
         // aren't used when things are started lazily or from elsewhere.
-        ThreadFactory threadFactory = new NamedThreadFactory(this.getName() + ".scheduler", this.getClass()
-                .getClassLoader());
+        ThreadFactory threadFactory = new NamedThreadFactory(this.getName() + ".scheduler", muleContext.getExecutionClassLoader());
         ScheduledThreadPoolExecutor newExecutor = new ScheduledThreadPoolExecutor(4, threadFactory);
         newExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
         newExecutor.setKeepAliveTime(this.getReceiverThreadingProfile().getThreadTTL(), TimeUnit.MILLISECONDS);
