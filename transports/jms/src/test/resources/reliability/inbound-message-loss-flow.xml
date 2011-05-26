@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd">
+
+    <flow name="NoException">
+        <jms:inbound-endpoint queue="noException" />
+        <test:component />
+    </flow>
+    <flow name="TransformerException">
+        <jms:inbound-endpoint queue="transformerException" />
+        <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
+        <test:component />
+    </flow>
+    <flow name="RouterException">
+        <jms:inbound-endpoint queue="routerException" />
+        <custom-processor class="org.mule.tck.testmodels.mule.FailingRouter" />
+        <test:component />
+    </flow>
+    <flow name="ComponentException">
+        <jms:inbound-endpoint queue="componentException" />
+        <test:component throwException="true" />
+    </flow>
+</mule>

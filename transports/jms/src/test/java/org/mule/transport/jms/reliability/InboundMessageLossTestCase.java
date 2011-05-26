@@ -83,7 +83,8 @@ public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
     {
         putMessageOnQueue("componentException");
         
-        // A component exception occurs after the SEDA queue, so message should not have been redelivered
+        // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
+        // perspective, the message has been delivered successfully.
         assertFalse("Message should not have been redelivered", 
             messageRedelivered.await(latchTimeout, TimeUnit.MILLISECONDS));
     }    
