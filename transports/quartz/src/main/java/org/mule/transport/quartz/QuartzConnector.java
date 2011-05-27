@@ -94,7 +94,17 @@ public class QuartzConnector extends AbstractConnector
     @Override
     protected void doDispose()
     {
-        // template method
+        try
+        {
+            if (quartzScheduler != null)
+            {
+                quartzScheduler.shutdown();
+            }
+        }
+        catch (Exception e)
+        {
+            logger.warn(CoreMessages.failedToStop("Quartz provider"), e);
+        }
     }
 
     @Override
@@ -129,7 +139,7 @@ public class QuartzConnector extends AbstractConnector
         {
             if (quartzScheduler != null)
             {
-                quartzScheduler.shutdown();
+                quartzScheduler.standby();
             }
         }
         catch (Exception e)
