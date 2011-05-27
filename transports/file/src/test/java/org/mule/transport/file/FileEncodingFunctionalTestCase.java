@@ -12,18 +12,12 @@ package org.mule.transport.file;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.util.FileUtils;
-
-import java.io.File;
 
 public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCase
 {
-
     private static final String TEST_MESSAGE_EUC_JP_ENCODED = "\u3053";
     private static final int FIVE_SECONDS_TIMEOUT = 5000;
     private static final String ENCODING = "EUC-JP";
-
-    private File tmpDir;
 
     @Override
     protected String getConfigResources()
@@ -42,31 +36,5 @@ public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCa
         assertNotNull(message);
         assertEquals(ENCODING, message.getEncoding());
         assertEquals(TEST_MESSAGE_EUC_JP_ENCODED, message.getPayloadAsString());
-    }
-
-    private File createDataFile(File folder, String encoding, final String testMessage) throws Exception
-    {
-        File target = File.createTempFile("mule-file-test-", ".txt", folder);
-        target.deleteOnExit();
-        FileUtils.writeStringToFile(target, testMessage, encoding);
-
-        return target;
-    }
-
-    private File createFolder(String name)
-    {
-        File result = FileUtils.newFile(name);
-        result.delete();
-        result.mkdir();
-        result.deleteOnExit();
-
-        return result;
-    }
-
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        super.doTearDown();
-        FileUtils.deleteTree(tmpDir);
     }
 }

@@ -20,9 +20,9 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
+import org.mule.api.transaction.RollbackMethod;
 import org.mule.api.transport.Connector;
 import org.mule.api.transport.PropertyScope;
-import org.mule.config.i18n.Message;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.ConnectException;
 import org.mule.transport.file.i18n.FileMessages;
@@ -65,6 +65,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
     private FilenameFilter filenameFilter = null;
     private FileFilter fileFilter = null;
     private boolean forceSync;
+    private String originalSourceFile;
 
     public FileMessageReceiver(Connector connector,
                                FlowConstruct flowConstruct,
@@ -194,73 +195,77 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
-    public void processFile(File sourceFile) throws MuleException
+    public void processFile(File file) throws MuleException
     {
-        FileConnector fileConnector = (FileConnector) connector;
-        
         //TODO RM*: This can be put in a Filter. Also we can add an AndFileFilter/OrFileFilter to allow users to
         //combine file filters (since we can only pass a single filter to File.listFiles, we would need to wrap
         //the current And/Or filters to extend {@link FilenameFilter}
-        boolean checkFileAge = fileConnector.getCheckFileAge();
+        boolean checkFileAge = ((FileConnector) connector).getCheckFileAge();
         if (checkFileAge)
         {
             long fileAge = ((FileConnector) connector).getFileAge();
-            long lastMod = sourceFile.lastModified();
+            long lastMod = file.lastModified();
             long now = System.currentTimeMillis();
             long thisFileAge = now - lastMod;
             if (thisFileAge < fileAge)
             {
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("The file has not aged enough yet, will return nothing for: " + sourceFile);
+                    logger.debug("The file has not aged enough yet, will return nothing for: " + file);
                 }
                 return;
             }
         }
 
-        String sourceFileOriginalName = sourceFile.getName();
-
         // Perform some quick checks to make sure file can be processed
-        if (!(sourceFile.canRead() && sourceFile.exists() && sourceFile.isFile()))
+        if (!(file.canRead() && file.exists() && file.isFile()))
         {
-            throw new DefaultMuleException(FileMessages.fileDoesNotExist(sourceFileOriginalName));
+            throw new DefaultMuleException(FileMessages.fileDoesNotExist(file.getName()));
         }
 
         // don't process a file that is locked by another process (probably still being written)
-        if (!attemptFileLock(sourceFile))
+        if (!attemptFileLock(file))
         {
             return;
         }
         else if(logger.isInfoEnabled())
         {
-            logger.info("Lock obtained on file: " + sourceFile.getAbsolutePath());
+            logger.info("Lock obtained on file: " + file.getAbsolutePath());
         }
 
         // This isn't nice but is needed as MuleMessage is required to resolve
         // destination file name
         DefaultMuleMessage fileParserMessasge = new DefaultMuleMessage(null, connector.getMuleContext());
-        fileParserMessasge.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
-        
-        File workFile = null;
+        fileParserMessasge.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, file.getName());
+
+        // The file may get moved/renamed here so store the original file info.
+        final String originalSourceFile = file.getAbsolutePath();
+        final String originalSourceFileName = file.getName();        
+        final File sourceFile;
         if (workDir != null)
         {
-            String workFileName = sourceFileOriginalName;
+            String workFileName = file.getName();
             
-            workFileName = fileConnector.getFilenameParser().getFilename(fileParserMessasge,
-                    workFileNamePattern);
+            workFileName = ((FileConnector) connector).getFilenameParser().getFilename(fileParserMessasge, workFileNamePattern);
             // don't use new File() directly, see MULE-1112
-            workFile = FileUtils.newFile(workDir, workFileName);
+            File workFile = FileUtils.newFile(workDir, workFileName);
             
-            move(sourceFile, workFile);
+            move(file, workFile);
             // Now the Work File is the Source file
             sourceFile = workFile;
         }
+        else
+        {
+            sourceFile = file;
+        }
+        // Do not use the original file handle beyond this point since it may have moved.
+        file = null;
         
         // set up destination file
         File destinationFile = null;
         if (moveDir != null)
         {
-            String destinationFileName = sourceFileOriginalName;
+            String destinationFileName = originalSourceFileName;
             if (moveToPattern != null)
             {
                 destinationFileName = ((FileConnector) connector).getFilenameParser().getFilename(fileParserMessasge,
@@ -274,10 +279,10 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         String encoding = endpoint.getEncoding();
         try
         {
-            if (fileConnector.isStreaming())
+            if (((FileConnector) connector).isStreaming())
             {
                 ReceiverFileInputStream payload = new ReceiverFileInputStream(sourceFile,
-                    fileConnector.isAutoDelete(), destinationFile);
+                    ((FileConnector) connector).isAutoDelete(), destinationFile);
                 message = createMuleMessage(payload, encoding);
             }
             else
@@ -292,99 +297,101 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
             return;
         }
 
-        message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+        message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, originalSourceFileName);
         if (forceSync)
         {
             message.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE, PropertyScope.INBOUND);
         }
-        if (!fileConnector.isStreaming())
+        
+        try
         {
-            moveAndDelete(sourceFile, destinationFile, sourceFileOriginalName, message);
+            if (!((FileConnector) connector).isStreaming())
+            {
+                moveAndDelete(sourceFile, destinationFile, originalSourceFileName, message);
+            }
+            else
+            {
+                // If we are streaming no need to move/delete now, that will be done when
+                // stream is closed
+                message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
+                this.routeMessage(message);
+            }
         }
-        else
+        catch (Exception e)
         {
-            // If we are streaming no need to move/delete now, that will be done when
-            // stream is closed
-            message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, sourceFile.getName());
-            this.routeMessage(message);
+            RollbackMethod rollbackMethod = new RollbackMethod()
+            {                
+                @Override
+                public void rollback()
+                {
+                    try
+                    {
+                        rollbackFileMove(sourceFile, originalSourceFile);
+                    }
+                    catch (IOException e)
+                    {
+                        logger.warn(e);
+                    }
+                }
+            };
+            if (!sourceFile.getAbsolutePath().equals(originalSourceFile))
+            {            
+                connector.getMuleContext().getExceptionListener().handleException(e, rollbackMethod);                
+            }
+            else
+            {
+                connector.getMuleContext().getExceptionListener().handleException(e);
+            }
         }
     }
 
     private void moveAndDelete(final File sourceFile, File destinationFile,
         String sourceFileOriginalName, MuleMessage message) throws MuleException
     {
-        boolean fileWasMoved = false;
-
-        try
+        // If we are moving the file to a read directory, move it there now and
+        // hand over a reference to the
+        // File in its moved location
+        if (destinationFile != null)
         {
-            // If we are moving the file to a read directory, move it there now and
-            // hand over a reference to the
-            // File in its moved location
-            if (destinationFile != null)
+            // move sourceFile to new destination
+            try
             {
-                // move sourceFile to new destination
-                try
-                {
-                    FileUtils.moveFile(sourceFile, destinationFile);
-                }
-                catch (IOException e)
-                {
-                    // move didn't work - bail out (will attempt rollback)
-                    throw new DefaultMuleException(FileMessages.failedToMoveFile(
-                        sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath()));
-                }
-
-                // create new Message for destinationFile
-                message = createMuleMessage(destinationFile, endpoint.getEncoding());
-                message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
-                message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
+                FileUtils.moveFile(sourceFile, destinationFile);
+            }
+            catch (IOException e)
+            {
+                // move didn't work - bail out (will attempt rollback)
+                throw new DefaultMuleException(FileMessages.failedToMoveFile(
+                    sourceFile.getAbsolutePath(), destinationFile.getAbsolutePath()));
             }
 
-            // finally deliver the file message
-            this.routeMessage(message);
-
-            // at this point msgAdapter either points to the old sourceFile
-            // or the new destinationFile.
-            if (((FileConnector) connector).isAutoDelete())
-            {
-                // no moveTo directory
-                if (destinationFile == null)
-                {
-                    // delete source
-                    if (!sourceFile.delete())
-                    {
-                        throw new DefaultMuleException(FileMessages.failedToDeleteFile(sourceFile));
-                    }
-                }
-                else
-                {
-                    // nothing to do here since moveFile() should have deleted
-                    // the source file for us
-                }
-            }
+            // create new Message for destinationFile
+            message = createMuleMessage(destinationFile, endpoint.getEncoding());
+            message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, destinationFile.getName());
+            message.setOutboundProperty(FileConnector.PROPERTY_ORIGINAL_FILENAME, sourceFileOriginalName);
         }
-        catch (Exception e)
-        {
-            boolean fileWasRolledBack = false;
 
-            // only attempt rollback if file move was successful
-            if (fileWasMoved)
+        // finally deliver the file message
+        this.routeMessage(message);
+
+        // at this point msgAdapter either points to the old sourceFile
+        // or the new destinationFile.
+        if (((FileConnector) connector).isAutoDelete())
+        {
+            // no moveTo directory
+            if (destinationFile == null)
             {
-                try
+                // delete source
+                if (!sourceFile.delete())
                 {
-                    rollbackFileMove(destinationFile, sourceFile.getAbsolutePath());
-                    fileWasRolledBack = true;
-                }
-                catch (IOException ioException)
-                {
-                    // eat it
+                    throw new DefaultMuleException(FileMessages.failedToDeleteFile(sourceFile));
                 }
             }
-
-            // wrap exception & handle it
-            Message msg = FileMessages.exceptionWhileProcessing(sourceFile.getName(),
-                (fileWasRolledBack ? "successful" : "unsuccessful"));
-            throw new MessagingException(msg, message, e);
+            else
+            {
+                // nothing to do here since moveFile() should have deleted
+                // the source file for us
+            }
         }
     }
 

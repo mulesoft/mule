@@ -28,11 +28,10 @@ import java.net.MalformedURLException;
  */
 public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
 {
-
     public static final String TEST_MESSAGE = "Test file contents";
     public static final String TARGET_FILE = "TARGET_FILE";
 
-    private File tmpDir;
+    protected File tmpDir;
 
     @Override
     protected String getConfigResources()
@@ -57,7 +56,7 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
     protected File initForRequest() throws Exception
     {
         createTempDirectory();
-        File target = createAndPopulateTempFile();
+        File target = createAndPopulateTempFile("mule-file-test-", ".txt");
 
         // define the readFromDirectory on the connector
         FileConnector connector = (FileConnector) muleContext.getRegistry().lookupConnector(
@@ -76,14 +75,16 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
         tmpDir.mkdir();
     }
     
-    private File createAndPopulateTempFile() throws Exception
+    protected File createAndPopulateTempFile(String prefix, String suffix) throws Exception
     {
-        File target = File.createTempFile("mule-file-test-", ".txt", tmpDir);
+        File target = File.createTempFile(prefix, suffix, tmpDir);
+        logger.info("Created temporary file: " + target.getAbsolutePath());
         
         Writer out = new FileWriter(target);
         out.write(TEST_MESSAGE);
         out.close();
         
+        target.deleteOnExit();
         return target;
     }
 
@@ -108,4 +109,27 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
         FileUtils.deleteTree(tmpDir);
     }
 
+    protected File createDataFile(File folder, final String testMessage) throws Exception
+    {
+        return createDataFile(folder, testMessage, null);
+    }
+    
+    protected File createDataFile(File folder, final String testMessage, String encoding) throws Exception
+    {
+        File target = File.createTempFile("mule-file-test-", ".txt", folder);
+        target.deleteOnExit();
+        FileUtils.writeStringToFile(target, testMessage, encoding);
+
+        return target;
+    }
+
+    protected File createFolder(String name)
+    {
+        File result = FileUtils.newFile(name);
+        result.delete();
+        result.mkdir();
+        result.deleteOnExit();
+
+        return result;
+    }
 }

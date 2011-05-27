@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd">
+
+    <file:connector name="fileConnector" streaming="false" workDirectory="/tmp" />
+    
+    <model>
+        <service name="NoException">
+            <inbound>
+                <file:inbound-endpoint path=".mule/noException" />
+            </inbound>
+            <test:component />
+        </service>
+        <service name="TransformerException">
+            <inbound>
+                <file:inbound-endpoint path=".mule/transformerException" />
+                <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
+            </inbound>
+            <test:component />
+        </service>
+        <service name="RouterException">
+            <inbound>
+                <file:inbound-endpoint path=".mule/routerException" />
+                <custom-inbound-router class="org.mule.tck.testmodels.mule.FailingRouter" />
+            </inbound>
+            <test:component />
+        </service>
+        <service name="ComponentException">
+            <inbound>
+                <file:inbound-endpoint path=".mule/componentException" />
+            </inbound>
+            <test:component throwException="true" />
+        </service>
+    </model>
+</mule>
