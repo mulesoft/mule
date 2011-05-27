@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd">
+
+    <flow name="NoException">
+        <jdbc:inbound-endpoint queryKey="getTest1">
+			<jdbc:transaction action="ALWAYS_BEGIN" />
+        </jdbc:inbound-endpoint>
+        <test:component />
+    </flow>
+    <flow name="TransformerException">
+        <jdbc:inbound-endpoint queryKey="getTest2">
+			<jdbc:transaction action="ALWAYS_BEGIN" />
+        </jdbc:inbound-endpoint>
+        <custom-transformer class="org.mule.tck.testmodels.mule.FailingTransformer" />
+        <test:component />
+    </flow>
+    <flow name="RouterException">
+        <jdbc:inbound-endpoint queryKey="getTest3">
+			<jdbc:transaction action="ALWAYS_BEGIN" />
+        </jdbc:inbound-endpoint>
+        <custom-processor class="org.mule.tck.testmodels.mule.FailingRouter" />
+        <test:component />
+    </flow>
+    <flow name="ComponentException">
+        <jdbc:inbound-endpoint queryKey="getTest4">
+			<jdbc:transaction action="ALWAYS_BEGIN" />
+        </jdbc:inbound-endpoint>
+        <test:component throwException="true" />
+    </flow>
+</mule>

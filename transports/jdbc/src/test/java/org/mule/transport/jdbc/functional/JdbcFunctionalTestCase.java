@@ -22,8 +22,6 @@ import org.apache.commons.dbutils.handlers.ArrayHandler;
 
 public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
 {
-    public static final String DEFAULT_MESSAGE = "Test Message";
-    
     public JdbcFunctionalTestCase()
     {
         setPopulateTestData(false);
@@ -41,7 +39,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
         assertResultSetEmpty(message);
         
         QueryRunner qr = jdbcConnector.getQueryRunner();
-        int updated = qr.update(jdbcConnector.getConnection(), "INSERT INTO TEST(TYPE, DATA) VALUES (1, '" + DEFAULT_MESSAGE + "')");
+        int updated = qr.update(jdbcConnector.getConnection(), "INSERT INTO TEST(TYPE, DATA) VALUES (1, '" + TEST_MESSAGE + "')");
         assertEquals(1, updated);
         message = client.request("jdbc://SELECT * FROM TEST", 1000);
         assertResultSetNotEmpty(message);
@@ -50,21 +48,21 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        client.send("jdbc://writeTest?type=2", new DefaultMuleMessage(DEFAULT_MESSAGE, muleContext));
+        client.send("jdbc://writeTest?type=2", new DefaultMuleMessage(TEST_MESSAGE, muleContext));
 
         QueryRunner qr = jdbcConnector.getQueryRunner();
         Object[] obj2 = 
             (Object[]) qr.query(jdbcConnector.getConnection(), "SELECT DATA FROM TEST WHERE TYPE = 2", new ArrayHandler());
         assertNotNull(obj2);
         assertEquals(1, obj2.length);
-        assertEquals(DEFAULT_MESSAGE, obj2[0]);
+        assertEquals(TEST_MESSAGE, obj2[0]);
     }
 
     public void testSendMap() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         Map map = new HashMap();
-        map.put("data", DEFAULT_MESSAGE);
+        map.put("data", TEST_MESSAGE);
         client.send("jdbc://writeMap?type=2", new DefaultMuleMessage(map, muleContext));
 
         QueryRunner qr = jdbcConnector.getQueryRunner();
@@ -72,7 +70,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
             (Object[]) qr.query(jdbcConnector.getConnection(), "SELECT DATA FROM TEST WHERE TYPE = 2", new ArrayHandler());
         assertNotNull(obj2);
         assertEquals(1, obj2.length);
-        assertEquals(DEFAULT_MESSAGE, obj2[0]);
+        assertEquals(TEST_MESSAGE, obj2[0]);
     }
 
     public void testReceive() throws Exception
@@ -82,7 +80,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
         assertResultSetEmpty(message);
 
         QueryRunner qr = jdbcConnector.getQueryRunner();
-        int updated = qr.update(jdbcConnector.getConnection(), "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (1, '" + DEFAULT_MESSAGE
+        int updated = qr.update(jdbcConnector.getConnection(), "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (1, '" + TEST_MESSAGE
             + "', NULL, NULL)");
         assertEquals(1, updated);
 
@@ -94,7 +92,7 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
     {
         QueryRunner qr = jdbcConnector.getQueryRunner();
         qr.update(jdbcConnector.getConnection(), 
-            "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (1, '" + DEFAULT_MESSAGE + "', NULL, NULL)");
+            "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (1, '" + TEST_MESSAGE + "', NULL, NULL)");
 
         long t0 = System.currentTimeMillis();
         while (System.currentTimeMillis() - t0 < 20000)
@@ -114,6 +112,6 @@ public class JdbcFunctionalTestCase extends AbstractJdbcFunctionalTestCase
             (Object[]) qr.query(jdbcConnector.getConnection(), "SELECT DATA FROM TEST WHERE TYPE = 2", new ArrayHandler());
         assertNotNull(obj2);
         assertEquals(1, obj2.length);
-        assertEquals(DEFAULT_MESSAGE + " Received", obj2[0]);
+        assertEquals(TEST_MESSAGE + " Received", obj2[0]);
     }
 }

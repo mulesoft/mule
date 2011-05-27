@@ -127,6 +127,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         {
             con = this.connector.getConnection();
             MuleMessage muleMessage = createMuleMessage(message, endpoint.getEncoding());
+            routeMessage(muleMessage);
             if (hasAckStatement())
             {
                 if (aggregateResult)
@@ -150,8 +151,6 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                     }
                 }
             }
-            routeMessage(muleMessage);
-
         }
         catch (Exception ex)
         {

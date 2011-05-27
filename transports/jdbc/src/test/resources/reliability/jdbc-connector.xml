@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+      xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd">
+
+    <spring:bean id="jdbcDataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
+        <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+        <spring:property name="url" value="jdbc:derby:muleEmbeddedDB;create=true"/>
+    </spring:bean>
+
+    <jdbc:connector name="jdbcConnector" pollingFrequency="1000" dataSource-ref="jdbcDataSource" queryTimeout="3000">
+        <jdbc:query key="getTest1"
+                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = 1 AND ACK IS NULL"/>
+        <jdbc:query key="getTest1.ack"
+                    value="UPDATE TEST SET ACK = #[function:NOW] WHERE TYPE = 1"/>
+        <jdbc:query key="getTest2"
+                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = 2 AND ACK IS NULL"/>
+        <jdbc:query key="getTest2.ack"
+                    value="UPDATE TEST SET ACK = #[function:NOW] WHERE TYPE = 2"/>
+        <jdbc:query key="getTest3"
+                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = 3 AND ACK IS NULL"/>
+        <jdbc:query key="getTest3.ack"
+                    value="UPDATE TEST SET ACK = #[function:NOW] WHERE TYPE = 3"/>
+        <jdbc:query key="getTest4"
+                    value="SELECT ID, TYPE, DATA, ACK, RESULT FROM TEST WHERE TYPE = 4 AND ACK IS NULL"/>
+        <jdbc:query key="getTest4.ack"
+                    value="UPDATE TEST SET ACK = #[function:NOW] WHERE TYPE = 4"/>
+    </jdbc:connector>
+</mule>
