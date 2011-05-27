@@ -15,6 +15,14 @@ import org.mule.transport.http.HttpConstants;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.PostMethod;
 
+/**
+ * Verify that no inbound messages are lost when exceptions occur.  
+ * The message must either make it all the way to the SEDA queue (in the case of 
+ * an asynchronous inbound endpoint), or be restored/rolled back at the source.
+ * 
+ * In the case of the HTTP transport, there is no way to restore the source message
+ * so an exception is simply returned to the client.
+ */
 public class InboundMessageLossAsynchTestCase extends InboundMessageLossTestCase
 {
     @Override

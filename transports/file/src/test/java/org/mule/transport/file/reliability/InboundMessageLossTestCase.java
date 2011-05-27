@@ -16,6 +16,15 @@ import org.mule.transport.file.AbstractFileMoveDeleteTestCase;
 
 import java.io.File;
 
+/**
+ * Verify that no inbound messages are lost when exceptions occur.  
+ * The message must either make it all the way to the SEDA queue (in the case of 
+ * an asynchronous inbound endpoint), or be restored/rolled back at the source.
+ * 
+ * In the case of the File transport, this will cause the file to be restored to 
+ * its original location from the working directory.  Note that a 
+ * workDirectory must be specified on the connector in order for this to succeed.  
+ */
 public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
 {
     /** Delay (in ms) to wait for file to be processed */

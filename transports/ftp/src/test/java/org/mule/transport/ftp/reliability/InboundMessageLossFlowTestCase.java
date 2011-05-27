@@ -11,6 +11,14 @@
 package org.mule.transport.ftp.reliability;
 
 
+/**
+ * Verify that no inbound messages are lost when exceptions occur.  
+ * The message must either make it all the way to the SEDA queue (in the case of 
+ * an asynchronous inbound endpoint), or be restored/rolled back at the source.
+ * 
+ * In the case of FTP, this will cause the postProcess() method to not be executed 
+ * and therefore the source file will not be deleted.
+ */
 public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
 {
     @Override

@@ -19,6 +19,14 @@ import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Verify that no inbound messages are lost when exceptions occur.  
+ * The message must either make it all the way to the SEDA queue (in the case of 
+ * an asynchronous inbound endpoint), or be restored/rolled back at the source.
+ * 
+ * In the case of JMS, this will cause the failed message to be redelivered if 
+ * JMSRedelivery is configured.
+ */
 public class InboundMessageLossTestCase extends AbstractJmsReliabilityTestCase
 {
     protected Latch messageRedelivered;

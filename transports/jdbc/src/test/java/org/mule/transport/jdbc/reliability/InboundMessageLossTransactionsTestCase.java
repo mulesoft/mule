@@ -13,6 +13,14 @@ package org.mule.transport.jdbc.reliability;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 
 
+/**
+ * Verify that no inbound messages are lost when exceptions occur.  
+ * The message must either make it all the way to the SEDA queue (in the case of 
+ * an asynchronous inbound endpoint), or be restored/rolled back at the source.
+ * 
+ * In the case of JDBC, this will cause the ACK query to not be executed and therefore 
+ * the source data will still be present the next time the database is polled.
+ */
 public class InboundMessageLossTransactionsTestCase extends InboundMessageLossTestCase
 {
     @Override
