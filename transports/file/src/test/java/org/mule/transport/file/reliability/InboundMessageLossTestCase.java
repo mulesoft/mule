@@ -28,7 +28,7 @@ import java.io.File;
 public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
 {
     /** Delay (in ms) to wait for file to be processed */
-    public static final int DELAY = 1000;
+    public static final int DELAY = 3000;
     
     @Override
     protected String getConfigResources()
