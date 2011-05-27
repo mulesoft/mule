@@ -67,8 +67,8 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         untilSuccessful = new UntilSuccessful();
         untilSuccessful.setMuleContext(muleContext);
         untilSuccessful.setFlowConstruct(getTestService());
-        untilSuccessful.setMaxProcessingAttempts(3);
-        untilSuccessful.setSecondsBetweenProcessingAttempts(1);
+        untilSuccessful.setMaxRetries(3);
+        untilSuccessful.setSecondsBetweenRetries(1);
 
         objectStore = new SimpleMemoryObjectStore<MuleEvent>();
         untilSuccessful.setObjectStore(objectStore);
@@ -156,7 +156,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
 
     public void testTemporaryDeliveryFailure() throws Exception
     {
-        targetMessageProcessor.setNumberOfFailuresToSimulate(untilSuccessful.getMaxProcessingAttempts() - 1);
+        targetMessageProcessor.setNumberOfFailuresToSimulate(untilSuccessful.getMaxRetries() - 1);
 
         untilSuccessful.initialise();
         untilSuccessful.start();
@@ -165,7 +165,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         assertNull(untilSuccessful.process(testEvent));
         assertEquals(1, objectStore.allKeys().size());
         ponderUntilEventProcessed(testEvent);
-        assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxProcessingAttempts());
+        assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxRetries());
     }
 
     private void ponderUntilEventProcessed(final MuleEvent testEvent)
@@ -184,14 +184,14 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
     private void ponderUntilEventAborted(final MuleEvent testEvent)
         throws InterruptedException, MuleException
     {
-        while (targetMessageProcessor.getEventCount() < untilSuccessful.getMaxProcessingAttempts())
+        while (targetMessageProcessor.getEventCount() <= untilSuccessful.getMaxRetries())
         {
             Thread.yield();
             Thread.sleep(250L);
         }
 
         assertEquals(0, objectStore.allKeys().size());
-        assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxProcessingAttempts());
+        assertEquals(targetMessageProcessor.getEventCount(), 1 + untilSuccessful.getMaxRetries());
     }
 
     private void assertLogicallyEqualEvents(final MuleEvent testEvent, MuleEvent eventReceived)

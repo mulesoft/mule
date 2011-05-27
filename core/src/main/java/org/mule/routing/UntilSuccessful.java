@@ -188,8 +188,8 @@ public class UntilSuccessful extends AbstractOutboundRouter
     private ExpressionFilter failureExpressionFilter;
 
     private ListableObjectStore<MuleEvent> objectStore;
-    private int maxProcessingAttempts = 5;
-    private long secondsBetweenProcessingAttempts = 60L;
+    private int maxRetries = 5;
+    private long secondsBetweenRetries = 60L;
     private String failureExpression;
     private String ackExpression;
 
@@ -245,7 +245,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
         super.start();
 
         // if secondsBetweenDeliveries is small, thrashing on object store will be high
-        executor.scheduleWithFixedDelay(new PendingEventsScheduler(), 0L, secondsBetweenProcessingAttempts,
+        executor.scheduleWithFixedDelay(new PendingEventsScheduler(), 0L, secondsBetweenRetries,
             TimeUnit.SECONDS);
     }
 
@@ -304,7 +304,8 @@ public class UntilSuccessful extends AbstractOutboundRouter
         final Integer deliveryAttemptCount = message.getInvocationProperty(
             DELIVERY_ATTEMPT_COUNT_PROPERTY_NAME, 0);
 
-        if (deliveryAttemptCount >= maxProcessingAttempts)
+        // > because we want the total of attempts to be maxRetries+1 (ie first attempt + retries)
+        if (deliveryAttemptCount > maxRetries)
         {
             deschedule(event);
             return false;
@@ -312,8 +313,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
 
         if (deliveryAttemptCount > 0)
         {
-            final long nextDeliveryAttemptTime = System.currentTimeMillis()
-                                                 + secondsBetweenProcessingAttempts;
+            final long nextDeliveryAttemptTime = System.currentTimeMillis() + secondsBetweenRetries;
             event.getMessage().setInvocationProperty(NEXT_DELIVERY_ATTEMPT_TIME_PROPERTY_NAME,
                 nextDeliveryAttemptTime);
         }
@@ -394,24 +394,24 @@ public class UntilSuccessful extends AbstractOutboundRouter
         this.objectStore = objectStore;
     }
 
-    public int getMaxProcessingAttempts()
+    public int getMaxRetries()
     {
-        return maxProcessingAttempts;
+        return maxRetries;
     }
 
-    public void setMaxProcessingAttempts(int maxProcessingAttempts)
+    public void setMaxRetries(int maxRetries)
     {
-        this.maxProcessingAttempts = maxProcessingAttempts;
+        this.maxRetries = maxRetries;
     }
 
-    public long getSecondsBetweenProcessingAttempts()
+    public long getSecondsBetweenRetries()
     {
-        return secondsBetweenProcessingAttempts;
+        return secondsBetweenRetries;
     }
 
-    public void setSecondsBetweenProcessingAttempts(long secondsBetweenProcessingAttempts)
+    public void setSecondsBetweenRetries(long secondsBetweenRetries)
     {
-        this.secondsBetweenProcessingAttempts = secondsBetweenProcessingAttempts;
+        this.secondsBetweenRetries = secondsBetweenRetries;
     }
 
     public String getFailureExpression()

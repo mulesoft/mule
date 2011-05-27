@@ -25,8 +25,8 @@
         <until-successful objectStore-ref="objectStore"
                           ackExpression="#[string:ACK]"
                           failureExpression="#[regex:(?i).*error]"
-                          maxProcessingAttempts="2"
-                          secondsBetweenProcessingAttempts="1">
+                          maxRetries="2"
+                          secondsBetweenRetries="1">
             <flow-ref name="target-mp" />
         </until-successful>
     </flow>

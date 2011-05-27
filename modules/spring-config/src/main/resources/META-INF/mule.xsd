@@ -4921,17 +4921,17 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
-                    <xsd:attribute name="maxProcessingAttempts" type="substitutableInt" use="optional" default="5">
+                    <xsd:attribute name="maxRetries" type="substitutableInt" use="optional" default="5">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Specifies the maximum number of processing attempts that will be performed.
+                                Specifies the maximum number of processing retries that will be performed.
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
-                    <xsd:attribute name="secondsBetweenProcessingAttempts" type="substitutableInt" use="optional" default="60">
+                    <xsd:attribute name="secondsBetweenRetries" type="substitutableInt" use="optional" default="60">
                         <xsd:annotation>
                             <xsd:documentation>
-                                Specifies the minimum time interval between two process attempts.
+                                Specifies the minimum time interval between two process retries.
                                 The actual time interval depends on the previous execution but should not exceed twice this number.
                             </xsd:documentation>
                         </xsd:annotation>
