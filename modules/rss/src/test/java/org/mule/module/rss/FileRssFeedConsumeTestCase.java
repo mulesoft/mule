@@ -10,12 +10,18 @@
 package org.mule.module.rss;
 
 import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class FileRssFeedConsumeTestCase extends FunctionalTestCase
 {
+    private static final int ENTRIES_IN_RSS_FEED = 25;
+
     @Override
     protected String getConfigResources()
     {
@@ -24,14 +30,31 @@ public class FileRssFeedConsumeTestCase extends FunctionalTestCase
 
     public void testConsumeFeedEntries() throws Exception
     {
-        FileOutputStream fos = new FileOutputStream(new File(muleContext.getConfiguration().getWorkingDirectory(), "sample-feed.rss"));
+        createSampleFeedFileInWorkDirectory();
+
+        final EntryReceiver component = (EntryReceiver) getComponent("feedSplitterConsumer");
+        Prober prober = new PollingProber(10000, 100);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                return component.getCount() == ENTRIES_IN_RSS_FEED;
+            }
+
+            public String describeFailure()
+            {
+                return String.format("Did not receive %d feed entries (only got %d)",
+                    ENTRIES_IN_RSS_FEED, component.getCount());
+            }
+        });
+    }
+
+    private void createSampleFeedFileInWorkDirectory() throws IOException
+    {
+        String workDirectory = muleContext.getConfiguration().getWorkingDirectory();
+        FileOutputStream fos = new FileOutputStream(new File(workDirectory, "sample-feed.rss"));
         String feed = loadResourceAsString("sample-feed.rss");
         fos.write(feed.getBytes());
         fos.close();
-
-        Thread.sleep(3000);
-        EntryReceiver component = (EntryReceiver) getComponent("feedSplitterConsumer");
-        assertEquals(25, component.getCount());
     }
-
 }
