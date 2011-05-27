@@ -47,6 +47,13 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         ponderUntilMessageCountReceived(2);
     }
 
+    public void testRetryOnEndpoint() throws Exception
+    {
+        final MuleClient client = new MuleClient(muleContext);
+        client.dispatch("vm://input-3", "XYZ", null);
+        ponderUntilMessageCountReceived(2);
+    }
+
     private void ponderUntilMessageCountReceived(final int expectedCount) throws InterruptedException
     {
         while (ftc.getReceivedMessagesCount() < expectedCount)
