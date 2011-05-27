@@ -15,7 +15,6 @@
     </mxml:namespace-manager>
 
     <model name="property extractor test">
-
         <service name="test">
             <inbound>
                 <vm:inbound-endpoint path="in" exchange-pattern="one-way"/>
@@ -37,9 +36,8 @@
                  or #[xpath:/endpoints/endpoint]
                  -->
                 <endpoint-selector-router evaluator="custom" custom-evaluator="${selector.evaluator}" expression="${selector.expression}">
-                    <!-- this could be a global endpoint too once MULE-2595  is fixed -->                    
-                    <vm:outbound-endpoint name="matchingEndpoint1" path="match1" exchange-pattern="one-way"/>
-                    <vm:outbound-endpoint name="matchingEndpoint2" path="match2" exchange-pattern="one-way"/>
+                    <vm:outbound-endpoint name="matchingEndpoint1" path="match1"/>
+                    <vm:outbound-endpoint name="matchingEndpoint2" path="match2"/>
                 </endpoint-selector-router>
             </outbound>
         </service>

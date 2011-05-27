@@ -16,12 +16,12 @@ import java.util.Properties;
 
 public class BeanPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlPropertyExtractorTestCase
 {
-
     public BeanPropertyExtractorMultipleEndpointsTestCase()
     {
         super(false);
     }
 
+    @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
@@ -30,18 +30,20 @@ public class BeanPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlP
         return p;
     }
 
+    @Override
     protected Object getMatchMessage()
     {
         //Model a simple bean graph. Path is: endpointsHolder.endpoints
-        List endpoints = new ArrayList(2);
+        List<String> endpoints = new ArrayList<String>(2);
         endpoints.add("matchingEndpoint1");
         endpoints.add("matchingEndpoint2");
         return new TestRootBean(new EndpointsHolder(endpoints));
     }
 
+    @Override
     protected Object getErrorMessage()
     {
-        List endpoints = new ArrayList(1);
+        List<String> endpoints = new ArrayList<String>(1);
         endpoints.add("missingEndpoint");
         return new TestRootBean(new EndpointsHolder(endpoints));
     }
@@ -68,22 +70,21 @@ public class BeanPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlP
 
     public class EndpointsHolder
     {
-        private List endpoints;
+        private List<String> endpoints;
 
-        public EndpointsHolder(List endpoints)
+        public EndpointsHolder(List<String> endpoints)
         {
             this.endpoints = endpoints;
         }
 
-        public List getEndpoints()
+        public List<String> getEndpoints()
         {
             return endpoints;
         }
 
-        public void setEndpoints(List endpoints)
+        public void setEndpoints(List<String> endpoints)
         {
             this.endpoints = endpoints;
         }
     }
-
 }
