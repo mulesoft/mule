@@ -135,11 +135,10 @@ public class FeedConsumeAndSplitTestCase extends DynamicPortTestCase
     {
         public void handle(Request request, Response response)
         {
-            InputStream rssFeed = getClass().getClassLoader().getResourceAsStream("sample-feed.rss");
-            assertNotNull(rssFeed);
-
             try
             {
+                InputStream rssFeed = SampleFeed.feedAsStream();
+
                 OutputStream responseStream = response.getOutputStream();
                 IOUtils.copy(rssFeed, responseStream);
                 responseStream.close();

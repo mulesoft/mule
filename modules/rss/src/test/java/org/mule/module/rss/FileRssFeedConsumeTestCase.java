@@ -18,10 +18,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import static org.mule.module.rss.SampleFeed.ENTRIES_IN_RSS_FEED;
+
 public class FileRssFeedConsumeTestCase extends FunctionalTestCase
 {
-    private static final int ENTRIES_IN_RSS_FEED = 25;
-
     @Override
     protected String getConfigResources()
     {
@@ -38,7 +38,7 @@ public class FileRssFeedConsumeTestCase extends FunctionalTestCase
         {
             public boolean isSatisfied()
             {
-                return component.getCount() == ENTRIES_IN_RSS_FEED;
+                return component.getCount() == SampleFeed.ENTRIES_IN_RSS_FEED;
             }
 
             public String describeFailure()
@@ -53,7 +53,7 @@ public class FileRssFeedConsumeTestCase extends FunctionalTestCase
     {
         String workDirectory = muleContext.getConfiguration().getWorkingDirectory();
         FileOutputStream fos = new FileOutputStream(new File(workDirectory, "sample-feed.rss"));
-        String feed = loadResourceAsString("sample-feed.rss");
+        String feed = SampleFeed.feedAsString();
         fos.write(feed.getBytes());
         fos.close();
     }

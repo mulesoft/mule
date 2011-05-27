@@ -16,10 +16,10 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 
+import static org.mule.module.rss.SampleFeed.ENTRIES_IN_RSS_FEED;
+
 public class FeedConsumeAndSplitExplicitNonHttpTestCase extends FunctionalTestCase
 {
-    private static final int ENTRIES_IN_RSS_FEED = 25;
-
     private final CounterCallback counter = new CounterCallback();
 
     @Override
@@ -37,7 +37,7 @@ public class FeedConsumeAndSplitExplicitNonHttpTestCase extends FunctionalTestCa
 
     public void testConsume() throws Exception
     {
-        String feed = loadResourceAsString("sample-feed.rss");
+        String feed = SampleFeed.feedAsString();
         muleContext.getClient().dispatch("vm://feed.in", feed, null);
 
         Prober prober = new PollingProber(10000, 100);
@@ -51,7 +51,7 @@ public class FeedConsumeAndSplitExplicitNonHttpTestCase extends FunctionalTestCa
             public String describeFailure()
             {
                 return String.format("Did not receive %d feed entries (only got %d)",
-                    ENTRIES_IN_RSS_FEED, counter.getCallbackCount());
+                    SampleFeed.ENTRIES_IN_RSS_FEED, counter.getCallbackCount());
             }
         });
     }
