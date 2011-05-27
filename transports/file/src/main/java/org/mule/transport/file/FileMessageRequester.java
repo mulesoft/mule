@@ -206,7 +206,6 @@ public class FileMessageRequester extends AbstractMessageRequester
             // no moveTo directory
             if (destinationFile == null)
             {
-System.out.println("\n\n***** FileMessageRequester moveOrDelete\n\n");
                 // delete source
                 if (!sourceFile.delete())
                 {
