@@ -34,11 +34,11 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 /**
- * <code>HttpsConnector</code> provides Secure http connectivity on top of what is already provided with the
- * Mule {@link org.mule.transport.http.HttpConnector}.
+ * <code>HttpsConnector</code> provides Secure http connectivity on top of what is
+ * already provided with the Mule {@link org.mule.transport.http.HttpConnector}.
  */
-public class HttpsConnector extends HttpConnector
-        implements TlsDirectKeyStore, TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler
+public class HttpsConnector extends HttpConnector implements TlsDirectKeyStore,
+    TlsIndirectKeyStore, TlsDirectTrustStore, TlsProtocolHandler
 {
 
     public static final String HTTPS = "https";
@@ -47,7 +47,7 @@ public class HttpsConnector extends HttpConnector
 
     // null initial keystore - see below
     private TlsConfiguration tls = new TlsConfiguration(null);
-    
+
     /**
      * Timeout for establishing the SSL connection with the client.
      */
@@ -120,6 +120,11 @@ public class HttpsConnector extends HttpConnector
     public String getKeyPassword()
     {
         return tls.getKeyPassword();
+    }
+
+    public String getKeyAlias()
+    {
+        return tls.getKeyAlias();
     }
 
     public String getKeyStore()
@@ -222,6 +227,11 @@ public class HttpsConnector extends HttpConnector
         tls.setKeyPassword(keyPassword);
     }
 
+    public void setKeyAlias(String keyAlias)
+    {
+        tls.setKeyAlias(keyAlias);
+    }
+
     public void setKeyStore(String keyStore) throws IOException
     {
         tls.setKeyStore(keyStore);
@@ -301,5 +311,5 @@ public class HttpsConnector extends HttpConnector
     {
         return tls.getSocketFactory();
     }
-    
+
 }

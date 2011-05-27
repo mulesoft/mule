@@ -10,18 +10,21 @@
 
 package org.mule.api;
 
+import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.tck.AbstractMuleTestCase;
+
+import java.io.File;
+import java.net.URL;
 
 import javax.net.ssl.SSLSocketFactory;
 
 public class TlsConfigurationTestCase extends AbstractMuleTestCase
 {
-
     public void testEmptyConfiguration() throws Exception
     {
         TlsConfiguration configuration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
-        try 
+        try
         {
             configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
             fail("no key password");
@@ -31,7 +34,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
             assertNotNull("expected", e);
         }
         configuration.setKeyPassword("mulepassword");
-        try 
+        try
         {
             configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
             fail("no store password");
@@ -42,7 +45,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         }
         configuration.setKeyStorePassword("mulepassword");
         configuration.setKeyStore(""); // guaranteed to not exist
-        try 
+        try
         {
             configuration.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
             fail("no keystore");
@@ -52,7 +55,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
             assertNotNull("expected", e);
         }
     }
-    
+
     public void testSimpleSocket() throws Exception
     {
         TlsConfiguration configuration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
@@ -64,6 +67,23 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         assertTrue("socket is useless", socketFactory.getSupportedCipherSuites().length > 0);
     }
 
+    public void testExceptionOnInvalidKeyAlias() throws Exception
+    {
+        URL keystoreUrl = getClass().getClassLoader().getResource("serverKeystore");
+        File keystoreFile = new File(keystoreUrl.toURI());
+
+        TlsConfiguration config = new TlsConfiguration(keystoreFile.getAbsolutePath());
+        config.setKeyStorePassword("mulepassword");
+        config.setKeyPassword("mulepassword");
+        config.setKeyAlias("this_key_does_not_exist_in_the_keystore");
+
+        try
+        {
+            config.initialise(false, TlsConfiguration.JSSE_NAMESPACE);
+        }
+        catch (CreateException ce)
+        {
+            assertTrue(ce.getCause() instanceof IllegalStateException);
+        }
+    }
 }
-
-

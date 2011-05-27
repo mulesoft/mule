@@ -10,7 +10,6 @@
 
 package org.mule.transport.http;
 
-import org.mule.transport.http.HttpsConnector;
 
 public class HttpsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestCase
 {
@@ -26,14 +25,15 @@ public class HttpsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestC
                 (HttpsConnector) muleContext.getRegistry().lookupConnector("httpsConnector");
         testBasicProperties(connector);
 
-        //The full path gets resolved, we're just checkng that the property got set
+        //The full path gets resolved, we're just checking that the property got set
         assertTrue(connector.getKeyStore().endsWith("/serverKeystore"));
+        assertEquals("muleserver", connector.getKeyAlias());
         assertEquals("mulepassword", connector.getKeyPassword());
         assertEquals("mulepassword", connector.getKeyStorePassword());
-        //The full path gets resolved, we're just checkng that the property got set
+        //The full path gets resolved, we're just checking that the property got set
         assertTrue(connector.getClientKeyStore().endsWith("/clientKeystore"));
         assertEquals("mulepassword", connector.getClientKeyStorePassword());
-        //The full path gets resolved, we're just checkng that the property got set
+        //The full path gets resolved, we're just checking that the property got set
         assertTrue(connector.getTrustStore().endsWith("/trustStore"));
         assertEquals("mulepassword", connector.getTrustStorePassword());
         assertTrue(connector.isExplicitTrustStoreOnly());
@@ -51,5 +51,4 @@ public class HttpsNamespaceHandlerTestCase extends AbstractNamespaceHandlerTestC
         assertFalse(connector.isCheckEtag());
         assertFalse(connector.isDiscardEmptyContent());
     }
-
 }

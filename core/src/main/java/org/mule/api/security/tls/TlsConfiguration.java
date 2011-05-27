@@ -21,15 +21,19 @@ import org.mule.api.security.provider.SecurityProviderInfo;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
+import org.mule.util.StringUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.GeneralSecurityException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
+import java.util.Enumeration;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -130,6 +134,7 @@ public final class TlsConfiguration
     // this is the key store that is generated in-memory and available to connectors explicitly.
     // it is local to the socket.
     private String keyStoreName = DEFAULT_KEYSTORE; // was default in https but not ssl
+    private String keyAlias = null;
     private String keyPassword = null;
     private String keyStorePassword = null;
     private String keystoreType = DEFAULT_KEYSTORE_TYPE;
@@ -215,23 +220,19 @@ public final class TlsConfiguration
         {
             logger.debug("initialising key manager factory from keystore data");
         }
+
         KeyStore tempKeyStore;
         try
         {
-            tempKeyStore = KeyStore.getInstance(keystoreType);
-            InputStream is = IOUtils.getResourceAsStream(keyStoreName, getClass());
-            if (null == is)
-            {
-                throw new FileNotFoundException(
-                    CoreMessages.cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
-            }
-            tempKeyStore.load(is, keyStorePassword.toCharArray());
+            tempKeyStore = loadKeyStore();
+            checkKeyStoreContainsAlias(tempKeyStore);
         }
         catch (Exception e)
         {
             throw new CreateException(
                     CoreMessages.failedToLoad("KeyStore: " + keyStoreName), e, this);
         }
+
         try
         {
             keyManagerFactory = KeyManagerFactory.getInstance(getKeyManagerAlgorithm());
@@ -240,6 +241,54 @@ public final class TlsConfiguration
         catch (Exception e)
         {
             throw new CreateException(CoreMessages.failedToLoad("Key Manager"), e, this);
+        }
+    }
+
+    protected  KeyStore loadKeyStore() throws GeneralSecurityException, IOException
+    {
+        KeyStore tempKeyStore = KeyStore.getInstance(keystoreType);
+
+        InputStream is = IOUtils.getResourceAsStream(keyStoreName, getClass());
+        if (null == is)
+        {
+            throw new FileNotFoundException(
+                CoreMessages.cannotLoadFromClasspath("Keystore: " + keyStoreName).getMessage());
+        }
+
+        tempKeyStore.load(is, keyStorePassword.toCharArray());
+        return tempKeyStore;
+    }
+
+    protected void checkKeyStoreContainsAlias(KeyStore keyStore) throws KeyStoreException
+    {
+        if (StringUtils.isNotBlank(keyAlias))
+        {
+            boolean keyAliasFound = false;
+
+            Enumeration<String> aliases = keyStore.aliases();
+            while (aliases.hasMoreElements())
+            {
+                String alias = aliases.nextElement();
+
+                if (alias.equals(keyAlias))
+                {
+                    // if alias is found all is valid but continue processing to strip out all
+                    // other (unwanted) keys
+                    keyAliasFound = true;
+                }
+                else
+                {
+                    // if the current alias is not the one we are looking for, remove
+                    // it from the keystore
+                    keyStore.deleteEntry(alias);
+                }
+            }
+
+            // if the alias was not found, throw an exception
+            if (!keyAliasFound)
+            {
+                throw new IllegalStateException("Key with alias \"" + keyAlias + "\" was not found");
+            }
         }
     }
 
@@ -548,6 +597,16 @@ public final class TlsConfiguration
     public void setRequireClientAuthentication(boolean requireClientAuthentication)
     {
         this.requireClientAuthentication = requireClientAuthentication;
+    }
+
+    public String getKeyAlias()
+    {
+        return keyAlias;
+    }
+
+    public void setKeyAlias(String keyAlias)
+    {
+        this.keyAlias = keyAlias;
     }
 
 }
