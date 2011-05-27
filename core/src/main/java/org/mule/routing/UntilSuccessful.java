@@ -17,7 +17,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 
 import org.apache.commons.lang.StringUtils;
@@ -33,6 +32,7 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
+import org.mule.work.AbstractMuleEventWork;
 
 /**
  * UntilSuccessful attempts to route a message to the message processor it contains in an asynchronous manner. Routing
@@ -46,13 +46,11 @@ public class UntilSuccessful extends AbstractOutboundRouter
     /**
      * Process a pending event, dealing with failures and rescheduling.
      */
-    private class PendingEventWorker implements Work
+    private class PendingEventWorker extends AbstractMuleEventWork
     {
-        private final MuleEvent event;
-
-        private PendingEventWorker(final MuleEvent event)
+        public PendingEventWorker(MuleEvent event)
         {
-            this.event = threadSafeCopy(event);
+            super(event);
         }
 
         private synchronized String acquireMutex()
@@ -66,7 +64,8 @@ public class UntilSuccessful extends AbstractOutboundRouter
             return eventId;
         }
 
-        public void run()
+        @Override
+        protected void doRun()
         {
             String mutex = acquireMutex();
             if (mutex == null)
@@ -138,6 +137,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
             }
         }
 
+        @Override
         public void release()
         {
             // NOOP
@@ -320,24 +320,13 @@ public class UntilSuccessful extends AbstractOutboundRouter
 
         message.setInvocationProperty(DELIVERY_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount + 1);
 
-        // store a non-thread owned version of the message
-        MuleEvent storableEvent = threadSafeCopy(event);
-
-        String storeKey = getStoreKey(storableEvent);
+        String storeKey = getStoreKey(event);
         if (objectStore.contains(storeKey))
         {
             objectStore.remove(storeKey);
         }
-        objectStore.store(storeKey, storableEvent);
+        objectStore.store(storeKey, event);
         return true;
-    }
-
-    private MuleEvent threadSafeCopy(final MuleEvent event)
-    {
-        DefaultMuleMessage storableMessage = new DefaultMuleMessage(event.getMessage());
-        MuleEvent storableEvent = new DefaultMuleEvent(storableMessage, event);
-        storableMessage.resetAccessControl();
-        return storableEvent;
     }
 
     private boolean isDueForRedelivery(final MuleEvent event)
