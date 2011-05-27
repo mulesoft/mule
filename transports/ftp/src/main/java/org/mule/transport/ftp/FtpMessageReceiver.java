@@ -105,14 +105,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         FTPClient client = null;
         try
         {
-            try
-            {
-                client = connector.createFtpClient(endpoint);
-            }
-            catch (Exception e)
-            {
-                throw new ConnectException(e, this);
-            }
+            client = connector.createFtpClient(endpoint);
             FTPListParseEngine engine = client.initiateListParsing();
             FTPFile[] files = null;
             List<FTPFile> v = new ArrayList<FTPFile>();
