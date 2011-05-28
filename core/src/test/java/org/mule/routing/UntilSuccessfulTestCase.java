@@ -67,7 +67,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         untilSuccessful = new UntilSuccessful();
         untilSuccessful.setMuleContext(muleContext);
         untilSuccessful.setFlowConstruct(getTestService());
-        untilSuccessful.setMaxRetries(3);
+        untilSuccessful.setMaxRetries(2);
         untilSuccessful.setSecondsBetweenRetries(1);
 
         objectStore = new SimpleMemoryObjectStore<MuleEvent>();
@@ -90,7 +90,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
 
         final MuleEvent testEvent = getTestEvent("test_data");
         assertNull(untilSuccessful.process(testEvent));
-        assertEquals(1, objectStore.allKeys().size());
         ponderUntilEventProcessed(testEvent);
     }
 
@@ -101,7 +100,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
 
         final MuleEvent testEvent = getTestEvent(new ByteArrayInputStream("test_data".getBytes()));
         assertNull(untilSuccessful.process(testEvent));
-        assertEquals(1, objectStore.allKeys().size());
         ponderUntilEventProcessed(testEvent);
     }
 
@@ -113,7 +111,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
 
         final MuleEvent testEvent = getTestEvent("test_data");
         assertEquals("ACK", untilSuccessful.process(testEvent).getMessageAsString());
-        assertEquals(0, objectStore.allKeys().size());
         ponderUntilEventProcessed(testEvent);
     }
 
@@ -125,7 +122,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
 
         final MuleEvent testEvent = getTestEvent("test_data");
         assertNull(untilSuccessful.process(testEvent));
-        assertEquals(1, objectStore.allKeys().size());
         ponderUntilEventProcessed(testEvent);
     }
 
@@ -138,7 +134,6 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
 
         final MuleEvent testEvent = getTestEvent("ERROR");
         assertNull(untilSuccessful.process(testEvent));
-        assertEquals(1, objectStore.allKeys().size());
         ponderUntilEventAborted(testEvent);
     }
 
@@ -150,22 +145,29 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
 
         final MuleEvent testEvent = getTestEvent("ERROR");
         assertNull(untilSuccessful.process(testEvent));
-        assertEquals(1, objectStore.allKeys().size());
         ponderUntilEventAborted(testEvent);
     }
 
     public void testTemporaryDeliveryFailure() throws Exception
     {
-        targetMessageProcessor.setNumberOfFailuresToSimulate(untilSuccessful.getMaxRetries() - 1);
+        targetMessageProcessor.setNumberOfFailuresToSimulate(untilSuccessful.getMaxRetries());
 
         untilSuccessful.initialise();
         untilSuccessful.start();
 
         final MuleEvent testEvent = getTestEvent("ERROR");
         assertNull(untilSuccessful.process(testEvent));
-        assertEquals(1, objectStore.allKeys().size());
         ponderUntilEventProcessed(testEvent);
-        assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxRetries());
+        assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxRetries() + 1);
+    }
+
+    public void testPreExistingEvents() throws Exception
+    {
+        final MuleEvent testEvent = getTestEvent("test_data");
+        objectStore.store(UntilSuccessful.EventStoreKey.buildFor(testEvent), testEvent);
+        untilSuccessful.initialise();
+        untilSuccessful.start();
+        ponderUntilEventProcessed(testEvent);
     }
 
     private void ponderUntilEventProcessed(final MuleEvent testEvent)

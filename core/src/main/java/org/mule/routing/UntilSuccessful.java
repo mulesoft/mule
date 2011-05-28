@@ -11,28 +11,27 @@
 package org.mule.routing;
 
 import java.io.Serializable;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.resource.spi.work.WorkException;
-
-import org.apache.commons.lang.StringUtils;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.retry.RetryCallback;
+import org.mule.api.retry.RetryContext;
+import org.mule.api.retry.RetryNotifier;
+import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.retry.async.AsynchronousRetryTemplate;
+import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
-import org.mule.work.AbstractMuleEventWork;
 
 /**
  * UntilSuccessful attempts to route a message to the message processor it contains in an asynchronous manner. Routing
@@ -43,155 +42,60 @@ import org.mule.work.AbstractMuleEventWork;
  */
 public class UntilSuccessful extends AbstractOutboundRouter
 {
-    /**
-     * Process a pending event, dealing with failures and rescheduling.
-     */
-    private class PendingEventWorker extends AbstractMuleEventWork
+    public static class EventStoreKey implements Serializable
     {
-        public PendingEventWorker(MuleEvent event)
+        private static final long serialVersionUID = 1L;
+        private final String value;
+
+        private EventStoreKey(String value)
         {
-            super(event);
+            this.value = value;
         }
 
-        private synchronized String acquireMutex()
+        public static EventStoreKey buildFor(MuleEvent muleEvent)
         {
-            String eventId = event.getId();
-            if (eventProcessMutex.contains(eventId))
-            {
-                return null;
-            }
-            eventProcessMutex.add(eventId);
-            return eventId;
+            // the key is built in way to prevent UntilSuccessful workers across a cluster to compete for the same
+            // events over a shared object store
+            return new EventStoreKey(muleEvent.getFlowConstruct() + "@"
+                                     + muleEvent.getMuleContext().getConfiguration().getClusterId() + ":"
+                                     + muleEvent.getId());
         }
 
         @Override
-        protected void doRun()
+        public String toString()
         {
-            String mutex = acquireMutex();
-            if (mutex == null)
-            {
-                // processing is already under way for this event
-                return;
-            }
-
-            try
-            {
-                if (processEvent())
-                {
-                    deschedule(event);
-                }
-                else
-                {
-                    final boolean successfullyScheduled = scheduleForProcessing(event);
-                    if (successfullyScheduled)
-                    {
-                        logger.warn("Reprocessing will be attempted again for event: " + event);
-                    }
-                    else
-                    {
-                        logger.error("Reprocessing has failed too many times and is aborted, droping event: "
-                                     + event);
-                    }
-                }
-            }
-            catch (final ObjectStoreException ose)
-            {
-                logger.error("Error when dealing with the object store while processing event: " + event, ose);
-            }
-            finally
-            {
-                eventProcessMutex.remove(mutex);
-            }
+            return value;
         }
 
-        private boolean processEvent()
+        @Override
+        public int hashCode()
         {
-            try
+            return value.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (!(obj instanceof EventStoreKey))
             {
-                MuleEvent returnEvent = routes.get(0).process(event);
-                if (returnEvent == null)
-                {
-                    return true;
-                }
-
-                MuleMessage msg = returnEvent.getMessage();
-                if (msg == null)
-                {
-                    logger.warn("No message found in response to processing, which is therefore considered failed for event: "
-                                + event);
-                    return false;
-                }
-
-                boolean errorDetected = failureExpressionFilter.accept(msg);
-                if (errorDetected)
-                {
-                    logger.warn("Failure as been detected when processing event: " + event);
-                }
-
-                return !errorDetected;
-            }
-            catch (final Exception e)
-            {
-                logger.warn("Processing failed for event: " + event, e);
                 return false;
             }
-        }
 
-        @Override
-        public void release()
-        {
-            // NOOP
+            return value.equals(((EventStoreKey) obj).value);
         }
     }
 
-    /**
-     * Checks all the accumulated events and schedule for processing the ones that belong to this MP, if they're ripe
-     * for reprocessing.
-     */
-    private class PendingEventsScheduler implements Runnable
-    {
-        public void run()
-        {
-            try
-            {
-                scheduleEventsRipeForProcessing();
-            }
-            catch (Throwable t)
-            {
-                logger.error("Failed to schedule events for processing", t);
-            }
-        }
+    public static final String PROCESS_ATTEMPT_COUNT_PROPERTY_NAME = "process.attempt.count";
 
-        private void scheduleEventsRipeForProcessing() throws ObjectStoreException, WorkException
-        {
-            for (final Serializable key : objectStore.allKeys())
-            {
-                if (isOwnedStoreKey((String) key))
-                {
-                    final MuleEvent event = objectStore.retrieve(key);
-
-                    if (isDueForRedelivery(event))
-                    {
-                        triggerProcessing(event);
-                    }
-                }
-            }
-        }
-    }
-
-    public static final String DELIVERY_ATTEMPT_COUNT_PROPERTY_NAME = "delivery.attempt.count";
-    public static final String NEXT_DELIVERY_ATTEMPT_TIME_PROPERTY_NAME = "delivery.next.attempt.time";
-
-    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    private final Set<String> eventProcessMutex = new CopyOnWriteArraySet<String>();
-    private String eventKeyPrefix;
-    private ExpressionFilter failureExpressionFilter;
+    private static final int DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE = 1;
 
     private ListableObjectStore<MuleEvent> objectStore;
     private int maxRetries = 5;
     private long secondsBetweenRetries = 60L;
     private String failureExpression;
     private String ackExpression;
+    private ExpressionFilter failureExpressionFilter;
+    private String eventKeyPrefix;
 
     @Override
     public void initialise() throws InitialisationException
@@ -243,17 +147,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
     public void start() throws MuleException
     {
         super.start();
-
-        // if secondsBetweenDeliveries is small, thrashing on object store will be high
-        executor.scheduleWithFixedDelay(new PendingEventsScheduler(), 0L, secondsBetweenRetries,
-            TimeUnit.SECONDS);
-    }
-
-    @Override
-    public void stop() throws MuleException
-    {
-        super.stop();
-        executor.shutdown();
+        scheduleAllPendingEventsForProcessing();
     }
 
     public boolean isMatch(MuleMessage message) throws MuleException
@@ -262,7 +156,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
     }
 
     @Override
-    protected MuleEvent route(MuleEvent event) throws MessagingException
+    protected MuleEvent route(final MuleEvent event) throws MessagingException
     {
         try
         {
@@ -276,8 +170,8 @@ public class UntilSuccessful extends AbstractOutboundRouter
 
         try
         {
-            scheduleForProcessing(event);
-            triggerProcessing(event);
+            EventStoreKey eventStoreKey = storeEvent(event);
+            scheduleForProcessing(eventStoreKey);
 
             if (ackExpression == null)
             {
@@ -297,64 +191,161 @@ public class UntilSuccessful extends AbstractOutboundRouter
         }
     }
 
-    private boolean scheduleForProcessing(final MuleEvent event) throws ObjectStoreException
+    private void scheduleAllPendingEventsForProcessing() throws ObjectStoreException
+    {
+        for (Serializable eventStoreKey : objectStore.allKeys())
+        {
+            try
+            {
+                scheduleForProcessing((EventStoreKey) eventStoreKey);
+            }
+            catch (Exception e)
+            {
+                logger.error(
+                    MessageFactory.createStaticMessage("Failed to schedule for processing event stored with key: "
+                                                       + eventStoreKey), e);
+            }
+        }
+    }
+
+    private void scheduleForProcessing(final EventStoreKey eventStoreKey) throws Exception
+    {
+        RetryCallback callback = new RetryCallback()
+        {
+            public String getWorkDescription()
+            {
+                return "Until successful processing of event stored under key: " + eventStoreKey;
+            }
+
+            public void doWork(RetryContext context) throws Exception
+            {
+                retrieveAndProcessEvent(eventStoreKey);
+            }
+        };
+
+        SimpleRetryPolicyTemplate simpleRetryPolicyTemplate = new SimpleRetryPolicyTemplate(
+            TimeUnit.SECONDS.toMillis(secondsBetweenRetries), maxRetries);
+
+        RetryPolicyTemplate retryPolicyTemplate = new AsynchronousRetryTemplate(simpleRetryPolicyTemplate);
+        retryPolicyTemplate.setNotifier(new RetryNotifier()
+        {
+            public void onSuccess(RetryContext context)
+            {
+                removeFromStore(eventStoreKey);
+            }
+
+            public void onFailure(RetryContext context, Throwable e)
+            {
+                incrementProcessAttemptCountOrRemoveFromStore(eventStoreKey);
+            }
+        });
+
+        retryPolicyTemplate.execute(callback, muleContext.getWorkManager());
+    }
+
+    private EventStoreKey storeEvent(final MuleEvent event) throws ObjectStoreException
+    {
+        MuleMessage message = event.getMessage();
+        Integer deliveryAttemptCount = message.getInvocationProperty(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME,
+            DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE);
+        return storeEvent(event, deliveryAttemptCount);
+    }
+
+    private EventStoreKey storeEvent(final MuleEvent event, int deliveryAttemptCount)
+        throws ObjectStoreException
     {
         final MuleMessage message = event.getMessage();
+        message.setInvocationProperty(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount);
+        EventStoreKey eventStoreKey = EventStoreKey.buildFor(event);
+        objectStore.store(eventStoreKey, event);
+        return eventStoreKey;
+    }
 
-        final Integer deliveryAttemptCount = message.getInvocationProperty(
-            DELIVERY_ATTEMPT_COUNT_PROPERTY_NAME, 0);
-
-        // > because we want the total of attempts to be maxRetries+1 (ie first attempt + retries)
-        if (deliveryAttemptCount > maxRetries)
+    private void incrementProcessAttemptCountOrRemoveFromStore(final EventStoreKey eventStoreKey)
+    {
+        try
         {
-            deschedule(event);
-            return false;
+            MuleEvent event = objectStore.remove(eventStoreKey);
+            MuleEvent mutableEvent = threadSafeCopy(event);
+
+            final MuleMessage message = mutableEvent.getMessage();
+            final Integer deliveryAttemptCount = message.getInvocationProperty(
+                PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, DEFAULT_PROCESS_ATTEMPT_COUNT_PROPERTY_VALUE);
+
+            if (deliveryAttemptCount <= getMaxRetries())
+            {
+                // we store the incremented version unless the max attempt count has been reached
+                message.setInvocationProperty(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount + 1);
+                objectStore.store(eventStoreKey, mutableEvent);
+            }
+        }
+        catch (ObjectStoreException ose)
+        {
+            logger.error("Failed to increment failure count for event stored with key: " + eventStoreKey);
+        }
+    }
+
+    private void removeFromStore(final EventStoreKey eventStoreKey)
+    {
+        try
+        {
+            objectStore.remove(eventStoreKey);
+        }
+        catch (ObjectStoreException ose)
+        {
+            logger.warn("Failed to remove following event from store with key: " + eventStoreKey);
+        }
+    }
+
+    private void retrieveAndProcessEvent(EventStoreKey eventStoreKey) throws ObjectStoreException
+    {
+        MuleEvent persistedEvent = objectStore.retrieve(eventStoreKey);
+        MuleEvent mutableEvent = threadSafeCopy(persistedEvent);
+        processEvent(mutableEvent);
+    }
+
+    private void processEvent(MuleEvent event)
+    {
+        if (routes.isEmpty())
+        {
+            return;
         }
 
-        if (deliveryAttemptCount > 0)
+        MuleEvent returnEvent;
+        try
         {
-            final long nextDeliveryAttemptTime = System.currentTimeMillis() + secondsBetweenRetries;
-            event.getMessage().setInvocationProperty(NEXT_DELIVERY_ATTEMPT_TIME_PROPERTY_NAME,
-                nextDeliveryAttemptTime);
+            returnEvent = routes.get(0).process(event);
+        }
+        catch (MuleException me)
+        {
+            throw new MuleRuntimeException(me);
         }
 
-        message.setInvocationProperty(DELIVERY_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount + 1);
-
-        String storeKey = getStoreKey(event);
-        if (objectStore.contains(storeKey))
+        if (returnEvent == null)
         {
-            objectStore.remove(storeKey);
+            return;
         }
-        objectStore.store(storeKey, event);
-        return true;
+
+        MuleMessage msg = returnEvent.getMessage();
+        if (msg == null)
+        {
+            throw new MuleRuntimeException(
+                MessageFactory.createStaticMessage("No message found in response to processing, which is therefore considered failed for event: "
+                                                   + event));
+        }
+
+        boolean errorDetected = failureExpressionFilter.accept(msg);
+        if (errorDetected)
+        {
+            throw new MuleRuntimeException(
+                MessageFactory.createStaticMessage("Failure expression positive when processing event: "
+                                                   + event));
+        }
     }
 
-    private boolean isDueForRedelivery(final MuleEvent event)
+    private DefaultMuleEvent threadSafeCopy(MuleEvent event)
     {
-        final Long nextDeliveryAttemptTime = event.getMessage().getInvocationProperty(
-            NEXT_DELIVERY_ATTEMPT_TIME_PROPERTY_NAME, 0L);
-
-        return System.currentTimeMillis() >= nextDeliveryAttemptTime;
-    }
-
-    private void triggerProcessing(final MuleEvent event) throws WorkException
-    {
-        getMuleContext().getWorkManager().scheduleWork(new PendingEventWorker(event));
-    }
-
-    private void deschedule(final MuleEvent event) throws ObjectStoreException
-    {
-        objectStore.remove(getStoreKey(event));
-    }
-
-    private String getStoreKey(final MuleEvent event)
-    {
-        return eventKeyPrefix + event.getId();
-    }
-
-    private boolean isOwnedStoreKey(final String eventKey)
-    {
-        return StringUtils.startsWith(eventKey, eventKeyPrefix);
+        return new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage()), event);
     }
 
     private void ensurePayloadSerializable(final MuleEvent event) throws Exception
@@ -421,11 +412,6 @@ public class UntilSuccessful extends AbstractOutboundRouter
     public void setAckExpression(String ackExpression)
     {
         this.ackExpression = ackExpression;
-    }
-
-    protected ScheduledExecutorService getExecutor()
-    {
-        return executor;
     }
 
     protected String getEventKeyPrefix()
