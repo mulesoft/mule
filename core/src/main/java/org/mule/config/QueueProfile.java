@@ -14,12 +14,10 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStore;
 import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueManager;
 import org.mule.util.store.DefaultInMemoryObjectStore;
 import org.mule.util.store.DefaultPersistentObjectStore;
-import org.mule.util.store.FacadeObjectStore;
 
 import java.io.Serializable;
 
@@ -49,6 +47,12 @@ public class QueueProfile
         this.objectStore = queueProfile.objectStore;
     }
 
+    public QueueProfile(int maxOutstandingMessages, ListableObjectStore<Serializable> objectStore)
+    {
+        this.maxOutstandingMessages = maxOutstandingMessages;
+        this.objectStore = objectStore;
+    }
+    
     /**
      * This specifies the number of messages that can be queued before it starts
      * blocking.
