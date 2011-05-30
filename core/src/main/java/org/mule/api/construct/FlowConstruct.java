@@ -10,6 +10,7 @@
 
 package org.mule.api.construct;
 
+import org.mule.api.NamedObject;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
 import org.mule.api.processor.MessageProcessorChain;
@@ -21,14 +22,8 @@ import org.mule.management.stats.FlowConstructStatistics;
  * configuration defines at a minimum where messages come from and what processing
  * steps should be used to process these messages.
  */
-public interface FlowConstruct extends LifecycleStateEnabled
+public interface FlowConstruct extends NamedObject, LifecycleStateEnabled
 {
-
-    /**
-     * @return The name which identifies this flow construct which is unique in
-     *         MuleConext registry
-     */
-    String getName();
 
     /**
      * @return The exception listener that will be used to handle exceptions that may

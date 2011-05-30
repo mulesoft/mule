@@ -10,6 +10,8 @@
 
 package org.mule.util.counters;
 
+import org.mule.api.NamedObject;
+
 /**
  * This interface is the interface implemented for all counter types. A Counter can
  * represent a real counter or a virtual counter that will be computed using one or
@@ -22,7 +24,7 @@ package org.mule.util.counters;
  * operations computed on associated counters. Usually, these counters will never be
  * used directly, but will only used to retrieve the computed values.
  */
-public interface Counter
+public interface Counter extends NamedObject
 {
 
     /**
@@ -31,13 +33,6 @@ public interface Counter
      * @return the type of the counter
      */
     CounterFactory.Type getType();
-
-    /**
-     * Accessor for the counter's name.
-     * 
-     * @return the name of the counter
-     */
-    String getName();
 
     /**
      * Increment the counter's value by 1.0.

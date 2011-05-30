@@ -8,16 +8,17 @@
  * LICENSE.txt file.
  */
 
-package org.mule.api.processor.policy;
-
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleException;
-import org.mule.api.NamedObject;
+package org.mule.api;
 
 /**
- *
+ * Adds {@link #getName} and {@link #setName} methods to an object
  */
-public interface AroundPolicy extends NamedObject
+public interface NamableObject extends NamedObject
 {
-    MuleEvent invoke(PolicyInvocation invocation) throws MuleException;
+    /**
+     * Sets the name of the object
+     * 
+     * @param name the name of the object
+     */
+    void setName(String name);
 }

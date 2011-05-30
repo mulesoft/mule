@@ -11,7 +11,7 @@
 package org.mule.lifecycle.processor;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.NamedObject;
+import org.mule.api.NamableObject;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.Startable;
@@ -44,9 +44,9 @@ public class ProcessIfStartedMessageProcessor extends AbstractFilteringMessagePr
 
     protected String getStartableName(Startable startableObject)
     {
-        if (startableObject instanceof NamedObject)
+        if (startableObject instanceof NamableObject)
         {
-            return ((NamedObject) startableObject).getName();
+            return ((NamableObject) startableObject).getName();
         }
         else
         {

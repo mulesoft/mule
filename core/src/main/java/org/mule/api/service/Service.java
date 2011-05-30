@@ -13,7 +13,7 @@ package org.mule.api.service;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.NamedObject;
+import org.mule.api.NamableObject;
 import org.mule.api.component.Component;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.exception.MessagingExceptionHandler;
@@ -33,7 +33,7 @@ import java.io.Serializable;
  * is responsible for managing the interaction of events to and from the service as
  * well as managing pooled resources.
  */
-public interface Service extends Serializable, FlowConstruct, Lifecycle, NamedObject
+public interface Service extends Serializable, FlowConstruct, Lifecycle, NamableObject
 {
     /**
      * Makes an asynchronous event call to the service.

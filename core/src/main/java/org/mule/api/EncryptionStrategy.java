@@ -22,10 +22,8 @@ import java.io.InputStream;
  * Encryption (PBE) a password, salt, iteration count and algorithm may be set on the
  * strategy.
  */
-public interface EncryptionStrategy extends Initialisable
+public interface EncryptionStrategy extends Initialisable, NamedObject
 {
-    String getName();
-
     InputStream encrypt(InputStream data, Object info) throws CryptoFailureException;
 
     InputStream decrypt(InputStream data, Object info) throws CryptoFailureException;

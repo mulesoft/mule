@@ -10,7 +10,7 @@
 
 package org.mule.security;
 
-import org.mule.api.NamedObject;
+import org.mule.api.NamableObject;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityContext;
@@ -19,7 +19,7 @@ import org.mule.api.security.SecurityProvider;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 
 
-public abstract class AbstractSecurityProvider implements SecurityProvider, NamedObject
+public abstract class AbstractSecurityProvider implements SecurityProvider, NamableObject
 {
     private String name;
     private SecurityContextFactory securityContextFactory;

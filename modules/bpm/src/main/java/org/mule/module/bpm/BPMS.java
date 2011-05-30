@@ -10,7 +10,7 @@
 
 package org.mule.module.bpm;
 
-import org.mule.api.NamedObject;
+import org.mule.api.NamableObject;
 
 import java.util.Map;
 
@@ -20,7 +20,7 @@ import java.util.Map;
  * 
  * @see MessageService
  */
-public interface BPMS extends NamedObject
+public interface BPMS extends NamableObject
 {
     /**
      * {@link MessageService} contains a callback method used to generate Mule messages from your process.

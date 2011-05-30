@@ -11,7 +11,7 @@
 package org.mule.api.expression;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.NamedObject;
+import org.mule.api.NamableObject;
 
 /**
  * <code>ExpressionEvaluator</code> extracts a property from the message in a generic
@@ -21,7 +21,7 @@ import org.mule.api.NamedObject;
  * These objects are used to execute property expressions (usually on the
  * current message) at runtime to extracta dynamic value.
  */
-public interface ExpressionEvaluator extends NamedObject
+public interface ExpressionEvaluator extends NamableObject
 {
     /**
      * Extracts a single property from the message

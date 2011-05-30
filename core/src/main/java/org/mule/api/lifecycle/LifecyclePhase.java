@@ -9,6 +9,7 @@
  */
 package org.mule.api.lifecycle;
 
+import org.mule.api.NamedObject;
 import org.mule.lifecycle.LifecycleObject;
 
 import java.util.Set;
@@ -21,7 +22,7 @@ import java.util.Set;
  * Note that users wouldn't normally customise the lifecycle of the server.
  */
 
-public interface LifecyclePhase
+public interface LifecyclePhase extends NamedObject
 {
     
     String ALL_PHASES = "all";
@@ -41,8 +42,6 @@ public interface LifecyclePhase
     Class<?> getLifecycleClass();
 
     void setLifecycleClass(Class<?> lifecycleClass);
-
-    String getName();
 
     Set<String> getSupportedPhases();
 

@@ -10,12 +10,14 @@
 
 package org.mule.util.queue;
 
+import org.mule.api.NamedObject;
+
 import java.io.Serializable;
 
 /**
  * <code>Queue</code> TODO
  */
-public interface Queue
+public interface Queue extends NamedObject
 {
     /**
      * Returns the number of elements in this queue.
@@ -42,5 +44,4 @@ public interface Queue
 
     boolean offer(Serializable object, long timeout) throws InterruptedException;
 
-    String getName();
 }

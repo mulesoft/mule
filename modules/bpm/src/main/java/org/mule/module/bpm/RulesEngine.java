@@ -10,7 +10,7 @@
 
 package org.mule.module.bpm;
 
-import org.mule.api.NamedObject;
+import org.mule.api.NamableObject;
 
 
 /**
@@ -19,7 +19,7 @@ import org.mule.api.NamedObject;
  * 
  * @see MessageService
  */
-public interface RulesEngine extends NamedObject
+public interface RulesEngine extends NamableObject
 {
     /**
      * Inject a callback so that the Rules Engine may generate messages within Mule.

@@ -10,6 +10,8 @@
 
 package org.mule.tck;
 
+import org.mule.api.NamedObject;
+
 import java.util.Map;
 
 import org.junit.runners.Parameterized;
@@ -24,13 +26,8 @@ import org.junit.runners.Parameterized.Parameters;
  * @see Parameterized
  * @see Parameters
  */
-public interface ParameterizedConfiguration
+public interface ParameterizedConfiguration extends NamedObject
 {
-    /**
-     * A string that uniquely identifies the configuration.
-     */
-    public String getName();
-
     /**
      * Perform any needed initialization in this method, such as loading properties from a properties file.
      * 

@@ -9,19 +9,13 @@
  */
 package org.mule;
 
-import org.mule.api.MuleException;
+import org.mule.api.NamedObject;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
-
-import java.io.File;
 
 /**
  * Allows Mule modules and transpornts to extend core functionality in an application-independent fashion
  */
-public interface MuleCoreExtension extends Initialisable, Disposable
+public interface MuleCoreExtension extends Initialisable, Disposable, NamedObject
 {
-    /**
-     * get the extension's name
-     */
-    String getName();
 }

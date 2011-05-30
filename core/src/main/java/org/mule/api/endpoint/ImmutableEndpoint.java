@@ -12,6 +12,7 @@ package org.mule.api.endpoint;
 
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
+import org.mule.api.NamedObject;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.retry.RetryPolicyTemplate;
 import org.mule.api.routing.filter.Filter;
@@ -29,7 +30,7 @@ import java.util.Map;
  * sent or received. An Enpoint is an Resource address (EndpointUri), with associated
  * transformation, transaction and filtering rules.
  */
-public interface ImmutableEndpoint extends Serializable
+public interface ImmutableEndpoint extends Serializable, NamedObject
 {
 
     String INITIAL_STATE_STARTED = "started";
@@ -78,13 +79,6 @@ public interface ImmutableEndpoint extends Serializable
      * @return the endpoint associated with the endpoint
      */
     Connector getConnector();
-
-    /**
-     * The name is the identifier for the endpoint
-     *
-     * @return the endpoint name
-     */
-    String getName();
 
     /**
      * Transformers are responsible for transforming data when it is received or

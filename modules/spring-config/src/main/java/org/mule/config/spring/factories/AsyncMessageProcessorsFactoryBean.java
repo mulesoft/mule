@@ -11,7 +11,7 @@
 package org.mule.config.spring.factories;
 
 import org.mule.api.MuleContext;
-import org.mule.api.NamedObject;
+import org.mule.api.NamableObject;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.MuleContextAware;
@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.FactoryBean;
 
-public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleContextAware, NamedObject
+public class AsyncMessageProcessorsFactoryBean implements FactoryBean, MuleContextAware, NamableObject
 {
 
     protected MuleContext muleContext;

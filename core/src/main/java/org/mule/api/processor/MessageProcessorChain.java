@@ -10,6 +10,7 @@
 
 package org.mule.api.processor;
 
+import org.mule.api.NamedObject;
 import org.mule.api.processor.policy.Policies;
 
 import java.util.List;
@@ -17,11 +18,9 @@ import java.util.List;
 /**
  *
  */
-public interface MessageProcessorChain extends MessageProcessor
+public interface MessageProcessorChain extends MessageProcessor, NamedObject
 {
     List<MessageProcessor> getMessageProcessors();
-
-    String getName();
 
     Policies getPolicies();
 

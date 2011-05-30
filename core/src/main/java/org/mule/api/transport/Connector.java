@@ -15,7 +15,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.NamedObject;
+import org.mule.api.NamableObject;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -33,7 +33,7 @@ import java.util.List;
  * <code>Connector</code> is the mechanism used to connect to external systems
  * and protocols in order to send and receive data.
  */
-public interface Connector extends Lifecycle, NamedObject, Connectable, LifecycleStateEnabled
+public interface Connector extends Lifecycle, NamableObject, Connectable, LifecycleStateEnabled
 {
     int INT_VALUE_NOT_SET = -1;
 
