@@ -10,39 +10,43 @@
 
 package org.mule.api.construct;
 
+import org.mule.api.MuleContext;
 import org.mule.api.NamedObject;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.LifecycleStateEnabled;
-import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.MessageInfoMapping;
+import org.mule.api.source.MessageSource;
 import org.mule.management.stats.FlowConstructStatistics;
 
 /**
- * A uniquely identified message flow construct who's implementation and
- * configuration defines at a minimum where messages come from and what processing
- * steps should be used to process these messages.
+ * A uniquely identified {@link FlowConstruct} that once implemented and configured defines a construct
+ * through which messages are processed using {@link MessageSource} and {@link MessageProcessor} building
+ * blocks.
  */
 public interface FlowConstruct extends NamedObject, LifecycleStateEnabled
 {
 
     /**
-     * @return The exception listener that will be used to handle exceptions that may
-     *         be thrown at different points during the message flow defined by this
-     *         construct.
+     * @return The exception listener that will be used to handle exceptions that may be thrown at different
+     *         points during the message flow defined by this construct.
      */
     MessagingExceptionHandler getExceptionListener();
 
     /**
-     * @return The statistics holder used by this flow construct to keep track of its
-     *         activity.
+     * @return The statistics holder used by this flow construct to keep track of its activity.
      */
     FlowConstructStatistics getStatistics();
 
     /**
-     * @return This implementation of {@link MessageInfoMapping} used to control how
-     *         Important message information is pulled from the current message.
+     * @return This implementation of {@link MessageInfoMapping} used to control how Important message
+     *         information is pulled from the current message.
      */
     MessageInfoMapping getMessageInfoMapping();
 
-    MessageProcessorChain getMessageProcessorChain();
+    /**
+     * @return This muleContext that this flow construct belongs to and runs in the context of.
+     */
+    MuleContext getMuleContext();
+
 }
