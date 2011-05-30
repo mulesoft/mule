@@ -68,6 +68,7 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
             }            
         });
         putMessageOnQueue("sanity");
+        Thread.sleep(500);
         closeConsumer();
         
         // Delivery was successful so message should be gone
@@ -89,13 +90,12 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
                 }
                 catch (JMSException e)
                 {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    fail(e.getMessage());
                 }
-                //throw new MuleRuntimeException(MessageFactory.createStaticMessage("Runtime Failure"));
             }            
         });
         putMessageOnQueue("sanity");
+        Thread.sleep(500);
         closeConsumer();
         
         // Delivery failed so message should be back on the queue
@@ -123,6 +123,7 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
             }            
         });
         putMessageOnQueue("sanity");
+        Thread.sleep(500);
         closeConsumer();
         
         // Delivery was successful so message should be gone
@@ -142,6 +143,7 @@ public class JmsAcknowledgementTestCase extends AbstractJmsReliabilityTestCase
             }            
         });
         putMessageOnQueue("sanity");
+        Thread.sleep(500);
         closeConsumer();
         
         // Delivery failed so message should be back on the queue
