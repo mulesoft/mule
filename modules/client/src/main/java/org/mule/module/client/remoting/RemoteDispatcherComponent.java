@@ -22,7 +22,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -38,6 +37,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.wire.WireFormat;
 import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.construct.SimpleFlowConstruct;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.model.seda.SedaService;
@@ -163,11 +163,11 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
         if (destComponent != null)
         {
             Object fc = muleContext.getRegistry().lookupObject(destComponent);
-            if (!(fc instanceof FlowConstruct))
+            if (!(fc instanceof SimpleFlowConstruct))
             {
                 return handleException(null, new DefaultMuleException(ClientMessages.noSuchFlowConstruct(destComponent)));
             }
-            FlowConstruct flowConstruct = (FlowConstruct) fc;
+            SimpleFlowConstruct flowConstruct = (SimpleFlowConstruct) fc;
             MuleSession session = new DefaultMuleSession(flowConstruct, muleContext);
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but
@@ -182,7 +182,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
 
             if (context.getExchangePattern().hasResponse())
             {
-                MuleEvent resultEvent = flowConstruct.getMessageProcessorChain().process(event);
+                MuleEvent resultEvent = flowConstruct.process(event);
                 result = resultEvent == null ? null : resultEvent.getMessage();
                 if (result == null)
                 {
@@ -197,7 +197,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             }
             else
             {
-                flowConstruct.getMessageProcessorChain().process(event);
+                flowConstruct.process(event);
                 return null;
             }
         }
