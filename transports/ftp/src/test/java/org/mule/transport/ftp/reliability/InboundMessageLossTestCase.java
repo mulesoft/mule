@@ -12,6 +12,9 @@ package org.mule.transport.ftp.reliability;
 
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 import org.mule.transport.ftp.AbstractFtpServerTestCase;
 
 /**
@@ -24,9 +27,9 @@ import org.mule.transport.ftp.AbstractFtpServerTestCase;
  */
 public class InboundMessageLossTestCase extends AbstractFtpServerTestCase
 {
-    /** Delay (in ms) to wait for file to be processed */
-    public static final int DELAY = 1000;
-    
+    /** Polling mechanism to replace Thread.sleep() for testing a delayed result. */
+    protected Prober prober = new PollingProber(10000, 100);
+        
     @Override
     protected String getConfigResources()
     {
@@ -51,33 +54,73 @@ public class InboundMessageLossTestCase extends AbstractFtpServerTestCase
     public void testNoException() throws Exception
     {
         createFileOnFtpServer("noException/test1");
-        Thread.sleep(DELAY);
-        // Delivery was successful so message should be gone
-        assertFalse(fileExists("noException/test1"));
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                // Delivery was successful so message should be gone
+                return !fileExists("noException/test1");
+            }
+
+            public String describeFailure()
+            {
+                return "File should be gone";
+            }
+        });
     }
     
     public void testTransformerException() throws Exception
     {
         createFileOnFtpServer("transformerException/test1");
-        Thread.sleep(DELAY);
-        // Delivery failed so message should have been restored at the source
-        assertTrue(fileExists("transformerException/test1"));
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                // Delivery failed so message should have been restored at the source
+                return fileExists("transformerException/test1");
+            }
+
+            public String describeFailure()
+            {
+                return "File should have been restored";
+            }
+        });
     }
     
     public void testRouterException() throws Exception
     {
         createFileOnFtpServer("routerException/test1");
-        Thread.sleep(DELAY);
-        // Delivery failed so message should have been restored at the source
-        assertTrue(fileExists("routerException/test1"));
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                // Delivery failed so message should have been restored at the source
+                return fileExists("routerException/test1");
+            }
+
+            public String describeFailure()
+            {
+                return "File should have been restored";
+            }
+        });
     }
     
     public void testComponentException() throws Exception
     {
         createFileOnFtpServer("componentException/test1");
-        Thread.sleep(DELAY);
-        // Component exception occurs after the SEDA queue for an asynchronous request, so from the client's
-        // perspective, the message has been delivered successfully.
-        assertFalse(fileExists("componentException/test1"));
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                // Component exception occurs after the SEDA queue for an asynchronous request, so from the client's
+                // perspective, the message has been delivered successfully.
+                return !fileExists("componentException/test1");
+            }
+
+            public String describeFailure()
+            {
+                return "File should be gone";
+            }
+        });
     }    
 }

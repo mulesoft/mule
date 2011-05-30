@@ -10,6 +10,8 @@
 
 package org.mule.transport.ftp.reliability;
 
+import org.mule.tck.probe.Probe;
+
 
 /**
  * Verify that no inbound messages are lost when exceptions occur.  
@@ -31,23 +33,43 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
     public void testTransformerException() throws Exception
     {
         createFileOnFtpServer("transformerException/test1");
-        Thread.sleep(DELAY);
-        // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
-        // perspective, the message has been delivered successfully.
-        // Note that this behavior is different from services because the exception occurs before
-        // the SEDA queue for services.
-        assertFalse(fileExists("transformerException/test1"));
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
+                // perspective, the message has been delivered successfully.
+                // Note that this behavior is different from services because the exception occurs before
+                // the SEDA queue for services.
+                return !fileExists("transformerException/test1");
+            }
+
+            public String describeFailure()
+            {
+                return "File should be gone";
+            }
+        });
     }
     
     @Override
     public void testRouterException() throws Exception
     {
         createFileOnFtpServer("routerException/test1");
-        Thread.sleep(DELAY);
-        // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
-        // perspective, the message has been delivered successfully.
-        // Note that this behavior is different from services because the exception occurs before
-        // the SEDA queue for services.
-        assertFalse(fileExists("routerException/test1"));
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
+                // perspective, the message has been delivered successfully.
+                // Note that this behavior is different from services because the exception occurs before
+                // the SEDA queue for services.
+                return !fileExists("routerException/test1");
+            }
+
+            public String describeFailure()
+            {
+                return "File should be gone";
+            }
+        });
     }
 }

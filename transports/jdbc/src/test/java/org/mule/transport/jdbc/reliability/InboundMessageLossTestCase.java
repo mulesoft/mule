@@ -12,6 +12,9 @@ package org.mule.transport.jdbc.reliability;
 
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 import org.mule.transport.jdbc.functional.AbstractJdbcFunctionalTestCase;
 
 import org.apache.commons.dbutils.QueryRunner;
@@ -27,9 +30,9 @@ import org.apache.commons.dbutils.handlers.ArrayHandler;
  */
 public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
 {
-    /** Delay (in ms) to wait for row to be processed */
-    public static final int DELAY = 1000;
-    
+    /** Polling mechanism to replace Thread.sleep() for testing a delayed result. */
+    protected Prober prober = new PollingProber(10000, 100);
+        
     protected QueryRunner qr;
     
     public InboundMessageLossTestCase()
@@ -59,12 +62,28 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
         assertEquals(1, qr.update(jdbcConnector.getConnection(), 
             "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (1, '" + TEST_MESSAGE + "', NULL, NULL)"));
 
-        Thread.sleep(DELAY);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                try
+                {
+                    Object[] queryResult = (Object[]) qr.query(jdbcConnector.getConnection(), 
+                        "SELECT DATA FROM TEST WHERE TYPE = 1 AND ACK IS NULL", new ArrayHandler());
+                    // Delivery was successful so row should be acknowledged (marked read).
+                    return (queryResult == null);
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
 
-        Object[] queryResult = (Object[]) qr.query(jdbcConnector.getConnection(), 
-            "SELECT DATA FROM TEST WHERE TYPE = 1 AND ACK IS NULL", new ArrayHandler());
-        // Delivery was successful so row should be acknowledged (marked read).
-        assertNull(queryResult);
+            public String describeFailure()
+            {
+                return "Row should be acknowledged (marked read)";
+            }
+        });
     }
     
     public void testTransformerException() throws Exception
@@ -72,13 +91,28 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
         assertEquals(1, qr.update(jdbcConnector.getConnection(), 
             "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (2, '" + TEST_MESSAGE + "', NULL, NULL)"));
 
-        Thread.sleep(DELAY);
-        
-        Object[] queryResult = (Object[]) qr.query(jdbcConnector.getConnection(), 
-            "SELECT DATA FROM TEST WHERE TYPE = 2 AND ACK IS NULL", new ArrayHandler());
-        // Delivery failed so row should not be acknowledged (marked read).
-        assertNotNull(queryResult);
-        assertEquals(1, queryResult.length);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                try
+                {
+                    Object[] queryResult = (Object[]) qr.query(jdbcConnector.getConnection(), 
+                        "SELECT DATA FROM TEST WHERE TYPE = 2 AND ACK IS NULL", new ArrayHandler());
+                    // Delivery failed so row should not be acknowledged (marked read).
+                    return (queryResult != null && queryResult.length == 1);
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            public String describeFailure()
+            {
+                return "Row should not be acknowledged (marked read)";
+            }
+        });
     }
     
     public void testRouterException() throws Exception
@@ -86,13 +120,28 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
         assertEquals(1, qr.update(jdbcConnector.getConnection(), 
             "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (3, '" + TEST_MESSAGE + "', NULL, NULL)"));
 
-        Thread.sleep(DELAY);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                try
+                {
+                    Object[] queryResult = (Object[]) qr.query(jdbcConnector.getConnection(), 
+                        "SELECT DATA FROM TEST WHERE TYPE = 3 AND ACK IS NULL", new ArrayHandler());
+                    // Delivery failed so row should not be acknowledged (marked read).
+                    return (queryResult != null && queryResult.length == 1);
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
 
-        Object[] queryResult = (Object[]) qr.query(jdbcConnector.getConnection(), 
-            "SELECT DATA FROM TEST WHERE TYPE = 3 AND ACK IS NULL", new ArrayHandler());
-        // Delivery failed so row should not be acknowledged (marked read).
-        assertNotNull(queryResult);
-        assertEquals(1, queryResult.length);
+            public String describeFailure()
+            {
+                return "Row should not be acknowledged (marked read)";
+            }
+        });
     }
     
     public void testComponentException() throws Exception
@@ -100,12 +149,28 @@ public class InboundMessageLossTestCase extends AbstractJdbcFunctionalTestCase
         assertEquals(1, qr.update(jdbcConnector.getConnection(), 
             "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (4, '" + TEST_MESSAGE + "', NULL, NULL)"));
 
-        Thread.sleep(DELAY);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                try
+                {
+                    Object[] queryResult = (Object[]) qr.query(jdbcConnector.getConnection(), 
+                        "SELECT DATA FROM TEST WHERE TYPE = 4 AND ACK IS NULL", new ArrayHandler());
+                    // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
+                    // perspective, the message has been delivered successfully.
+                    return (queryResult == null);
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
 
-        Object[] queryResult = (Object[]) qr.query(jdbcConnector.getConnection(), 
-            "SELECT DATA FROM TEST WHERE TYPE = 4 AND ACK IS NULL", new ArrayHandler());
-        // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
-        // perspective, the message has been delivered successfully.
-        assertNull(queryResult);
+            public String describeFailure()
+            {
+                return "Row should be acknowledged (marked read)";
+            }
+        });
     }    
 }

@@ -10,6 +10,8 @@
 
 package org.mule.transport.jdbc.reliability;
 
+import org.mule.tck.probe.Probe;
+
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 
 
@@ -35,13 +37,28 @@ public class InboundMessageLossTransactionsTestCase extends InboundMessageLossTe
         assertEquals(1, qr.update(jdbcConnector.getConnection(), 
             "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (4, '" + TEST_MESSAGE + "', NULL, NULL)"));
 
-        Thread.sleep(DELAY);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                try
+                {
+                    Object[] queryResult = (Object[]) qr.query(jdbcConnector.getConnection(), 
+                        "SELECT DATA FROM TEST WHERE TYPE = 4 AND ACK IS NULL", new ArrayHandler());
+                    // Although a component exception occurs after the SEDA queue, the use of transactions 
+                    // bypasses the SEDA queue, so message should get redelivered.
+                    return (queryResult != null && queryResult.length == 1);
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
 
-        Object[] queryResult = (Object[]) qr.query(jdbcConnector.getConnection(), 
-            "SELECT DATA FROM TEST WHERE TYPE = 4 AND ACK IS NULL", new ArrayHandler());
-        // Although a component exception occurs after the SEDA queue, the use of transactions 
-        // bypasses the SEDA queue, so message should get redelivered.
-        assertNotNull(queryResult);
-        assertEquals(1, queryResult.length);
+            public String describeFailure()
+            {
+                return "Row should not be acknowledged (marked read)";
+            }
+        });
     }    
 }

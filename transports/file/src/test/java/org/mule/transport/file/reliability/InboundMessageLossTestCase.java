@@ -12,6 +12,9 @@ package org.mule.transport.file.reliability;
 
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
+import org.mule.tck.probe.PollingProber;
+import org.mule.tck.probe.Probe;
+import org.mule.tck.probe.Prober;
 import org.mule.transport.file.AbstractFileMoveDeleteTestCase;
 
 import java.io.File;
@@ -27,8 +30,8 @@ import java.io.File;
  */
 public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
 {
-    /** Delay (in ms) to wait for file to be processed */
-    public static final int DELAY = 3000;
+    /** Polling mechanism to replace Thread.sleep() for testing a delayed result. */
+    protected Prober prober = new PollingProber(10000, 100);
     
     @Override
     protected String getConfigResources()
@@ -48,37 +51,77 @@ public class InboundMessageLossTestCase extends AbstractFileMoveDeleteTestCase
     public void testNoException() throws Exception
     {
         tmpDir = createFolder(".mule/noException");
-        File file = createDataFile(tmpDir, "test1.txt");
-        Thread.sleep(DELAY);
-        // Delivery was successful so message should be gone
-        assertFalse(file.exists());
+        final File file = createDataFile(tmpDir, "test1.txt");
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                // Delivery was successful so message should be gone
+                return !file.exists();
+            }
+
+            public String describeFailure()
+            {
+                return "File should be gone";
+            }
+        });
     }
     
     public void testTransformerException() throws Exception
     {
         tmpDir = createFolder(".mule/transformerException");
-        File file = createDataFile(tmpDir, "test1.txt");
-        Thread.sleep(DELAY);
-        // Delivery failed so message should have been restored at the source
-        assertTrue(file.exists());
+        final File file = createDataFile(tmpDir, "test1.txt");
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                // Delivery failed so message should have been restored at the source
+                return file.exists();
+            }
+
+            public String describeFailure()
+            {
+                return "File should have been restored";
+            }
+        });
     }
     
     public void testRouterException() throws Exception
     {
         tmpDir = createFolder(".mule/routerException");
-        File file = createDataFile(tmpDir, "test1.txt");
-        Thread.sleep(DELAY);
-        // Delivery failed so message should have been restored at the source
-        assertTrue(file.exists());
+        final File file = createDataFile(tmpDir, "test1.txt");
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                // Delivery failed so message should have been restored at the source
+                return file.exists();
+            }
+
+            public String describeFailure()
+            {
+                return "File should have been restored";
+            }
+        });
     }
     
     public void testComponentException() throws Exception
     {
         tmpDir = createFolder(".mule/componentException");
-        File file = createDataFile(tmpDir, "test1.txt");
-        Thread.sleep(DELAY);
-        // Component exception occurs after the SEDA queue for an asynchronous request, so from the client's
-        // perspective, the message has been delivered successfully.
-        assertFalse(file.exists());
+        final File file = createDataFile(tmpDir, "test1.txt");
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                // Component exception occurs after the SEDA queue for an asynchronous request, so from the client's
+                // perspective, the message has been delivered successfully.
+                return !file.exists();
+            }
+
+            public String describeFailure()
+            {
+                return "File should be gone";
+            }
+        });
     }        
 }

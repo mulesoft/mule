@@ -10,6 +10,8 @@
 
 package org.mule.transport.jdbc.reliability;
 
+import org.mule.tck.probe.Probe;
+
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 
 
@@ -35,15 +37,31 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
         assertEquals(1, qr.update(jdbcConnector.getConnection(), 
             "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (2, '" + TEST_MESSAGE + "', NULL, NULL)"));
 
-        Thread.sleep(DELAY);
-        
-        Object[] queryResult = (Object[]) qr.query(jdbcConnector.getConnection(), 
-            "SELECT DATA FROM TEST WHERE TYPE = 2 AND ACK IS NULL", new ArrayHandler());
-        // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
-        // perspective, the message has been delivered successfully.
-        // Note that this behavior is different from services because the exception occurs before
-        // the SEDA queue for services.
-        assertNull(queryResult);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                try
+                {
+                    Object[] queryResult = (Object[]) qr.query(jdbcConnector.getConnection(), 
+                        "SELECT DATA FROM TEST WHERE TYPE = 2 AND ACK IS NULL", new ArrayHandler());
+                    // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
+                    // perspective, the message has been delivered successfully.
+                    // Note that this behavior is different from services because the exception occurs before
+                    // the SEDA queue for services.
+                    return (queryResult == null);
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            public String describeFailure()
+            {
+                return "Row should be acknowledged (marked read)";
+            }
+        });
     }
     
     @Override
@@ -52,15 +70,31 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
         assertEquals(1, qr.update(jdbcConnector.getConnection(), 
             "INSERT INTO TEST(TYPE, DATA, ACK, RESULT) VALUES (3, '" + TEST_MESSAGE + "', NULL, NULL)"));
 
-        Thread.sleep(DELAY);
+        prober.check(new Probe()
+        {
+            public boolean isSatisfied()
+            {
+                try
+                {
+                    Object[] queryResult = (Object[]) qr.query(jdbcConnector.getConnection(), 
+                        "SELECT DATA FROM TEST WHERE TYPE = 3 AND ACK IS NULL", new ArrayHandler());
+                    // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
+                    // perspective, the message has been delivered successfully.
+                    // Note that this behavior is different from services because the exception occurs before
+                    // the SEDA queue for services.
+                    return (queryResult == null);
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
 
-        Object[] queryResult = (Object[]) qr.query(jdbcConnector.getConnection(), 
-            "SELECT DATA FROM TEST WHERE TYPE = 3 AND ACK IS NULL", new ArrayHandler());
-        // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
-        // perspective, the message has been delivered successfully.
-        // Note that this behavior is different from services because the exception occurs before
-        // the SEDA queue for services.
-        assertNull(queryResult);
+            public String describeFailure()
+            {
+                return "Row should be acknowledged (marked read)";
+            }
+        });
     }    
 }
 
