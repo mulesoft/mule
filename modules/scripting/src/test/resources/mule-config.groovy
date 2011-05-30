@@ -64,7 +64,7 @@ muleContext.registry.registerObject(MuleProperties.OBJECT_DEFAULT_RETRY_POLICY_T
 
 muleContext.registry.registerObject("doCompression", "true")
 
-epFactory = muleContext.registry.lookupEndpointFactory()
+epFactory = muleContext.getEndpointFactory()
 
 InboundEndpoint createInboundEndpoint(String url, String name)
 {

@@ -99,3 +99,6 @@ org.mule.test.integration.exceptions.ExceptionStrategyReturnMessageTestCase
 
 # AMQ 5.x never returns a message within xa flow request, regression in amq
 org.mule.test.integration.transport.jms.scripting.JmsRequestFromScriptWithXaTransactionTestCase
+
+# MULE-5578
+org.mule.test.integration.exceptions.ExceptionStrategyFilterTestCase

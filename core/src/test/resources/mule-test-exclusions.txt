@@ -31,3 +31,5 @@ org.mule.client.DefaultLocalMuleClientTestCase
 # Number of test methods are invalid due to changes required for MULE-5450.  Test methods that 
 # still pass are in TransientRegistryTestCase while those that fail are in TransientRegistryLifecycleTestCase
 org.mule.registry.TransientRegistryLifecycleTestCase
+
+org.mule.transport.DispatcherPoolTestCase

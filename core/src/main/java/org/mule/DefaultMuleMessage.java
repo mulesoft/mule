@@ -60,6 +60,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -151,7 +152,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     public DefaultMuleMessage(Object message, Map<String, Object> outboundProperties, Map<String, DataHandler> attachments, MuleContext muleContext)
     {
-        this(message, null, outboundProperties, attachments, muleContext);   
+        this(message, null, outboundProperties, attachments, muleContext);
     }
 
     public DefaultMuleMessage(Object message, Map<String, Object> inboundProperties,
@@ -548,13 +549,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             return getPayloadAsString(encoding);
         }
-        catch (Exception e) 
+        catch (Exception e)
         {
             // TODO Auto-generated catch block
             return  "[Messaage could not be converted to string]";
         }
-    } 
-    
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -564,12 +565,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         {
             return getPayloadAsString();
         }
-        catch (Exception e) 
+        catch (Exception e)
         {
             // TODO Auto-generated catch block
             return  "[Messaage could not be converted to string]";
         }
-    } 
+    }
 
     /**
      * {@inheritDoc}
@@ -1687,9 +1688,6 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public MuleMessage createInboundMessage() throws Exception
     {
         DefaultMuleMessage newMessage =  new DefaultMuleMessage(getPayload(), this, getMuleContext());
@@ -1697,34 +1695,34 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return newMessage;
     }
 
-    /*
-     ** copy outbound artifacts to inbound artifacts in the new message
+    /**
+     * copy outbound artifacts to inbound artifacts in the new message
      */
     protected void copyToInbound(DefaultMuleMessage newMessage) throws Exception
     {
-
-        //Copy message, but put all outbound properties and attachments on inbound
-        //We ignore inbound and invocation scopes since the VM receiver needs to behave the
-        //same way as any other receiver in Mule and would only receive inbound headers and attachments
+        // Copy message, but put all outbound properties and attachments on inbound scope.
+        // We ignore inbound and invocation scopes since the VM receiver needs to behave the
+        // same way as any other receiver in Mule and would only receive inbound headers
+        // and attachments
         Map<String, DataHandler> attachments = new HashMap<String, DataHandler>(3);
         for (String name : getOutboundAttachmentNames())
         {
             attachments.put(name, getOutboundAttachment(name));
         }
 
-        Map<String, Object> properties = new HashMap<String, Object>(3);
+        Map<String, Object> newInboundProperties = new HashMap<String, Object>(3);
         for (String name : getOutboundPropertyNames())
         {
-            properties.put(name, getOutboundProperty(name));
+            newInboundProperties.put(name, getOutboundProperty(name));
         }
 
         newMessage.clearProperties(PropertyScope.INBOUND);
         newMessage.clearProperties(PropertyScope.INVOCATION);
         newMessage.clearProperties(PropertyScope.OUTBOUND);
 
-        for (String s : properties.keySet())
+        for (String s : newInboundProperties.keySet())
         {
-            newMessage.setInboundProperty(s, properties.get(s));
+            newMessage.setInboundProperty(s, newInboundProperties.get(s));
         }
 
         newMessage.inboundAttachments.clear();

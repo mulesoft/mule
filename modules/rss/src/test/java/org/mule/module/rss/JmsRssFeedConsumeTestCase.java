@@ -23,7 +23,7 @@ public class JmsRssFeedConsumeTestCase extends FunctionalTestCase
     public void testConsumeFeed() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        String feed = loadResourceAsString("sample-feed.rss");
+        String feed = SampleFeed.feedAsString();
         client.dispatch("jms://feed.in", feed, null);
         Thread.sleep(3000);
         FeedReceiver component = (FeedReceiver) getComponent("feedConsumer");
@@ -33,7 +33,7 @@ public class JmsRssFeedConsumeTestCase extends FunctionalTestCase
     public void testConsumeSplitFeed() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
-        String feed = loadResourceAsString("sample-feed.rss");
+        String feed = SampleFeed.feedAsString();
         client.dispatch("jms://feed.split.in", feed, null);
         Thread.sleep(3000);
         EntryReceiver component = (EntryReceiver) getComponent("feedSplitterConsumer");

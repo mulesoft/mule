@@ -63,7 +63,7 @@ public class EndpointSelector extends FilteringOutboundRouter
         String endpointName;
 
         String prop = expressionConfig.getFullExpression(expressionManager);
-        if (!muleContext.getExpressionManager().isValidExpression(prop))
+        if (!expressionManager.isValidExpression(prop))
         {
             throw new CouldNotRouteOutboundMessageException(
                     CoreMessages.expressionInvalidForProperty("expression", prop), event, null);
@@ -72,13 +72,13 @@ public class EndpointSelector extends FilteringOutboundRouter
         Object property = null;
         try
         {
-            property = muleContext.getExpressionManager().evaluate(prop, message);
+            property = expressionManager.evaluate(prop, message);
         }
         catch (ExpressionRuntimeException e)
         {
             logger.error(e.getMessage());
         }
-        
+
         if (property == null && getDefaultEndpointName() == null)
         {
             throw new CouldNotRouteOutboundMessageException(
@@ -103,7 +103,7 @@ public class EndpointSelector extends FilteringOutboundRouter
         else
         {
             throw new CouldNotRouteOutboundMessageException(CoreMessages.propertyIsNotSupportedType(
-                    expressionConfig.getFullExpression(expressionManager), 
+                    expressionConfig.getFullExpression(expressionManager),
                     new Class[]{String.class, List.class}, property.getClass()), event, null);
         }
 

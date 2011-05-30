@@ -26,10 +26,10 @@ import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
 
+import static org.mule.module.rss.SampleFeed.ENTRIES_IN_RSS_FEED;
+
 public class FeedConsumeAndSplitTestCase extends DynamicPortTestCase
 {
-    private static final int ENTRIES_IN_RSS_FEED = 25;
-
     private final CounterCallback counter = new CounterCallback();
     private SimpleHttpServer httpServer;
     private AtomicInteger pollCount = new AtomicInteger(0);
@@ -99,11 +99,13 @@ public class FeedConsumeAndSplitTestCase extends DynamicPortTestCase
         Prober prober = new PollingProber(10000, 100);
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 return counter.getCallbackCount() == ENTRIES_IN_RSS_FEED;
             }
 
+            @Override
             public String describeFailure()
             {
                 return String.format("Did not receive %d feed entries (only got %d)",
@@ -118,11 +120,13 @@ public class FeedConsumeAndSplitTestCase extends DynamicPortTestCase
         Prober prober = new PollingProber(2000, 100);
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 return pollCount.get() > currentPollCount;
             }
 
+            @Override
             public String describeFailure()
             {
                 return "Poll count did not increment in time";
@@ -132,14 +136,14 @@ public class FeedConsumeAndSplitTestCase extends DynamicPortTestCase
 
     private class RssFeeder implements Container
     {
+        @Override
         public void handle(Request request, Response response)
         {
-            InputStream rssFeed = getClass().getClassLoader().getResourceAsStream("sample-feed.rss");
-            assertNotNull(rssFeed);
-
             OutputStream responseStream = null;
+            InputStream rssFeed = null;
             try
             {
+                rssFeed = SampleFeed.feedAsStream();
                 responseStream = response.getOutputStream();
                 IOUtils.copy(rssFeed, responseStream);
                 responseStream.close();

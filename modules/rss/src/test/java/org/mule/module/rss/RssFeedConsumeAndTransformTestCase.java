@@ -47,27 +47,20 @@ public class RssFeedConsumeAndTransformTestCase extends FunctionalTestCase
             }
         });
     }
-    
+
     public void testSendFeed() throws Exception
     {
-        InputStream input = getFeedInput();
-        
+        InputStream input = SampleFeed.feedAsStream();
+
         MuleClient client = muleContext.getClient();
         client.dispatch("vm://fromTest", input, null);
-        
+
         assertTrue(receiveLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
-        
+
         Object payload = message.getPayload();
         assertTrue(payload instanceof SyndFeed);
 
         SyndFeed feed = (SyndFeed) payload;
         assertEquals(25, feed.getEntries().size());
-    }
-    
-    private InputStream getFeedInput()
-    {
-        InputStream input = getClass().getClassLoader().getResourceAsStream("sample-feed.rss");
-        assertNotNull(input);
-        return input;
     }
 }

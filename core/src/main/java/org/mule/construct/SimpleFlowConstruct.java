@@ -106,6 +106,9 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct implements Messag
         return messageProcessors;
     }
 
+    /**
+     * @deprecated use setMessageSource(MessageSource) instead
+     */
     @Deprecated
     public void setEndpoint(InboundEndpoint endpoint)
     {
@@ -117,7 +120,7 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct implements Messag
     {
         return "Flow";
     }
-    
+
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleSession calledSession = new DefaultMuleSession(event.getSession(), this);

@@ -17,11 +17,12 @@ import org.mule.tck.AbstractScriptConfigBuilderTestCase;
 import org.mule.util.store.QueuePersistenceObjectStore;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
+import java.io.Serializable;
 import java.util.Properties;
 
 public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
-
+    @Override
     public String getConfigResources()
     {
         return "mule-config.groovy";
@@ -40,14 +41,13 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
             return null;
         }
     }
-
     @Override
     protected Properties getStartUpProperties()
     {
         Properties superProps = super.getStartUpProperties();
         Properties props = superProps == null ? new Properties() : new Properties(superProps);
-        props.put(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, new SimpleMemoryObjectStore());
-        props.put(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, new QueuePersistenceObjectStore());
+        props.put(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME, new SimpleMemoryObjectStore<Serializable>());
+        props.put(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME, new QueuePersistenceObjectStore<Serializable>());
         return props;
     }
 }
