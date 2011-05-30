@@ -14,7 +14,6 @@ import org.mule.api.MuleMessage;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
-import org.mule.construct.SimpleFlowConstruct;
 import org.mule.transport.AbstractPollingMessageReceiver;
 import org.mule.transport.sftp.notification.SftpNotifier;
 
@@ -32,7 +31,7 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
     private SftpReceiverRequesterUtil sftpRRUtil = null;
 
     public SftpMessageReceiver(SftpConnector connector,
-                               SimpleFlowConstruct flow,
+                               FlowConstruct flow,
                                InboundEndpoint endpoint,
                                long frequency) throws CreateException
     {
