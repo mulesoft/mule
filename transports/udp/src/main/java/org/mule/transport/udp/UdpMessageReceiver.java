@@ -33,7 +33,6 @@ import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.resource.spi.work.Work;
@@ -47,7 +46,6 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     protected InetAddress inetAddress;
     protected int bufferSize;
     private URI uri;
-    protected List responseTransformers = null;
 
     protected final AtomicBoolean disposing = new AtomicBoolean(false);
 
@@ -72,8 +70,6 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
         {
             throw new CreateException(UdpMessages.failedToLocateHost(uri), e, this);
         }
-
-        responseTransformers = getResponseTransformers();
     }
 
     @Override
@@ -120,16 +116,6 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
     protected void doStop() throws MuleException
     {
         // nothing to do
-    }
-
-    protected List getResponseTransformers()
-    {
-        List transformers = endpoint.getResponseTransformers();
-        if (transformers == null)
-        {
-            return connector.getDefaultResponseTransformers(endpoint);
-        }
-        return transformers;
     }
 
     protected DatagramSocket createSocket(URI uri, InetAddress inetAddress) throws IOException
@@ -275,26 +261,9 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
 
                 if (returnMessage != null)
                 {
-                    byte[] data;
-                    if (responseTransformers != null)
-                    {
-                        returnMessage.applyTransformers(event, responseTransformers);
-                        Object response = returnMessage.getPayload();
-                        if (response instanceof byte[])
-                        {
-                            data = (byte[]) response;
-                        }
-                        else
-                        {
-                            data = response.toString().getBytes();
-                        }
-                    }
-                    else
-                    {
-                        data = returnMessage.getPayloadAsBytes();
-                    }
-                    DatagramPacket result = new DatagramPacket(data, data.length, packet.getAddress(),
-                            packet.getPort());
+                    byte[] data= returnMessage.getPayloadAsBytes();
+                    DatagramPacket result = new DatagramPacket(data, data.length,
+                        packet.getAddress(), packet.getPort());
                     socket.send(result);
                 }
             }
