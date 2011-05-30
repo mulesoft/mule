@@ -20,7 +20,6 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryContext;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractPollingMessageReceiver;
-import org.mule.transport.ConnectException;
 
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -158,15 +157,7 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
                 return;
             }
 
-            try
-            {
-                client = connector.createFtpClient(endpoint);
-            }
-            catch (Exception e)
-            {
-                throw new ConnectException(e, this);
-            }
-
+            client = connector.createFtpClient(endpoint);
             FtpMuleMessageFactory muleMessageFactory = createMuleMessageFactory(client);
             MuleMessage message = muleMessageFactory.create(file, endpoint.getEncoding());
 
