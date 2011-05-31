@@ -10,25 +10,27 @@
 
 package org.mule.construct;
 
-import java.util.List;
-
-import org.apache.commons.lang.Validate;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
+import org.mule.api.construct.PipelineProcessingStrategy;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
-import org.mule.interceptor.LoggingInterceptor;
 import org.mule.interceptor.ProcessingTimeInterceptor;
+import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
 import org.mule.processor.ResponseMessageProcessorAdapter;
 import org.mule.processor.StopFurtherMessageProcessingMessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChain;
 
+import java.util.List;
+
+import org.apache.commons.lang.Validate;
+
 /**
- * A template class for configuration patterns, which takes care of setting common message processors and optional
- * transformers defined on the pattern.
+ * A template class for configuration patterns, which takes care of setting common message processors and
+ * optional transformers defined on the pattern.
  */
-public abstract class AbstractConfigurationPattern extends AbstractFlowConstruct
+public abstract class AbstractConfigurationPattern extends AbstractPipeline
 {
     protected final List<MessageProcessor> transformers;
     protected final List<MessageProcessor> responseTransformers;
@@ -48,13 +50,8 @@ public abstract class AbstractConfigurationPattern extends AbstractFlowConstruct
     }
 
     @Override
-    protected final void configureMessageProcessors(final MessageProcessorChainBuilder builder)
-        throws MuleException
+    protected final void configureMessageProcessors(final MessageProcessorChainBuilder builder) throws MuleException
     {
-        builder.chain(new ProcessingTimeInterceptor());
-        builder.chain(new LoggingInterceptor());
-        builder.chain(new FlowConstructStatisticsMessageProcessor());
-
         configureMessageProcessorsBeforeTransformation(builder);
 
         builder.chain(DefaultMessageProcessorChain.from(transformers));
@@ -65,7 +62,16 @@ public abstract class AbstractConfigurationPattern extends AbstractFlowConstruct
 
         configureMessageProcessorsAfterTransformation(builder);
     }
-
+    
+    @Override
+    protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException
+    {
+        super.configurePreProcessors(builder);
+        builder.chain(new ProcessIfStartedMessageProcessor(this, getLifecycleState()));
+        builder.chain(new ProcessingTimeInterceptor());
+        builder.chain(new FlowConstructStatisticsMessageProcessor());
+    }
+    
     public boolean hasTransformers()
     {
         return !transformers.isEmpty();
@@ -74,6 +80,12 @@ public abstract class AbstractConfigurationPattern extends AbstractFlowConstruct
     public boolean hasResponseTransformers()
     {
         return !responseTransformers.isEmpty();
+    }
+
+    @Override
+    public final void setProcessingStrategy(PipelineProcessingStrategy processingStrategy)
+    {
+        throw new UnsupportedOperationException();
     }
 
     protected abstract void configureMessageProcessorsBeforeTransformation(final MessageProcessorChainBuilder builder)

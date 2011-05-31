@@ -15,11 +15,11 @@ import org.mule.api.source.MessageSource;
 import org.mule.config.i18n.MessageFactory;
 #end
 import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.construct.AbstractFlowConstruct;
+import org.mule.construct.AbstractPipeline;
 import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
 import org.mule.interceptor.LoggingInterceptor;
 
-public class ${patternClassName} extends AbstractFlowConstruct
+public class ${patternClassName} extends AbstractPipeline
 {
 #if($patternType == "siso")
     private final OutboundEndpoint outboundEndpoint;

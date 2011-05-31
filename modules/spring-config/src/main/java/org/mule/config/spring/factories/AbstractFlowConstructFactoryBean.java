@@ -18,7 +18,6 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.source.MessageSource;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.builder.AbstractFlowConstructBuilder;
@@ -43,12 +42,6 @@ public abstract class AbstractFlowConstructFactoryBean implements FactoryBean<Fl
         public NullFlowConstruct(String name, MuleContext muleContext)
         {
             super(name, muleContext);
-        }
-
-        @Override
-        protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
-        {
-            // NOOP
         }
 
         @Override

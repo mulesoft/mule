@@ -10,27 +10,57 @@
 
 package org.mule.management.stats;
 
+import org.mule.api.construct.PipelineProcessingStrategy;
+import org.mule.construct.AsynchronousProcessingStrategy;
+
 import java.util.concurrent.atomic.AtomicLong;
 
-public class FlowConstructStatistics extends AbstractFlowConstructStatistics
+public class FlowConstructStatistics extends AbstractFlowConstructStatistics implements QueueStatistics
 {
     private static final long serialVersionUID = 5337576392583767442L;
     private final AtomicLong executionError = new AtomicLong(0);
     private final AtomicLong fatalError = new AtomicLong(0);
     private int threadPoolSize = 0;
     protected final ComponentStatistics flowStatistics = new ComponentStatistics();
+    
+    // these can't sensibly converted to AtomicLong as they are processed together
+    // in incQueuedEvent
+    private long queuedEvent = 0;
+    private long maxQueuedEvent = 0;
+    private long averageQueueSize = 0;
+    private long totalQueuedEvent = 0;
 
-    public FlowConstructStatistics(String flowConstructType, String name, int threadPoolSize)
+
+    public FlowConstructStatistics(String flowConstructType, String name, PipelineProcessingStrategy processingStrategy)
     {
         super(flowConstructType, name);
-        this.threadPoolSize = threadPoolSize;
         flowStatistics.setEnabled(enabled);
+        if (processingStrategy instanceof AsynchronousProcessingStrategy)
+        {
+            this.threadPoolSize = ((AsynchronousProcessingStrategy) processingStrategy).getMaxThreads();
+        }
+        if (this.getClass() == FlowConstructStatistics.class)
+        {
+            clear();
+        }
+    }
+    
+    public FlowConstructStatistics(String flowConstructType, String name, int maxThreadSize)
+    {
+        super(flowConstructType, name);
+        flowStatistics.setEnabled(enabled);
+        this.threadPoolSize = maxThreadSize;
         if (this.getClass() == FlowConstructStatistics.class)
         {
             clear();
         }
     }
 
+    public FlowConstructStatistics(String flowConstructType, String name)
+    {
+        this(flowConstructType, name, null);
+    }
+    
     /**
      * Are statistics logged
      */
@@ -118,6 +148,27 @@ public class FlowConstructStatistics extends AbstractFlowConstructStatistics
     public int getThreadPoolSize()
     {
         return threadPoolSize;
+    }
+
+    public synchronized void incQueuedEvent()
+    {
+        queuedEvent++;
+        totalQueuedEvent++;
+        if (queuedEvent > maxQueuedEvent)
+        {
+            maxQueuedEvent = queuedEvent;
+        }
+        averageQueueSize = receivedEventASync.get() / totalQueuedEvent;
+    }
+
+    public synchronized void decQueuedEvent()
+    {
+        queuedEvent--;
+    }
+    
+    public synchronized long getAverageQueueSize()
+    {
+        return averageQueueSize;
     }
 
 }

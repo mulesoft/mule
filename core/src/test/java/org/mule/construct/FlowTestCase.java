@@ -69,12 +69,28 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
         flow.start();
         MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent("hello",
             MessageExchangePattern.ONE_WAY, muleContext));
-        Thread.sleep(10);
+        Thread.sleep(50);
 
         assertNull(response);
 
         assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString());
         assertNotSame(Thread.currentThread(), sensingMessageProcessor.event.getMessage().getOutboundProperty(
+            "thread"));
+    }
+    
+    public void testProcessOneWayEndpointDirect() throws Exception
+    {
+        flow.setMessageSource(null);
+        flow.initialise();
+        flow.start();
+        MuleEvent response = flow.process(MuleTestUtils.getTestInboundEvent("hello",
+            MessageExchangePattern.ONE_WAY, muleContext));
+        Thread.sleep(50);
+
+        assertNull(response);
+
+        assertEquals("helloabc", sensingMessageProcessor.event.getMessageAsString());
+        assertSame(Thread.currentThread(), sensingMessageProcessor.event.getMessage().getOutboundProperty(
             "thread"));
     }
 

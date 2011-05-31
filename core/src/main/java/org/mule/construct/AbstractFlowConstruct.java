@@ -11,9 +11,7 @@
 package org.mule.construct;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.config.ThreadingProfile;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
 import org.mule.api.construct.FlowConstructInvalidException;
@@ -28,15 +26,10 @@ import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.api.processor.MessageProcessorChain;
-import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.source.MessageSource;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.management.stats.FlowConstructStatistics;
-import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.routing.MuleMessageInfoMapping;
 import org.mule.util.ClassUtils;
 
@@ -70,14 +63,11 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
     protected transient Log logger = LogFactory.getLog(getClass());
 
     protected String name;
-    protected MessageSource messageSource;
-    protected MessageProcessorChain messageProcessorChain;
     protected MessagingExceptionHandler exceptionListener;
     protected final FlowConstructLifecycleManager lifecycleManager;
     protected final MuleContext muleContext;
     protected FlowConstructStatistics statistics;
     protected MessageInfoMapping messageInfoMapping = new MuleMessageInfoMapping();
-    protected ThreadingProfile threadingProfile;
 
     public AbstractFlowConstruct(String name, MuleContext muleContext)
     {
@@ -95,25 +85,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
             {
                 public void onTransition(String phaseName, FlowConstruct object) throws MuleException
                 {
-                    createMessageProcessor();
-
-                    if (messageSource != null)
-                    {
-                        // Wrap chain to decouple lifecycle
-                        messageSource.setListener(new AbstractInterceptingMessageProcessor()
-                        {
-                            public MuleEvent process(MuleEvent event) throws MuleException
-                            {
-                                return messageProcessorChain.process(event);
-                            }
-                        });
-                    }
-
-                    injectFlowConstructMuleContext(messageSource);
-                    injectFlowConstructMuleContext(messageProcessorChain);
                     injectFlowConstructMuleContext(exceptionListener);
-                    initialiseIfInitialisable(messageSource);
-                    initialiseIfInitialisable(messageProcessorChain);
                     initialiseIfInitialisable(exceptionListener);
 
                     doInitialise();
@@ -139,9 +111,7 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         {
             public void onTransition(String phaseName, FlowConstruct object) throws MuleException
             {
-                startIfStartable(messageProcessorChain);
                 startIfStartable(exceptionListener);
-                startIfStartable(messageSource);
                 doStart();
             }
         });
@@ -153,10 +123,8 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         {
             public void onTransition(String phaseName, FlowConstruct object) throws MuleException
             {
-                stopIfStoppable(messageSource);
-                stopIfStoppable(messageProcessorChain);
-                stopIfStoppable(exceptionListener);
                 doStop();
+                stopIfStoppable(exceptionListener);
             }
         });
     }
@@ -174,10 +142,8 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
             {
                 public void onTransition(String phaseName, FlowConstruct object) throws MuleException
                 {
-                    disposeIfDisposable(messageProcessorChain);
-                    disposeIfDisposable(exceptionListener);
-                    disposeIfDisposable(messageSource);
                     doDispose();
+                    disposeIfDisposable(exceptionListener);
                 }
             });
         }
@@ -185,11 +151,6 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         {
             logger.error("Failed to stop service: " + name, e);
         }
-    }
-
-    public ThreadingProfile getThreadingProfile()
-    {
-        return threadingProfile;
     }
 
     public boolean isStarted()
@@ -206,44 +167,6 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
     {
         return lifecycleManager.getState().isStopping();
     }
-
-    /**
-     * Creates a {@link MessageProcessor} that will process messages from the
-     * configured {@link MessageSource}.
-     * <p>
-     * The default implementation of this methods uses a
-     * {@link DefaultMessageProcessorChainBuilder} and allows a chain of
-     * {@link MessageProcessor}s to be configured using the
-     * {@link #configureMessageProcessors(org.mule.api.processor.MessageProcessorChainBuilder)}
-     * method but if you wish to use another {@link MessageProcessorBuilder} or just
-     * a single {@link MessageProcessor} then this method can be overridden and
-     * return a single {@link MessageProcessor} instead.
-     * 
-     * @throws MuleException
-     */
-    protected void createMessageProcessor() throws MuleException
-    {
-        DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder(this);
-        builder.setName("'" + getName() + "' processor chain");
-        configureMessageProcessors(builder);
-        messageProcessorChain = builder.build();
-    }
-
-    /**
-     * Used to configure the processing chain for this <code>FlowConstuct</code by
-     * adding {@link MessageProcessor}s to the chain using the builder provided.
-     * <p>
-     * To use a different builder of to construct a composite
-     * {@link MessageProcessor} manually override {@link #createMessageProcessor()}
-     * instead.
-     * 
-     *
-     *
-     *
-     * @param builder instance of {@link org.mule.processor.chain.DefaultMessageProcessorChainBuilder}
-     * @throws MuleException
-     */
-    protected abstract void configureMessageProcessors(MessageProcessorChainBuilder builder) throws MuleException;
 
     public String getName()
     {
@@ -270,16 +193,6 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         return muleContext;
     }
 
-    public MessageSource getMessageSource()
-    {
-        return messageSource;
-    }
-
-    public void setMessageSource(MessageSource messageSource)
-    {
-        this.messageSource = messageSource;
-    }
-
     public FlowConstructStatistics getStatistics()
     {
         return statistics;
@@ -294,11 +207,15 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
     {
         this.messageInfoMapping = messageInfoMapping;
     }
-
-    protected void doInitialise() throws InitialisationException
+    
+    protected void doInitialise() throws MuleException
     {
-        int threadPoolSize = threadingProfile == null ? 0 : threadingProfile.getMaxThreadsActive();
-        statistics = new FlowConstructStatistics(getConstructType(), name, threadPoolSize);
+        configureStatistics();
+    }
+
+    protected void configureStatistics()
+    {
+        statistics = new FlowConstructStatistics(getConstructType(), name);
         statistics.setEnabled(muleContext.getStatistics().isEnabled());
         muleContext.getStatistics().add(statistics);
     }
@@ -379,11 +296,6 @@ public abstract class AbstractFlowConstruct implements FlowConstruct, Lifecycle
         }
     }
     
-    public MessageProcessorChain getMessageProcessorChain()
-    {
-        return this.messageProcessorChain;
-    }
-
     /**
      *
      * @return the type of construct being created, e.g. "Flow"

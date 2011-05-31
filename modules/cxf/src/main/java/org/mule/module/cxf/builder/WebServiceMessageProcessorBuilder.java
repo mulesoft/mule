@@ -16,11 +16,11 @@ import org.mule.api.component.Component;
 import org.mule.api.component.JavaComponent;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.construct.FlowConstructAware;
+import org.mule.api.construct.Pipeline;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.service.Service;
 import org.mule.api.source.MessageSource;
-import org.mule.construct.AbstractFlowConstruct;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.MuleJAXWSInvoker;
@@ -158,9 +158,9 @@ public class WebServiceMessageProcessorBuilder
                     }
                 }
             }
-            else if (flowConstruct instanceof AbstractFlowConstruct)
+            else if (flowConstruct instanceof Pipeline)
             {
-                MessageSource source = ((AbstractFlowConstruct) flowConstruct).getMessageSource();
+                MessageSource source = ((Pipeline) flowConstruct).getMessageSource();
 
                 if (source instanceof InboundEndpoint)
                 {

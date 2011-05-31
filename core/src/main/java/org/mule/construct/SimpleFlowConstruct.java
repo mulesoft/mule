@@ -17,93 +17,58 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleSession;
 import org.mule.api.config.ThreadingProfile;
-import org.mule.api.context.WorkManager;
+import org.mule.api.construct.PipelineProcessingStrategy;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
 import org.mule.construct.processor.FlowConstructStatisticsMessageProcessor;
-import org.mule.interceptor.LoggingInterceptor;
 import org.mule.interceptor.ProcessingTimeInterceptor;
 import org.mule.lifecycle.processor.ProcessIfStartedMessageProcessor;
-import org.mule.processor.OptionalAsyncInterceptingMessageProcessor;
-import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
+import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.session.DefaultMuleSession;
-import org.mule.util.concurrent.ThreadNameHelper;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
- * Simple implementation of {@link AbstractFlowConstruct} that allows a list of
- * {@link MessageProcessor}s that will be used to process messages to be configured.
- * These MessageProcessors are chained together using the
- * {@link DefaultMessageProcessorChainBuilder}.
- * <p/>
- * If not message processors are configured then the source message is simply
- * returned.
+ * This implementation of {@link AbstractPipeline} adds the following functionality: <li>Rejects inbound
+ * events when Flow is not started <li>Gathers statistics and processing time data . <li>Implements
+ * MessagePorcessor allowing direct invocation of the pipeline. <li>Supports the optional configuration of a
+ * {@link PipelineProcessingStrategy} that determines how message processors are processed. The default
+ * {@link PipelineProcessingStrategy} is {@link AsynchronousProcessingStrategy}. With this strategy when
+ * messages are received from a one-way message source and there is no current transactions message processing
+ * in another thread asynchronously.
  */
-public class SimpleFlowConstruct extends AbstractFlowConstruct implements MessageProcessor
+public class SimpleFlowConstruct extends AbstractPipeline implements MessageProcessor
 {
-    protected List<MessageProcessor> messageProcessors = Collections.emptyList();
 
-    protected WorkManager workManager;
+    protected ThreadingProfile threadingProfile;
 
     public SimpleFlowConstruct(String name, MuleContext muleContext)
     {
         super(name, muleContext);
     }
 
-    @Override
-    protected void configureMessageProcessors(MessageProcessorChainBuilder builder)
+    public MuleEvent process(MuleEvent event) throws MuleException
     {
-        if (threadingProfile == null)
+        MuleSession calledSession = new DefaultMuleSession(event.getSession(), this);
+        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event.getEndpoint(), event,
+            calledSession);
+        RequestContext.setEvent(newEvent);
+        try
         {
-            threadingProfile = muleContext.getDefaultServiceThreadingProfile();
+            return pipeline.process(newEvent);
         }
+        finally
+        {
+            RequestContext.setEvent(event);
+        }
+    }
 
-        final String threadPrefix = ThreadNameHelper.flow(muleContext, getName());
-
+    @Override
+    protected void configurePreProcessors(MessageProcessorChainBuilder builder) throws MuleException
+    {
+        super.configurePreProcessors(builder);
         builder.chain(new ProcessIfStartedMessageProcessor(this, getLifecycleState()));
         builder.chain(new ProcessingTimeInterceptor());
-        builder.chain(new LoggingInterceptor());
         builder.chain(new FlowConstructStatisticsMessageProcessor());
-        if (messageSource != null)
-        {
-            builder.chain(new OptionalAsyncInterceptingMessageProcessor(threadingProfile, threadPrefix,
-                muleContext.getConfiguration().getShutdownTimeout()));
-        }
-        for (Object processor : messageProcessors)
-        {
-            if (processor instanceof MessageProcessor)
-            {
-                builder.chain((MessageProcessor) processor);
-            }
-            else if (processor instanceof MessageProcessorBuilder)
-            {
-                builder.chain((MessageProcessorBuilder) processor);
-            }
-            else
-            {
-                throw new IllegalArgumentException(
-                    "MessageProcessorBuilder should only have MessageProcessor's or MessageProcessorBuilder's configured");
-            }
-        }
-    }
-
-    public void setThreadingProfile(ThreadingProfile threadingProfile)
-    {
-        this.threadingProfile = threadingProfile;
-    }
-
-    public void setMessageProcessors(List<MessageProcessor> messageProcessors)
-    {
-        this.messageProcessors = messageProcessors;
-    }
-
-    public List<MessageProcessor> getMessageProcessors()
-    {
-        return messageProcessors;
     }
 
     /**
@@ -121,19 +86,47 @@ public class SimpleFlowConstruct extends AbstractFlowConstruct implements Messag
         return "Flow";
     }
 
-    public MuleEvent process(MuleEvent event) throws MuleException
+    @Deprecated
+    public ThreadingProfile getThreadingProfile()
     {
-        MuleSession calledSession = new DefaultMuleSession(event.getSession(), this);
-        MuleEvent newEvent = new DefaultMuleEvent(event.getMessage(), event.getEndpoint(), event, calledSession);
-        RequestContext.setEvent(newEvent);
-        try
+        return threadingProfile;
+    }
+
+    @Deprecated
+    public void setThreadingProfile(ThreadingProfile threadingProfile)
+    {
+        this.threadingProfile = threadingProfile;
+    }
+
+    @Override
+    protected void doInitialise() throws MuleException
+    {
+        if (messageSource == null)
         {
-            return messageProcessorChain.process(newEvent);
+            processingStrategy = new SynchronousProcessingStrategy();
         }
-        finally
+        else
         {
-            RequestContext.setEvent(event);
+            processingStrategy = new QueuedAsyncProcessingStrategy();
         }
+        super.doInitialise();
+    }
+
+    @Override
+    protected void configureStatistics()
+    {
+        if (processingStrategy instanceof AsynchronousProcessingStrategy
+            && ((AsynchronousProcessingStrategy) processingStrategy).getMaxThreads() != null)
+        {
+            statistics = new FlowConstructStatistics(getConstructType(), name,
+                ((AsynchronousProcessingStrategy) processingStrategy).getMaxThreads());
+        }
+        else
+        {
+            statistics = new FlowConstructStatistics(getConstructType(), name);
+        }
+        statistics.setEnabled(muleContext.getStatistics().isEnabled());
+        muleContext.getStatistics().add(statistics);
     }
 
 }
