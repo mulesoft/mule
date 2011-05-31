@@ -12,7 +12,7 @@ package org.mule.transport.quartz.config;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.NamableObject;
+import org.mule.api.NameableObject;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.quartz.QuartzConnector;
@@ -22,7 +22,7 @@ import org.quartz.Scheduler;
 /**
  * TODO
  */
-public class ScheduleConfigBuilder implements NamableObject
+public class ScheduleConfigBuilder implements NameableObject
 {
     private EndpointBuilder endpointBuilder;
     private QuartzConnector connector;

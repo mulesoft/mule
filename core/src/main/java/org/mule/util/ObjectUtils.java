@@ -10,7 +10,7 @@
 
 package org.mule.util;
 
-import org.mule.api.NamableObject;
+import org.mule.api.NameableObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -337,9 +337,9 @@ public class ObjectUtils extends org.apache.commons.lang.ObjectUtils
         }
 
         String str = obj.getClass().getName();
-        if (obj instanceof NamableObject)
+        if (obj instanceof NameableObject)
         {
-            str += String.format(" '%s'", ((NamableObject) obj).getName());
+            str += String.format(" '%s'", ((NameableObject) obj).getName());
         }
         return str;
     }

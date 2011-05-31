@@ -10,7 +10,7 @@
 
 package org.mule.api.transformer;
 
-import org.mule.api.NamableObject;
+import org.mule.api.NameableObject;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.lifecycle.Disposable;
@@ -24,7 +24,7 @@ import java.util.List;
  * <code>Transformer</code> can be chained together to covert message payloads
  * from one object type to another.
  */
-public interface Transformer extends MessageProcessor, Initialisable, Disposable, NamableObject, MuleContextAware, EndpointAware
+public interface Transformer extends MessageProcessor, Initialisable, Disposable, NameableObject, MuleContextAware, EndpointAware
 {
 
     /**

@@ -137,9 +137,9 @@ public class GuiceRegistry extends AbstractRegistry
 //                    {
 //                        name = ((Named)binding.getKey().getAnnotation()).value();
 //                    }
-//                    else if(object instanceof NamableObject)
+//                    else if(object instanceof NameableObject)
 //                    {
-//                        name = ((NamableObject)object).getName();
+//                        name = ((NameableObject)object).getName();
 //                    }
 //                    else
 //                    {

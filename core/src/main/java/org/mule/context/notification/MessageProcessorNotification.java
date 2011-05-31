@@ -12,7 +12,7 @@ package org.mule.context.notification;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.NamableObject;
+import org.mule.api.NameableObject;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.context.notification.BlockingServerEvent;
 import org.mule.api.context.notification.ServerNotification;
@@ -58,7 +58,7 @@ public class MessageProcessorNotification extends ServerNotification implements 
             }
             catch (NoSuchMethodException e)
             {
-                // no such method, fallback to MP class name + NamableObject
+                // no such method, fallback to MP class name + NameableObject
                 messageProcessorName = toString(processor);
             }
         }
@@ -96,9 +96,9 @@ public class MessageProcessorNotification extends ServerNotification implements 
         }
 
         String name;
-        if (obj instanceof NamableObject)
+        if (obj instanceof NameableObject)
         {
-            name = String.format("%s '%s'", obj.getClass().getName(), ((NamableObject) obj).getName());
+            name = String.format("%s '%s'", obj.getClass().getName(), ((NameableObject) obj).getName());
         }
         else
         {

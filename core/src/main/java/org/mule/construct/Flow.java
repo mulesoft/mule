@@ -107,7 +107,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
         }
         else
         {
-            processingStrategy = new QueuedAsyncProcessingStrategy();
+            processingStrategy = new AsynchronousProcessingStrategy();
         }
         super.doInitialise();
     }

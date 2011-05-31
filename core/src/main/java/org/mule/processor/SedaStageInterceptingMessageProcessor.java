@@ -16,7 +16,7 @@ import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.NamableObject;
+import org.mule.api.NameableObject;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManager;
 import org.mule.api.exception.MessagingExceptionHandler;
@@ -330,9 +330,9 @@ public class SedaStageInterceptingMessageProcessor extends OptionalAsyncIntercep
         {
             return name;
         }
-        else if (next instanceof NamableObject)
+        else if (next instanceof NameableObject)
         {
-            return ((NamableObject) next).getName();
+            return ((NameableObject) next).getName();
         }
         else
         {

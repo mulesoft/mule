@@ -11,7 +11,7 @@ package org.mule.module.guice;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleRuntimeException;
-import org.mule.api.NamableObject;
+import org.mule.api.NameableObject;
 import org.mule.api.agent.Agent;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.registry.RegistrationException;
@@ -83,9 +83,9 @@ public class MuleSupportModule extends AbstractModule
                     try
                     {
                         Object o = ((ProviderMethod)i).get();
-                        if(o instanceof NamableObject)
+                        if(o instanceof NameableObject)
                         {
-                            ((NamableObject)o).setName(bindTo.value());
+                            ((NameableObject)o).setName(bindTo.value());
                         }
                         muleContext.getRegistry().registerObject(bindTo.value(), o);
                     }

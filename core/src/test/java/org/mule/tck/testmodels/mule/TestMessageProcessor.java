@@ -12,11 +12,11 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.NamableObject;
+import org.mule.api.NameableObject;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.util.ObjectUtils;
 
-public class TestMessageProcessor implements MessageProcessor, NamableObject
+public class TestMessageProcessor implements MessageProcessor, NameableObject
 {
     /** Simple label string to be appended to the payload. */
     private String label;

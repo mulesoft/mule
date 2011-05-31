@@ -11,13 +11,13 @@
 package org.mule.api.expression;
 
 import org.mule.api.MuleMessage;
-import org.mule.api.NamableObject;
+import org.mule.api.NameableObject;
 
 /**
  * <code>ExpressionEnricher</code> enriches a message using the extensible mule
  * expression framework allowing the contribution of additional enrichers.
  */
-public interface ExpressionEnricher extends NamableObject
+public interface ExpressionEnricher extends NameableObject
 {
 
     /**

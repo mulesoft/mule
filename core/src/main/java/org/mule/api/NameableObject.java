@@ -13,7 +13,7 @@ package org.mule.api;
 /**
  * Adds {@link #getName} and {@link #setName} methods to an object
  */
-public interface NamableObject extends NamedObject
+public interface NameableObject extends NamedObject
 {
     /**
      * Sets the name of the object

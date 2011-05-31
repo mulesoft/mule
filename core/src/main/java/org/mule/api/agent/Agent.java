@@ -10,7 +10,7 @@
 
 package org.mule.api.agent;
 
-import org.mule.api.NamableObject;
+import org.mule.api.NameableObject;
 import org.mule.api.lifecycle.Lifecycle;
 
 /**
@@ -18,7 +18,7 @@ import org.mule.api.lifecycle.Lifecycle;
  * destroyed along with the MuleContext itself. Agents can initialise or bind to
  * external services such as a Jmx server.
  */
-public interface Agent extends Lifecycle, NamableObject
+public interface Agent extends Lifecycle, NameableObject
 {
     /**
      * A description of the agent that gets displayed in the splash

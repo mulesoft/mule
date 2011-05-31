@@ -12,7 +12,7 @@ package org.mule.registry;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.api.NamableObject;
+import org.mule.api.NameableObject;
 import org.mule.api.agent.Agent;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
@@ -745,8 +745,8 @@ public class MuleRegistryHelper implements MuleRegistry
     }
 
     /**
-     * Returns the name for the object passed in.  If the object implements {@link org.mule.api.NamableObject}, then
-     * {@link org.mule.api.NamableObject#getName()} will be returned, otherwise a name is generated using the class name
+     * Returns the name for the object passed in.  If the object implements {@link org.mule.api.NameableObject}, then
+     * {@link org.mule.api.NameableObject#getName()} will be returned, otherwise a name is generated using the class name
      * and a generated UUID.
      * @param obj the object to inspect
      * @return the name for this object
@@ -754,9 +754,9 @@ public class MuleRegistryHelper implements MuleRegistry
     protected String getName(Object obj)
     {
         String name = null;
-        if (obj instanceof NamableObject)
+        if (obj instanceof NameableObject)
         {
-            name = ((NamableObject) obj).getName();
+            name = ((NameableObject) obj).getName();
         }
         else if (obj instanceof FlowConstruct)
         {
