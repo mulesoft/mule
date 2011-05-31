@@ -99,20 +99,6 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     }
 
     @Override
-    protected void doInitialise() throws MuleException
-    {
-        if (messageSource == null)
-        {
-            processingStrategy = new SynchronousProcessingStrategy();
-        }
-        else
-        {
-            processingStrategy = new AsynchronousProcessingStrategy();
-        }
-        super.doInitialise();
-    }
-
-    @Override
     protected void configureStatistics()
     {
         if (processingStrategy instanceof AsynchronousProcessingStrategy

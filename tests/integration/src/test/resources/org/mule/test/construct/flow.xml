@@ -39,6 +39,24 @@
         <append-string-transformer message="1" />
         <processor ref="composite1" />
     </flow>
+    
+    <flow name="synchronousFlow" processingStrategy="synchronous">
+        <vm:inbound-endpoint path="synchronous" exchange-pattern="one-way"/>
+        <custom-processor class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$ThreadSensingMessageProcessor"/>
+        <vm:outbound-endpoint path="synchronous-out" exchange-pattern="one-way"/>
+    </flow>    
+
+    <flow name="asynchronousFlow" processingStrategy="asynchronous">
+        <vm:inbound-endpoint path="asynchronous" exchange-pattern="one-way"/>
+        <custom-processor class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$ThreadSensingMessageProcessor"/>
+        <vm:outbound-endpoint path="asynchronous-out" exchange-pattern="one-way"/>
+    </flow>    
+
+    <flow name="queuedAsynchronousFlow" processingStrategy="queued-asynchronous">
+        <vm:inbound-endpoint path="queued-asynchronous" exchange-pattern="one-way"/>
+        <custom-processor class="org.mule.test.construct.FlowConfigurationFunctionalTestCase$ThreadSensingMessageProcessor"/>
+        <vm:outbound-endpoint path="queued-asynchronous-out" exchange-pattern="one-way"/>
+    </flow>    
 
     <flow name="inout">
         <vm:inbound-endpoint path="inout-in" exchange-pattern="one-way" />
@@ -354,7 +372,7 @@
         <vm:outbound-endpoint path="poll2-out"/>
     </flow>
     
-    <flow name="pollappend">
+    <flow name="pollappend" processingStrategy="synchronous">
         <append-string-transformer message="pollappend" />
     </flow>
 

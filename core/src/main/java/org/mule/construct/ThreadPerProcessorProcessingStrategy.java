@@ -14,16 +14,14 @@ import org.mule.api.construct.Pipeline;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChainBuilder;
-import org.mule.util.queue.QueueManager;
 
 import javax.resource.spi.work.WorkManager;
 
 /**
- * This strategy uses the {@link QueueManager} to decouple the processing of each message processor. Each
- * queue is polled and a {@link WorkManager} is used to schedule processing of the message processors in a new
+ * This strategy uses a {@link WorkManager} to schedule the processing of each message processors in a new
  * worker thread.
  */
-public class QueuedAsyncPerProcessorProcessingStrategy extends QueuedAsyncProcessingStrategy
+public class ThreadPerProcessorProcessingStrategy extends AsynchronousProcessingStrategy
 {
 
     @Override

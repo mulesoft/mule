@@ -31,7 +31,7 @@ import javax.resource.spi.work.WorkManager;
  * polled and a {@link WorkManager} is used to schedule processing of the pipeline of message processors in a
  * single worker thread.
  */
-public class QueuedAsyncProcessingStrategy extends AsynchronousProcessingStrategy
+public class QueuedAsynchronousProcessingStrategy extends AsynchronousProcessingStrategy
     implements QueueStatisticsAware
 {
 

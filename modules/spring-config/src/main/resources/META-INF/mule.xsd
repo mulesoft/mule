@@ -1895,7 +1895,69 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-            </xsd:extension>
+                 <xsd:attribute name="processingStrategy" use="optional" default="queued-asynchronous">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Strategy used to process the message processors configured.  
+                            This attribute accepts either one of the enumerated strategies with default configuration options or a reference to a gloablly defined strategy.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:union>
+                            <xsd:simpleType>
+                                <xsd:restriction base="xsd:string">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
+                                            The name of a globally configured processing strategy
+                                        </xsd:documentation>
+                                    </xsd:annotation>
+                                </xsd:restriction>
+                            </xsd:simpleType>
+                            <xsd:simpleType>
+                                <xsd:restriction base="xsd:NMTOKEN">
+                                    <xsd:enumeration value="synchronous">
+                                        <xsd:annotation>
+                                            <xsd:documentation>
+                                                Processes all message processors in the calling thread.
+                                            </xsd:documentation>
+                                        </xsd:annotation>
+                                    </xsd:enumeration>
+                                    <xsd:enumeration value="asynchronous">
+                                        <xsd:annotation>
+                                            <xsd:documentation>
+                                                Uses a worker thread to process the pipeline of message processors asynchonously.
+                                            </xsd:documentation>
+                                        </xsd:annotation>
+                                    </xsd:enumeration>
+                                    <xsd:enumeration value="queued-asynchronous">
+                                        <xsd:annotation>
+                                            <xsd:documentation>
+                                                Decouples the recieving of a new message from it's processing using a queue. 
+                                                The queue is polled and a worker thread used to process the pipeline of message processors asynchonously.
+                                            </xsd:documentation>
+                                        </xsd:annotation>
+                                    </xsd:enumeration>
+                                    <xsd:enumeration value="thread-per-processor">
+                                        <xsd:annotation>
+                                            <xsd:documentation>
+                                                EXPERIMENTAL: Uses a worker thread to process each message processors asynchronously.
+                                            </xsd:documentation>
+                                        </xsd:annotation>
+                                    </xsd:enumeration>
+                                    <xsd:enumeration value="queued-thread-per-processor">
+                                        <xsd:annotation>
+                                            <xsd:documentation>
+                                                EXPERIMENTAL:  Decouples the processing of each message processor using a queue. 
+                                                The queue is polled and a worker thread used to process each message processor asynchronously.
+                                            </xsd:documentation>
+                                        </xsd:annotation>
+                                    </xsd:enumeration>
+                                </xsd:restriction>
+                            </xsd:simpleType>
+                        </xsd:union>
+                    </xsd:simpleType>
+                </xsd:attribute>
+           </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 

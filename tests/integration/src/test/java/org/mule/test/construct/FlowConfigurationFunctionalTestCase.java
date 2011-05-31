@@ -17,6 +17,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.construct.Flow;
@@ -62,6 +63,36 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         assertEquals("012xyzabc3", muleContext.getClient().send("vm://in",
             new DefaultMuleMessage("0", muleContext)).getPayloadAsString());
 
+    }
+    
+    public void testFlowSynchronous() throws MuleException
+    {
+        muleContext.getClient().send("vm://synchronous", new DefaultMuleMessage("0", muleContext));
+        MuleMessage message = muleContext.getClient().request("vm://synchronous-out", RECEIVE_TIMEOUT);
+        assertNotNull(message);
+        Thread thread = (Thread) message.getPayload();
+        assertNotNull(thread);
+        assertEquals(Thread.currentThread(), thread);
+    }
+
+    public void testFlowAynchronous() throws MuleException
+    {
+        muleContext.getClient().send("vm://asynchronous", new DefaultMuleMessage("0", muleContext));
+        MuleMessage message = muleContext.getClient().request("vm://asynchronous-out", RECEIVE_TIMEOUT);
+        assertNotNull(message);
+        Thread thread = (Thread) message.getPayload();
+        assertNotNull(thread);
+        assertNotSame(Thread.currentThread(), thread);
+    }
+
+    public void testFlowQueuedAsynchronous() throws MuleException
+    {
+        muleContext.getClient().send("vm://queued-asynchronous", new DefaultMuleMessage("0", muleContext));
+        MuleMessage message = muleContext.getClient().request("vm://queued-asynchronous-out", RECEIVE_TIMEOUT);
+        assertNotNull(message);
+        Thread thread = (Thread) message.getPayload();
+        assertNotNull(thread);
+        assertNotSame(Thread.currentThread(), thread);
     }
 
     public void testFlowCompositeSource() throws MuleException, Exception
@@ -481,6 +512,15 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         MuleMessage message = muleContext.getClient().request("vm://poll2-out", RECEIVE_TIMEOUT);
         assertNotNull(message);
         assertEquals("pollappendout", message.getPayloadAsString());
+    }
+    
+    public static class ThreadSensingMessageProcessor implements MessageProcessor
+    {
+        public MuleEvent process(MuleEvent event) throws MuleException
+        {
+            event.getMessage().setPayload(Thread.currentThread());
+            return event;
+        }
     }
 
 }
