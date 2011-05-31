@@ -36,12 +36,12 @@ import org.mule.session.DefaultMuleSession;
  * messages are received from a one-way message source and there is no current transactions message processing
  * in another thread asynchronously.
  */
-public class SimpleFlowConstruct extends AbstractPipeline implements MessageProcessor
+public class Flow extends AbstractPipeline implements MessageProcessor
 {
 
     protected ThreadingProfile threadingProfile;
 
-    public SimpleFlowConstruct(String name, MuleContext muleContext)
+    public Flow(String name, MuleContext muleContext)
     {
         super(name, muleContext);
     }

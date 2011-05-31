@@ -12,7 +12,7 @@ package org.mule.registry;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
@@ -87,7 +87,7 @@ public class RegistryBrokerTestCase extends AbstractMuleTestCase
         }
     }
 
-    class LifecycleTrackerFlow extends SimpleFlowConstruct
+    class LifecycleTrackerFlow extends Flow
     {
 
         public LifecycleTrackerFlow(String name, MuleContext muleContext)

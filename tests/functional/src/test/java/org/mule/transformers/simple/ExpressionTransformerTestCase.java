@@ -15,7 +15,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.expression.transformers.BeanBuilderTransformer;
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.expression.transformers.ExpressionTransformer;
@@ -172,7 +172,7 @@ public class ExpressionTransformerTestCase extends FunctionalTestCase
 
     public void testTransformerConfigWithSingleArgumentShortcutConfigInFlow() throws Exception
     {
-        SimpleFlowConstruct flow = (SimpleFlowConstruct) muleContext.getRegistry().lookupFlowConstruct("et");
+        Flow flow = (Flow) muleContext.getRegistry().lookupFlowConstruct("et");
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("foo", "moo");
         props.put("bar", "mar");

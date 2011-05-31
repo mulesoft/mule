@@ -18,7 +18,7 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
@@ -132,7 +132,7 @@ public abstract class AbstractOutboundMessageProcessorBuilder
             
             EndpointBuilder ep = muleContext.getEndpointFactory().getEndpointBuilder(decoupledEndpoint);
             
-            SimpleFlowConstruct flow = new SimpleFlowConstruct("decoupled-" + ep.toString(), muleContext);
+            Flow flow = new Flow("decoupled-" + ep.toString(), muleContext);
             flow.setMessageProcessors(mps);
             flow.setMessageSource(ep.buildInboundEndpoint());
             muleContext.getRegistry().registerObject(flow.getName(), flow);

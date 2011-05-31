@@ -19,7 +19,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.transformer.Transformer;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.context.notification.MessageProcessorNotification;
 import org.mule.routing.MessageFilter;
 
@@ -79,7 +79,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
             fireNotification(event.getFlowConstruct(), event, processor,
                 MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE);
 
-            if (flowConstruct instanceof SimpleFlowConstruct && processorIterator.hasNext()
+            if (flowConstruct instanceof Flow && processorIterator.hasNext()
                 && processorMayReturnNull(processor))
             {
                 copy = OptimizedRequestContext.criticalSetEvent(currentEvent);
@@ -94,7 +94,7 @@ public class DefaultMessageProcessorChain extends AbstractMessageProcessorChain
             {
                 currentEvent = resultEvent;
             }
-            else if (flowConstruct instanceof SimpleFlowConstruct && processorIterator.hasNext())
+            else if (flowConstruct instanceof Flow && processorIterator.hasNext())
             {
                 // // In a flow when a MessageProcessor returns null the next
                 // processor acts as an implicit

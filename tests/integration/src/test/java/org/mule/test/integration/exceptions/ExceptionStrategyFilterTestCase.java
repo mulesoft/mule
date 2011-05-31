@@ -16,7 +16,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.transaction.RollbackMethod;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
@@ -44,7 +44,7 @@ public class ExceptionStrategyFilterTestCase extends FunctionalTestCase
         FlowConstruct flow = getFlowConstruct("filter");
         assertNotNull(flow);
 
-        SimpleFlowConstruct simpleFlow = (SimpleFlowConstruct) flow;
+        Flow simpleFlow = (Flow) flow;
         simpleFlow.setExceptionListener(new TestMessagingExceptionHandler(exceptionHandlerLatch));
     }
 

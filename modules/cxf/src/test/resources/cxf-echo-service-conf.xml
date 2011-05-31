@@ -25,7 +25,7 @@
     </flow>
 
     <flow name="helloServiceClient">
-        <inbound-endpoint address="vm://helloClient" />
+        <inbound-endpoint address="vm://helloClient" exchange-pattern="request-response"/>
         <cxf:jaxws-client serviceClass="org.mule.module.cxf.example.HelloWorldImpl" operation="sayHi"/>
         <outbound-endpoint address="http://localhost:${port1}/hello" />
         <message-properties-transformer scope="outbound">

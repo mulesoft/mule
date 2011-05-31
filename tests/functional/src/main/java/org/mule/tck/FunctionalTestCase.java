@@ -20,7 +20,7 @@ import org.mule.api.service.Service;
 import org.mule.component.AbstractJavaComponent;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.construct.SimpleService;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.IOUtils;
@@ -91,9 +91,9 @@ public abstract class FunctionalTestCase extends AbstractMuleTestCase
         {
             return getComponentObject(((SimpleService) flowConstruct).getComponent());
         }
-        else if (flowConstruct instanceof SimpleFlowConstruct)
+        else if (flowConstruct instanceof Flow)
         {
-            SimpleFlowConstruct flow = (SimpleFlowConstruct)flowConstruct;
+            Flow flow = (Flow)flowConstruct;
             //Retrieve the first component
             for (MessageProcessor processor : flow.getMessageProcessors())
             {

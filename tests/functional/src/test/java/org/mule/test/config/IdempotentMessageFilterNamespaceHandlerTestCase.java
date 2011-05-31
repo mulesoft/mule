@@ -13,7 +13,7 @@ package org.mule.test.config;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.store.ObjectStore;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.routing.IdempotentMessageFilter;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.SystemUtils;
@@ -87,9 +87,9 @@ public class IdempotentMessageFilterNamespaceHandlerTestCase extends FunctionalT
     private IdempotentMessageFilter idempotentMessageFilterFromFlow(String flowName) throws Exception
     {
         FlowConstruct flow = getFlowConstruct(flowName);
-        assertTrue(flow instanceof SimpleFlowConstruct);
+        assertTrue(flow instanceof Flow);
 
-        SimpleFlowConstruct simpleFlow = (SimpleFlowConstruct) flow;
+        Flow simpleFlow = (Flow) flow;
         List<MessageProcessor> processors = simpleFlow.getMessageProcessors();
         assertEquals(1, processors.size());
 

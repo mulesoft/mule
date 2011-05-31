@@ -37,7 +37,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.wire.WireFormat;
 import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.model.seda.SedaService;
@@ -163,11 +163,11 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
         if (destComponent != null)
         {
             Object fc = muleContext.getRegistry().lookupObject(destComponent);
-            if (!(fc instanceof SimpleFlowConstruct))
+            if (!(fc instanceof Flow))
             {
                 return handleException(null, new DefaultMuleException(ClientMessages.noSuchFlowConstruct(destComponent)));
             }
-            SimpleFlowConstruct flowConstruct = (SimpleFlowConstruct) fc;
+            Flow flowConstruct = (Flow) fc;
             MuleSession session = new DefaultMuleSession(flowConstruct, muleContext);
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but

@@ -12,7 +12,7 @@ package org.mule.module.atom.config;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.Transformer;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.module.atom.routing.EntryLastUpdatedFilter;
 import org.mule.module.atom.routing.FeedLastUpdatedFilter;
 import org.mule.module.atom.routing.FeedSplitter;
@@ -32,7 +32,7 @@ public class AtomNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testFlowConfig() throws Exception
     {
-        SimpleFlowConstruct flowConstruct = muleContext.getRegistry().lookupObject("flowTest");
+        Flow flowConstruct = muleContext.getRegistry().lookupObject("flowTest");
         assertNotNull(flowConstruct);
         assertTrue(flowConstruct.getMessageSource() instanceof InboundEndpoint);
         InboundEndpoint ep = ((InboundEndpoint)flowConstruct.getMessageSource());

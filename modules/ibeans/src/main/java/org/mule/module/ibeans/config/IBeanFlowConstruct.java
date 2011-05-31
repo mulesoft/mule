@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.mule.api.MuleContext;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 
 /**
  * This is an empty flow construct that is used to host an iBean as a component with
@@ -25,7 +25,7 @@ import org.mule.construct.SimpleFlowConstruct;
  * 
  * @see org.mule.module.ibeans.config.CallInterfaceBinding
  */
-public class IBeanFlowConstruct extends SimpleFlowConstruct
+public class IBeanFlowConstruct extends Flow
 {
     public IBeanFlowConstruct(String name, MuleContext muleContext)
     {

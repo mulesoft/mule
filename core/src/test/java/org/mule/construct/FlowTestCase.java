@@ -25,7 +25,7 @@ import java.util.List;
 public class FlowTestCase extends AbstractFlowConstuctTestCase
 {
 
-    private SimpleFlowConstruct flow;
+    private Flow flow;
     private SensingNullMessageProcessor sensingMessageProcessor;
 
     @Override
@@ -35,7 +35,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
 
         sensingMessageProcessor = getSensingNullMessageProcessor();
 
-        flow = new SimpleFlowConstruct("test-flow", muleContext);
+        flow = new Flow("test-flow", muleContext);
         flow.setMessageSource(directInboundMessageSource);
 
         List<MessageProcessor> processors = new ArrayList<MessageProcessor>();

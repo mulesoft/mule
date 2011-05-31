@@ -19,7 +19,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.PropertyScope;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.source.StartableCompositeMessageSource;
 import org.mule.tck.FunctionalTestCase;
@@ -51,7 +51,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
     public void testFlow() throws MuleException, Exception
     {
-        final SimpleFlowConstruct flow = muleContext.getRegistry().lookupObject("flow");
+        final Flow flow = muleContext.getRegistry().lookupObject("flow");
         assertEquals(DefaultInboundEndpoint.class, flow.getMessageSource().getClass());
         assertEquals("vm://in", ((InboundEndpoint) flow.getMessageSource()).getEndpointURI()
             .getUri()
@@ -66,7 +66,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
     public void testFlowCompositeSource() throws MuleException, Exception
     {
-        final SimpleFlowConstruct flow = muleContext.getRegistry().lookupObject("flow2");
+        final Flow flow = muleContext.getRegistry().lookupObject("flow2");
         assertEquals(StartableCompositeMessageSource.class, flow.getMessageSource().getClass());
         assertEquals(2, flow.getMessageProcessors().size());
 
@@ -161,7 +161,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         map.put("banana", banana);
         map.put("orange", orange);
 
-        MuleEvent result = ((SimpleFlowConstruct) muleContext.getRegistry().lookupFlowConstruct("split-map")).process(getTestEvent(map));
+        MuleEvent result = ((Flow) muleContext.getRegistry().lookupFlowConstruct("split-map")).process(getTestEvent(map));
 
         assertNotNull(result);
         assertTrue(result.getMessage() instanceof MuleMessageCollection);
@@ -455,7 +455,7 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
 
     public void testFlowThreadingProfile() throws MuleException, Exception
     {
-        SimpleFlowConstruct flow = muleContext.getRegistry().lookupObject("flow-threading-profile");
+        Flow flow = muleContext.getRegistry().lookupObject("flow-threading-profile");
         assertTrue(flow.getThreadingProfile().isDoThreading());
         assertEquals(2, flow.getThreadingProfile().getMaxThreadsActive());
         assertEquals(1, flow.getThreadingProfile().getMaxThreadsIdle());

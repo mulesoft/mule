@@ -39,7 +39,7 @@ import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.api.transport.MuleMessageFactory;
 import org.mule.component.DefaultJavaComponent;
-import org.mule.construct.SimpleFlowConstruct;
+import org.mule.construct.Flow;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.model.seda.SedaModel;
@@ -542,7 +542,7 @@ public final class MuleTestUtils
         return getTestService("appleService", Apple.class, context);
     }
     
-    public static SimpleFlowConstruct getTestFlow(MuleContext context) throws Exception
+    public static Flow getTestFlow(MuleContext context) throws Exception
     {
         return getTestFlow("appleFlow", context);
     }
@@ -558,7 +558,7 @@ public final class MuleTestUtils
         return getTestService(name, clazz, props, context, true);
     }
 
-    public static SimpleFlowConstruct getTestFlow(String name, MuleContext context) throws Exception
+    public static Flow getTestFlow(String name, MuleContext context) throws Exception
     {
         return getTestFlow(name, context, true);
     }
@@ -589,10 +589,10 @@ public final class MuleTestUtils
         return service;
     }
     
-    public static SimpleFlowConstruct getTestFlow(String name, MuleContext context, boolean initialize)
+    public static Flow getTestFlow(String name, MuleContext context, boolean initialize)
         throws Exception
     {
-        final SimpleFlowConstruct flow = new SimpleFlowConstruct(name, context);
+        final Flow flow = new Flow(name, context);
         if (initialize)
         {
             context.getRegistry().registerFlowConstruct(flow);
