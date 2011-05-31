@@ -319,28 +319,38 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (Exception e)
         {
-            RollbackMethod rollbackMethod = new RollbackMethod()
-            {                
-                @Override
-                public void rollback()
-                {
-                    try
-                    {
-                        rollbackFileMove(sourceFile, originalSourceFile);
-                    }
-                    catch (IOException e)
-                    {
-                        logger.warn(e);
-                    }
-                }
-            };
+            RollbackMethod rollbackMethod;
             if (!sourceFile.getAbsolutePath().equals(originalSourceFile))
-            {            
-                connector.getMuleContext().getExceptionListener().handleException(e, rollbackMethod);                
+            {
+                rollbackMethod = new RollbackMethod()
+                {                
+                    @Override
+                    public void rollback()
+                    {
+                        try
+                        {
+                            rollbackFileMove(sourceFile, originalSourceFile);
+                        }
+                        catch (IOException e)
+                        {
+                            logger.warn(e);
+                        }
+                    }
+                };
             }
             else
             {
-                connector.getMuleContext().getExceptionListener().handleException(e);
+                rollbackMethod = null;
+            }
+
+            if (e instanceof MessagingException)
+            {            
+                MuleEvent event = ((MessagingException) e).getEvent();
+                event.getFlowConstruct().getExceptionListener().handleException(e, event, rollbackMethod);                
+            }
+            else
+            {
+                connector.getMuleContext().getExceptionListener().handleException(e, rollbackMethod);
             }
         }
     }
