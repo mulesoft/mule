@@ -22,6 +22,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.ImmutableEndpoint;
@@ -30,6 +31,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transformer.DataType;
@@ -37,7 +39,6 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.api.transformer.wire.WireFormat;
 import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.construct.Flow;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.model.seda.SedaService;
@@ -162,13 +163,12 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
 
         if (destComponent != null)
         {
-            Object fc = muleContext.getRegistry().lookupObject(destComponent);
-            if (!(fc instanceof Flow))
+            Object flowConstruct = muleContext.getRegistry().lookupObject(destComponent);
+            if (!(flowConstruct instanceof FlowConstruct && flowConstruct instanceof MessageProcessor))
             {
                 return handleException(null, new DefaultMuleException(ClientMessages.noSuchFlowConstruct(destComponent)));
             }
-            Flow flowConstruct = (Flow) fc;
-            MuleSession session = new DefaultMuleSession(flowConstruct, muleContext);
+            MuleSession session = new DefaultMuleSession((FlowConstruct) flowConstruct, muleContext);
             // Need to do this otherise when the event is invoked the
             // transformer associated with the Mule Admin queue will be invoked, but
             // the message will not be of expected type
@@ -182,7 +182,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
 
             if (context.getExchangePattern().hasResponse())
             {
-                MuleEvent resultEvent = flowConstruct.process(event);
+                MuleEvent resultEvent = ((MessageProcessor) flowConstruct).process(event);
                 result = resultEvent == null ? null : resultEvent.getMessage();
                 if (result == null)
                 {
@@ -197,7 +197,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             }
             else
             {
-                flowConstruct.process(event);
+                ((MessageProcessor) flowConstruct).process(event);
                 return null;
             }
         }
