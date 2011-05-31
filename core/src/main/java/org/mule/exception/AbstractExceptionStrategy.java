@@ -71,7 +71,6 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
         setMuleContext(muleContext);
         if (rollbackByDefault)
         {
-            new RuntimeException().printStackTrace();
             setRollbackTxFilter(new WildcardFilter("*"));
         }
     }
