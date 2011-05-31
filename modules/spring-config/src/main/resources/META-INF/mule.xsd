@@ -123,6 +123,7 @@
             <xsd:element ref="abstract-global-endpoint"/>
             <xsd:element ref="abstract-flow-construct" />
             <xsd:element ref="flow" />
+            <xsd:element ref="sub-flow" />
             <xsd:element ref="abstract-model"/>
             <xsd:element ref="abstract-interceptor-stack"/>
             <xsd:element ref="abstract-filter"/>
@@ -448,7 +449,17 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="processor-chain" type="messageProcessorChainType" substitutionGroup="abstract-message-processor"/>
+    <xsd:element name="processor-chain" type="messageProcessorChainType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>The use of globally defined processor-chain element is deprecated since Mule 3.2.  Use sub-flow instead.</xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="sub-flow" type="messageProcessorChainType">
+        <xsd:annotation>
+            <xsd:documentation>A chain of message processors processed synchronously that can be referenced and reused.</xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
     <xsd:complexType name="messageProcessorChainType">
         <xsd:complexContent>
@@ -471,22 +482,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <!-- TODO
-                <xsd:attribute name="type" use="optional" default="intercepting">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Defines how the child messge processors should used to construct the composite message processor.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="iterating"/>
-                            <xsd:enumeration value="intercepting"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-                <xsd:attribute name="builderClass" type="xsd:NMTOKEN" use="optional"/>
-                -->
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -1834,18 +1829,14 @@
     <xsd:element name="flow" type="flowType">
         <xsd:annotation>
             <xsd:documentation>
-                A flexible flow.
+                A pipeline of message processors processed using a given processingStrategy when either a new message is received from a message source, or when a new message is 
+                recieved via a flow-ref or programativally.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:complexType name="flowType">
         <xsd:complexContent>
             <xsd:extension base="annotatedType">
-                <xsd:annotation>
-                    <xsd:documentation>
-                        A flexible flow..
-                    </xsd:documentation>
-                </xsd:annotation>
                 <xsd:sequence>
                     <xsd:element name="description" type="descriptionType" minOccurs="0">
                         <xsd:annotation>

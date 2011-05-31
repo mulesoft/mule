@@ -25,6 +25,7 @@ import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.config.spring.factories.CompositeMessageSourceFactoryBean;
 import org.mule.config.spring.factories.InboundEndpointFactoryBean;
+import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.factories.PollingMessageSourceFactoryBean;
@@ -311,6 +312,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerMuleBeanDefinitionParser("processor", new ParentDefinitionParser()).addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "messageProcessor");
         registerMuleBeanDefinitionParser("custom-processor", new MessageProcessorDefinitionParser()).addIgnored("name");
         registerBeanDefinitionParser("processor-chain", new MessageProcessorChainDefinitionParser());
+        registerBeanDefinitionParser("sub-flow", new MuleOrphanDefinitionParser(MessageProcessorChainFactoryBean.class, false));
         registerBeanDefinitionParser("response", new ResponseDefinitionParser());
         registerMuleBeanDefinitionParser("message-filter", new MessageFilterDefinitionParser());
         registerMuleBeanDefinitionParser("invoke",

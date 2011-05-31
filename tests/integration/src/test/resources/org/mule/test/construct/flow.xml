@@ -372,9 +372,9 @@
         <vm:outbound-endpoint path="poll2-out"/>
     </flow>
     
-    <flow name="pollappend" processingStrategy="synchronous">
+    <sub-flow name="pollappend">
         <append-string-transformer message="pollappend" />
-    </flow>
+    </sub-flow>
 
     <flow name="customRouter">
         <vm:inbound-endpoint path="customRouter-in" exchange-pattern="request-response"/>
