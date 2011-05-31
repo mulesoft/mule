@@ -15,6 +15,11 @@ import org.mule.exception.AbstractMessagingExceptionStrategy;
 
 public class TestExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
+    public TestExceptionStrategy()
+    {
+        super(null, true);
+    }
+    
     @Override
     public MuleEvent handleException(Exception exception, MuleEvent event)
     {

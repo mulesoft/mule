@@ -9,7 +9,9 @@
  */
 package org.mule;
 
+import org.mule.api.MessagingException;
 import org.mule.api.MuleContext;
+import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.client.LocalMuleClient;
@@ -34,6 +36,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ListableObjectStore;
+import org.mule.api.transaction.RollbackMethod;
 import org.mule.api.transaction.TransactionManagerFactory;
 import org.mule.client.DefaultLocalMuleClient;
 import org.mule.config.DefaultMuleConfiguration;
@@ -132,7 +135,7 @@ public class DefaultMuleContext implements MuleContext
         registryBroker = createRegistryBroker();
         muleRegistryHelper = createRegistryHelper(registryBroker);
         localMuleClient = new DefaultLocalMuleClient(this);
-        exceptionListener = new DefaultSystemExceptionStrategy(this);
+        exceptionListener = new DefaultSystemExceptionStrategy(this, true);
     }
 
     protected DefaultRegistryBroker createRegistryBroker()
@@ -640,6 +643,24 @@ public class DefaultMuleContext implements MuleContext
         return localMuleClient;
     }
 
+    public void handleException(Exception e, RollbackMethod rollbackMethod)
+    {
+        if (e instanceof MessagingException)
+        {
+            MuleEvent event = ((MessagingException) e).getEvent();
+            event.getFlowConstruct().getExceptionListener().handleException(e, event, rollbackMethod);
+        }
+        else
+        {
+            getExceptionListener().handleException(e, rollbackMethod);
+        }
+    }
+    
+    public void handleException(Exception e)
+    {
+        handleException(e, null);
+    }
+    
     public SystemExceptionHandler getExceptionListener()
     {
         return exceptionListener;

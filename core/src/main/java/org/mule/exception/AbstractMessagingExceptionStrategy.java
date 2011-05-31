@@ -12,6 +12,7 @@ package org.mule.exception;
 
 import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
@@ -33,6 +34,11 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
      * Stop the flow/service when an exception occurs.  You will need to restart the flow/service manually after this (e.g, using JMX). 
      */
     private boolean stopMessageProcessing;
+
+    public AbstractMessagingExceptionStrategy(MuleContext muleContext, boolean rollbackByDefault)
+    {
+        super(muleContext, rollbackByDefault);
+    }
 
     public MuleEvent handleException(Exception ex, MuleEvent event, RollbackMethod rollbackMethod)
     {

@@ -26,6 +26,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.store.ListableObjectStore;
+import org.mule.api.transaction.RollbackMethod;
 import org.mule.context.notification.NotificationException;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.management.stats.AllStatistics;
@@ -241,4 +242,8 @@ public interface MuleContext extends Lifecycle
     ListableObjectStore<Serializable> getObjectStore(String name);
 
     void setObjectStore(String name, ListableObjectStore<Serializable> store) throws RegistrationException;
+    
+    void handleException(Exception e, RollbackMethod rollbackMethod);
+
+    void handleException(Exception e);
 }

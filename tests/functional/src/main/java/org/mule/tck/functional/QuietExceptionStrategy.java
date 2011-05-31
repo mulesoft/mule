@@ -24,6 +24,11 @@ public class QuietExceptionStrategy extends AbstractMessagingExceptionStrategy
 {
     protected transient Log logger = LogFactory.getLog(getClass());
 
+    public QuietExceptionStrategy()
+    {
+        super(null, true);
+    }
+    
     @Override
     protected void doHandleException(Exception e, MuleEvent event, RollbackMethod rollbackMethod)
     {

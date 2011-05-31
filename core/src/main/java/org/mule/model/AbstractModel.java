@@ -43,12 +43,12 @@ public abstract class AbstractModel implements Model
     public static final String DEFAULT_MODEL_NAME = "main";
 
     private String name = DEFAULT_MODEL_NAME;
+    protected MuleContext muleContext;
     private EntryPointResolverSet entryPointResolverSet = null; // values are supplied below as required
     private LifecycleAdapterFactory lifecycleAdapterFactory = new DefaultComponentLifecycleAdapterFactory();
-    private MessagingExceptionHandler exceptionListener = new DefaultMessagingExceptionStrategy();
+    private MessagingExceptionHandler exceptionListener = new DefaultMessagingExceptionStrategy(muleContext, true);
 
     protected transient Log logger = LogFactory.getLog(getClass());
-    protected MuleContext muleContext;
 
     protected ModelLifecycleManager lifecycleManager = new ModelLifecycleManager(this);
 

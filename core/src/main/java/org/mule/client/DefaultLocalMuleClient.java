@@ -172,7 +172,7 @@ public class DefaultLocalMuleClient implements LocalMuleClient
 
         public MessagingExceptionHandler getExceptionListener()
         {
-            return new DefaultMessagingExceptionStrategy(muleContext);
+            return new DefaultMessagingExceptionStrategy(muleContext, true);
         }
 
         public LifecycleState getLifecycleState()

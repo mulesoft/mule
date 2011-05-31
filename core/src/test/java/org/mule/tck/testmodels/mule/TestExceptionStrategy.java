@@ -10,6 +10,7 @@
 
 package org.mule.tck.testmodels.mule;
 
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.SystemExceptionHandler;
@@ -48,6 +49,11 @@ public class TestExceptionStrategy extends AbstractExceptionStrategy implements 
 
     private volatile String testProperty;
 
+    public TestExceptionStrategy()
+    {
+        super(null, true);
+    }
+    
     public String getTestProperty()
     {
         return testProperty;

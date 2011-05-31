@@ -65,10 +65,20 @@ public abstract class AbstractExceptionStrategy extends AbstractMessageProcessor
 
     protected boolean enableNotifications = true;
 
+    public AbstractExceptionStrategy(MuleContext muleContext, boolean rollbackByDefault)
+    {
+        super();
+        setMuleContext(muleContext);
+        if (rollbackByDefault)
+        {
+            new RuntimeException().printStackTrace();
+            setRollbackTxFilter(new WildcardFilter("*"));
+        }
+    }
+    
     protected boolean isRollback(Throwable t)
     {
-        return (rollbackTxFilter == null && commitTxFilter == null) || 
-            (rollbackTxFilter != null && rollbackTxFilter.accept(t.getClass().getName())) ||
+        return (rollbackTxFilter != null && rollbackTxFilter.accept(t.getClass().getName())) ||
             (commitTxFilter != null && !commitTxFilter.accept(t.getClass().getName()));
     }
     

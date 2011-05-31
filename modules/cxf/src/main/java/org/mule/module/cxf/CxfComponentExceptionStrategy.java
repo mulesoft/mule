@@ -10,7 +10,6 @@
 
 package org.mule.module.cxf;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.transaction.RollbackMethod;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
@@ -24,11 +23,6 @@ import org.apache.cxf.interceptor.Fault;
  */
 public class CxfComponentExceptionStrategy extends DefaultMessagingExceptionStrategy
 {
-    public CxfComponentExceptionStrategy(MuleContext context)
-    {
-        super(context);
-    }
-    
     @Override
     protected void doHandleException(Exception e, MuleEvent event, RollbackMethod rollbackMethod)
     {

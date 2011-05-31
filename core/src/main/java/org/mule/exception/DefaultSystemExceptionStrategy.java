@@ -13,22 +13,14 @@ package org.mule.exception;
 import org.mule.api.MuleContext;
 
 /**
- * Log exception, fire a notification, and clean up transaction if any.
+ * This is the default exception handler for any exception which does not inherit from MessagingException, 
+ * i.e, when no message is in play.  The exception handler will fire a notification, log exception, 
+ * roll back any transaction, and trigger a reconnection strategy if this is a <code>ConnectException</code>.
  */
 public class DefaultSystemExceptionStrategy extends AbstractSystemExceptionStrategy
 {
-    /** 
-     * For IoC only 
-     * @deprecated Use DefaultSystemExceptionStrategy(MuleContext muleContext) instead
-     */
-    public DefaultSystemExceptionStrategy()
+    public DefaultSystemExceptionStrategy(MuleContext muleContext, boolean rollbackByDefault)
     {
-        super();
-    }
-
-    public DefaultSystemExceptionStrategy(MuleContext muleContext)
-    {
-        super();
-        setMuleContext(muleContext);
+        super(muleContext, rollbackByDefault);
     }
 }

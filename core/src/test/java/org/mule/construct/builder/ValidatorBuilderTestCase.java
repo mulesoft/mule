@@ -25,7 +25,7 @@ public class ValidatorBuilderTestCase extends AbstractMuleTestCase
             .ackExpression("#[string:GOOD:#[message:payload]]")
             .nackExpression("#[string:BAD:#[message:payload]]")
             .outboundAddress("test://foo.out")
-            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext))
+            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext, true))
             .build(muleContext);
 
         assertEquals("test-validator-no-error", validator.getName());
@@ -40,7 +40,7 @@ public class ValidatorBuilderTestCase extends AbstractMuleTestCase
             .nackExpression("#[string:BAD:#[message:payload]]")
             .errorExpression("#[string:ERROR:#[message:payload]]")
             .outboundAddress("test://foo.out")
-            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext))
+            .exceptionStrategy(new DefaultMessagingExceptionStrategy(muleContext, true))
             .build(muleContext);
 
         assertEquals("test-validator-full", validator.getName());

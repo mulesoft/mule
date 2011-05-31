@@ -28,7 +28,6 @@
         <vm:outbound-endpoint path="forProcessing" />
 
         <default-exception-strategy>
-        	<commit-transaction exception-pattern="*" />
             <vm:outbound-endpoint path="duplicated" />
         </default-exception-strategy>
     </flow>

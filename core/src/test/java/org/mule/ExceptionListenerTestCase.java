@@ -23,7 +23,7 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase
 {
     public void testAddGoodEndpoint() throws Exception
     {
-        AbstractExceptionStrategy router = new DefaultMessagingExceptionStrategy(muleContext);
+        AbstractExceptionStrategy router = new DefaultMessagingExceptionStrategy(muleContext, true);
         OutboundEndpoint endpoint = getTestOutboundEndpoint("test");
         router.addEndpoint(endpoint);
         assertNotNull(router.getMessageProcessors());
@@ -36,7 +36,7 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase
         list.add(getTestOutboundEndpoint("test"));
         list.add(getTestOutboundEndpoint("test"));
         
-        AbstractExceptionStrategy router = new DefaultMessagingExceptionStrategy(muleContext);
+        AbstractExceptionStrategy router = new DefaultMessagingExceptionStrategy(muleContext, true);
         assertNotNull(router.getMessageProcessors());
         assertEquals(0, router.getMessageProcessors().size());
         
