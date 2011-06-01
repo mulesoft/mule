@@ -62,7 +62,7 @@ public class AsynchronousProcessingStrategy extends SynchronousProcessingStrateg
         if (maxBufferSize != null) threadingProfile.setMaxBufferSize(maxBufferSize);
         if (threadTTL != null) threadingProfile.setThreadTTL(threadTTL);
         if (threadWaitTimeout != null) threadingProfile.setThreadWaitTimeout(threadWaitTimeout);
-        if (poolExhaustedAction != null) threadingProfile.setMaxThreadsActive(poolExhaustedAction);
+        if (poolExhaustedAction != null) threadingProfile.setPoolExhaustedAction(poolExhaustedAction);
         threadingProfile.setMuleContext(muleContext);
         return threadingProfile;
     }
@@ -105,6 +105,26 @@ public class AsynchronousProcessingStrategy extends SynchronousProcessingStrateg
     public void setPoolExhaustedAction(Integer poolExhaustedAction)
     {
         this.poolExhaustedAction = poolExhaustedAction;
+    }
+
+    public Integer getMaxBufferSize()
+    {
+        return maxBufferSize;
+    }
+
+    public Long getThreadTTL()
+    {
+        return threadTTL;
+    }
+
+    public Long getThreadWaitTimeout()
+    {
+        return threadWaitTimeout;
+    }
+
+    public Integer getPoolExhaustedAction()
+    {
+        return poolExhaustedAction;
     }
 
 }

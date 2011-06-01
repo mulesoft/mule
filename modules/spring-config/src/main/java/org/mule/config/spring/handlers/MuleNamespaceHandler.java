@@ -11,6 +11,7 @@
 package org.mule.config.spring.handlers;
 
 import org.mule.api.config.MuleProperties;
+import org.mule.api.config.ThreadingProfile;
 import org.mule.api.processor.LoggerMessageProcessor;
 import org.mule.component.DefaultInterfaceBinding;
 import org.mule.component.DefaultJavaComponent;
@@ -93,6 +94,10 @@ import org.mule.config.spring.parsers.specific.endpoint.EndpointRefParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
 import org.mule.config.spring.util.SpringBeanLookup;
+import org.mule.construct.AsynchronousProcessingStrategy;
+import org.mule.construct.QueuedAsynchronousProcessingStrategy;
+import org.mule.construct.QueuedThreadPerProcessorProcessingStrategy;
+import org.mule.construct.ThreadPerProcessorProcessingStrategy;
 import org.mule.context.notification.ListenerSubscriptionPair;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.enricher.MessageEnricher;
@@ -375,6 +380,22 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("validator", new ValidatorDefinitionParser());
 
         registerBeanDefinitionParser("flow-ref", new FlowRefDefinitionParser());
+        
+        // Processing Strategies
+        registerMuleBeanDefinitionParser("asynchronous-processing-strategy",
+            new OrphanDefinitionParser(AsynchronousProcessingStrategy.class, false)).addMapping(
+            "poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS).addIgnored("name");
+        registerMuleBeanDefinitionParser("queued-asynchronous-processing-strategy",
+            new OrphanDefinitionParser(QueuedAsynchronousProcessingStrategy.class, false)).addMapping(
+            "poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS).addIgnored("name");
+        registerMuleBeanDefinitionParser("thread-per-processor-processing-strategy",
+            new OrphanDefinitionParser(ThreadPerProcessorProcessingStrategy.class, false)).addMapping(
+            "poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS).addIgnored("name");
+        registerMuleBeanDefinitionParser("queued-thread-per-processor-processing-strategy",
+            new OrphanDefinitionParser(QueuedThreadPerProcessorProcessingStrategy.class, false)).addMapping(
+            "poolExhaustedAction", ThreadingProfile.POOL_EXHAUSTED_ACTIONS).addIgnored("name");
+        registerMuleBeanDefinitionParser("custom-processing-strategy", new OrphanDefinitionParser(false)).addIgnored(
+            "name");
 
         // Components
         registerBeanDefinitionParser("component", new ComponentDelegatingDefinitionParser(DefaultJavaComponent.class));

@@ -12,14 +12,14 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.api.config.MuleProperties;
 import org.mule.config.spring.parsers.generic.OrphanDefinitionParser;
-import org.mule.construct.ThreadPerProcessorProcessingStrategy;
 import org.mule.construct.AsynchronousProcessingStrategy;
 import org.mule.construct.Flow;
-import org.mule.construct.QueuedThreadPerProcessorProcessingStrategy;
 import org.mule.construct.QueuedAsynchronousProcessingStrategy;
+import org.mule.construct.QueuedThreadPerProcessorProcessingStrategy;
 import org.mule.construct.SynchronousProcessingStrategy;
+import org.mule.construct.ThreadPerProcessorProcessingStrategy;
 
-import org.springframework.beans.factory.config.RuntimeBeanNameReference;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
@@ -72,7 +72,7 @@ public class FlowDefinitionParser extends OrphanDefinitionParser
         }
         else if (null != processingStrategy)
         {
-            builder.addPropertyValue(PROCESSING_STRATEGY_ATTRIBUTE_NAME, new RuntimeBeanNameReference(
+            builder.addPropertyValue(PROCESSING_STRATEGY_ATTRIBUTE_NAME, new RuntimeBeanReference(
                 processingStrategy));
         }
 

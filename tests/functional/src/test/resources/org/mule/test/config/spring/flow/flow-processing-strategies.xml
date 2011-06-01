@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+               http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
+
+
+    <flow name="defaultFlow">
+        <echo-component />
+    </flow>
+
+    <flow name="synchronousFlow" processingStrategy="synchronous">
+        <echo-component />
+    </flow>
+
+    <flow name="asynchronousFlow" processingStrategy="asynchronous">
+        <echo-component />
+    </flow>
+
+    <flow name="queuedAsynchronousFlow" processingStrategy="queued-asynchronous">
+        <echo-component />
+    </flow>
+
+    <flow name="customAsynchronousFlow" processingStrategy="customAsynchronousStrategy">
+        <echo-component />
+    </flow>
+
+    <flow name="customQueuedAsynchronousFlow" processingStrategy="customQueuedAsynchronousStrategy">
+        <echo-component />
+    </flow>
+
+    <flow name="customProcessingStrategyFlow" processingStrategy="customStrategy">
+        <echo-component />
+    </flow>
+
+    <asynchronous-processing-strategy name="customAsynchronousStrategy"
+        maxThreads="10" minThreads="5" threadTTL="100" maxBufferSize="10" threadWaitTimeout="1000"
+        poolExhaustedAction="WAIT" />
+
+    <queued-asynchronous-processing-strategy name="customQueuedAsynchronousStrategy"
+        maxThreads="10" minThreads="5" threadTTL="100" maxBufferSize="10" threadWaitTimeout="1000"
+        poolExhaustedAction="WAIT" queueTimeout="100" maxQueueSize="10" />
+
+
+    <custom-processing-strategy name="customStrategy" class="org.mule.config.spring.flow.FlowProcessingStrategyConfigTestCase$CustomProcessingStrategy">
+        <spring:property name="foo" value="bar" />
+    </custom-processing-strategy>
+
+
+
+
+
+
+</mule>

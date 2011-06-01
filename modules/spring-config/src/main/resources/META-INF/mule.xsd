@@ -133,6 +133,7 @@
             <xsd:element ref="invoke"/>
             <xsd:element ref="message-filter"/>
             <xsd:element ref="custom-queue-store" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="abstract-processing-strategy" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:choice>
     </xsd:group>
 
@@ -1889,7 +1890,7 @@
                  <xsd:attribute name="processingStrategy" use="optional" default="queued-asynchronous">
                     <xsd:annotation>
                         <xsd:documentation>
-                            Strategy used to process the message processors configured.  
+                            Strategy used to process the configured message processors when exchange pattern is 'one-way'.  
                             This attribute accepts either one of the enumerated strategies with default configuration options or a reference to a gloablly defined strategy.
                         </xsd:documentation>
                     </xsd:annotation>
@@ -1916,7 +1917,7 @@
                                     <xsd:enumeration value="asynchronous">
                                         <xsd:annotation>
                                             <xsd:documentation>
-                                                Uses a worker thread to process the pipeline of message processors asynchonously.
+                                                Uses a thread pool to process the pipeline of message processors asynchronously.
                                             </xsd:documentation>
                                         </xsd:annotation>
                                     </xsd:enumeration>
@@ -1924,14 +1925,14 @@
                                         <xsd:annotation>
                                             <xsd:documentation>
                                                 Decouples the recieving of a new message from it's processing using a queue. 
-                                                The queue is polled and a worker thread used to process the pipeline of message processors asynchonously.
+                                                The queue is polled and a thread pool is used to process the pipeline of message processors asynchonously.
                                             </xsd:documentation>
                                         </xsd:annotation>
                                     </xsd:enumeration>
                                     <xsd:enumeration value="thread-per-processor">
                                         <xsd:annotation>
                                             <xsd:documentation>
-                                                EXPERIMENTAL: Uses a worker thread to process each message processors asynchronously.
+                                                EXPERIMENTAL: Uses a thread pool to process each message processors asynchronously. (each processor has it's own thread pool currently)
                                             </xsd:documentation>
                                         </xsd:annotation>
                                     </xsd:enumeration>
@@ -1939,7 +1940,7 @@
                                         <xsd:annotation>
                                             <xsd:documentation>
                                                 EXPERIMENTAL:  Decouples the processing of each message processor using a queue. 
-                                                The queue is polled and a worker thread used to process each message processor asynchronously.
+                                                The queue is polled and use a thread pool to process each message processor asynchronously. (each processor has it's own thread pool currently)
                                             </xsd:documentation>
                                         </xsd:annotation>
                                     </xsd:enumeration>
@@ -1951,7 +1952,128 @@
            </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+    
+    <!--  Processing Strategies -->
+    
+    <xsd:element name="abstract-processing-strategy" type="processingStrategyType" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation>
+                The processing strategy to be used for processing a pipeline of message processors (e.g. in a Flow)
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="processingStrategyType">
+        <xsd:attribute name="name" type="nonBlankString" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The name used to identify the processing strategy.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+    
+    <xsd:element name="asynchronous-processing-strategy" type="asynchronousProcessingStrategy" substitutionGroup="abstract-processing-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+               Processing strategy that uses a thread pool to process the pipeline of message processors asynchronously in a worker thread.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="asynchronousProcessingStrategy">
+        <xsd:complexContent>
+            <xsd:extension base="processingStrategyType">
+                <xsd:attribute name="maxThreads" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The maximum number of threads that will be used when under load.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="minThreads" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The number of idle threads that will kept in the pool when there is no load.  
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attributeGroup ref="commonThreadPoolAttributes"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 
+    <xsd:element name="queued-asynchronous-processing-strategy" type="queuedAsynchronousProcessingStrategy" substitutionGroup="abstract-processing-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                Decouples the recieving of a new message from it's processing using a queue. 
+                The queue is polled and a thread pool is used to process the pipeline of message processors asynchonously in a worker thread.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="queuedAsynchronousProcessingStrategy">
+        <xsd:complexContent>
+            <xsd:extension base="asynchronousProcessingStrategy">
+                <xsd:sequence>
+                    <xsd:element ref="abstract-queue-store" minOccurs="0">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The queue store that stortes the queue's elements.  If not specified, this will be the default-in-memory-queue-store.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+                <xsd:attribute name="queueTimeout" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The timeout used when taking messages from the service queue.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="maxQueueSize" type="substitutableInt">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Defines the maximum number of messages that can be queued.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="thread-per-processor-processing-strategy" type="asynchronousProcessingStrategy" substitutionGroup="abstract-processing-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                EXPERIMENTAL: Uses a thread pool to process each message processors asynchronously in a worker thread. (each processor has it's own thread pool currently)
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="queued-thread-per-processor-processing-strategy" type="queuedAsynchronousProcessingStrategy" substitutionGroup="abstract-processing-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                EXPERIMENTAL:  Decouples the processing of each message processor using a queue. 
+                The queue is polled and use a thread pool to process each message processor asynchronously in a worker thread. (each processor has it's own thread pool currently)
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    
+    <xsd:element name="custom-processing-strategy" type="customProcessingStrategy" substitutionGroup="abstract-processing-strategy">
+        <xsd:annotation>
+            <xsd:documentation>
+                Allows for the configuration of a custom processing strategy that implements 'org.mule.api.construct.PipelineProcessingStrategy'.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="customProcessingStrategy">
+        <xsd:complexContent>
+            <xsd:extension base="processingStrategyType">
+                <xsd:sequence>
+                    <xsd:element ref="spring:property" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="class" type="substitutableClass" use="required"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
     <xsd:element name="flow-ref" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -2930,6 +3052,47 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:attributeGroup name="commonThreadPoolAttributes">
+        <xsd:attribute name="threadTTL" type="substitutableInt">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Determines how long an inactive thread is kept in the pool before being discarded.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="poolExhaustedAction">
+            <xsd:annotation>
+                <xsd:documentation>
+                    When the maximum pool size or queue size is bounded, this value determines how to handle incoming tasks. Possible values are: WAIT (wait until a thread becomes available; don't use this value if the minimum number of threads is zero, in which case a thread may never become available), DISCARD (throw away the current request and return), DISCARD_OLDEST (throw away the oldest request and return), ABORT (throw a RuntimeException), and RUN (the default; the thread making the execute request runs the task itself, which helps guard against lockup).
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="WAIT"/>
+                    <xsd:enumeration value="DISCARD"/>
+                    <xsd:enumeration value="DISCARD_OLDEST"/>
+                    <xsd:enumeration value="ABORT"/>
+                    <xsd:enumeration value="RUN"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="threadWaitTimeout" type="substitutableInt">
+            <xsd:annotation>
+                <xsd:documentation>
+                    How long to wait in milliseconds when the pool exhausted action is WAIT. If the value is negative, it will wait indefinitely.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="maxBufferSize" type="substitutableInt">
+            <xsd:annotation>
+                <xsd:documentation>
+                    Determines how many requests are queued when the pool is at maximum usage capacity and the pool exhausted action is WAIT. The buffer is used as an overflow.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
 
     <xsd:attributeGroup name="defaultEndpointAttributes">
         <xsd:attributeGroup ref="restrictedEndpointAttributes"/>
@@ -4191,36 +4354,6 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="threadTTL" type="substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Determines how long an inactive thread is kept in the pool before being discarded.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="poolExhaustedAction">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            When the maximum pool size or queue size is bounded, this value determines how to handle incoming tasks. Possible values are: WAIT (wait until a thread becomes available; don't use this value if the minimum number of threads is zero, in which case a thread may never become available), DISCARD (throw away the current request and return), DISCARD_OLDEST (throw away the oldest request and return), ABORT (throw a RuntimeException), and RUN (the default; the thread making the execute request runs the task itself, which helps guard against lockup).
-                        </xsd:documentation>
-                    </xsd:annotation>
-                    <xsd:simpleType>
-                        <xsd:restriction base="xsd:NMTOKEN">
-                            <xsd:enumeration value="WAIT"/>
-                            <xsd:enumeration value="DISCARD"/>
-                            <xsd:enumeration value="DISCARD_OLDEST"/>
-                            <xsd:enumeration value="ABORT"/>
-                            <xsd:enumeration value="RUN"/>
-                        </xsd:restriction>
-                    </xsd:simpleType>
-                </xsd:attribute>
-                <xsd:attribute name="threadWaitTimeout" type="substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            How long to wait in milliseconds when the pool exhausted action is WAIT. If the value is negative, it will wait indefinitely.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
                 <xsd:attribute name="doThreading" type="substitutableBoolean" default="true">
                     <xsd:annotation>
                         <xsd:documentation>
@@ -4228,13 +4361,7 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="maxBufferSize" type="substitutableInt">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            Determines how many requests are queued when the pool is at maximum usage capacity and the pool exhausted action is WAIT. The buffer is used as an overflow.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
+                <xsd:attributeGroup ref="commonThreadPoolAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
