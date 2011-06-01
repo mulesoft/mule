@@ -10,6 +10,9 @@
 
 package org.mule.transport.sftp;
 
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.transport.sftp.notification.SftpNotifier;
+
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
@@ -19,13 +22,6 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.transport.sftp.notification.SftpNotifier;
-import static org.mule.transport.sftp.notification.SftpTransportNotification.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +29,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
+
+import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_DELETE_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_GET_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_PUT_ACTION;
+import static org.mule.transport.sftp.notification.SftpTransportNotification.SFTP_RENAME_ACTION;
 
 /**
  * <code>SftpClient</code> Wrapper around jsch sftp library. Provides access to basic
@@ -102,7 +107,7 @@ public class SftpClient
     /**
      * Converts a relative path to an absolute path according to
      * http://tools.ietf.org/html/draft-ietf-secsh-scp-sftp-ssh-uri-04.
-     * 
+     *
      * @param path relative path
      * @return Absolute path
      */
@@ -402,7 +407,7 @@ public class SftpClient
     {
         try
         {
-            return channelSftp.stat("./" + filename).getSize();
+            return channelSftp.stat(filename).getSize();
         }
         catch (SftpException e)
         {
@@ -430,7 +435,7 @@ public class SftpClient
 
     /**
      * Creates a directory
-     * 
+     *
      * @param directoryName The directory name
      * @throws IOException If an error occurs
      */
@@ -474,7 +479,7 @@ public class SftpClient
 
     /**
      * Setter for 'home'
-     * 
+     *
      * @param home The path to home
      */
     void setHome(String home)
@@ -495,7 +500,7 @@ public class SftpClient
      * SftpClient methods can be merged Note, this method is synchronized because it
      * in rare cases can be called from two threads at the same time and thus cause
      * an error.
-     * 
+     *
      * @param endpoint
      * @param newDir
      * @throws IOException
