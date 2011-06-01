@@ -44,6 +44,7 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     public Flow(String name, MuleContext muleContext)
     {
         super(name, muleContext);
+        processingStrategy = new QueuedAsynchronousProcessingStrategy();
     }
 
     public MuleEvent process(MuleEvent event) throws MuleException
