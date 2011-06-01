@@ -27,7 +27,7 @@
     
     <expression-transformer name="testTransformer4" evaluator="headers-list" expression="foo,bar"/>
     
-    <flow name="et">
+    <flow name="et" processingStrategy="synchronous">
         <expression-transformer name="testTransformer5" evaluator="headers-list" expression="foo,bar"/>
     </flow>
     

@@ -38,8 +38,11 @@ public class AsynchronousProcessingStrategy extends SynchronousProcessingStrateg
     @Override
     public void configureProcessors(Pipeline pipeline, MessageProcessorChainBuilder chainBuilder)
     {
-        chainBuilder.chain(createAsyncMessageProcessor(pipeline));
-        super.configureProcessors(pipeline, chainBuilder);
+        if (pipeline.getMessageProcessors().size() > 0)
+        {
+            chainBuilder.chain(createAsyncMessageProcessor(pipeline));
+            super.configureProcessors(pipeline, chainBuilder);
+        }
     }
 
     protected AsyncInterceptingMessageProcessor createAsyncMessageProcessor(Pipeline pipeline)
