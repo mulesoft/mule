@@ -15,7 +15,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
-import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.DispatchException;
@@ -484,15 +483,6 @@ public class FlowConfigurationFunctionalTestCase extends FunctionalTestCase
         }
     }
 
-    public void testFlowThreadingProfile() throws MuleException, Exception
-    {
-        Flow flow = muleContext.getRegistry().lookupObject("flow-threading-profile");
-        assertTrue(flow.getThreadingProfile().isDoThreading());
-        assertEquals(2, flow.getThreadingProfile().getMaxThreadsActive());
-        assertEquals(1, flow.getThreadingProfile().getMaxThreadsIdle());
-        assertEquals(ThreadingProfile.WHEN_EXHAUSTED_RUN, flow.getThreadingProfile().getPoolExhaustedAction());
-    }
-    
     public void testCustomMessageRouter() throws MuleException, Exception
     {
         MuleMessage message = new DefaultMuleMessage("", muleContext);

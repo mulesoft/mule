@@ -16,7 +16,6 @@ import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleSession;
-import org.mule.api.config.ThreadingProfile;
 import org.mule.api.construct.PipelineProcessingStrategy;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
@@ -38,8 +37,6 @@ import org.mule.session.DefaultMuleSession;
  */
 public class Flow extends AbstractPipeline implements MessageProcessor
 {
-
-    protected ThreadingProfile threadingProfile;
 
     public Flow(String name, MuleContext muleContext)
     {
@@ -85,18 +82,6 @@ public class Flow extends AbstractPipeline implements MessageProcessor
     public String getConstructType()
     {
         return "Flow";
-    }
-
-    @Deprecated
-    public ThreadingProfile getThreadingProfile()
-    {
-        return threadingProfile;
-    }
-
-    @Deprecated
-    public void setThreadingProfile(ThreadingProfile threadingProfile)
-    {
-        this.threadingProfile = threadingProfile;
     }
 
     @Override
