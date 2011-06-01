@@ -68,29 +68,32 @@ public abstract class AbstractMessagingExceptionStrategy extends AbstractExcepti
     
     protected void doHandleException(Exception ex, MuleEvent event, RollbackMethod rollbackMethod)
     {
+        FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
+        if (statistics != null && statistics.isEnabled())
+        {
+            statistics.incExecutionError();
+        }
+
         if (isRollback(ex))
         {
+            logger.debug("Rolling back transaction");
             rollback(rollbackMethod);
         }
         else
         {
-            FlowConstructStatistics statistics = event.getFlowConstruct().getStatistics();
-            if (statistics != null && statistics.isEnabled())
-            {
-                statistics.incExecutionError();
-            }
-
+            logger.debug("Routing exception message");
             routeException(event, ex);
             
-            closeStream(event.getMessage());
-            
+            logger.debug("Committing transaction");
             commit();
-
-            if (stopMessageProcessing)
-            {
-                stopFlow(event.getFlowConstruct());
-            }        
         }
+
+        closeStream(event.getMessage());        
+
+        if (stopMessageProcessing)
+        {
+            stopFlow(event.getFlowConstruct());
+        }        
     }
 
     protected void stopFlow(FlowConstruct flow)

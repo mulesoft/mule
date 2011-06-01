@@ -34,17 +34,16 @@ public class AbstractSystemExceptionStrategy extends AbstractExceptionStrategy i
     {
         fireNotification(ex);
 
-        // Work with the root exception, not anything that wraps it
-        //Throwable t = ExceptionHelper.getRootException(ex);
-
         logException(ex);
         
         if (isRollback(ex))
         {
+            logger.debug("Rolling back transaction");
             rollback(rollbackMethod);
         }
         else
         {
+            logger.debug("Committing transaction");
             commit();
         }
 
