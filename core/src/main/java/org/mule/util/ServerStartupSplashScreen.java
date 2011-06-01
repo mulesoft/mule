@@ -13,7 +13,6 @@ package org.mule.util;
 import org.mule.api.MuleContext;
 import org.mule.api.agent.Agent;
 import org.mule.config.MuleManifest;
-import org.mule.config.StartupContext;
 import org.mule.config.i18n.CoreMessages;
 
 import java.net.InetAddress;
@@ -72,8 +71,9 @@ public class ServerStartupSplashScreen extends SplashScreen
         }
 
         // Dev/Production mode
-        final boolean productionMode = StartupContext.get().getStartupOptions().containsKey("production");
-        header.add("Mode: " + (productionMode ? "Production" : "Development"));
+        // TODO for now now used, potentially a 'production' mode can disable direcotry (non-api) hot-deployment for tight app control
+        //final boolean productionMode = StartupContext.get().getStartupOptions().containsKey("production");
+        //header.add("Mode: " + (productionMode ? "Production" : "Development"));
 
         header.add(" ");
     }
