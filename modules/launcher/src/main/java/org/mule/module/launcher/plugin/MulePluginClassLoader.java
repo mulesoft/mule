@@ -13,6 +13,8 @@ package org.mule.module.launcher.plugin;
 import org.mule.module.launcher.GoodCitizenClassLoader;
 
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Handles Mule extensions in $MULE_HOME/lib/ext
@@ -31,22 +33,57 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
             "com.mulesource"
     };
 
-    protected String[] overrides = {
-
-    };
+    protected List<String> overrides = Collections.emptyList();
+    protected List<String> blocked = Collections.emptyList();
 
     public MulePluginClassLoader(URL[] urls, ClassLoader parent)
     {
-        this(urls, parent, null);
+        this(urls, parent, Collections.<String>emptyList(), Collections.<String>emptyList());
     }
 
-    /**
-     * @param appName when specified, temp files will be stored under this app's working dir;
-     *                if null, a top-level work dir is used
-     */
-    public MulePluginClassLoader(URL[] urls, ClassLoader parent, String appName)
+    public MulePluginClassLoader(URL[] urls, ClassLoader parent, List<String> overrides, List<String> blocked)
     {
         super(urls, parent);
+
+        if (overrides != null && !overrides.isEmpty())
+        {
+            for (String override : overrides)
+            {
+                for (String systemPackage : systemPackages)
+                {
+                    if (override.startsWith(systemPackage))
+                    {
+                        throw new IllegalArgumentException("Can't override a system package. Offending value: " + override);
+                    }
+                }
+            }
+        }
+
+        if (blocked != null && !blocked.isEmpty())
+        {
+            for (String aBlocked : blocked)
+            {
+                for (String systemPackage : systemPackages)
+                {
+                    if (aBlocked.startsWith(systemPackage))
+                    {
+                        throw new IllegalArgumentException("Can't block a system package. Offending value: " + aBlocked);
+                    }
+                }
+            }
+        }
+
+        this.overrides = overrides;
+        this.blocked = blocked;
+    }
+
+    ///**
+    // * @param appName when specified, temp files will be stored under this app's working dir;
+    // *                if null, a top-level work dir is used
+    // */
+    //public MulePluginClassLoader(URL[] urls, ClassLoader parent, String appName)
+    //{
+    //    super(urls, parent);
 
         /*String s = "c:\\java\\mule\\mule-standalone-3.2.0-SNAPSHOT\\lib\\user\\ext-test.zip";
 
@@ -77,7 +114,7 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
             throw new MuleRuntimeException(e);
         }*/
 
-    }
+    //}
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
