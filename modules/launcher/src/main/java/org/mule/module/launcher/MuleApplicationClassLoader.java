@@ -11,6 +11,7 @@
 package org.mule.module.launcher;
 
 import org.mule.api.config.MuleProperties;
+import org.mule.module.launcher.plugin.FineGrainedControlClassLoader;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
 
@@ -19,13 +20,15 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class MuleApplicationClassLoader extends GoodCitizenClassLoader
+public class MuleApplicationClassLoader extends FineGrainedControlClassLoader
 {
 
     /**
@@ -47,7 +50,12 @@ public class MuleApplicationClassLoader extends GoodCitizenClassLoader
 
     public MuleApplicationClassLoader(String appName, ClassLoader parentCl)
     {
-        super(CLASSPATH_EMPTY, parentCl);
+        this(appName, parentCl, Collections.<String>emptySet());
+    }
+
+    public MuleApplicationClassLoader(String appName, ClassLoader parentCl, Set<String> loaderOverrides)
+    {
+        super(CLASSPATH_EMPTY, parentCl, loaderOverrides);
         this.appName = appName;
         try
         {

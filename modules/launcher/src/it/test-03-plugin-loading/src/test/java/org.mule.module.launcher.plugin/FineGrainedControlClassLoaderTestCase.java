@@ -20,7 +20,7 @@ import java.net.URLClassLoader;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
+public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase
 {
 
     /**
@@ -44,7 +44,7 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
         assertTrue("Dependent test classes not found, has required IT test modules been run before?", f.exists());
         URL[] childUrls = new URL[] {f.toURI().toURL()};
 
-        MulePluginClassLoader ext = new MulePluginClassLoader(childUrls, parent);
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(childUrls, parent);
         Class c = ext.loadClass("mypackage.SneakyChatter");
         final Method methodHi = c.getMethod("hi");
         final Object result = methodHi.invoke(c.newInstance());
@@ -75,7 +75,7 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
         Set<String> overrides = new HashSet<String>();
         overrides.add("mypackage");
         // child will override all classes in 'mypackage'
-        MulePluginClassLoader ext = new MulePluginClassLoader(childUrls, parent, overrides);
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(childUrls, parent, overrides);
         Class c = ext.loadClass("mypackage.SneakyChatter");
         final Method methodHi = c.getMethod("hi");
         final Object result = methodHi.invoke(c.newInstance());
@@ -100,7 +100,7 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
         Set<String> overrides = new HashSet<String>();
         overrides.add("mypackage");
         // child will override all classes in 'mypackage'
-        MulePluginClassLoader ext = new MulePluginClassLoader(new URL[0], parent, overrides);
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[0], parent, overrides);
         Class c = ext.loadClass("mypackage.SneakyChatter");
         final Method methodHi = c.getMethod("hi");
         final Object result = methodHi.invoke(c.newInstance());
@@ -128,7 +128,7 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
         Set<String> overrides = new HashSet<String>();
         overrides.add("-mypackage");
         // block the package, this is stronger than override
-        MulePluginClassLoader ext = new MulePluginClassLoader(new URL[0], parent, overrides);
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[0], parent, overrides);
         try
         {
             ext.loadClass("mypackage.SneakyChatter");
@@ -167,7 +167,7 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
         Set<String> overrides = new HashSet<String>();
         overrides.add("-mypackage");
         // block the package, this is stronger than override
-        MulePluginClassLoader ext = new MulePluginClassLoader(childUrls, parent, overrides);
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(childUrls, parent, overrides);
         Class c = ext.loadClass("mypackage.SneakyChatter");
         final Method methodHi = c.getMethod("hi");
         final Object result = methodHi.invoke(c.newInstance());
@@ -184,7 +184,7 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
         Set<String> overrides = new HashSet<String>();
         overrides.add("mypackage");
         // child will override all classes in 'mypackage'
-        MulePluginClassLoader ext = new MulePluginClassLoader(new URL[0], Thread.currentThread().getContextClassLoader(),
+        FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[0], Thread.currentThread().getContextClassLoader(),
                                                               overrides);
         try
         {
@@ -203,7 +203,7 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
         {
             Set<String> overrides = new HashSet<String>();
             overrides.add("org.mule.module.reboot.MuleContainerBootstrap");
-            new MulePluginClassLoader(new URL[0], null, overrides);
+            new FineGrainedControlClassLoader(new URL[0], null, overrides);
             fail("Should have not allowed this illegal override value");
         }
         catch (IllegalArgumentException e)
@@ -218,7 +218,7 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
         {
             Set<String> overrides = new HashSet<String>();
             overrides.add("-java.util.Collections");
-            new MulePluginClassLoader(new URL[0], null, overrides);
+            new FineGrainedControlClassLoader(new URL[0], null, overrides);
             fail("Should have not allowed this illegal 'blocked' value");
         }
         catch (IllegalArgumentException e)

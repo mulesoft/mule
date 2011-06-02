@@ -18,7 +18,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MulePluginClassLoader extends GoodCitizenClassLoader
+/**
+ * TODO document overrides, blocked, systemPackages and syntax for specifying those.
+ */
+public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
 {
 
     protected String appName;
@@ -34,12 +37,12 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
     protected Set<String> overrides = new HashSet<String>();
     protected Set<String> blocked = new HashSet<String>();
 
-    public MulePluginClassLoader(URL[] urls, ClassLoader parent)
+    public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent)
     {
         this(urls, parent, Collections.<String>emptySet());
     }
 
-    public MulePluginClassLoader(URL[] urls, ClassLoader parent, Set<String> overrides)
+    public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent, Set<String> overrides)
     {
         super(urls, parent);
 
@@ -71,7 +74,7 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
     // * @param appName when specified, temp files will be stored under this app's working dir;
     // *                if null, a top-level work dir is used
     // */
-    //public MulePluginClassLoader(URL[] urls, ClassLoader parent, String appName)
+    //public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent, String appName)
     //{
     //    super(urls, parent);
 

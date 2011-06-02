@@ -38,7 +38,6 @@ import org.mule.module.launcher.InstallException;
 import org.mule.module.launcher.MuleApplicationClassLoader;
 import org.mule.module.launcher.MuleSharedDomainClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
-import org.mule.module.launcher.plugin.MulePluginClassLoader;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
@@ -47,7 +46,6 @@ import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -390,8 +388,9 @@ public class DefaultMuleApplication implements Application
             parent = new MuleSharedDomainClassLoader(domain, getClass().getClassLoader());
         }
 
-        MulePluginClassLoader pluginCl = new MulePluginClassLoader(new URL[0], parent, null);
-        final MuleApplicationClassLoader appCl = new MuleApplicationClassLoader(appName, pluginCl);
+        final MuleApplicationClassLoader appCl = new MuleApplicationClassLoader(appName,
+                                                                                parent,
+                                                                                descriptor.getLoaderOverride());
         this.deploymentClassLoader = appCl;
     }
 
