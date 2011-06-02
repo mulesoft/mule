@@ -17,7 +17,8 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
 {
@@ -71,8 +72,10 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
         assertTrue("Dependent test classes not found, has required IT test modules been run before?", f.exists());
         URL[] childUrls = new URL[] {f.toURI().toURL()};
 
+        Set<String> overrides = new HashSet<String>();
+        overrides.add("mypackage");
         // child will override all classes in 'mypackage'
-        MulePluginClassLoader ext = new MulePluginClassLoader(childUrls, parent, Arrays.asList("mypackage"));
+        MulePluginClassLoader ext = new MulePluginClassLoader(childUrls, parent, overrides);
         Class c = ext.loadClass("mypackage.SneakyChatter");
         final Method methodHi = c.getMethod("hi");
         final Object result = methodHi.invoke(c.newInstance());
@@ -82,7 +85,7 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
     /**
      * Child impl2 overrides parent, but no child impl available (fallback to parent)
      */
-    public void testPackageOverrideChildClassMissing() throws Exception
+    public void testPackageOverrideChildImplMissing() throws Exception
     {
 
         // load compiled classes from the previously built test modules
@@ -94,8 +97,10 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
         URL[] parentUrls = new URL[] {f.toURI().toURL()};
         URLClassLoader parent = new URLClassLoader(parentUrls, Thread.currentThread().getContextClassLoader());
 
+        Set<String> overrides = new HashSet<String>();
+        overrides.add("mypackage");
         // child will override all classes in 'mypackage'
-        MulePluginClassLoader ext = new MulePluginClassLoader(new URL[0], parent, Arrays.asList("mypackage"));
+        MulePluginClassLoader ext = new MulePluginClassLoader(new URL[0], parent, overrides);
         Class c = ext.loadClass("mypackage.SneakyChatter");
         final Method methodHi = c.getMethod("hi");
         final Object result = methodHi.invoke(c.newInstance());
@@ -103,14 +108,84 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
     }
 
     /**
+     * Child blocks the package without providing an implementation for it.
+     */
+    public void testBlockedPackageChildImplMissing() throws Exception
+    {
+
+        // load compiled classes from the previously built test modules
+        final URL classPathRoot = ClassUtils.getClassPathRoot(getClass());
+        System.out.println("classPathRoot = " + classPathRoot);
+        File f = new File(classPathRoot.getPath(), "../../../test-01-plugin-impl-1/target/classes/");
+        System.out.println("f = " + f);
+        assertTrue("Dependent test classes not found, has required IT test modules been run before?", f.exists());
+        URL[] parentUrls = new URL[] {f.toURI().toURL()};
+        URLClassLoader parent = new URLClassLoader(parentUrls, Thread.currentThread().getContextClassLoader());
+
+        // confirm the parent is able to load the class
+        assertNotNull(parent.loadClass("mypackage.SneakyChatter"));
+
+        Set<String> overrides = new HashSet<String>();
+        overrides.add("-mypackage");
+        // block the package, this is stronger than override
+        MulePluginClassLoader ext = new MulePluginClassLoader(new URL[0], parent, overrides);
+        try
+        {
+            ext.loadClass("mypackage.SneakyChatter");
+            fail("Should have failed to load the class");
+        }
+        catch (ClassNotFoundException e)
+        {
+            // expected
+        }
+    }
+
+    /**
+     * Child blocks the package, impl2 says 'Bye', impl1 is 'invisible' to the child.
+     */
+    public void testBlockedPackage() throws Exception
+    {
+
+        // load compiled classes from the previously built test modules
+        final URL classPathRoot = ClassUtils.getClassPathRoot(getClass());
+        System.out.println("classPathRoot = " + classPathRoot);
+        File f = new File(classPathRoot.getPath(), "../../../test-01-plugin-impl-1/target/classes/");
+        System.out.println("f = " + f);
+        assertTrue("Dependent test classes not found, has required IT test modules been run before?", f.exists());
+        URL[] parentUrls = new URL[] {f.toURI().toURL()};
+        URLClassLoader parent = new URLClassLoader(parentUrls, Thread.currentThread().getContextClassLoader());
+
+        // confirm the parent is able to load the class
+        assertNotNull(parent.loadClass("mypackage.SneakyChatter"));
+
+        // now load alternative impl overriding the original behavior
+        f = new File(classPathRoot.getPath(), "../../../test-02-plugin-impl-2/target/classes/");
+        System.out.println("f = " + f);
+        assertTrue("Dependent test classes not found, has required IT test modules been run before?", f.exists());
+        URL[] childUrls = new URL[] {f.toURI().toURL()};
+
+        Set<String> overrides = new HashSet<String>();
+        overrides.add("-mypackage");
+        // block the package, this is stronger than override
+        MulePluginClassLoader ext = new MulePluginClassLoader(childUrls, parent, overrides);
+        Class c = ext.loadClass("mypackage.SneakyChatter");
+        final Method methodHi = c.getMethod("hi");
+        final Object result = methodHi.invoke(c.newInstance());
+        assertEquals("Wrong implementation loaded", "Bye", result);
+    }
+
+
+    /**
      * Child impl2 overrides parent, but class is not available in either classloader
      */
     public void testPackageOverrideClassNotFound() throws Exception
     {
 
+        Set<String> overrides = new HashSet<String>();
+        overrides.add("mypackage");
         // child will override all classes in 'mypackage'
         MulePluginClassLoader ext = new MulePluginClassLoader(new URL[0], Thread.currentThread().getContextClassLoader(),
-                                                              Arrays.asList("mypackage"));
+                                                              overrides);
         try
         {
             ext.loadClass("mypackage.SneakyChatter");
@@ -126,7 +201,9 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
     {
         try
         {
-            new MulePluginClassLoader(new URL[0], null, Arrays.asList("org.mule.module.reboot.MuleContainerBootstrap"));
+            Set<String> overrides = new HashSet<String>();
+            overrides.add("org.mule.module.reboot.MuleContainerBootstrap");
+            new MulePluginClassLoader(new URL[0], null, overrides);
             fail("Should have not allowed this illegal override value");
         }
         catch (IllegalArgumentException e)
@@ -139,7 +216,9 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
     {
         try
         {
-            new MulePluginClassLoader(new URL[0], null, Arrays.asList("-java.util.Collections"));
+            Set<String> overrides = new HashSet<String>();
+            overrides.add("-java.util.Collections");
+            new MulePluginClassLoader(new URL[0], null, overrides);
             fail("Should have not allowed this illegal 'blocked' value");
         }
         catch (IllegalArgumentException e)

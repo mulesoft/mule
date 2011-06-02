@@ -14,9 +14,9 @@ import org.mule.module.launcher.GoodCitizenClassLoader;
 import org.mule.util.StringUtils;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MulePluginClassLoader extends GoodCitizenClassLoader
 {
@@ -31,15 +31,15 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
             "com.mulesource"
     };
 
-    protected List<String> overrides = new ArrayList<String>();
-    protected List<String> blocked = new ArrayList<String>();
+    protected Set<String> overrides = new HashSet<String>();
+    protected Set<String> blocked = new HashSet<String>();
 
     public MulePluginClassLoader(URL[] urls, ClassLoader parent)
     {
-        this(urls, parent, Collections.<String>emptyList());
+        this(urls, parent, Collections.<String>emptySet());
     }
 
-    public MulePluginClassLoader(URL[] urls, ClassLoader parent, List<String> overrides)
+    public MulePluginClassLoader(URL[] urls, ClassLoader parent, Set<String> overrides)
     {
         super(urls, parent);
 
@@ -47,25 +47,24 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
         {
             for (String override : overrides)
             {
+                override = StringUtils.defaultString(override).trim();
+                // 'blocked' package definitions come with a '-' prefix
+                if (override.startsWith("-"))
+                {
+                    override = override.substring(1);
+                    this.blocked.add(override);
+                }
+                this.overrides.add(override);
+
                 for (String systemPackage : systemPackages)
                 {
-                    override = StringUtils.defaultString(override).trim();
-                    // 'blocked' package definitions come with a '-' prefix
-                    if (override.startsWith("-"))
-                    {
-                        override = override.substring(1);
-                        this.blocked.add(override);
-                    }
                     if (override.startsWith(systemPackage))
                     {
                         throw new IllegalArgumentException("Can't override a system package. Offending value: " + override);
                     }
-                    this.overrides.add(override);
                 }
             }
         }
-
-        this.overrides = overrides;
     }
 
     ///**
@@ -118,7 +117,61 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
         {
             return result;
         }
+        boolean overrideMatch = isOverridden(name);
 
+
+        if (overrideMatch)
+        {
+            System.out.printf("Name: %s Overridden: %s", name, overrideMatch);
+
+            boolean blockedMatch = isBlocked(name);
+
+            System.out.printf("Name: %s Blocked: %s", name, blockedMatch);
+
+            if (blockedMatch)
+            {
+                // load this class from the child ONLY, don't attempt parent, let CNFE exception propagate
+                result = findClass(name);
+            }
+            else
+            {
+                // load this class from the child
+                try
+                {
+                    result = findClass(name);
+                }
+                catch (ClassNotFoundException e)
+                {
+                    // let it fail with CNFE
+                    result = findParentClass(name);
+                }
+            }
+
+
+        }
+        else
+        {
+            // no overrides, regular parent-first lookup
+            try
+            {
+                result = findParentClass(name);
+            }
+            catch (ClassNotFoundException e)
+            {
+                result = findClass(name);
+            }
+        }
+
+        if (resolve)
+        {
+            resolveClass(result);
+        }
+
+        return result;
+    }
+
+    protected boolean isOverridden(String name)
+    {
         // find a match
         boolean overrideMatch = false;
         for (String override : overrides)
@@ -129,37 +182,21 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
                 break;
             }
         }
+        return overrideMatch;
+    }
 
-        if (overrideMatch)
+    protected boolean isBlocked(String name)
+    {
+        boolean blockedMatch = false;
+        for (String b : blocked)
         {
-            // load this class from the child
-            try
+            if (name.startsWith(b))
             {
-                result = findClass(name);
-            }
-            catch (ClassNotFoundException e)
-            {
-                // let it fail with CNFE
-                result = findParentClass(name);
+                blockedMatch = true;
+                break;
             }
         }
-        else
-        {
-            try
-            {
-                result = findParentClass(name);
-            }
-            catch (ClassNotFoundException e)
-            {
-                result = findClass(name);
-                if (resolve)
-                {
-                    resolveClass(result);
-                }
-            }
-        }
-
-        return result;
+        return blockedMatch;
     }
 
     protected Class<?> findParentClass(String name) throws ClassNotFoundException
