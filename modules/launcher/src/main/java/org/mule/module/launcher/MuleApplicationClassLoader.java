@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -94,6 +95,30 @@ public class MuleApplicationClassLoader extends GoodCitizenClassLoader
                 logger.debug(String.format("[%s]", appName), e);
             }
         }
+    }
+
+    @Override
+    protected Class<?> findClass(String name) throws ClassNotFoundException
+    {
+        return super.findClass(name);
+    }
+
+    @Override
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
+    {
+        return super.loadClass(name, resolve);
+    }
+
+    @Override
+    public URL getResource(String name)
+    {
+        return super.getResource(name);
+    }
+
+    @Override
+    public Enumeration<URL> getResources(String name) throws IOException
+    {
+        return super.getResources(name);
     }
 
     @Override

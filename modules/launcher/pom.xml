@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>mule-modules</artifactId>
         <groupId>org.mule.modules</groupId>
+        <artifactId>mule-modules</artifactId>
         <version>3.2.0-SNAPSHOT</version>
     </parent>
 
@@ -14,6 +14,79 @@
     <packaging>jar</packaging>
 
     <name>Mule 3 Launcher</name>
+
+    <profiles>
+        <profile>
+            <id>classloader-integration-tests</id>
+
+            <activation>
+                <property>
+                    <name>it</name>
+                    <value>true</value>
+                </property>
+            </activation>
+
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>shitty-maven-plugin</artifactId>
+                        <version>1.0-alpha-3</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>clean</goal>
+                                    <goal>install</goal>
+                                    <goal>test</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+
+
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>shitty-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>clean</goal>
+                            <goal>install</goal>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--<plugin>
+                <artifactId>maven-invoker-plugin</artifactId>
+                <version>1.5</version>
+                <configuration>
+                    <projectsDirectory>src/it</projectsDirectory>
+                    <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>classloader-tests</id>
+                        <goals>
+                            <goal>install</goal>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>-->
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>

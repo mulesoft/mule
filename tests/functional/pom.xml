@@ -11,6 +11,27 @@
     <name>Mule Functional Test Framework (TCK)</name>
     <description>Mule functional test framework (TCK)</description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <!--
+                    Install a special 'TESTING' version of this module,
+                    used in launcher integration tests
+                -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>shitty-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>clean</goal>
+                            <goal>install</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule</groupId>
