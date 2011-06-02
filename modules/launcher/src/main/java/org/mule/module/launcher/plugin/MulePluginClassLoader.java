@@ -120,11 +120,7 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
 
         if (overrideMatch)
         {
-            System.out.printf("Name: %s Overridden: %s", name, overrideMatch);
-
             boolean blockedMatch = isBlocked(name);
-
-            System.out.printf("Name: %s Blocked: %s", name, blockedMatch);
 
             if (blockedMatch)
             {
