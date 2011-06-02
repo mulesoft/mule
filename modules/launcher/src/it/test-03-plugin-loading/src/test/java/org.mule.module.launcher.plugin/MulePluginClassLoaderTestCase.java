@@ -102,4 +102,24 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
         final Object result = methodHi.invoke(c.newInstance());
         assertEquals("Wrong implementation loaded", "Hello", result);
     }
+
+    /**
+     * Child impl2 overrides parent, but class is not available in either classloader
+     */
+    public void testPackageOverrideClassNotFound() throws Exception
+    {
+
+        MulePluginClassLoader ext = new MulePluginClassLoader(new URL[0], Thread.currentThread().getContextClassLoader());
+        // child will override all classes in 'mypackage'
+        ext.overrides = new String[] {"mypackage"};
+        try
+        {
+            ext.loadClass("mypackage.SneakyChatter");
+            fail("Should have thrown a ClassNotFoundException");
+        }
+        catch (ClassNotFoundException e)
+        {
+            // expected
+        }
+    }
 }
