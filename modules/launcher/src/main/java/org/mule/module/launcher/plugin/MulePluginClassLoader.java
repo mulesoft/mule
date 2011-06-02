@@ -94,50 +94,20 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
             return result;
         }
 
-        if (parentFirst)
+        // find a match
+        boolean overrideMatch = false;
+        for (String override : overrides)
         {
-            // find a match
-            boolean overrideMatch = false;
-            for (String override : overrides)
+            if (name.startsWith(override))
             {
-                if (name.startsWith(override))
-                {
-                    overrideMatch = true;
-                    break;
-                }
-            }
-
-            // TODO this is a dup from childFirst
-            if (overrideMatch)
-            {
-                try
-                {
-                    result = findClass(name);
-                }
-                catch (ClassNotFoundException e)
-                {
-                    // let it fail with CNFE
-                    result = findParentClass(name);
-                }
-            }
-            else
-            {
-                try
-                {
-                    result = findParentClass(name);
-                }
-                catch (ClassNotFoundException e)
-                {
-                    result = findClass(name);
-                    if (resolve)
-                    {
-                        resolveClass(result);
-                    }
-                }
+                overrideMatch = true;
+                break;
             }
         }
-        else
+
+        if (overrideMatch)
         {
+            // load this class from the child
             try
             {
                 result = findClass(name);
@@ -146,6 +116,21 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
             {
                 // let it fail with CNFE
                 result = findParentClass(name);
+            }
+        }
+        else
+        {
+            try
+            {
+                result = findParentClass(name);
+            }
+            catch (ClassNotFoundException e)
+            {
+                result = findClass(name);
+                if (resolve)
+                {
+                    resolveClass(result);
+                }
             }
         }
 
