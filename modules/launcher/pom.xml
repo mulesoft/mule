@@ -21,8 +21,7 @@
 
             <activation>
                 <property>
-                    <name>it</name>
-                    <value>true</value>
+                    <name>!skipTests</name>
                 </property>
             </activation>
 
@@ -49,44 +48,6 @@
 
         </profile>
     </profiles>
-
-    <build>
-        <plugins>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>shitty-maven-plugin</artifactId>
-                <version>1.0-alpha-2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>clean</goal>
-                            <goal>install</goal>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!--<plugin>
-                <artifactId>maven-invoker-plugin</artifactId>
-                <version>1.5</version>
-                <configuration>
-                    <projectsDirectory>src/it</projectsDirectory>
-                    <localRepositoryPath>${project.build.directory}/it-repo</localRepositoryPath>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>classloader-tests</id>
-                        <goals>
-                            <goal>install</goal>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>-->
-        </plugins>
-    </build>
 
     <dependencies>
         <dependency>
