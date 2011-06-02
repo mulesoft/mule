@@ -109,8 +109,6 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException
     {
-        //System.out.println("MulePluginClassLoader.loadClass " + name);
-
         Class<?> result = findLoadedClass(name);
 
         if (result != null)
@@ -214,7 +212,6 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException
     {
-        //System.out.println("MulePluginClassLoader.findClass " + name);
         return super.findClass(name);
     }
 
