@@ -15,7 +15,10 @@ import org.mule.util.StringUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.lang.BooleanUtils;
 
@@ -28,12 +31,12 @@ public class PropertiesDescriptorParser implements DescriptorParser
     protected static final String PROPERTY_CONFIG_BUILDER = "config.builder";
     protected static final String PROPERTY_DOMAIN = "domain";
     // support not yet implemented for CL reversal
-    protected static final String PROPERTY_CLASSLOADER_PARENT_FIRST = "classloader.parentFirst";
     protected static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
     protected static final String PROPERTY_REDEPLOYMENT_ENABLED = "redeployment.enabled";
     // there was a typo in the prop name, but we still support it
     protected static final String PROPERTY_LEGACY_PRIVILEGED = "priviledged";
     protected static final String PROPERTY_PRIVILEGED = "privileged";
+    protected static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
 
     public ApplicationDescriptor parse(File descriptor) throws IOException
     {
@@ -62,6 +65,15 @@ public class PropertiesDescriptorParser implements DescriptorParser
 
         d.setPrivileged(BooleanUtils.toBoolean(p.getProperty(PROPERTY_LEGACY_PRIVILEGED, Boolean.FALSE.toString())));
         d.setPrivileged(BooleanUtils.toBoolean(p.getProperty(PROPERTY_PRIVILEGED, Boolean.FALSE.toString())));
+
+        final String overrideString = p.getProperty(PROPERTY_LOADER_OVERRIDE);
+        if (StringUtils.isNotBlank(overrideString))
+        {
+            Set<String> values = new HashSet<String>();
+            final String[] overrides = overrideString.split(",");
+            Collections.addAll(values, overrides);
+            d.setLoaderOverride(values);
+        }
 
         return d;
     }

@@ -11,7 +11,9 @@
 package org.mule.module.launcher.descriptor;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 public class ApplicationDescriptor
@@ -36,6 +38,8 @@ public class ApplicationDescriptor
     private boolean redeploymentEnabled = true;
 
     private boolean privileged;
+
+    private Set<String> loaderOverride = new HashSet<String>();
 
     public String getAppName()
     {
@@ -140,5 +144,15 @@ public class ApplicationDescriptor
     public void setPrivileged(boolean privileged)
     {
         this.privileged = privileged;
+    }
+
+    public Set<String> getLoaderOverride()
+    {
+        return loaderOverride;
+    }
+
+    public void setLoaderOverride(Set<String> loaderOverride)
+    {
+        this.loaderOverride = loaderOverride;
     }
 }
