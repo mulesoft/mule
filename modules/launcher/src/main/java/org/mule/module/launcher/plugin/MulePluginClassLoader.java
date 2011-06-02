@@ -22,9 +22,6 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
 
     protected String appName;
 
-    // TODO delete this switch
-    protected boolean parentFirst = true;
-
     // TODO double-check, we might need to restrict logging libs loading too
     protected String[] systemPackages = {
             "java",
@@ -156,32 +153,4 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
         return super.findClass(name);
     }
 
-    // TODO remove this method
-    public static void main(String[] args) throws Exception
-    {
-        System.setProperty("mule.home", "c:\\java\\mule\\mule-standalone-3.2.0-SNAPSHOT");
-        MulePluginClassLoader ext = new MulePluginClassLoader(new URL[0], Thread.currentThread().getContextClassLoader());
-        Class c = ext.loadClass("junit.framework.Assert");
-        URL location = c.getProtectionDomain().getCodeSource().getLocation();
-        System.out.println("\nparent first");
-        System.out.println("location = " + location);
-
-        // reset CL
-        ext = new MulePluginClassLoader(new URL[0], Thread.currentThread().getContextClassLoader());
-        ext.parentFirst = false;
-        System.out.println("\nchild first");
-        c = ext.loadClass("junit.framework.Assert");
-        location = c.getProtectionDomain().getCodeSource().getLocation();
-        System.out.println("location = " + location);
-
-        // reset CL & configure overrides
-        ext = new MulePluginClassLoader(new URL[0], Thread.currentThread().getContextClassLoader());
-        System.out.println("\noverrides");
-        ext.overrides = new String[] {"junit"};
-        c = ext.loadClass("junit.framework.Assert");
-        location = c.getProtectionDomain().getCodeSource().getLocation();
-
-        System.out.println("location = " + location);
-
-    }
 }
