@@ -72,7 +72,7 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
         URL[] childUrls = new URL[] {f.toURI().toURL()};
 
         // child will override all classes in 'mypackage'
-        MulePluginClassLoader ext = new MulePluginClassLoader(childUrls, parent, Arrays.asList("mypackage"), null);
+        MulePluginClassLoader ext = new MulePluginClassLoader(childUrls, parent, Arrays.asList("mypackage"));
         Class c = ext.loadClass("mypackage.SneakyChatter");
         final Method methodHi = c.getMethod("hi");
         final Object result = methodHi.invoke(c.newInstance());
@@ -95,7 +95,7 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
         URLClassLoader parent = new URLClassLoader(parentUrls, Thread.currentThread().getContextClassLoader());
 
         // child will override all classes in 'mypackage'
-        MulePluginClassLoader ext = new MulePluginClassLoader(new URL[0], parent, Arrays.asList("mypackage"), null);
+        MulePluginClassLoader ext = new MulePluginClassLoader(new URL[0], parent, Arrays.asList("mypackage"));
         Class c = ext.loadClass("mypackage.SneakyChatter");
         final Method methodHi = c.getMethod("hi");
         final Object result = methodHi.invoke(c.newInstance());
@@ -110,7 +110,7 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
 
         // child will override all classes in 'mypackage'
         MulePluginClassLoader ext = new MulePluginClassLoader(new URL[0], Thread.currentThread().getContextClassLoader(),
-                                                              Arrays.asList("mypackage"), null);
+                                                              Arrays.asList("mypackage"));
         try
         {
             ext.loadClass("mypackage.SneakyChatter");
@@ -126,7 +126,7 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
     {
         try
         {
-            new MulePluginClassLoader(new URL[0], null, Arrays.asList("org.mule.module.reboot.MuleContainerBootstrap"), null);
+            new MulePluginClassLoader(new URL[0], null, Arrays.asList("org.mule.module.reboot.MuleContainerBootstrap"));
             fail("Should have not allowed this illegal override value");
         }
         catch (IllegalArgumentException e)
@@ -139,7 +139,7 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
     {
         try
         {
-            new MulePluginClassLoader(new URL[0], null, null, Arrays.asList("java.util.Collections"));
+            new MulePluginClassLoader(new URL[0], null, Arrays.asList("-java.util.Collections"));
             fail("Should have not allowed this illegal 'blocked' value");
         }
         catch (IllegalArgumentException e)

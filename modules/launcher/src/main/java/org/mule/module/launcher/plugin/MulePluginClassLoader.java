@@ -11,20 +11,18 @@
 package org.mule.module.launcher.plugin;
 
 import org.mule.module.launcher.GoodCitizenClassLoader;
+import org.mule.util.StringUtils;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Handles Mule extensions in $MULE_HOME/lib/ext
- */
 public class MulePluginClassLoader extends GoodCitizenClassLoader
 {
 
     protected String appName;
 
-    // TODO double-check, we might need to restrict logging libs loading too
     protected String[] systemPackages = {
             "java",
             "javax",
@@ -33,15 +31,15 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
             "com.mulesource"
     };
 
-    protected List<String> overrides = Collections.emptyList();
-    protected List<String> blocked = Collections.emptyList();
+    protected List<String> overrides = new ArrayList<String>();
+    protected List<String> blocked = new ArrayList<String>();
 
     public MulePluginClassLoader(URL[] urls, ClassLoader parent)
     {
-        this(urls, parent, Collections.<String>emptyList(), Collections.<String>emptyList());
+        this(urls, parent, Collections.<String>emptyList());
     }
 
-    public MulePluginClassLoader(URL[] urls, ClassLoader parent, List<String> overrides, List<String> blocked)
+    public MulePluginClassLoader(URL[] urls, ClassLoader parent, List<String> overrides)
     {
         super(urls, parent);
 
@@ -51,30 +49,23 @@ public class MulePluginClassLoader extends GoodCitizenClassLoader
             {
                 for (String systemPackage : systemPackages)
                 {
+                    override = StringUtils.defaultString(override).trim();
+                    // 'blocked' package definitions come with a '-' prefix
+                    if (override.startsWith("-"))
+                    {
+                        override = override.substring(1);
+                        this.blocked.add(override);
+                    }
                     if (override.startsWith(systemPackage))
                     {
                         throw new IllegalArgumentException("Can't override a system package. Offending value: " + override);
                     }
-                }
-            }
-        }
-
-        if (blocked != null && !blocked.isEmpty())
-        {
-            for (String aBlocked : blocked)
-            {
-                for (String systemPackage : systemPackages)
-                {
-                    if (aBlocked.startsWith(systemPackage))
-                    {
-                        throw new IllegalArgumentException("Can't block a system package. Offending value: " + aBlocked);
-                    }
+                    this.overrides.add(override);
                 }
             }
         }
 
         this.overrides = overrides;
-        this.blocked = blocked;
     }
 
     ///**
