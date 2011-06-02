@@ -390,7 +390,7 @@ public class DefaultMuleApplication implements Application
             parent = new MuleSharedDomainClassLoader(domain, getClass().getClassLoader());
         }
 
-        MulePluginClassLoader pluginCl = new MulePluginClassLoader(new URL[0], parent, appName);
+        MulePluginClassLoader pluginCl = new MulePluginClassLoader(new URL[0], parent, null);
         final MuleApplicationClassLoader appCl = new MuleApplicationClassLoader(appName, pluginCl);
         this.deploymentClassLoader = appCl;
     }
