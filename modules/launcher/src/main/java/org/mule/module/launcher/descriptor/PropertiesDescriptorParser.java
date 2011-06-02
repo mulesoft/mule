@@ -63,8 +63,9 @@ public class PropertiesDescriptorParser implements DescriptorParser
         // supports true (case insensitive), yes, on as positive values
         d.setRedeploymentEnabled(BooleanUtils.toBoolean(p.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, Boolean.TRUE.toString())));
 
-        d.setPrivileged(BooleanUtils.toBoolean(p.getProperty(PROPERTY_LEGACY_PRIVILEGED, Boolean.FALSE.toString())));
-        d.setPrivileged(BooleanUtils.toBoolean(p.getProperty(PROPERTY_PRIVILEGED, Boolean.FALSE.toString())));
+        // fallback to a legacy property name
+        d.setPrivileged(BooleanUtils.toBoolean(p.getProperty(PROPERTY_PRIVILEGED,
+                                                             p.getProperty(PROPERTY_LEGACY_PRIVILEGED, Boolean.FALSE.toString()))));
 
         final String overrideString = p.getProperty(PROPERTY_LOADER_OVERRIDE);
         if (StringUtils.isNotBlank(overrideString))

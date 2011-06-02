@@ -92,7 +92,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
     }
 
-    public void testPriviledgedApp() throws Exception
+    public void testPrivilegedApp() throws Exception
     {
         final URL url = getClass().getResource("/priviledged-dummy-app.zip");
         assertNotNull("Test app file not found " + url, url);
@@ -106,13 +106,13 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         final Application app = findApp("priviledged-dummy-app", 1);
         // now that we're sure it's the app we wanted, assert the registry has everything
-        // a 'priviledged' app would have had
+        // a 'privileged' app would have had
         final Object obj = app.getMuleContext().getRegistry().lookupObject(PriviledgedMuleApplication.REGISTRY_KEY_DEPLOYMENT_SERVICE);
-        assertNotNull("Priviledged objects have not been registered", obj);
+        assertNotNull("Privileged objects have not been registered", obj);
         assertTrue(((ApplicationWrapper) app).getDelegate() instanceof PriviledgedMuleApplication);
     }
 
-    public void testPriviledgedCrossAppAccess() throws Exception
+    public void testPrivilegedCrossAppAccess() throws Exception
     {
         URL url = getClass().getResource("/priviledged-dummy-app.zip");
         assertNotNull("Test app file not found " + url, url);
@@ -159,7 +159,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         assertAppsDir(NONE, new String[] {"dummy-app"}, true);
 
-        // just assert no priviledged entries were put in the registry
+        // just assert no privileged entries were put in the registry
         final Application app = findApp("dummy-app", 1);
         final MuleRegistry registry = app.getMuleContext().getRegistry();
         final Object obj = registry.lookupObject(PriviledgedMuleApplication.REGISTRY_KEY_DEPLOYMENT_SERVICE);
@@ -264,7 +264,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
 
         assertAppsDir(NONE, new String[] {"configurableApp", "dummy-app"}, true);
 
-        // just assert no priviledged entries were put in the registry
+        // just assert no privileged entries were put in the registry
         final Application configurableApp = findApp("configurableApp", 2);
         final Application dummyApp = findApp("dummy-app", 2);
         
