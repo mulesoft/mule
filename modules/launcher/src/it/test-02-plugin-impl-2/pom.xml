@@ -7,22 +7,11 @@
     <artifactId>mule-module-launcher-tests</artifactId>
     <version>testing</version>
 
-   <!-- <build>
-        <plugins>
-            <plugin>
-                <groupId>my.company.myproject</groupId>
-                <artifactId>myproject-maven-plugin</artifactId>
-                <version>testing</version>
+    <description>
+        A SneakyChatter implementation saying 'Bye'. It mirrors the test-01-plugin-impl-1 completely, but changes the
+        functionality. Note the artifactId doesn't matter much, as the jar
+        is never installed in the repo (the follow-up test points to target/classes at known locations).
+    </description>
 
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>do-something</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>-->
 </project>
 
