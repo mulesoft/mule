@@ -30,13 +30,12 @@ public class ApplicationDescriptor
     private String encoding;
     private String configurationBuilder;
     private String domain;
-    private boolean parentFirstClassLoader = true;
     private String[] configResources = new String[] {DEFAULT_CONFIGURATION_RESOURCE};
     private Map<String, String> appProperties = new HashMap<String, String>();
 
     private boolean redeploymentEnabled = true;
 
-    private boolean priviledged = false;
+    private boolean privileged;
 
     public String getAppName()
     {
@@ -95,21 +94,6 @@ public class ApplicationDescriptor
         this.domain = domain;
     }
 
-    /**
-     * Default (true) mode is a regular java classloading policy. When inverted (false),
-     * application libraries will be consulted before any other locations.
-     * @return default is true
-     */
-    public boolean isParentFirstClassLoader()
-    {
-        return parentFirstClassLoader;
-    }
-
-    public void setParentFirstClassLoader(boolean parentFirstClassLoader)
-    {
-        this.parentFirstClassLoader = parentFirstClassLoader;
-    }
-
     public String[] getConfigResources()
     {
         return configResources;
@@ -130,13 +114,31 @@ public class ApplicationDescriptor
         this.redeploymentEnabled = redeploymentEnabled;
     }
 
+    /**
+     * @deprecated use {@link #isPrivileged}
+     */
+    @Deprecated
     public boolean isPriviledged()
     {
-        return priviledged;
+        return privileged;
     }
 
+    /**
+     * @deprecated use @{link #setPrivileged}
+     */
+    @Deprecated
     public void setPriviledged(boolean priviledged)
     {
-        this.priviledged = priviledged;
+        this.privileged = priviledged;
+    }
+
+    public boolean isPrivileged()
+    {
+        return privileged;
+    }
+
+    public void setPrivileged(boolean privileged)
+    {
+        this.privileged = privileged;
     }
 }

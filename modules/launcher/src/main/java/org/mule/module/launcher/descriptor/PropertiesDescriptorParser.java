@@ -31,7 +31,9 @@ public class PropertiesDescriptorParser implements DescriptorParser
     protected static final String PROPERTY_CLASSLOADER_PARENT_FIRST = "classloader.parentFirst";
     protected static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
     protected static final String PROPERTY_REDEPLOYMENT_ENABLED = "redeployment.enabled";
-    protected static final String PROPERTY_PRIVILEDGED = "priviledged";
+    // there was a typo in the prop name, but we still support it
+    protected static final String PROPERTY_LEGACY_PRIVILEGED = "priviledged";
+    protected static final String PROPERTY_PRIVILEGED = "privileged";
 
     public ApplicationDescriptor parse(File descriptor) throws IOException
     {
@@ -42,9 +44,6 @@ public class PropertiesDescriptorParser implements DescriptorParser
         d.setEncoding(p.getProperty(PROPERTY_ENCODING));
         d.setConfigurationBuilder(p.getProperty(PROPERTY_CONFIG_BUILDER));
         d.setDomain(p.getProperty(PROPERTY_DOMAIN));
-
-        // supports 'true' (case insensitive), 'yes', 'on' as positive values
-        d.setParentFirstClassLoader(BooleanUtils.toBoolean(p.getProperty(PROPERTY_CLASSLOADER_PARENT_FIRST, Boolean.TRUE.toString())));
 
         final String resProps = p.getProperty(PROPERTY_CONFIG_RESOURCES);
         String[] urls;
@@ -61,7 +60,8 @@ public class PropertiesDescriptorParser implements DescriptorParser
         // supports true (case insensitive), yes, on as positive values
         d.setRedeploymentEnabled(BooleanUtils.toBoolean(p.getProperty(PROPERTY_REDEPLOYMENT_ENABLED, Boolean.TRUE.toString())));
 
-        d.setPriviledged(BooleanUtils.toBoolean(p.getProperty(PROPERTY_PRIVILEDGED, Boolean.FALSE.toString())));
+        d.setPrivileged(BooleanUtils.toBoolean(p.getProperty(PROPERTY_LEGACY_PRIVILEGED, Boolean.FALSE.toString())));
+        d.setPrivileged(BooleanUtils.toBoolean(p.getProperty(PROPERTY_PRIVILEGED, Boolean.FALSE.toString())));
 
         return d;
     }
