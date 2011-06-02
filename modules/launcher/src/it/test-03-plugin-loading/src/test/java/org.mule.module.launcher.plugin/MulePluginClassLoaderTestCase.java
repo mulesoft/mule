@@ -21,6 +21,9 @@ import java.net.URLClassLoader;
 public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
 {
 
+    /**
+     * Parent implementation 1 says 'Hello', child impl2 ignored.
+     */
     public void testParentFirst() throws Exception
     {
 
@@ -32,10 +35,47 @@ public class MulePluginClassLoaderTestCase extends AbstractMuleTestCase
         assertTrue("Dependent test classes not found, has required IT test modules been run before?", f.exists());
         URL[] parentUrls = new URL[] {f.toURI().toURL()};
         URLClassLoader parent = new URLClassLoader(parentUrls, Thread.currentThread().getContextClassLoader());
-        MulePluginClassLoader ext = new MulePluginClassLoader(new URL[0], parent);
+
+        // now load alternative impl overriding the original behavior
+        f = new File(classPathRoot.getPath(), "../../../test-02-plugin-impl-2/target/classes/");
+        System.out.println("f = " + f);
+        assertTrue("Dependent test classes not found, has required IT test modules been run before?", f.exists());
+        URL[] childUrls = new URL[] {f.toURI().toURL()};
+
+        MulePluginClassLoader ext = new MulePluginClassLoader(childUrls, parent);
         Class c = ext.loadClass("mypackage.SneakyChatter");
         final Method methodHi = c.getMethod("hi");
         final Object result = methodHi.invoke(c.newInstance());
         assertEquals("Wrong implementation loaded", "Hello", result);
+    }
+
+    /**
+     * Child impl2 overrides parent and says 'Bye'.
+     */
+    public void testChildPackageOverrides() throws Exception
+    {
+
+        // load compiled classes from the previously built test modules
+        final URL classPathRoot = ClassUtils.getClassPathRoot(getClass());
+        System.out.println("classPathRoot = " + classPathRoot);
+        File f = new File(classPathRoot.getPath(), "../../../test-01-plugin-impl-1/target/classes/");
+        System.out.println("f = " + f);
+        assertTrue("Dependent test classes not found, has required IT test modules been run before?", f.exists());
+        URL[] parentUrls = new URL[] {f.toURI().toURL()};
+        URLClassLoader parent = new URLClassLoader(parentUrls, Thread.currentThread().getContextClassLoader());
+
+        // now load alternative impl overriding the original behavior
+        f = new File(classPathRoot.getPath(), "../../../test-02-plugin-impl-2/target/classes/");
+        System.out.println("f = " + f);
+        assertTrue("Dependent test classes not found, has required IT test modules been run before?", f.exists());
+        URL[] childUrls = new URL[] {f.toURI().toURL()};
+
+        MulePluginClassLoader ext = new MulePluginClassLoader(childUrls, parent);
+        // child will override all classes in 'mypackage'
+        ext.overrides = new String[] {"mypackage"};
+        Class c = ext.loadClass("mypackage.SneakyChatter");
+        final Method methodHi = c.getMethod("hi");
+        final Object result = methodHi.invoke(c.newInstance());
+        assertEquals("Wrong implementation loaded", "Bye", result);
     }
 }
