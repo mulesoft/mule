@@ -45,7 +45,7 @@
                     <xsd:element ref="file:abstract-filenameParser">
                         <xsd:annotation>
                             <xsd:documentation>
-                                The filenameParser is used when writing files to an FTP server. The parser will convert the outputPattern attribute to a string using the parser and the current message. To add a parser to your configuration, you import the "file" namespace into your XML configuration. For more information about filenameParsers, see the [File Transport].
+                                The filenameParser is used when writing files to an FTP server. The parser will convert the outputPattern attribute to a string using the parser and the current message. To add a parser to your configuration, you import the "file" namespace into your XML configuration. For more information about filenameParsers, see the [File Transport Reference].
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:element>
@@ -74,9 +74,9 @@
     <xsd:element name="inbound-endpoint" type="inboundEndpointType" substitutionGroup="mule:abstract-inbound-endpoint"/>
     <xsd:complexType name="inboundEndpointType">
         <xsd:complexContent>
-            <!-- 
-                The only valid exchange-pattern is one-way which is the default. No need to make 
-                the exchange-pattern attribute configurable.  
+            <!--
+                The only valid exchange-pattern is one-way which is the default. No need to make
+                the exchange-pattern attribute configurable.
             -->
             <xsd:extension base="mule:inboundEndpointTypeWithoutExchangePattern">
                 <xsd:attributeGroup ref="addressAttributes"/>
@@ -90,9 +90,9 @@
                  substitutionGroup="mule:abstract-outbound-endpoint"/>
     <xsd:complexType name="outboundEndpointType">
         <xsd:complexContent>
-            <!-- 
-                The only valid exchange-pattern is one-way which is the default. No need to make 
-                the exchange-pattern attribute configurable.  
+            <!--
+                The only valid exchange-pattern is one-way which is the default. No need to make
+                the exchange-pattern attribute configurable.
             -->
             <xsd:extension base="mule:outboundEndpointTypeWithoutExchangePattern">
                 <xsd:attributeGroup ref="addressAttributes"/>
@@ -105,9 +105,9 @@
     <xsd:element name="endpoint" type="globalEndpointType" substitutionGroup="mule:abstract-global-endpoint"/>
     <xsd:complexType name="globalEndpointType">
         <xsd:complexContent>
-            <!-- 
-                The only valid exchange-pattern is one-way which is the default. No need to make 
-                the exchange-pattern attribute configurable.  
+            <!--
+                The only valid exchange-pattern is one-way which is the default. No need to make
+                the exchange-pattern attribute configurable.
             -->
             <xsd:extension base="mule:globalEndpointTypeWithoutExchangePattern">
                 <xsd:attributeGroup ref="addressAttributes"/>
