@@ -72,15 +72,22 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver implements Baye
             {
                 messageToRoute.setProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.TRUE, PropertyScope.INBOUND);
             }
-            
+
             MuleEvent event = AjaxMessageReceiver.this.routeMessage(messageToRoute);
             MuleMessage message = event == null ? null : event.getMessage();
-            //If a replyTo channel is set the client is expecting a response.
-            //Mule does not invoke the replyTo handler if an error occurs, but in this case we want it to.
-            AjaxConnector connector = (AjaxConnector) getConnector();
-            if (!connector.isDisableReplyTo() && message != null && message.getExceptionPayload() == null && replyTo != null)
+
+            // only the AjaxConnector (as opposed to the AjaxServletConnector) has the
+            // isDisableReplyTo() method and both inherit from different superclasses
+            if (getConnector() instanceof AjaxConnector)
             {
-                connector.getReplyToHandler(endpoint).processReplyTo(RequestContext.getEvent(), message, replyTo);
+                // If a replyTo channel is set the client is expecting a response.
+                // Mule does not invoke the replyTo handler if an error occurs, but in this case we
+                // want it to.
+                AjaxConnector ajaxConnector = (AjaxConnector) getConnector();
+                if (!ajaxConnector.isDisableReplyTo() && message != null && message.getExceptionPayload() == null && replyTo != null)
+                {
+                    ajaxConnector.getReplyToHandler(endpoint).processReplyTo(RequestContext.getEvent(), message, replyTo);
+                }
             }
             return null;
         }
@@ -104,4 +111,3 @@ public class AjaxMessageReceiver extends AbstractMessageReceiver implements Baye
         new ReceiverService(channel, getBayeux(), getEndpoint());
     }
 }
-
