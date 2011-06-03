@@ -78,6 +78,8 @@ import org.mule.config.spring.parsers.specific.PoolingProfileDefinitionParser;
 import org.mule.config.spring.parsers.specific.QueueStoreDefinitionParser;
 import org.mule.config.spring.parsers.specific.RegExFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ResponseDefinitionParser;
+import org.mule.config.spring.parsers.specific.RetryNotifierDefinitionParser;
+import org.mule.config.spring.parsers.specific.RetryPolicyDefinitionParser;
 import org.mule.config.spring.parsers.specific.RouterDefinitionParser;
 import org.mule.config.spring.parsers.specific.SecurityFilterDefinitionParser;
 import org.mule.config.spring.parsers.specific.ServiceDefinitionParser;
@@ -123,6 +125,9 @@ import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
 import org.mule.processor.InvokerMessageProcessor;
 import org.mule.processor.NullMessageProcessor;
+import org.mule.retry.notifiers.ConnectNotifier;
+import org.mule.retry.policies.RetryForeverPolicyTemplate;
+import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.routing.CollectionSplitter;
 import org.mule.routing.ExpressionMessageInfoMapping;
 import org.mule.routing.ExpressionSplitter;
@@ -224,11 +229,20 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("default-receiver-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_MESSAGE_RECEIVER_THREADING_PROFILE));
         registerBeanDefinitionParser("default-service-threading-profile", new DefaultThreadingProfileDefinitionParser(MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE));
         registerBeanDefinitionParser("threading-profile", new ThreadingProfileDefinitionParser("threadingProfile", MuleProperties.OBJECT_DEFAULT_SERVICE_THREADING_PROFILE));
-        registerBeanDefinitionParser("custom-exception-strategy", new ChildDefinitionParser("exceptionListener", null));
+        registerBeanDefinitionParser("custom-agent", new DefaultNameMuleOrphanDefinitionParser());
+
+        // Exception Strategies
         registerBeanDefinitionParser("default-exception-strategy", new ChildDefinitionParser("exceptionListener", DefaultMessagingExceptionStrategy.class));
+        registerBeanDefinitionParser("custom-exception-strategy", new ChildDefinitionParser("exceptionListener", null));
         registerBeanDefinitionParser("commit-transaction", new ExceptionTXFilterDefinitionParser("commitTxFilter"));
         registerBeanDefinitionParser("rollback-transaction", new ExceptionTXFilterDefinitionParser("rollbackTxFilter"));
-        registerBeanDefinitionParser("custom-agent", new DefaultNameMuleOrphanDefinitionParser());
+
+        // Reconnection Strategies
+        registerBeanDefinitionParser("reconnect", new RetryPolicyDefinitionParser(SimpleRetryPolicyTemplate.class));
+        registerBeanDefinitionParser("reconnect-forever", new RetryPolicyDefinitionParser(RetryForeverPolicyTemplate.class));
+        registerBeanDefinitionParser("reconnect-custom-strategy", new RetryPolicyDefinitionParser());
+        registerBeanDefinitionParser("reconnect-notifier", new RetryNotifierDefinitionParser(ConnectNotifier.class));
+        registerBeanDefinitionParser("reconnect-custom-notifier", new RetryNotifierDefinitionParser());
 
         registerMuleBeanDefinitionParser("queue-store", new ParentDefinitionParser()).addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "queue-store");
         registerMuleBeanDefinitionParser("custom-queue-store", new QueueStoreDefinitionParser()).addIgnored("name");
