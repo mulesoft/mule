@@ -1,5 +1,5 @@
 /*
- * $Id: AsynchronousRetryTemplate.java 18236 2010-11-25 10:48:47Z esteban.robles $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

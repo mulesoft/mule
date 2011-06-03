@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleRetryPolicy.java 18914 2011-05-18 13:36:16Z andrew.perepelytsya $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

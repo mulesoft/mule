@@ -1,5 +1,5 @@
 /*
- * $Id: SimpleRetryPolicyTemplate.java 18230 2010-11-25 01:06:28Z pablo.kraan $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *

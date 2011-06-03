@@ -1,5 +1,5 @@
 /*
- * $Id: RetryWorker.java 17934 2010-09-23 15:07:22Z andrew.perepelytsya $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
