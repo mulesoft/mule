@@ -17,18 +17,20 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
 import org.mule.config.i18n.CoreMessages;
 
+import java.io.Serializable;
+
 public class QueueConfiguration
 {
     protected final int capacity;
-    protected final ListableObjectStore objectStore;
+    protected final ListableObjectStore<Serializable> objectStore;
 
-    public QueueConfiguration(MuleContext context, int capacity, ListableObjectStore objectStore)
+    public QueueConfiguration(MuleContext context, int capacity, ListableObjectStore<Serializable> objectStore)
     {
         this.capacity = capacity;
         this.objectStore = objectStore;
     }
 
-    public QueueConfiguration(int capacity, ListableObjectStore objectStore)
+    public QueueConfiguration(int capacity, ListableObjectStore<Serializable> objectStore)
     {
         this.capacity = capacity;
         this.objectStore = objectStore;

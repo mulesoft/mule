@@ -11,10 +11,12 @@ package org.mule.util.store;
 
 import org.mule.api.config.MuleProperties;
 
+import java.io.Serializable;
+
 /**
  * A facade for the default in-memory object store
  */
-public class DefaultInMemoryObjectStore extends FacadeObjectStore
+public class DefaultInMemoryObjectStore<T extends Serializable> extends FacadeObjectStore<T>
 {
     public DefaultInMemoryObjectStore()
     {

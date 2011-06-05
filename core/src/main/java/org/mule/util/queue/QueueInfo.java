@@ -10,17 +10,51 @@
 
 package org.mule.util.queue;
 
+import org.mule.api.store.ListableObjectStore;
+import org.mule.api.store.ObjectStore;
+
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Stores information about a Queue
  */
 public class QueueInfo
 {
-    protected LinkedList<Serializable> list;
-    protected String name;
-    protected QueueConfiguration config;
+    private QueueConfiguration config;
+    private String name;
+    private QueueInfoDelegate delegate;
+    private static Map<Class<? extends ObjectStore>, QueueInfoDelegateFactory> delegateFactories = new HashMap<Class<? extends ObjectStore>, QueueInfoDelegateFactory>();
+
+    public QueueInfo(String name, QueueConfiguration config)
+    {
+        this.name = name;
+        setConfigAndDelegate(config);
+    }
+
+    public void setConfig(QueueConfiguration config)
+    {
+        setConfigAndDelegate(config);
+    }
+
+    private void setConfigAndDelegate(QueueConfiguration config)
+    {
+        boolean hadConfig = this.config != null;
+        this.config = config;
+        int capacity = 0;
+        QueueInfoDelegateFactory factory = null;
+        if (config != null)
+        {
+            capacity = config.capacity;
+            factory = delegateFactories.get(TransactionalQueueManager.getActualStore(config.objectStore).getClass());
+        }
+        if (delegate == null || (config != null && !hadConfig))
+        {
+            this.delegate = factory != null ? factory.createDelegate(this) : new DefaultQueueInfoDelegate(capacity);
+        }
+    }
 
     @Override
     public boolean equals(Object obj)
@@ -33,6 +67,7 @@ public class QueueInfo
         return name;
     }
 
+
     @Override
     public int hashCode()
     {
@@ -41,102 +76,61 @@ public class QueueInfo
 
     public void putNow(Serializable o)
     {
-        synchronized (list)
-        {
-            list.addLast(o);
-            list.notifyAll();
-        }
+        delegate.putNow(o);
     }
 
-    public boolean offer(Serializable o, int room, long timeout) throws InterruptedException
+    public boolean offer(Serializable o, int room, long timeout)
+        throws InterruptedException
     {
-        if (Thread.interrupted())
-        {
-            throw new InterruptedException();
-        }
-        synchronized (list)
-        {
-            if (config.capacity > 0)
-            {
-                if (config.capacity <= room)
-                {
-                    throw new IllegalStateException("Can not add more objects than the capacity in one time");
-                }
-                long l1 = timeout > 0L ? System.currentTimeMillis() : 0L;
-                long l2 = timeout;
-                while (list.size() >= config.capacity - room)
-                {
-                    if (l2 <= 0L)
-                    {
-                        return false;
-                    }
-                    list.wait(l2);
-                    l2 = timeout - (System.currentTimeMillis() - l1);
-                }
-            }
-            if (o != null)
-            {
-                list.addLast(o);
-            }
-            list.notifyAll();
-            return true;
-        }
+        return delegate.offer(o, room, timeout);
     }
 
-    public Serializable poll(long timeout) throws InterruptedException
+    public Serializable poll(long timeout)
+        throws InterruptedException
     {
-        if (Thread.interrupted())
-        {
-            throw new InterruptedException();
-        }
-        synchronized (list)
-        {
-            long l1 = timeout > 0L ? System.currentTimeMillis() : 0L;
-            long l2 = timeout;
-            while (list.isEmpty())
-            {
-                if (l2 <= 0L)
-                {
-                    return null;
-                }
-                list.wait(l2);
-                l2 = timeout - (System.currentTimeMillis() - l1);
-            }
-
-            Serializable o = list.removeFirst();
-            list.notifyAll();
-            return o;
-        }
+        return delegate.poll(timeout);
     }
 
-    public Serializable peek() throws InterruptedException
+    public Serializable peek()
+        throws InterruptedException
     {
-        if (Thread.interrupted())
-        {
-            throw new InterruptedException();
-        }
-        synchronized (list)
-        {
-            if (list.isEmpty())
-            {
-                return null;
-            }
-            else
-            {
-                return list.getFirst();
-            }
-        }
+        return delegate.peek();
     }
 
-    public void untake(Serializable item) throws InterruptedException
+    public void untake(Serializable item)
+        throws InterruptedException
     {
-        if (Thread.interrupted())
-        {
-            throw new InterruptedException();
-        }
-        synchronized (list)
-        {
-            list.addFirst(item);
-        }
+        delegate.untake(item);
+    }
+
+    public int getSize()
+    {
+        return delegate.getSize();
+    }
+
+    public ListableObjectStore<Serializable> getStore()
+    {
+        return config == null ? null : TransactionalQueueManager.getActualStore(config.objectStore);
+    }
+
+    public static synchronized void registerDelegateFactory(Class<? extends ObjectStore>storeType, QueueInfoDelegateFactory factory)
+    {
+        delegateFactories.put(storeType, factory);;    
+    }
+
+    public int getCapacity()
+    {
+        return config == null ? null : config.capacity;
+    }
+
+    /**
+     * A factory for creating object store-specific queue info delegates
+     */
+    public static interface QueueInfoDelegateFactory
+    {
+        /**
+         * Create a delegate
+         */
+        QueueInfoDelegate createDelegate(QueueInfo parent);
     }
 }

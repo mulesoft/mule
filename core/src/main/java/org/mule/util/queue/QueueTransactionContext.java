@@ -125,7 +125,7 @@ public class QueueTransactionContext extends AbstractTransactionContext
 
     public int size(QueueInfo queue)
     {
-        int sz = queue.list.size();
+        int sz = queue.getSize();
         if (added != null)
         {
             List<Serializable> queueAdded = added.get(queue);

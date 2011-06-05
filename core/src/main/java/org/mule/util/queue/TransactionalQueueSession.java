@@ -10,7 +10,12 @@
 
 package org.mule.util.queue;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.api.MuleEvent;
+import org.mule.api.MuleMessage;
 import org.mule.api.store.ObjectStoreException;
+import org.mule.util.store.DeserializationPostInitialisable;
 import org.mule.util.xa.AbstractXAResourceManager;
 import org.mule.util.xa.DefaultXASession;
 
@@ -21,6 +26,7 @@ import java.io.Serializable;
  */
 class TransactionalQueueSession extends DefaultXASession implements QueueSession
 {
+    private Log logger = LogFactory.getLog(TransactionalQueueSession.class);
 
     protected TransactionalQueueManager queueManager;
 
@@ -118,7 +124,8 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             {
                 if (localContext != null)
                 {
-                    return ((QueueTransactionContext) localContext).poll(queue, timeout);
+                    Serializable item = ((QueueTransactionContext) localContext).poll(queue, timeout);
+                    return postProcessIfNeeded(item);
                 }
                 else
                 {
@@ -127,7 +134,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
                     {
                         Serializable item = queueManager.doLoad(queue, id);
                         queueManager.doRemove(queue, id);
-                        return item;
+                        return postProcessIfNeeded(item);
                     }
                     return null;
                 }
@@ -153,14 +160,16 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             {
                 if (localContext != null)
                 {
-                    return ((QueueTransactionContext) localContext).peek(queue);
+                    Serializable item = ((QueueTransactionContext) localContext).peek(queue);
+                    return postProcessIfNeeded(item);
                 }
                 else
                 {
                     Serializable id = queue.peek();
                     if (id != null)
                     {
-                        return queueManager.doLoad(queue, id);
+                        Serializable item = queueManager.doLoad(queue, id);
+                        return postProcessIfNeeded(item);
                     }
                     return null;
                 }
@@ -179,13 +188,30 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             }
             else
             {
-                return queue.list.size();
+                return queue.getSize();
             }
         }
 
         public String getName()
         {
             return queue.getName();
+        }
+
+        private Serializable postProcessIfNeeded(Serializable item)
+        {
+            try
+            {
+                if (item instanceof DeserializationPostInitialisable && ((DeserializationPostInitialisable)item).requiresInitialization())
+                {
+                    DeserializationPostInitialisable.Implementation.init(item, queueManager.getMuleContext());
+                }
+                return item;
+            }
+            catch (Exception e)
+            {
+                logger.warn("Unable to deserialize message", e);
+                return null;
+            }
         }
     }
 }

@@ -11,7 +11,6 @@
 package org.mule.util.queue;
 
 import org.mule.api.MuleContext;
-import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
@@ -19,17 +18,14 @@ import org.mule.api.store.ObjectStoreException;
 import org.mule.util.UUID;
 import org.mule.util.store.DefaultInMemoryObjectStore;
 import org.mule.util.store.FacadeObjectStore;
-import org.mule.util.store.SimpleMemoryObjectStore;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;
 import org.mule.util.xa.ResourceManagerException;
 import org.mule.util.xa.ResourceManagerSystemException;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +44,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 
     private QueueConfiguration defaultQueueConfiguration;
     private MuleContext muleContext;
-    private Set<ListableObjectStore> stores = new HashSet();
+    private Set<ListableObjectStore> stores = new HashSet<ListableObjectStore>();
 
     public synchronized QueueSession getQueueSession()
     {
@@ -60,7 +56,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         if (this.defaultQueueConfiguration == null)
         {
             this.defaultQueueConfiguration =
-                new QueueConfiguration(getMuleContext(), 0, new DefaultInMemoryObjectStore());
+                new QueueConfiguration(getMuleContext(), 0, new DefaultInMemoryObjectStore<Serializable>());
         }
         return this.defaultQueueConfiguration;
     }
@@ -73,7 +69,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 
     public synchronized void setQueueConfiguration(String queueName, QueueConfiguration config)
     {
-        getQueue(queueName).config = config;
+        getQueue(queueName).setConfig(config);
         addStore(config.objectStore);
     }
 
@@ -82,11 +78,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         QueueInfo q = queues.get(name);
         if (q == null)
         {
-            q = new QueueInfo();
-            q.name = name;
-            q.list = new LinkedList<Serializable>();
-            q.config = defaultQueueConfiguration;
-
+            q = new QueueInfo(name, defaultQueueConfiguration);
             queues.put(name, q);
         }
         return q;
@@ -225,27 +217,27 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
 
     protected Serializable doStore(QueueInfo queue, Serializable object) throws ObjectStoreException
     {
-        ObjectStore<Serializable> store = queue.config.objectStore;
+        ObjectStore<Serializable> store = queue.getStore();
 
         String id = UUID.getUUID();
-        Serializable key = new QueueKey(queue.name, id);
+        Serializable key = new QueueKey(queue.getName(), id);
         store.store(key, object);
         return id;
     }
 
     protected void doRemove(QueueInfo queue, Serializable id) throws ObjectStoreException
     {
-        ObjectStore<Serializable> store = queue.config.objectStore;
+        ObjectStore<Serializable> store = queue.getStore();
 
-        Serializable key = new QueueKey(queue.name, id);
+        Serializable key = new QueueKey(queue.getName(), id);
         store.remove(key);
     }
 
     protected Serializable doLoad(QueueInfo queue, Serializable id) throws ObjectStoreException
     {
-        ObjectStore<Serializable> store = queue.config.objectStore;
+        ObjectStore<Serializable> store = queue.getStore();
 
-        Serializable key = new QueueKey(queue.name, id);
+        Serializable key = new QueueKey(queue.getName(), id);
         return store.retrieve(key);
     }
 
@@ -303,7 +295,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         stores.add(getActualStore(store));
     }
 
-    private ListableObjectStore getActualStore(ListableObjectStore store)
+    static ListableObjectStore getActualStore(ListableObjectStore store)
     {
         while (store instanceof FacadeObjectStore)
         {
