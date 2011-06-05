@@ -295,9 +295,20 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     {
         out.defaultWriteObject();
         //Can be null if service call originates from MuleClient
-        if (getFlowConstruct() != null)
+        if (serializedData != null)
         {
-            out.writeObject(getFlowConstruct() != null ? getFlowConstruct().getName() : "null");
+            Object serviceName = serializedData.get("serviceName");
+            if (serviceName != null)
+            {
+                out.writeObject(serviceName);   
+            }
+        }
+        else
+        {
+            if (getFlowConstruct() != null)
+            {
+                out.writeObject(getFlowConstruct() != null ? getFlowConstruct().getName() : "null");
+            }
         }
     }
 
