@@ -1556,6 +1556,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         this.muleContext = muleContext;
     }
 
+    @Override
+    public boolean requiresInitialization()
+    {
+        return muleContext == null;
+    }
+
     public DataType<?> getDataType()
     {
         return dataType;

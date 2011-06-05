@@ -33,7 +33,13 @@ import java.security.PrivilegedAction;
 public interface DeserializationPostInitialisable
 {
     //private void initAfterDeserialisation(MuleContext muleContext) throws MuleException;
-    
+
+    /**
+     * Returns true if the object currently requires post-deserialization initialization (i.e. if it has been deserailized
+     * and the initialization has not taken place)
+     */
+    boolean requiresInitialization();
+
     public class Implementation
     {
         public static void init(final Object object, final MuleContext muleContext) throws Exception

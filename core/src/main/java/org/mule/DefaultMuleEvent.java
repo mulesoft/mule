@@ -682,6 +682,12 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         serializedData = null;
     }
 
+    @Override
+    public boolean requiresInitialization()
+    {
+        return serializedData != null;
+    }
+
     /**
      * Gets the encoding for this message. First it looks to see if encoding has been
      * set on the endpoint, if not it will check the message itself and finally it

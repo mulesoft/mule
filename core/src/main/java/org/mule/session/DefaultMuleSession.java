@@ -339,4 +339,9 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         serializedData = null;
     }
 
+    @Override
+    public boolean requiresInitialization()
+    {
+        return serializedData == null;
+    }
 }
