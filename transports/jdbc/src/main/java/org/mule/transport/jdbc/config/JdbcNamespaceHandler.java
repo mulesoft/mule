@@ -16,6 +16,7 @@ import org.mule.config.spring.parsers.collection.ChildSingletonMapDefinitionPars
 import org.mule.config.spring.parsers.delegate.ParentContextDefinitionParser;
 import org.mule.config.spring.parsers.generic.ChildDefinitionParser;
 import org.mule.config.spring.parsers.generic.ParentDefinitionParser;
+import org.mule.config.spring.parsers.processors.CheckExclusiveAttributes;
 import org.mule.config.spring.parsers.specific.ObjectFactoryWrapper;
 import org.mule.config.spring.parsers.specific.TransactionDefinitionParser;
 import org.mule.config.spring.parsers.specific.properties.NestedMapDefinitionParser;
@@ -48,13 +49,24 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("extractors", new ParentDefinitionParser());
         registerBeanDefinitionParser("transaction", new TransactionDefinitionParser(JdbcTransactionFactory.class));
         registerBeanDefinitionParser("object-store", new ChildDefinitionParser("store", JdbcObjectStore.class));
-        registerPoolDefinitionParsers();
+        registerDataSourceDefinitionParsers();
     }
 
-    protected void registerPoolDefinitionParsers()
+    protected void registerDataSourceDefinitionParsers()
     {
-        // TODO pool: can only have either url or one or more of host, port, instance
-        registerBeanDefinitionParser("oracle-data-source",
-            new DataSourceDefinitionParser(OracleDataSourceFactoryBean.class));
+        registerOracleDataSourceDefinitionParser();
+    }
+
+    protected void registerOracleDataSourceDefinitionParser()
+    {
+        DataSourceDefinitionParser parser = new DataSourceDefinitionParser(OracleDataSourceFactoryBean.class);
+        String[][] attributeGroups = new String[][] {
+            new String[] { "url" },
+            new String[] { "host", "port", "instance" }
+        };
+        CheckExclusiveAttributes attributeCheck = new CheckExclusiveAttributes(attributeGroups);
+        parser.registerPreProcessor(attributeCheck);
+
+        registerBeanDefinitionParser("oracle-data-source", parser);
     }
 }
