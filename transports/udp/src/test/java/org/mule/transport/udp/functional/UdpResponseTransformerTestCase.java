@@ -11,10 +11,7 @@
 package org.mule.transport.udp.functional;
 
 import org.mule.tck.DynamicPortTestCase;
-
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
+import org.mule.transport.udp.util.UdpClient;
 
 public class UdpResponseTransformerTestCase extends DynamicPortTestCase
 {
@@ -32,35 +29,23 @@ public class UdpResponseTransformerTestCase extends DynamicPortTestCase
 
     public void testResponseTransformer() throws Exception
     {
-        DatagramSocket socket = null;
-
+        UdpClient client = null;
         try
         {
-            socket = new DatagramSocket();
-            socket.setSoTimeout(RECEIVE_TIMEOUT);
-
-            byte[] buf = TEST_MESSAGE.getBytes();
             int port = getPorts().get(0).intValue();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length,
-                    InetAddress.getByName("localhost"), port);
-
-            socket.send(packet);
-
-            packet = new DatagramPacket(new byte[128], 128);
-            socket.receive(packet);
+            client = new UdpClient(port);
+            byte[] response = client.send(TEST_MESSAGE);
 
             String expected = TEST_MESSAGE + " In Out Out2";
-            String result = new String(packet.getData()).trim();
+            String result = new String(response).trim();
             assertEquals(expected, result);
         }
         finally
         {
-            if (socket != null)
+            if (client != null)
             {
-                socket.close();
+                client.shutdown();
             }
         }
     }
 }
-
-
