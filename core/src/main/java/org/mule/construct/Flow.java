@@ -27,23 +27,27 @@ import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.session.DefaultMuleSession;
 
 /**
- * This implementation of {@link AbstractPipeline} adds the following functionality: <li>Rejects inbound
- * events when Flow is not started <li>Gathers statistics and processing time data . <li>Implements
- * MessagePorcessor allowing direct invocation of the pipeline. <li>Supports the optional configuration of a
- * {@link PipelineProcessingStrategy} that determines how message processors are processed. The default
- * {@link PipelineProcessingStrategy} is {@link AsynchronousProcessingStrategy}. With this strategy when
- * messages are received from a one-way message source and there is no current transactions message processing
- * in another thread asynchronously.
+ * This implementation of {@link AbstractPipeline} adds the following functionality:
+ * <ul>
+ * <li>Rejects inbound events when Flow is not started</li>
+ * <li>Gathers statistics and processing time data</li>
+ * <li>Implements MessagePorcessor allowing direct invocation of the pipeline</li>
+ * <li>Supports the optional configuration of a {@link PipelineProcessingStrategy} that determines
+ * how message processors are processed. The default {@link PipelineProcessingStrategy} is
+ * {@link AsynchronousProcessingStrategy}. With this strategy when messages are received from a
+ * one-way message source and there is no current transactions message processing in another thread
+ * asynchronously.</li>
+ * </ul>
  */
 public class Flow extends AbstractPipeline implements MessageProcessor
 {
-
     public Flow(String name, MuleContext muleContext)
     {
         super(name, muleContext);
         processingStrategy = new QueuedAsynchronousProcessingStrategy();
     }
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleSession calledSession = new DefaultMuleSession(event.getSession(), this);
@@ -100,5 +104,4 @@ public class Flow extends AbstractPipeline implements MessageProcessor
         statistics.setEnabled(muleContext.getStatistics().isEnabled());
         muleContext.getStatistics().add(statistics);
     }
-
 }

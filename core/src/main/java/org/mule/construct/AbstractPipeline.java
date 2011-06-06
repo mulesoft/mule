@@ -26,15 +26,16 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of {@link MessageProcessor}s
- * that will be used to process messages to be configured. These MessageProcessors are chained together using
- * the {@link DefaultMessageProcessorChainBuilder}.
+ * Abstract implementation of {@link AbstractFlowConstruct} that allows a list of
+ * {@link MessageProcessor}s that will be used to process messages to be configured.
+ * These MessageProcessors are chained together using the
+ * {@link DefaultMessageProcessorChainBuilder}.
  * <p/>
- * If not message processors are configured then the source message is simply returned.
+ * If no message processors are configured then the source message is simply
+ * returned.
  */
 public abstract class AbstractPipeline extends AbstractFlowConstruct implements Pipeline
 {
-
     protected MessageSource messageSource;
     protected MessageProcessor pipeline;
 
@@ -49,16 +50,16 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     }
 
     /**
-     * Creates a {@link MessageProcessor} that will process messages from the configured {@link MessageSource}
-     * .
+     * Creates a {@link MessageProcessor} that will process messages from the
+     * configured {@link MessageSource} .
      * <p>
-     * The default implementation of this methods uses a {@link DefaultMessageProcessorChainBuilder} and
-     * allows a chain of {@link MessageProcessor}s to be configured using the
-     * {@link #configureMessageProcessors(org.mule.api.processor.MessageProcessorChainBuilder)} method but if
-     * you wish to use another {@link MessageProcessorBuilder} or just a single {@link MessageProcessor} then
-     * this method can be overridden and return a single {@link MessageProcessor} instead.
-     * 
-     * @throws MuleException
+     * The default implementation of this methods uses a
+     * {@link DefaultMessageProcessorChainBuilder} and allows a chain of
+     * {@link MessageProcessor}s to be configured using the
+     * {@link #configureMessageProcessors(org.mule.api.processor.MessageProcessorChainBuilder)}
+     * method but if you wish to use another {@link MessageProcessorBuilder} or just
+     * a single {@link MessageProcessor} then this method can be overridden and
+     * return a single {@link MessageProcessor} instead.
      */
     protected MessageProcessor createPipeline() throws MuleException
     {
@@ -80,26 +81,31 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         // Template method
     }
 
+    @Override
     public void setMessageProcessors(List<MessageProcessor> messageProcessors)
     {
         this.messageProcessors = messageProcessors;
     }
 
+    @Override
     public List<MessageProcessor> getMessageProcessors()
     {
         return messageProcessors;
     }
 
+    @Override
     public MessageSource getMessageSource()
     {
         return messageSource;
     }
 
+    @Override
     public void setMessageSource(MessageSource messageSource)
     {
         this.messageSource = messageSource;
     }
 
+    @Override
     public PipelineProcessingStrategy getProcessingStrategy()
     {
         return processingStrategy;
@@ -123,6 +129,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
             // Wrap chain to decouple lifecycle
             messageSource.setListener(new AbstractInterceptingMessageProcessor()
             {
+                @Override
                 public MuleEvent process(MuleEvent event) throws MuleException
                 {
                     return pipeline.process(event);
@@ -164,5 +171,4 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
         disposeIfDisposable(messageSource);
         super.doDispose();
     }
-
 }
