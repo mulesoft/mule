@@ -293,7 +293,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="abstractPoolType">
+    <xsd:complexType name="abstractDataSourceType">
         <xsd:complexContent>
             <xsd:extension base="mule:abstractExtensionType">
                 <xsd:attribute name="name" type="mule:substitutableName" use="required">
@@ -328,11 +328,11 @@
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:element name="oracle-pool" type="oraclePoolType" substitutionGroup="mule:abstract-extension"/>
+    <xsd:element name="oracle-data-source" type="oracleDataSourceType" substitutionGroup="mule:abstract-extension"/>
 
-    <xsd:complexType name="oraclePoolType">
+    <xsd:complexType name="oracleDataSourceType">
         <xsd:complexContent>
-            <xsd:extension base="abstractPoolType">
+            <xsd:extension base="abstractDataSourceType">
                 <xsd:attribute name="host" type="xsd:string" use="optional">
                     <xsd:annotation>
                         <xsd:documentation>
