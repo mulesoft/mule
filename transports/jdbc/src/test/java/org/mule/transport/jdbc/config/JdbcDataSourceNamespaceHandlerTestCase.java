@@ -132,6 +132,25 @@ public class JdbcDataSourceNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("jdbc:postgresql://localhost:5433/mule", source.getUrl());
     }
 
+    public void testDerbyDefaults()
+    {
+        StandardDataSource source = lookupDataSource("default-derby");
+        assertEquals("jdbc:derby:memory:mule", source.getUrl());
+        assertEquals("org.apache.derby.jdbc.EmbeddedDriver", source.getDriverName());
+    }
+
+    public void testDerbyCustomUrl()
+    {
+        StandardDataSource source = lookupDataSource("custom-url-derby");
+        assertEquals("jdbc:derby:muleEmbedded", source.getUrl());
+    }
+
+    public void testDerbyCreateDatabase()
+    {
+        StandardDataSource source = lookupDataSource("create-database-derby");
+        assertEquals("jdbc:derby:memory:mule;create=true", source.getUrl());
+    }
+
     private StandardDataSource lookupDataSource(String key)
     {
         Object object = muleContext.getRegistry().lookupObject(key);

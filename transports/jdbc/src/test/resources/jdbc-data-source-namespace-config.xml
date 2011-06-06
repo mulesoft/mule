@@ -62,4 +62,17 @@
         database="mule" user="postgres" password="secret"/>
     <jdbc:postgresql-data-source name="custom-port-postgresql" port="5433" database="mule"
         user="postgres" password="secret"/>
+
+    <!--
+        Derby
+    -->
+
+    <!-- using the default URL -->
+    <jdbc:derby-data-source name="default-derby" database="mule"/>
+
+    <!-- using a custom URL -->
+    <jdbc:derby-data-source name="custom-url-derby" url="jdbc:derby:muleEmbedded"/>
+
+    <!-- create the database -->
+    <jdbc:derby-data-source name="create-database-derby" database="mule" create="true"/>
 </mule>

@@ -482,20 +482,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-<!--                 <xsd:attribute name="host" type="xsd:string" use="optional"> -->
-<!--                     <xsd:annotation> -->
-<!--                         <xsd:documentation> -->
-<!--                             Allows to configure just the host part of the JDBC URL (and leave the rest of the default JDBC URL untouched). -->
-<!--                         </xsd:documentation> -->
-<!--                     </xsd:annotation> -->
-<!--                 </xsd:attribute> -->
-<!--                 <xsd:attribute name="port" type="xsd:int" use="optional"> -->
-<!--                     <xsd:annotation> -->
-<!--                         <xsd:documentation> -->
-<!--                             Allows to configure just the port part of the JDBC URL (and leave the rest of the default JDBC URL untouched). -->
-<!--                         </xsd:documentation> -->
-<!--                     </xsd:annotation> -->
-<!--                 </xsd:attribute> -->
+                <xsd:attribute name="create" type="xsd:boolean" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            If true, the database will be created upon first access to the database. See <a href="http://db.apache.org/derby/docs/10.6/ref/rrefattrib26867.html">the derby documentation</a>.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

@@ -30,7 +30,6 @@ import org.mule.transport.jdbc.store.JdbcObjectStore;
  */
 public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
 {
-
     public static final String QUERY_KEY = "queryKey";
     public static final String[] ADDRESS_ATTRIBUTES = new String[]{QUERY_KEY};
     public static final String SQL_STATEMENT_FACTORY_PROPERTY = "sqlStatementStrategyFactory";
@@ -54,9 +53,20 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
 
     protected void registerDataSourceDefinitionParsers()
     {
+        registerDerbyDataSourceDefinitionParser();
         registerMysqlDataSourceDefinitionParser();
         registerOracleDataSourceDefinitionParser();
         registerPostgresqlDataSourceDefinitionParser();
+    }
+
+    protected void registerDerbyDataSourceDefinitionParser()
+    {
+        DataSourceDefinitionParser parser = new DataSourceDefinitionParser(DerbyDataSourceFactoryBean.class);
+
+        // make sure that either url or database is configured
+        parser.registerPreProcessor(new CheckDatabaseOrUrl());
+
+        registerBeanDefinitionParser("derby-data-source", parser);
     }
 
     protected void registerMysqlDataSourceDefinitionParser()
@@ -68,6 +78,7 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
     protected void registerOracleDataSourceDefinitionParser()
     {
         DataSourceDefinitionParser parser = new DataSourceDefinitionParser(OracleDataSourceFactoryBean.class);
+
         String[][] attributeGroups = new String[][] {
             new String[] { "url" },
             new String[] { "host", "port", "instance" }
