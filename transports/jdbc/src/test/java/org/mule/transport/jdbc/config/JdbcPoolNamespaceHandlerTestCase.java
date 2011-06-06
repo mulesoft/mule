@@ -44,6 +44,24 @@ public class JdbcPoolNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("jdbc:oracle:thin:@some-other-host:1522:mule", pool.getUrl());
     }
 
+    public void testCustomHost()
+    {
+        StandardDataSource pool = lookupPool("custom-host-oracle");
+        assertEquals("jdbc:oracle:thin:@some-other-host:1521:orcl", pool.getUrl());
+    }
+
+    public void testCustomPort()
+    {
+        StandardDataSource pool = lookupPool("custom-port-oracle");
+        assertEquals("jdbc:oracle:thin:@localhost:1522:orcl", pool.getUrl());
+    }
+
+    public void testCustomInstance()
+    {
+        StandardDataSource pool = lookupPool("custom-instance-oracle");
+        assertEquals("jdbc:oracle:thin:@localhost:1521:mule", pool.getUrl());
+    }
+
     private StandardDataSource lookupPool(String key)
     {
         Object object = muleContext.getRegistry().lookupObject(key);

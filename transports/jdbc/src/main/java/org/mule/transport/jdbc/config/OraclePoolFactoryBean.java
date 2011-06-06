@@ -12,13 +12,65 @@ package org.mule.transport.jdbc.config;
 
 public class OraclePoolFactoryBean extends AbstractPoolFactoryBean
 {
-    private static final String DEFAULT_JDBC_URL = "jdbc:oracle:thin:@localhost:1521:orcl";
+    private static final String DEFAULT_HOST = "localhost";
+    private static final String DEFAULT_INSTANCE = "orcl";
+    private static final int DEFAULT_PORT = 1521;
     private static final String DRIVER_CLASS_NAME = "oracle.jdbc.driver.OracleDriver";
+    private static final String JDBC_URL_PREFIX = "jdbc:oracle:thin:@";
+
+    protected String host = DEFAULT_HOST;
+    protected int port = DEFAULT_PORT;
+    protected String instance = DEFAULT_INSTANCE;
 
     public OraclePoolFactoryBean()
     {
         super();
-        url = DEFAULT_JDBC_URL;
         driverClassName = DRIVER_CLASS_NAME;
+        updateUrl();
+    }
+
+    protected void updateUrl()
+    {
+        StringBuilder buf = new StringBuilder(JDBC_URL_PREFIX);
+        buf.append(host);
+        buf.append(":");
+        buf.append(port);
+        buf.append(":");
+        buf.append(instance);
+
+        url = buf.toString();
+    }
+
+    public String getHost()
+    {
+        return host;
+    }
+
+    public void setHost(String host)
+    {
+        this.host = host;
+        updateUrl();
+    }
+
+    public int getPort()
+    {
+        return port;
+    }
+
+    public void setPort(int port)
+    {
+        this.port = port;
+        updateUrl();
+    }
+
+    public String getInstance()
+    {
+        return instance;
+    }
+
+    public void setInstance(String instance)
+    {
+        this.instance = instance;
+        updateUrl();
     }
 }

@@ -333,15 +333,28 @@
     <xsd:complexType name="oraclePoolType">
         <xsd:complexContent>
             <xsd:extension base="abstractPoolType">
-<!--                 <xsd:attribute name="name" type="substitutableName" use="required"> -->
-<!--                     <xsd:annotation> -->
-<!--                         <xsd:documentation> -->
-<!--                             Identifies the connector so that other elements can reference it. -->
-<!--                         </xsd:documentation> -->
-<!--                     </xsd:annotation> -->
-<!--                 </xsd:attribute> -->
+                <xsd:attribute name="host" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to configure just the host part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="port" type="xsd:int" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to configure just the port part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="instance" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Allows to configure just the instance part of the JDBC URL (and leave the rest of the default JDBC URL untouched).
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
 </xsd:schema>

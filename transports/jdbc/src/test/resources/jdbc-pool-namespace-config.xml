@@ -15,6 +15,11 @@
     <jdbc:oracle-pool name="custom-url-oracle" url="jdbc:oracle:thin:@some-other-host:1522:mule"
         user="scott" password="tiger"/>
 
+    <!-- specify custom parts of the URL -->
+    <jdbc:oracle-pool name="custom-host-oracle" host="some-other-host" user="scott" password="tiger"/>
+    <jdbc:oracle-pool name="custom-port-oracle" port="1522" user="scott" password="tiger"/>
+    <jdbc:oracle-pool name="custom-instance-oracle" instance="mule" user="scott" password="tiger"/>
+
 <!--     <spring:bean id="jdbcDataSource" -->
 <!--         class="org.enhydra.jdbc.standard.StandardDataSource" -->
 <!--         destroy-method="shutdown"> -->
