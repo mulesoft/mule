@@ -12,7 +12,7 @@ public class ScanLicenseHeaders
      * Files in the following packages are known do have invalid license headers
      */
     static List ignoredPackages = [ "net/webservicex", "org/hibernate"  ]
-
+    static boolean fail = false
     /**
      * These files are known to have invalid license headers and are the usual exception to the rule
      */
@@ -29,7 +29,9 @@ public class ScanLicenseHeaders
             System.exit(1)
         }
 
-        if (scan(new File(args[0])) == false)
+        scan(new File(args[0]))
+        
+        if(fail)
         {
             System.exit(1)
         }
@@ -65,6 +67,7 @@ public class ScanLicenseHeaders
             // no line? Most probably this file doesn't even have a license header
             if (line == null)
             {
+                fail = true
                 return false
             }
 
@@ -78,6 +81,7 @@ public class ScanLicenseHeaders
                 if (ignoredFiles.contains(file.name) == false)
                 {
                     println("License suspect: $file")
+                    fail = true
                     return false
                 }
             }
@@ -89,10 +93,9 @@ public class ScanLicenseHeaders
     static boolean isInIgnoredPackage(File file)
     {
         def folder = file.getParent();
-
         for (String pkg : ignoredPackages)
         {
-            if (folder.endsWith(pkg))
+            if (folder.contains(pkg))
             {
                 return true;
             }
