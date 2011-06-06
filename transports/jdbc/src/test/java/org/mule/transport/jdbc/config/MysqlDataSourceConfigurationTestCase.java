@@ -11,18 +11,11 @@
 package org.mule.transport.jdbc.config;
 
 import org.mule.api.MuleException;
-import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.ConfigurationException;
-import org.mule.api.context.MuleContextFactory;
-import org.mule.config.spring.SpringXmlConfigurationBuilder;
-import org.mule.context.DefaultMuleContextFactory;
-import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 
-import static org.junit.Assert.fail;
-
-public class MysqlDataSourceConfigurationTestCase extends AbstractMuleTestCase
+public class MysqlDataSourceConfigurationTestCase extends AbstractDataSourceConfigurationTestCase
 {
     @Test(expected=ConfigurationException.class)
     public void failWhenUrlAndDatabaseConfigured() throws MuleException
@@ -35,13 +28,4 @@ public class MysqlDataSourceConfigurationTestCase extends AbstractMuleTestCase
     {
         tryBuildingMuleContextFromInvalidConfig("jdbc-data-source-mysql-url-and-host.xml");
     }
-
-    private void tryBuildingMuleContextFromInvalidConfig(String config) throws MuleException
-    {
-        MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-        ConfigurationBuilder builder = new SpringXmlConfigurationBuilder(config);
-        muleContextFactory.createMuleContext(builder);
-        fail();
-    }
 }
-
