@@ -23,4 +23,17 @@
     <!-- specify custom attributes of StandardDataSource -->
     <jdbc:oracle-data-source name="custom-ds-properties" user="scott" password="tiger"
         transactionIsolation="SERIALIZABLE" loginTimeout="42"/>
+
+    <!-- using the default url -->
+    <jdbc:mysql-data-source name="default-mysql" database="mule" user="mysql" password="secret"/>
+
+    <!-- using a custom URL -->
+    <jdbc:mysql-data-source name="custom-url-mysql" url="jdbc:mysql://mule-db-host:3306/mule"
+        user="mysql" password="secret"/>
+
+    <!-- custom parts of the msyql url -->
+    <jdbc:mysql-data-source name="custom-host-mysql" host="some-other-host"
+        database="mule" user="mysql" password="secret"/>
+    <jdbc:mysql-data-source name="custom-port-mysql" port="4242"
+        user="mysql" database="mule" password="secret"/>
 </mule>

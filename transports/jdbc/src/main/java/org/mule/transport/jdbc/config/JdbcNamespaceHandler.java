@@ -54,7 +54,26 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
 
     protected void registerDataSourceDefinitionParsers()
     {
+        registerMysqlDataSourceDefinitionParser();
         registerOracleDataSourceDefinitionParser();
+    }
+
+    protected void registerMysqlDataSourceDefinitionParser()
+    {
+        DataSourceDefinitionParser parser = new DataSourceDefinitionParser(MysqlDataSourceFactoryBean.class);
+
+        // make sure that either url or host/port are configured
+        String[][] attributeGroups = new String[][] {
+            new String[] { "url" },
+            new String[] { "host", "port" }
+        };
+        CheckExclusiveAttributes attributeCheck = new CheckExclusiveAttributes(attributeGroups);
+        parser.registerPreProcessor(attributeCheck);
+
+        // make sure that either url or database is configured
+        parser.registerPreProcessor(new CheckDatabaseOrUrl());
+
+        registerBeanDefinitionParser("mysql-data-source", parser);
     }
 
     protected void registerOracleDataSourceDefinitionParser()

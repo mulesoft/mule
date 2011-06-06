@@ -18,6 +18,12 @@ import org.enhydra.jdbc.standard.StandardDataSource;
 
 public class JdbcDataSourceNamespaceHandlerTestCase extends FunctionalTestCase
 {
+    public JdbcDataSourceNamespaceHandlerTestCase()
+    {
+        super();
+        setStartContext(false);
+    }
+
     @Override
     protected String getConfigResources()
     {
@@ -31,7 +37,14 @@ public class JdbcDataSourceNamespaceHandlerTestCase extends FunctionalTestCase
         assertSame(ds1, ds2);
     }
 
-    public void testDefault()
+    public void testCustomDataSourceProperties()
+    {
+        StandardDataSource source = lookupDataSource("custom-ds-properties");
+        assertEquals(Connection.TRANSACTION_SERIALIZABLE, source.getTransactionIsolation());
+        assertEquals(42, source.getLoginTimeout());
+    }
+
+    public void testOracleDefaults()
     {
         StandardDataSource source = lookupDataSource("default-oracle");
         assertEquals("jdbc:oracle:thin:@localhost:1521:orcl", source.getUrl());
@@ -41,35 +54,55 @@ public class JdbcDataSourceNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("tiger", source.getPassword());
     }
 
-    public void testCustomUrl()
+    public void testOracleCustomUrl()
     {
         StandardDataSource source = lookupDataSource("custom-url-oracle");
         assertEquals("jdbc:oracle:thin:@some-other-host:1522:mule", source.getUrl());
     }
 
-    public void testCustomHost()
+    public void testOracleCustomHost()
     {
         StandardDataSource source = lookupDataSource("custom-host-oracle");
         assertEquals("jdbc:oracle:thin:@some-other-host:1521:orcl", source.getUrl());
     }
 
-    public void testCustomPort()
+    public void testOracleCustomPort()
     {
         StandardDataSource source = lookupDataSource("custom-port-oracle");
         assertEquals("jdbc:oracle:thin:@localhost:1522:orcl", source.getUrl());
     }
 
-    public void testCustomInstance()
+    public void testOracleCustomInstance()
     {
         StandardDataSource source = lookupDataSource("custom-instance-oracle");
         assertEquals("jdbc:oracle:thin:@localhost:1521:mule", source.getUrl());
     }
 
-    public void testCustomDataSourceProperties()
+    public void testMysqlDefaults()
     {
-        StandardDataSource source = lookupDataSource("custom-ds-properties");
-        assertEquals(Connection.TRANSACTION_SERIALIZABLE, source.getTransactionIsolation());
-        assertEquals(42, source.getLoginTimeout());
+        StandardDataSource source = lookupDataSource("default-mysql");
+        assertEquals("jdbc:mysql://localhost/mule", source.getUrl());
+        assertEquals("com.mysql.jdbc.Driver", source.getDriverName());
+        assertEquals("mysql", source.getUser());
+        assertEquals("secret", source.getPassword());
+    }
+
+    public void testMysqlCustomUrl()
+    {
+        StandardDataSource source = lookupDataSource("custom-url-mysql");
+        assertEquals("jdbc:mysql://mule-db-host:3306/mule", source.getUrl());
+    }
+
+    public void testMysqlCustomHost()
+    {
+        StandardDataSource source = lookupDataSource("custom-host-mysql");
+        assertEquals("jdbc:mysql://some-other-host/mule", source.getUrl());
+    }
+
+    public void testMysqlCustomPort()
+    {
+        StandardDataSource source = lookupDataSource("custom-port-mysql");
+        assertEquals("jdbc:mysql://localhost:4242/mule", source.getUrl());
     }
 
     private StandardDataSource lookupDataSource(String key)
