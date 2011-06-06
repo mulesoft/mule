@@ -10,16 +10,15 @@
 
 package org.mule.util.queue;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.util.store.DeserializationPostInitialisable;
 import org.mule.util.xa.AbstractXAResourceManager;
 import org.mule.util.xa.DefaultXASession;
 
 import java.io.Serializable;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A Queue session that is used to manage the transaction context of a Queue
@@ -37,6 +36,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         this.queueManager = queueManager;
     }
 
+    @Override
     public Queue getQueue(String name)
     {
         QueueInfo queue = queueManager.getQueue(name);
@@ -52,11 +52,13 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             this.queue = queue;
         }
 
+        @Override
         public void put(Serializable item) throws InterruptedException
         {
             offer(item, Long.MAX_VALUE);
         }
 
+        @Override
         public boolean offer(Serializable item, long timeout) throws InterruptedException
         {
             if (localContext != null)
@@ -93,11 +95,13 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             }
         }
 
+        @Override
         public Serializable take() throws InterruptedException
         {
             return poll(Long.MAX_VALUE);
         }
 
+        @Override
         public void untake(Serializable item) throws InterruptedException
         {
             if (localContext != null)
@@ -118,6 +122,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             }
         }
 
+        @Override
         public Serializable poll(long timeout) throws InterruptedException
         {
             try
@@ -154,6 +159,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             }
         }
 
+        @Override
         public Serializable peek() throws InterruptedException
         {
             try
@@ -180,6 +186,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             }
         }
 
+        @Override
         public int size()
         {
             if (localContext != null)
@@ -192,6 +199,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
             }
         }
 
+        @Override
         public String getName()
         {
             return queue.getName();
@@ -201,7 +209,7 @@ class TransactionalQueueSession extends DefaultXASession implements QueueSession
         {
             try
             {
-                if (item instanceof DeserializationPostInitialisable && ((DeserializationPostInitialisable)item).requiresInitialization())
+                if (item instanceof DeserializationPostInitialisable)
                 {
                     DeserializationPostInitialisable.Implementation.init(item, queueManager.getMuleContext());
                 }

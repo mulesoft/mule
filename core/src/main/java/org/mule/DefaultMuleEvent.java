@@ -281,6 +281,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
     }
 
+    @Override
     public Credentials getCredentials()
     {
         MuleCredentials creds = message.getOutboundProperty(MuleProperties.MULE_CREDENTIALS_PROPERTY);
@@ -292,11 +293,13 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         return transformedMessage;
     }
 
+    @Override
     public MuleMessage getMessage()
     {
         return message;
     }
 
+    @Override
     public byte[] getMessageAsBytes() throws DefaultMuleException
     {
         try
@@ -310,12 +313,14 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
     }
 
+    @Override
     @SuppressWarnings("cast")
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
         return (T) transformMessage(DataTypeFactory.create(outputType));
     }
 
+    @Override
     public <T> T transformMessage(DataType<T> outputType) throws TransformerException
     {
         if (outputType == null)
@@ -337,6 +342,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      *                              the result message is not a String byte[] or Seializable object
      * @deprecated use {@link #transformMessage(org.mule.api.transformer.DataType)} instead
      */
+    @Override
     @Deprecated
     public byte[] transformMessageToBytes() throws TransformerException
     {
@@ -355,11 +361,13 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      *          the transformer
      * @see org.mule.api.transformer.Transformer
      */
+    @Override
     public String transformMessageToString() throws TransformerException
     {
         return transformMessage(DataTypeFactory.createWithEncoding(String.class, getEncoding()));
     }
 
+    @Override
     public String getMessageAsString() throws MuleException
     {
         return getMessageAsString(getEncoding());
@@ -373,6 +381,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      * @throws org.mule.api.MuleException if the message cannot be converted into a
      *                                    string
      */
+    @Override
     public String getMessageAsString(String encoding) throws MuleException
     {
         try
@@ -386,6 +395,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
     }
 
+    @Override
     public String getId()
     {
         return id;
@@ -395,6 +405,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      * @see #getMessage()
      * @deprecated use appropriate scope-aware calls on the MuleMessage (via event.getMessage())
      */
+    @Override
     @Deprecated
     public Object getProperty(String name)
     {
@@ -407,6 +418,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      * @see #getMessage()
      * @deprecated use appropriate scope-aware calls on the MuleMessage (via event.getMessage())
      */
+    @Override
     @Deprecated
     public Object getProperty(String name, Object defaultValue)
     {
@@ -415,6 +427,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                                                 "methods on it");
     }
 
+    @Override
     public ImmutableEndpoint getEndpoint()
     {
         return endpoint;
@@ -436,6 +449,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         return UUID.getUUID();
     }
 
+    @Override
     public MuleSession getSession()
     {
         return session;
@@ -449,6 +463,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     /**
      * Gets the recipient service of this event
      */
+    @Override
     public FlowConstruct getFlowConstruct()
     {
         return session.getFlowConstruct();
@@ -459,6 +474,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      *
      * @return Returns the stopFurtherProcessing.
      */
+    @Override
     public boolean isStopFurtherProcessing()
     {
         return stopFurtherProcessing;
@@ -475,6 +491,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      *
      * @param stopFurtherProcessing The stopFurtherProcessing to set.
      */
+    @Override
     public void setStopFurtherProcessing(boolean stopFurtherProcessing)
     {
         this.stopFurtherProcessing = stopFurtherProcessing;
@@ -507,6 +524,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         return 29 * id.hashCode() + (message != null ? message.hashCode() : 0);
     }
 
+    @Override
     public int getTimeout()
     {
         if (timeout == TIMEOUT_NOT_SET_VALUE)
@@ -517,6 +535,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         return timeout;
     }
 
+    @Override
     public void setTimeout(int timeout)
     {
         this.timeout = timeout;
@@ -529,6 +548,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      * @return an output strem if one has been made available by the message receiver
      *         that received the message
      */
+    @Override
     public OutputStream getOutputStream()
     {
         return outputStream;
@@ -622,6 +642,13 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     @SuppressWarnings({"unused", "unchecked"})
     private void initAfterDeserialisation(MuleContext muleContext) throws MuleException
     {
+        // this method can be called even on objects that were not serialized. In this case,
+        // the temporary holder for serialized data is not initialized and we can just return
+        if (serializedData == null)
+        {
+            return;
+        }
+
         if (session instanceof DefaultMuleSession)
         {
             ((DefaultMuleSession) session).initAfterDeserialisation(muleContext);
@@ -698,12 +725,6 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         serializedData = null;
     }
 
-    @Override
-    public boolean requiresInitialization()
-    {
-        return serializedData != null;
-    }
-
     /**
      * Gets the encoding for this message. First it looks to see if encoding has been
      * set on the endpoint, if not it will check the message itself and finally it
@@ -712,6 +733,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      *
      * @return the encoding for the event
      */
+    @Override
     public String getEncoding()
     {
         String encoding = message.getEncoding();
@@ -723,11 +745,13 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         return encoding;
     }
 
+    @Override
     public MuleContext getMuleContext()
     {
         return message.getMuleContext();
     }
 
+    @Override
     public ThreadSafeAccess newThreadCopy()
     {
         if (message instanceof ThreadSafeAccess)
@@ -742,6 +766,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
     }
 
+    @Override
     public void resetAccessControl()
     {
         if (message instanceof ThreadSafeAccess)
@@ -750,6 +775,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
     }
 
+    @Override
     public void assertAccess(boolean write)
     {
         if (message instanceof ThreadSafeAccess)
@@ -758,6 +784,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         }
     }
 
+    @Override
     @Deprecated
     public Object transformMessage() throws TransformerException
     {
@@ -765,6 +792,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         return message.getPayload();
     }
 
+    @Override
     public ProcessingTime getProcessingTime()
     {
         return processingTime;

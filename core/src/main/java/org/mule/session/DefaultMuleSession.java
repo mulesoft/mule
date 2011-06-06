@@ -182,16 +182,19 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
         this.valid = session.valid;
     }
 
+    @Override
     public String getId()
     {
         return id;
     }
 
+    @Override
     public boolean isValid()
     {
         return valid;
     }
 
+    @Override
     public void setValid(boolean value)
     {
         valid = value;
@@ -200,11 +203,13 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
     /**
      * @return Returns the service.
      */
+    @Override
     public FlowConstruct getFlowConstruct()
     {
         return flowConstruct;
     }
 
+    @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
@@ -217,6 +222,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      * @param context the context for this session or null if the request is not
      *                secure.
      */
+    @Override
     public void setSecurityContext(SecurityContext context)
     {
         securityContext = context;
@@ -228,6 +234,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      *
      * @return the context for this session or null if the request is not secure.
      */
+    @Override
     public SecurityContext getSecurityContext()
     {
         return securityContext;
@@ -240,6 +247,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      * @param key   the key for the object data being stored on the session
      * @param value the value of the session data
      */
+    @Override
     public void setProperty(String key, Object value)
     {
         properties.put(key, value);
@@ -251,6 +259,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
      */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T getProperty(Object key)
     {
@@ -263,6 +272,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      * @param key the key for the object data being stored on the session
      * @return the value of the session data or null if the property does not exist
      */
+    @Override
     public Object removeProperty(Object key)
     {
         return properties.remove(key);
@@ -276,12 +286,14 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      *         session
      * @deprecated Use getPropertyNamesAsSet() instead
      */
+    @Override
     @Deprecated
     public Iterator<String> getPropertyNames()
     {
         return properties.keySet().iterator();
     }
 
+    @Override
     public Set<String> getPropertyNamesAsSet()
     {
         return Collections.unmodifiableSet(properties.keySet());
@@ -300,7 +312,7 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
             Object serviceName = serializedData.get("serviceName");
             if (serviceName != null)
             {
-                out.writeObject(serviceName);   
+                out.writeObject(serviceName);
             }
         }
         else
@@ -336,23 +348,24 @@ public final class DefaultMuleSession implements MuleSession, DeserializationPos
      * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat}, or the
      * {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
      *
-     * @param muleContext the current muleContext instance
+     * @param context the current muleContext instance
      * @throws MuleException if there is an error initializing
      */
-    public void initAfterDeserialisation(MuleContext muleContext) throws MuleException
+    public void initAfterDeserialisation(MuleContext context) throws MuleException
     {
+        // this method can be called even on objects that were not serialized. In this case,
+        // the temporary holder for serialized data is not initialized and we can just return
+        if (serializedData == null)
+        {
+            return;
+        }
+
         String serviceName = (String) serializedData.get("serviceName");
         //Can be null if service call originates from MuleClient
         if (serviceName != null)
         {
-            flowConstruct = muleContext.getRegistry().lookupFlowConstruct(serviceName);
+            flowConstruct = context.getRegistry().lookupFlowConstruct(serviceName);
         }
         serializedData = null;
-    }
-
-    @Override
-    public boolean requiresInitialization()
-    {
-        return serializedData == null;
     }
 }

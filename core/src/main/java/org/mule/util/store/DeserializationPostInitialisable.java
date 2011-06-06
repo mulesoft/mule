@@ -17,13 +17,13 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 /**
- * A marker interface used to trigger post-deserialization initialization of an object. This works 
- * in the same way as {@link Cloneable} interface. Implementors of this interface must add the 
+ * A marker interface used to trigger post-deserialization initialization of an object. This works
+ * in the same way as {@link Cloneable} interface. Implementors of this interface must add the
  * method <code>private void initAfterDeserialization(MuleContext muleContext) throws MuleException</code>
- * to their class (note that it's private). This will get invoked after the object has been 
- * deserialized passing in the current mulecontext when using either 
- * {@link org.mule.transformer.wire.SerializationWireFormat}, 
- * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat}, or the 
+ * to their class (note that it's private). This will get invoked after the object has been
+ * deserialized passing in the current mulecontext when using either
+ * {@link org.mule.transformer.wire.SerializationWireFormat},
+ * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat}, or the
  * {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
  *
  * @see org.mule.transformer.simple.ByteArrayToSerializable
@@ -32,25 +32,18 @@ import java.security.PrivilegedAction;
  */
 public interface DeserializationPostInitialisable
 {
-    //private void initAfterDeserialisation(MuleContext muleContext) throws MuleException;
-
-    /**
-     * Returns true if the object currently requires post-deserialization initialization (i.e. if it has been deserailized
-     * and the initialization has not taken place)
-     */
-    boolean requiresInitialization();
-
     public class Implementation
     {
         public static void init(final Object object, final MuleContext muleContext) throws Exception
         {
             try
             {
-                final Method m = object.getClass().getDeclaredMethod("initAfterDeserialisation", 
+                final Method m = object.getClass().getDeclaredMethod("initAfterDeserialisation",
                     MuleContext.class);
 
                 Object o = AccessController.doPrivileged(new PrivilegedAction<Object>()
                 {
+                    @Override
                     public Object run()
                     {
                         try
@@ -66,7 +59,7 @@ public interface DeserializationPostInitialisable
 
                     }
                 });
-                
+
                 if (o != null)
                 {
                     throw (Exception) o;

@@ -60,7 +60,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -298,6 +297,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public <T> T getPayload(Class<T> outputType) throws TransformerException
     {
         return (T) getPayload(DataTypeFactory.create(outputType), getEncoding());
@@ -307,11 +307,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public <T> T getPayload(DataType<T> outputType) throws TransformerException
     {
         return getPayload(outputType, getEncoding());
     }
 
+    @Override
     public MuleContext getMuleContext()
     {
         return muleContext;
@@ -408,6 +410,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object getOriginalPayload()
     {
         return originalPayload;
@@ -418,16 +421,19 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         setProperty(key, value, PropertyScope.INBOUND);
     }
 
+    @Override
     public void setInvocationProperty(String key, Object value)
     {
         setProperty(key, value, PropertyScope.INVOCATION);
     }
 
+    @Override
     public void setOutboundProperty(String key, Object value)
     {
         setProperty(key, value, PropertyScope.OUTBOUND);
     }
 
+    @Override
     public void setSessionProperty(String key, Object value)
     {
         setProperty(key, value, PropertyScope.SESSION);
@@ -436,6 +442,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setProperty(String key, Object value, PropertyScope scope)
     {
         assertAccess(WRITE);
@@ -464,6 +471,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public Object getProperty(String key)
     {
@@ -475,6 +483,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object removeProperty(String key)
     {
         //TODO
@@ -487,6 +496,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object removeProperty(String key, PropertyScope scope)
     {
         assertAccess(WRITE);
@@ -505,6 +515,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      * @deprecated use {@link #setProperty(String, Object, org.mule.api.transport.PropertyScope)} or
      *             preferrably any of the scope-specific set methods.
      */
+    @Override
     @Deprecated
     public void setProperty(String key, Object value)
     {
@@ -534,6 +545,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public final String getPayloadAsString() throws Exception
     {
         assertAccess(READ);
@@ -543,6 +555,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      /**
      * {@inheritDoc}
      */
+    @Override
     public String getPayloadForLogging(String encoding)
     {
         try
@@ -559,6 +572,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getPayloadForLogging()
     {
         try
@@ -575,6 +589,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public byte[] getPayloadAsBytes() throws Exception
     {
         assertAccess(READ);
@@ -593,6 +608,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getPayloadAsString(String encoding) throws Exception
     {
         assertAccess(READ);
@@ -613,6 +629,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      *
      * @deprecated use {@link #getPropertyNames(org.mule.api.transport.PropertyScope)}
      */
+    @Override
     @Deprecated
     public Set<String> getPropertyNames()
     {
@@ -625,6 +642,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public Set<String> getPropertyNames(PropertyScope scope)
     {
         assertAccess(READ);
@@ -645,21 +663,25 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
     }
 
+    @Override
     public Set<String> getInvocationPropertyNames()
     {
         return getPropertyNames(PropertyScope.INVOCATION);
     }
 
+    @Override
     public Set<String> getInboundPropertyNames()
     {
         return getPropertyNames(PropertyScope.INBOUND);
     }
 
+    @Override
     public Set<String> getOutboundPropertyNames()
     {
         return getPropertyNames(PropertyScope.OUTBOUND);
     }
 
+    @Override
     public Set<String> getSessionPropertyNames()
     {
         return getPropertyNames(PropertyScope.SESSION);
@@ -670,6 +692,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getUniqueId()
     {
         assertAccess(READ);
@@ -685,6 +708,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object getProperty(String name, Object defaultValue)
     {
         //TODO logger.warn("MuleMessage.getProperty() method is deprecated, use MuleMessage.getOutboundProperty() instead.  This method will be removed in the next point release");
@@ -696,6 +720,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String name, PropertyScope scope)
     {
@@ -703,41 +728,49 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return (T) properties.getProperty(name, scope);
     }
 
+    @Override
     public <T> T getInboundProperty(String name, T defaultValue)
     {
         return getProperty(name, PropertyScope.INBOUND, defaultValue);
     }
 
+    @Override
     public <T> T getInboundProperty(String name)
     {
         return getProperty(name, PropertyScope.INBOUND, (T) null);
     }
 
+    @Override
     public <T> T getInvocationProperty(String name, T defaultValue)
     {
         return getProperty(name, PropertyScope.INVOCATION, defaultValue);
     }
 
+    @Override
     public <T> T getInvocationProperty(String name)
     {
         return getInvocationProperty(name, (T) null);
     }
 
+    @Override
     public <T> T getOutboundProperty(String name, T defaultValue)
     {
         return getProperty(name, PropertyScope.OUTBOUND, defaultValue);
     }
 
+    @Override
     public <T> T getOutboundProperty(String name)
     {
         return getOutboundProperty(name, (T) null);
     }
 
+    @Override
     public <T> T getSessionProperty(String name, T defaultValue)
     {
         return getProperty(name, PropertyScope.SESSION, defaultValue);
     }
 
+    @Override
     public <T> T getSessionProperty(String name)
     {
         return getSessionProperty(name, (T) null);
@@ -746,6 +779,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String name, PropertyScope scope, T defaultValue)
     {
@@ -813,6 +847,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setCorrelationId(String id)
     {
         assertAccess(WRITE);
@@ -829,6 +864,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCorrelationId()
     {
         assertAccess(READ);
@@ -844,6 +880,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setReplyTo(Object replyTo)
     {
         assertAccess(WRITE);
@@ -861,6 +898,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object getReplyTo()
     {
         assertAccess(READ);
@@ -876,6 +914,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getCorrelationSequence()
     {
         assertAccess(READ);
@@ -889,6 +928,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setCorrelationSequence(int sequence)
     {
         assertAccess(WRITE);
@@ -898,6 +938,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getCorrelationGroupSize()
     {
         assertAccess(READ);
@@ -911,6 +952,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setCorrelationGroupSize(int size)
     {
         assertAccess(WRITE);
@@ -920,6 +962,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public ExceptionPayload getExceptionPayload()
     {
         assertAccess(READ);
@@ -929,6 +972,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setExceptionPayload(ExceptionPayload exceptionPayload)
     {
         assertAccess(WRITE);
@@ -971,6 +1015,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public void addAttachment(String name, DataHandler dataHandler) throws Exception
     {
@@ -981,6 +1026,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public void removeAttachment(String name) throws Exception
     {
@@ -991,6 +1037,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public DataHandler getAttachment(String name)
     {
@@ -1001,6 +1048,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public Set<String> getAttachmentNames()
     {
@@ -1008,6 +1056,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return getInboundAttachmentNames();
     }
 
+    @Override
     public void addOutboundAttachment(String name, DataHandler dataHandler) throws Exception
     {
         assertAccess(WRITE);
@@ -1023,6 +1072,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         inboundAttachments.put(name, dataHandler);
     }
 
+    @Override
     public void addOutboundAttachment(String name, Object object, String contentType) throws Exception
     {
         assertAccess(WRITE);
@@ -1057,36 +1107,42 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         outboundAttachments.put(name, dh);
     }
 
+    @Override
     public void removeOutboundAttachment(String name) throws Exception
     {
         assertAccess(WRITE);
         outboundAttachments.remove(name);
     }
 
+    @Override
     public DataHandler getInboundAttachment(String name)
     {
         assertAccess(READ);
         return inboundAttachments.get(name);
     }
 
+    @Override
     public DataHandler getOutboundAttachment(String name)
     {
         assertAccess(READ);
         return outboundAttachments.get(name);
     }
 
+    @Override
     public Set<String> getInboundAttachmentNames()
     {
         assertAccess(READ);
         return Collections.unmodifiableSet(inboundAttachments.keySet());
     }
 
+    @Override
     public Set<String> getOutboundAttachmentNames()
     {
         assertAccess(READ);
         return Collections.unmodifiableSet(outboundAttachments.keySet());
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T findPropertyInAnyScope(String name, T defaultValue)
     {
@@ -1105,6 +1161,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getEncoding()
     {
         assertAccess(READ);
@@ -1131,6 +1188,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setEncoding(String encoding)
     {
         assertAccess(WRITE);
@@ -1161,6 +1219,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addProperties(Map<String, Object> props)
     {
         addProperties(props, properties.getDefaultScope());
@@ -1169,6 +1228,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addProperties(Map<String, Object> props, PropertyScope scope)
     {
         assertAccess(WRITE);
@@ -1192,6 +1252,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void clearProperties()
     {
         assertAccess(WRITE);
@@ -1203,6 +1264,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void clearProperties(PropertyScope scope)
     {
         assertAccess(WRITE);
@@ -1213,6 +1275,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object getPayload()
     {
         return payload;
@@ -1221,6 +1284,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized void setPayload(Object payload)
     {
         if (payload == null)
@@ -1237,6 +1301,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void release()
     {
         cache = null;
@@ -1246,6 +1311,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void applyTransformers(MuleEvent event, List<? extends Transformer> transformers) throws MuleException
     {
         applyTransformers(event, transformers, null);
@@ -1254,11 +1320,13 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void applyTransformers(MuleEvent event, Transformer... transformers) throws MuleException
     {
         applyTransformers(event, Arrays.asList(transformers), null);
     }
 
+    @Override
     public void applyTransformers(MuleEvent event, List<? extends Transformer> transformers, Class<?> outputType) throws MuleException
     {
         if (!transformers.isEmpty() && !appliedTransformerHashCodes.contains(transformers.hashCode()))
@@ -1371,6 +1439,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public ThreadSafeAccess newThreadCopy()
     {
         return new DefaultMuleMessage(this);
@@ -1379,6 +1448,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void resetAccessControl()
     {
         // just reset the internal state here as this method is explicitly intended not to
@@ -1396,6 +1466,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     public void assertAccess(boolean write)
     {
         if (AccessControl.isAssertMessageAccess())
@@ -1548,20 +1619,15 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
      * {@link org.mule.transformer.wire.SerializedMuleMessageWireFormat} or the
      * {@link org.mule.transformer.simple.ByteArrayToSerializable} transformer.
      *
-     * @param muleContext the current muleContext instance
+     * @param context the current muleContext instance
      * @throws MuleException if there is an error initializing
      */
-    public void initAfterDeserialisation(MuleContext muleContext) throws MuleException
+    public void initAfterDeserialisation(MuleContext context) throws MuleException
     {
-        this.muleContext = muleContext;
+        this.muleContext = context;
     }
 
     @Override
-    public boolean requiresInitialization()
-    {
-        return muleContext == null;
-    }
-
     public DataType<?> getDataType()
     {
         return dataType;
@@ -1570,6 +1636,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public int getIntProperty(String name, int defaultValue)
     {
@@ -1581,6 +1648,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public long getLongProperty(String name, long defaultValue)
     {
@@ -1592,6 +1660,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public double getDoubleProperty(String name, double defaultValue)
     {
@@ -1603,6 +1672,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public boolean getBooleanProperty(String name, boolean defaultValue)
     {
@@ -1614,6 +1684,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public void setBooleanProperty(String name, boolean value)
     {
@@ -1625,6 +1696,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public void setIntProperty(String name, int value)
     {
@@ -1636,6 +1708,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public void setLongProperty(String name, long value)
     {
@@ -1647,6 +1720,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public void setDoubleProperty(String name, double value)
     {
@@ -1658,6 +1732,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public String getStringProperty(String name, String defaultValue)
     {
@@ -1669,6 +1744,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * {@inheritDoc}
      */
+    @Override
     @Deprecated
     public void setStringProperty(String name, String value)
     {
@@ -1694,6 +1770,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return null;
     }
 
+    @Override
     public MuleMessage createInboundMessage() throws Exception
     {
         DefaultMuleMessage newMessage =  new DefaultMuleMessage(getPayload(), this, getMuleContext());
