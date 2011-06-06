@@ -324,6 +324,23 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="transactionIsolation" default="UNSPECIFIED">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The transaction isolation level to set on the driver when connecting the database.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="UNSPECIFIED"/>
+                            <xsd:enumeration value="NONE"/>
+                            <xsd:enumeration value="READ_COMMITTED"/>
+                            <xsd:enumeration value="READ_UNCOMMITTED"/>
+                            <xsd:enumeration value="REPEATABLE_READ"/>
+                            <xsd:enumeration value="SERIALIZABLE"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

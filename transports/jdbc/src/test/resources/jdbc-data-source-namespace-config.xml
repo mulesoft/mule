@@ -19,4 +19,8 @@
     <jdbc:oracle-data-source name="custom-host-oracle" host="some-other-host" user="scott" password="tiger"/>
     <jdbc:oracle-data-source name="custom-port-oracle" port="1522" user="scott" password="tiger"/>
     <jdbc:oracle-data-source name="custom-instance-oracle" instance="mule" user="scott" password="tiger"/>
+
+    <!-- specify custom attributes of StandardDataSource -->
+    <jdbc:oracle-data-source name="custom-ds-properties" user="scott" password="tiger"
+        transactionIsolation="SERIALIZABLE"/>
 </mule>

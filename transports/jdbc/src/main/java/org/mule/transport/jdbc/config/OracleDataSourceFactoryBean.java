@@ -10,7 +10,7 @@
 
 package org.mule.transport.jdbc.config;
 
-public class OraclePoolFactoryBean extends AbstractPoolFactoryBean
+public class OracleDataSourceFactoryBean extends AbstractDataSourceFactoryBean
 {
     private static final String DEFAULT_HOST = "localhost";
     private static final String DEFAULT_INSTANCE = "orcl";
@@ -22,7 +22,7 @@ public class OraclePoolFactoryBean extends AbstractPoolFactoryBean
     protected int port = DEFAULT_PORT;
     protected String instance = DEFAULT_INSTANCE;
 
-    public OraclePoolFactoryBean()
+    public OracleDataSourceFactoryBean()
     {
         super();
         driverClassName = DRIVER_CLASS_NAME;

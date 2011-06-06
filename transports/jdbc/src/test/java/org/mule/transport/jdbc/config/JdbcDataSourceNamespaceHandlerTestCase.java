@@ -12,6 +12,8 @@ package org.mule.transport.jdbc.config;
 
 import org.mule.tck.FunctionalTestCase;
 
+import java.sql.Connection;
+
 import org.enhydra.jdbc.standard.StandardDataSource;
 
 public class JdbcDataSourceNamespaceHandlerTestCase extends FunctionalTestCase
@@ -60,6 +62,12 @@ public class JdbcDataSourceNamespaceHandlerTestCase extends FunctionalTestCase
     {
         StandardDataSource source = lookupDataSource("custom-instance-oracle");
         assertEquals("jdbc:oracle:thin:@localhost:1521:mule", source.getUrl());
+    }
+
+    public void testCustomDataSourceProperties()
+    {
+        StandardDataSource source = lookupDataSource("custom-ds-properties");
+        assertEquals(Connection.TRANSACTION_SERIALIZABLE, source.getTransactionIsolation());
     }
 
     private StandardDataSource lookupDataSource(String key)

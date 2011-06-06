@@ -13,10 +13,11 @@ package org.mule.transport.jdbc.config;
 import org.enhydra.jdbc.standard.StandardDataSource;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-public class AbstractPoolFactoryBean extends AbstractFactoryBean<StandardDataSource>
+public class AbstractDataSourceFactoryBean extends AbstractFactoryBean<StandardDataSource>
 {
     protected String driverClassName;
     protected String password;
+    protected int transactionIsolation;
     protected String url;
     protected String user;
 
@@ -32,6 +33,7 @@ public class AbstractPoolFactoryBean extends AbstractFactoryBean<StandardDataSou
         StandardDataSource dataSource = new StandardDataSource();
         dataSource.setDriverName(driverClassName);
         dataSource.setPassword(password);
+        dataSource.setTransactionIsolation(transactionIsolation);
         dataSource.setUrl(url);
         dataSource.setUser(user);
         return dataSource;
@@ -65,6 +67,16 @@ public class AbstractPoolFactoryBean extends AbstractFactoryBean<StandardDataSou
     public String getUrl()
     {
         return url;
+    }
+
+    public void setTransactionIsolation(int transactionIsolation)
+    {
+        this.transactionIsolation = transactionIsolation;
+    }
+
+    public int getTransactionIsolation()
+    {
+        return transactionIsolation;
     }
 }
 
