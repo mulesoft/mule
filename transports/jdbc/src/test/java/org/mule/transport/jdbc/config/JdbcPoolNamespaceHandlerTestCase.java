@@ -38,6 +38,12 @@ public class JdbcPoolNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("tiger", pool.getPassword());
     }
 
+    public void testCustomUrl()
+    {
+        StandardDataSource pool = lookupPool("custom-url-oracle");
+        assertEquals("jdbc:oracle:thin:@some-other-host:1522:mule", pool.getUrl());
+    }
+
     private StandardDataSource lookupPool(String key)
     {
         Object object = muleContext.getRegistry().lookupObject(key);

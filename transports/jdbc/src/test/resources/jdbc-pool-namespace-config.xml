@@ -8,7 +8,12 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd">
 
+    <!-- using the default URL -->
     <jdbc:oracle-pool name="default-oracle" user="scott" password="tiger"/>
+
+    <!-- using a custom URL -->
+    <jdbc:oracle-pool name="custom-url-oracle" url="jdbc:oracle:thin:@some-other-host:1522:mule"
+        user="scott" password="tiger"/>
 
 <!--     <spring:bean id="jdbcDataSource" -->
 <!--         class="org.enhydra.jdbc.standard.StandardDataSource" -->
