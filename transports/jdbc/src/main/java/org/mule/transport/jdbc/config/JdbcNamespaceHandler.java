@@ -55,6 +55,6 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         // TODO pool: can only have either url or one or more of host, port, instance
         registerBeanDefinitionParser("oracle-data-source",
-            new PoolDefinitionParser(OracleDataSourceFactoryBean.class));
+            new DataSourceDefinitionParser(OracleDataSourceFactoryBean.class));
     }
 }

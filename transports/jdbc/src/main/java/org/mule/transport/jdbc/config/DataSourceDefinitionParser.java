@@ -17,7 +17,7 @@ import java.util.Map;
 
 
 // TODO pool: destroy-method="shutdown"
-public class PoolDefinitionParser extends MuleOrphanDefinitionParser
+public class DataSourceDefinitionParser extends MuleOrphanDefinitionParser
 {
     private static final Map<String, Integer> TRANSACTION_ISOLATION_MAPPING;
 
@@ -32,7 +32,7 @@ public class PoolDefinitionParser extends MuleOrphanDefinitionParser
         TRANSACTION_ISOLATION_MAPPING.put("SERIALIZABLE", Integer.valueOf(Connection.TRANSACTION_SERIALIZABLE));
     }
 
-    public PoolDefinitionParser(Class<? extends AbstractDataSourceFactoryBean> poolFactoryClass)
+    public DataSourceDefinitionParser(Class<? extends AbstractDataSourceFactoryBean> poolFactoryClass)
     {
         super(poolFactoryClass, true);
         addIgnored("name");
