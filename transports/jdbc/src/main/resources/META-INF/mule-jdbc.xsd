@@ -13,7 +13,7 @@
                 schemaLocation = "http://www.mulesoft.org/schema/mule/schemadoc/3.2/mule-schemadoc.xsd"/>
 
     <xsd:annotation>
-            <xsd:documentation>The JDBC transport allows data to be retrieved from and written to any database that supports a JDBC driver. It also supports invoking stored precedures.  
+            <xsd:documentation>The JDBC transport allows data to be retrieved from and written to any database that supports a JDBC driver. It also supports invoking stored precedures.
             </xsd:documentation>
             <xsd:appinfo>
                 <schemadoc:short-name>JDBC</schemadoc:short-name>
@@ -178,7 +178,7 @@
             <xsd:extension base="mule:keyValueType"/>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:element name="query" type="queryType" substitutionGroup="abstract-query">
         <xsd:annotation>
             <xsd:documentation>
@@ -193,7 +193,7 @@
             <xsd:extension base="abstractQueryType"/>
         </xsd:complexContent>
     </xsd:complexType>
-    
+
     <xsd:attributeGroup name="addressAttributes">
         <xsd:attribute name="queryKey" type="xsd:string">
                 <xsd:annotation>
@@ -210,7 +210,7 @@
     <xsd:element name="transaction" type="transactionType" substitutionGroup="mule:abstract-transaction">
         <xsd:annotation>
             <xsd:documentation>
-                            Standard Mule transaction configuration. See [Transaction Management] for usage details. 
+                            Standard Mule transaction configuration. See [Transaction Management] for usage details.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -245,7 +245,7 @@
         <xsd:attribute name="class" type="mule:substitutableClass" use="optional"/>
         <xsd:attribute name="ref" use="optional" type="xsd:string"/>
     </xsd:attributeGroup>
-    
+
     <xsd:element name="object-store" type="jdbcObjectStoreType" substitutionGroup="mule:abstract-object-store"/>
 
     <xsd:complexType name="jdbcObjectStoreType">
@@ -289,6 +289,57 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="abstractPoolType">
+        <xsd:complexContent>
+            <xsd:extension base="mule:abstractExtensionType">
+                <xsd:attribute name="name" type="mule:substitutableName" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Identifies the pool so that the connector can reference it.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="user" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The user that is used for authentication against the database.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="password" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The password that is used for authentication against the database.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="url" type="xsd:string" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The JDBC URL that is used for connecting the database.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:element name="oracle-pool" type="oraclePoolType" substitutionGroup="mule:abstract-extension"/>
+
+    <xsd:complexType name="oraclePoolType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractPoolType">
+<!--                 <xsd:attribute name="name" type="substitutableName" use="required"> -->
+<!--                     <xsd:annotation> -->
+<!--                         <xsd:documentation> -->
+<!--                             Identifies the connector so that other elements can reference it. -->
+<!--                         </xsd:documentation> -->
+<!--                     </xsd:annotation> -->
+<!--                 </xsd:attribute> -->
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>

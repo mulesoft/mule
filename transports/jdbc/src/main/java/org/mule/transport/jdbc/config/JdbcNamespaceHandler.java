@@ -34,6 +34,7 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
     public static final String[] ADDRESS_ATTRIBUTES = new String[]{QUERY_KEY};
     public static final String SQL_STATEMENT_FACTORY_PROPERTY = "sqlStatementStrategyFactory";
 
+    @Override
     public void init()
     {
         registerStandardTransportEndpoints(JdbcConnector.JDBC, ADDRESS_ATTRIBUTES).addAlias(QUERY_KEY, URIBuilder.PATH);
@@ -47,5 +48,12 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("extractors", new ParentDefinitionParser());
         registerBeanDefinitionParser("transaction", new TransactionDefinitionParser(JdbcTransactionFactory.class));
         registerBeanDefinitionParser("object-store", new ChildDefinitionParser("store", JdbcObjectStore.class));
+        registerPoolDefinitionParsers();
+    }
+
+    protected void registerPoolDefinitionParsers()
+    {
+        // TODO pool: can only have either url or one or more of host, port, instance
+        registerBeanDefinitionParser("oracle-pool", new PoolDefinitionParser(OraclePoolFactoryBean.class));
     }
 }
