@@ -7,23 +7,23 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd">
-    
+
     <spring:bean id="databaseConnection" class="java.lang.String">
-        <spring:constructor-arg value="jdbc:derby:muleEmbeddedDB;sql.enforce_strict_size=true"/>
+        <spring:constructor-arg value="jdbc:derby:muleEmbeddedDB"/>
     </spring:bean>
-       
+
     <spring:bean id="jdbcDataSource1" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
         <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
         <spring:property name="url" ref="databaseConnection"/>
     </spring:bean>
-    
+
     <spring:bean id="jdbcDataSource2" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
         <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
         <spring:property name="url" ref="databaseConnection"/>
     </spring:bean>
-    
-    <!-- 
-        Do not change the name of this connector, AbstractJdbcFunctionalTestCase relies on the 
+
+    <!--
+        Do not change the name of this connector, AbstractJdbcFunctionalTestCase relies on the
         existence of a JDBC connector with this name.
      -->
     <jdbc:connector name="jdbcConnector" dataSource-ref="jdbcDataSource1" pollingFrequency="1000">
@@ -34,17 +34,17 @@
     <jdbc:connector name="jdbcOUTConnector" dataSource-ref="jdbcDataSource2" pollingFrequency="10000">
         <jdbc:query key="write" value="INSERT INTO test_out(id, type, data) VALUES(#[map-payload:id], #[map-payload:type], #[map-payload:data])"/>
     </jdbc:connector>
-    
+
     <model name="testing">
         <service name="bridge">
             <inbound>
                 <jdbc:inbound-endpoint queryKey="read" connector-ref="jdbcConnector" exchange-pattern="one-way">
                     <jdbc:transaction action="ALWAYS_BEGIN"/>
-                </jdbc:inbound-endpoint>                
+                </jdbc:inbound-endpoint>
             </inbound>
             <outbound>
                 <pass-through-router>
-                    <jdbc:outbound-endpoint queryKey="write" connector-ref="jdbcOUTConnector" 
+                    <jdbc:outbound-endpoint queryKey="write" connector-ref="jdbcOUTConnector"
                         exchange-pattern="one-way">
                         <jdbc:transaction action="NONE"/>
                     </jdbc:outbound-endpoint>
