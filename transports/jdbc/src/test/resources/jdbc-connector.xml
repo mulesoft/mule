@@ -8,10 +8,7 @@
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
        http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd">
 
-    <spring:bean id="jdbcDataSource" class="org.enhydra.jdbc.standard.StandardDataSource" destroy-method="shutdown">
-        <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/>
-        <spring:property name="url" value="jdbc:derby:muleEmbeddedDB;create=true"/>
-    </spring:bean>
+    <jdbc:derby-data-source name="jdbcDataSource" url="jdbc:derby:muleEmbeddedDB;create=true"/>
 
     <jdbc:connector name="jdbcConnector" pollingFrequency="1000" dataSource-ref="jdbcDataSource" queryTimeout="3000">
         <jdbc:query key="getTest"
