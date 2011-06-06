@@ -56,24 +56,13 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
     {
         registerMysqlDataSourceDefinitionParser();
         registerOracleDataSourceDefinitionParser();
+        registerPostgresqlDataSourceDefinitionParser();
     }
 
     protected void registerMysqlDataSourceDefinitionParser()
     {
-        DataSourceDefinitionParser parser = new DataSourceDefinitionParser(MysqlDataSourceFactoryBean.class);
-
-        // make sure that either url or host/port are configured
-        String[][] attributeGroups = new String[][] {
-            new String[] { "url" },
-            new String[] { "host", "port" }
-        };
-        CheckExclusiveAttributes attributeCheck = new CheckExclusiveAttributes(attributeGroups);
-        parser.registerPreProcessor(attributeCheck);
-
-        // make sure that either url or database is configured
-        parser.registerPreProcessor(new CheckDatabaseOrUrl());
-
-        registerBeanDefinitionParser("mysql-data-source", parser);
+        registerHostAndPortTypeDefinitionParser(MysqlDataSourceFactoryBean.class,
+            "mysql-data-source");
     }
 
     protected void registerOracleDataSourceDefinitionParser()
@@ -87,5 +76,31 @@ public class JdbcNamespaceHandler extends AbstractMuleNamespaceHandler
         parser.registerPreProcessor(attributeCheck);
 
         registerBeanDefinitionParser("oracle-data-source", parser);
+    }
+
+    protected void registerPostgresqlDataSourceDefinitionParser()
+    {
+        registerHostAndPortTypeDefinitionParser(PostgresqlDataSourceFactoryBean.class,
+            "postgresql-data-source");
+    }
+
+    protected void registerHostAndPortTypeDefinitionParser(Class<? extends AbstractDataSourceFactoryBean> poolFactoryClass,
+        String elementName)
+    {
+        DataSourceDefinitionParser parser = new DataSourceDefinitionParser(poolFactoryClass);
+
+        // make sure that either url or host/port are configured
+        String[][] attributeGroups = new String[][] {
+            new String[] { "url" },
+            new String[] { "host", "port" }
+        };
+        CheckExclusiveAttributes attributeCheck = new CheckExclusiveAttributes(attributeGroups);
+        parser.registerPreProcessor(attributeCheck);
+
+        // make sure that either url or database is configured
+        parser.registerPreProcessor(new CheckDatabaseOrUrl());
+
+        registerBeanDefinitionParser(elementName, parser);
+
     }
 }

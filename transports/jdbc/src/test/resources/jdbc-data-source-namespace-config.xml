@@ -8,6 +8,14 @@
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
         http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd">
 
+    <!-- specify custom attributes of StandardDataSource -->
+    <jdbc:oracle-data-source name="custom-ds-properties" user="scott" password="tiger"
+        transactionIsolation="SERIALIZABLE" loginTimeout="42"/>
+
+    <!--
+        Oracle
+    -->
+
     <!-- using the default URL -->
     <jdbc:oracle-data-source name="default-oracle" user="scott" password="tiger"/>
 
@@ -20,9 +28,9 @@
     <jdbc:oracle-data-source name="custom-port-oracle" port="1522" user="scott" password="tiger"/>
     <jdbc:oracle-data-source name="custom-instance-oracle" instance="mule" user="scott" password="tiger"/>
 
-    <!-- specify custom attributes of StandardDataSource -->
-    <jdbc:oracle-data-source name="custom-ds-properties" user="scott" password="tiger"
-        transactionIsolation="SERIALIZABLE" loginTimeout="42"/>
+    <!--
+        MySQL
+    -->
 
     <!-- using the default url -->
     <jdbc:mysql-data-source name="default-mysql" database="mule" user="mysql" password="secret"/>
@@ -36,4 +44,22 @@
         database="mule" user="mysql" password="secret"/>
     <jdbc:mysql-data-source name="custom-port-mysql" port="4242"
         user="mysql" database="mule" password="secret"/>
+
+    <!--
+        PostgreSQL
+    -->
+
+    <!-- using the default url -->
+    <jdbc:postgresql-data-source name="default-postgresql" database="mule"
+        user="postgres" password="secret"/>
+
+    <!-- using a custom URL -->
+    <jdbc:postgresql-data-source name="custom-url-postgresql"
+        url="jdbc:postgresql://mule-db-host:5432/mule" user="postgres" password="secret"/>
+
+    <!-- custom parts of the postgresql url -->
+    <jdbc:postgresql-data-source name="custom-host-postgresql" host="some-other-host"
+        database="mule" user="postgres" password="secret"/>
+    <jdbc:postgresql-data-source name="custom-port-postgresql" port="5433" database="mule"
+        user="postgres" password="secret"/>
 </mule>

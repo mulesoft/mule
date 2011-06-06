@@ -10,12 +10,12 @@
 
 package org.mule.transport.jdbc.config;
 
-public class MysqlDataSourceFactoryBean extends AbstractHostPortDatabaseDataSourceFactoryBean
+public class PostgresqlDataSourceFactoryBean extends AbstractHostPortDatabaseDataSourceFactoryBean
 {
-    private static final String DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
-    private static final String JDBC_URL_PREFIX = "jdbc:mysql://";
+    private static final String DRIVER_CLASS_NAME = "org.postgresql.Driver";
+    private static final String JDBC_URL_PREFIX = "jdbc:postgresql://";
 
-    public MysqlDataSourceFactoryBean()
+    public PostgresqlDataSourceFactoryBean()
     {
         super();
         driverClassName = DRIVER_CLASS_NAME;

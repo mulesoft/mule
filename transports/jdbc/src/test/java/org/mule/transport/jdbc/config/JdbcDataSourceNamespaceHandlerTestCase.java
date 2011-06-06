@@ -105,6 +105,33 @@ public class JdbcDataSourceNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("jdbc:mysql://localhost:4242/mule", source.getUrl());
     }
 
+    public void testPostgresqlDefaults()
+    {
+        StandardDataSource source = lookupDataSource("default-postgresql");
+        assertEquals("jdbc:postgresql://localhost/mule", source.getUrl());
+        assertEquals("org.postgresql.Driver", source.getDriverName());
+        assertEquals("postgres", source.getUser());
+        assertEquals("secret", source.getPassword());
+    }
+
+    public void testPostgresqlCustomUrl()
+    {
+        StandardDataSource source = lookupDataSource("custom-url-postgresql");
+        assertEquals("jdbc:postgresql://mule-db-host:5432/mule", source.getUrl());
+    }
+
+    public void testPostgresqlCustomHost()
+    {
+        StandardDataSource source = lookupDataSource("custom-host-postgresql");
+        assertEquals("jdbc:postgresql://some-other-host/mule", source.getUrl());
+    }
+
+    public void testPostgresqlCustomPort()
+    {
+        StandardDataSource source = lookupDataSource("custom-port-postgresql");
+        assertEquals("jdbc:postgresql://localhost:5433/mule", source.getUrl());
+    }
+
     private StandardDataSource lookupDataSource(String key)
     {
         Object object = muleContext.getRegistry().lookupObject(key);
