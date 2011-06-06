@@ -36,6 +36,7 @@ public class JdbcDataSourceNamespaceHandlerTestCase extends FunctionalTestCase
         StandardDataSource source = lookupDataSource("default-oracle");
         assertEquals("jdbc:oracle:thin:@localhost:1521:orcl", source.getUrl());
         assertEquals("oracle.jdbc.driver.OracleDriver", source.getDriverName());
+        assertEquals(-1, source.getTransactionIsolation());
         assertEquals("scott", source.getUser());
         assertEquals("tiger", source.getPassword());
     }
@@ -68,6 +69,7 @@ public class JdbcDataSourceNamespaceHandlerTestCase extends FunctionalTestCase
     {
         StandardDataSource source = lookupDataSource("custom-ds-properties");
         assertEquals(Connection.TRANSACTION_SERIALIZABLE, source.getTransactionIsolation());
+        assertEquals(42, source.getLoginTimeout());
     }
 
     private StandardDataSource lookupDataSource(String key)

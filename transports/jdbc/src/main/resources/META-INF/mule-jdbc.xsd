@@ -324,6 +324,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="loginTimeout" type="xsd:int" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            Maximum time in seconds that this data source will wait while attempting to connect to a database.  A value of zero specifies that the timeout is the default system timeout if there is one; otherwise, it specifies that there is no timeout.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="transactionIsolation" default="UNSPECIFIED">
                     <xsd:annotation>
                         <xsd:documentation>

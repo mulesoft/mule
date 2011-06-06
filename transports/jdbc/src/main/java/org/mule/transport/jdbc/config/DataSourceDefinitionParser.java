@@ -15,8 +15,6 @@ import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
 import java.sql.Connection;
 import java.util.Map;
 
-
-// TODO pool: destroy-method="shutdown"
 public class DataSourceDefinitionParser extends MuleOrphanDefinitionParser
 {
     private static final Map<String, Integer> TRANSACTION_ISOLATION_MAPPING;

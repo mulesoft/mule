@@ -16,6 +16,7 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
 public class AbstractDataSourceFactoryBean extends AbstractFactoryBean<StandardDataSource>
 {
     protected String driverClassName;
+    protected int loginTimeout = -1;
     protected String password;
     protected int transactionIsolation;
     protected String url;
@@ -32,6 +33,10 @@ public class AbstractDataSourceFactoryBean extends AbstractFactoryBean<StandardD
     {
         StandardDataSource dataSource = new StandardDataSource();
         dataSource.setDriverName(driverClassName);
+        if (loginTimeout >= 0)
+        {
+            dataSource.setLoginTimeout(loginTimeout);
+        }
         dataSource.setPassword(password);
         dataSource.setTransactionIsolation(transactionIsolation);
         dataSource.setUrl(url);
@@ -78,6 +83,14 @@ public class AbstractDataSourceFactoryBean extends AbstractFactoryBean<StandardD
     {
         return transactionIsolation;
     }
+
+    public void setLoginTimeout(int loginTimeout)
+    {
+        this.loginTimeout = loginTimeout;
+    }
+
+    public int getLoginTimeout()
+    {
+        return loginTimeout;
+    }
 }
-
-
