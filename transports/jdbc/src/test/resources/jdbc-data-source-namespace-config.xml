@@ -19,12 +19,4 @@
     <jdbc:oracle-data-source name="custom-host-oracle" host="some-other-host" user="scott" password="tiger"/>
     <jdbc:oracle-data-source name="custom-port-oracle" port="1522" user="scott" password="tiger"/>
     <jdbc:oracle-data-source name="custom-instance-oracle" instance="mule" user="scott" password="tiger"/>
-
-<!--     <spring:bean id="jdbcDataSource" -->
-<!--         class="org.enhydra.jdbc.standard.StandardDataSource" -->
-<!--         destroy-method="shutdown"> -->
-<!--         <spring:property name="driverName" value="org.apache.derby.jdbc.EmbeddedDriver"/> -->
-<!--         <spring:property name="url" value="jdbc:derby:testdb;sql.enforce_strict_size=true"/> -->
-<!--     </spring:bean> -->
-
 </mule>
