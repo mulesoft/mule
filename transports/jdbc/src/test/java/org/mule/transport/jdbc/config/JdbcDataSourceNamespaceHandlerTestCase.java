@@ -58,8 +58,8 @@ public class JdbcDataSourceNamespaceHandlerTestCase extends FunctionalTestCase
 
     public void testCustomInstance()
     {
-        StandardDataSource pool = lookupDataSource("custom-instance-oracle");
-        assertEquals("jdbc:oracle:thin:@localhost:1521:mule", pool.getUrl());
+        StandardDataSource source = lookupDataSource("custom-instance-oracle");
+        assertEquals("jdbc:oracle:thin:@localhost:1521:mule", source.getUrl());
     }
 
     private StandardDataSource lookupDataSource(String key)
