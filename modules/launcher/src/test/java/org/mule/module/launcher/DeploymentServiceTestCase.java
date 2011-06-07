@@ -29,6 +29,7 @@ import org.mule.util.concurrent.Latch;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -238,8 +239,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         }
 
         // zip stays intact, no app dir created
-        // %20 is returned by java file api :/
-        assertAppsDir(new String[] {"app%20with%20spaces.zip"}, NONE, true);
+        assertAppsDir(new String[] {"app with spaces.zip"}, NONE, true);
         final Map<URL, Long> zombieMap = deploymentService.getZombieMap();
         assertEquals("Wrong number of zombie apps registered.", 1, zombieMap.size());
         final Map.Entry<URL, Long> zombie = zombieMap.entrySet().iterator().next();
@@ -280,7 +280,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
     private void addAppArchive(URL url) throws IOException
     {
         // copy is not atomic, copy to a temp file and rename instead (rename is atomic)
-        final String tempFileName = new File(url.getFile() + ".part").getName();
+        final String tempFileName = new File(URLDecoder.decode(url.getFile()) + ".part").getName();
         final File tempFile = new File(appsDir, tempFileName);
         FileUtils.copyURLToFile(url, tempFile);
         tempFile.renameTo(new File(StringUtils.removeEnd(tempFile.getAbsolutePath(), ".part")));
