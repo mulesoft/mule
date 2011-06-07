@@ -47,7 +47,7 @@ public class PriviledgedMuleApplication extends DefaultMuleApplication
         super.init();
         try
         {
-            if (getDescriptor().isPriviledged())
+            if (getDescriptor().isPrivileged())
             {
                 getMuleContext().getRegistry().registerObject(REGISTRY_KEY_DEPLOYMENT_SERVICE, deploymentService);
                 getMuleContext().getRegistry().registerObject(REGISTRY_KEY_CORE_EXTENSIONS, coreExtensions);

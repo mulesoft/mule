@@ -10,6 +10,8 @@
 
 package org.mule.module.launcher.descriptor;
 
+import org.mule.module.launcher.plugin.PluginDescriptor;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -40,6 +42,8 @@ public class ApplicationDescriptor
     private boolean privileged;
 
     private Set<String> loaderOverride = new HashSet<String>();
+
+    private Set<PluginDescriptor> plugins = new HashSet<PluginDescriptor>();
 
     public String getAppName()
     {
@@ -154,5 +158,15 @@ public class ApplicationDescriptor
     public void setLoaderOverride(Set<String> loaderOverride)
     {
         this.loaderOverride = loaderOverride;
+    }
+
+    public Set<PluginDescriptor> getPlugins()
+    {
+        return plugins;
+    }
+
+    public void setPlugins(Set<PluginDescriptor> plugins)
+    {
+        this.plugins = plugins;
     }
 }

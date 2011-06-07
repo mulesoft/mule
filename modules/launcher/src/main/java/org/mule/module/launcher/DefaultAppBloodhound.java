@@ -12,28 +12,37 @@ package org.mule.module.launcher;
 
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.PreferredObjectSelector;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.descriptor.DescriptorParser;
 import org.mule.module.launcher.descriptor.EmptyApplicationDescriptor;
 import org.mule.module.launcher.descriptor.PropertiesDescriptorParser;
+import org.mule.module.launcher.plugin.PluginClasspath;
+import org.mule.module.launcher.plugin.PluginDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.FilenameUtils;
 import org.mule.util.PropertiesUtils;
+import org.mule.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.imageio.spi.ServiceRegistry;
 
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.collections.map.MultiValueMap;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 /**
@@ -123,8 +132,49 @@ public class DefaultAppBloodhound implements AppBloodhound
             desc.setAppProperties(m);
         }
 
+        final Set<PluginDescriptor> plugins = parsePlugins(appDir, desc);
+        desc.setPlugins(plugins);
+
         return desc;
 
+    }
+
+    protected Set<PluginDescriptor> parsePlugins(File appDir, ApplicationDescriptor desc)
+    {
+        // parse plugins
+        final File pluginsDir = new File(appDir, "plugins");
+        // TODO decide if we want to support 'exploded' plugins, for now no
+        String[] pluginZips = pluginsDir.list(new SuffixFileFilter(".zip"));
+        if (pluginZips.length == 0)
+        {
+            return Collections.emptySet();
+        }
+
+        Arrays.sort(pluginZips);
+        Set<PluginDescriptor> pds = new HashSet<PluginDescriptor>(pluginZips.length);
+
+        for (String pluginZip : pluginZips)
+        {
+            final String pluginName = StringUtils.removeEnd(pluginZip, ".zip");
+            final File tmpDir = new File(MuleContainerBootstrapUtils.getMuleTmpDir(), desc.getAppName() + "/plugins/" + pluginName);
+            try
+            {
+                FileUtils.unzip(new File(pluginsDir, pluginZip), tmpDir);
+            }
+            catch (IOException e)
+            {
+                throw new MuleRuntimeException(CoreMessages.createStaticMessage(
+                        String.format("Failed to parse plugins for application [%s]", desc.getAppName())));
+            }
+            final PluginDescriptor pd = new PluginDescriptor();
+            pd.setName(pluginName);
+            // TODO parse plugin.properties
+            PluginClasspath cp = PluginClasspath.from(tmpDir);
+            pd.setClasspath(cp);
+            pds.add(pd);
+        }
+
+        return pds;
     }
 
     /**

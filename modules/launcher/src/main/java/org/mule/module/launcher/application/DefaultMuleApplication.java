@@ -115,6 +115,8 @@ public class DefaultMuleApplication implements Application
             absoluteResourcePaths[i] = file.getAbsolutePath();
         }
 
+        // TODO deploy any plugins bundled with this app
+
         createDeploymentClassLoader();
     }
 

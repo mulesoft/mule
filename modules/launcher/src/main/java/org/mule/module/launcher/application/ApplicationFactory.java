@@ -38,7 +38,7 @@ public class ApplicationFactory
     {
         AppBloodhound bh = new DefaultAppBloodhound();
         final ApplicationDescriptor descriptor = bh.fetch(appName);
-        if (descriptor.isPriviledged())
+        if (descriptor.isPrivileged())
         {
             final PriviledgedMuleApplication delegate = new PriviledgedMuleApplication(appName);
             delegate.setDeploymentService(deploymentService);
