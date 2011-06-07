@@ -125,18 +125,8 @@ public class DeploymentService
 
                     fireOnDeploymentFailure(appName, t);
 
-                    File appFile = new File(appsDir, zip);
-                    try
-                    {
-                        addZombie(appFile.toURL());
-                    }
-                    catch (MalformedURLException muex)
-                    {
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug(muex);
-                        }
-                    }
+                    File appZip = new File(appsDir, zip);
+                    addZombie(appZip);
                 }
             }
 
@@ -168,9 +158,11 @@ public class DeploymentService
                 }
                 applications.add(a);
             }
-            catch (IOException e)
+            catch (Throwable t)
             {
-                logger.error(String.format("Failed to create application [%s]", app), e);
+                fireOnDeploymentFailure(app, t);
+                addZombie(new File(appsDir, app));
+                logger.error(String.format("Failed to create application [%s]", app), t);
             }
         }
 
@@ -338,7 +330,7 @@ public class DeploymentService
         }
         catch (Throwable t)
         {
-            addZombie(appArchiveUrl);
+            addZombie(FileUtils.toFile(appArchiveUrl));
             if (t instanceof DeploymentException)
             {
                 // re-throw
@@ -350,17 +342,42 @@ public class DeploymentService
         }
     }
 
-    protected void addZombie(URL appArchiveUrl)
+    protected void addZombie(File marker)
     {
         // no sync required as deploy operations are single-threaded
-        if (appArchiveUrl == null)
+        if (marker == null)
         {
             return;
         }
 
-        long lastModified = FileUtils.getFileTimeStamp(appArchiveUrl);
+        if (!marker.exists())
+        {
+            return;
+        }
 
-        zombieMap.put(appArchiveUrl, lastModified);
+        try
+        {
+            if (marker.isDirectory())
+            {
+                final File appConfig = new File(marker, "mule-config.xml");
+                if (appConfig.exists())
+                {
+                    long lastModified = appConfig.lastModified();
+                    zombieMap.put(appConfig.toURI().toURL(), lastModified);
+                }
+            }
+            else
+            {
+                // zip deployment
+                long lastModified = marker.lastModified();
+
+                zombieMap.put(marker.toURI().toURL(), lastModified);
+            }
+        }
+        catch (MalformedURLException e)
+        {
+            logger.debug(String.format("Failed to mark an exploded app [%s] as a zombie", marker.getName()), e);
+        }
     }
 
     public void addStartupListener(StartupListener listener)
@@ -567,7 +584,8 @@ public class DeploymentService
                 // new packed Mule apps
                 for (String zip : zips)
                 {
-                    URL url = null;
+                    URL url;
+                    File appZip = null;
                     try
                     {
                         // check if this app is running first, undeploy it then
@@ -577,9 +595,10 @@ public class DeploymentService
                         {
                             undeploy(appName);
                         }
-                        url = new File(appsDir, zip).toURI().toURL();
+                        appZip = new File(appsDir, zip);
+                        url = appZip.toURI().toURL();
 
-                        if (isZombieApplicationFile(url))
+                        if (isZombieApplication(appZip))
                         {
                             // Skips the file because it was already deployed with failure
                             continue;
@@ -590,7 +609,7 @@ public class DeploymentService
                     catch (Throwable t)
                     {
                         logger.error("Failed to deploy application archive: " + zip, t);
-                        addZombie(url);
+                        addZombie(appZip);
                     }
                 }
 
@@ -607,24 +626,19 @@ public class DeploymentService
                 final Collection<String> addedApps = CollectionUtils.subtract(Arrays.asList(apps), deployedAppNames);
                 for (String addedApp : addedApps)
                 {
+                    final File appDir = new File(appsDir, addedApp);
+                    if (isZombieApplication(appDir))
+                    {
+                        continue;
+                    }
                     try
                     {
                         onNewExplodedApplication(addedApp);
                     }
                     catch (Throwable t)
                     {
+                        addZombie(appDir);
                         logger.error("Failed to deploy exploded application: " + addedApp, t);
-                        try
-                        {
-                            addZombie(new File(appsDir, addedApp).toURI().toURL());
-                        }
-                        catch (MalformedURLException e)
-                        {
-                            if (logger.isDebugEnabled())
-                            {
-                                logger.debug(e);
-                            }
-                        }
                     }
                 }
 
@@ -646,18 +660,43 @@ public class DeploymentService
 
 
         /**
-         * Determines if a given URL points to the same file that an existent
+         * Determines if a given URL points to the same file as an existing
          * zombie application.
          *
-         * @param url the URL representing the resource to be checked
+         * @param marker a pointer to a zip or exploded mule app (in the latter case
+         *        an app's 'mule-config.xml' will be monitored for updates
          * @return true if the URL already a zombie application and both file
          *         timestamps are the same.
          */
-        protected boolean isZombieApplicationFile(URL url)
+        protected boolean isZombieApplication(File marker)
         {
+            URL url;
+
+            if (!marker.exists())
+            {
+                return false;
+            }
+
+            try
+            {
+                if (marker.isDirectory())
+                {
+                    // this is an exploded app
+                    url = new File(marker, "mule-config.xml").toURI().toURL();
+                }
+                else
+                {
+                    url = marker.toURI().toURL();
+                }
+            }
+            catch (MalformedURLException e)
+            {
+                throw new RuntimeException(e);
+            }
+
             boolean result = false;
 
-            if (FileUtils.isFile(url) && zombieMap.containsKey(url))
+            if (zombieMap.containsKey(url))
             {
                 long originalTimeStamp = zombieMap.get(url);
                 long newTimeStamp = FileUtils.getFileTimeStamp(url);

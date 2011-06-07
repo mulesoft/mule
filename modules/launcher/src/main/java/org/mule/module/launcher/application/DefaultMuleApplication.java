@@ -38,6 +38,8 @@ import org.mule.module.launcher.InstallException;
 import org.mule.module.launcher.MuleApplicationClassLoader;
 import org.mule.module.launcher.MuleSharedDomainClassLoader;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
+import org.mule.module.launcher.plugin.MulePluginsClassLoader;
+import org.mule.module.launcher.plugin.PluginDescriptor;
 import org.mule.module.reboot.MuleContainerBootstrapUtils;
 import org.mule.util.ClassUtils;
 import org.mule.util.ExceptionUtils;
@@ -49,6 +51,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -114,8 +117,6 @@ public class DefaultMuleApplication implements Application
 
             absoluteResourcePaths[i] = file.getAbsolutePath();
         }
-
-        // TODO deploy any plugins bundled with this app
 
         createDeploymentClassLoader();
     }
@@ -388,6 +389,14 @@ public class DefaultMuleApplication implements Application
         {
             // TODO handle non-existing domains with an exception
             parent = new MuleSharedDomainClassLoader(domain, getClass().getClassLoader());
+        }
+
+        final Set<PluginDescriptor> plugins = descriptor.getPlugins();
+        if (!plugins.isEmpty())
+        {
+            MulePluginsClassLoader cl = new MulePluginsClassLoader(parent, plugins);
+            // re-assign parent ref if any plugins deployed, will be used by the MuleAppCL
+            parent = cl;
         }
 
         final MuleApplicationClassLoader appCl = new MuleApplicationClassLoader(appName,

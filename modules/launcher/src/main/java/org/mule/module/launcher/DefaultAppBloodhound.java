@@ -12,7 +12,6 @@ package org.mule.module.launcher;
 
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.PreferredObjectSelector;
-import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.descriptor.DescriptorParser;
@@ -132,6 +131,7 @@ public class DefaultAppBloodhound implements AppBloodhound
             desc.setAppProperties(m);
         }
 
+        // TODO extract a plugin parser class
         final Set<PluginDescriptor> plugins = parsePlugins(appDir, desc);
         desc.setPlugins(plugins);
 
@@ -139,13 +139,13 @@ public class DefaultAppBloodhound implements AppBloodhound
 
     }
 
-    protected Set<PluginDescriptor> parsePlugins(File appDir, ApplicationDescriptor desc)
+    protected Set<PluginDescriptor> parsePlugins(File appDir, ApplicationDescriptor desc) throws IOException
     {
         // parse plugins
         final File pluginsDir = new File(appDir, "plugins");
         // TODO decide if we want to support 'exploded' plugins, for now no
         String[] pluginZips = pluginsDir.list(new SuffixFileFilter(".zip"));
-        if (pluginZips.length == 0)
+        if (pluginZips == null || pluginZips.length == 0)
         {
             return Collections.emptySet();
         }
@@ -157,18 +157,10 @@ public class DefaultAppBloodhound implements AppBloodhound
         {
             final String pluginName = StringUtils.removeEnd(pluginZip, ".zip");
             final File tmpDir = new File(MuleContainerBootstrapUtils.getMuleTmpDir(), desc.getAppName() + "/plugins/" + pluginName);
-            try
-            {
-                FileUtils.unzip(new File(pluginsDir, pluginZip), tmpDir);
-            }
-            catch (IOException e)
-            {
-                throw new MuleRuntimeException(CoreMessages.createStaticMessage(
-                        String.format("Failed to parse plugins for application [%s]", desc.getAppName())));
-            }
+            FileUtils.unzip(new File(pluginsDir, pluginZip), tmpDir);
             final PluginDescriptor pd = new PluginDescriptor();
             pd.setName(pluginName);
-            // TODO parse plugin.properties
+
             PluginClasspath cp = PluginClasspath.from(tmpDir);
             pd.setClasspath(cp);
             pds.add(pd);
