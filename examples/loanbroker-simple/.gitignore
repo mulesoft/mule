@@ -1,9 +1,6 @@
-/.mule
-/target
 /*.iml
+/.mule
 /.classpath
 /.project
 /.settings
-/classes
-/*.log
-/cobertura.ser
+/target

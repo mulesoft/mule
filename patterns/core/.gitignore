@@ -1,7 +1,12 @@
-/target
-/.classpath
-/.project
-/.settings
-/*.iml
 /.mule
+/*.iml
+/.fbprefs
+/.fbwarnings
 /*.log
+/.settings
+/.project
+/.classpath
+/cobertura.ser
+/target
+/pom.properties
+/.checkstyle

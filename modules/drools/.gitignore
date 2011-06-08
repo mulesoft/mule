@@ -1,9 +1,10 @@
 /target
 /.classpath
 /.project
+/.fbprefs
+/.fbwarnings
 /.settings
-/bin
-/weblogic
+/*.log
+/cobertura.ser
 /*.iml
 /.mule
-/*.log

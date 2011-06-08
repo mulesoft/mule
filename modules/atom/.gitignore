@@ -1,4 +1,3 @@
-/repository
 /mule-module-atom.iml
 /derby.log
 /mule-module-atom.iws
@@ -7,3 +6,4 @@
 /.project
 /.settings
 /target
+/repository
