@@ -10,6 +10,7 @@
 
 package org.mule.module.launcher.plugin;
 
+import org.mule.module.launcher.FineGrainedControlClassLoader;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.ClassUtils;
 

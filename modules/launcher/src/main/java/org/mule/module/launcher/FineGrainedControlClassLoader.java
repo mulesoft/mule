@@ -8,9 +8,8 @@
  * LICENSE.txt file.
  */
 
-package org.mule.module.launcher.plugin;
+package org.mule.module.launcher;
 
-import org.mule.module.launcher.GoodCitizenClassLoader;
 import org.mule.util.StringUtils;
 
 import java.net.URL;

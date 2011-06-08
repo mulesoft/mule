@@ -10,6 +10,8 @@
 
 package org.mule.module.launcher.plugin;
 
+import org.mule.module.launcher.FineGrainedControlClassLoader;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;

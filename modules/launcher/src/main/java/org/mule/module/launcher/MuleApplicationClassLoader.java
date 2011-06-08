@@ -11,7 +11,6 @@
 package org.mule.module.launcher;
 
 import org.mule.api.config.MuleProperties;
-import org.mule.module.launcher.plugin.FineGrainedControlClassLoader;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
 
