@@ -15,3 +15,5 @@
 /*.log
 /svnmerge-commit-message.txt
 /activemq-data
+
+/modules/launcher/src/it/test-01-plugin-impl-1/build.log
