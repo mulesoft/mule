@@ -15,7 +15,6 @@ import org.mule.api.store.ObjectStore;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -115,7 +114,7 @@ public class QueueInfo
 
     public static synchronized void registerDelegateFactory(Class<? extends ObjectStore>storeType, QueueInfoDelegateFactory factory)
     {
-        delegateFactories.put(storeType, factory);;    
+        delegateFactories.put(storeType, factory);
     }
 
     public int getCapacity()

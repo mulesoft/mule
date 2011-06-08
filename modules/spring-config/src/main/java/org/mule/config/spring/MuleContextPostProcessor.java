@@ -26,7 +26,6 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  */
 public class MuleContextPostProcessor implements BeanPostProcessor
 {
-
     private MuleContext muleContext;
 
     public MuleContextPostProcessor(MuleContext muleContext)
@@ -34,6 +33,7 @@ public class MuleContextPostProcessor implements BeanPostProcessor
         this.muleContext = muleContext;
     }
 
+    @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException
     {
         if (bean instanceof MuleContextAware)
@@ -48,9 +48,9 @@ public class MuleContextPostProcessor implements BeanPostProcessor
         return bean;
     }
 
+    @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException
     {
         return bean;
     }
-
 }

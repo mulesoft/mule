@@ -26,6 +26,7 @@ public class DefaultQueueInfoDelegate implements QueueInfoDelegate
         list = new LinkedList<Serializable>();
     }
 
+    @Override
     public void putNow(Serializable o)
     {
         synchronized (list)
@@ -35,6 +36,7 @@ public class DefaultQueueInfoDelegate implements QueueInfoDelegate
         }
     }
 
+    @Override
     public boolean offer(Serializable o, int room, long timeout) throws InterruptedException
     {
         if (Thread.interrupted())
@@ -70,6 +72,7 @@ public class DefaultQueueInfoDelegate implements QueueInfoDelegate
         }
     }
 
+    @Override
     public Serializable poll(long timeout) throws InterruptedException
     {
         if (Thread.interrupted())
@@ -96,6 +99,7 @@ public class DefaultQueueInfoDelegate implements QueueInfoDelegate
         }
     }
 
+    @Override
     public Serializable peek() throws InterruptedException
     {
         if (Thread.interrupted())
@@ -115,6 +119,7 @@ public class DefaultQueueInfoDelegate implements QueueInfoDelegate
         }
     }
 
+    @Override
     public void untake(Serializable item) throws InterruptedException
     {
         if (Thread.interrupted())

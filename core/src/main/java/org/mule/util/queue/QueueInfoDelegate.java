@@ -36,7 +36,6 @@ public interface QueueInfoDelegate
      */
     Serializable peek() throws InterruptedException;
 
-
     /**
      * Restore a previously removed member to the front of the queue
      */
@@ -46,5 +45,4 @@ public interface QueueInfoDelegate
      * Return the size of the queue
      */
     int getSize();
-
 }

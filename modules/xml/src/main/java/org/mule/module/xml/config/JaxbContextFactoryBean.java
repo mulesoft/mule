@@ -18,21 +18,21 @@ import org.springframework.beans.factory.config.AbstractFactoryBean;
 /**
  * TODO
  */
-public class JaxbContextFactoryBean extends AbstractFactoryBean
+public class JaxbContextFactoryBean extends AbstractFactoryBean<JAXBContext>
 {
     private String packageNames;
     private String name;
 
     @Override
-    public Class getObjectType()
+    public Class<?> getObjectType()
     {
         return JAXBContext.class;
     }
 
     @Override
-    protected Object createInstance() throws Exception
+    protected JAXBContext createInstance() throws Exception
     {
-        if(packageNames==null)
+        if (packageNames == null)
         {
             throw new IllegalArgumentException(CoreMessages.objectIsNull("packageNames").getMessage());
         }

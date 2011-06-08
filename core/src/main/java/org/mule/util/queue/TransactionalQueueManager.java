@@ -46,6 +46,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     private MuleContext muleContext;
     private Set<ListableObjectStore> stores = new HashSet<ListableObjectStore>();
 
+    @Override
     public synchronized QueueSession getQueueSession()
     {
         return new TransactionalQueueSession(this, this);
@@ -61,12 +62,14 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         return this.defaultQueueConfiguration;
     }
 
+    @Override
     public synchronized void setDefaultQueueConfiguration(QueueConfiguration config)
     {
         this.defaultQueueConfiguration = config;
         addStore(config.objectStore);
     }
 
+    @Override
     public synchronized void setQueueConfiguration(String queueName, QueueConfiguration config)
     {
         getQueue(queueName).setConfig(config);
@@ -275,6 +278,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         }
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
