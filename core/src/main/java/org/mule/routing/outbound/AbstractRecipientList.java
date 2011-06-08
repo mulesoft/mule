@@ -16,7 +16,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.api.processor.MessageRouter;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutingException;
@@ -24,13 +23,9 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.routing.CorrelationMode;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>AbstractRecipientList</code> is used to dispatch a single event to
@@ -38,24 +33,18 @@ import org.apache.commons.logging.LogFactory;
  * configured statically or can be obtained from the message payload.
  */
 
-public abstract class AbstractRecipientList extends FilteringOutboundRouter implements MessageRouter
+public abstract class AbstractRecipientList extends FilteringOutboundRouter
 {
-    /**
-     * logger used by this class
-     */
-    protected final Log logger = LogFactory.getLog(getClass());
-
-    private final ConcurrentMap recipientCache = new ConcurrentHashMap();
+    private final ConcurrentMap<Object, OutboundEndpoint> recipientCache = new ConcurrentHashMap<Object, OutboundEndpoint>();
 
     private Boolean synchronous;
 
     @Override
-    public MuleEvent route(MuleEvent event)
-        throws RoutingException
+    public MuleEvent route(MuleEvent event) throws RoutingException
     {
         MuleMessage message = event.getMessage();
 
-        List recipients = this.getRecipients(event);
+        List<Object> recipients = getRecipients(event);
         List<MuleEvent> results = new ArrayList<MuleEvent>();
         
         if (enableCorrelation != CorrelationMode.NEVER)
@@ -73,15 +62,11 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
         }
 
         OutboundEndpoint endpoint = null;
-        MuleMessage request;
-
-        for (Iterator iterator = recipients.iterator(); iterator.hasNext();)
+        for (Object recipient : recipients)
         {
-            Object recipient = iterator.next();
             // Make a copy of the message. Question is do we do a proper clone? in
-            // which case there
-            // would potentially be multiple messages with the same id...
-            request = new DefaultMuleMessage(message.getPayload(), message, muleContext);
+            // which case there would potentially be multiple messages with the same id...
+            MuleMessage request = new DefaultMuleMessage(message.getPayload(), message, muleContext);
             try
             {
                 endpoint = getRecipientEndpoint(request, recipient);
@@ -127,7 +112,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
             throw new RegistrationException(MessageFactory.createStaticMessage("Failed to create endpoint for: " + recipient));
         }
 
-        OutboundEndpoint existingEndpoint = (OutboundEndpoint) recipientCache.putIfAbsent(recipient, endpoint);
+        OutboundEndpoint existingEndpoint = recipientCache.putIfAbsent(recipient, endpoint);
         if (existingEndpoint != null)
         {
             endpoint = existingEndpoint;
@@ -153,7 +138,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
     protected OutboundEndpoint getRecipientEndpointFromString(MuleMessage message, String recipient)
             throws MuleException
     {
-        OutboundEndpoint endpoint = (OutboundEndpoint) recipientCache.get(recipient);
+        OutboundEndpoint endpoint = recipientCache.get(recipient);
         if (null == endpoint && null != getMuleContext() && null != getMuleContext().getRegistry())
         {
             endpoint = getMuleContext().getEndpointFactory().getOutboundEndpoint(recipient);
@@ -177,6 +162,6 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter impl
         return true;
     }
 
-    protected abstract List getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException;
+    protected abstract List<Object> getRecipients(MuleEvent event) throws CouldNotRouteOutboundMessageException;
 
 }

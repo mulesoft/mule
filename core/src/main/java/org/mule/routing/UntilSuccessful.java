@@ -10,9 +10,6 @@
 
 package org.mule.routing;
 
-import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
@@ -33,12 +30,17 @@ import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 
+import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
+
 /**
- * UntilSuccessful attempts to route a message to the message processor it contains in an asynchronous manner. Routing
- * is considered successful if no exception has been raised and, optionally, if the response matches an expression.
- * UntilSuccessful can optionally be configured to synchronously return an acknowledgment message when it has scheduled
- * the event for processing. UntilSuccessful is backed by a {@link ListableObjectStore} for storing the events that are
- * pending (re)processing.
+ * UntilSuccessful attempts to route a message to the message processor it contains
+ * in an asynchronous manner. Routing is considered successful if no exception has
+ * been raised and, optionally, if the response matches an expression.
+ * UntilSuccessful can optionally be configured to synchronously return an
+ * acknowledgment message when it has scheduled the event for processing.
+ * UntilSuccessful is backed by a {@link ListableObjectStore} for storing the events
+ * that are pending (re)processing.
  */
 public class UntilSuccessful extends AbstractOutboundRouter
 {
@@ -150,6 +152,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
         scheduleAllPendingEventsForProcessing();
     }
 
+    @Override
     public boolean isMatch(MuleMessage message) throws MuleException
     {
         return true;
@@ -212,11 +215,13 @@ public class UntilSuccessful extends AbstractOutboundRouter
     {
         RetryCallback callback = new RetryCallback()
         {
+            @Override
             public String getWorkDescription()
             {
                 return "Until successful processing of event stored under key: " + eventStoreKey;
             }
 
+            @Override
             public void doWork(RetryContext context) throws Exception
             {
                 retrieveAndProcessEvent(eventStoreKey);
@@ -229,11 +234,13 @@ public class UntilSuccessful extends AbstractOutboundRouter
         RetryPolicyTemplate retryPolicyTemplate = new AsynchronousRetryTemplate(simpleRetryPolicyTemplate);
         retryPolicyTemplate.setNotifier(new RetryNotifier()
         {
+            @Override
             public void onSuccess(RetryContext context)
             {
                 removeFromStore(eventStoreKey);
             }
 
+            @Override
             public void onFailure(RetryContext context, Throwable e)
             {
                 incrementProcessAttemptCountOrRemoveFromStore(eventStoreKey);

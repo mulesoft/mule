@@ -88,12 +88,12 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
         super.setFilter(filter);
     }
 
-    protected void addEventHandlers(XPathBuilder builder, Filter filter)
+    protected void addEventHandlers(XPathBuilder xpathBuilder, Filter filter)
     {
         if (filter instanceof SxcFilter)
         {
             SxcFilter sxcFilter = ((SxcFilter) filter);
-            sxcFilter.addEventHandler(this, builder);
+            sxcFilter.addEventHandler(this, xpathBuilder);
         }
         else if (filter instanceof AndFilter)
         {
@@ -101,7 +101,7 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
 
             for (Iterator<?> itr = f.getFilters().iterator(); itr.hasNext();)
             {
-                addEventHandlers(builder, (Filter) itr.next());
+                addEventHandlers(xpathBuilder, (Filter) itr.next());
             }
         }
         else if (filter instanceof OrFilter)
@@ -110,14 +110,14 @@ public class SxcFilteringOutboundRouter extends FilteringOutboundRouter
 
             for (Iterator<?> itr = f.getFilters().iterator(); itr.hasNext();)
             {
-                addEventHandlers(builder, (Filter) itr.next());
+                addEventHandlers(xpathBuilder, (Filter) itr.next());
             }
         }
         else if (filter instanceof NotFilter)
         {
             NotFilter f = (NotFilter) filter;
 
-            addEventHandlers(builder, f.getFilter());
+            addEventHandlers(xpathBuilder, f.getFilter());
         }
         else
         {

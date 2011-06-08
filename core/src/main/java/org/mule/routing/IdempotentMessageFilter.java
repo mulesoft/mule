@@ -27,11 +27,14 @@ import org.mule.util.store.InMemoryObjectStore;
 import java.text.MessageFormat;
 
 /**
- * <code>IdempotentMessageFilter</code> ensures that only unique messages are passed on. It does this by
- * checking the unique ID of the incoming message. Note that the underlying endpoint must support unique
- * message IDs for this to work, otherwise a <code>UniqueIdNotSupportedException</code> is thrown.<br>
+ * <code>IdempotentMessageFilter</code> ensures that only unique messages are passed
+ * on. It does this by checking the unique ID of the incoming message. Note that the
+ * underlying endpoint must support unique message IDs for this to work, otherwise a
+ * <code>UniqueIdNotSupportedException</code> is thrown.<br>
  * <p>
- * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/IdempotentReceiver.html">http://www.eaipatterns.com/IdempotentReceiver.html</a>
+ * <b>EIP Reference:</b> <a
+ * href="http://www.eaipatterns.com/IdempotentReceiver.html">
+ * http://www.eaipatterns.com/IdempotentReceiver.html</a>
  */
 public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor implements FlowConstructAware, Initialisable
 {
@@ -50,11 +53,12 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
         super();
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         if (store == null)
         {
-            this.store = this.createMessageIdStore();
+            this.store = createMessageIdStore();
         }
     }
 
@@ -72,8 +76,8 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
     @Override
     protected MuleEvent processNext(MuleEvent event) throws MuleException
     {
-        String id = this.getIdForEvent(event);
-        String value = this.getValueForEvent(event);
+        String id = getIdForEvent(event);
+        String value = getValueForEvent(event);
         try
         {
             store.store(id, value);
@@ -161,6 +165,7 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
         }
     }
 
+    @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;
@@ -175,5 +180,4 @@ public class IdempotentMessageFilter extends AbstractFilteringMessageProcessor i
     {
         this.valueExpression = valueExpression;
     }
-
 }

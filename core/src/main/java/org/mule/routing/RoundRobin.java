@@ -21,13 +21,12 @@ import org.mule.routing.outbound.AbstractOutboundRouter;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-
 /**
- * RoundRobin divides the messages it receives among its target routes in round-robin fashion. This includes messages
- * received on all threads, so there is no guarantee that messages received from a splitter are sent to consecutively
- * numbered targets. 
+ * RoundRobin divides the messages it receives among its target routes in round-robin
+ * fashion. This includes messages received on all threads, so there is no guarantee
+ * that messages received from a splitter are sent to consecutively numbered targets.
  */
-public class RoundRobin extends AbstractOutboundRouter implements MessageProcessor
+public class RoundRobin extends AbstractOutboundRouter
 {
     /** Index of target route to use */
     AtomicInteger index = new AtomicInteger(0);
@@ -35,14 +34,16 @@ public class RoundRobin extends AbstractOutboundRouter implements MessageProcess
     /**
      *  Process the event using the next target route in sequence
      */
+    @Override
     public MuleEvent route(MuleEvent event) throws MessagingException
     {
-        int index = getAndIncrementModuloN(routes.size());
-        if (index < 0)
+        int modulo = getAndIncrementModuloN(routes.size());
+        if (modulo < 0)
         {
             throw new CouldNotRouteOutboundMessageException(event, this);
         }
-        MessageProcessor mp = routes.get(index);
+        
+        MessageProcessor mp = routes.get(modulo);
         try
         {
             return mp.process(event);
@@ -73,6 +74,7 @@ public class RoundRobin extends AbstractOutboundRouter implements MessageProcess
         }
     }
 
+    @Override
     public boolean isMatch(MuleMessage message) throws MuleException
     {
         return true;

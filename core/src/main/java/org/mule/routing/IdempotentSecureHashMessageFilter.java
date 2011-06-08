@@ -44,9 +44,11 @@ public class IdempotentSecureHashMessageFilter extends IdempotentMessageFilter
     {
         try
         {
+            Object payload = event.getMessage().getPayload();
+            byte[] bytes = (byte[]) objectToByteArray.transform(payload);
             MessageDigest md = MessageDigest.getInstance(messageDigestAlgorithm);
-            return (String)byteArrayToHexString.transform(md.digest((byte[]) objectToByteArray.transform(event.getMessage()
-                .getPayload())));
+            byte[] digestedBytes = md.digest(bytes);
+            return (String)byteArrayToHexString.transform(digestedBytes);
         }
         catch (NoSuchAlgorithmException nsa)
         {
