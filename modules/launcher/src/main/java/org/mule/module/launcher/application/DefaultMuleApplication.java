@@ -24,10 +24,8 @@ import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.NotificationException;
 import org.mule.module.launcher.AbstractFileWatcher;
-import org.mule.module.launcher.AppBloodhound;
 import org.mule.module.launcher.ApplicationMuleContextBuilder;
 import org.mule.module.launcher.ConfigChangeMonitorThreadFactory;
-import org.mule.module.launcher.DefaultAppBloodhound;
 import org.mule.module.launcher.DefaultMuleSharedDomainClassLoader;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentService;
@@ -72,33 +70,22 @@ public class DefaultMuleApplication implements Application
 
     protected ScheduledExecutorService watchTimer;
 
-    private String appName;
     private MuleContext muleContext;
     private ClassLoader deploymentClassLoader;
     private ApplicationDescriptor descriptor;
 
     protected String[] absoluteResourcePaths;
 
-    protected DefaultMuleApplication(String appName)
+    protected DefaultMuleApplication(ApplicationDescriptor appDesc)
     {
-        this.appName = appName;
+        this.descriptor = appDesc;
     }
 
     public void install()
     {
         if (logger.isInfoEnabled())
         {
-            logger.info(miniSplash(String.format("New app '%s'", appName)));
-        }
-
-        AppBloodhound bh = new DefaultAppBloodhound();
-        try
-        {
-            descriptor = bh.fetch(getAppName());
-        }
-        catch (IOException e)
-        {
-            throw new InstallException(MessageFactory.createStaticMessage("Failed to parse the application deployment descriptor"), e);
+            logger.info(miniSplash(String.format("New app '%s'", descriptor.getAppName())));
         }
 
         // convert to absolute paths
@@ -123,7 +110,7 @@ public class DefaultMuleApplication implements Application
 
     public String getAppName()
     {
-        return appName;
+        return descriptor.getAppName();
     }
 
     public ApplicationDescriptor getDescriptor()
@@ -133,14 +120,14 @@ public class DefaultMuleApplication implements Application
 
     public void setAppName(String appName)
     {
-        this.appName = appName;
+        this.descriptor.setAppName(appName);
     }
 
     public void start()
     {
         if (logger.isInfoEnabled())
         {
-            logger.info(miniSplash(String.format("Starting app '%s'", appName)));
+            logger.info(miniSplash(String.format("Starting app '%s'", descriptor.getAppName())));
         }
 
         try
@@ -156,7 +143,7 @@ public class DefaultMuleApplication implements Application
             try
             {
                 Thread.currentThread().setContextClassLoader(null);
-                deployLogger.info(miniSplash(String.format("Started app '%s'", appName)));
+                deployLogger.info(miniSplash(String.format("Started app '%s'", descriptor.getAppName())));
             }
             finally
             {
@@ -183,7 +170,7 @@ public class DefaultMuleApplication implements Application
     {
         if (logger.isInfoEnabled())
         {
-            logger.info(miniSplash(String.format("Initializing app '%s'", appName)));
+            logger.info(miniSplash(String.format("Initializing app '%s'", descriptor.getAppName())));
         }
 
         try
@@ -308,7 +295,7 @@ public class DefaultMuleApplication implements Application
     {
         if (logger.isInfoEnabled())
         {
-            logger.info(miniSplash(String.format("Redeploying app '%s'", appName)));
+            logger.info(miniSplash(String.format("Redeploying app '%s'", descriptor.getAppName())));
         }
         dispose();
         install();
@@ -333,7 +320,7 @@ public class DefaultMuleApplication implements Application
         }
         if (logger.isInfoEnabled())
         {
-            logger.info(miniSplash(String.format("Stopping app '%s'", appName)));
+            logger.info(miniSplash(String.format("Stopping app '%s'", descriptor.getAppName())));
         }
         try
         {
@@ -342,7 +329,7 @@ public class DefaultMuleApplication implements Application
         catch (MuleException e)
         {
             // TODO add app name to the exception field
-            throw new DeploymentStopException(MessageFactory.createStaticMessage(appName), e);
+            throw new DeploymentStopException(MessageFactory.createStaticMessage(descriptor.getAppName()), e);
         }
     }
 
@@ -350,7 +337,7 @@ public class DefaultMuleApplication implements Application
     public String toString()
     {
         return String.format("%s[%s]@%s", getClass().getName(),
-                             appName,
+                             descriptor.getAppName(),
                              Integer.toHexString(System.identityHashCode(this)));
     }
 
@@ -360,7 +347,7 @@ public class DefaultMuleApplication implements Application
         {
             if (logger.isInfoEnabled())
             {
-                logger.info(String.format("App '%s' never started, nothing to dispose of", appName));
+                logger.info(String.format("App '%s' never started, nothing to dispose of", descriptor.getAppName()));
             }
             return;
         }
@@ -379,7 +366,7 @@ public class DefaultMuleApplication implements Application
         }
         if (logger.isInfoEnabled())
         {
-            logger.info(miniSplash(String.format("Disposing app '%s'", appName)));
+            logger.info(miniSplash(String.format("Disposing app '%s'", descriptor.getAppName())));
         }
 
         muleContext.dispose();
@@ -409,7 +396,7 @@ public class DefaultMuleApplication implements Application
             parent = cl;
         }
 
-        final MuleApplicationClassLoader appCl = new MuleApplicationClassLoader(appName,
+        final MuleApplicationClassLoader appCl = new MuleApplicationClassLoader(descriptor.getAppName(),
                                                                                 parent,
                                                                                 descriptor.getLoaderOverride());
         this.deploymentClassLoader = appCl;
@@ -452,7 +439,7 @@ public class DefaultMuleApplication implements Application
     protected void scheduleConfigMonitor(AbstractFileWatcher watcher)
     {
         final int reloadIntervalMs = DEFAULT_RELOAD_CHECK_INTERVAL_MS;
-        watchTimer = Executors.newSingleThreadScheduledExecutor(new ConfigChangeMonitorThreadFactory(appName));
+        watchTimer = Executors.newSingleThreadScheduledExecutor(new ConfigChangeMonitorThreadFactory(descriptor.getAppName()));
 
         watchTimer.scheduleWithFixedDelay(watcher, reloadIntervalMs, reloadIntervalMs, TimeUnit.MILLISECONDS);
 

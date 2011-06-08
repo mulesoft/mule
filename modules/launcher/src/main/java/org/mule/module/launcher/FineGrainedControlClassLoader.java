@@ -44,7 +44,11 @@ public class FineGrainedControlClassLoader extends GoodCitizenClassLoader
     public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent, Set<String> overrides)
     {
         super(urls, parent);
+        processOverrides(overrides);
+    }
 
+    protected void processOverrides(Set<String> overrides)
+    {
         if (overrides != null && !overrides.isEmpty())
         {
             for (String override : overrides)

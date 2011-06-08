@@ -10,7 +10,7 @@
 
 package org.mule.module.launcher.plugin;
 
-import org.mule.module.launcher.application.Application;
+import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +18,7 @@ import java.util.Set;
 public class PluginDescriptor
 {
     private Set<String> loaderOverride = new HashSet<String>();
-    private Application application;
+    private ApplicationDescriptor appDescriptor;
     private String name;
     private PluginClasspath classpath = new PluginClasspath();
 
@@ -32,17 +32,14 @@ public class PluginDescriptor
         this.loaderOverride = loaderOverride;
     }
 
-    /**
-     * @return owning application ref or null for container-level (system) plugin
-     */
-    public Application getApplication()
+    public ApplicationDescriptor getAppDescriptor()
     {
-        return application;
+        return appDescriptor;
     }
 
-    public void setApplication(Application application)
+    public void setAppDescriptor(ApplicationDescriptor appDescriptor)
     {
-        this.application = application;
+        this.appDescriptor = appDescriptor;
     }
 
     public String getName()

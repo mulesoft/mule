@@ -13,10 +13,9 @@ package org.mule.module.launcher.plugin;
 import org.mule.module.launcher.FineGrainedControlClassLoader;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 public class MulePluginsClassLoader extends FineGrainedControlClassLoader
 {
@@ -29,7 +28,6 @@ public class MulePluginsClassLoader extends FineGrainedControlClassLoader
     public MulePluginsClassLoader(ClassLoader parent, Collection<PluginDescriptor> plugins)
     {
         super(new URL[0], parent);
-        List<URL> urls = new ArrayList<URL>();
         for (PluginDescriptor plugin : plugins)
         {
             final URL[] pluginUrls = plugin.getClasspath().toURLs();
@@ -37,6 +35,9 @@ public class MulePluginsClassLoader extends FineGrainedControlClassLoader
             {
                 addURL(pluginUrl);
             }
+
+            final Set<String> override = plugin.getLoaderOverride();
+            processOverrides(override);
         }
     }
 }

@@ -40,14 +40,14 @@ public class ApplicationFactory
         final ApplicationDescriptor descriptor = bh.fetch(appName);
         if (descriptor.isPrivileged())
         {
-            final PriviledgedMuleApplication delegate = new PriviledgedMuleApplication(appName);
+            final PriviledgedMuleApplication delegate = new PriviledgedMuleApplication(descriptor);
             delegate.setDeploymentService(deploymentService);
             delegate.setCoreExtensions(coreExtensions);
             return new ApplicationWrapper(delegate);
         }
         else
         {
-            return new ApplicationWrapper(new DefaultMuleApplication(appName));
+            return new ApplicationWrapper(new DefaultMuleApplication(descriptor));
         }
     }
 }

@@ -43,7 +43,7 @@ public class ApplicationDescriptor
 
     private Set<String> loaderOverride = new HashSet<String>();
 
-    private Set<PluginDescriptor> plugins = new HashSet<PluginDescriptor>();
+    private Set<PluginDescriptor> plugins = new HashSet<PluginDescriptor>(0);
 
     public String getAppName()
     {

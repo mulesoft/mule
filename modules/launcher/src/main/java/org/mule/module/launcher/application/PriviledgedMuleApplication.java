@@ -15,6 +15,7 @@ import org.mule.api.registry.RegistrationException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.launcher.DeploymentInitException;
 import org.mule.module.launcher.DeploymentService;
+import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 
 import java.util.Map;
 
@@ -30,9 +31,9 @@ public class PriviledgedMuleApplication extends DefaultMuleApplication
     protected DeploymentService deploymentService;
     protected Map<Class<? extends MuleCoreExtension>, MuleCoreExtension> coreExtensions;
 
-    protected PriviledgedMuleApplication(String appName)
+    protected PriviledgedMuleApplication(ApplicationDescriptor appDescriptor)
     {
-        super(appName);
+        super(appDescriptor);
     }
 
     @Override
