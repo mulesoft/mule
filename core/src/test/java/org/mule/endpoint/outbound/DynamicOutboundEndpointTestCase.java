@@ -53,7 +53,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
-        testOutboundEvent = createTestOutboundEvent(endpoint);
+        testOutboundEvent = createTestOutboundEvent();
         //First Request creates the real endpoint
         endpoint.process(testOutboundEvent);
 
@@ -78,7 +78,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         OutboundEndpoint endpoint = createOutboundEndpoint( null, null, null,
             null, MessageExchangePattern.ONE_WAY, null);
 
-        testOutboundEvent = createTestOutboundEvent(endpoint);
+        testOutboundEvent = createTestOutboundEvent();
         //First Request creates the real endpoint
         endpoint.process(testOutboundEvent);
         Thread.sleep(1000);
@@ -102,7 +102,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
-        testOutboundEvent = createTestOutboundEvent(endpoint);
+        testOutboundEvent = createTestOutboundEvent();
         //First Request creates the real endpoint
         endpoint.process(testOutboundEvent);
 
@@ -131,7 +131,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
-        testOutboundEvent = createTestOutboundEvent(endpoint);
+        testOutboundEvent = createTestOutboundEvent();
         //First Request creates the real endpoint
         try
         {
@@ -170,7 +170,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
             MessageExchangePattern.REQUEST_RESPONSE, null);
-        MuleEvent outboundEvent = createTestOutboundEvent(endpoint);
+        MuleEvent outboundEvent = createTestOutboundEvent();
         endpoint.process(outboundEvent);
 
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
@@ -189,7 +189,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
             MessageExchangePattern.ONE_WAY, null);
-        MuleEvent outboundEvent = createTestOutboundEvent(endpoint);
+        MuleEvent outboundEvent = createTestOutboundEvent();
         endpoint.process(outboundEvent);
 
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
@@ -208,7 +208,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         
          assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
-        testOutboundEvent = createTestOutboundEvent(endpoint);
+        testOutboundEvent = createTestOutboundEvent();
         //First Request creates the real endpoint
         endpoint.process(testOutboundEvent);
 
@@ -228,7 +228,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
             MessageExchangePattern.REQUEST_RESPONSE, null);
-        testOutboundEvent = createTestOutboundEvent(endpoint);
+        testOutboundEvent = createTestOutboundEvent();
         // Force the creation of the real endpoint
         endpoint.process(testOutboundEvent);
         endpoint.getConnector().stop();
@@ -254,7 +254,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
         assertTrue(endpoint instanceof DynamicOutboundEndpoint);
 
-        testOutboundEvent = createTestOutboundEvent(endpoint);
+        testOutboundEvent = createTestOutboundEvent();
         testOutboundEvent.getMessage()
             .setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, testTimeout);
 

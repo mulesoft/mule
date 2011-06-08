@@ -58,7 +58,7 @@ public class GracefulShutdownTimeoutTestCase extends FunctionalTestCase
 
             }
         });
-        service.dispatchEvent(getTestInboundEvent("test"));
+        service.dispatchEvent(getTestEvent("test"));
         Thread.sleep(200);
         service.dispose();
         assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));

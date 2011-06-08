@@ -42,13 +42,13 @@ public class AxisWsdlMessageDispatcher extends AxisMessageDispatcher
 
     protected Service createService(MuleEvent event) throws Exception
     {
-        String wsdlUrl = event.getEndpoint().getEndpointURI().getAddress();
+        String wsdlUrl = endpoint.getEndpointURI().getAddress();
         // Parse the wsdl
         Parser parser = new Parser();
-        if (event.getEndpoint().getEndpointURI().getUserInfo() != null)
+        if (endpoint.getEndpointURI().getUserInfo() != null)
         {
-            parser.setUsername(event.getEndpoint().getEndpointURI().getUser());
-            parser.setPassword(event.getEndpoint().getEndpointURI().getPassword());
+            parser.setUsername(endpoint.getEndpointURI().getUser());
+            parser.setPassword(endpoint.getEndpointURI().getPassword());
         }
         parser.run(wsdlUrl);
         // Retrieves the defined services

@@ -137,7 +137,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         // TODO set connection timeout buffer etc
         try
         {
-            URI uri = event.getEndpoint().getEndpointURI().getUri();
+            URI uri = endpoint.getEndpointURI().getUri();
 
             this.processCookies(event);
 
@@ -183,8 +183,8 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         // precedence and is not available before send/dispatch.
         // Given that dispatchers are borrowed from a thread pool mutating client
         // here is ok even though it is not ideal.
-        client.getHttpConnectionManager().getParams().setConnectionTimeout(event.getTimeout());
-        client.getHttpConnectionManager().getParams().setSoTimeout(event.getTimeout());
+        client.getHttpConnectionManager().getParams().setConnectionTimeout(endpoint.getResponseTimeout());
+        client.getHttpConnectionManager().getParams().setSoTimeout(endpoint.getResponseTimeout());
         
         MuleMessage msg = event.getMessage();
         setPropertyFromEndpoint(event, msg, HttpConnector.HTTP_CUSTOM_HEADERS_MAP_PROPERTY);
@@ -210,7 +210,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         Object o = msg.getOutboundProperty(prop);
         if (o == null)
         {
-            o = event.getEndpoint().getProperty(prop);
+            o = endpoint.getProperty(prop);
             if (o != null)
             {
                 msg.setOutboundProperty(prop, o);

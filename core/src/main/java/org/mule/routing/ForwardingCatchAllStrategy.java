@@ -10,7 +10,6 @@
 
 package org.mule.routing;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
@@ -60,9 +59,6 @@ public class ForwardingCatchAllStrategy extends AbstractCatchAllStrategy
                 event.getMessage().applyTransformers(event, endpoint.getTransformers());
             }
 
-            // Recreate event with outbound endpoint incase anything uses event
-            // endpoint down the line
-            event = new DefaultMuleEvent(event.getMessage(), endpoint, event.getFlowConstruct(), event);
             MuleEvent result = endpoint.process(event);
             if (statistics != null && statistics.isEnabled())
             {

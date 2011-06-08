@@ -44,21 +44,21 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
     @Override
     protected synchronized void doDispatch(MuleEvent event) throws Exception
     {
-        Socket socket = connector.getSocket(event.getEndpoint());
+        Socket socket = connector.getSocket(endpoint);
         try 
         {
             dispatchToSocket(socket, event);
         }
         finally 
         {
-            connector.releaseSocket(socket, event.getEndpoint());
+            connector.releaseSocket(socket, endpoint);
         }
     }
 
     @Override
     protected synchronized MuleMessage doSend(MuleEvent event) throws Exception
     {
-        Socket socket = connector.getSocket(event.getEndpoint());
+        Socket socket = connector.getSocket(endpoint);
         dispatchToSocket(socket, event);
 
         try 
@@ -84,7 +84,7 @@ public class TcpMessageDispatcher extends AbstractMessageDispatcher
                 {
                     // we don't necessarily expect to receive a response here
                     logger.info("Socket timed out normally while doing a synchronous receive on endpointUri: "
-                        + event.getEndpoint().getEndpointURI());
+                        + endpoint.getEndpointURI());
                     return new DefaultMuleMessage(NullPayload.getInstance(), connector.getMuleContext());
                 }
             }

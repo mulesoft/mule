@@ -10,26 +10,15 @@
 
 package org.mule.routing;
 
-import com.mockobjects.dynamic.Mock;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
-import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.routing.outbound.ListMessageSplitter;
-import org.mule.routing.outbound.OutboundRoutingTestEvent;
-import org.mule.routing.outbound.RouterTestUtils;
 import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.MuleTestUtils;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Orange;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,7 +63,7 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleTestCase
         splitter.setMuleContext(muleContext);
         Grabber grabber = new Grabber();
         splitter.setListener(grabber);
-        DefaultMuleEvent event = new DefaultMuleEvent(toSplit, getTestOutboundEndpoint("ep"), session);
+        DefaultMuleEvent event = new DefaultMuleEvent(toSplit, getTestInboundEndpoint("ep"), session);
         splitter.process(event);
         List<MuleMessage> splits =  grabber.getMessages();
         assertEquals(3, splits.size());

@@ -23,6 +23,7 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.Connector;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.endpoint.NullInboundEndpoint;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transport.AbstractConnector;
 import org.mule.transport.AbstractPollingMessageReceiver;
@@ -77,8 +78,8 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
             ep = (ImmutableEndpoint) sourceMessageProcessor;
         }
 
-        MuleEvent event = new DefaultMuleEvent(request, ep, new DefaultMuleSession(flowConstruct,
-            connector.getMuleContext()));
+        MuleEvent event = new DefaultMuleEvent(request, new NullInboundEndpoint(ep.getExchangePattern(),
+            connector.getMuleContext()), new DefaultMuleSession(flowConstruct, connector.getMuleContext()));
 
         MuleEvent sourceEvent = sourceMessageProcessor.process(event);
         if (sourceEvent != null)

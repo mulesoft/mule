@@ -20,7 +20,6 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
@@ -706,6 +705,15 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties);
     }
 
+    public static InboundEndpoint getTestInboundEndpoint(String name,
+                                                          String uri,
+                                                          List<Transformer> transformers,
+                                                          Filter filter,
+                                                          Map<Object, Object> properties) throws Exception
+    {
+        return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, transformers, filter, properties);
+    }
+
     public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri, 
         List<Transformer> transformers, Filter filter, Map<Object, Object> properties, Connector connector) throws Exception
     {
@@ -737,20 +745,20 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestEvent(data, mep, muleContext);
     }
 
-    public static MuleEvent getTestInboundEvent(Object data, MuleSession session) throws Exception
+    public static MuleEvent getTestEvent(Object data, MuleSession session) throws Exception
     {
-        return MuleTestUtils.getTestInboundEvent(data, session, muleContext);
+        return MuleTestUtils.getTestEvent(data, session, muleContext);
     }
 
-    public static MuleEvent getTestInboundEvent(Object data) throws Exception
-    {
-        return MuleTestUtils.getTestInboundEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
-    }
-
-    public static MuleEvent getTestInboundEvent(Object data, MessageExchangePattern mep) throws Exception
-    {
-        return MuleTestUtils.getTestInboundEvent(data, mep, muleContext);
-    }
+//    public static MuleEvent getTestInboundEvent(Object data) throws Exception
+//    {
+//        return MuleTestUtils.getTestInboundEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
+//    }
+//
+//    public static MuleEvent getTestInboundEvent(Object data, MessageExchangePattern mep) throws Exception
+//    {
+//        return MuleTestUtils.getTestInboundEvent(data, mep, muleContext);
+//    }
 
     public static MuleEventContext getTestEventContext(Object data) throws Exception
     {
@@ -767,12 +775,12 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestTransformer();
     }
 
-    public static MuleEvent getTestEvent(Object data, ImmutableEndpoint endpoint) throws Exception
+    public static MuleEvent getTestEvent(Object data, InboundEndpoint endpoint) throws Exception
     {
         return MuleTestUtils.getTestEvent(data, endpoint, muleContext);
     }
 
-    public static MuleEvent getTestEvent(Object data, Service service, ImmutableEndpoint endpoint)
+    public static MuleEvent getTestEvent(Object data, Service service, InboundEndpoint endpoint)
             throws Exception
     {
         return MuleTestUtils.getTestEvent(data, service, endpoint, muleContext);

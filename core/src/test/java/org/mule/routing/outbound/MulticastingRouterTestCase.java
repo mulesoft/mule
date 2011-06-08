@@ -60,7 +60,7 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
         mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+        router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
         mockendpoint1.verify();
         mockendpoint2.verify();
 
@@ -96,11 +96,11 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
 
-        MuleEvent event = new OutboundRoutingTestEvent(message, null);
+        MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
         mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
         assertNotNull(result);
         MuleMessage resultMessage = result.getMessage();
         assertNotNull(resultMessage);
@@ -138,11 +138,11 @@ public class MulticastingRouterTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
 
         assertTrue(router.isMatch(message));
-        MuleEvent event = new OutboundRoutingTestEvent(message, null);
+        MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
         mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
         assertNotNull(result);
         assertEquals(getPayload(message), getPayload(result.getMessage()));
         mockendpoint1.verify();

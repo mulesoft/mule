@@ -49,7 +49,7 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase
     public void testNoInfiniteLoop() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        client.send("InputQueueClient2", "payload", null);
+        client.dispatch("InputQueueClient2", "payload", null);
 
         Thread.sleep(500);
         

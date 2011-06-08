@@ -92,7 +92,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
             if (isAuthenticate())
             {
                 throw new UnauthorisedException(event, event.getSession().getSecurityContext(),
-                    event.getEndpoint(), this);
+                    endpoint, this);
             }
             else
             {

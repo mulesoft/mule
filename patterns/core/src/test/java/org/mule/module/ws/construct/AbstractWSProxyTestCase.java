@@ -66,7 +66,7 @@ public abstract class AbstractWSProxyTestCase extends AbstractFlowConstuctTestCa
     {
         startWsProxy();
 
-        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent(
+        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent(
             "hello", muleContext));
 
         assertEquals("hello", response.getMessageAsString());
@@ -93,7 +93,7 @@ public abstract class AbstractWSProxyTestCase extends AbstractFlowConstuctTestCa
             }
         });
 
-        final MuleEvent event = MuleTestUtils.getTestInboundEvent("hello", muleContext);
+        final MuleEvent event = MuleTestUtils.getTestEvent("hello", muleContext);
         event.getMessage().setProperty("http.request", "test://foo?WSDL", PropertyScope.INBOUND);
         final MuleEvent response = directInboundMessageSource.process(event);
 
@@ -103,7 +103,7 @@ public abstract class AbstractWSProxyTestCase extends AbstractFlowConstuctTestCa
     public void testProcessHttpServiceRequest() throws Exception
     {
         startWsProxy();
-        final MuleEvent event = MuleTestUtils.getTestInboundEvent("hello", muleContext);
+        final MuleEvent event = MuleTestUtils.getTestEvent("hello", muleContext);
         event.getMessage().setProperty("http.request", "http://foo", PropertyScope.INBOUND);
         final MuleEvent response = directInboundMessageSource.process(event);
 

@@ -164,15 +164,15 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         final ItemNodeConstraint itemNodeConstraint = new ItemNodeConstraint();
         mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
         mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        asyncXmlSplitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        asyncXmlSplitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
         mockendpoint1.verify();
         mockendpoint2.verify();
 
         message = new DefaultMuleMessage(payload, muleContext);
-        MuleEvent event = new OutboundRoutingTestEvent(message, null);
+        MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
         mockendpoint4.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint5.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        MuleEvent result = syncXmlSplitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        MuleEvent result = syncXmlSplitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
         MuleMessage resultMessage = result.getMessage();
         assertNotNull(resultMessage);
         assertNotNull(result);
@@ -199,7 +199,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         assertTrue(splitter.isMatch(message));
         try
         {
-            splitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+            splitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
             fail("Should have thrown an exception, because XSD is not found.");
         }
         catch (IllegalArgumentException iaex)
@@ -222,7 +222,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
 
         try
         {
-            splitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+            splitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
             fail("No exception thrown.");
         }
         catch (IllegalArgumentException iaex)
@@ -244,7 +244,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
 
         try
         {
-            splitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+            splitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
             fail("No exception thrown.");
         }
         catch (IllegalArgumentException iaex)

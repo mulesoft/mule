@@ -37,7 +37,7 @@ public class OutboundEndpointMessageProcessorsTestCase extends AbstractMessagePr
         super.doSetUp();
         endpoint = createOutboundEndpoint(null, null, null, null, 
             MessageExchangePattern.REQUEST_RESPONSE, null);
-        testOutboundEvent = createTestOutboundEvent(endpoint);
+        testOutboundEvent = createTestOutboundEvent();
     }
 
     public void testProcessors() throws Exception

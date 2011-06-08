@@ -10,10 +10,10 @@
        http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd">
 
     <endpoint name="out1" address="${outbound.destination}" connector-ref="jmsConnector1"
-        exchange-pattern="one-way"/>
+        exchange-pattern="request-response"/>
 
     <endpoint name="out2" address="${outbound.destination}" connector-ref="jmsConnector2"
-        exchange-pattern="one-way">
+        exchange-pattern="request-response">
         <properties>
             <spring:entry key="disableTemporaryReplyToDestinations" value="true" />
             <spring:entry key="returnOriginalMessageAsReply" value="true" />
@@ -21,5 +21,15 @@
     </endpoint>
 
     <endpoint name="out3" address="${outbound.destination}" connector-ref="jmsConnector2"
-        exchange-pattern="one-way"/>
+        exchange-pattern="request-response"/>
+        
+    <model name="model">
+        <service name="out3echo">
+            <inbound>
+                <inbound-endpoint ref="out3"/>
+            </inbound>
+            <echo-component/>
+        </service>
+    </model>
+
 </mule>

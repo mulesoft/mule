@@ -17,7 +17,6 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageDispatcher;
-import org.mule.endpoint.MuleEndpointURI;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.outbound.FilteringOutboundRouter;
@@ -29,8 +28,6 @@ import org.mule.util.CollectionUtils;
 import com.mockobjects.constraint.Constraint;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
-
-import java.util.HashMap;
 
 public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 {
@@ -57,10 +54,6 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         MuleEvent event = getTestEvent("UncaughtEvent");
         strategy.setEndpoint((OutboundEndpoint) endpoint.proxy());
 
-        endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
-        endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
-        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
-        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
         endpoint.expect("process", C.isA(DefaultMuleEvent.class));
 
         strategy.process(event);
@@ -119,10 +112,6 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
 
         endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
         endpoint.expectAndReturn("getTransformers", CollectionUtils.singletonList(new TestEventTransformer()));
-        endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
-        endpoint.expectAndReturn("getProperties", new HashMap<Object, Object>());
-        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
-        endpoint.expectAndReturn("getEndpointURI", new MuleEndpointURI("test://dummy", muleContext));
         endpoint.expect("process", new Constraint()
         {
             public boolean eval(Object object)

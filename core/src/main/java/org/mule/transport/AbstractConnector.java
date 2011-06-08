@@ -57,6 +57,7 @@ import org.mule.config.i18n.MessageFactory;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.context.notification.OptimisedNotificationHandler;
+import org.mule.endpoint.EndpointAware;
 import org.mule.endpoint.outbound.OutboundNotificationMessageProcessor;
 import org.mule.model.streaming.DelegatingInputStream;
 import org.mule.processor.OptionalAsyncInterceptingMessageProcessor;
@@ -2426,20 +2427,22 @@ public abstract class AbstractConnector implements Connector, WorkListener
     {
         if (endpoint.getExchangePattern().hasResponse() || !getDispatcherThreadingProfile().isDoThreading())
         {
-            return new DispatcherMessageProcessor();
+            return new DispatcherMessageProcessor(endpoint);
         }
         else
         {
             DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
             builder.setName("dispatcher processor chain for '" + endpoint.getAddress() + "'");
-            builder.chain(new OptionalAsyncInterceptingMessageProcessor(new WorkManagerSource()
+            OptionalAsyncInterceptingMessageProcessor async = new OptionalAsyncInterceptingMessageProcessor(new WorkManagerSource()
             {
                 public WorkManager getWorkManager() throws MuleException
                 {
                     return getDispatcherWorkManager();
                 }
-            }));
-            builder.chain(new DispatcherMessageProcessor());
+            });
+            ((EndpointAware)async).setEndpoint(endpoint);
+            builder.chain(async);
+            builder.chain(new DispatcherMessageProcessor(endpoint));
             return builder.build();
         }
     }
@@ -2483,10 +2486,15 @@ public abstract class AbstractConnector implements Connector, WorkListener
     class DispatcherMessageProcessor implements MessageProcessor
     {
         private MessageProcessor notificationMessageProcessor;
+        private OutboundEndpoint endpoint;
 
+        public DispatcherMessageProcessor(OutboundEndpoint endpoint)
+        {
+           this.endpoint = endpoint;
+        }
+        
         public MuleEvent process(MuleEvent event) throws MuleException
         {
-            OutboundEndpoint endpoint = (OutboundEndpoint) event.getEndpoint();
             MessageDispatcher dispatcher = null;
             try
             {

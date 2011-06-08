@@ -10,14 +10,14 @@
 
 package org.mule.construct;
 
-import java.util.Collections;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.Connector;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.tck.MuleTestUtils;
+
+import java.util.Collections;
 
 public class ValidatorTestCase extends AbstractFlowConstuctTestCase
 {
@@ -50,7 +50,7 @@ public class ValidatorTestCase extends AbstractFlowConstuctTestCase
     {
         validator.initialise();
         validator.start();
-        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent(
+        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent(
             Integer.valueOf(123), muleContext));
 
         assertEquals("GOOD:123", response.getMessageAsString());
@@ -60,7 +60,7 @@ public class ValidatorTestCase extends AbstractFlowConstuctTestCase
     {
         validator.initialise();
         validator.start();
-        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent(
+        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent(
             "abc", muleContext));
 
         assertEquals("BAD:abc", response.getMessageAsString());
@@ -92,7 +92,7 @@ public class ValidatorTestCase extends AbstractFlowConstuctTestCase
 
         validator.initialise();
         validator.start();
-        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent(123,
+        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent(123,
             muleContext));
 
         assertEquals("ERROR:123", response.getMessageAsString());

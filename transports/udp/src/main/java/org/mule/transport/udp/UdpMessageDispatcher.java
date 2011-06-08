@@ -93,30 +93,28 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
     @Override
     protected synchronized void doDispatch(MuleEvent event) throws Exception
     {
-        ImmutableEndpoint ep = event.getEndpoint();
-
-        DatagramSocket socket = connector.getSocket(ep);
+        DatagramSocket socket = connector.getSocket(endpoint);
         try
         {
             byte[] payload = event.transformMessage(DataType.BYTE_ARRAY_DATA_TYPE);
 
-            int port = ep.getEndpointURI().getPort();
+            int port = endpoint.getEndpointURI().getPort();
             InetAddress inetAddress = null;
             //TODO, check how expensive this operation is
-            if("null".equalsIgnoreCase(ep.getEndpointURI().getHost()))
+            if("null".equalsIgnoreCase(endpoint.getEndpointURI().getHost()))
             {
                 inetAddress = InetAddress.getLocalHost();
             }
             else
             {
-                inetAddress = InetAddress.getByName(ep.getEndpointURI().getHost());
+                inetAddress = InetAddress.getByName(endpoint.getEndpointURI().getHost());
             }
 
             write(socket, payload, port, inetAddress);
         }
         finally
         {
-            connector.releaseSocket(socket, ep);
+            connector.releaseSocket(socket, endpoint);
         }
     }
 
@@ -136,9 +134,9 @@ public class UdpMessageDispatcher extends AbstractMessageDispatcher
     {
         doDispatch(event);
         // If we're doing sync receive try and read return info from socket
-        if (event.getEndpoint().getExchangePattern().hasResponse())
+        if (endpoint.getExchangePattern().hasResponse())
         {
-            DatagramSocket socket = connector.getSocket(event.getEndpoint());
+            DatagramSocket socket = connector.getSocket(endpoint);
             DatagramPacket result = receive(socket, event.getTimeout());
             if (result == null)
             {

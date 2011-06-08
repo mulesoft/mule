@@ -53,7 +53,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
             MessageExchangePattern.REQUEST_RESPONSE, null);
 
-        testOutboundEvent = createTestOutboundEvent(endpoint);
+        testOutboundEvent = createTestOutboundEvent();
         MuleEvent result = endpoint.process(testOutboundEvent);
 
         assertMessageSentSame(true);
@@ -74,7 +74,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
             MessageExchangePattern.ONE_WAY, null);
 
-        testOutboundEvent = createTestOutboundEvent(endpoint);
+        testOutboundEvent = createTestOutboundEvent();
         MuleEvent result = endpoint.process(testOutboundEvent);
 
         dispacher.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -87,7 +87,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         OutboundEndpoint endpoint = createOutboundEndpoint(null, new TestSecurityFilter(true), 
             null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
 
-        testOutboundEvent = createTestOutboundEvent(endpoint);
+        testOutboundEvent = createTestOutboundEvent();
         MuleEvent result = endpoint.process(testOutboundEvent);
 
         assertMessageSentSame(true);
@@ -110,7 +110,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         OutboundEndpoint endpoint = createOutboundEndpoint(null, new TestSecurityFilter(false), 
             null, null, MessageExchangePattern.REQUEST_RESPONSE, null);
 
-        testOutboundEvent = createTestOutboundEvent(endpoint);
+        testOutboundEvent = createTestOutboundEvent();
         RequestContext.setEvent(testOutboundEvent);
         try
         {
@@ -138,7 +138,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
             MessageExchangePattern.REQUEST_RESPONSE, null);
-        MuleEvent outboundEvent = createTestOutboundEvent(endpoint);
+        MuleEvent outboundEvent = createTestOutboundEvent();
         endpoint.process(outboundEvent);
 
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
@@ -157,7 +157,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
             MessageExchangePattern.ONE_WAY, null);
-        MuleEvent outboundEvent = createTestOutboundEvent(endpoint);
+        MuleEvent outboundEvent = createTestOutboundEvent();
         endpoint.process(outboundEvent);
 
         assertTrue(listener.latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
@@ -173,7 +173,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, new OutboundAppendTransformer(),
             new ResponseAppendTransformer(), MessageExchangePattern.REQUEST_RESPONSE, null);
-        MuleEvent outboundEvent = createTestOutboundEvent(endpoint);
+        MuleEvent outboundEvent = createTestOutboundEvent();
         MuleEvent result = endpoint.process(outboundEvent);
 
         assertMessageSent(true);
@@ -189,7 +189,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
             MessageExchangePattern.REQUEST_RESPONSE, null);
-        testOutboundEvent = createTestOutboundEvent(endpoint);
+        testOutboundEvent = createTestOutboundEvent();
         endpoint.getConnector().stop();
 
         try
@@ -210,7 +210,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
             MessageExchangePattern.REQUEST_RESPONSE, null);
-        testOutboundEvent = createTestOutboundEvent(endpoint);
+        testOutboundEvent = createTestOutboundEvent();
         testOutboundEvent.getMessage()
             .setOutboundProperty(MuleProperties.MULE_EVENT_TIMEOUT_PROPERTY, testTimeout);
 
@@ -225,7 +225,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         endpointBuilder.addMessageProcessor(new ObjectAwareProcessor());
 
         OutboundEndpoint endpoint = endpointBuilder.buildOutboundEndpoint();
-        endpoint.process(createTestOutboundEvent(endpoint));
+        endpoint.process(createTestOutboundEvent());
         
         ObjectAwareProcessor objectAware = (ObjectAwareProcessor) endpoint.getMessageProcessors().get(0);
         

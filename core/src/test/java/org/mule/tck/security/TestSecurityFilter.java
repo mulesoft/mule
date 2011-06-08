@@ -33,21 +33,11 @@ public class TestSecurityFilter extends AbstractAuthenticationFilter
     }
 
     @Override
-    protected void authenticateInbound(MuleEvent event)
+    public void authenticate(MuleEvent event)
         throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
         EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException
     {
         called = true;
-        if (!accept)
-        {
-            throw new StaticMessageUnauthorisedException();
-        }
-    }
-
-    @Override
-    protected void authenticateOutbound(MuleEvent event)
-        throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
-    {
         if (!accept)
         {
             throw new StaticMessageUnauthorisedException();

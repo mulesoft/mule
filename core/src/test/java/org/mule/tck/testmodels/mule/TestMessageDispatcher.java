@@ -38,7 +38,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
     @Override
     protected void doDispatch(MuleEvent event) throws Exception
     {
-        if (event.getEndpoint().getEndpointURI().toString().equals("test://AlwaysFail"))
+        if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail"))
         {
             throw new RoutingException(event, (OutboundEndpoint) endpoint);
         }
@@ -47,7 +47,7 @@ public class TestMessageDispatcher extends AbstractMessageDispatcher
     @Override
     protected MuleMessage doSend(MuleEvent event) throws Exception
     {
-        if (event.getEndpoint().getEndpointURI().toString().equals("test://AlwaysFail"))
+        if (endpoint.getEndpointURI().toString().equals("test://AlwaysFail"))
         {
             throw new RoutingException(event, (OutboundEndpoint) endpoint);
         }

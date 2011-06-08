@@ -11,7 +11,7 @@
 package org.mule.api;
 
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
@@ -169,7 +169,7 @@ public interface MuleEvent extends Serializable
      * 
      * @return the endpoint associated with this event
      */
-    ImmutableEndpoint getEndpoint();
+    InboundEndpoint getEndpoint();
 
     /**
      * Retrieves the service session for the current event

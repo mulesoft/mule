@@ -10,13 +10,13 @@
 
 package org.mule.construct;
 
-import java.util.Collections;
-
 import org.mule.api.MuleEvent;
 import org.mule.component.AbstractComponent;
 import org.mule.construct.SimpleService.Type;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.StringUtils;
+
+import java.util.Collections;
 
 public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
 {
@@ -42,7 +42,7 @@ public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
     {
         simpleService.initialise();
         simpleService.start();
-        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent("hello",
+        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello",
             muleContext));
 
         assertEquals("olleh", response.getMessageAsString());

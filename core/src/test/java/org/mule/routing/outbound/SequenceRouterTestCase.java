@@ -58,12 +58,12 @@ public class SequenceRouterTestCase extends AbstractMuleTestCase
     public void testSyncEndpointsOk() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
-        MuleEvent event = new OutboundRoutingTestEvent(message, null);
+        MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
         mockEndpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockEndpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
 
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
 
         assertNotNull(result);
         MuleMessage resultMessage = result.getMessage();
@@ -77,11 +77,11 @@ public class SequenceRouterTestCase extends AbstractMuleTestCase
     public void testSyncEndpointsWithFirstOneFailing() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
-        MuleEvent eventWithNullMessage = new OutboundRoutingTestEvent(null, null);
+        MuleEvent eventWithNullMessage = new OutboundRoutingTestEvent(null, null, muleContext);
 
         mockEndpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), eventWithNullMessage);
 
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
 
         assertNull(result);
     }
@@ -90,13 +90,13 @@ public class SequenceRouterTestCase extends AbstractMuleTestCase
     {
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
 
-        MuleEvent event = new OutboundRoutingTestEvent(message, null);
-        MuleEvent eventWithNullMessage = new OutboundRoutingTestEvent(null, null);
+        MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
+        MuleEvent eventWithNullMessage = new OutboundRoutingTestEvent(null, null, muleContext);
 
         mockEndpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockEndpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), eventWithNullMessage);
 
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
 
         assertNotNull(result);
         assertTrue(result instanceof MuleEvent);

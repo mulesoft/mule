@@ -141,9 +141,9 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
     protected boolean returnResponse(MuleEvent event, boolean doSend)
     {
         boolean remoteSync = false;
-        if (event.getEndpoint().getConnector().isResponseEnabled())
+        if (endpoint.getConnector().isResponseEnabled())
         {
-            boolean hasResponse = event.getEndpoint().getExchangePattern().hasResponse();
+            boolean hasResponse = endpoint.getExchangePattern().hasResponse();
             remoteSync = hasResponse || doSend;
             if (remoteSync)
             {

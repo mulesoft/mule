@@ -50,7 +50,7 @@ public class SoapAttachmentsFunctionalTestCase extends DynamicPortTestCase
             MuleMessage msg = new DefaultMuleMessage("testPayload", muleContext);
             msg.addOutboundAttachment("testAttachment", new DataHandler(new StringDataSource("foo")));
             DefaultMuleSession session = new DefaultMuleSession(msg, ((AbstractConnector) ep.getConnector()).getSessionHandler(), muleContext);
-            DefaultMuleEvent event = new DefaultMuleEvent(msg, ep, session);
+            DefaultMuleEvent event = new DefaultMuleEvent(msg, getTestInboundEndpoint("test://test"), session);
             MuleMessage result = client.process(event).getMessage();
             assertNotNull(result);
             assertNotNull(result.getPayload());

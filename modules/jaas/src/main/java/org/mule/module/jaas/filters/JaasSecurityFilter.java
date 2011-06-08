@@ -96,8 +96,8 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
         {
             if (isAuthenticate())
             {
-                throw new UnauthorisedException(event, event.getSession().getSecurityContext(),
-                    event.getEndpoint(), this);
+                throw new UnauthorisedException(event, event.getSession().getSecurityContext(), endpoint,
+                    this);
             }
             else
             {

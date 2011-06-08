@@ -80,13 +80,13 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         list.add(router2);
         messageRouter.setMessageProcessors(list);
 
-        MuleEvent event = getTestInboundEvent("test event", (MuleSession) session.proxy());
+        MuleEvent event = getTestEvent("test event", (MuleSession) session.proxy());
 
         mockendpoint1.expect("process",RouterTestUtils.getArgListCheckerMuleEvent());
         messageRouter.process(event);
         mockendpoint1.verify();
 
-        event = getTestInboundEvent(new IllegalArgumentException(), (MuleSession) session.proxy());
+        event = getTestEvent(new IllegalArgumentException(), (MuleSession) session.proxy());
         
         session.expectAndReturn("getFlowConstruct", getTestService());
         mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
@@ -101,7 +101,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         messageRouter.addRoute(router3);
 
         // now the message should be routed twice to different targets
-        event = getTestInboundEvent("testing multiple routing", (MuleSession) session.proxy());
+        event = getTestEvent("testing multiple routing", (MuleSession) session.proxy());
         session.expectAndReturn("getFlowConstruct", getTestService());
         session.expectAndReturn("getFlowConstruct", getTestService());
 
@@ -163,19 +163,19 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
 
         MuleSession session = getTestSession(getTestService(), muleContext);
 
-        MuleEvent event = getTestInboundEvent("hello");
+        MuleEvent event = getTestEvent("hello");
         messageRouter.process(event);
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(0, count2[0]);
 
-        event = getTestInboundEvent(new StringBuffer());
+        event = getTestEvent(new StringBuffer());
         messageRouter.process(event);
         assertEquals(1, catchAllCount[0]);
         assertEquals(0, count1[0]);
         assertEquals(1, count2[0]);
 
-        event = getTestInboundEvent(new Exception());
+        event = getTestEvent(new Exception());
         messageRouter.process(event);
         assertEquals(1, catchAllCount[0]);
         assertEquals(1, count1[0]);

@@ -10,6 +10,7 @@
 
 package org.mule.routing.outbound;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -17,7 +18,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
@@ -39,11 +40,14 @@ public class OutboundRoutingTestEvent implements MuleEvent
     private String id = UUID.getUUID();
     private boolean stopFurtherProcessing;
     int timeout = -1;
-
-    public OutboundRoutingTestEvent(MuleMessage message, MuleSession session)
+    private InboundEndpoint endpoint;
+    
+    public OutboundRoutingTestEvent(MuleMessage message, MuleSession session, MuleContext muleContext) throws Exception
     {
         this.message = message;
         this.session = session;
+        this.endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE,
+            muleContext);
     }
 
     public MuleMessage getMessage()
@@ -145,9 +149,9 @@ public class OutboundRoutingTestEvent implements MuleEvent
         return defaultValue;
     }
 
-    public ImmutableEndpoint getEndpoint()
+    public InboundEndpoint getEndpoint()
     {
-        return null;
+        return endpoint;
     }
 
     public FlowConstruct getService()

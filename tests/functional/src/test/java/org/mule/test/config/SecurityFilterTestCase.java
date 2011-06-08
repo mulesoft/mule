@@ -15,6 +15,11 @@ import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
+import org.mule.api.security.CryptoFailureException;
+import org.mule.api.security.EncryptionStrategyNotFoundException;
+import org.mule.api.security.SecurityException;
+import org.mule.api.security.SecurityProviderNotFoundException;
+import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.security.AbstractAuthenticationFilter;
 import org.mule.security.filters.MuleEncryptionEndpointSecurityFilter;
@@ -76,18 +81,17 @@ public class SecurityFilterTestCase extends FunctionalTestCase
     public static class CustomSecurityFilter extends AbstractAuthenticationFilter
     {
         @Override
-        protected void authenticateInbound(MuleEvent event)
-        {
-        }
-
-        @Override
-        protected void authenticateOutbound(MuleEvent event)
-        {
-        }
-
-        @Override
         protected void doInitialise() throws InitialisationException
         {
+        }
+
+        @Override
+        public void authenticate(MuleEvent event)
+            throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+            SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException
+        {
+            // TODO Auto-generated method stub
+            
         }
     }
 

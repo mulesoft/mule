@@ -164,7 +164,7 @@ public class CallOutboundEndpoint extends org.mule.endpoint.DynamicOutboundEndpo
         MuleEvent result = super.process(event);
         if (result != null)
         {
-            result.getMessage().setProperty(CHANNEL.CALL_URI_PROPERTY, event.getEndpoint().getEndpointURI().toString(), PropertyScope.OUTBOUND);
+            result.getMessage().setProperty(CHANNEL.CALL_URI_PROPERTY, getEndpointURI().toString(), PropertyScope.OUTBOUND);
         }
         return result;
     }

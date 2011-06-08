@@ -78,7 +78,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
         mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
         mockendpoint3.verify();
     }
 
@@ -96,7 +96,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
         mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
         mockendpoint2.verify();
     }
 
@@ -110,7 +110,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
             // this test used to fail at the router; it now fails earlier when the message is
             // constructed.  i don't think this is a problem.
             MuleMessage message = new DefaultMuleMessage("test event", props, muleContext);
-            router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+            router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
             fail("Router should have thrown an exception if endpoint was not found.");
         }
         catch (Exception e)
@@ -126,7 +126,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
         assertTrue(router.isMatch(message));
         mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
         mockendpoint3.verify();
     }
 
@@ -136,7 +136,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
 
         try
         {
-            router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+            router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
             fail("Router should have thrown an exception if no selector property was set on the message.");
         }
         catch (RoutingException e)

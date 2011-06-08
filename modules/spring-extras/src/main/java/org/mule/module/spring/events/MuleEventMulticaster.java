@@ -41,6 +41,7 @@ import org.mule.api.transport.Connector;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.config.QueueProfile;
 import org.mule.endpoint.MuleEndpointURI;
+import org.mule.endpoint.NullInboundEndpoint;
 import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
 import org.mule.module.spring.i18n.SpringMessages;
@@ -521,7 +522,8 @@ public class MuleEventMulticaster
                 else
                 {
                     MuleSession session = new DefaultMuleSession(service, muleContext);
-                    DefaultMuleEvent event = new DefaultMuleEvent(message, endpoint, session);
+                    DefaultMuleEvent event = new DefaultMuleEvent(message, new NullInboundEndpoint(
+                        endpoint.getExchangePattern(), muleContext), session);
                     RequestContext.setEvent(event);
                     // transform if necessary
                     if (endpoint.getTransformers() != null)
@@ -530,7 +532,8 @@ public class MuleEventMulticaster
                             applicationEvent.getProperties(), muleContext);
                         message.applyTransformers(event, endpoint.getTransformers());
                     }
-                    endpoint.process(new DefaultMuleEvent(message, endpoint, session));
+                    endpoint.process(new DefaultMuleEvent(message, new NullInboundEndpoint(
+                        endpoint.getExchangePattern(), muleContext), session));
                 }
             }
             catch (Exception e1)

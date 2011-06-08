@@ -10,7 +10,6 @@
 
 package org.mule.endpoint;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
@@ -87,12 +86,6 @@ public class DefaultOutboundEndpoint extends AbstractEndpoint implements Outboun
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        // Update event endpoint for outbound endpoint
-        if ((event.getEndpoint() == null || !event.getEndpoint().equals(this)))
-        {
-            event = new DefaultMuleEvent(event.getMessage(), this, event.getSession(), null, event.getProcessingTime());
-        }
-
         return getMessageProcessorChain(event.getFlowConstruct()).process(event);
     }
 

@@ -158,14 +158,14 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     protected Call getCall(MuleEvent event, Object[] args) throws Exception
     {
-        EndpointURI endpointUri = event.getEndpoint().getEndpointURI();
+        EndpointURI endpointUri = endpoint.getEndpointURI();
         Object method = getInitialMethod(event); // changes object state
         Call call = (Call) service.createCall();
         parseStyle(event, call);
         parseUse(event, call);
 
         // set properties on the call from the endpoint properties
-        BeanUtils.populateWithoutFail(call, event.getEndpoint().getProperties(), false);
+        BeanUtils.populateWithoutFail(call, endpoint.getProperties(), false);
         call.setTargetEndpointAddress(endpointUri.getAddress());
 
         method = refineMethod(event, call, method);
@@ -173,7 +173,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
         // set Mule event here so that handlers can extract info
         call.setProperty(MuleProperties.MULE_EVENT_PROPERTY, event);
-        call.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, event.getEndpoint());
+        call.setProperty(MuleProperties.MULE_ENDPOINT_PROPERTY, endpoint);
         call.setProperty(MuleProperties.MULE_CONTEXT_PROPERTY, connector.getMuleContext());
 
         setCustomProperties(event, call);
@@ -379,7 +379,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
         Object method = event.getMessage().getOutboundProperty(MuleProperties.MULE_METHOD_PROPERTY);
         if (method == null)
         {
-            method = event.getEndpoint().getEndpointURI().getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
+            method = endpoint.getEndpointURI().getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY);
         }
         if (method == null)
         {
@@ -484,7 +484,7 @@ public class AxisMessageDispatcher extends AbstractMessageDispatcher
 
     public String parseSoapAction(String soapAction, QName method, MuleEvent event)
     {
-        EndpointURI endpointURI = event.getEndpoint().getEndpointURI();
+        EndpointURI endpointURI = endpoint.getEndpointURI();
         Map properties = new HashMap();
         MuleMessage msg = event.getMessage();
         for (String propertyKey : msg.getOutboundPropertyNames())

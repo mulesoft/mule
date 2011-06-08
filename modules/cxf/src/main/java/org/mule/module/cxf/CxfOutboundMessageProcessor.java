@@ -16,7 +16,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.DispatchException;
 import org.mule.message.DefaultExceptionPayload;
@@ -25,7 +24,6 @@ import org.mule.module.cxf.security.WebServiceSecurityException;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
-import org.mule.util.StringUtils;
 import org.mule.util.TemplateParser;
 
 import java.lang.reflect.InvocationTargetException;
@@ -164,7 +162,6 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         String soapAction = event.getMessage().getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
         if (soapAction != null)
         {
-            soapAction = parseSoapAction(soapAction, new QName(method.getName()), event);
             props.put(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION, soapAction);
         }
 
@@ -204,15 +201,6 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         // Holds the response from the transport
         Holder<MuleEvent> responseHolder = new Holder<MuleEvent>();
         props.put("holder", responseHolder);
-
-        // Set custom soap action if set on the event or endpoint
-        String soapAction = event.getMessage().getOutboundProperty(SoapConstants.SOAP_ACTION_PROPERTY);
-        if (soapAction != null)
-        {
-            soapAction = parseSoapAction(soapAction, bop.getName(), event);
-            props.put(org.apache.cxf.binding.soap.SoapBindingConstants.SOAP_ACTION, soapAction);
-            event.getMessage().setProperty(SoapConstants.SOAP_ACTION_PROPERTY, soapAction);
-        }
 
         Map<String, Object> ctx = new HashMap<String, Object>();
         ctx.put(Client.REQUEST_CONTEXT, props);
@@ -365,7 +353,7 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(CxfConstants.MULE_EVENT, event);
         props.put(CxfConstants.CXF_OUTBOUND_MESSAGE_PROCESSOR, this);
-        props.put(org.apache.cxf.message.Message.ENDPOINT_ADDRESS, event.getEndpoint().getEndpointURI().toString());
+        //props.put(org.apache.cxf.message.Message.ENDPOINT_ADDRESS, endpoint.getEndpointURI().toString());
 
         if (decoupledEndpoint != null)
         {
@@ -421,46 +409,46 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
         return transportResponse;
     }
 
-    public String parseSoapAction(String soapAction, QName method, MuleEvent event)
-    {
-        EndpointURI endpointURI = event.getEndpoint().getEndpointURI();
-        Map<String, String> properties = new HashMap<String, String>();
-        MuleMessage msg = event.getMessage();
-        // propagate only invocation- and outbound-scoped properties
-        for (String name : msg.getInvocationPropertyNames())
-        {
-            final String value = msg.getInvocationProperty(name, StringUtils.EMPTY);
-            properties.put(name, value);
-        }
-        for (String name : msg.getOutboundPropertyNames())
-        {
-            final String value = msg.getOutboundProperty(name, StringUtils.EMPTY);
-            properties.put(name, value);
-        }
-        properties.put(MuleProperties.MULE_METHOD_PROPERTY, method.getLocalPart());
-        properties.put("methodNamespace", method.getNamespaceURI());
-        properties.put("address", endpointURI.getAddress());
-        properties.put("scheme", endpointURI.getScheme());
-        properties.put("host", endpointURI.getHost());
-        properties.put("port", String.valueOf(endpointURI.getPort()));
-        properties.put("path", endpointURI.getPath());
-        properties.put("hostInfo",
-            endpointURI.getScheme() + "://" + endpointURI.getHost()
-                            + (endpointURI.getPort() > -1 ? ":" + String.valueOf(endpointURI.getPort()) : ""));
-        if (event.getFlowConstruct() != null)
-        {
-            properties.put("serviceName", event.getFlowConstruct().getName());
-        }
-
-        soapAction = soapActionTemplateParser.parse(properties, soapAction);
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("SoapAction for this call is: " + soapAction);
-        }
-
-        return soapAction;
-    }
+//    public String parseSoapAction(String soapAction, QName method, MuleEvent event)
+//    {
+//        EndpointURI endpointURI = endpoint.getEndpointURI();
+//        Map<String, String> properties = new HashMap<String, String>();
+//        MuleMessage msg = event.getMessage();
+//        // propagate only invocation- and outbound-scoped properties
+//        for (String name : msg.getInvocationPropertyNames())
+//        {
+//            final String value = msg.getInvocationProperty(name, StringUtils.EMPTY);
+//            properties.put(name, value);
+//        }
+//        for (String name : msg.getOutboundPropertyNames())
+//        {
+//            final String value = msg.getOutboundProperty(name, StringUtils.EMPTY);
+//            properties.put(name, value);
+//        }
+//        properties.put(MuleProperties.MULE_METHOD_PROPERTY, method.getLocalPart());
+//        properties.put("methodNamespace", method.getNamespaceURI());
+//        properties.put("address", endpointURI.getAddress());
+//        properties.put("scheme", endpointURI.getScheme());
+//        properties.put("host", endpointURI.getHost());
+//        properties.put("port", String.valueOf(endpointURI.getPort()));
+//        properties.put("path", endpointURI.getPath());
+//        properties.put("hostInfo",
+//            endpointURI.getScheme() + "://" + endpointURI.getHost()
+//                            + (endpointURI.getPort() > -1 ? ":" + String.valueOf(endpointURI.getPort()) : ""));
+//        if (event.getFlowConstruct() != null)
+//        {
+//            properties.put("serviceName", event.getFlowConstruct().getName());
+//        }
+//
+//        soapAction = soapActionTemplateParser.parse(properties, soapAction);
+//
+//        if (logger.isDebugEnabled())
+//        {
+//            logger.debug("SoapAction for this call is: " + soapAction);
+//        }
+//
+//        return soapAction;
+//    }
 
     public void setPayloadToArguments(CxfPayloadToArguments payloadToArguments)
     {
@@ -511,5 +499,5 @@ public class CxfOutboundMessageProcessor extends AbstractInterceptingMessageProc
     {
         this.decoupledEndpoint = decoupledEndpoint;
     }
-
+    
 }

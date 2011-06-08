@@ -64,7 +64,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
 
         JobDetail jobDetail = new JobDetail();
         // make the job name unique per endpoint (MULE-753)
-        jobDetail.setName(event.getEndpoint().getEndpointURI().getAddress() + "-" + event.getId());
+        jobDetail.setName(endpoint.getEndpointURI().getAddress() + "-" + event.getId());
 
         JobDataMap jobDataMap = new JobDataMap();
         MuleMessage msg = event.getMessage();
@@ -160,7 +160,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
             throw new IllegalArgumentException(
                 QuartzMessages.cronExpressionOrIntervalMustBeSet().getMessage());
         }
-        trigger.setName(event.getEndpoint().getEndpointURI().toString() + "-" + event.getId());
+        trigger.setName(endpoint.getEndpointURI().toString() + "-" + event.getId());
         trigger.setGroup(groupName);
         trigger.setJobName(jobDetail.getName());
         trigger.setJobGroup(jobGroupName);

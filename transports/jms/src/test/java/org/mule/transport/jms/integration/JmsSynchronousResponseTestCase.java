@@ -60,7 +60,7 @@ public class JmsSynchronousResponseTestCase extends AbstractJmsFunctionalTestCas
         
         MuleMessage response = client.send("out3", "TEST_MESSAGE", null);
         assertNotNull(response);
-        assertTrue("Response should be NullPayload", response.getPayload() instanceof NullPayload);
+        assertFalse("Response should not be NullPayload", response.getPayload() instanceof NullPayload);
     }
 
     private void assertJmsMessageIdPresent(MuleMessage message)

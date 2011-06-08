@@ -24,10 +24,10 @@ public class OutboundEndpointPropertyMessageProcessorTestCase extends AbstractMe
 
     public void testProcess() throws InitialisationException, EndpointException, Exception
     {
-        MessageProcessor mp = new OutboundEndpointPropertyMessageProcessor();
         OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null);
+        MessageProcessor mp = new OutboundEndpointPropertyMessageProcessor(endpoint);
 
-        MuleEvent event = mp.process(createTestOutboundEvent(endpoint));
+        MuleEvent event = mp.process(createTestOutboundEvent());
 
         assertEquals(endpoint.getEndpointURI().getUri().toString(),
                      event.getMessage().getOutboundProperty(MuleProperties.MULE_ENDPOINT_PROPERTY));

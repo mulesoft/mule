@@ -51,7 +51,7 @@ public class SimpleCollectionAggregatorTestCase extends AbstractMuleTestCase
         message3.setCorrelationId(message1.getUniqueId());
         message1.setCorrelationGroupSize(3);
 
-        ImmutableEndpoint endpoint = MuleTestUtils.getTestOutboundEndpoint(MessageExchangePattern.ONE_WAY, muleContext);
+        ImmutableEndpoint endpoint = MuleTestUtils.getTestInboundEndpoint(MessageExchangePattern.ONE_WAY, muleContext);
         MuleEvent event1 = new DefaultMuleEvent(message1, endpoint, session);
         MuleEvent event2 = new DefaultMuleEvent(message2, endpoint, session);
         MuleEvent event3 = new DefaultMuleEvent(message3, endpoint, session);

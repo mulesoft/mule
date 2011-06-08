@@ -35,7 +35,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
         TestListener listener = new TestListener();
         mp.setListener(listener);
 
-        MuleEvent event = createTestOutboundEvent(endpoint);
+        MuleEvent event = createTestOutboundEvent();
 
         MuleEvent result = mp.process(event);
 
@@ -50,7 +50,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
         InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
         mp.setListener(new ExceptionThrowingMessageProcessr());
 
-        MuleEvent event = createTestOutboundEvent(endpoint, exceptionListener);
+        MuleEvent event = createTestOutboundEvent(exceptionListener);
 
         MuleEvent resultEvent = mp.process(event);
         assertNotNull(resultEvent);
@@ -68,7 +68,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
         InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
         mp.setListener(new ExceptionThrowingMessageProcessr());
 
-        MuleEvent event = createTestOutboundEvent(endpoint, exceptionListener);
+        MuleEvent event = createTestOutboundEvent(exceptionListener);
 
         MuleEvent resultEvent = mp.process(event);
         assertNotNull(resultEvent);
@@ -85,7 +85,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
         InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
         mp.setListener(new ExceptionThrowingMessageProcessr());
 
-        MuleEvent event = createTestOutboundEvent(endpoint, exceptionListener);
+        MuleEvent event = createTestOutboundEvent(exceptionListener);
 
         MuleEvent resultEvent = mp.process(event);
         assertNotNull(resultEvent);
@@ -103,7 +103,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
         InterceptingMessageProcessor mp = new ExceptionHandlingMessageProcessor();
         mp.setListener(new ExceptionThrowingMessageProcessr());
 
-        MuleEvent event = createTestOutboundEvent(endpoint, exceptionListener);
+        MuleEvent event = createTestOutboundEvent(exceptionListener);
 
         MuleEvent resultEvent = mp.process(event);
         assertNotNull(resultEvent);

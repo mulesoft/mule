@@ -56,7 +56,7 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleTestC
     {
         assertFalse(componentListener.isNotified());
 
-        service.sendEvent(MuleTestUtils.getTestInboundEvent("test data", muleContext));
+        service.sendEvent(MuleTestUtils.getTestEvent("test data", muleContext));
 
         assertFalse(componentListener.isNotified());
         assertFalse(componentListener.isBefore());
@@ -70,7 +70,7 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleTestC
 
         assertFalse(componentListener.isNotified());
 
-        service.sendEvent(MuleTestUtils.getTestInboundEvent("test data", muleContext));
+        service.sendEvent(MuleTestUtils.getTestEvent("test data", muleContext));
 
         // threaded processing, make sure the notifications have time to process
         Thread.sleep(100);

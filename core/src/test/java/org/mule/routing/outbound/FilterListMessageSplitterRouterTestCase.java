@@ -64,7 +64,7 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
         mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
         mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
         mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
         mockendpoint1.verify();
         mockendpoint2.verify();
         mockendpoint3.verify();
@@ -88,13 +88,13 @@ public class FilterListMessageSplitterRouterTestCase extends AbstractMuleTestCas
 
         message = new DefaultMuleMessage(payload, muleContext);
 
-        MuleEvent event = new OutboundRoutingTestEvent(message, null);
+        MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
         mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint1.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint2.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint3.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
         assertNotNull(result);
         MuleMessage resultMessage = result.getMessage();
         assertNotNull(resultMessage);

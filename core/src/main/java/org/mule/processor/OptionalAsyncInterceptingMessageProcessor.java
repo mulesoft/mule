@@ -15,6 +15,8 @@ import org.mule.api.MuleEvent;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.config.ThreadingProfile;
 import org.mule.api.context.WorkManagerSource;
+import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.endpoint.EndpointAware;
 
 /**
  * Implementation of {@link AsyncInterceptingMessageProcessor} which continues
@@ -22,8 +24,10 @@ import org.mule.api.context.WorkManagerSource;
  * has a response or if a transaction is present. Execution of the next message
  * processor is only passed off to another thread if this is not the case.
  */
-public class OptionalAsyncInterceptingMessageProcessor extends AsyncInterceptingMessageProcessor
+public class OptionalAsyncInterceptingMessageProcessor extends AsyncInterceptingMessageProcessor implements EndpointAware
 {
+    protected ImmutableEndpoint endpoint;
+
     public OptionalAsyncInterceptingMessageProcessor(WorkManagerSource workManagerSource)
     {
         super(workManagerSource);
@@ -48,10 +52,27 @@ public class OptionalAsyncInterceptingMessageProcessor extends AsyncIntercepting
         Object messageProperty = event.getMessage().getInboundProperty(MuleProperties.MULE_FORCE_SYNC_PROPERTY);
         boolean forceSync = Boolean.TRUE.equals(messageProperty);
         
-        boolean hasResponse = event.getEndpoint().getExchangePattern().hasResponse();
-        boolean isTransacted = event.getEndpoint().getTransactionConfig().isTransacted();
+        boolean hasResponse;
+        boolean isTransacted ;
+
+        if (endpoint != null)
+        {
+            hasResponse = endpoint.getExchangePattern().hasResponse();
+            isTransacted = endpoint.getTransactionConfig().isTransacted();
+        }
+        else
+        {
+            hasResponse = event.getEndpoint().getExchangePattern().hasResponse();
+            isTransacted = event.getEndpoint().getTransactionConfig().isTransacted();
+        }
         
         return !forceSync && doThreading && !hasResponse && !isTransacted;
+    }
+
+    @Override
+    public void setEndpoint(ImmutableEndpoint endpoint)
+    {
+        this.endpoint = endpoint;
     }
 
 }

@@ -29,7 +29,7 @@ public class AxisMessageDispatcherTestCase extends AbstractMuleTestCase
             "axis:http://www.muleumo.org/services/myService?method=myTestMethod");
         AxisMessageDispatcher dispatcher = new AxisMessageDispatcher(ep);
         dispatcher.service = new Service();
-        MuleEvent event = getTestEvent("testPayload", ep);
+        MuleEvent event = getTestEvent("testPayload");
         // there should be no NullPointerException
         Call call = dispatcher.getCall(event, new Object[]{null});
 

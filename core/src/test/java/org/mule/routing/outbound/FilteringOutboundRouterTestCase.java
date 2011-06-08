@@ -64,7 +64,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
 
         //session.expect("dispatchEvent", C.eq(message, endpoint1));
         mockEndpoint.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+        router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
         mockEndpoint.verify();
         //session.verify();
 
@@ -111,9 +111,9 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         assertEquals(filter, router.getFilter());
 
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
-        MuleEvent event = new OutboundRoutingTestEvent(message, null);
+        MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
         mockEndpoint.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
         assertNotNull(result);
         assertEquals(message, result.getMessage());
         session.verify();
@@ -138,7 +138,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         Map<String, Object> m = new HashMap<String, Object>();
         m.put("barValue", "bar");
         MuleMessage message = new DefaultMuleMessage("test event", m, muleContext);
-        MuleEvent event = new OutboundRoutingTestEvent(message, null);
+        MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
         assertTrue(router.isMatch(message));
         OutboundEndpoint ep = (OutboundEndpoint) router.getRoute(0, event);

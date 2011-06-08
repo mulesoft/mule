@@ -10,8 +10,6 @@
 
 package org.mule.transport.http.construct;
 
-import java.util.Collections;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -21,6 +19,8 @@ import org.mule.api.transport.Connector;
 import org.mule.construct.AbstractFlowConstruct;
 import org.mule.construct.AbstractFlowConstuctTestCase;
 import org.mule.tck.MuleTestUtils;
+
+import java.util.Collections;
 
 public class NoCacheHttpProxyTestCase extends AbstractFlowConstuctTestCase
 {
@@ -59,7 +59,7 @@ public class NoCacheHttpProxyTestCase extends AbstractFlowConstuctTestCase
     {
         startHttpProxy();
 
-        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent(
+        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent(
             "hello", muleContext));
 
         assertEquals("hello", response.getMessageAsString());

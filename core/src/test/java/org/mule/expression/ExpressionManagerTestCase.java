@@ -97,7 +97,7 @@ public class ExpressionManagerTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().registerObject("proc1", new StringAppendTransformer("c"));
         muleContext.getRegistry().registerObject("proc2", new StringAppendTransformer("e"));
 
-        MuleEvent event = getTestInboundEvent("b");
+        MuleEvent event = getTestEvent("b");
         RequestContext.setEvent(event);
 
         assertEquals("-1-abcde-2-", muleContext.getExpressionManager().parse(

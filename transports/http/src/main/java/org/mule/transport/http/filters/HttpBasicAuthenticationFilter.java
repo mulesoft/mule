@@ -200,7 +200,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
             if (isAuthenticate())
             {
                 throw new UnauthorisedException(event, event.getSession().getSecurityContext(),
-                    event.getEndpoint(), this);
+                    endpoint, this);
             }
             else
             {

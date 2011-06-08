@@ -10,7 +10,6 @@
 
 package org.mule.transport.soap.axis.component;
 
-import org.mule.DefaultMuleEvent;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -69,8 +68,7 @@ public class WebServiceWrapperComponent extends AbstractWebServiceWrapperCompone
 
         OutboundEndpoint endpoint = endpointBuilder.buildOutboundEndpoint();
 
-        MuleEvent responseEvent = endpoint.process(new DefaultMuleEvent(event.getMessage(), endpoint,
-            event.getSession()));
+        MuleEvent responseEvent = endpoint.process(event);
 
         if (responseEvent != null)
         {

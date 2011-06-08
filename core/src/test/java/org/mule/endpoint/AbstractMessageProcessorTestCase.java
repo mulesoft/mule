@@ -199,12 +199,12 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
         // template method
     }
 
-    protected MuleEvent createTestOutboundEvent(OutboundEndpoint endpoint) throws Exception
+    protected MuleEvent createTestOutboundEvent() throws Exception
     {
-        return createTestOutboundEvent(endpoint, null);
+        return createTestOutboundEvent(null);
     }
     
-    protected MuleEvent createTestOutboundEvent(OutboundEndpoint endpoint, MessagingExceptionHandler exceptionListener) throws Exception
+    protected MuleEvent createTestOutboundEvent(MessagingExceptionHandler exceptionListener) throws Exception
     {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("prop1", "value1");
@@ -215,7 +215,7 @@ public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestC
         {
             svc.setExceptionListener(exceptionListener);
         }
-        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext), endpoint, getTestSession(svc, muleContext));
+        return new DefaultMuleEvent(new DefaultMuleMessage(TEST_MESSAGE, props, muleContext), getTestInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE), getTestSession(svc, muleContext));
     }
 
     protected MuleMessage createTestResponseMuleMessage()

@@ -49,7 +49,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
         service.initialise();
         service.start();
 
-        MuleEvent result = component.process(getTestInboundEvent(""));
+        MuleEvent result = component.process(getTestEvent(""));
 
         assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
@@ -67,7 +67,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
         service.initialise();
         service.start();
 
-        MuleEvent result = component.process(getTestInboundEvent(""));
+        MuleEvent result = component.process(getTestEvent(""));
 
         assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
@@ -85,7 +85,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
         service.initialise();
         service.start();
 
-        MuleEvent result = component.process(getTestInboundEvent(""));
+        MuleEvent result = component.process(getTestEvent(""));
 
         assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
@@ -105,7 +105,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
         service.initialise();
         service.start();
 
-        MuleEvent result = component.process(getTestInboundEvent(""));
+        MuleEvent result = component.process(getTestEvent(""));
 
         assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
@@ -128,7 +128,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
         service.initialise();
         service.start();
 
-        MuleEvent result = component.process(getTestInboundEvent(""));
+        MuleEvent result = component.process(getTestEvent(""));
 
         assertEquals(INTERCEPTOR_ONE + BEFORE + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE
                      + INTERCEPTOR_ONE + BEFORE + INTERCEPTOR_TWO + BEFORE + INTERCEPTOR_THREE + BEFORE

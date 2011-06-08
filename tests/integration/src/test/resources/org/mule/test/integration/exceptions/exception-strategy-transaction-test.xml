@@ -20,20 +20,20 @@
     
     <object-to-string-transformer name="ObjectToString"/>
     
-    <jms:endpoint name="InputQueueClient" queue="InputQueue" exchange-pattern="request-response"/>
-    <jms:endpoint name="InputQueueClient2" queue="InputQueue2" exchange-pattern="request-response"/>
+    <jms:endpoint name="InputQueueClient" queue="InputQueue" exchange-pattern="one-way"/>
+    <jms:endpoint name="InputQueueClient2" queue="InputQueue2" exchange-pattern="one-way"/>
     
-    <jms:endpoint name="InputQueue" queue="InputQueue" exchange-pattern="request-response">
+    <jms:endpoint name="InputQueue" queue="InputQueue" exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_BEGIN"/>
     </jms:endpoint>
-    <jms:endpoint name="InputQueue2" queue="InputQueue2" exchange-pattern="request-response">
+    <jms:endpoint name="InputQueue2" queue="InputQueue2" exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_BEGIN"/>
     </jms:endpoint>
     
-    <jms:endpoint name="RequestQueue" queue="RequestQueue" exchange-pattern="request-response">
+    <jms:endpoint name="RequestQueue" queue="RequestQueue" exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_JOIN"/>
     </jms:endpoint>
-    <jms:endpoint name="RequestQueue2" queue="RequestQueue2" exchange-pattern="request-response">
+    <jms:endpoint name="RequestQueue2" queue="RequestQueue2" exchange-pattern="one-way">
         <jms:transaction action="ALWAYS_JOIN"/>
     </jms:endpoint>
     

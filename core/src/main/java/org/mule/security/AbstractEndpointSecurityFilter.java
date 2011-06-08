@@ -12,6 +12,7 @@ package org.mule.security;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.CryptoFailureException;
 import org.mule.api.security.EncryptionStrategyNotFoundException;
@@ -21,11 +22,12 @@ import org.mule.api.security.SecurityProviderNotFoundException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 
 /**
- * <code>AbstractEndpointSecurityFilter</code> provides basic initialisation for
- * all security filters, namely configuring the SecurityManager for this instance
+ * <code>AbstractEndpointSecurityFilter</code> provides basic initialisation for all security filters, namely
+ * configuring the SecurityManager for this instance
  */
 @Deprecated
-public abstract class AbstractEndpointSecurityFilter extends AbstractAuthenticationFilter implements EndpointSecurityFilter
+public abstract class AbstractEndpointSecurityFilter extends AbstractAuthenticationFilter
+    implements EndpointSecurityFilter
 {
     protected ImmutableEndpoint endpoint;
 
@@ -44,13 +46,28 @@ public abstract class AbstractEndpointSecurityFilter extends AbstractAuthenticat
         throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
         SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException
     {
-        // lazy init the endpoint
-        if (endpoint == null)
-        {
-            endpoint = event.getEndpoint();
-        }
-        
         super.doFilter(event);
     }
+
+    public void authenticate(MuleEvent event)
+        throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
+        SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, InitialisationException
+    {
+        if (endpoint == null || endpoint instanceof InboundEndpoint)
+        {
+            authenticateInbound(event);
+        }
+        else
+        {
+            authenticateOutbound(event);
+        }
+    }
+
+    protected abstract void authenticateInbound(MuleEvent event)
+        throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
+        EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException;
+
+    protected abstract void authenticateOutbound(MuleEvent event)
+        throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException;
 
 }

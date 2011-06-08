@@ -43,7 +43,7 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
             }
         });
 
-        MuleEvent event = createTestOutboundEvent(endpoint);
+        MuleEvent event = createTestOutboundEvent();
         event.getMessage().setOutboundProperty(MY_PROPERTY_KEY, MY_PROPERTY_VAL);
         event.getMessage().setOutboundProperty(MuleProperties.MULE_CORRELATION_ID_PROPERTY, MULE_CORRELATION_ID_VAL);
         MuleEvent result = mp.process(event);

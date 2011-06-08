@@ -34,7 +34,7 @@ public class WireTapTestCase extends AbstractMuleTestCase
 
     public void testWireTapNoFilter() throws Exception
     {
-        MuleEvent event = getTestInboundEvent("data");
+        MuleEvent event = getTestEvent("data");
         MuleEvent primaryOutput = wireTap.process(event);
 
         assertSame(event, primaryOutput);
@@ -53,7 +53,7 @@ public class WireTapTestCase extends AbstractMuleTestCase
             }
         });
 
-        MuleEvent event = getTestInboundEvent("data");
+        MuleEvent event = getTestEvent("data");
         MuleEvent primaryOutput = wireTap.process(event);
 
         assertSame(event, primaryOutput);
@@ -72,7 +72,7 @@ public class WireTapTestCase extends AbstractMuleTestCase
             }
         });
 
-        MuleEvent event = getTestInboundEvent("data");
+        MuleEvent event = getTestEvent("data");
         MuleEvent primaryOutput = wireTap.process(event);
 
         assertSame(event, primaryOutput);
@@ -84,7 +84,7 @@ public class WireTapTestCase extends AbstractMuleTestCase
     {
         wireTap.setTap(null);
 
-        MuleEvent event = getTestInboundEvent("data");
+        MuleEvent event = getTestEvent("data");
         MuleEvent primaryOutput = wireTap.process(event);
 
         assertSame(event, primaryOutput);

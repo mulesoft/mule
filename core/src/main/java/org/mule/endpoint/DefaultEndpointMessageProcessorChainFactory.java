@@ -80,7 +80,7 @@ public class DefaultEndpointMessageProcessorChainFactory implements EndpointMess
         list.add(new OutboundEventTimeoutMessageProcessor());
 
         list.add(new OutboundSessionHandlerMessageProcessor(connector.getSessionHandler()));
-        list.add(new OutboundEndpointPropertyMessageProcessor());
+        list.add(new OutboundEndpointPropertyMessageProcessor(endpoint));
         list.add(new OutboundResponsePropertiesMessageProcessor(endpoint));
         list.add(new OutboundEndpointMimeTypeCheckingMessageProcessor(endpoint));
 

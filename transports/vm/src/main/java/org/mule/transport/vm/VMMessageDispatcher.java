@@ -66,14 +66,13 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
     protected MuleMessage doSend(final MuleEvent event) throws Exception
     {
         MuleMessage retMessage;
-        EndpointURI endpointUri = event.getEndpoint().getEndpointURI();
-        final VMMessageReceiver receiver = connector.getReceiver(endpointUri);
+        final VMMessageReceiver receiver = connector.getReceiver(endpoint.getEndpointURI());
         // Apply any outbound transformers on this event before we dispatch
 
         if (receiver == null)
         {
             throw new NoReceiverForEndpointException(VMMessages.noReceiverForEndpoint(connector.getName(),
-                                                                                      event.getEndpoint().getEndpointURI()));
+                                                                                      endpoint.getEndpointURI()));
         }
 
         MuleMessage message = event.getMessage();
@@ -93,7 +92,7 @@ public class VMMessageDispatcher extends AbstractMessageDispatcher
         
         if (logger.isDebugEnabled())
         {
-            logger.debug("sent event on endpointUri: " + event.getEndpoint().getEndpointURI());
+            logger.debug("sent event on endpointUri: " +endpoint.getEndpointURI());
         }
         return retMessage;
     }

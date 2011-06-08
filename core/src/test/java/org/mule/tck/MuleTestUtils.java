@@ -167,6 +167,23 @@ public final class MuleTestUtils
             }, null);
     }
 
+    public static InboundEndpoint getTestInboundEndpoint(String name,
+                                                           final MuleContext context,
+                                                           String uri,
+                                                           List<Transformer> transformers,
+                                                           Filter filter,
+                                                           Map<Object, Object> properties) throws Exception
+    {
+        return (InboundEndpoint) getTestEndpoint(name, uri, transformers, filter, properties, context,
+            new EndpointSource()
+            {
+                public ImmutableEndpoint getEndpoint(EndpointBuilder builder) throws MuleException
+                {
+                    return context.getEndpointFactory().getInboundEndpoint(builder);
+                }
+            }, null);
+    }
+    
     public static OutboundEndpoint getTestOutboundEndpoint(String name,
                                                            final MuleContext context,
                                                            String uri,
@@ -423,23 +440,23 @@ public final class MuleTestUtils
         return getTestEvent(data, getTestFlow(context), mep, context);
     }
     
-    public static MuleEvent getTestInboundEvent(Object data, MuleContext context) throws Exception
-    {
-        return getTestInboundEvent(data, getTestService(context), MessageExchangePattern.REQUEST_RESPONSE,
-            context);
-    }
-
-    public static MuleEvent getTestInboundEvent(Object data, MessageExchangePattern mep, MuleContext context)
-        throws Exception
-    {
-        return getTestInboundEvent(data, getTestService(context), mep, context);
-    }
+//    public static MuleEvent getTestInboundEvent(Object data, MuleContext context) throws Exception
+//    {
+//        return getTestInboundEvent(data, getTestService(context), MessageExchangePattern.REQUEST_RESPONSE,
+//            context);
+//    }
+//
+//    public static MuleEvent getTestInboundEvent(Object data, MessageExchangePattern mep, MuleContext context)
+//        throws Exception
+//    {
+//        return getTestInboundEvent(data, getTestService(context), mep, context);
+//    }
 
     /** Supply service but no endpoint */
     public static MuleEvent getTestEvent(Object data, Service service, MuleContext context) throws Exception
     {
-        return getTestEvent(data, service, getTestOutboundEndpoint("test1",
-            MessageExchangePattern.REQUEST_RESPONSE, context), context);
+        return getTestEvent(data, service, getTestInboundEndpoint("test1",
+            MessageExchangePattern.REQUEST_RESPONSE, context, null), context);
     }
 
     public static MuleEvent getTestEvent(Object data,
@@ -447,26 +464,26 @@ public final class MuleTestUtils
                                          MessageExchangePattern mep,
                                          MuleContext context) throws Exception
     {
-        return getTestEvent(data, flowConstruct, getTestOutboundEndpoint("test1", mep, context), context);
+        return getTestEvent(data, flowConstruct, getTestInboundEndpoint("test1", mep, context, null), context);
     }
 
-    public static MuleEvent getTestInboundEvent(Object data, Service service, MuleContext context)
-        throws Exception
-    {
-        return getTestEvent(data, service, getTestInboundEndpoint("test1",
-            MessageExchangePattern.REQUEST_RESPONSE, context, null), context);
-    }
-
-    public static MuleEvent getTestInboundEvent(Object data,
-                                                Service service,
-                                                MessageExchangePattern mep,
-                                                MuleContext context) throws Exception
-    {
-        return getTestEvent(data, service, getTestInboundEndpoint("test1", mep, context, null), context);
-    }
+//    public static MuleEvent getTestInboundEvent(Object data, Service service, MuleContext context)
+//        throws Exception
+//    {
+//        return getTestEvent(data, service, getTestInboundEndpoint("test1",
+//            MessageExchangePattern.REQUEST_RESPONSE, context, null), context);
+//    }
+//
+//    public static MuleEvent getTestInboundEvent(Object data,
+//                                                Service service,
+//                                                MessageExchangePattern mep,
+//                                                MuleContext context) throws Exception
+//    {
+//        return getTestEvent(data, service, getTestInboundEndpoint("test1", mep, context, null), context);
+//    }
 
     /** Supply endpoint but no service */
-    public static MuleEvent getTestEvent(Object data, ImmutableEndpoint endpoint, MuleContext context)
+    public static MuleEvent getTestEvent(Object data, InboundEndpoint endpoint, MuleContext context)
         throws Exception
     {
         return getTestEvent(data, getTestService(context), endpoint, context);
@@ -474,7 +491,7 @@ public final class MuleTestUtils
 
     public static MuleEvent getTestEvent(Object data,
                                          FlowConstruct flowConstruct,
-                                         ImmutableEndpoint endpoint,
+                                         InboundEndpoint endpoint,
                                          MuleContext context) throws Exception
     {
         final MuleSession session = getTestSession(flowConstruct, context);
@@ -485,7 +502,7 @@ public final class MuleTestUtils
         return new DefaultMuleEvent(message, endpoint, session);
     }
 
-    public static MuleEvent getTestInboundEvent(Object data, MuleSession session, MuleContext context)
+    public static MuleEvent getTestEvent(Object data, MuleSession session, MuleContext context)
         throws Exception
     {
         final InboundEndpoint endpoint = getTestInboundEndpoint("test1",

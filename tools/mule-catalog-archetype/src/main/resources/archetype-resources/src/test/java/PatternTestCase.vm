@@ -55,8 +55,7 @@ public class ${patternClassName}TestCase extends AbstractFlowConstuctTestCase
         ${patternVariableName}.start();
 
         final String testPayload = RandomStringUtils.randomAlphanumeric(10);
-        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent(testPayload,
-            muleContext));
+        final MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent(testPayload, muleContext));
         assertEquals(testPayload, response.getMessageAsString());
     }
 #end

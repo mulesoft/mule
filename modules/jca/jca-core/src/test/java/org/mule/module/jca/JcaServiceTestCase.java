@@ -63,7 +63,7 @@ public class JcaServiceTestCase extends AbstractServiceTestCase
         getService().initialise();
         getService().start();
         ImmutableEndpoint endpoint = getTestInboundEndpoint("jcaInFlowEndpoint");
-        MuleEvent event = getTestEvent("Message", endpoint);
+        MuleEvent event = getTestEvent("Message");
 
         try
         {
@@ -81,7 +81,7 @@ public class JcaServiceTestCase extends AbstractServiceTestCase
         getService().initialise();
         getService().start();
         ImmutableEndpoint endpoint = getTestInboundEndpoint("jcaInFlowEndpoint");
-        MuleEvent event = getTestEvent("Message", endpoint);
+        MuleEvent event = getTestEvent("Message");
 
         getService().dispatchEvent(event);
         assertEquals(1, workManager.getScheduledWorkList().size());

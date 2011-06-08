@@ -19,8 +19,7 @@ import org.mule.transport.AbstractConnector;
 import org.mule.util.ObjectUtils;
 
 /**
- * Publishes a {@link EndpointMessageNotification}'s when a message is sent or
- * dispatched.
+ * Publishes a {@link EndpointMessageNotification}'s when a message is sent or dispatched.
  */
 
 public class OutboundNotificationMessageProcessor implements MessageProcessor
@@ -45,7 +44,7 @@ public class OutboundNotificationMessageProcessor implements MessageProcessor
             }
 
             int notificationAction;
-            if (event.getEndpoint().getExchangePattern().hasResponse())
+            if (endpoint.getExchangePattern().hasResponse())
             {
                 notificationAction = EndpointMessageNotification.MESSAGE_SENT;
             }
@@ -53,8 +52,8 @@ public class OutboundNotificationMessageProcessor implements MessageProcessor
             {
                 notificationAction = EndpointMessageNotification.MESSAGE_DISPATCHED;
             }
-            connector.fireNotification(new EndpointMessageNotification(event.getMessage(),
-                event.getEndpoint(), component, notificationAction));
+            connector.fireNotification(new EndpointMessageNotification(event.getMessage(), endpoint,
+                component, notificationAction));
         }
 
         return event;

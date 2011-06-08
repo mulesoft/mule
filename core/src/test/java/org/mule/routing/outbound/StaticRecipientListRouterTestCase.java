@@ -73,7 +73,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
             }
         });
 
-        router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+        router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
         for (Mock mockEp : mockEndpoints)
         {
             mockEp.verify();
@@ -113,7 +113,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         // so we can't
         // check for equality on the arguments passed to the dispatch / send methods
         message = new DefaultMuleMessage("test event", muleContext);
-        final MuleEvent event = new OutboundRoutingTestEvent(message, null);
+        final MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
         // Set up the mock targets as we discover them
          final List<Mock> mockEndpoints = new ArrayList<Mock>();
@@ -127,7 +127,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
          });
 
         router.getRecipients().add("test://recipient3?exchangePattern=request-response");
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
         assertNotNull(result);
         MuleMessage resultMessage = result.getMessage();
         assertNotNull(resultMessage);
@@ -160,7 +160,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         assertTrue(router.isMatch(message));
         try
         {
-            router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy()));
+            router.route(new OutboundRoutingTestEvent(message, (MuleSession)session.proxy(), muleContext));
             fail("Should not allow malformed endpointUri");
         }
         catch (Exception e)

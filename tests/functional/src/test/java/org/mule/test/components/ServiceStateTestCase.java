@@ -188,7 +188,7 @@ public class ServiceStateTestCase extends FunctionalTestCase
             }
         }).start();
         long t0 = System.currentTimeMillis();
-        c.sendEvent(getTestInboundEvent("hello"));
+        c.sendEvent(getTestEvent("hello"));
         long t1 = System.currentTimeMillis();
         assertTrue(t1 - t0 > 1000);
     }

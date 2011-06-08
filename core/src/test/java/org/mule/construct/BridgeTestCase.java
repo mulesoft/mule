@@ -10,13 +10,13 @@
 
 package org.mule.construct;
 
-import java.util.Collections;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.Connector;
 import org.mule.tck.MuleTestUtils;
+
+import java.util.Collections;
 
 public class BridgeTestCase extends AbstractFlowConstuctTestCase
 {
@@ -49,7 +49,7 @@ public class BridgeTestCase extends AbstractFlowConstuctTestCase
     {
         bridge.initialise();
         bridge.start();
-        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent("hello",
+        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello",
             muleContext));
 
         assertEquals("hello", response.getMessageAsString());

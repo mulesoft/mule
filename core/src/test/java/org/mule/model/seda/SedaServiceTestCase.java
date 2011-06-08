@@ -10,6 +10,9 @@
 
 package org.mule.model.seda;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
@@ -30,9 +33,6 @@ import org.mule.util.queue.QueueManager;
 import java.util.concurrent.TimeUnit;
 
 import junit.framework.AssertionFailedError;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class SedaServiceTestCase extends AbstractServiceTestCase
 {
@@ -153,7 +153,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         service.setComponent(component);
         muleContext.getRegistry().registerService(service);
 
-        service.dispatchEvent(MuleTestUtils.getTestInboundEvent("test", service, muleContext));
+        service.dispatchEvent(MuleTestUtils.getTestEvent("test", service, muleContext));
 
         assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
 

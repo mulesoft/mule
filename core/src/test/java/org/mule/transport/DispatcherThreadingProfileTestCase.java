@@ -10,6 +10,7 @@
 
 package org.mule.transport;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.ThreadingProfile;
@@ -195,8 +196,8 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
     {
         OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint(
             "test://test");
-        endpoint.process(getTestEvent("data", endpoint));
-        endpoint.process(getTestEvent("data", endpoint));
+        endpoint.process(getTestEvent("data", getTestInboundEndpoint(MessageExchangePattern.ONE_WAY)));
+        endpoint.process(getTestEvent("data", getTestInboundEndpoint(MessageExchangePattern.ONE_WAY)));
     }
 
     public class DelayTestMessageDispatcher extends TestMessageDispatcher

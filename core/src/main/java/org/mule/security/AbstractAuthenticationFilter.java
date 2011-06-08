@@ -12,7 +12,6 @@ package org.mule.security;
 
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.AuthenticationFilter;
 import org.mule.api.security.CredentialsAccessor;
@@ -60,26 +59,9 @@ public abstract class AbstractAuthenticationFilter extends AbstractSecurityFilte
         authenticate(event);
     }
 
-    public void authenticate(MuleEvent event)
+    public abstract void authenticate(MuleEvent event)
             throws SecurityException, UnknownAuthenticationTypeException, CryptoFailureException,
             SecurityProviderNotFoundException, EncryptionStrategyNotFoundException,
-            InitialisationException
-    {
-        if (event.getEndpoint() instanceof InboundEndpoint)
-        {
-            authenticateInbound(event);
-        }
-        else
-        {
-            authenticateOutbound(event);
-        }
-    }
-
-    protected abstract void authenticateInbound(MuleEvent event)
-            throws SecurityException, CryptoFailureException, SecurityProviderNotFoundException,
-            EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException;
-
-    protected abstract void authenticateOutbound(MuleEvent event)
-            throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException;
+            InitialisationException;
 
 }

@@ -249,11 +249,7 @@ public class DefaultMuleEventContext implements MuleEventContext
      */
     public MuleMessage sendEvent(MuleMessage message) throws MuleException
     {
-        if (event.getEndpoint() instanceof OutboundEndpoint)
-        {
-            return clientInterface.process((OutboundEndpoint) event.getEndpoint(), message);
-        }
-        else if (session.getFlowConstruct() instanceof Service)
+        if (session.getFlowConstruct() instanceof Service)
         {
             Service service = (Service) session.getFlowConstruct();
             DefaultMuleEvent eventToSend = new DefaultMuleEvent(message, event.getEndpoint(), session);
@@ -263,7 +259,7 @@ public class DefaultMuleEventContext implements MuleEventContext
         else
         {
             throw new MessagingException(
-                CoreMessages.createStaticMessage("Current event has 'inbound' endpoint and FlowConstuct is not a 'Service', MuleEventContext cannot  this message"),
+                CoreMessages.createStaticMessage("FlowConstuct is not a 'Service', MuleEventContext cannot send this message"),
                 event);
         }
     }

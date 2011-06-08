@@ -67,7 +67,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
     {
         flow.initialise();
         flow.start();
-        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent("hello",
+        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello",
             MessageExchangePattern.ONE_WAY, muleContext));
         Thread.sleep(50);
 
@@ -82,7 +82,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
     {
         flow.initialise();
         flow.start();
-        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent("hello",
+        MuleEvent response = directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello",
             MessageExchangePattern.REQUEST_RESPONSE, muleContext));
 
         assertEquals("helloabcdef", response.getMessageAsString());
@@ -102,7 +102,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
 
         try
         {
-            directInboundMessageSource.process(MuleTestUtils.getTestInboundEvent("hello", muleContext));
+            directInboundMessageSource.process(MuleTestUtils.getTestEvent("hello", muleContext));
             fail("exception expected");
         }
         catch (Exception e)

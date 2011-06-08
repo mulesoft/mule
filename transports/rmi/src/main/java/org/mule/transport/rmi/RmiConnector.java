@@ -19,6 +19,7 @@ import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.MessageReceiver;
@@ -208,10 +209,10 @@ public class RmiConnector extends AbstractJndiConnector
      * @throws NoSuchMethodException
      * @throws ClassNotFoundException
      */
-    public Method getMethodObject(Remote remoteObject, MuleEvent event)
+    public Method getMethodObject(Remote remoteObject, MuleEvent event, OutboundEndpoint outboundEndpoint)
         throws MuleException, NoSuchMethodException, ClassNotFoundException
     {
-        EndpointURI endpointUri = event.getEndpoint().getEndpointURI();
+        EndpointURI endpointUri = outboundEndpoint.getEndpointURI();
         String methodName = MapUtils.getString(endpointUri.getParams(), MuleProperties.MULE_METHOD_PROPERTY,
             null);
 

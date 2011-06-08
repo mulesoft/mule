@@ -11,12 +11,7 @@ package org.mule.example.notifications;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.api.security.CryptoFailureException;
-import org.mule.api.security.EncryptionStrategyNotFoundException;
-import org.mule.api.security.SecurityException;
-import org.mule.api.security.SecurityProviderNotFoundException;
 import org.mule.api.security.UnauthorisedException;
-import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.security.AbstractAuthenticationFilter;
 import org.mule.transformer.types.DataTypeFactory;
@@ -28,19 +23,8 @@ import java.util.Map;
  */
 public class DummySecurityFilter extends AbstractAuthenticationFilter
 {
-    @Override
-    protected void authenticateInbound(MuleEvent event) throws org.mule.api.security.SecurityException, CryptoFailureException, SecurityProviderNotFoundException, EncryptionStrategyNotFoundException, UnknownAuthenticationTypeException
-    {
-        doAuthenticate(event);
-    }
 
-    @Override
-    protected void authenticateOutbound(MuleEvent event) throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
-    {
-        doAuthenticate(event);
-    }
-
-    protected void doAuthenticate(MuleEvent event) throws UnauthorisedException
+    public void authenticate(MuleEvent event) throws UnauthorisedException
     {
         try
         {

@@ -79,7 +79,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
         Object[] arguments = getArgs(event);
         if (invokedMethod == null)
         {
-            invokedMethod = connector.getMethodObject(remoteObject, event);
+            invokedMethod = connector.getMethodObject(remoteObject, event, (OutboundEndpoint) endpoint);
         }
         invokedMethod.invoke(remoteObject, arguments);
     }
@@ -88,7 +88,7 @@ public class RmiMessageDispatcher extends AbstractMessageDispatcher
     {
         if (invokedMethod == null)
         {
-            invokedMethod = connector.getMethodObject(remoteObject, event);
+            invokedMethod = connector.getMethodObject(remoteObject, event, (OutboundEndpoint) endpoint);
         }
 
         Object[] arguments = getArgs(event);

@@ -303,7 +303,7 @@ public abstract class AbstractSelectiveRouter
 
         if (getRouterStatistics() != null && getRouterStatistics().isEnabled())
         {
-            getRouterStatistics().incrementRoutedMessage(event.getEndpoint());
+            getRouterStatistics().incrementRoutedMessage(processor);
         }
     }
 

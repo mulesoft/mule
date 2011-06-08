@@ -16,8 +16,6 @@ import static org.mockito.Mockito.when;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.module.cxf.CxfConfiguration;
-import org.mule.module.cxf.CxfOutboundMessageProcessor;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.NullPayload;
 

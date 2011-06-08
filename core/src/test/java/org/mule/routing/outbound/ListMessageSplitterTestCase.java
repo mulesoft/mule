@@ -55,7 +55,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
 
         MuleMessage message = new DefaultMuleMessage(payload, muleContext);
 
-        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, session));
+        MuleEvent result = router.route(new OutboundRoutingTestEvent(message, session, muleContext));
         assertNotNull(result);
         MuleMessage resultMessage = result.getMessage();
         assertNotNull(resultMessage);
@@ -115,17 +115,17 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         mockendpoint1.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
         mockendpoint2.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
         mockendpoint3.expect("process", RouterTestUtils.getArgListCheckerMuleEvent());
-        asyncSplitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        asyncSplitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
         session.verify();
 
         message = new DefaultMuleMessage(payload, muleContext);
-        MuleEvent event = new OutboundRoutingTestEvent(message, null);
+        MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
         mockendpoint4.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint4.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint5.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
         mockendpoint6.expectAndReturn("process", RouterTestUtils.getArgListCheckerMuleEvent(), event);
-        MuleEvent result = syncSplitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy()));
+        MuleEvent result = syncSplitter.route(new OutboundRoutingTestEvent(message, (MuleSession) session.proxy(), muleContext));
         assertNotNull(result);
         MuleMessage resultMessage = result.getMessage();
         assertNotNull(resultMessage);

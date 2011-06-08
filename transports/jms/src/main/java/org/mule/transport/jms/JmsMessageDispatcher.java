@@ -112,9 +112,9 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
 
         if (logger.isDebugEnabled())
         {
-            logger.debug("dispatching on endpoint: " + event.getEndpoint().getEndpointURI()
+            logger.debug("dispatching on endpoint: " + endpoint.getEndpointURI()
                     + ". MuleEvent id is: " + event.getId()
-                    + ". Outbound transformers are: " + event.getEndpoint().getTransformers());
+                    + ". Outbound transformers are: " + endpoint.getTransformers());
         }
 
         // assume session is transacted first, and thus, managed
@@ -138,7 +138,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 }
                 else
                 {
-                    session = connector.getSession(event.getEndpoint());
+                    session = connector.getSession(endpoint);
                     cachedSession = session;
                 }
             }
@@ -147,8 +147,8 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
                 // by now we're running with a different connector and connection
                 sessionManaged = muleTx != null && muleTx.isXA();
 
-                session = connector.getSession(event.getEndpoint());
-                if (event.getEndpoint().getTransactionConfig().isTransacted())
+                session = connector.getSession(endpoint);
+                if (endpoint.getTransactionConfig().isTransacted())
                 {
                     transacted = true;
                 }
@@ -158,7 +158,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             // in the same transaction using a replyTo destination
             useReplyToDestination = returnResponse(event, doSend) && !transacted;
 
-            boolean topic = connector.getTopicResolver().isTopic(event.getEndpoint(), true);
+            boolean topic = connector.getTopicResolver().isTopic(endpoint, true);
 
             Destination dest = connector.getJmsSupport().createDestination(session, endpoint);
             producer = connector.getJmsSupport().createProducer(session, dest, topic);

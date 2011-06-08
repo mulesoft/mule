@@ -19,6 +19,7 @@ import org.mule.api.component.InterfaceBinding;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.endpoint.NullInboundEndpoint;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.module.ibeans.config.IBeanFlowConstruct;
 import org.mule.session.DefaultMuleSession;
@@ -135,7 +136,8 @@ public class MuleCallAnnotationHandler implements ClientAnnotationHandler
 
         try
         {
-            replyEvent = router.process(new DefaultMuleEvent(message, router.getEndpoint(), session));
+            replyEvent = router.process(new DefaultMuleEvent(message, new NullInboundEndpoint(
+                router.getEndpoint().getExchangePattern(), muleContext), session));
         }
         catch (Throwable e)
         {

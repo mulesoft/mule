@@ -20,7 +20,6 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.context.MuleContextFactory;
 import org.mule.api.context.notification.MuleContextNotificationListener;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
@@ -366,19 +365,9 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         return MuleTestUtils.getTestEvent(data, mep, muleContext);
     }
 
-    public static MuleEvent getTestInboundEvent(Object data, MuleSession session) throws Exception
+    public static MuleEvent getTestEvent(Object data, MuleSession session) throws Exception
     {
-        return MuleTestUtils.getTestInboundEvent(data, session, muleContext);
-    }
-
-    public static MuleEvent getTestInboundEvent(Object data) throws Exception
-    {
-        return MuleTestUtils.getTestInboundEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
-    }
-
-    public static MuleEvent getTestInboundEvent(Object data, MessageExchangePattern mep) throws Exception
-    {
-        return MuleTestUtils.getTestInboundEvent(data, mep, muleContext);
+        return MuleTestUtils.getTestEvent(data, session, muleContext);
     }
 
     public static MuleEventContext getTestEventContext(Object data) throws Exception
@@ -396,12 +385,12 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase
         return MuleTestUtils.getTestTransformer();
     }
 
-    public static MuleEvent getTestEvent(Object data, ImmutableEndpoint endpoint) throws Exception
+    public static MuleEvent getTestEvent(Object data, InboundEndpoint endpoint) throws Exception
     {
         return MuleTestUtils.getTestEvent(data, endpoint, muleContext);
     }
 
-    public static MuleEvent getTestEvent(Object data, Service service, ImmutableEndpoint endpoint)
+    public static MuleEvent getTestEvent(Object data, Service service, InboundEndpoint endpoint)
             throws Exception
     {
         return MuleTestUtils.getTestEvent(data, service, endpoint, muleContext);

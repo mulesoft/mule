@@ -20,6 +20,7 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointCache;
+import org.mule.api.endpoint.EndpointException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
@@ -27,6 +28,7 @@ import org.mule.api.lifecycle.LifecycleState;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.MessageInfoMapping;
 import org.mule.api.transport.ReceiveException;
+import org.mule.endpoint.NullInboundEndpoint;
 import org.mule.endpoint.SimpleEndpointCache;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.management.stats.FlowConstructStatistics;
@@ -135,10 +137,10 @@ public class DefaultLocalMuleClient implements LocalMuleClient
         return returnMessage(endpoint.process(createMuleEvent(message, endpoint)));
     }
 
-    protected MuleEvent createMuleEvent(MuleMessage message, OutboundEndpoint endpoint)
+    protected MuleEvent createMuleEvent(MuleMessage message, OutboundEndpoint endpoint) throws EndpointException
     {
         DefaultMuleSession session = new DefaultMuleSession(new MuleClientFlowConstruct(muleContext), muleContext);
-        return new DefaultMuleEvent(message, endpoint, session);
+        return new DefaultMuleEvent(message, new NullInboundEndpoint(endpoint.getExchangePattern(), muleContext), session);
     }
 
     protected MuleMessage returnMessage(MuleEvent event)

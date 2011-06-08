@@ -13,6 +13,7 @@ package org.mule;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.security.Credentials;
 import org.mule.api.service.Service;
@@ -166,7 +167,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         // cannot set SMTP endpoint type, because the module doesn't have this
         // dependency
         ImmutableEndpoint endpoint = getTestOutboundEndpoint("AuthTest", "test://john.doe@xyz.fr");
-        MuleEvent event = getTestEvent(new Object(), endpoint);
+        MuleEvent event = getTestEvent(new Object());
         Credentials credentials = event.getCredentials();
         assertNull("Credentials must not be created for endpoints without a password.", credentials);
     }
@@ -183,7 +184,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         transformers.add(trans1);
         transformers.add(trans2);
 
-        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test", null, transformers, 
+        InboundEndpoint endpoint = getTestInboundEndpoint("Test", null, transformers, 
             new PayloadTypeFilter(Object.class), null);
 
         MuleEvent event = RequestContext.setEvent(getTestEvent("payload", endpoint));
@@ -291,7 +292,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         String username = "mule";
         String password = "rulez";
         String url = "test://" + username + ":" + password + "@localhost";
-        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test", url);
+        InboundEndpoint endpoint = getTestInboundEndpoint("Test", url);
         ByteArrayToObject trans = new ByteArrayToObject();
         trans.setMuleContext(muleContext);
 
@@ -311,7 +312,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
     private MuleEvent createEventToSerialize() throws Exception
     {
         createAndRegisterTransformersEndpointBuilderService();
-        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
+        InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
             muleContext.getRegistry().lookupEndpointBuilder("epBuilderTest"));
         Service service = muleContext.getRegistry().lookupService("appleService");
         return RequestContext.setEvent(getTestEvent("payload", service, endpoint));

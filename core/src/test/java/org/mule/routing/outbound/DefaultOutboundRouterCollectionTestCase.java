@@ -97,7 +97,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     public void testSingleDoesNotRequireCopyRouterMatchAllTrue() throws Exception
     {
 
-        MuleEvent testEvent = getTestInboundEvent("TEST_MESSAGE");
+        MuleEvent testEvent = getTestEvent("TEST_MESSAGE");
         getOutboundRouterCollection().setMatchAll(true);
         getOutboundRouterCollection().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(false));
 
@@ -179,7 +179,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     public void testMultipleDoesNotRequireCopyRouterMatchAllTrue() throws Exception
     {
 
-        MuleEvent testEvent = getTestInboundEvent("TEST_MESSAGE");
+        MuleEvent testEvent = getTestEvent("TEST_MESSAGE");
         getOutboundRouterCollection().setMatchAll(true);
         getOutboundRouterCollection().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(true));
         getOutboundRouterCollection().addRoute(new TestDoesNotRequireNewMessageOutboundRouter(true));

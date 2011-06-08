@@ -53,7 +53,7 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
      * @throws org.mule.api.security.SecurityException if authentication fails
      */
     @Override
-    public void authenticateInbound(MuleEvent event)
+    public void authenticate(MuleEvent event)
         throws SecurityException, SecurityProviderNotFoundException, UnknownAuthenticationTypeException
     {
         Authentication authentication = getAuthenticationToken(event);
@@ -102,20 +102,6 @@ public class UsernamePasswordAuthenticationFilter extends AbstractAuthentication
         return new DefaultMuleAuthentication(new MuleCredentials(usernameEval.toString(), passwordEval.toString().toCharArray()));
     }
     
-
-    /**
-     * Authenticates the current message if authenticate is set to true. This method
-     * will always populate the secure context in the session
-     * 
-     * @param event the current event being dispatched
-     * @throws org.mule.api.security.SecurityException if authentication fails
-     */
-    @Override
-    public void authenticateOutbound(MuleEvent event)
-        throws SecurityException, SecurityProviderNotFoundException
-    {
-    }
-
     public String getUsername()
     {
         return username;
