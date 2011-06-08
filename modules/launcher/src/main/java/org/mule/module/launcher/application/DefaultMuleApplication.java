@@ -183,42 +183,13 @@ public class DefaultMuleApplication implements Application
             logger.info(miniSplash(String.format("Initializing app '%s'", appName)));
         }
 
-        String configBuilderClassName = null;
         try
         {
-            // Configuration builder
-            // Provide a shortcut for Spring: "-builder spring"
-            final String builderFromDesc = descriptor.getConfigurationBuilder();
-            if ("spring".equalsIgnoreCase(builderFromDesc))
-            {
-                configBuilderClassName = ApplicationDescriptor.CLASSNAME_SPRING_CONFIG_BUILDER;
-            }
-            else if (builderFromDesc == null)
-            {
-                configBuilderClassName = AutoConfigurationBuilder.class.getName();
-            }
-            else
-            {
-                configBuilderClassName = builderFromDesc;
-            }
-
-            ConfigurationBuilder cfgBuilder = (ConfigurationBuilder) ClassUtils.instanciateClass(
-                configBuilderClassName, new Object[] {absoluteResourcePaths}, getDeploymentClassLoader());
-
+            ConfigurationBuilder cfgBuilder = createConfigurationBuiler();
             if (!cfgBuilder.isConfigured())
             {
-                //Load application properties first since they may be needed by other configuration builders
-                List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(2);
-
-                final Map<String,String> appProperties = descriptor.getAppProperties();
-
-                //Add the app.home variable to the context
-                appProperties.put(MuleProperties.APP_HOME_DIRECTORY_PROPERTY,
-                        new File(MuleContainerBootstrapUtils.getMuleAppsDir(), getAppName()).getAbsolutePath());
-
-                appProperties.put(MuleProperties.APP_NAME_PROPERTY, getAppName());
-
-                builders.add(new SimpleConfigurationBuilder(appProperties));
+                List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(3);
+                builders.add(createConfigurationBuilderFromApplicationProperties());
 
                 // If the annotations module is on the classpath, add the annotations config builder to the list
                 // This will enable annotations config for this instance
@@ -247,6 +218,45 @@ public class DefaultMuleApplication implements Application
             logger.error(null, ExceptionUtils.getRootCause(e));
             throw new DeploymentInitException(CoreMessages.createStaticMessage(ExceptionUtils.getRootCauseMessage(e)), e);
         }
+    }
+
+    protected ConfigurationBuilder createConfigurationBuiler() throws Exception
+    {
+        String configBuilderClassName = determineConfigBuilderClassName();
+        return (ConfigurationBuilder) ClassUtils.instanciateClass(configBuilderClassName,
+            new Object[] { absoluteResourcePaths }, getDeploymentClassLoader());
+    }
+
+    protected String determineConfigBuilderClassName()
+    {
+        // Provide a shortcut for Spring: "-builder spring"
+        final String builderFromDesc = descriptor.getConfigurationBuilder();
+        if ("spring".equalsIgnoreCase(builderFromDesc))
+        {
+            return ApplicationDescriptor.CLASSNAME_SPRING_CONFIG_BUILDER;
+        }
+        else if (builderFromDesc == null)
+        {
+            return AutoConfigurationBuilder.class.getName();
+        }
+        else
+        {
+            return builderFromDesc;
+        }
+    }
+
+    protected ConfigurationBuilder createConfigurationBuilderFromApplicationProperties()
+    {
+        // Load application properties first since they may be needed by other configuration builders
+        final Map<String,String> appProperties = descriptor.getAppProperties();
+
+        // Add the app.home variable to the context
+        File appPath = new File(MuleContainerBootstrapUtils.getMuleAppsDir(), getAppName());
+        appProperties.put(MuleProperties.APP_HOME_DIRECTORY_PROPERTY, appPath.getAbsolutePath());
+
+        appProperties.put(MuleProperties.APP_NAME_PROPERTY, getAppName());
+
+        return new SimpleConfigurationBuilder(appProperties);
     }
 
     public MuleContext getMuleContext()
