@@ -19,7 +19,8 @@ public class ScanLicenseHeaders
     static List ignoredFiles = [ "BndMojo.java", "BobberArchetype.java", "BobberArchetypeMojo.java", "ClassReader.java",
         "ConfigurationPatternArchetypeMojo.java", "DummySSLServerSocketFactory.java", "ExampleArchetypeMojo.java", 
         "ModuleArchetypeMojo.java", "MultipartConfiguration.java", "ParamReader.java", "Part.java", 
-        "ProjectArchetypeMojo.java", "TransportArchetypeMojo.java", "XMLStreamReaderToContentHandler.java"];
+        "ProjectArchetypeMojo.java", "TransportArchetypeMojo.java", "XMLStreamReaderToContentHandler.java",
+        "WebAppDeployer.java", "__artifactId__IBean.java", "__artifactId__IBeanTestCase.java"];
 
     static void main(args)
     {
