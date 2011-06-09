@@ -70,7 +70,7 @@ public class FlowDefinitionParser extends OrphanDefinitionParser
         {
             builder.addPropertyValue(PROCESSING_STRATEGY_ATTRIBUTE_NAME, new QueuedThreadPerProcessorProcessingStrategy());
         }
-        else if (null != processingStrategy)
+        else if (null != processingStrategy && !processingStrategy.isEmpty())
         {
             builder.addPropertyValue(PROCESSING_STRATEGY_ATTRIBUTE_NAME, new RuntimeBeanReference(
                 processingStrategy));
