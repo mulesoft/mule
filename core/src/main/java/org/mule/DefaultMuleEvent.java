@@ -29,11 +29,12 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DefaultEndpointFactory;
+import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.endpoint.NullInboundEndpoint;
 import org.mule.management.stats.ProcessingTime;
 import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
+import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.service.TransportServiceDescriptor;
 import org.mule.util.ObjectNameHelper;
@@ -151,6 +152,20 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         fillProperties();
     }
 
+    public DefaultMuleEvent(MuleMessage message,
+                            MessageExchangePattern exchangePattern,
+                            MuleSession session,
+                            ResponseOutputStream outputStream)
+    {
+        this(message, new NullInboundEndpoint(exchangePattern, message.getMuleContext()), session,
+            outputStream);
+    }
+
+    public DefaultMuleEvent(MuleMessage message, MessageExchangePattern exchangePattern, MuleSession session)
+    {
+        this(message, exchangePattern, session, null);
+    }
+    
     public DefaultMuleEvent(MuleMessage message,
                             InboundEndpoint endpoint,
                             MuleSession session)
@@ -779,4 +794,15 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         return processingTime;
     }
 
+    private static class NullInboundEndpoint extends DefaultInboundEndpoint
+    {
+        public NullInboundEndpoint(MessageExchangePattern mep, MuleContext muleContext)
+        {
+            super(null,
+                new MuleEndpointURI("dynamic://null", null, null, null, null, null, null, muleContext), null,
+                new HashMap(), new MuleTransactionConfig(), false, mep, 0, null, null, null, muleContext,
+                null, null, null, null, false, null);
+        }
+
+    }
 }

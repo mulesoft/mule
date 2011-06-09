@@ -18,6 +18,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.message.DefaultExceptionPayload;
@@ -147,7 +148,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         MuleMessage msg = new DefaultMuleMessage(message, muleContext);
         try
         {
-            MuleEvent event = mp.process(new DefaultMuleEvent(msg, null, session));
+            MuleEvent event = mp.process(new DefaultMuleEvent(msg, (InboundEndpoint) null, session));
             MuleMessage returnedMessage = event.getMessage();
             if (returnedMessage.getExceptionPayload() != null)
             {
@@ -192,7 +193,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
                 {
                     msg = new DefaultMuleMessage("No " + rejectIfMatches, muleContext);
                 }
-                return new DefaultMuleEvent(msg, null, event.getSession());
+                return new DefaultMuleEvent(msg, (InboundEndpoint)  null, event.getSession());
             }
             catch (Exception e)
             {

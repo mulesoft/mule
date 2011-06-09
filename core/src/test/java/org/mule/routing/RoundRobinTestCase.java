@@ -17,6 +17,7 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.tck.AbstractMuleTestCase;
 
@@ -82,7 +83,7 @@ public class RoundRobinTestCase extends AbstractMuleTestCase
             for (int i = 0; i < numMessages; i++)
             {
                 MuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE + messageNumber.getAndIncrement(), muleContext);
-                MuleEvent event = new DefaultMuleEvent(msg, null, session);
+                MuleEvent event = new DefaultMuleEvent(msg, (InboundEndpoint) null, session);
                 try
                 {
                     target.process(event);

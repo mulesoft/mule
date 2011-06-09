@@ -43,7 +43,6 @@ import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.DefaultMuleContextFactory;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.endpoint.NullInboundEndpoint;
 import org.mule.security.MuleCredentials;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.session.DefaultMuleSession;
@@ -267,7 +266,7 @@ public class MuleClient implements Disposable
     public void dispatch(String url, MuleMessage message) throws MuleException
     {
         OutboundEndpoint endpoint = getOutboundEndpoint(url, MessageExchangePattern.ONE_WAY, null);
-        MuleEvent event = getEvent(message, new NullInboundEndpoint(MessageExchangePattern.ONE_WAY, muleContext));
+        MuleEvent event = getEvent(message, MessageExchangePattern.ONE_WAY);
         endpoint.process(event);
     }
 
@@ -622,7 +621,7 @@ public class MuleClient implements Disposable
         OutboundEndpoint endpoint = 
             getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, timeout);
         
-        MuleEvent event = getEvent(message, new NullInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE, muleContext));
+        MuleEvent event = getEvent(message, MessageExchangePattern.REQUEST_RESPONSE);
         event.setTimeout(timeout);
 
         MuleEvent response = endpoint.process(event);
@@ -695,7 +694,7 @@ public class MuleClient implements Disposable
         return request(url, timeout);
     }
 
-    protected MuleEvent getEvent(MuleMessage message, InboundEndpoint endpoint) throws MuleException
+    protected MuleEvent getEvent(MuleMessage message, MessageExchangePattern exchangePattern) throws MuleException
     {
         DefaultMuleSession session = new DefaultMuleSession(new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext), muleContext);
 
@@ -703,7 +702,7 @@ public class MuleClient implements Disposable
         {
             message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(user.getUsername(), user.getPassword()));
         }
-        return new DefaultMuleEvent(message, endpoint, session);
+        return new DefaultMuleEvent(message, exchangePattern, session);
     }
 
     protected InboundEndpoint getInboundEndpoint(String uri) throws MuleException
@@ -825,7 +824,7 @@ public class MuleClient implements Disposable
         
         OutboundEndpoint endpoint = 
             getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, null);
-        MuleEvent event = getEvent(message, new NullInboundEndpoint(MessageExchangePattern.REQUEST_RESPONSE, muleContext));
+        MuleEvent event = getEvent(message, MessageExchangePattern.REQUEST_RESPONSE);
         endpoint.process(event);
     }
 

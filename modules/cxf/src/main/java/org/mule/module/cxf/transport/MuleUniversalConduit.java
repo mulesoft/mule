@@ -22,7 +22,6 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.OutputHandler;
-import org.mule.endpoint.NullInboundEndpoint;
 import org.mule.module.cxf.CxfConfiguration;
 import org.mule.module.cxf.CxfConstants;
 import org.mule.module.cxf.CxfOutboundMessageProcessor;
@@ -165,8 +164,7 @@ public class MuleUniversalConduit extends AbstractConduit
             try
             {
                 ep = getEndpoint(muleContext, url);
-                event = new DefaultMuleEvent(muleMsg, new NullInboundEndpoint(ep.getExchangePattern(),
-                    muleContext), session);
+                event = new DefaultMuleEvent(muleMsg, ep.getExchangePattern(), session);
             }
             catch (Exception e)
             {

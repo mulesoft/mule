@@ -22,7 +22,6 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.component.BindingInvocationHandler;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.endpoint.NullInboundEndpoint;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.session.DefaultMuleSession;
 
@@ -71,8 +70,7 @@ public class CallInterfaceBinding implements InterfaceBinding, MessageProcessor
             session = new DefaultMuleSession(flow, message.getMuleContext());
         }
 
-        MuleEvent result = process(new DefaultMuleEvent(message, new NullInboundEndpoint(
-            endpoint.getExchangePattern(), message.getMuleContext()), session));
+        MuleEvent result = process(new DefaultMuleEvent(message, endpoint.getExchangePattern(), session));
         if (result != null)
         {
             return result.getMessage();

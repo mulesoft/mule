@@ -16,6 +16,7 @@ import org.mule.api.MuleContext;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ListenerSubscriptionPair;
@@ -230,9 +231,10 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
 
         public TestSecurityEvent(MuleContext muleContext)
         {
-            super(new UnauthorisedException(CoreMessages.createStaticMessage("dummy"),
-                new DefaultMuleEvent(new DefaultMuleMessage(NullPayload.getInstance(), muleContext), 
-                null, null)), 0);
+            super(
+                new UnauthorisedException(CoreMessages.createStaticMessage("dummy"), new DefaultMuleEvent(
+                    new DefaultMuleMessage(NullPayload.getInstance(), muleContext), (InboundEndpoint) null,
+                    null)), 0);
         }
 
     }

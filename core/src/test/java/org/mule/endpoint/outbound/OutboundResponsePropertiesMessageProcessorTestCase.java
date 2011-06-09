@@ -12,6 +12,7 @@ package org.mule.endpoint.outbound;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
@@ -39,7 +40,7 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
             {
                 // return event with same payload but no properties
                 return new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage().getPayload(),
-                    muleContext), null, null);
+                    muleContext), MessageExchangePattern.REQUEST_RESPONSE, null);
             }
         });
 

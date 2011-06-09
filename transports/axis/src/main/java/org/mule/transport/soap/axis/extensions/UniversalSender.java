@@ -30,7 +30,6 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.endpoint.NullInboundEndpoint;
 import org.mule.module.cxf.SoapConstants;
 import org.mule.session.DefaultMuleSession;
 import org.mule.transport.http.HttpConstants;
@@ -225,8 +224,8 @@ public class UniversalSender extends BasicHandler
                 OutboundEndpoint syncEndpoint = muleContext.getRegistry()
                     .lookupEndpointFactory()
                     .getOutboundEndpoint(builder);
-                MuleEvent dispatchEvent = new DefaultMuleEvent(message, new NullInboundEndpoint(
-                    MessageExchangePattern.REQUEST_RESPONSE, muleContext), session);
+                MuleEvent dispatchEvent = new DefaultMuleEvent(message,
+                    MessageExchangePattern.REQUEST_RESPONSE, session);
                 MuleMessage result = null;
                 MuleEvent resultEvent = syncEndpoint.process(dispatchEvent);
                 if (resultEvent != null)
@@ -254,8 +253,8 @@ public class UniversalSender extends BasicHandler
             }
             else
             {
-                MuleEvent dispatchEvent = new DefaultMuleEvent(message, new NullInboundEndpoint(
-                    MessageExchangePattern.ONE_WAY, muleContext), session);
+                MuleEvent dispatchEvent = new DefaultMuleEvent(message, MessageExchangePattern.ONE_WAY,
+                    session);
                 endpoint.process(dispatchEvent);
             }
         }

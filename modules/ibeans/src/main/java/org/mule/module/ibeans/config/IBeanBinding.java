@@ -21,7 +21,6 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.endpoint.NullInboundEndpoint;
 import org.mule.module.ibeans.spi.MuleCallAnnotationHandler;
 import org.mule.module.ibeans.spi.MuleIBeansPlugin;
 import org.mule.module.ibeans.spi.support.DynamicRequestInterfaceBinding;
@@ -92,8 +91,8 @@ public class IBeanBinding implements InterfaceBinding
     {
         try
         {
-            return endpoint.process(new DefaultMuleEvent(event.getMessage(), new NullInboundEndpoint(
-                endpoint.getExchangePattern(), muleContext), event.getSession()));
+            return endpoint.process(new DefaultMuleEvent(event.getMessage(), endpoint.getExchangePattern(),
+                event.getSession()));
         }
         catch (MessagingException e)
         {
