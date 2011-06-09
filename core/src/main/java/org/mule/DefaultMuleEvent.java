@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -798,10 +799,9 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     {
         public NullInboundEndpoint(MessageExchangePattern mep, MuleContext muleContext)
         {
-            super(null,
-                new MuleEndpointURI("dynamic://null", null, null, null, null, null, null, muleContext), null,
-                new HashMap(), new MuleTransactionConfig(), false, mep, 0, null, null, null, muleContext,
-                null, null, null, null, false, null);
+            super(null, new MuleEndpointURI("dynamic://null", null, null, null, null, null,
+                URI.create("dynamic://null"), muleContext), null, new HashMap(), new MuleTransactionConfig(),
+                false, mep, 0, null, null, null, muleContext, null, null, null, null, false, null);
         }
 
     }
