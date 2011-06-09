@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 public class TickFeed implements Initialisable, Callable
 {
     public static final String DATA_FILE = "stocktickstream.dat";
-    private static final MessageFormat lineFormat = new MessageFormat("{0,number,0};{1};{2,number,currency}");
+	private static final MessageFormat lineFormat = new MessageFormat("{0,number,0};{1};{2,number,currency}", Locale.US);
     
     private Iterator<String> lines;
     
