@@ -168,7 +168,7 @@ public class JmsMessageDispatcher extends AbstractMessageDispatcher
             {
                 throw new DispatchException(
                         JmsMessages.checkTransformer("JMS message", message.getClass(), connector.getName()),
-                        event, (OutboundEndpoint) endpoint);
+                        event, getEndpoint());
             }
 
             Message msg = (Message) message;

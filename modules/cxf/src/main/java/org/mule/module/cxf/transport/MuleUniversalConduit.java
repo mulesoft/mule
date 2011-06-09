@@ -344,9 +344,6 @@ public class MuleUniversalConduit extends AbstractConduit
         MuleEvent response;
         if (processor == null)
         {
-//            // we're sending from a CXF client, not from mule
-//            OutboundEndpoint ep = (OutboundEndpoint) processor.getEndpoint();
-//            RequestContext.setEvent(event);
             response = endpoint.process(event);
         }
         else

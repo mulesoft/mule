@@ -99,7 +99,7 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
         }
         catch (Exception e)
         {
-            throw new DispatchException(event, (OutboundEndpoint) endpoint, e);
+            throw new DispatchException(event, getEndpoint(), e);
         }
         return resultEvent;
     }

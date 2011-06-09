@@ -116,7 +116,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 
                 Exception cause = new Exception(String.format("Http call returned a status of: %1d %1s",
                     httpMethod.getStatusCode(), httpMethod.getStatusText()));
-                throw new DispatchException(event, (OutboundEndpoint) endpoint, cause);
+                throw new DispatchException(event, getEndpoint(), cause);
             }
             else if (httpMethod.getStatusCode() >= REDIRECT_STATUS_CODE_RANGE_START)
             {
@@ -149,11 +149,11 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
         catch (IOException e)
         {
             // TODO employ dispatcher reconnection strategy at this point
-            throw new DispatchException(event, (OutboundEndpoint) endpoint, e);
+            throw new DispatchException(event, getEndpoint(), e);
         }
         catch (Exception e)
         {
-            throw new DispatchException(event, (OutboundEndpoint) endpoint, e);
+            throw new DispatchException(event, getEndpoint(), e);
         }
 
     }
@@ -263,7 +263,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
             if (returnException(event, httpMethod))
             {
-                ep = new DefaultExceptionPayload(new DispatchException(event, (OutboundEndpoint) endpoint,
+                ep = new DefaultExceptionPayload(new DispatchException(event, getEndpoint(),
                         new HttpResponseException(httpMethod.getStatusText(), httpMethod.getStatusCode())));
             }
             else if (httpMethod.getStatusCode() >= REDIRECT_STATUS_CODE_RANGE_START)
@@ -274,7 +274,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
                 }
                 catch (Exception e)
                 {
-                    ep = new DefaultExceptionPayload(new DispatchException(event, (OutboundEndpoint) endpoint, e));
+                    ep = new DefaultExceptionPayload(new DispatchException(event, getEndpoint(), e));
                     return getResponseFromMethod(httpMethod, ep);
                 }
             }
@@ -288,7 +288,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             {
                 throw (DispatchException) e;
             }
-            throw new DispatchException(event, (OutboundEndpoint) endpoint, e);
+            throw new DispatchException(event, getEndpoint(), e);
         }
         finally
         {
