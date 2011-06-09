@@ -24,6 +24,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.ReceiveException;
+import org.mule.endpoint.NullInboundEndpoint;
 import org.mule.module.client.i18n.ClientMessages;
 import org.mule.module.jca.i18n.JcaMessages;
 import org.mule.security.MuleCredentials;
@@ -172,7 +173,8 @@ public class DefaultMuleConnection implements MuleConnection
             message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, "Plain " + credentials.getToken());
         }
 
-        return new DefaultMuleEvent(message, endpoint, session);
+        return new DefaultMuleEvent(message, new NullInboundEndpoint(endpoint.getExchangePattern(),
+            muleContext), session);
     }
 
     /**

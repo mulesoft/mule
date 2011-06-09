@@ -265,7 +265,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
                 logger.debug("Message with correlationId: " + message.getJMSCorrelationID()
                              + " is redelivered. handing off to Exception Handler");
             }
-            ((RedeliveryHandler) redeliveryHandler.get()).handleRedelivery(message, endpoint, flowConstruct);
+            ((RedeliveryHandler) redeliveryHandler.get()).handleRedelivery(message, (InboundEndpoint) endpoint, flowConstruct);
         }
 
         MuleMessage messageToRoute = createMuleMessage(message, endpoint.getEncoding());

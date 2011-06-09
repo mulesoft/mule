@@ -17,7 +17,6 @@ import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.filter.Filter;
@@ -318,12 +317,12 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         return new DefaultMuleMessage(TEST_MESSAGE, props, muleContext);
     }
 
-    protected MuleEvent createTestRequestEvent(ImmutableEndpoint endpoint) throws Exception
+    protected MuleEvent createTestRequestEvent(InboundEndpoint endpoint) throws Exception
     {
         return new DefaultMuleEvent(inMessage, endpoint, getTestSession(getTestService(), muleContext));
     }
     
-    protected MuleEvent createTestResponseEvent(ImmutableEndpoint endpoint) throws Exception
+    protected MuleEvent createTestResponseEvent(InboundEndpoint endpoint) throws Exception
     {
         return new DefaultMuleEvent(new DefaultMuleMessage(RESPONSE_MESSAGE, muleContext),
             endpoint, getTestSession(getTestService(), muleContext));

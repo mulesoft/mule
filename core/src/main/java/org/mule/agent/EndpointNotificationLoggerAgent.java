@@ -22,6 +22,7 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ConnectionNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
+import org.mule.endpoint.NullInboundEndpoint;
 import org.mule.session.DefaultMuleSession;
 
 import java.util.ArrayList;
@@ -101,7 +102,8 @@ public class EndpointNotificationLoggerAgent extends AbstractNotificationLoggerA
                     return;
                 }
 
-                MuleEvent event = new DefaultMuleEvent(msg, endpoint, session);
+                MuleEvent event = new DefaultMuleEvent(msg, new NullInboundEndpoint(
+                    endpoint.getExchangePattern(), muleContext), session);
                 endpoint.process(event);
             }
             catch (Exception e1)

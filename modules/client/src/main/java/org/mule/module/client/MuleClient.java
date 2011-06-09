@@ -26,7 +26,6 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextBuilder;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.Disposable;
@@ -318,7 +317,7 @@ public class MuleClient implements Disposable
         }
 
         MuleSession session = new DefaultMuleSession(service, muleContext);
-        ImmutableEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), true);
+        InboundEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), true);
         MuleEvent event = new DefaultMuleEvent(message, endpoint, session);
 
         if (logger.isDebugEnabled())
@@ -372,7 +371,7 @@ public class MuleClient implements Disposable
             throw new ServiceException(CoreMessages.objectNotRegistered("Service", componentName));
         }
         MuleSession session = new DefaultMuleSession(service, muleContext);
-        ImmutableEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), false);
+        InboundEndpoint endpoint = getDefaultClientEndpoint(service, message.getPayload(), false);
         MuleEvent event = new DefaultMuleEvent(message, endpoint, session);
 
         if (logger.isDebugEnabled())
@@ -759,7 +758,7 @@ public class MuleClient implements Disposable
         return endpoint;
     }
 
-    protected ImmutableEndpoint getDefaultClientEndpoint(Service service, Object payload, boolean sync)
+    protected InboundEndpoint getDefaultClientEndpoint(Service service, Object payload, boolean sync)
         throws MuleException
     {
         if (!(service.getMessageSource() instanceof ServiceCompositeMessageSource))
@@ -769,7 +768,7 @@ public class MuleClient implements Disposable
         }
     
         // as we are bypassing the message transport layer we need to check that
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
+        InboundEndpoint endpoint = (InboundEndpoint) ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
         if (endpoint != null)
         {
             if (endpoint.getTransformers() != null)

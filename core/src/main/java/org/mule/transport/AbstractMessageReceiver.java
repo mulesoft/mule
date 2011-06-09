@@ -270,7 +270,7 @@ public abstract class AbstractMessageReceiver extends AbstractTransportMessageHa
         {
             session = new DefaultMuleSession(flowConstruct, connector.getMuleContext());
         }
-        return new DefaultMuleEvent(message, endpoint, session, ros);
+        return new DefaultMuleEvent(message, (InboundEndpoint) endpoint, session, ros);
     }
 
     public EndpointURI getEndpointURI()

@@ -176,7 +176,7 @@ public class RemoteDispatcherComponent implements Callable, Initialisable
             EndpointBuilder builder = new EndpointURIEndpointBuilder(RequestContext.getEvent().getEndpoint());
             // TODO - is this correct? it stops any other transformer from being set
             builder.setTransformers(new LinkedList());
-            ImmutableEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(builder);
+            InboundEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(builder);
             MuleEvent event = new DefaultMuleEvent(action.getMessage(), ep, context.getSession());
             event = RequestContext.setEvent(event);
 

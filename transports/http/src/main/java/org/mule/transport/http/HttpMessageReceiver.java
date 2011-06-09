@@ -357,7 +357,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         protected HttpResponse doOtherValid(RequestLine requestLine, String method) throws MuleException
         {
             MuleMessage message = createMuleMessage(null);
-            MuleEvent event = new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(connector.getMuleContext()));
+            MuleEvent event = new DefaultMuleEvent(message, (InboundEndpoint) endpoint, new DefaultMuleSession(connector.getMuleContext()));
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_METHOD_NOT_ALLOWED);
@@ -368,7 +368,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
         protected HttpResponse doBad(RequestLine requestLine) throws MuleException
         {
             MuleMessage message = createMuleMessage(null);
-            MuleEvent event = new DefaultMuleEvent(message, endpoint, new DefaultMuleSession(connector.getMuleContext()));
+            MuleEvent event = new DefaultMuleEvent(message, (InboundEndpoint) endpoint, new DefaultMuleSession(connector.getMuleContext()));
             OptimizedRequestContext.unsafeSetEvent(event);
             HttpResponse response = new HttpResponse();
             response.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_BAD_REQUEST);
@@ -396,7 +396,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
                         HttpResponse expected = new HttpResponse();
                         expected.setStatusLine(requestLine.getHttpVersion(), HttpConstants.SC_CONTINUE);
                         final DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(expected,
-                            connector.getMuleContext()), endpoint, new DefaultMuleSession(flowConstruct,
+                            connector.getMuleContext()), (InboundEndpoint) endpoint, new DefaultMuleSession(flowConstruct,
                             connector.getMuleContext()));
                         RequestContext.setEvent(event);
                         conn.writeResponse(transformResponse(expected, event));
@@ -410,7 +410,7 @@ public class HttpMessageReceiver extends TcpMessageReceiver
             HttpResponse response = new HttpResponse();
             response.setStatusLine(version, statusCode);
             response.setBody(description);
-            DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(response, connector.getMuleContext()), endpoint,
+            DefaultMuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage(response, connector.getMuleContext()), (InboundEndpoint) endpoint,
                 new DefaultMuleSession(flowConstruct, connector.getMuleContext()));
             RequestContext.setEvent(event);
             // The DefaultResponseTransformer will set the necessary headers

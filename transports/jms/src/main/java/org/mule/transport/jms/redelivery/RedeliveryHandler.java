@@ -12,7 +12,7 @@ package org.mule.transport.jms.redelivery;
 
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.transport.jms.JmsConnector;
 
 import javax.jms.JMSException;
@@ -50,6 +50,6 @@ public interface RedeliveryHandler
      *             handled by the connection exception handler
      * @throws MuleException if there is a problem reading or proessing the message
      */
-    public void handleRedelivery(Message message, ImmutableEndpoint endpoint, FlowConstruct flow) throws JMSException, MuleException;
+    public void handleRedelivery(Message message, InboundEndpoint endpoint, FlowConstruct flow) throws JMSException, MuleException;
 
 }

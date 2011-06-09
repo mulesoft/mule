@@ -21,9 +21,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
-import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
@@ -80,7 +78,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     /**
      * The endpoint associated with the event
      */
-    private transient ImmutableEndpoint endpoint = null;
+    private transient InboundEndpoint endpoint = null;
 
     /**
      * the Universally Unique ID for the event
@@ -121,7 +119,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      * @param previousEvent
      */
     public DefaultMuleEvent(MuleMessage message,
-                            ImmutableEndpoint endpoint,
+                            InboundEndpoint endpoint,
                             FlowConstruct service,
                             MuleEvent previousEvent)
     {
@@ -138,7 +136,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     }
 
     public DefaultMuleEvent(MuleMessage message,
-                            ImmutableEndpoint endpoint,
+                            InboundEndpoint endpoint,
                             MuleEvent previousEvent,
                             MuleSession session)
     {
@@ -154,14 +152,14 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     }
 
     public DefaultMuleEvent(MuleMessage message,
-                            ImmutableEndpoint endpoint,
+                            InboundEndpoint endpoint,
                             MuleSession session)
     {
         this(message, endpoint, session, null, null);
     }
 
     public DefaultMuleEvent(MuleMessage message,
-                            ImmutableEndpoint endpoint,
+                            InboundEndpoint endpoint,
                             MuleSession session,
                             ProcessingTime time)
     {
@@ -169,7 +167,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     }
 
     public DefaultMuleEvent(MuleMessage message,
-                            ImmutableEndpoint endpoint,
+                            InboundEndpoint endpoint,
                             MuleSession session,
                             ResponseOutputStream outputStream)
     {
@@ -177,7 +175,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     }
 
     public DefaultMuleEvent(MuleMessage message,
-                            ImmutableEndpoint endpoint,
+                            InboundEndpoint endpoint,
                             MuleSession session,
                             ResponseOutputStream outputStream,
                             ProcessingTime time)
@@ -432,11 +430,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     @Override
     public InboundEndpoint getEndpoint()
     {
-        if (endpoint instanceof OutboundEndpoint)
-        {
-            throw new RuntimeException("ATTEMPTED ACCES OF OUTBOUND ENDPINT ON EVENT");
-        }
-        return (InboundEndpoint) endpoint;
+        return endpoint;
     }
 
     @Override
@@ -668,7 +662,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
         // 1) First attempt to get same endpoint instance from registry using
         // hashcode, this will work if registry hasn't been disposed.
-        endpoint = (ImmutableEndpoint) muleContext.getRegistry().lookupObject(
+        endpoint = (InboundEndpoint) muleContext.getRegistry().lookupObject(
                 DefaultEndpointFactory.ENDPOINT_REGISTRY_PREFIX + endpointHashcode);
 
         // Registry has been disposed so we need to recreate endpoint

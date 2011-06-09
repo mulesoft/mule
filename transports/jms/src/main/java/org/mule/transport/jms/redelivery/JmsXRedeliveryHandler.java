@@ -14,7 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.ImmutableEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transport.jms.JmsConnector;
 import org.mule.transport.jms.JmsConstants;
@@ -44,7 +44,7 @@ public class JmsXRedeliveryHandler extends AbstractRedeliveryHandler
      * 
      */
     @Override
-    public void handleRedelivery(Message message, ImmutableEndpoint endpoint, FlowConstruct flow) throws JMSException, MuleException
+    public void handleRedelivery(Message message, InboundEndpoint endpoint, FlowConstruct flow) throws JMSException, MuleException
     {
         final int connectorRedelivery = connector.getMaxRedelivery();
         if (connectorRedelivery == JmsConnector.REDELIVERY_IGNORE || connectorRedelivery < 0 ) // just in case, for manual setting)

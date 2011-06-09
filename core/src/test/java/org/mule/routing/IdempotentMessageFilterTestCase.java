@@ -15,7 +15,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.OutboundEndpoint;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
@@ -28,7 +28,7 @@ public class IdempotentMessageFilterTestCase extends AbstractMuleTestCase
 
     public void testIdempotentReceiver() throws Exception
     {
-        OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?exchangePattern=one-way");
+        InboundEndpoint endpoint1 = getTestInboundEndpoint("Test1Provider", "test://Test1Provider?exchangePattern=one-way");
         Mock session = MuleTestUtils.getMockSession();
         Service service = getTestService();
         session.matchAndReturn("getFlowConstruct", service);
