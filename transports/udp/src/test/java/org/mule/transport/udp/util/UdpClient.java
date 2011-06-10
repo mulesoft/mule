@@ -33,7 +33,7 @@ public class UdpClient
     {
         super();
         this.port = port;
-        this.host = InetAddress.getLocalHost();
+        this.host = InetAddress.getByName("localhost");
     }
 
     public byte[] send(String string) throws IOException
