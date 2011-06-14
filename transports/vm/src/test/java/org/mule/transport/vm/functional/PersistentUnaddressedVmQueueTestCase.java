@@ -16,8 +16,7 @@ import org.mule.tck.FunctionalTestCase;
 
 public class PersistentUnaddressedVmQueueTestCase extends FunctionalTestCase
 {
-    private static final int RECEIVE_TIMEOUT = 5000;
-
+    @Override
     protected String getConfigResources()
     {
         return "vm/persistent-unaddressed-vm-queue-test.xml";
@@ -31,5 +30,4 @@ public class PersistentUnaddressedVmQueueTestCase extends FunctionalTestCase
         assertNotNull(result);
         assertEquals(result.getPayloadAsString(),"Test");
     }
-
 }
