@@ -46,15 +46,15 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
      */
     public void testSpringConfigurationBuilder() throws Exception
     {
-        MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
+        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
         
         ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
         ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
-        builder.configure(muleContext); 
+        builder.configure(context); 
 
-        muleContext.start();
+        context.start();
         
-        Object orange = muleContext.getRegistry().lookupObject("orange");
+        Object orange = context.getRegistry().lookupObject("orange");
         assertNotNull(orange);
         assertTrue(orange instanceof Orange);
         assertEquals("Pirulo", ((Orange) orange).getBrand());
@@ -65,19 +65,19 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
      */
     public void testSpringConfigurationBuilderPrecedence() throws Exception
     {
-        MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
+        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
         
         ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
         ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
-        builder.configure(muleContext); 
+        builder.configure(context); 
 
         appContext = new ClassPathXmlApplicationContext("application-context-2.xml");
         builder = new SpringConfigurationBuilder(appContext);
-        builder.configure(muleContext); 
+        builder.configure(context); 
 
-        muleContext.start();
+        context.start();
         
-        Object orange = muleContext.getRegistry().lookupObject("orange");
+        Object orange = context.getRegistry().lookupObject("orange");
         assertNotNull(orange);
         assertTrue(orange instanceof Orange);
         assertEquals("Tropicana", ((Orange) orange).getBrand());
@@ -85,19 +85,19 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
 
     public void testSpringConfigurationBuilderBackwardsPrecedence() throws Exception
     {
-        MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
+        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
         
         ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context-2.xml");
         ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
-        builder.configure(muleContext); 
+        builder.configure(context); 
 
         appContext = new ClassPathXmlApplicationContext("application-context.xml");
         builder = new SpringConfigurationBuilder(appContext);
-        builder.configure(muleContext); 
+        builder.configure(context); 
 
-        muleContext.start();
+        context.start();
         
-        Object orange = muleContext.getRegistry().lookupObject("orange");
+        Object orange = context.getRegistry().lookupObject("orange");
         assertNotNull(orange);
         assertTrue(orange instanceof Orange);
         assertEquals("Pirulo", ((Orange) orange).getBrand());
@@ -108,17 +108,17 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
      */
     public void testTransientRegistryPrecedence() throws Exception
     {
-        MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
+        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
         
-        muleContext.getRegistry().registerObject("orange", new Orange(12, 5.5, "Tutti Frutti"));
+        context.getRegistry().registerObject("orange", new Orange(12, 5.5, "Tutti Frutti"));
         
         ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
         ConfigurationBuilder builder = new SpringConfigurationBuilder(appContext);
-        builder.configure(muleContext); 
+        builder.configure(context); 
 
-        muleContext.start();
+        context.start();
         
-        Object orange = muleContext.getRegistry().lookupObject("orange");
+        Object orange = context.getRegistry().lookupObject("orange");
         assertNotNull(orange);
         assertTrue(orange instanceof Orange);
         assertEquals("Tutti Frutti", ((Orange) orange).getBrand());
@@ -129,17 +129,17 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
      */
     public void testParentContext() throws Exception
     {
-        MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
+        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
 
         ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
 
         SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("mule-config.xml");
         builder.setParentContext(appContext);
-        builder.configure(muleContext);
+        builder.configure(context);
 
-        muleContext.start();
+        context.start();
 
-        Object orange = muleContext.getRegistry().lookupObject("orange");
+        Object orange = context.getRegistry().lookupObject("orange");
         assertNotNull(orange);
         assertTrue(orange instanceof Orange);
         assertEquals("Pirulo", ((Orange) orange).getBrand());
@@ -150,14 +150,14 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
      */
     public void testAppContextTogetherWithMuleConfig() throws Exception
     {
-        MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
+        MuleContext context = new DefaultMuleContextFactory().createMuleContext();
 
         SpringXmlConfigurationBuilder builder = new SpringXmlConfigurationBuilder("application-context.xml, mule-config.xml");
-        builder.configure(muleContext);
+        builder.configure(context);
 
-        muleContext.start();
+        context.start();
 
-        Object orange = muleContext.getRegistry().lookupObject("orange");
+        Object orange = context.getRegistry().lookupObject("orange");
         assertNotNull(orange);
         assertTrue(orange instanceof Orange);
         assertEquals("Pirulo", ((Orange) orange).getBrand());

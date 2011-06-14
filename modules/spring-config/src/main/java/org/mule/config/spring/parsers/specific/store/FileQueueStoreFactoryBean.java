@@ -7,17 +7,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.util.store;
+
+package org.mule.config.spring.parsers.specific.store;
 
 import org.mule.api.config.MuleProperties;
 
-/**
- * A facade for the default simple memory-based object store
- */
-public class MemoryObjectStore extends FacadeObjectStore
+public class FileQueueStoreFactoryBean extends ObjectStoreFromRegistryFactoryBean
 {
-    public MemoryObjectStore()
+    public FileQueueStoreFactoryBean()
     {
-        super(MuleProperties.OBJECT_STORE_SIMPLE_MEMORY_NAME);
+        super(MuleProperties.OBJECT_STORE_FILE_NAME);
     }
 }

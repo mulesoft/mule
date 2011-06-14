@@ -11,11 +11,7 @@
 package org.mule.util.queue;
 
 import org.mule.api.MuleContext;
-import org.mule.api.MuleRuntimeException;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ListableObjectStore;
-import org.mule.api.store.ObjectStore;
-import org.mule.config.i18n.CoreMessages;
 
 import java.io.Serializable;
 

@@ -95,6 +95,10 @@ import org.mule.config.spring.parsers.specific.ValidatorDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.EndpointRefParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.ChildEndpointDefinitionParser;
 import org.mule.config.spring.parsers.specific.endpoint.support.OrphanEndpointDefinitionParser;
+import org.mule.config.spring.parsers.specific.store.DefaultMemoryQueueStoreFactoryBean;
+import org.mule.config.spring.parsers.specific.store.DefaultPersistentQueueStoreFactoryBean;
+import org.mule.config.spring.parsers.specific.store.FileQueueStoreFactoryBean;
+import org.mule.config.spring.parsers.specific.store.SimpleMemoryQueueStoreFactoryBean;
 import org.mule.config.spring.util.SpringBeanLookup;
 import org.mule.construct.AsynchronousProcessingStrategy;
 import org.mule.construct.QueuedAsynchronousProcessingStrategy;
@@ -202,11 +206,7 @@ import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.ObjectToString;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
-import org.mule.util.store.DefaultInMemoryObjectStore;
-import org.mule.util.store.DefaultPersistentObjectStore;
-import org.mule.util.store.FileObjectStore;
 import org.mule.util.store.InMemoryObjectStore;
-import org.mule.util.store.MemoryObjectStore;
 import org.mule.util.store.TextFileObjectStore;
 
 /**
@@ -215,7 +215,7 @@ import org.mule.util.store.TextFileObjectStore;
  */
 public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
 {
-
+    @Override
     public void init()
     {
         registerIgnoredElement("mule");
@@ -244,12 +244,13 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("reconnect-notifier", new RetryNotifierDefinitionParser(ConnectNotifier.class));
         registerBeanDefinitionParser("reconnect-custom-notifier", new RetryNotifierDefinitionParser());
 
+        // Queue Store
         registerMuleBeanDefinitionParser("queue-store", new ParentDefinitionParser()).addAlias(AbstractMuleBeanDefinitionParser.ATTRIBUTE_REF, "queue-store");
         registerMuleBeanDefinitionParser("custom-queue-store", new QueueStoreDefinitionParser()).addIgnored("name");
-        registerBeanDefinitionParser("default-in-memory-queue-store", new QueueStoreDefinitionParser(DefaultInMemoryObjectStore.class));
-        registerBeanDefinitionParser("default-persistent-queue-store", new QueueStoreDefinitionParser(DefaultPersistentObjectStore.class));
-        registerBeanDefinitionParser("simple-in-memory-queue-store", new QueueStoreDefinitionParser(MemoryObjectStore.class));
-        registerBeanDefinitionParser("file-queue-store", new QueueStoreDefinitionParser(FileObjectStore.class));
+        registerBeanDefinitionParser("default-in-memory-queue-store", new QueueStoreDefinitionParser(DefaultMemoryQueueStoreFactoryBean.class));
+        registerBeanDefinitionParser("default-persistent-queue-store", new QueueStoreDefinitionParser(DefaultPersistentQueueStoreFactoryBean.class));
+        registerBeanDefinitionParser("simple-in-memory-queue-store", new QueueStoreDefinitionParser(SimpleMemoryQueueStoreFactoryBean.class));
+        registerBeanDefinitionParser("file-queue-store", new QueueStoreDefinitionParser(FileQueueStoreFactoryBean.class));
         
         registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
         registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
@@ -564,5 +565,4 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("timer-interceptor", new InterceptorDefinitionParser(TimerInterceptor.class));
         registerBeanDefinitionParser("logging-interceptor", new InterceptorDefinitionParser(LoggingInterceptor.class));
     }
-
 }

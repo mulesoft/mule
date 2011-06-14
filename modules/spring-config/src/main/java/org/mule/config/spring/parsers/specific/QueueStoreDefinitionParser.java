@@ -19,11 +19,11 @@ import org.mule.config.spring.parsers.generic.MuleOrphanDefinitionParser;
  */
 public class QueueStoreDefinitionParser extends ParentContextDefinitionParser
 {
-
-    public QueueStoreDefinitionParser(Class queueStore)
+    public QueueStoreDefinitionParser(Class<?> queueStoreFactoryBeanClass)
     {
-        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(queueStore, true));
-        otherwise(new ChildDefinitionParser("queue-store", queueStore));
+        super(MuleOrphanDefinitionParser.ROOT_ELEMENT, 
+            new MuleOrphanDefinitionParser(queueStoreFactoryBeanClass, true));
+        otherwise(new ChildDefinitionParser("queue-store", queueStoreFactoryBeanClass));
     }
 
     /**
@@ -34,5 +34,4 @@ public class QueueStoreDefinitionParser extends ParentContextDefinitionParser
         super(MuleOrphanDefinitionParser.ROOT_ELEMENT, new MuleOrphanDefinitionParser(true));
         otherwise(new ChildDefinitionParser("queue-store"));
     }
-
 }
