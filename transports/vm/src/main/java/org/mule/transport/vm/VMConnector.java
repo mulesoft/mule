@@ -64,7 +64,7 @@ public class VMConnector extends AbstractConnector
         if (queueProfile == null)
         {
             // create a default QueueProfile
-            queueProfile = new QueueProfile();
+            queueProfile = QueueProfile.newInstancePersistingToDefaultMemoryQueueStore(muleContext);
             if (logger.isDebugEnabled())
             {
                 logger.debug("created default QueueProfile for VM connector: " + queueProfile);

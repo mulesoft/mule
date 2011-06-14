@@ -43,11 +43,13 @@ public class SedaModel extends AbstractModel
      * 
      * @return the model type
      */
+    @Override
     public String getType()
     {
         return "seda";
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         if (queueTimeout == null)
@@ -56,7 +58,7 @@ public class SedaModel extends AbstractModel
         }
         if (queueProfile == null)
         {
-            queueProfile = new QueueProfile();
+            queueProfile = QueueProfile.newInstancePersistingToDefaultMemoryQueueStore(muleContext);
         }
         if (poolingProfile == null)
         {

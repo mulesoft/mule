@@ -11,13 +11,12 @@
 package org.mule.config;
 
 import org.mule.api.MuleContext;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.util.queue.QueueConfiguration;
 import org.mule.util.queue.QueueManager;
-import org.mule.util.store.DefaultInMemoryObjectStore;
-import org.mule.util.store.DefaultPersistentObjectStore;
 
 import java.io.Serializable;
 
@@ -30,17 +29,20 @@ public class QueueProfile
 {
     private int maxOutstandingMessages = 0;
     private ListableObjectStore<Serializable> objectStore;
-    public QueueProfile()
+    
+    public static QueueProfile newInstancePersistingToDefaultMemoryQueueStore(MuleContext muleContext)
     {
-        this(0, false);
+        ListableObjectStore<Serializable> defaultMemoryObjectStore =
+            muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
+        return new QueueProfile(defaultMemoryObjectStore);
     }
 
-    public QueueProfile(int maxOutstandingMessages, boolean persistent)
+    public QueueProfile(ListableObjectStore<Serializable> objectStore)
     {
-        this.maxOutstandingMessages = maxOutstandingMessages;
-        this.objectStore = persistent ? new DefaultPersistentObjectStore() : new DefaultInMemoryObjectStore();
+        this.objectStore = objectStore;
     }
 
+    // TODO DO: is this ctor required at all? It's not used anywhere in the code base
     public QueueProfile(QueueProfile queueProfile)
     {
         this.maxOutstandingMessages = queueProfile.getMaxOutstandingMessages();
@@ -101,6 +103,7 @@ public class QueueProfile
         this.objectStore = objectStore;
     }
 
+    @Override
     public String toString()
     {
         return "QueueProfile{maxOutstandingMessage=" + maxOutstandingMessages + ", storeType="

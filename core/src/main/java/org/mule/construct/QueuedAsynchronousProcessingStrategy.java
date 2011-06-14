@@ -11,6 +11,8 @@
 package org.mule.construct;
 
 import org.mule.api.MuleContext;
+import org.mule.api.config.MuleProperties;
+import org.mule.api.config.ThreadingProfile;
 import org.mule.api.construct.Pipeline;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.config.QueueProfile;
@@ -20,7 +22,6 @@ import org.mule.processor.AsyncInterceptingMessageProcessor;
 import org.mule.processor.SedaStageInterceptingMessageProcessor;
 import org.mule.util.concurrent.ThreadNameHelper;
 import org.mule.util.queue.QueueManager;
-import org.mule.util.store.DefaultInMemoryObjectStore;
 
 import java.io.Serializable;
 
@@ -37,7 +38,7 @@ public class QueuedAsynchronousProcessingStrategy extends AsynchronousProcessing
 
     protected Integer queueTimeout;
     protected Integer maxQueueSize = 0;
-    protected ListableObjectStore<Serializable> queueStore = new DefaultInMemoryObjectStore();
+    protected ListableObjectStore<Serializable> queueStore = null;
     protected QueueStatistics queueStatistics;
 
     @Override
@@ -46,10 +47,19 @@ public class QueuedAsynchronousProcessingStrategy extends AsynchronousProcessing
         MuleContext muleContext = pipeline.getMuleContext();
         Integer timeout = queueTimeout != null ? queueTimeout : muleContext.getConfiguration()
             .getDefaultQueueTimeout();
-
-        return new SedaStageInterceptingMessageProcessor(ThreadNameHelper.flow(pipeline.getMuleContext(),
-            pipeline.getName()), new QueueProfile(maxQueueSize, queueStore), timeout,
-            createThreadingProfile(muleContext), queueStatistics, muleContext);
+        
+        initQueueStore(muleContext);
+        
+        String threadName = ThreadNameHelper.flow(pipeline.getMuleContext(), pipeline.getName());
+        QueueProfile queueProfile = new QueueProfile(maxQueueSize, queueStore);
+        ThreadingProfile threadingProfile = createThreadingProfile(muleContext);
+        return new SedaStageInterceptingMessageProcessor(threadName, queueProfile, timeout,
+            threadingProfile, queueStatistics, muleContext);
+    }
+    
+    protected void initQueueStore(MuleContext muleContext)
+    {
+        queueStore = muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
     }
 
     public Integer getQueueTimeout()
@@ -87,6 +97,7 @@ public class QueuedAsynchronousProcessingStrategy extends AsynchronousProcessing
         return queueStatistics;
     }
 
+    @Override
     public void setQueueStatistics(QueueStatistics queueStatistics)
     {
         this.queueStatistics = queueStatistics;

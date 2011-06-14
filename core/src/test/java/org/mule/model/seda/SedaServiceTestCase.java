@@ -10,9 +10,6 @@
 
 package org.mule.model.seda;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEventContext;
 import org.mule.api.config.MuleProperties;
@@ -20,6 +17,7 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.service.Service;
+import org.mule.api.store.ListableObjectStore;
 import org.mule.component.DefaultJavaComponent;
 import org.mule.component.SimpleCallableJavaComponent;
 import org.mule.config.ChainedThreadingProfile;
@@ -30,9 +28,13 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.queue.QueueManager;
 
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 import junit.framework.AssertionFailedError;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SedaServiceTestCase extends AbstractServiceTestCase
 {
@@ -69,7 +71,6 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
      */
     public void testQueueConfiguration() throws Exception
     {
-        boolean persistent = true;
         int capacity = 345;
 
         QueueManager queueManager = muleContext.getQueueManager();
@@ -82,7 +83,9 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER,
             mockTransactionalQueueManager);
 
-        service.setQueueProfile(new QueueProfile(capacity, persistent));
+        ListableObjectStore<Serializable> objectStore = 
+            muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
+        service.setQueueProfile(new QueueProfile(capacity, objectStore));
 
         try
         {

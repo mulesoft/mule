@@ -648,7 +648,10 @@ public class MuleEventMulticaster
             SedaService s = new SedaService(muleContext);
             s.setName(serviceName);
             s.setModel(muleContext.getRegistry().lookupSystemModel());
-            s.setQueueProfile(new QueueProfile());
+            
+            QueueProfile queueProfile = QueueProfile.newInstancePersistingToDefaultMemoryQueueStore(muleContext);
+            s.setQueueProfile(queueProfile);
+            
             ((CompositeMessageSource) s.getMessageSource()).addSource(
                 muleContext.getEndpointFactory().getInboundEndpoint(newEndpoint));
             final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(listener));

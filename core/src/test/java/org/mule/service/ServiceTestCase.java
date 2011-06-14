@@ -50,9 +50,11 @@ public class ServiceTestCase extends AbstractMuleTestCase
         model.setMuleContext(muleContext);
         model.initialise();
         service.setModel(model);
-        ((SedaService) service).setQueueProfile(new QueueProfile());
-        muleContext.getRegistry().registerService(service);
+        
+        QueueProfile queueProfile = QueueProfile.newInstancePersistingToDefaultMemoryQueueStore(muleContext);
+        ((SedaService) service).setQueueProfile(queueProfile);
 
+        muleContext.getRegistry().registerService(service);
     }
 
     @Override

@@ -21,7 +21,6 @@ import org.mule.component.simple.EchoComponent;
 import org.mule.component.simple.LogComponent;
 import org.mule.component.simple.NullComponent;
 import org.mule.component.simple.PassThroughComponent;
-import org.mule.config.QueueProfile;
 import org.mule.config.spring.factories.AsyncMessageProcessorsFactoryBean;
 import org.mule.config.spring.factories.ChoiceRouterFactoryBean;
 import org.mule.config.spring.factories.CompositeMessageSourceFactoryBean;
@@ -30,6 +29,7 @@ import org.mule.config.spring.factories.MessageProcessorChainFactoryBean;
 import org.mule.config.spring.factories.MessageProcessorFilterPairFactoryBean;
 import org.mule.config.spring.factories.OutboundEndpointFactoryBean;
 import org.mule.config.spring.factories.PollingMessageSourceFactoryBean;
+import org.mule.config.spring.factories.QueueProfileFactoryBean;
 import org.mule.config.spring.factories.TransactionalMessageProcessorsFactoryBean;
 import org.mule.config.spring.parsers.AbstractMuleBeanDefinitionParser;
 import org.mule.config.spring.parsers.collection.ChildListDefinitionParser;
@@ -253,7 +253,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("file-queue-store", new QueueStoreDefinitionParser(FileQueueStoreFactoryBean.class));
         
         registerBeanDefinitionParser("pooling-profile", new PoolingProfileDefinitionParser());
-        registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfile.class));
+        registerBeanDefinitionParser("queue-profile", new ChildDefinitionParser("queueProfile", QueueProfileFactoryBean.class));
         registerMuleBeanDefinitionParser("notifications", new NamedDefinitionParser(MuleProperties.OBJECT_NOTIFICATION_MANAGER)).addAlias("dynamic", "notificationDynamic");
         registerBeanDefinitionParser("notification", new NotificationDefinitionParser());
         registerBeanDefinitionParser("disable-notification", new NotificationDisableDefinitionParser());

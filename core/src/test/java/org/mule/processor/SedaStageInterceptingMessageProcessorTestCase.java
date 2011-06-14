@@ -33,8 +33,7 @@ import javax.resource.spi.work.WorkException;
 public class SedaStageInterceptingMessageProcessorTestCase extends
     OptionalAsyncInterceptingMessageProcessorTestCase implements ExceptionListener
 {
-
-    QueueProfile queueProfile = new QueueProfile();
+    QueueProfile queueProfile = null;
     int queueTimeout;
     QueueStatistics queueStatistics;
     TestLifeCycleState lifeCycleState;
@@ -42,6 +41,8 @@ public class SedaStageInterceptingMessageProcessorTestCase extends
     @Override
     protected void doSetUp() throws Exception
     {
+        super.doSetUp();
+        queueProfile = QueueProfile.newInstancePersistingToDefaultMemoryQueueStore(muleContext);
         queueStatistics = new TestQueueStatistics();
         queueTimeout = muleContext.getConfiguration().getDefaultQueueTimeout();
         lifeCycleState = new TestLifeCycleState();
@@ -67,6 +68,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends
 
     }
 
+    @Override
     protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
         throws Exception
     {
