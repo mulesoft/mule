@@ -8,7 +8,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.specific.store;
+package org.mule.config.spring.factories;
 
 import org.mule.api.config.MuleProperties;
 

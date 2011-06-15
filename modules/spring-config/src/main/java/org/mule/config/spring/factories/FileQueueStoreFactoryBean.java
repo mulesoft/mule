@@ -8,14 +8,14 @@
  * LICENSE.txt file.
  */
 
-package org.mule.config.spring.parsers.specific.store;
+package org.mule.config.spring.factories;
 
 import org.mule.api.config.MuleProperties;
 
-public class DefaultMemoryQueueStoreFactoryBean extends ObjectStoreFromRegistryFactoryBean
+public class FileQueueStoreFactoryBean extends ObjectStoreFromRegistryFactoryBean
 {
-    public DefaultMemoryQueueStoreFactoryBean()
+    public FileQueueStoreFactoryBean()
     {
-        super(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
+        super(MuleProperties.OBJECT_STORE_FILE_NAME);
     }
 }
