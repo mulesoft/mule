@@ -1416,6 +1416,21 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>native2ascii-maven-plugin</artifactId>
                     <version>1.0-alpha-1</version>
+                    <executions>
+                        <execution>
+                            <phase>generate-test-resources</phase>
+                            <goals>
+                                <goal>native2ascii</goal>
+                            </goals>
+                            <configuration>
+                                <src>${project.basedir}/src/test/resources</src>
+                                <dest>${project.basedir}/src/test/resources</dest>
+                                <includes>*.src</includes>
+                                <ext>.properties</ext>
+                                <encoding>UTF-8</encoding>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1530,25 +1545,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>native2ascii-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>native2ascii</goal>
-                        </goals>
-                        <configuration>
-                            <src>${project.basedir}/src/test/resources</src>
-                            <dest>${project.basedir}/src/test/resources</dest>
-                            <includes>*.src</includes>
-                            <ext>.properties</ext>
-                            <encoding>UTF-8</encoding>
-                        </configuration>
-                    </execution>
-                </executions>
-                </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-eclipse-plugin</artifactId>
@@ -1843,7 +1839,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>buildnumber-maven-plugin</artifactId>
-                        <version>1.0-beta-2</version>
+                        <version>1.0</version>
                         <executions>
                             <execution>
                                 <phase>validate</phase>
