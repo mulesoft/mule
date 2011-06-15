@@ -16,17 +16,17 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.tools</groupId>
             <artifactId>bobberplus</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.tools</groupId>
             <artifactId>mule-module-archetype</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Due to the Maven 2.0.4 prerequisites. By default, maven-plugin-test-plugin uses 2.0.1 -->
@@ -96,7 +96,7 @@
                             <classifier>sources</classifier>
                             <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
                             <outputDirectory>${project.build.directory}/src-other</outputDirectory>
-                            <includeGroupIds>${groupId}</includeGroupIds>
+                            <includeGroupIds>${project.groupId}</includeGroupIds>
                             <includeArtifactIds>mule-module-archetype</includeArtifactIds>
                         </configuration>
                     </execution>

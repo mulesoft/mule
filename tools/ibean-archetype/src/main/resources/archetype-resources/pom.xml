@@ -13,7 +13,7 @@
    <artifactId>${artifactIdLower}-ibean</artifactId>
    <packaging>jar</packaging>
    <name>${artifactId} IBean</name>
-   <version>${version}</version>
+   <version>${project.version}</version>
    <description>TODO</description>
 
    <properties>

@@ -1,33 +1,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>org.mule.modules</groupId>
         <artifactId>mule-modules</artifactId>
         <version>3.2.0-M2-SNAPSHOT</version>
     </parent>
-
     <artifactId>mule-module-launcher</artifactId>
     <packaging>jar</packaging>
-
     <name>Mule 3 Launcher</name>
 
     <profiles>
         <profile>
             <id>integration-tests</id>
-
             <activation>
                 <property>
                     <name>!skipTests</name>
                 </property>
             </activation>
-
             <build>
                 <plugins>
-
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>shitty-maven-plugin</artifactId>
@@ -44,8 +37,6 @@
                     </plugin>
                 </plugins>
             </build>
-
-
         </profile>
 
         <profile>
@@ -81,8 +72,6 @@
                     </plugin>
                 </plugins>
             </build>
-
-
         </profile>
     </profiles>
 
@@ -90,19 +79,19 @@
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
             <artifactId>mule-core</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-reboot</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>tanukisoft</groupId>
@@ -112,20 +101,17 @@
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-builders</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 </project>

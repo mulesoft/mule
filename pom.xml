@@ -1237,7 +1237,7 @@
         <site>
             <id>mule-site</id>
             <name>Mule Website</name>
-            <url>dav:https://dav.codehaus.org/mule/docs/${version}</url>
+            <url>dav:https://dav.codehaus.org/mule/docs/${project.version}</url>
         </site>
     </distributionManagement>
 
@@ -1446,7 +1446,7 @@
                     <dependency>
                         <groupId>org.mule</groupId>
                         <artifactId>mule-buildtools</artifactId>
-                        <version>${version}</version>
+                        <version>${project.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -1521,10 +1521,10 @@
                         <!-- Custom Entries -->
                         <manifestEntries>
                             <More-Info>For more information go to ${productUrl}</More-Info>
-                            <Support>Get commercial support: ${pom.organization.url}/support</Support>
+                            <Support>Get commercial support: ${project.organization.url}/support</Support>
                             <Description>Mule ESB and Integration Platform</Description>
                             <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
-                            <Vendor-Url>${pom.organization.url}</Vendor-Url>
+                            <Vendor-Url>${project.organization.url}</Vendor-Url>
                             <Product-Url>${productUrl}</Product-Url>
                             <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
                             <!-- include repository revision from buildnumber plugin -->
@@ -1750,7 +1750,7 @@
             <id>ci-server</id>
             <distributionManagement>
                 <site>
-                    <url>file:///home/luntbuild/publish/mule/docs/${version}</url>
+                    <url>file:///home/luntbuild/publish/mule/docs/${project.version}</url>
                 </site>
             </distributionManagement>
         </profile>
@@ -1760,7 +1760,7 @@
             <distributionManagement>
                 <site>
                     <id>mule-site</id>
-                    <url>file:///var/www/html/docs/site/${version}</url>
+                    <url>file:///var/www/html/docs/site/${project.version}</url>
                 </site>
             </distributionManagement>
         </profile>

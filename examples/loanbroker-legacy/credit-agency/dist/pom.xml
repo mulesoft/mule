@@ -56,7 +56,7 @@
                                 <artifactItem>
                                     <groupId>${groupId}</groupId>
                                     <artifactId>${artifactId}</artifactId>
-                                    <version>${version}</version>
+                                    <version>${project.version}</version>
                                     <destFileName>${artifactId}.jar</destFileName>
                                 </artifactItem>
                             </artifactItems>
