@@ -29,6 +29,7 @@
         <module>jaas</module>
         <module>jboss-transactions</module>
         <module>jbpm</module>
+        <module>jersey</module>
         <module>jca</module>
         <module>json</module>
         <module>logging</module>
@@ -45,20 +46,4 @@
         <module>tomcat</module>
         <module>xml</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>beyond-jdk5</id>
-            <activation>
-                <!--
-                    Minimum JDK version for the build is JDK5. Everything with
-                    a higher version number enables this profile.
-                -->
-                <jdk>!1.5</jdk>
-            </activation>
-            <modules>
-                <module>jersey</module>
-            </modules>
-         </profile>
-    </profiles>
 </project>

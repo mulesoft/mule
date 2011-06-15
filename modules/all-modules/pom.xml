@@ -87,6 +87,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-jersey</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-json</artifactId>
             <version>${version}</version>
         </dependency>
@@ -146,24 +151,4 @@
             <version>${version}</version>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>beyond-jdk5</id>
-            <activation>
-                <!--
-                    Minimum JDK version for the build is JDK5. Everything with
-                    a higher version number enables this profile.
-                -->
-                <jdk>!1.5</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.mule.modules</groupId>
-                    <artifactId>mule-module-jersey</artifactId>
-                    <version>${version}</version>
-                </dependency>
-            </dependencies>
-         </profile>
-    </profiles>
 </project>
