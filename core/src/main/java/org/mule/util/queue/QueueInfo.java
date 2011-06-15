@@ -47,7 +47,7 @@ public class QueueInfo
         if (config != null)
         {
             capacity = config.capacity;
-            factory = delegateFactories.get(TransactionalQueueManager.getActualStore(config.objectStore).getClass());
+            factory = delegateFactories.get(config.objectStore.getClass());
         }
         if (delegate == null || (config != null && !hadConfig))
         {
@@ -109,7 +109,7 @@ public class QueueInfo
 
     public ListableObjectStore<Serializable> getStore()
     {
-        return config == null ? null : TransactionalQueueManager.getActualStore(config.objectStore);
+        return config == null ? null : config.objectStore;
     }
 
     public static synchronized void registerDelegateFactory(Class<? extends ObjectStore>storeType, QueueInfoDelegateFactory factory)

@@ -16,8 +16,6 @@ import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.util.UUID;
-import org.mule.util.store.DefaultInMemoryObjectStore;
-import org.mule.util.store.FacadeObjectStore;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;
 import org.mule.util.xa.ResourceManagerException;
@@ -50,16 +48,6 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
     public synchronized QueueSession getQueueSession()
     {
         return new TransactionalQueueSession(this, this);
-    }
-
-    public synchronized QueueConfiguration getDefaultQueueConfiguration()
-    {
-        if (this.defaultQueueConfiguration == null)
-        {
-            this.defaultQueueConfiguration =
-                new QueueConfiguration(getMuleContext(), 0, new DefaultInMemoryObjectStore<Serializable>());
-        }
-        return this.defaultQueueConfiguration;
     }
 
     @Override
@@ -294,17 +282,8 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         System.out.println(o.getClass());   
     }
 
-    private void addStore(ListableObjectStore store)
+    private void addStore(ListableObjectStore<?> store)
     {
-        stores.add(getActualStore(store));
-    }
-
-    static ListableObjectStore getActualStore(ListableObjectStore store)
-    {
-        while (store instanceof FacadeObjectStore)
-        {
-            store = ((FacadeObjectStore)store).getDelegate();
-        }
-        return store;
+        stores.add(store);
     }
 }
