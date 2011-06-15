@@ -81,6 +81,7 @@ public class DefaultMuleApplication implements Application
         this.descriptor = appDesc;
     }
 
+    @Override
     public void install()
     {
         if (logger.isInfoEnabled())
@@ -108,11 +109,13 @@ public class DefaultMuleApplication implements Application
         createDeploymentClassLoader();
     }
 
+    @Override
     public String getAppName()
     {
         return descriptor.getAppName();
     }
 
+    @Override
     public ApplicationDescriptor getDescriptor()
     {
         return descriptor;
@@ -123,6 +126,7 @@ public class DefaultMuleApplication implements Application
         this.descriptor.setAppName(appName);
     }
 
+    @Override
     public void start()
     {
         if (logger.isInfoEnabled())
@@ -166,6 +170,7 @@ public class DefaultMuleApplication implements Application
         }
     }
 
+    @Override
     public void init()
     {
         if (logger.isInfoEnabled())
@@ -175,7 +180,7 @@ public class DefaultMuleApplication implements Application
 
         try
         {
-            ConfigurationBuilder cfgBuilder = createConfigurationBuiler();
+            ConfigurationBuilder cfgBuilder = createConfigurationBuilder();
             if (!cfgBuilder.isConfigured())
             {
                 List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(3);
@@ -210,7 +215,7 @@ public class DefaultMuleApplication implements Application
         }
     }
 
-    protected ConfigurationBuilder createConfigurationBuiler() throws Exception
+    protected ConfigurationBuilder createConfigurationBuilder() throws Exception
     {
         String configBuilderClassName = determineConfigBuilderClassName();
         return (ConfigurationBuilder) ClassUtils.instanciateClass(configBuilderClassName,
@@ -249,16 +254,19 @@ public class DefaultMuleApplication implements Application
         return new SimpleConfigurationBuilder(appProperties);
     }
 
+    @Override
     public MuleContext getMuleContext()
     {
         return muleContext;
     }
 
+    @Override
     public ClassLoader getDeploymentClassLoader()
     {
         return this.deploymentClassLoader;
     }
 
+    @Override
     public void dispose()
     {
         // moved wrapper logic into the actual implementation, as redeploy() invokes it directly, bypassing
@@ -291,6 +299,7 @@ public class DefaultMuleApplication implements Application
         }
     }
 
+    @Override
     public void redeploy()
     {
         if (logger.isInfoEnabled())
@@ -311,6 +320,7 @@ public class DefaultMuleApplication implements Application
         Thread.currentThread().setContextClassLoader(null);
     }
 
+    @Override
     public void stop()
     {
         if (this.muleContext == null)
@@ -414,7 +424,7 @@ public class DefaultMuleApplication implements Application
         // register a config monitor only after context has started, as it may take some time
         muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
         {
-
+            @Override
             public void onNotification(MuleContextNotification notification)
             {
                 final int action = notification.getAction();
