@@ -92,6 +92,12 @@
             <artifactId>cxf-testutils</artifactId>
             <version>${cxfVersion}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Test jars -->
         <dependency>
@@ -111,7 +117,7 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-annotation_1.0_spec</artifactId>
         </dependency>
-        
+
         <!-- Needed for JAX-RS -->
         <dependency>
           <groupId>javax.ws.rs</groupId>
