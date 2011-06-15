@@ -12,6 +12,7 @@ package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -78,20 +79,34 @@ public class RoundRobinTestCase extends AbstractMuleTestCase
             this.session = session;
         }
 
+        @Override
         public void run()
         {
             for (int i = 0; i < numMessages; i++)
             {
                 MuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE + messageNumber.getAndIncrement(), muleContext);
-                MuleEvent event = new DefaultMuleEvent(msg, (InboundEndpoint) null, session);
+                InboundEndpoint endpoint = createTestEndpoint();
+                MuleEvent event = new DefaultMuleEvent(msg, endpoint, session);
                 try
                 {
                     target.process(event);
                 }
                 catch (MuleException e)
                 {
-                    ; // this is expected
+                    // this is expected
                 }
+            }
+        }
+
+        private InboundEndpoint createTestEndpoint()
+        {
+            try
+            {
+                return getTestInboundEndpoint(MessageExchangePattern.ONE_WAY);
+            }
+            catch (Exception e)
+            {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -101,6 +116,7 @@ public class RoundRobinTestCase extends AbstractMuleTestCase
         private int count;
         private List<Object> payloads = new ArrayList<Object>();
 
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             payloads.add(event.getMessage().getPayload());
