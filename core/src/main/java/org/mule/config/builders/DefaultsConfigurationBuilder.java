@@ -17,7 +17,6 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.model.Model;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
-import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
 import org.mule.config.ChainedThreadingProfile;
 import org.mule.config.bootstrap.SimpleRegistryBootstrap;
@@ -84,10 +83,7 @@ public class DefaultsConfigurationBuilder extends AbstractConfigurationBuilder
 
     protected void configureQueueManager(MuleContext muleContext) throws RegistrationException
     {
-        ListableObjectStore<Serializable> store = muleContext.getObjectStore(MuleProperties.OBJECT_STORE_DEFAULT_IN_MEMORY_NAME);
-
         QueueManager queueManager = new TransactionalQueueManager();
-
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER, queueManager);
     }
 

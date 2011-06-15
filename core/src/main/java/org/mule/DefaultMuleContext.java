@@ -681,12 +681,4 @@ public class DefaultMuleContext implements MuleContext
         checkLifecycleForPropertySet(name, Initialisable.PHASE_NAME);
         registryBroker.registerObject(name, store);
     }
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public ListableObjectStore<Serializable> getObjectStore(String name)
-    {
-        ListableObjectStore<Serializable> objectStore =
-            (ListableObjectStore<Serializable>) registryBroker.lookupObject(name);
-        return objectStore;
-    }
 }
