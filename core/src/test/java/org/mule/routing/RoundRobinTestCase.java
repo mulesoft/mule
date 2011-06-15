@@ -85,8 +85,7 @@ public class RoundRobinTestCase extends AbstractMuleTestCase
             for (int i = 0; i < numMessages; i++)
             {
                 MuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE + messageNumber.getAndIncrement(), muleContext);
-                InboundEndpoint endpoint = createTestEndpoint();
-                MuleEvent event = new DefaultMuleEvent(msg, endpoint, session);
+                MuleEvent event = new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE, session);
                 try
                 {
                     target.process(event);

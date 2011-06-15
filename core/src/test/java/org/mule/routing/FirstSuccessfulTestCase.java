@@ -12,6 +12,7 @@ package org.mule.routing;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
@@ -148,7 +149,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         MuleMessage msg = new DefaultMuleMessage(message, muleContext);
         try
         {
-            MuleEvent event = mp.process(new DefaultMuleEvent(msg, (InboundEndpoint) null, session));
+            MuleEvent event = mp.process(new DefaultMuleEvent(msg, MessageExchangePattern.REQUEST_RESPONSE, session));
             MuleMessage returnedMessage = event.getMessage();
             if (returnedMessage.getExceptionPayload() != null)
             {

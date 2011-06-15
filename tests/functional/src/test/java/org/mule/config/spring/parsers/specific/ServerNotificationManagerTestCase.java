@@ -12,11 +12,11 @@ package org.mule.config.spring.parsers.specific;
 
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.context.notification.ServerNotificationListener;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ListenerSubscriptionPair;
@@ -233,7 +233,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         {
             super(
                 new UnauthorisedException(CoreMessages.createStaticMessage("dummy"), new DefaultMuleEvent(
-                    new DefaultMuleMessage(NullPayload.getInstance(), muleContext), (InboundEndpoint) null,
+                    new DefaultMuleMessage(NullPayload.getInstance(), muleContext), MessageExchangePattern.REQUEST_RESPONSE,
                     null)), 0);
         }
 
