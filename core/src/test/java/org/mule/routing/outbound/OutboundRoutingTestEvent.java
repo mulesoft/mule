@@ -217,4 +217,10 @@ public class OutboundRoutingTestEvent implements MuleEvent
     {
         return null;
     }
+
+    @Override
+    public MessageExchangePattern getExchangePattern()
+    {
+        return endpoint.getExchangePattern();
+    }
 }

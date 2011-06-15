@@ -332,7 +332,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
     {
         MuleEvent event = inboundListener.sensedEvent;
         assertNotNull(event);
-        assertEquals(sync, event.getEndpoint().getExchangePattern().hasResponse());
+        assertEquals(sync, event.getExchangePattern().hasResponse());
         assertNotNull(event.getMessage());
         return event;
     }

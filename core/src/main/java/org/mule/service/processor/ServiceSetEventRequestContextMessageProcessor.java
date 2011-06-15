@@ -21,7 +21,7 @@ public class ServiceSetEventRequestContextMessageProcessor implements MessagePro
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         // DF: I've no idea why we only do this for sync
-        if (event.getEndpoint().getExchangePattern().hasResponse())
+        if (event.getExchangePattern().hasResponse())
         {
             event = OptimizedRequestContext.unsafeSetEvent(event);
         }

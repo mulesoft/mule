@@ -36,7 +36,7 @@ public class ServiceCatchAllStrategy extends AbstractCatchAllStrategy
         logger.debug("Catch all strategy handling event: " + event);
         try
         {
-            if (event.getEndpoint().getExchangePattern().hasResponse())
+            if (event.getExchangePattern().hasResponse())
             {
                 if (statistics.isEnabled())
                 {

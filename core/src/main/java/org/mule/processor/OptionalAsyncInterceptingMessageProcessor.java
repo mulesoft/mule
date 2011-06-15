@@ -62,7 +62,7 @@ public class OptionalAsyncInterceptingMessageProcessor extends AsyncIntercepting
         }
         else
         {
-            hasResponse = event.getEndpoint().getExchangePattern().hasResponse();
+            hasResponse = event.getExchangePattern().hasResponse();
             isTransacted = event.getEndpoint().getTransactionConfig().isTransacted();
         }
         

@@ -42,7 +42,7 @@ public class SensingNullMessageProcessor implements MessageProcessor
         }
         else
         {
-            if (event.getEndpoint().getExchangePattern().hasResponse())
+            if (event.getExchangePattern().hasResponse())
             {
                 return event;
             }

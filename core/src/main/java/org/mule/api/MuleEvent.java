@@ -10,6 +10,7 @@
 
 package org.mule.api;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.security.Credentials;
@@ -260,4 +261,9 @@ public interface MuleEvent extends Serializable
      * Returns the times spent processing this event (so far)
      */
     ProcessingTime getProcessingTime();
+    
+    /**
+     * Returns the message exchange pattern for this event
+     */
+    MessageExchangePattern getExchangePattern();
 }

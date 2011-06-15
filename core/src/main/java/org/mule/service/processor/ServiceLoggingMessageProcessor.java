@@ -30,7 +30,7 @@ public class ServiceLoggingMessageProcessor implements MessageProcessor
 
     public MuleEvent process(MuleEvent event) throws MuleException
     {
-        if (event.getEndpoint().getExchangePattern().hasResponse())
+        if (event.getExchangePattern().hasResponse())
         {
             if (logger.isDebugEnabled())
             {

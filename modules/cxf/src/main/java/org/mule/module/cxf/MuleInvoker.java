@@ -90,7 +90,7 @@ public class MuleInvoker implements Invoker
             throw new Fault(e);
         }
 
-        if (!event.getEndpoint().getExchangePattern().hasResponse())
+        if (!event.getExchangePattern().hasResponse())
         {
             // weird response from AbstractInterceptingMessageProcessor
             responseEvent = null;

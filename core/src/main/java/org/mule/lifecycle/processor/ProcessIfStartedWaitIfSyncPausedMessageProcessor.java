@@ -33,7 +33,7 @@ public class ProcessIfStartedWaitIfSyncPausedMessageProcessor extends
     {
         if (accept(event))
         {
-            if (isPaused() && event.getEndpoint().getExchangePattern().hasResponse())
+            if (isPaused() && event.getExchangePattern().hasResponse())
             {
                 try
                 {

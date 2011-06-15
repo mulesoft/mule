@@ -109,6 +109,8 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     private transient Map<String, Object> serializedData = null;
 
     private final ProcessingTime processingTime;
+    
+    private final MessageExchangePattern exchangePattern;
 
     /**
      * Properties cache that only reads properties once from the inbound message and
@@ -134,6 +136,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.timeout = previousEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
         this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
+        this.exchangePattern = endpoint.getExchangePattern();
         fillProperties();
     }
 
@@ -150,6 +153,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.timeout = previousEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
         this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
+        this.exchangePattern = endpoint.getExchangePattern();
         fillProperties();
     }
 
@@ -202,6 +206,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.session = session;
         this.id = generateEventId();
         this.outputStream = outputStream;
+        this.exchangePattern = endpoint.getExchangePattern();
         fillProperties();
         this.processingTime = time != null ? time : ProcessingTime.newInstance(this.session, message.getMuleContext());
     }
@@ -222,6 +227,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.endpoint = rewriteEvent.getEndpoint();
         this.timeout = rewriteEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) rewriteEvent.getOutputStream();
+        this.exchangePattern = endpoint.getExchangePattern();
         if (rewriteEvent instanceof DefaultMuleEvent)
         {
             this.transformedMessage = ((DefaultMuleEvent) rewriteEvent).getCachedMessage();
@@ -804,5 +810,11 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
                 false, mep, 0, null, null, null, muleContext, null, null, null, null, false, null);
         }
 
+    }
+
+    @Override
+    public MessageExchangePattern getExchangePattern()
+    {
+        return exchangePattern;
     }
 }

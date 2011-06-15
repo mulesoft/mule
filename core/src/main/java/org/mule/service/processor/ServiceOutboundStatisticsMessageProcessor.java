@@ -35,7 +35,7 @@ public class ServiceOutboundStatisticsMessageProcessor implements MessageProcess
             if (!(service.getOutboundMessageProcessor() instanceof OutboundRouterCollection)
                 || (service.getOutboundMessageProcessor() instanceof OutboundRouterCollection && ((OutboundRouterCollection) service.getOutboundMessageProcessor()).hasEndpoints()))
             {
-                if (event.getEndpoint().getExchangePattern().hasResponse())
+                if (event.getExchangePattern().hasResponse())
                 {
                     stats.incSentEventSync();
                 }

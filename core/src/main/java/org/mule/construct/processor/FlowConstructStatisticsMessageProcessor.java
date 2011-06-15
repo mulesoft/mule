@@ -25,7 +25,7 @@ public class FlowConstructStatisticsMessageProcessor implements MessageProcessor
     {
         if (flowConstruct.getStatistics().isEnabled())
         {
-            if (event.getEndpoint().getExchangePattern().hasResponse())
+            if (event.getExchangePattern().hasResponse())
             {
                 flowConstruct.getStatistics().incReceivedEventSync();
             }

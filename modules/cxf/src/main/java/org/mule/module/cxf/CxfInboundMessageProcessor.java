@@ -292,7 +292,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
             // If there isn't one, there was probably a fault, so use the original
             // event
-            if (responseEvent == null || !event.getEndpoint().getExchangePattern().hasResponse())
+            if (responseEvent == null || !event.getExchangePattern().hasResponse())
             {
                 return null;
             }

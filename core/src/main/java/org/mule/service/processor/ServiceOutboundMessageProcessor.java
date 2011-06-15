@@ -42,7 +42,7 @@ public class ServiceOutboundMessageProcessor extends AbstractInterceptingMessage
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         // Skip outbound phase is inbound is sync and payload is NullPayload
-        boolean syncNullPayload = event.getEndpoint().getExchangePattern().hasResponse()
+        boolean syncNullPayload = event.getExchangePattern().hasResponse()
                                   && (event.getMessage().getPayload() instanceof NullPayload);
 
         if (event.isStopFurtherProcessing())
@@ -57,7 +57,7 @@ public class ServiceOutboundMessageProcessor extends AbstractInterceptingMessage
                 || (service.getOutboundMessageProcessor() instanceof OutboundRouterCollection && ((OutboundRouterCollection) service.getOutboundMessageProcessor()).hasEndpoints()))
             {
                 MuleEvent outboundEvent;
-                if (event.getEndpoint().getExchangePattern().hasResponse())
+                if (event.getExchangePattern().hasResponse())
                 {
                     // Copy of the inbound event for outbound phase
                     outboundEvent = new DefaultMuleEvent(new DefaultMuleMessage(event.getMessage()

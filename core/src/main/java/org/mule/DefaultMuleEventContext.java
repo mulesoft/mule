@@ -671,7 +671,7 @@ public class DefaultMuleEventContext implements MuleEventContext
 
     public MessageExchangePattern getExchangePattern()
     {
-        return event.getEndpoint().getExchangePattern();
+        return event.getExchangePattern();
     }
 
     /**

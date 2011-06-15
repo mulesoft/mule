@@ -11,6 +11,7 @@
 package org.mule.registry;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.MessageExchangePattern;
 import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.api.MuleContext;
@@ -251,6 +252,12 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         }
 
         public ProcessingTime getProcessingTime()
+        {
+            return null;
+        }
+
+        @Override
+        public MessageExchangePattern getExchangePattern()
         {
             return null;
         }

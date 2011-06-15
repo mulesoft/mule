@@ -28,7 +28,7 @@ public class ServiceStatisticsMessageProcessor implements MessageProcessor
     {
         if (service.getStatistics().isEnabled())
         {
-            if (event.getEndpoint().getExchangePattern().hasResponse())
+            if (event.getExchangePattern().hasResponse())
             {
                 service.getStatistics().incReceivedEventSync();
             }
