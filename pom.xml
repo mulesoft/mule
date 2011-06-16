@@ -35,6 +35,7 @@
 
     <pluginRepositories>
         <pluginRepository>
+            <!-- Mule Assembly Verifier Plugin snapshots hosted here -->
             <id>codehaus-plugin-snapshots</id>
             <name>Codehaus Plugin Snapshot Repository</name>
             <url>http://snapshots.repository.codehaus.org</url>
@@ -46,6 +47,24 @@
             </releases>
         </pluginRepository>
     </pluginRepositories>
+
+    <repositories>
+        <repository>
+            <!--
+                standalone-light needs this repo declared as a regular one now for maven 3,
+                dependency-unpack downloads and repackages full distro
+             -->
+            <id>codehaus-dist-snapshots</id>
+            <name>Codehaus Distribution Snapshots</name>
+            <url>http://snapshots.dist.codehaus.org/mule/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
 
     <modules>
         <module>embedded</module>
