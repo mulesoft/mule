@@ -62,21 +62,28 @@ runMaven(cmdline, existingProjectDir)
 
 def buildArchetypeCommand(String archetype, String goal, String archetypeParams)
 {
-  def cmdline = "-o ${localRepoArgument} "
-  cmdline += archetype + project.version + ":${goal} "
-  
-  if (archetypeParams != null)
-  {
-      cmdline += archetypeParams
-  }
-  cmdline += ' -DmuleVersion=' + project.version
-  cmdline += ' -Dinteractive=false'
+    def cmdline = "-o ${localRepoArgument} "
+    cmdline += archetype + project.version + ":${goal} "
+
+    if (archetypeParams != null)
+    {
+        cmdline += archetypeParams
+    }
+    cmdline += ' -DmuleVersion=' + project.version
+    cmdline += ' -Dinteractive=false'
 }
 
 def runMaven(String commandline, File directory)
 {
     def maven = SystemUtils.IS_OS_WINDOWS ? "mvn.bat" : "mvn"
-    
+
+    def mavenHome = System.getenv("MAVEN_HOME")
+    if (mavenHome != null)
+    {
+        mavenHome = new File(mavenHome, "bin");
+        maven = new File(mavenHome, maven).getAbsolutePath()
+    }
+
     commandline = maven + " " + commandline
 
     log.info("***** directory: '${directory}'")
