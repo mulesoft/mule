@@ -1266,11 +1266,13 @@
             <name>Java net repository</name>
             <url>http://download.java.net/maven/2</url>
         </repository>
+        <!--
         <repository>
             <id>public-jboss</id>
             <name>JBoss Public Repository</name>
             <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
         </repository>
+        -->
         <repository>
             <id>mule-deps</id>
             <name>Mule Dependencies</name>
