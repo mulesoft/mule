@@ -11,10 +11,12 @@
             <directory>target/ce-distribution/${communityArtifact}-${version}</directory>
             <outputDirectory></outputDirectory>
             <excludes>
+                <exclude>bin/**</exclude>
                 <exclude>examples/**</exclude>
                 <exclude>docs/**</exclude>
                 <exclude>src/**</exclude>
                 <exclude>bin/mule_examples*</exclude>
+                <exclude>lib/boot/exec/**</exclude>
             </excludes>
         </fileSet>
 
