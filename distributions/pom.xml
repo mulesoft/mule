@@ -33,6 +33,20 @@
         </plugins>
     </build>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>codehaus-plugin-snapshots</id>
+            <name>Codehaus Plugin Snapshot Repository</name>
+            <url>http://snapshots.repository.codehaus.org</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+
     <modules>
         <module>embedded</module>
         <module>profiler</module>
