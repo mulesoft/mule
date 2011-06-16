@@ -1,157 +1,157 @@
 <!-- Assembly descriptor for the full Mule distribution. -->
 <assembly>
-  <id>full</id>
-  <formats>
-    <format>zip</format>
-    <format>tar.gz</format>
-  </formats>
+    <id>full</id>
+    <formats>
+        <format>zip</format>
+        <format>tar.gz</format>
+    </formats>
 
-  <fileSets>
-    <fileSet>
-      <directory>src/main/resources</directory>
-      <outputDirectory></outputDirectory>
-    </fileSet>
+    <fileSets>
+        <fileSet>
+            <directory>src/main/resources</directory>
+            <outputDirectory></outputDirectory>
+        </fileSet>
 
-    <!-- Make binary files executable. -->
-    <fileSet>
-      <directory>src/main/resources/bin</directory>
-      <outputDirectory>bin</outputDirectory>
-      <fileMode>755</fileMode>
-      <includes>
-        <include>launcher</include>
-        <include>mule</include>
-        <include>setup_local_instance.sh</include>
-        <include>mule_examples</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>src/main/resources/bin</directory>
-      <outputDirectory>bin</outputDirectory>
-      <fileMode>644</fileMode>
-      <includes>
-          <include>*.txt</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>src/main/resources/lib/boot/exec</directory>
-      <outputDirectory>lib/boot/exec</outputDirectory>
-      <fileMode>755</fileMode>
-    </fileSet>
-    <fileSet>
-      <directory>src/main/resources/lib/boot/exec</directory>
-      <outputDirectory>lib/boot/exec</outputDirectory>
-      <fileMode>644</fileMode>
-      <includes>
-          <include>*.txt</include>
-      </includes>
-    </fileSet>
+        <!-- Make binary files executable. -->
+        <fileSet>
+            <directory>src/main/resources/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <fileMode>755</fileMode>
+            <includes>
+                <include>launcher</include>
+                <include>mule</include>
+                <include>setup_local_instance.sh</include>
+                <include>mule_examples</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/resources/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <fileMode>644</fileMode>
+            <includes>
+                <include>*.txt</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/resources/lib/boot/exec</directory>
+            <outputDirectory>lib/boot/exec</outputDirectory>
+            <fileMode>755</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/resources/lib/boot/exec</directory>
+            <outputDirectory>lib/boot/exec</outputDirectory>
+            <fileMode>644</fileMode>
+            <includes>
+                <include>*.txt</include>
+            </includes>
+        </fileSet>
 
-    <!-- Copy javadocs (the build must be run with -DperformRelease=true) -->
-    <fileSet>
-      <directory>../../target/site/apidocs</directory>
-      <outputDirectory>docs/api</outputDirectory>
-    </fileSet>
+        <!-- Copy javadocs (the build must be run with -DperformRelease=true) -->
+        <fileSet>
+            <directory>../../target/site/apidocs</directory>
+            <outputDirectory>docs/api</outputDirectory>
+        </fileSet>
 
-    <!-- Copy source bundle (the build must be run with -DperformRelease=true) -->
-    <fileSet>
-      <directory>target</directory>
-      <outputDirectory>src</outputDirectory>
-      <includes>
-          <include>mule-*-src.zip</include>
-      </includes>
-    </fileSet>
+        <!-- Copy source bundle (the build must be run with -DperformRelease=true) -->
+        <fileSet>
+            <directory>target</directory>
+            <outputDirectory>src</outputDirectory>
+            <includes>
+                <include>mule-*-src.zip</include>
+            </includes>
+        </fileSet>
 
-    <!--
-    ============================
-        Examples
-    ============================
-    -->
+        <!--
+        ============================
+            Examples
+        ============================
+        -->
 
-    <!--
-    The entire examples directory is copied over first, then for each example, the contents
-    of the "dist" directory (README.txt, pom.xml, build.xml) are copied over, followed by
-    the executable scripts.
-    -->
-    <fileSet>
-        <directory>../../examples</directory>
-        <outputDirectory>examples</outputDirectory>
-        <excludes>
-            <exclude>pom.xml</exclude>
-            <exclude>all-examples/**</exclude>
-            <exclude>**/target/**</exclude>
-            <exclude>**/dist/**</exclude>
-            <exclude>**/.*/**</exclude>
-            <exclude>**/*.iml</exclude>
-            <exclude>**/*.ipr</exclude>
-            <exclude>**/*.iws</exclude>
-            <!-- Exclude this example until someone gets it working -->
-            <exclude>geomail/**</exclude>
-            <!-- Legacy LoanBroker example, used for testing only -->
-            <exclude>loanbroker-legacy/**</exclude>
-        </excludes>
-    </fileSet>
+        <!--
+        The entire examples directory is copied over first, then for each example, the contents
+        of the "dist" directory (README.txt, pom.xml, build.xml) are copied over, followed by
+        the executable scripts.
+        -->
+        <fileSet>
+            <directory>../../examples</directory>
+            <outputDirectory>examples</outputDirectory>
+            <excludes>
+                <exclude>pom.xml</exclude>
+                <exclude>all-examples/**</exclude>
+                <exclude>**/target/**</exclude>
+                <exclude>**/dist/**</exclude>
+                <exclude>**/.*/**</exclude>
+                <exclude>**/*.iml</exclude>
+                <exclude>**/*.ipr</exclude>
+                <exclude>**/*.iws</exclude>
+                <!-- Exclude this example until someone gets it working -->
+                <exclude>geomail/**</exclude>
+                <!-- Legacy LoanBroker example, used for testing only -->
+                <exclude>loanbroker-legacy/**</exclude>
+            </excludes>
+        </fileSet>
 
-    <fileSet>
-        <directory>../../examples/cep/dist</directory>
-        <outputDirectory>examples/cep</outputDirectory>
-    </fileSet>
-    <fileSet>
-        <directory>../../examples/echo/dist</directory>
-        <outputDirectory>examples/echo</outputDirectory>
-    </fileSet>
-    <fileSet>
-        <directory>../../examples/errorhandler/dist</directory>
-        <outputDirectory>examples/errorhandler</outputDirectory>
-    </fileSet>
-    <!--
-    <fileSet>
-        <directory>../../examples/geomail/dist</directory>
-        <outputDirectory>examples/geomail</outputDirectory>
-    </fileSet>
-    -->
-    <fileSet>
-        <directory>../../examples/gpswalker/dist</directory>
-        <outputDirectory>examples/gpswalker</outputDirectory>
-    </fileSet>
-    <fileSet>
-        <directory>../../examples/hello/dist</directory>
-        <outputDirectory>examples/hello</outputDirectory>
-    </fileSet>
-    <fileSet>
-        <directory>../../examples/loanbroker-simple/dist</directory>
-        <outputDirectory>examples/loanbroker-simple</outputDirectory>
-    </fileSet>
-    <fileSet>
-        <directory>../../examples/loanbroker-bpm/dist</directory>
-        <outputDirectory>examples/loanbroker-bpm</outputDirectory>
-    </fileSet>
-    <fileSet>
-        <directory>../../examples/notifications/dist</directory>
-        <outputDirectory>examples/notifications</outputDirectory>
-    </fileSet>
-    <fileSet>
-        <directory>../../examples/scripting/dist</directory>
-        <outputDirectory>examples/scripting</outputDirectory>
-    </fileSet>
-    <fileSet>
-        <directory>../../examples/stockquote/dist</directory>
-        <outputDirectory>examples/stockquote</outputDirectory>
-    </fileSet>
-    <fileSet>
-        <directory>../../examples/bookstore/dist</directory>
-        <outputDirectory>examples/bookstore</outputDirectory>
-    </fileSet>
+        <fileSet>
+            <directory>../../examples/cep/dist</directory>
+            <outputDirectory>examples/cep</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../../examples/echo/dist</directory>
+            <outputDirectory>examples/echo</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../../examples/errorhandler/dist</directory>
+            <outputDirectory>examples/errorhandler</outputDirectory>
+        </fileSet>
+        <!--
+        <fileSet>
+            <directory>../../examples/geomail/dist</directory>
+            <outputDirectory>examples/geomail</outputDirectory>
+        </fileSet>
+        -->
+        <fileSet>
+            <directory>../../examples/gpswalker/dist</directory>
+            <outputDirectory>examples/gpswalker</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../../examples/hello/dist</directory>
+            <outputDirectory>examples/hello</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../../examples/loanbroker-simple/dist</directory>
+            <outputDirectory>examples/loanbroker-simple</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../../examples/loanbroker-bpm/dist</directory>
+            <outputDirectory>examples/loanbroker-bpm</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../../examples/notifications/dist</directory>
+            <outputDirectory>examples/notifications</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../../examples/scripting/dist</directory>
+            <outputDirectory>examples/scripting</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../../examples/stockquote/dist</directory>
+            <outputDirectory>examples/stockquote</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../../examples/bookstore/dist</directory>
+            <outputDirectory>examples/bookstore</outputDirectory>
+        </fileSet>
 
-    <!--
-    ============================
-        Mule Examples: Mule Example Launcher
-    ============================
-    -->
-    <fileSet>
-        <directory>../../examples/mule-example-launcher/dist</directory>
-        <outputDirectory>examples/mule-example-launcher</outputDirectory>
-    </fileSet>
-  </fileSets>
+        <!--
+        ============================
+            Mule Examples: Mule Example Launcher
+        ============================
+        -->
+        <fileSet>
+            <directory>../../examples/mule-example-launcher/dist</directory>
+            <outputDirectory>examples/mule-example-launcher</outputDirectory>
+        </fileSet>
+    </fileSets>
 
     <!--
     ============================
@@ -159,297 +159,297 @@
     ============================
     -->
 
-  <!-- TODO: Update to use wildcards once this issue is fixed:
-       http://jira.codehaus.org/browse/MASSEMBLY-220 -->
-  <dependencySets>
+    <!-- TODO: Update to use wildcards once this issue is fixed:
+   http://jira.codehaus.org/browse/MASSEMBLY-220 -->
+    <dependencySets>
 
-    <!-- Bootstrap -->
-    <dependencySet>
-      <outputDirectory>lib/boot</outputDirectory>
-      <includes>
-        <include>org.mule.modules:mule-module-boot</include>
-        <include>org.mule.modules:mule-module-logging</include>
-        <include>org.mule.modules:mule-module-reboot</include>
-        <include>commons-cli:commons-cli</include>
-        <include>tanukisoft:wrapper</include>
-        <include>log4j:log4j</include>
-      </includes>
-    </dependencySet>
+        <!-- Bootstrap -->
+        <dependencySet>
+            <outputDirectory>lib/boot</outputDirectory>
+            <includes>
+                <include>org.mule.modules:mule-module-boot</include>
+                <include>org.mule.modules:mule-module-logging</include>
+                <include>org.mule.modules:mule-module-reboot</include>
+                <include>commons-cli:commons-cli</include>
+                <include>tanukisoft:wrapper</include>
+                <include>log4j:log4j</include>
+            </includes>
+        </dependencySet>
 
-    <!-- Mule libraries -->
-    <dependencySet>
-      <outputDirectory>lib/mule</outputDirectory>
-      <includes>
-        <!-- Core -->
-        <include>org.mule:mule-core</include>
-        <!-- Transports -->
-        <include>org.mule.transports:mule-transport-ajax</include>
-        <include>org.mule.transports:mule-transport-axis</include>
-        <include>org.mule.transports:mule-transport-ejb</include>
-        <include>org.mule.transports:mule-transport-email</include>
-        <include>org.mule.transports:mule-transport-file</include>
-        <include>org.mule.transports:mule-transport-ftp</include>
-        <include>org.mule.transports:mule-transport-http</include>
-        <include>org.mule.transports:mule-transport-jdbc</include>
-        <include>org.mule.transports:mule-transport-jetty</include>
-        <include>org.mule.transports:mule-transport-jms</include>
-        <include>org.mule.transports:mule-transport-multicast</include>
-        <include>org.mule.transports:mule-transport-quartz</include>
-        <include>org.mule.transports:mule-transport-rmi</include>
-        <include>org.mule.transports:mule-transport-servlet</include>
-        <include>org.mule.transports:mule-transport-sftp</include>
-        <include>org.mule.transports:mule-transport-ssl</include>
-        <include>org.mule.transports:mule-transport-stdio</include>
-        <include>org.mule.transports:mule-transport-tcp</include>
-        <include>org.mule.transports:mule-transport-udp</include>
-        <include>org.mule.transports:mule-transport-vm</include>
-        <include>org.mule.transports:mule-transport-xmpp</include>
-        <!-- Modules -->
-        <include>org.mule.modules:mule-module-launcher</include>
-        <include>org.mule.modules:mule-module-annotations</include>
-        <include>org.mule.modules:mule-module-atom</include>
-        <include>org.mule.modules:mule-module-bpm</include>
-        <include>org.mule.modules:mule-module-builders</include>
-        <include>org.mule.modules:mule-module-client</include>
-        <include>org.mule.modules:mule-module-cxf</include>
-        <include>org.mule.modules:mule-module-drools</include>
-        <include>org.mule.modules:mule-module-ibeans</include>
-        <include>org.mule.modules:mule-module-jaas</include>
-        <include>org.mule.modules:mule-module-jersey</include>
-        <include>org.mule.modules:mule-module-jbossts</include>
-        <include>org.mule.modules:mule-module-jbpm</include>
-        <include>org.mule.modules:mule-module-json</include>
-        <include>org.mule.modules:mule-module-management</include>
-        <include>org.mule.modules:mule-module-ognl</include>
-        <include>org.mule.modules:mule-module-pgp</include>
-        <include>org.mule.modules:mule-module-rss</include>
-        <include>org.mule.modules:mule-module-scripting</include>
-        <include>org.mule.modules:mule-module-spring-config</include>
-        <include>org.mule.modules:mule-module-spring-extras</include>
-        <include>org.mule.modules:mule-module-spring-security</include>
-        <include>org.mule.modules:mule-module-sxc</include>
-        <include>org.mule.modules:mule-module-tomcat</include>
-        <include>org.mule.modules:mule-module-xml</include>
-        <include>org.mule.patterns:mule-pattern-core</include>
-        <!-- Tools -->
-        <include>org.mule.tools:mule-tools-anttasks</include>
-      </includes>
-    </dependencySet>
+        <!-- Mule libraries -->
+        <dependencySet>
+            <outputDirectory>lib/mule</outputDirectory>
+            <includes>
+                <!-- Core -->
+                <include>org.mule:mule-core</include>
+                <!-- Transports -->
+                <include>org.mule.transports:mule-transport-ajax</include>
+                <include>org.mule.transports:mule-transport-axis</include>
+                <include>org.mule.transports:mule-transport-ejb</include>
+                <include>org.mule.transports:mule-transport-email</include>
+                <include>org.mule.transports:mule-transport-file</include>
+                <include>org.mule.transports:mule-transport-ftp</include>
+                <include>org.mule.transports:mule-transport-http</include>
+                <include>org.mule.transports:mule-transport-jdbc</include>
+                <include>org.mule.transports:mule-transport-jetty</include>
+                <include>org.mule.transports:mule-transport-jms</include>
+                <include>org.mule.transports:mule-transport-multicast</include>
+                <include>org.mule.transports:mule-transport-quartz</include>
+                <include>org.mule.transports:mule-transport-rmi</include>
+                <include>org.mule.transports:mule-transport-servlet</include>
+                <include>org.mule.transports:mule-transport-sftp</include>
+                <include>org.mule.transports:mule-transport-ssl</include>
+                <include>org.mule.transports:mule-transport-stdio</include>
+                <include>org.mule.transports:mule-transport-tcp</include>
+                <include>org.mule.transports:mule-transport-udp</include>
+                <include>org.mule.transports:mule-transport-vm</include>
+                <include>org.mule.transports:mule-transport-xmpp</include>
+                <!-- Modules -->
+                <include>org.mule.modules:mule-module-launcher</include>
+                <include>org.mule.modules:mule-module-annotations</include>
+                <include>org.mule.modules:mule-module-atom</include>
+                <include>org.mule.modules:mule-module-bpm</include>
+                <include>org.mule.modules:mule-module-builders</include>
+                <include>org.mule.modules:mule-module-client</include>
+                <include>org.mule.modules:mule-module-cxf</include>
+                <include>org.mule.modules:mule-module-drools</include>
+                <include>org.mule.modules:mule-module-ibeans</include>
+                <include>org.mule.modules:mule-module-jaas</include>
+                <include>org.mule.modules:mule-module-jersey</include>
+                <include>org.mule.modules:mule-module-jbossts</include>
+                <include>org.mule.modules:mule-module-jbpm</include>
+                <include>org.mule.modules:mule-module-json</include>
+                <include>org.mule.modules:mule-module-management</include>
+                <include>org.mule.modules:mule-module-ognl</include>
+                <include>org.mule.modules:mule-module-pgp</include>
+                <include>org.mule.modules:mule-module-rss</include>
+                <include>org.mule.modules:mule-module-scripting</include>
+                <include>org.mule.modules:mule-module-spring-config</include>
+                <include>org.mule.modules:mule-module-spring-extras</include>
+                <include>org.mule.modules:mule-module-spring-security</include>
+                <include>org.mule.modules:mule-module-sxc</include>
+                <include>org.mule.modules:mule-module-tomcat</include>
+                <include>org.mule.modules:mule-module-xml</include>
+                <include>org.mule.patterns:mule-pattern-core</include>
+                <!-- Tools -->
+                <include>org.mule.tools:mule-tools-anttasks</include>
+            </includes>
+        </dependencySet>
 
-    <!-- 3rd-party libraries -->
-    <dependencySet>
-      <outputDirectory>lib/opt</outputDirectory>
+        <!-- 3rd-party libraries -->
+        <dependencySet>
+            <outputDirectory>lib/opt</outputDirectory>
 
-      <!-- Since we don't define any "includes" here, this will suck in the whole
-      universe of transitive dependencies.  Therefore, we need to explicitly
-      _exclude_ all libs which should _not_ go into this directory (usually
-      because they are already in a different directory). -->
-      <excludes>
-        <!-- lib/mule -->
-        <exclude>org.mule:mule-core</exclude>
-        <exclude>org.mule.transports:mule-transports-all</exclude>
-        <exclude>org.mule.transports:mule-transport-ajax</exclude>
-        <exclude>org.mule.transports:mule-transport-axis</exclude>
-        <exclude>org.mule.transports:mule-transport-ejb</exclude>
-        <exclude>org.mule.transports:mule-transport-email</exclude>
-        <exclude>org.mule.transports:mule-transport-file</exclude>
-        <exclude>org.mule.transports:mule-transport-ftp</exclude>
-        <exclude>org.mule.transports:mule-transport-http</exclude>
-        <exclude>org.mule.transports:mule-transport-jdbc</exclude>
-        <exclude>org.mule.transports:mule-transport-jetty</exclude>
-        <exclude>org.mule.transports:mule-transport-jms</exclude>
-        <exclude>org.mule.transports:mule-transport-multicast</exclude>
-        <exclude>org.mule.transports:mule-transport-quartz</exclude>
-        <exclude>org.mule.transports:mule-transport-rmi</exclude>
-        <exclude>org.mule.transports:mule-transport-servlet</exclude>
-        <exclude>org.mule.transports:mule-transport-sftp</exclude>
-        <exclude>org.mule.transports:mule-transport-ssl</exclude>
-        <exclude>org.mule.transports:mule-transport-stdio</exclude>
-        <exclude>org.mule.transports:mule-transport-tcp</exclude>
-        <exclude>org.mule.transports:mule-transport-udp</exclude>
-        <exclude>org.mule.transports:mule-transport-vm</exclude>
-        <exclude>org.mule.transports:mule-transport-xfire</exclude>
-        <exclude>org.mule.transports:mule-transport-xmpp</exclude>
-        <exclude>org.mule.modules:mule-modules-all</exclude>
-        <exclude>org.mule.modules:mule-module-annotations</exclude>
-        <exclude>org.mule.modules:mule-module-atom</exclude>
-        <exclude>org.mule.modules:mule-module-boot</exclude>
-        <exclude>org.mule.modules:mule-module-bpm</exclude>
-        <exclude>org.mule.modules:mule-module-builders</exclude>
-        <exclude>org.mule.modules:mule-module-client</exclude>
-        <exclude>org.mule.modules:mule-module-cxf</exclude>
-        <exclude>org.mule.modules:mule-module-drools</exclude>
-        <exclude>org.mule.modules:mule-module-ibeans</exclude>
-        <exclude>org.mule.modules:mule-module-jaas</exclude>
-        <exclude>org.mule.modules:mule-module-jersey</exclude>
-        <exclude>org.mule.modules:mule-module-jbossts</exclude>
-        <exclude>org.mule.modules:mule-module-jbpm</exclude>
-        <exclude>org.mule.modules:mule-module-jca</exclude>
-        <exclude>org.mule.modules:mule-module-json</exclude>
-        <exclude>org.mule.modules:mule-module-launcher</exclude>
-        <exclude>org.mule.modules:mule-module-logging</exclude>
-        <exclude>org.mule.modules:mule-module-management</exclude>
-        <exclude>org.mule.modules:mule-module-ognl</exclude>
-        <exclude>org.mule.modules:mule-module-pgp</exclude>
-        <exclude>org.mule.modules:mule-module-reboot</exclude>
-        <exclude>org.mule.modules:mule-module-rss</exclude>
-        <exclude>org.mule.modules:mule-module-scripting</exclude>
-        <exclude>org.mule.modules:mule-module-spring-config</exclude>
-        <exclude>org.mule.modules:mule-module-spring-extras</exclude>
-        <exclude>org.mule.modules:mule-module-spring-security</exclude>
-        <exclude>org.mule.modules:mule-module-sxc</exclude>
-        <exclude>org.mule.modules:mule-module-tomcat</exclude>
-        <exclude>org.mule.modules:mule-module-xml</exclude>
-        <exclude>org.mule.patterns:mule-patterns-all</exclude>
-        <exclude>org.mule.patterns:mule-pattern-core</exclude>
-        <exclude>org.mule.examples:mule-examples-all</exclude>
-        <exclude>org.mule.examples:mule-example-bookstore</exclude>
-        <exclude>org.mule.examples:mule-example-cep</exclude>
-        <exclude>org.mule.examples:mule-example-echo</exclude>
-        <exclude>org.mule.examples:mule-example-errorhandler</exclude>
-        <exclude>org.mule.examples:mule-example-gpswalker</exclude>
-        <exclude>org.mule.examples:mule-example-hello</exclude>
-        <exclude>org.mule.examples:mule-example-loanbroker-common</exclude>
-        <exclude>org.mule.examples:mule-example-loanbroker-esn</exclude>
-        <exclude>org.mule.examples:mule-example-loanbroker-esb</exclude>
-        <exclude>org.mule.examples:mule-example-loanbroker-bpm</exclude>
-        <exclude>org.mule.examples:mule-example-loanbroker-credit-agency</exclude>
-        <exclude>org.mule.examples:mule-example-loanbroker-simple</exclude>
-        <exclude>org.mule.examples:mule-example-notifications</exclude>
-        <exclude>org.mule.examples:mule-example-scripting</exclude>
-        <exclude>org.mule.examples:mule-example-stockquote</exclude>
-        <exclude>org.mule.examples:mule-example-launcher</exclude>
-        <exclude>org.mule.tools:mule-tools-anttasks</exclude>
+            <!-- Since we don't define any "includes" here, this will suck in the whole
+    universe of transitive dependencies.  Therefore, we need to explicitly
+    _exclude_ all libs which should _not_ go into this directory (usually
+    because they are already in a different directory). -->
+            <excludes>
+                <!-- lib/mule -->
+                <exclude>org.mule:mule-core</exclude>
+                <exclude>org.mule.transports:mule-transports-all</exclude>
+                <exclude>org.mule.transports:mule-transport-ajax</exclude>
+                <exclude>org.mule.transports:mule-transport-axis</exclude>
+                <exclude>org.mule.transports:mule-transport-ejb</exclude>
+                <exclude>org.mule.transports:mule-transport-email</exclude>
+                <exclude>org.mule.transports:mule-transport-file</exclude>
+                <exclude>org.mule.transports:mule-transport-ftp</exclude>
+                <exclude>org.mule.transports:mule-transport-http</exclude>
+                <exclude>org.mule.transports:mule-transport-jdbc</exclude>
+                <exclude>org.mule.transports:mule-transport-jetty</exclude>
+                <exclude>org.mule.transports:mule-transport-jms</exclude>
+                <exclude>org.mule.transports:mule-transport-multicast</exclude>
+                <exclude>org.mule.transports:mule-transport-quartz</exclude>
+                <exclude>org.mule.transports:mule-transport-rmi</exclude>
+                <exclude>org.mule.transports:mule-transport-servlet</exclude>
+                <exclude>org.mule.transports:mule-transport-sftp</exclude>
+                <exclude>org.mule.transports:mule-transport-ssl</exclude>
+                <exclude>org.mule.transports:mule-transport-stdio</exclude>
+                <exclude>org.mule.transports:mule-transport-tcp</exclude>
+                <exclude>org.mule.transports:mule-transport-udp</exclude>
+                <exclude>org.mule.transports:mule-transport-vm</exclude>
+                <exclude>org.mule.transports:mule-transport-xfire</exclude>
+                <exclude>org.mule.transports:mule-transport-xmpp</exclude>
+                <exclude>org.mule.modules:mule-modules-all</exclude>
+                <exclude>org.mule.modules:mule-module-annotations</exclude>
+                <exclude>org.mule.modules:mule-module-atom</exclude>
+                <exclude>org.mule.modules:mule-module-boot</exclude>
+                <exclude>org.mule.modules:mule-module-bpm</exclude>
+                <exclude>org.mule.modules:mule-module-builders</exclude>
+                <exclude>org.mule.modules:mule-module-client</exclude>
+                <exclude>org.mule.modules:mule-module-cxf</exclude>
+                <exclude>org.mule.modules:mule-module-drools</exclude>
+                <exclude>org.mule.modules:mule-module-ibeans</exclude>
+                <exclude>org.mule.modules:mule-module-jaas</exclude>
+                <exclude>org.mule.modules:mule-module-jersey</exclude>
+                <exclude>org.mule.modules:mule-module-jbossts</exclude>
+                <exclude>org.mule.modules:mule-module-jbpm</exclude>
+                <exclude>org.mule.modules:mule-module-jca</exclude>
+                <exclude>org.mule.modules:mule-module-json</exclude>
+                <exclude>org.mule.modules:mule-module-launcher</exclude>
+                <exclude>org.mule.modules:mule-module-logging</exclude>
+                <exclude>org.mule.modules:mule-module-management</exclude>
+                <exclude>org.mule.modules:mule-module-ognl</exclude>
+                <exclude>org.mule.modules:mule-module-pgp</exclude>
+                <exclude>org.mule.modules:mule-module-reboot</exclude>
+                <exclude>org.mule.modules:mule-module-rss</exclude>
+                <exclude>org.mule.modules:mule-module-scripting</exclude>
+                <exclude>org.mule.modules:mule-module-spring-config</exclude>
+                <exclude>org.mule.modules:mule-module-spring-extras</exclude>
+                <exclude>org.mule.modules:mule-module-spring-security</exclude>
+                <exclude>org.mule.modules:mule-module-sxc</exclude>
+                <exclude>org.mule.modules:mule-module-tomcat</exclude>
+                <exclude>org.mule.modules:mule-module-xml</exclude>
+                <exclude>org.mule.patterns:mule-patterns-all</exclude>
+                <exclude>org.mule.patterns:mule-pattern-core</exclude>
+                <exclude>org.mule.examples:mule-examples-all</exclude>
+                <exclude>org.mule.examples:mule-example-bookstore</exclude>
+                <exclude>org.mule.examples:mule-example-cep</exclude>
+                <exclude>org.mule.examples:mule-example-echo</exclude>
+                <exclude>org.mule.examples:mule-example-errorhandler</exclude>
+                <exclude>org.mule.examples:mule-example-gpswalker</exclude>
+                <exclude>org.mule.examples:mule-example-hello</exclude>
+                <exclude>org.mule.examples:mule-example-loanbroker-common</exclude>
+                <exclude>org.mule.examples:mule-example-loanbroker-esn</exclude>
+                <exclude>org.mule.examples:mule-example-loanbroker-esb</exclude>
+                <exclude>org.mule.examples:mule-example-loanbroker-bpm</exclude>
+                <exclude>org.mule.examples:mule-example-loanbroker-credit-agency</exclude>
+                <exclude>org.mule.examples:mule-example-loanbroker-simple</exclude>
+                <exclude>org.mule.examples:mule-example-notifications</exclude>
+                <exclude>org.mule.examples:mule-example-scripting</exclude>
+                <exclude>org.mule.examples:mule-example-stockquote</exclude>
+                <exclude>org.mule.examples:mule-example-launcher</exclude>
+                <exclude>org.mule.tools:mule-tools-anttasks</exclude>
 
-        <!-- lib/user -->
-        <exclude>junit:junit</exclude>
-        <exclude>xmlunit:xmlunit</exclude>
-        <exclude>org.mule.tests:mule-tests-functional</exclude>
+                <!-- lib/user -->
+                <exclude>junit:junit</exclude>
+                <exclude>xmlunit:xmlunit</exclude>
+                <exclude>org.mule.tests:mule-tests-functional</exclude>
 
-        <!-- lib/boot -->
-        <exclude>commons-cli:commons-cli</exclude>
-        <exclude>tanukisoft:wrapper</exclude>
-        <exclude>org.slf4j:slf4j-api</exclude>
-        <exclude>org.slf4j:jcl-over-slf4j</exclude>
-        <exclude>org.slf4j:slf4j-log4j12</exclude>
-        <exclude>log4j:log4j</exclude>
+                <!-- lib/boot -->
+                <exclude>commons-cli:commons-cli</exclude>
+                <exclude>tanukisoft:wrapper</exclude>
+                <exclude>org.slf4j:slf4j-api</exclude>
+                <exclude>org.slf4j:jcl-over-slf4j</exclude>
+                <exclude>org.slf4j:slf4j-log4j12</exclude>
+                <exclude>log4j:log4j</exclude>
 
-        <!-- lib/endorsed -->
-        <exclude>xml-apis:xml-apis</exclude>
-        <exclude>xerces:xercesImpl</exclude>
-        <exclude>xerces:xml-serializer</exclude>
-        <exclude>xalan:xalan</exclude>
+                <!-- lib/endorsed -->
+                <exclude>xml-apis:xml-apis</exclude>
+                <exclude>xerces:xercesImpl</exclude>
+                <exclude>xerces:xml-serializer</exclude>
+                <exclude>xalan:xalan</exclude>
 
-        <!-- Distributed separately in profiler pack -->
-        <exclude>com.yourkit:yjp-controller-api-redist</exclude>
+                <!-- Distributed separately in profiler pack -->
+                <exclude>com.yourkit:yjp-controller-api-redist</exclude>
 
-        <!-- We don't redistribute Ant -->
-        <exclude>org.apache.ant:ant</exclude>
-        <exclude>org.apache.ant:ant-launcher</exclude>
-      </excludes>
-    </dependencySet>
+                <!-- We don't redistribute Ant -->
+                <exclude>org.apache.ant:ant</exclude>
+                <exclude>org.apache.ant:ant-launcher</exclude>
+            </excludes>
+        </dependencySet>
 
-    <!-- Mule testing framework -->
-    <dependencySet>
-      <outputDirectory>lib/user</outputDirectory>
-      <scope>test</scope>
-      <includes>
-        <include>junit:junit</include>
-        <include>xmlunit:xmlunit</include>
-        <include>org.mule.tests:mule-tests-functional</include>
-      </includes>
-    </dependencySet>
+        <!-- Mule testing framework -->
+        <dependencySet>
+            <outputDirectory>lib/user</outputDirectory>
+            <scope>test</scope>
+            <includes>
+                <include>junit:junit</include>
+                <include>xmlunit:xmlunit</include>
+                <include>org.mule.tests:mule-tests-functional</include>
+            </includes>
+        </dependencySet>
 
-    <!--
-        These XML dependencies end up in the "endorsed" directory
-        and must be excluded from other dependencySets, otherwise
-        the inclusions here will cause other artifacts to pull them
-        in as well. If that happens, the MAVP blacklisting mechanism
-        should kick in, since only jars in the endorsed directory are
-        explicitly blacklisted by full path.
-    -->
-    <dependencySet>
-      <outputDirectory>lib/endorsed</outputDirectory>
-      <includes>
-          <include>xml-apis:xml-apis</include>
-          <include>xerces:xercesImpl</include>
-          <include>xerces:xml-serializer</include>
-          <include>xalan:xalan</include>
-      </includes>
-    </dependencySet>
+        <!--
+            These XML dependencies end up in the "endorsed" directory
+            and must be excluded from other dependencySets, otherwise
+            the inclusions here will cause other artifacts to pull them
+            in as well. If that happens, the MAVP blacklisting mechanism
+            should kick in, since only jars in the endorsed directory are
+            explicitly blacklisted by full path.
+        -->
+        <dependencySet>
+            <outputDirectory>lib/endorsed</outputDirectory>
+            <includes>
+                <include>xml-apis:xml-apis</include>
+                <include>xerces:xercesImpl</include>
+                <include>xerces:xml-serializer</include>
+                <include>xalan:xalan</include>
+            </includes>
+        </dependencySet>
 
-    <!-- Examples -->
-    <dependencySet>
-      <outputDirectory>examples/bookstore</outputDirectory>
-      <includes>
-        <include>org.mule.examples:mule-example-bookstore</include>
-      </includes>
-    </dependencySet>
-    <dependencySet>
-      <outputDirectory>examples/cep</outputDirectory>
-      <includes>
-        <include>org.mule.examples:mule-example-cep</include>
-      </includes>
-    </dependencySet>
-    <dependencySet>
-      <outputDirectory>examples/echo</outputDirectory>
-      <includes>
-        <include>org.mule.examples:mule-example-echo</include>
-      </includes>
-    </dependencySet>
-    <dependencySet>
-      <outputDirectory>examples/hello</outputDirectory>
-      <includes>
-        <include>org.mule.examples:mule-example-hello</include>
-      </includes>
-    </dependencySet>
-    <dependencySet>
-      <outputDirectory>examples/errorhandler</outputDirectory>
-      <includes>
-        <include>org.mule.examples:mule-example-errorhandler</include>
-      </includes>
-    </dependencySet>
-    <dependencySet>
-      <outputDirectory>examples/loanbroker-bpm</outputDirectory>
-      <includes>
-        <include>org.mule.examples:mule-example-loanbroker-bpm</include>
-      </includes>
-    </dependencySet>
-    <dependencySet>
-      <outputDirectory>examples/loanbroker-simple</outputDirectory>
-      <includes>
-        <include>org.mule.examples:mule-example-loanbroker-simple</include>
-      </includes>
-    </dependencySet>
-    <dependencySet>
-      <outputDirectory>examples/scripting</outputDirectory>
-      <includes>
-        <include>org.mule.examples:mule-example-scripting</include>
-      </includes>
-    </dependencySet>
-    <dependencySet>
-      <outputDirectory>examples/gpswalker</outputDirectory>
-      <includes>
-        <include>org.mule.examples:mule-example-gpswalker</include>
-      </includes>
-    </dependencySet>
-    <dependencySet>
-      <outputDirectory>examples/notifications</outputDirectory>
-      <includes>
-        <include>org.mule.examples:mule-example-notifications</include>
-      </includes>
-    </dependencySet>
-    <dependencySet>
-      <outputDirectory>examples/stockquote</outputDirectory>
-      <includes>
-        <include>org.mule.examples:mule-example-stockquote</include>
-      </includes>
-    </dependencySet>
-    <dependencySet>
-      <outputDirectory>examples/mule-example-launcher</outputDirectory>
-      <includes>
-        <include>org.mule.examples:mule-example-launcher</include>
-      </includes>
-    </dependencySet>
-  </dependencySets>
+        <!-- Examples -->
+        <dependencySet>
+            <outputDirectory>examples/bookstore</outputDirectory>
+            <includes>
+                <include>org.mule.examples:mule-example-bookstore</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>examples/cep</outputDirectory>
+            <includes>
+                <include>org.mule.examples:mule-example-cep</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>examples/echo</outputDirectory>
+            <includes>
+                <include>org.mule.examples:mule-example-echo</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>examples/hello</outputDirectory>
+            <includes>
+                <include>org.mule.examples:mule-example-hello</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>examples/errorhandler</outputDirectory>
+            <includes>
+                <include>org.mule.examples:mule-example-errorhandler</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>examples/loanbroker-bpm</outputDirectory>
+            <includes>
+                <include>org.mule.examples:mule-example-loanbroker-bpm</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>examples/loanbroker-simple</outputDirectory>
+            <includes>
+                <include>org.mule.examples:mule-example-loanbroker-simple</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>examples/scripting</outputDirectory>
+            <includes>
+                <include>org.mule.examples:mule-example-scripting</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>examples/gpswalker</outputDirectory>
+            <includes>
+                <include>org.mule.examples:mule-example-gpswalker</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>examples/notifications</outputDirectory>
+            <includes>
+                <include>org.mule.examples:mule-example-notifications</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>examples/stockquote</outputDirectory>
+            <includes>
+                <include>org.mule.examples:mule-example-stockquote</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>examples/mule-example-launcher</outputDirectory>
+            <includes>
+                <include>org.mule.examples:mule-example-launcher</include>
+            </includes>
+        </dependencySet>
+    </dependencySets>
 </assembly>
