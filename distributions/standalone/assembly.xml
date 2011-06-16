@@ -88,6 +88,7 @@
                 <exclude>geomail/**</exclude>
                 <!-- Legacy LoanBroker example, used for testing only -->
                 <exclude>loanbroker-legacy/**</exclude>
+                <exclude>webapp/**</exclude>
             </excludes>
         </fileSet>
 
@@ -103,6 +104,35 @@
             <directory>../../examples/errorhandler/dist</directory>
             <outputDirectory>examples/errorhandler</outputDirectory>
         </fileSet>
+        <fileSet>
+            <!-- Empty dir -->
+            <directory>../../examples/errorhandler/test-data</directory>
+            <outputDirectory>examples/errorhandler/test-data</outputDirectory>
+            <directoryMode>0755</directoryMode>
+            <excludes>
+                <exclude>*</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <!-- Empty dir -->
+            <directory>../../examples/errorhandler/exceptions</directory>
+            <outputDirectory>examples/errorhandler/exceptions</outputDirectory>
+            <directoryMode>0755</directoryMode>
+            <excludes>
+                <exclude>*</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <!-- Empty dir -->
+            <directory>../../examples/errorhandler/in</directory>
+            <outputDirectory>examples/errorhandler/in</outputDirectory>
+            <directoryMode>0755</directoryMode>
+            <excludes>
+                <exclude>*</exclude>
+            </excludes>
+        </fileSet>
+
+
         <!--
         <fileSet>
             <directory>../../examples/geomail/dist</directory>
@@ -128,6 +158,15 @@
         <fileSet>
             <directory>../../examples/notifications/dist</directory>
             <outputDirectory>examples/notifications</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <!-- Empty dir -->
+            <directory>../../examples/notifications/src/test/java/resources</directory>
+            <outputDirectory>examples/notifications/src/test/java/resources</outputDirectory>
+            <directoryMode>0755</directoryMode>
+            <excludes>
+                <exclude>*</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <directory>../../examples/scripting/dist</directory>
