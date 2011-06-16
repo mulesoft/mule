@@ -3,13 +3,17 @@
     <id>full</id>
     <formats>
         <format>zip</format>
-        <format>tar.gz</format>
+        <!--<format>tar.gz</format>-->
     </formats>
 
     <fileSets>
         <fileSet>
             <directory>src/main/resources</directory>
             <outputDirectory></outputDirectory>
+            <excludes>
+                <exclude>bin/**</exclude>
+                <exclude>lib/boot/exec/**</exclude>
+            </excludes>
         </fileSet>
 
         <!-- Make binary files executable. -->
@@ -29,6 +33,9 @@
             <outputDirectory>bin</outputDirectory>
             <fileMode>644</fileMode>
             <includes>
+                <include>*.groovy</include>
+                <include>*.bat</include>
+                <include>*.conf</include>
                 <include>*.txt</include>
             </includes>
         </fileSet>
@@ -36,6 +43,12 @@
             <directory>src/main/resources/lib/boot/exec</directory>
             <outputDirectory>lib/boot/exec</outputDirectory>
             <fileMode>755</fileMode>
+            <excludes>
+                <exclude>*.txt</exclude>
+            </excludes>
+            <includes>
+                <include>*</include>
+            </includes>
         </fileSet>
         <fileSet>
             <directory>src/main/resources/lib/boot/exec</directory>
@@ -76,6 +89,7 @@
             <directory>../../examples</directory>
             <outputDirectory>examples</outputDirectory>
             <excludes>
+                <exclude>**/pom.xml</exclude>
                 <exclude>pom.xml</exclude>
                 <exclude>all-examples/**</exclude>
                 <exclude>**/target/**</exclude>
