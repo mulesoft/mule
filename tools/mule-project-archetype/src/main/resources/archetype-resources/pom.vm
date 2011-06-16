@@ -60,7 +60,7 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <finalName>${D}{artifactId}-${D}{version}</finalName>
+                    <finalName>${D}{project.artifactId}-${D}{project.version}</finalName>
                     <descriptors>
                         <descriptor>assembly.xml</descriptor>
                     </descriptors>
@@ -83,6 +83,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-idea-plugin</artifactId>
+                <version>2.2</version>
                 <configuration>
                     <downloadSources>true</downloadSources>
                     <jdkName>${D}{jdk.version}</jdkName>
@@ -129,7 +130,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${D}{project.build.directory}/${D}{build.finalName}.zip"
+                                <copy file="${D}{project.build.directory}/${D}{project.build.finalName}.zip"
                                     todir="${D}{env.MULE_HOME}/apps" overwrite="true"/>
                             </tasks>
                         </configuration>
@@ -144,26 +145,21 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <source>${D}{jdk.version}</source>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>2.4.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.5</version>
                 <configuration>
-                    <configLocation>http://mulesoft.org/download/attachments/92/checkstyle.xml?version=1
-                    </configLocation>
+                    <configLocation>http://mulesoft.org/download/attachments/92/checkstyle.xml?version=1</configLocation>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
+                <version>2.5</version>
                 <configuration>
                     <targetJdk>${D}{jdk.version}</targetJdk>
                 </configuration>
@@ -171,10 +167,12 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.5</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>taglist-maven-plugin</artifactId>
+                <version>2.4</version>
                 <configuration>
                     <tags>
                         <tag>TODO</tag>
@@ -188,11 +186,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.7</version>
                 <configuration>
+                    <source>${D}{jdk.version}</source>
                     <links>
                         <link>http://java.sun.com/j2ee/1.4/docs/api</link>
                         <link>http://java.sun.com/j2se/1.4.2/docs/api</link>
@@ -203,10 +204,12 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jdepend-maven-plugin</artifactId>
+                <version>2.0-beta-2</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
+                <version>2.3.2</version>
             </plugin>
         </plugins>
     </reporting>
@@ -384,7 +387,7 @@
             -->
             <id>${ModuleNameLower}-deps</id>
             <name>${ModuleName} Dependencies</name>
-            <url>http://dist.muleforge.org/${artifactId}/dependencies/maven2</url>
+            <url>http://dist.muleforge.org/${project.artifactId}/dependencies/maven2</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
