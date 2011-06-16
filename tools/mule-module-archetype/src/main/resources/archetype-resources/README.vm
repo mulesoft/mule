@@ -53,13 +53,6 @@ A maven assembly descriptor that defines how this module will be packaged when y
 ./LICENSE.txt:
 The open source license text for this project.
 
-#if($forgeProject == "y")
-./wiki-template.txt:
-This is a skeletal wiki page that you can use to start off the documentation for your project.  the content here can
-be cut n' pasted directly into the homepage of your project on MuleForge (Use the Edit menu at the bottom right of the
-homepage to add this content).
-You don't need to use this template if you'd prefer to write in your own style :)
-#end
 -----------------------------------------------------------------
 ./src/main/java/${package}/${ModuleNameLower}/i18n/${ModuleName}Messages.java:
 
@@ -144,7 +137,7 @@ http://www.mulesoft.org/documentation/display/MULE3USER/Introduction+to+Extendin
 There is detailed information about creating Mule configuration schemas here:
 http://www.mulesoft.org/documentation/display/MULE3USER/Creating+a+Custom+XML+Namespace
   #end
-  
+
 For information about working with Mule inside and IDE with maven can be found here:
 http://www.mulesoft.org/documentation/display/MULE3INTRO/Setting+Up+Eclipse
 
@@ -167,7 +160,6 @@ muleVersion=${muleVersion}
 hasCustomSchema=${hasCustomSchema}
 hasBootstrap=${hasBootstrap}
 package=${package}
-forgeProject=${forgeProject}
 
 version=${version}
 groupId=${groupId}

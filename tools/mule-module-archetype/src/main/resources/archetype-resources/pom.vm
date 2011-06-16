@@ -68,62 +68,6 @@
                     </classpathContainers>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-idea-plugin</artifactId>
-                <configuration>
-                    <downloadSources>true</downloadSources>
-                    <jdkName>${D}{jdk.version}</jdkName>
-                </configuration>
-            </plugin>
-
-#if($forgeProject == "y")
-            <!-- Responsible for creating the release distribution for this project -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <finalName>${D}{artifactId}-${D}{version}</finalName>
-                    <descriptors>
-                        <descriptor>assembly.xml</descriptor>
-                    </descriptors>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.0-beta-7</version>
-                <configuration>
-                    <!-- We only do this at release time. However, before doing a
-                        release of your project and deploying it you nedd to run 'mvn assembly:assembly' and check that
-                        the distribution is created correctly -->
-                    <preparationGoals>assembly:assembly</preparationGoals>
-                </configuration>
-            </plugin>
-
-            <!-- Used for deploying zip and tar.gz  distributions to MuleForge. Called using:
-           mvn muleforge:deploy-distro-->
-            <plugin>
-                <groupId>org.mule.tools</groupId>
-                <artifactId>maven-muleforge-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <id>upload-muleforge-artifacts</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <!-- Attached to the deploy lifecycle this plugin is Used for deploying any config schemas
-                        for this module or transport -->
-                            <goal>deploy-schema</goal>
-                            <!-- Attached to the deploy lifecycle this plugin is Used for deploying the projects
-                            distribution archives (generated from the assembly.xml descriptor) -->
-                            <goal>deploy-distro</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-#end
         </plugins>
     </build>
 
@@ -132,18 +76,13 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <source>${D}{jdk.version}</source>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>2.4.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.5</version>
                 <configuration>
                     <configLocation>http://mulesoft.org/download/attachments/92/checkstyle.xml?version=1
                     </configLocation>
@@ -152,6 +91,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
+                <version>2.5</version>
                 <configuration>
                     <targetJdk>${D}{jdk.version}</targetJdk>
                 </configuration>
@@ -159,10 +99,12 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.5</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>taglist-maven-plugin</artifactId>
+                <version>2.4</version>
                 <configuration>
                     <tags>
                         <tag>TODO</tag>
@@ -176,11 +118,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.7</version>
                 <configuration>
+                    <source>${D}{jdk.version}</source>
                     <links>
                         <link>http://java.sun.com/j2ee/1.4/docs/api</link>
                         <link>http://java.sun.com/j2se/1.4.2/docs/api</link>
@@ -191,10 +136,12 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jdepend-maven-plugin</artifactId>
+                <version>2.0-beta-2</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
+                <version>2.3.2</version>
             </plugin>
         </plugins>
     </reporting>
@@ -304,43 +251,6 @@
         </dependency>
     </dependencies>
 
-#if($forgeProject == "y")
-    <!-- Mule Forge Configuration -->
-    <issueManagement>
-        <system>Jira</system>
-        <url>http://www.mulesoft.org/jira/browse/${ModuleName.toUpperCase()}</url>
-    </issueManagement>
-
-    <scm>
-        <connection>scm:svn:http://svn.muleforge.org/${ModuleNameLower}/</connection>
-        <developerConnection>scm:svn:https://svn.muleforge.org/${ModuleNameLower}/</developerConnection>
-        <tag>HEAD</tag>
-        <url>http://svn.${ModuleNameLower}.muleforge.org/</url>
-    </scm>
-
-    <ciManagement>
-        <system>Bamboo</system>
-        <url>http://bamboo.muleforge.org/browse/${ModuleName.toUpperCase()}-FORGE</url>
-        <notifiers/>
-    </ciManagement>
-
-    <distributionManagement>
-        <repository>
-            <id>muleforge.webdav.releases</id>
-            <url>dav:https://dav.muleforge.org/repository/${ModuleNameLower}/</url>
-        </repository>
-        <snapshotRepository>
-            <id>muleforge.webdav.snapshots</id>
-            <url>dav:https://dav.muleforge.org/snapshots.repository/${ModuleNameLower}/</url>
-        </snapshotRepository>
-        <site>
-            <id>muleforge.webdav.sites</id>
-            <url>dav:https://dav.muleforge.org/${ModuleNameLower}/maven/${version}/</url>
-        </site>
-    </distributionManagement>
-    <!-- End of MuleForge Configuration -->
-
-#end
     <repositories>
         <repository>
             <id>muleforge-repo</id>
@@ -355,19 +265,5 @@
             <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
             <layout>default</layout>
         </repository>
-#if($forgeProject == "y")
-        <repository>
-            <!-- local repository for this forge project. Users can upload dependencies here when the artifact
-                 is not available on any other repository. Its the users' responsibility to make sure that no
-                 licenses are violated by uploading dependencies to this location
-            -->
-            <id>${ModuleNameLower}-deps</id>
-            <name>${ModuleName} Dependencies</name>
-            <url>http://dist.muleforge.org/${artifactId}/dependencies/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-#end
     </repositories>
 </project>

@@ -80,15 +80,6 @@
                     </classpathContainers>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-idea-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <downloadSources>true</downloadSources>
-                    <jdkName>${D}{jdk.version}</jdkName>
-                </configuration>
-            </plugin>
             <!--
                 make sure that MULE_HOME is set when building (required below when copying the
                 artifact to Mule's apps directory

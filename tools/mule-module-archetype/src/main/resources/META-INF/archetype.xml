@@ -20,11 +20,6 @@
                     <defvalue>${muleVersion}</defvalue>
                 </variable>
                 <variable>
-                    <name>forgeProject</name>
-                    <description>Will this module be hosted on MuleForge? [y] or [n]</description>
-                    <defvalue>y</defvalue>
-                </variable>
-                <variable>
                     <name>transports</name>
                     <description>Which Mule transports do you want to include in this module?
 
@@ -84,11 +79,6 @@ spring-extras, sxc, xml):
             <file>assembly.xml.vm</file>
             <output>assembly.xml</output>
             <dependsOnVar>newProject=y</dependsOnVar>
-        </template>
-        <template>
-            <file>wiki-template.txt.vm</file>
-            <output>wiki-template.txt</output>
-            <dependsOnVar>forgeProject=y</dependsOnVar>
         </template>
 
         <template>

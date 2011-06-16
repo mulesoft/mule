@@ -95,7 +95,6 @@ artifactId=${artifactId}
 description=${description}
 muleVersion=${muleVersion}
 packagePath=${packagePath}
-forgeProject=${forgeProject}
 transports=${transports}
 modules=${modules}
 
