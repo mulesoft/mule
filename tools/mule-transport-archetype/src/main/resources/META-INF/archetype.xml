@@ -19,7 +19,11 @@
                     <description>Which version of Mule is this transport targeted at?</description>
                     <defvalue>${muleVersion}</defvalue>
                 </variable>
-
+                <variable>
+                    <name>forgeRepo</name>
+                    <description>Will this example be hosted in the MuleForge Maven repository? [y] or [n]</description>
+                    <defvalue>y</defvalue>
+                </variable>
                 <variable>
                     <name>hasReceiver</name>
                     <description>Can the transport receive inbound requests? [y] or [n]</description>

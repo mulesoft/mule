@@ -252,6 +252,22 @@
         </dependency>
     </dependencies>
 
+#if($forgeRepo == "y")
+    <distributionManagement>
+        <repository>
+            <id>muleforge-releases</id>
+            <name>MuleForge Releases Repository</name>
+            <url>https://repository.mulesoft.org/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>muleforge-snapshots</id>
+            <name>MuleForge Snapshots Repository</name>
+            <url>https://repository.mulesoft.org/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
+#end
     <repositories>
         <repository>
             <id>muleforge-repo</id>

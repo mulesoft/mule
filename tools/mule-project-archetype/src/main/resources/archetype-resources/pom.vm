@@ -318,42 +318,20 @@
         </dependency>
     </dependencies>
 
-#if($forgeProject == "y")
-    <!-- Mule Forge Configuration -->
-    <issueManagement>
-        <system>Jira</system>
-        <url>http://www.mulesoft.org/jira/browse/${ModuleName.toUpperCase()}</url>
-    </issueManagement>
-
-    <scm>
-        <connection>scm:svn:http://svn.muleforge.org/${ModuleNameLower}/</connection>
-        <developerConnection>scm:svn:https://svn.muleforge.org/${ModuleNameLower}/</developerConnection>
-        <tag>HEAD</tag>
-        <url>http://svn.${ModuleNameLower}.muleforge.org/</url>
-    </scm>
-
-
-    <ciManagement>
-        <system>Bamboo</system>
-        <url>http://bamboo.muleforge.org/browse/${ModuleName.toUpperCase()}-FORGE</url>
-        <notifiers/>
-    </ciManagement>
-
+#if($forgeRepo == "y")
     <distributionManagement>
         <repository>
-            <id>muleforge.webdav.releases</id>
-            <url>dav:https://dav.muleforge.org/repository/${ModuleNameLower}/</url>
+            <id>muleforge-releases</id>
+            <name>MuleForge Releases Repository</name>
+            <url>https://repository.mulesoft.org/releases</url>
         </repository>
         <snapshotRepository>
-            <id>muleforge.webdav.snapshots</id>
-            <url>dav:https://dav.muleforge.org/snapshots.repository/${ModuleNameLower}/</url>
+            <id>muleforge-snapshots</id>
+            <name>MuleForge Snapshots Repository</name>
+            <url>https://repository.mulesoft.org/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
-        <site>
-            <id>muleforge.webdav.sites</id>
-            <url>dav:https://dav.muleforge.org/${ModuleNameLower}/</url>
-        </site>
     </distributionManagement>
-    <!-- End of MuleForge Configuration -->
 
 #end
     <repositories>
@@ -370,19 +348,5 @@
             <url>http://dist.codehaus.org/mule/dependencies/maven2</url>
             <layout>default</layout>
         </repository>
-#if($forgeProject == "y")
-        <repository>
-            <!-- local repository for this forge project. Users can upload dependencies here when the artifact
-                 is not available on any other repository. Its the users' responsibility to make sure that no
-                 licenses are violated by uploading dependencies to this location
-            -->
-            <id>${ModuleNameLower}-deps</id>
-            <name>${ModuleName} Dependencies</name>
-            <url>http://dist.muleforge.org/${project.artifactId}/dependencies/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-#end
     </repositories>
 </project>
