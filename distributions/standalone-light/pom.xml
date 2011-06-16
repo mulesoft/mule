@@ -79,14 +79,6 @@
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>mule-assembly-verifier</artifactId>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
                 <configuration>
                     <projectOutputFile>mule-standalone-nodocs-${project.version}.zip</projectOutputFile>
                     <!-- Default is under src/main/resources, pull it to the root for this project -->
