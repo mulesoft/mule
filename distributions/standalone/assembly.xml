@@ -3,7 +3,7 @@
     <id>full</id>
     <formats>
         <format>zip</format>
-        <!--<format>tar.gz</format>-->
+        <format>tar.gz</format>
     </formats>
 
     <fileSets>
