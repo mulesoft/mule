@@ -40,16 +40,6 @@
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>mule-assembly-verifier</artifactId>
-                <executions>
-                    <!-- Disable for now since this will completely change for OSGi.
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                    -->
-                </executions>
                 <configuration>
                     <projectOutputFile>${pom.artifactId}-${pom.version}.zip</projectOutputFile>
                     <whitelist>assembly-whitelist.txt</whitelist>
