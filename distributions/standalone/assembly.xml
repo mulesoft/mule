@@ -118,34 +118,6 @@
             <directory>../../examples/errorhandler/dist</directory>
             <outputDirectory>examples/errorhandler</outputDirectory>
         </fileSet>
-        <fileSet>
-            <!-- Empty dir -->
-            <directory>../../examples/errorhandler/test-data</directory>
-            <outputDirectory>examples/errorhandler/test-data</outputDirectory>
-            <directoryMode>0755</directoryMode>
-            <excludes>
-                <exclude>*</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <!-- Empty dir -->
-            <directory>../../examples/errorhandler/exceptions</directory>
-            <outputDirectory>examples/errorhandler/exceptions</outputDirectory>
-            <directoryMode>0755</directoryMode>
-            <excludes>
-                <exclude>*</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <!-- Empty dir -->
-            <directory>../../examples/errorhandler/in</directory>
-            <outputDirectory>examples/errorhandler/in</outputDirectory>
-            <directoryMode>0755</directoryMode>
-            <excludes>
-                <exclude>*</exclude>
-            </excludes>
-        </fileSet>
-
 
         <!--
         <fileSet>
