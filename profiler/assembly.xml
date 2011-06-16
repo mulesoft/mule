@@ -23,24 +23,5 @@ Assembly descriptor for the YourKit Profiler distribution.
     </fileSet>
 
   </fileSets>
-    
-
-    <!--
-    ============================
-        Libraries
-    ============================
-    -->
-
-  <dependencySets>
-
-    <!-- Non-Mule libraries -->
-    <dependencySet>
-      <outputDirectory>lib/user</outputDirectory>
-      <outputFileNameMapping>${artifactId}.${extension}</outputFileNameMapping>
-      <includes>
-        <include>com.yourkit:yjp-controller-api-redist</include>
-      </includes>
-    </dependencySet>
-  </dependencySets>
 
 </assembly>
