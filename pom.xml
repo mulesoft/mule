@@ -1346,6 +1346,13 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>2.3.2</version>
+                    <configuration>
+                        <encoding>ISO-8859-1</encoding>
+                        <fork>true</fork>
+                        <maxmem>512m</maxmem>
+                        <source>1.6</source>
+                        <target>1.6</target>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1446,19 +1453,6 @@
         </pluginManagement>
 
         <plugins>
-            <!--
-                Default is to compile to JDK 6. Individual modules may override
-                this setting.
-            -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <encoding>ISO-8859-1</encoding>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
