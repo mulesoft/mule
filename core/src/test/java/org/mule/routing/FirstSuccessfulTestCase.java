@@ -19,7 +19,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.message.DefaultExceptionPayload;
@@ -59,6 +58,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
     {
         MessageProcessor intSetter = new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 event.getMessage().setPayload(Integer.valueOf(1));
@@ -77,6 +77,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
     {
         MessageProcessor nullReturningMp = new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 return null;
@@ -92,6 +93,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
     {
         MessageProcessor nullEventMp = new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 return new DefaultMuleEvent(null, event);
@@ -115,6 +117,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
     {
         MessageProcessor checkForceSyncFlag = new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 MuleMessage message = event.getMessage();
@@ -175,6 +178,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
             this.rejectIfMatches = rejectIfMatches;
         }
 
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             try
@@ -194,7 +198,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
                 {
                     msg = new DefaultMuleMessage("No " + rejectIfMatches, muleContext);
                 }
-                return new DefaultMuleEvent(msg, (InboundEndpoint)  null, event.getSession());
+                return new DefaultMuleEvent(msg, MessageExchangePattern.ONE_WAY, event.getSession());
             }
             catch (Exception e)
             {
