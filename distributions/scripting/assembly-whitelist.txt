@@ -1,6 +1,8 @@
-jruby-engine-1.1-jdk14
-js-engine-1.1-jdk14
-jython-engine-1.1-jdk14
-jruby-complete-1.0
-js-1.6R5
-jython-2.2.1
+/lib
+/lib/user
+/lib/user/jruby-complete-1.0.jar
+/lib/user/jruby-engine-1.1-jdk14.jar
+/lib/user/js-1.6R5.jar
+/lib/user/js-engine-1.1-jdk14.jar
+/lib/user/jython-2.2.1.jar
+/lib/user/jython-engine-1.1-jdk14.jar

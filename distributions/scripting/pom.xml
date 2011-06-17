@@ -40,10 +40,7 @@
             <plugin>
                 <groupId>org.mule.tools</groupId>
                 <artifactId>mule-assembly-verifier</artifactId>
-                <configuration>
-                    <projectOutputFile>${pom.artifactId}-${pom.version}.zip</projectOutputFile>
-                    <whitelist>assembly-whitelist.txt</whitelist>
-                </configuration>
+                <version>1.3-SNAPSHOT</version>
             </plugin>
 
         </plugins>
