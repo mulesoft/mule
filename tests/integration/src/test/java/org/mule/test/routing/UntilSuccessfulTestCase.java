@@ -17,7 +17,8 @@ import org.mule.tck.functional.FunctionalTestComponent;
 
 public class UntilSuccessfulTestCase extends FunctionalTestCase
 {
-    private FunctionalTestComponent ftc;
+    private FunctionalTestComponent targetMessageProcessor;
+    private FunctionalTestComponent deadLetterQueueProcessor;
 
     @Override
     protected String getConfigResources()
@@ -29,14 +30,15 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        ftc = getFunctionalTestComponent("target-mp");
+        targetMessageProcessor = getFunctionalTestComponent("target-mp");
+        deadLetterQueueProcessor = getFunctionalTestComponent("dlq-processor");
     }
 
     public void testDefaultConfiguration() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://input-1", "XYZ", null);
-        ponderUntilMessageCountReceived(1);
+        ponderUntilMessageCountReceivedByTargetMessageProcessor(1);
     }
 
     public void testFullConfiguration() throws Exception
@@ -44,17 +46,31 @@ public class UntilSuccessfulTestCase extends FunctionalTestCase
         final MuleClient client = new MuleClient(muleContext);
         final MuleMessage response = client.send("vm://input-2", "XYZ", null);
         assertEquals("ACK", response.getPayloadAsString());
-        ponderUntilMessageCountReceived(2);
+        ponderUntilMessageCountReceivedByTargetMessageProcessor(2);
+        ponderUntilMessageCountReceivedByDlqProcessor(1);
     }
 
     public void testRetryOnEndpoint() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://input-3", "XYZ", null);
-        ponderUntilMessageCountReceived(2);
+        ponderUntilMessageCountReceivedByTargetMessageProcessor(2);
     }
 
-    private void ponderUntilMessageCountReceived(final int expectedCount) throws InterruptedException
+    private void ponderUntilMessageCountReceivedByTargetMessageProcessor(final int expectedCount)
+        throws InterruptedException
+    {
+        ponderUntilMessageCountReceived(expectedCount, targetMessageProcessor);
+    }
+
+    private void ponderUntilMessageCountReceivedByDlqProcessor(final int expectedCount)
+        throws InterruptedException
+    {
+        ponderUntilMessageCountReceived(expectedCount, deadLetterQueueProcessor);
+    }
+
+    private void ponderUntilMessageCountReceived(final int expectedCount, final FunctionalTestComponent ftc)
+        throws InterruptedException
     {
         while (ftc.getReceivedMessagesCount() < expectedCount)
         {

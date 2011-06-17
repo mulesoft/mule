@@ -10,6 +10,9 @@
 
 package org.mule.routing;
 
+import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
+
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MessagingException;
@@ -17,6 +20,9 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.EndpointException;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.retry.RetryCallback;
 import org.mule.api.retry.RetryContext;
@@ -30,17 +36,12 @@ import org.mule.retry.policies.SimpleRetryPolicyTemplate;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 
-import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
-
 /**
- * UntilSuccessful attempts to route a message to the message processor it contains
- * in an asynchronous manner. Routing is considered successful if no exception has
- * been raised and, optionally, if the response matches an expression.
- * UntilSuccessful can optionally be configured to synchronously return an
- * acknowledgment message when it has scheduled the event for processing.
- * UntilSuccessful is backed by a {@link ListableObjectStore} for storing the events
- * that are pending (re)processing.
+ * UntilSuccessful attempts to route a message to the message processor it contains in an asynchronous manner. Routing
+ * is considered successful if no exception has been raised and, optionally, if the response matches an expression.
+ * UntilSuccessful can optionally be configured to synchronously return an acknowledgment message when it has scheduled
+ * the event for processing. UntilSuccessful is backed by a {@link ListableObjectStore} for storing the events that are
+ * pending (re)processing.
  */
 public class UntilSuccessful extends AbstractOutboundRouter
 {
@@ -98,6 +99,8 @@ public class UntilSuccessful extends AbstractOutboundRouter
     private String ackExpression;
     private ExpressionFilter failureExpressionFilter;
     private String eventKeyPrefix;
+    private EndpointBuilder dlqEndpointBuilder;
+    private OutboundEndpoint dlqEndpoint;
 
     @Override
     public void initialise() throws InitialisationException
@@ -125,6 +128,20 @@ public class UntilSuccessful extends AbstractOutboundRouter
         }
 
         super.initialise();
+
+        if (dlqEndpointBuilder != null)
+        {
+            try
+            {
+                dlqEndpoint = dlqEndpointBuilder.buildOutboundEndpoint();
+            }
+            catch (EndpointException ee)
+            {
+                throw new InitialisationException(
+                    MessageFactory.createStaticMessage("Invalid DQL endpoint builder: " + dlqEndpointBuilder),
+                    ee, this);
+            }
+        }
 
         if (failureExpression != null)
         {
@@ -285,10 +302,34 @@ public class UntilSuccessful extends AbstractOutboundRouter
                 message.setInvocationProperty(PROCESS_ATTEMPT_COUNT_PROPERTY_NAME, deliveryAttemptCount + 1);
                 objectStore.store(eventStoreKey, mutableEvent);
             }
+            else
+            {
+                abandonRetries(event, mutableEvent);
+            }
         }
         catch (ObjectStoreException ose)
         {
             logger.error("Failed to increment failure count for event stored with key: " + eventStoreKey);
+        }
+    }
+
+    private void abandonRetries(MuleEvent event, MuleEvent mutableEvent)
+    {
+        if (dlqEndpoint == null)
+        {
+            logger.info("Retry attempts exhausted and no DLQ endpoint defined, dropping message: " + event);
+            return;
+        }
+
+        try
+        {
+            logger.info("Retry attempts exhausted, routing message to DLQ endpoint: " + dlqEndpoint);
+            dlqEndpoint.process(mutableEvent);
+        }
+        catch (MuleException me)
+        {
+            logger.error("Failed to route message to DLQ endpoint: " + dlqEndpoint + ", dropping message: "
+                         + event, me);
         }
     }
 
@@ -421,12 +462,22 @@ public class UntilSuccessful extends AbstractOutboundRouter
         this.ackExpression = ackExpression;
     }
 
-    protected String getEventKeyPrefix()
+    public void setDlqEndpoint(EndpointBuilder dlqEndpointBuilder)
+    {
+        this.dlqEndpointBuilder = dlqEndpointBuilder;
+    }
+
+    public EndpointBuilder getDlqEndpoint()
+    {
+        return dlqEndpointBuilder;
+    }
+
+    public String getEventKeyPrefix()
     {
         return eventKeyPrefix;
     }
 
-    protected ExpressionFilter getFailureExpressionFilter()
+    public ExpressionFilter getFailureExpressionFilter()
     {
         return failureExpressionFilter;
     }

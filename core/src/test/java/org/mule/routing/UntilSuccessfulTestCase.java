@@ -10,10 +10,17 @@
 
 package org.mule.routing;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.ByteArrayInputStream;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
+import org.mule.api.endpoint.EndpointBuilder;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.tck.AbstractMuleTestCase;
@@ -146,6 +153,23 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         final MuleEvent testEvent = getTestEvent("ERROR");
         assertNull(untilSuccessful.process(testEvent));
         ponderUntilEventAborted(testEvent);
+    }
+
+    public void testPermanentDeliveryFailureDLQ() throws Exception
+    {
+        targetMessageProcessor.setNumberOfFailuresToSimulate(Integer.MAX_VALUE);
+        EndpointBuilder dlqEndpointBuilder = mock(EndpointBuilder.class);
+        OutboundEndpoint dlqEndpoint = mock(OutboundEndpoint.class);
+        when(dlqEndpointBuilder.buildOutboundEndpoint()).thenReturn(dlqEndpoint);
+        untilSuccessful.setDlqEndpoint(dlqEndpointBuilder);
+        untilSuccessful.initialise();
+        untilSuccessful.start();
+
+        final MuleEvent testEvent = getTestEvent("ERROR");
+        assertNull(untilSuccessful.process(testEvent));
+        ponderUntilEventAborted(testEvent);
+
+        verify(dlqEndpoint).process(any(MuleEvent.class));
     }
 
     public void testTemporaryDeliveryFailure() throws Exception

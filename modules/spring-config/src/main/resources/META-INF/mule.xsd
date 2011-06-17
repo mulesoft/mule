@@ -5246,6 +5246,13 @@
                             </xsd:documentation>
                         </xsd:annotation>
                     </xsd:attribute>
+                    <xsd:attribute name="dlqEndpoint-ref" type="xsd:string" use="optional">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                                The endpoint to which undeliverable messages are sent after all retries have been attempted.
+                            </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

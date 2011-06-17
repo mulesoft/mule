@@ -11,6 +11,8 @@
                http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd">
 
     <spring:bean id="objectStore" class="org.mule.util.store.SimpleMemoryObjectStore" />
+    
+    <vm:endpoint name="dlqChannel" path="dlq" />
 
     <flow name="minimal-config">
         <vm:inbound-endpoint path="input-1" exchange-pattern="one-way"/>
@@ -26,7 +28,8 @@
                           ackExpression="#[string:ACK]"
                           failureExpression="#[regex:(?i).*error]"
                           maxRetries="2"
-                          secondsBetweenRetries="1">
+                          secondsBetweenRetries="1"
+                          dlqEndpoint-ref="dlqChannel">
             <flow-ref name="target-mp" />
         </until-successful>
     </flow>
@@ -48,5 +51,10 @@
     <flow name="target-flow">
         <vm:inbound-endpoint path="target-flow" exchange-pattern="request-response" />
         <flow-ref name="target-mp" />
+    </flow>
+    
+    <flow name="dlq-processor">
+        <inbound-endpoint ref="dlqChannel" />
+        <test:component />
     </flow>
 </mule>
