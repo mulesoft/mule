@@ -225,7 +225,6 @@
                 <include>org.mule:mule-core</include>
                 <!-- Transports -->
                 <include>org.mule.transports:mule-transport-ajax</include>
-                <include>org.mule.transports:mule-transport-axis</include>
                 <include>org.mule.transports:mule-transport-ejb</include>
                 <include>org.mule.transports:mule-transport-email</include>
                 <include>org.mule.transports:mule-transport-file</include>
@@ -290,7 +289,6 @@
                 <exclude>org.mule:mule-core</exclude>
                 <exclude>org.mule.transports:mule-transports-all</exclude>
                 <exclude>org.mule.transports:mule-transport-ajax</exclude>
-                <exclude>org.mule.transports:mule-transport-axis</exclude>
                 <exclude>org.mule.transports:mule-transport-ejb</exclude>
                 <exclude>org.mule.transports:mule-transport-email</exclude>
                 <exclude>org.mule.transports:mule-transport-file</exclude>
@@ -309,7 +307,6 @@
                 <exclude>org.mule.transports:mule-transport-tcp</exclude>
                 <exclude>org.mule.transports:mule-transport-udp</exclude>
                 <exclude>org.mule.transports:mule-transport-vm</exclude>
-                <exclude>org.mule.transports:mule-transport-xfire</exclude>
                 <exclude>org.mule.transports:mule-transport-xmpp</exclude>
                 <exclude>org.mule.modules:mule-modules-all</exclude>
                 <exclude>org.mule.modules:mule-module-annotations</exclude>
@@ -325,7 +322,6 @@
                 <exclude>org.mule.modules:mule-module-jersey</exclude>
                 <exclude>org.mule.modules:mule-module-jbossts</exclude>
                 <exclude>org.mule.modules:mule-module-jbpm</exclude>
-                <exclude>org.mule.modules:mule-module-jca</exclude>
                 <exclude>org.mule.modules:mule-module-json</exclude>
                 <exclude>org.mule.modules:mule-module-launcher</exclude>
                 <exclude>org.mule.modules:mule-module-logging</exclude>
@@ -350,11 +346,7 @@
                 <exclude>org.mule.examples:mule-example-errorhandler</exclude>
                 <exclude>org.mule.examples:mule-example-gpswalker</exclude>
                 <exclude>org.mule.examples:mule-example-hello</exclude>
-                <exclude>org.mule.examples:mule-example-loanbroker-common</exclude>
-                <exclude>org.mule.examples:mule-example-loanbroker-esn</exclude>
-                <exclude>org.mule.examples:mule-example-loanbroker-esb</exclude>
                 <exclude>org.mule.examples:mule-example-loanbroker-bpm</exclude>
-                <exclude>org.mule.examples:mule-example-loanbroker-credit-agency</exclude>
                 <exclude>org.mule.examples:mule-example-loanbroker-simple</exclude>
                 <exclude>org.mule.examples:mule-example-notifications</exclude>
                 <exclude>org.mule.examples:mule-example-scripting</exclude>
