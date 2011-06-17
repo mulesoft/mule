@@ -204,7 +204,9 @@
 /mule-standalone-${productVersion}/examples/errorhandler/src/main/app/mule-config.xml
 /mule-standalone-${productVersion}/examples/errorhandler/src/main/app/test-data
 /mule-standalone-${productVersion}/examples/errorhandler/src/main/app/test-data/exceptions
+/mule-standalone-${productVersion}/examples/errorhandler/src/main/app/test-data/exceptions/.empty
 /mule-standalone-${productVersion}/examples/errorhandler/src/main/app/test-data/in
+/mule-standalone-${productVersion}/examples/errorhandler/src/main/app/test-data/in/.empty
 /mule-standalone-${productVersion}/examples/errorhandler/src/main/app/test-data/out
 /mule-standalone-${productVersion}/examples/errorhandler/src/main/app/test-data/out/BusinessException.xml
 /mule-standalone-${productVersion}/examples/errorhandler/src/main/app/test-data/out/FatalException.xml
@@ -246,11 +248,6 @@
 /mule-standalone-${productVersion}/examples/errorhandler/src/test/java/org/mule/example/errorhandler/ErrorHandlerTestDataGenerator.java
 /mule-standalone-${productVersion}/examples/errorhandler/src/test/resources
 /mule-standalone-${productVersion}/examples/errorhandler/src/test/resources/log4j.properties
-/mule-standalone-${productVersion}/examples/errorhandler/test-data
-/mule-standalone-${productVersion}/examples/errorhandler/test-data/exceptions
-/mule-standalone-${productVersion}/examples/errorhandler/test-data/in
-
-
 
 
 #
