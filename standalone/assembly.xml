@@ -157,6 +157,19 @@
             <directory>../../examples/notifications/dist</directory>
             <outputDirectory>examples/notifications</outputDirectory>
         </fileSet>
+        <!--
+            dependencySet decided to omit 'hidden' files like ".empty".
+            Manually include these for consistent cross-platform layout (e.g. linux build
+            may skip empty dirs).
+        -->
+        <fileSet>
+            <directory>../../examples/notifications/src/test/java</directory>
+            <outputDirectory>examples/notifications/src/test/java</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../../examples/notifications/src/test/resources</directory>
+            <outputDirectory>examples/notifications/src/test/resources</outputDirectory>
+        </fileSet>
         <fileSet>
             <directory>../../examples/scripting/dist</directory>
             <outputDirectory>examples/scripting</outputDirectory>
