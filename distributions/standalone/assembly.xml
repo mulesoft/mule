@@ -118,7 +118,19 @@
             <directory>../../examples/errorhandler/dist</directory>
             <outputDirectory>examples/errorhandler</outputDirectory>
         </fileSet>
-
+        <!--
+            dependencySet decided to omit 'hidden' files like ".empty".
+            Manually include these for consistent cross-platform layout (e.g. linux build
+            may skip empty dirs).
+        -->
+        <fileSet>
+            <directory>../../examples/errorhandler/src/main/app/test-data/in</directory>
+            <outputDirectory>examples/errorhandler/src/main/app/test-data/in</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>../../examples/errorhandler/src/main/app/test-data/exceptions</directory>
+            <outputDirectory>examples/errorhandler/src/main/app/test-data/exceptions</outputDirectory>
+        </fileSet>
         <!--
         <fileSet>
             <directory>../../examples/geomail/dist</directory>
@@ -144,15 +156,6 @@
         <fileSet>
             <directory>../../examples/notifications/dist</directory>
             <outputDirectory>examples/notifications</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <!-- Empty dir -->
-            <directory>../../examples/notifications/src/test/java/resources</directory>
-            <outputDirectory>examples/notifications/src/test/java/resources</outputDirectory>
-            <directoryMode>0755</directoryMode>
-            <excludes>
-                <exclude>*</exclude>
-            </excludes>
         </fileSet>
         <fileSet>
             <directory>../../examples/scripting/dist</directory>
