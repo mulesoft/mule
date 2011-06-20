@@ -14,7 +14,6 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.management.stats.ProcessingTime;
 
 /**
@@ -24,6 +23,7 @@ public class ProcessingTimeInterceptor extends AbstractEnvelopeInterceptor
 {
     public ProcessingTimeInterceptor()
     {
+        super();
     }
 
     public ProcessingTimeInterceptor(MessageProcessor next, FlowConstruct fc)
