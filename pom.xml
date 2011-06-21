@@ -67,9 +67,12 @@
             instead a module artifact id is erroneously substituted.
          -->
         <productUrl>http://www.mulesoft.org</productUrl>
-        <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
+
         <coberturaVersion>2.5</coberturaVersion>
+        <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
+        <javadocPluginVersion>2.7</javadocPluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
+
         <!--
              Use the name of an Eclipse Java execution environment, Eclipse will
              choose the right one by itself.
@@ -1381,6 +1384,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-rar-plugin</artifactId>
+                    <version>2.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
                     <version>2.0</version>
                 </plugin>
@@ -1666,7 +1674,7 @@
                         <reportPlugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-javadoc-plugin</artifactId>
-                            <version>2.7</version>
+                            <version>${javadocPluginVersion}</version>
                             <configuration>
                                 <minmemory>128m</minmemory>
                                 <maxmemory>512m</maxmemory>
