@@ -19,6 +19,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.http.ntlm.NTLMScheme;
 import org.mule.transport.tcp.TcpConnector;
 
 import java.io.UnsupportedEncodingException;
@@ -37,6 +38,7 @@ import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 
@@ -122,6 +124,8 @@ public class HttpConnector extends TcpConnector
         props.add(HTTP_VERSION_PROPERTY);
         props.add(HTTP_ENCODE_PARAMVALUE);
         HTTP_INBOUND_PROPERTIES = props;
+
+        AuthPolicy.registerAuthScheme(AuthPolicy.NTLM, NTLMScheme.class);
     }
     
     public static final String HTTP_COOKIE_SPEC_PROPERTY = "cookieSpec";
@@ -139,7 +143,7 @@ public class HttpConnector extends TcpConnector
 
     private String proxyPassword = null;
 
-    private String proxyAuthenticationScheme;
+    private boolean proxyNtlmAuthentication;
 
     private String cookieSpec;
 
@@ -331,7 +335,7 @@ public class HttpConnector extends TcpConnector
         if (getProxyUsername() != null)
         {
             Credentials credentials;
-            if ("NTLM".equalsIgnoreCase(getProxyAuthenticationScheme()))
+            if (isProxyNtlmAuthentication())
             {
                 credentials = new NTCredentials(getProxyUsername(), getProxyPassword(), getProxyHostname(), "");
             }
@@ -340,7 +344,7 @@ public class HttpConnector extends TcpConnector
                 credentials = new UsernamePasswordCredentials(getProxyUsername(), getProxyPassword());
             }
 
-            AuthScope authscope = new AuthScope(getProxyHostname(), getProxyPort(), null, getProxyAuthenticationScheme());
+            AuthScope authscope = new AuthScope(getProxyHostname(), getProxyPort());
 
             state.setProxyCredentials(authscope, credentials);
         }
@@ -411,13 +415,13 @@ public class HttpConnector extends TcpConnector
         return url;
     }
 
-    public String getProxyAuthenticationScheme()
+    public boolean isProxyNtlmAuthentication()
     {
-        return proxyAuthenticationScheme;
+        return proxyNtlmAuthentication;
     }
 
-    public void setProxyAuthenticationScheme(String proxyAuthenticationScheme)
+    public void setProxyNtlmAuthentication(boolean proxyNtlmAuthentication)
     {
-        this.proxyAuthenticationScheme = proxyAuthenticationScheme;
+        this.proxyNtlmAuthentication = proxyNtlmAuthentication;
     }
 }
