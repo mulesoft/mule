@@ -92,6 +92,7 @@ jbpm-pvm-4.4
 jbossts-common-4.2.3-SP5-osgi
 jbossts-jta-4.2.3-SP5-patched-osgi
 jbossts-jta-integration-4.2.3-SP5-osgi
+jcifs-1.3.3
 jdom-1.1.1
 jersey-client-1.6
 jersey-core-1.6
