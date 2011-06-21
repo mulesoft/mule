@@ -26,13 +26,11 @@ import java.util.Set;
 
 public class ClasspathScannerTestCase extends AbstractMuleTestCase
 {
-
-
     //This is slow
     public void testSearchInterfaceScanClasspathAndJars() throws Exception
     {
-        ClasspathScanner s = new ClasspathScanner("org");
-        Set<Class> set = s.scanFor(Fruit.class);
+        ClasspathScanner scanner = new ClasspathScanner("org");
+        Set<Class<Fruit>> set = scanner.scanFor(Fruit.class);
 
         assertTrue(set.contains(Apple.class));
         assertTrue(set.contains(RedApple.class));
@@ -44,24 +42,24 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
     }
 
     public void testSearchInterfaceScanClasspathAndJarsWithInterfaceFlag() throws Exception
-        {
-            ClasspathScanner s = new ClasspathScanner("org/mule");
-            Set<Class> set = s.scanFor(Fruit.class, ClasspathScanner.INCLUDE_INTERFACE);
+    {
+        ClasspathScanner scanner = new ClasspathScanner("org/mule");
+        Set<Class<Fruit>> set = scanner.scanFor(Fruit.class, ClasspathScanner.INCLUDE_INTERFACE);
 
-            assertTrue(set.contains(Apple.class));
-            assertTrue(set.contains(RedApple.class));
-            assertTrue(set.contains(BloodOrange.class));
-            assertTrue(set.contains(OrangeInterface.class));
-            assertTrue(set.contains(Orange.class));
-            assertTrue(set.contains(Grape.class));
-            assertTrue(set.contains(SeedlessGrape.class));
-        }
+        assertTrue(set.contains(Apple.class));
+        assertTrue(set.contains(RedApple.class));
+        assertTrue(set.contains(BloodOrange.class));
+        assertTrue(set.contains(OrangeInterface.class));
+        assertTrue(set.contains(Orange.class));
+        assertTrue(set.contains(Grape.class));
+        assertTrue(set.contains(SeedlessGrape.class));
+    }
 
     //This will be a lot more efficient
     public void testInterfaceScanClasspathAndJarsMultipleBasePaths() throws Exception
     {
-        ClasspathScanner s = new ClasspathScanner("org/mule");
-        Set<Class> set = s.scanFor(Fruit.class);
+        ClasspathScanner scanner = new ClasspathScanner("org/mule");
+        Set<Class<Fruit>> set = scanner.scanFor(Fruit.class);
 
         assertTrue(set.contains(Apple.class));
         assertTrue(set.contains(RedApple.class));
@@ -76,8 +74,8 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
 
     public void testImplementationScanClasspathAndJarsMultipleBasePaths() throws Exception
     {
-        ClasspathScanner s = new ClasspathScanner("org/mule");
-        Set<Class> set = s.scanFor(Orange.class);
+        ClasspathScanner scanner = new ClasspathScanner("org/mule");
+        Set<Class<Orange>> set = scanner.scanFor(Orange.class);
 
         assertFalse(set.contains(Apple.class));
         assertTrue(set.contains(BloodOrange.class));
@@ -89,8 +87,8 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
 
     public void testAnnotationMetaScanClasspathAndJarsMultipleBasePaths() throws Exception
     {
-        ClasspathScanner s = new ClasspathScanner("org/mule/util");
-        Set<Class> set = s.scanFor(Meta.class);
+        ClasspathScanner scanner = new ClasspathScanner("org/mule/util");
+        Set<Class<Meta>> set = scanner.scanFor(Meta.class);
 
         assertEquals(3, set.size());
         assertTrue(set.contains(SampleClassWithAnnotations.class));
@@ -100,15 +98,14 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
 
     public void testAnnotationScanClasspathAndJarsMultipleBasePaths() throws Exception
     {
-        ClasspathScanner s = new ClasspathScanner("org/mule");
-        Set<Class> set = s.scanFor(Marker.class);
+        ClasspathScanner scanner = new ClasspathScanner("org/mule");
+        Set<Class<Marker>> set = scanner.scanFor(Marker.class);
 
         assertTrue(set.contains(SampleBeanWithAnnotations.class));
         assertTrue(set.contains(SubscribeBean.class));
 
-        set = s.scanFor(NonMeta.class);
+        Set<Class<NonMeta>> nonMetaSet = scanner.scanFor(NonMeta.class);
         //assertEquals(1, set.size());
-        assertTrue(set.contains(SampleBeanWithAnnotations.class));
-
+        assertTrue(nonMetaSet.contains(SampleBeanWithAnnotations.class));
     }
 }

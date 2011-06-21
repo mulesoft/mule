@@ -83,6 +83,7 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
         this.modules = modules;
     }
 
+    @Override
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
 
@@ -99,8 +100,8 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
         if (modules == null)
         {
             ClasspathScanner scanner = new ClasspathScanner(classLoader, basepath);
-            Set<Class> classes = scanner.scanFor(Module.class);
-            Set<Class> factories = scanner.scanFor(GuiceModuleFactory.class);
+            Set<Class<Module>> classes = scanner.scanFor(Module.class);
+            Set<Class<GuiceModuleFactory>> factories = scanner.scanFor(GuiceModuleFactory.class);
 
             if (classes.size() == 0 && factories.size() == 0)
             {
@@ -117,13 +118,13 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
                 return;
             }
 
-            for (Class moduleClass : classes)
+            for (Class<Module> moduleClass : classes)
             {
-                allModules.add((Module) ClassUtils.instanciateClass(moduleClass, ClassUtils.NO_ARGS));
+                allModules.add(ClassUtils.instanciateClass(moduleClass, ClassUtils.NO_ARGS));
             }
-            for (Class factoryClass : factories)
+            for (Class<GuiceModuleFactory> factoryClass : factories)
             {
-                GuiceModuleFactory factory = (GuiceModuleFactory) ClassUtils.instanciateClass(factoryClass, ClassUtils.NO_ARGS);
+                GuiceModuleFactory factory = ClassUtils.instanciateClass(factoryClass, ClassUtils.NO_ARGS);
                 allModules.add(factory.createModule());
             }
         }
@@ -156,10 +157,10 @@ public class GuiceConfigurationBuilder extends AbstractConfigurationBuilder
 
     protected List<Module> getSystemModules(MuleContext muleContext)
     {
-        List<Module> modules = new ArrayList<Module>();
+        List<Module> systemModules = new ArrayList<Module>();
         //JSR-250 lifecycle and @Resource annotation support & Mule lifecycle support
-        modules.add(new MuleModule());
-        modules.add(new MuleSupportModule(muleContext));
-        return modules;
+        systemModules.add(new MuleModule());
+        systemModules.add(new MuleSupportModule(muleContext));
+        return systemModules;
     }
 }
