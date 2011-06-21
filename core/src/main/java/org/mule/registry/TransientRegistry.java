@@ -31,26 +31,23 @@ import org.mule.util.StringUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.collections.functors.InstanceofPredicate;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
- * Use synchronized(registry) when reading/writing/iterating over the contents of the registry hashmap.
+ * Use the registryLock when reading/writing/iterating over the contents of the registry hashmap.
  */
 //@ThreadSafe
 public class TransientRegistry extends AbstractRegistry
 {
-    /** logger used by this class */
-    protected transient final Log logger = LogFactory.getLog(TransientRegistry.class);
     public static final String REGISTRY_ID = "org.mule.Registry.Transient";
 
-    //@ThreadSafe synchronized(registry)
+    //@GuardedBy(registryLock)
     private final Map<String, Object> registry = new HashMap<String, Object>();
-
+    private final ReadWriteLock registryLock = new ReentrantReadWriteLock();
 
     public TransientRegistry(MuleContext muleContext)
     {
@@ -60,14 +57,25 @@ public class TransientRegistry extends AbstractRegistry
     public TransientRegistry(String id, MuleContext muleContext)
     {
         super(id, muleContext);
-        synchronized(registry)
+        putDefaultEntriesIntoRegistry();
+    }
+    
+    private void putDefaultEntriesIntoRegistry()
+    {
+        try
         {
+            registryLock.writeLock().lock();
+        
             registry.put("_muleContextProcessor", new MuleContextProcessor(muleContext));
             //registry.put("_muleNotificationProcessor", new NotificationListenersProcessor(muleContext));
             registry.put("_muleExpressionEvaluatorProcessor", new ExpressionEvaluatorProcessor(muleContext));
             registry.put("_muleExpressionEnricherProcessor", new ExpressionEnricherProcessor(muleContext));
             registry.put("_muleLifecycleStateInjectorProcessor", new LifecycleStateInjectorProcessor(getLifecycleManager().getState()));
             registry.put("_muleLifecycleManager", getLifecycleManager());
+        }
+        finally
+        {
+            registryLock.writeLock().unlock();
         }
     }
 
@@ -86,25 +94,27 @@ public class TransientRegistry extends AbstractRegistry
     @Override
     protected void doDispose()
     {
+        registryLock.writeLock().lock();
         registry.clear();
+        registryLock.writeLock().unlock();
     }
 
-    protected Map applyProcessors(Map<String, Object> objects)
+    protected Map<String, Object> applyProcessors(Map<String, Object> objects)
     {
         if (objects == null)
         {
             return null;
         }
+        
         Map<String, Object> results = new HashMap<String, Object>();
         for (Map.Entry<String, Object> entry : objects.entrySet())
         {
-            //We do this in the loop in case the map contains ObjectProcessors
+            // We do this inside the loop in case the map contains ObjectProcessors
             Collection<ObjectProcessor> processors = lookupObjects(ObjectProcessor.class);
             for (ObjectProcessor processor : processors)
             {
                 Object result = processor.process(entry.getValue());
-                //If result is null do not add the object
-                if(result != null)
+                if (result != null)
                 {
                     results.put(entry.getKey(), result);
                 }
@@ -114,55 +124,57 @@ public class TransientRegistry extends AbstractRegistry
     }
 
 
-    public void registerObjects(Map objects) throws RegistrationException
+    public void registerObjects(Map<String, Object> objects) throws RegistrationException
     {
         if (objects == null)
         {
             return;
         }
 
-        for (Iterator iterator = objects.entrySet().iterator(); iterator.hasNext();)
+        for (Map.Entry<String, Object> entry : objects.entrySet())
         {
-            Map.Entry entry = (Map.Entry) iterator.next();
-            registerObject(entry.getKey().toString(), entry.getValue());
+            registerObject(entry.getKey(), entry.getValue());
         }
     }
 
     @SuppressWarnings("unchecked")
     public <T> Map<String, T> lookupByType(Class<T> type)
     {
-        synchronized(registry)
-        {
-            final Map<String, T> results = new HashMap<String, T>();
-            for (Map.Entry<String, Object> entry : registry.entrySet())
-            {
-                final Class clazz = entry.getValue().getClass();
-                if (type.isAssignableFrom(clazz))
-                {
-                    results.put(entry.getKey(), (T) entry.getValue());
-                }
-            }
+        registryLock.readLock().lock();
 
-            return results;
+        final Map<String, T> results = new HashMap<String, T>();
+        for (Map.Entry<String, Object> entry : registry.entrySet())
+        {
+            final Class<?> clazz = entry.getValue().getClass();
+            if (type.isAssignableFrom(clazz))
+            {
+                results.put(entry.getKey(), (T) entry.getValue());
+            }
         }
+
+        registryLock.readLock().unlock();
+        return results;
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T  lookupObject(String key)
+    public <T> T lookupObject(String key)
     {
-        synchronized(registry)
-        {
-            return (T) registry.get(key);
-        }
+        registryLock.readLock().lock();
+        T retValue = (T) registry.get(key);
+        registryLock.readLock().unlock();
+        
+        return retValue;
     }
 
     @SuppressWarnings("unchecked")
     public <T> Collection<T> lookupObjects(Class<T> returntype)
     {
-        synchronized(registry)
-        {
-            return CollectionUtils.select(registry.values(), new InstanceofPredicate(returntype));
-        }
+        registryLock.readLock().lock();
+        Collection<T> retValue = CollectionUtils.select(registry.values(), 
+            new InstanceofPredicate(returntype));
+        registryLock.readLock().unlock();
+        
+        return retValue;
     }
 
     /**
@@ -231,8 +243,6 @@ public class TransientRegistry extends AbstractRegistry
 
     /**
      * Allows for arbitrary registration of transient objects
-     *
-     * @param key
      */
     public void registerObject(String key, Object object, Object metadata) throws RegistrationException
     {
@@ -249,23 +259,12 @@ public class TransientRegistry extends AbstractRegistry
         
         logger.debug("applying processors");
         object = applyProcessors(object, metadata);
-        //Don't add the object if the processor returns null
-        if (object==null)
+        if (object == null)
         {
             return;
         }
 
-        synchronized(registry)
-        {
-            if (registry.containsKey(key))
-            {
-                // registry.put(key, value) would overwrite a previous entity with the same name.  Is this really what we want?
-                // Not sure whether to throw an exception or log a warning here.
-                //throw new RegistrationException("TransientRegistry already contains an object named '" + key + "'.  The previous object would be overwritten.");
-                logger.warn("TransientRegistry already contains an object named '" + key + "'.  The previous object will be overwritten.");
-            }
-            registry.put(key, object);
-        }
+        putIntoRegistry(key, object);
 
         try
         {
@@ -284,6 +283,23 @@ public class TransientRegistry extends AbstractRegistry
         }
     }
 
+    // this method is private on purpose ... it only serves to better encapsulate the interaction
+    // with the registry and is not intended to be overridden by subclasses
+    private void putIntoRegistry(String key, Object object)
+    {
+        registryLock.writeLock().lock();
+        
+        if (registry.containsKey(key))
+        {
+            // registry.put(key, value) would overwrite a previous entity with the same name.  Is this really what we want?
+            // Not sure whether to throw an exception or log a warning here.
+            //throw new RegistrationException("TransientRegistry already contains an object named '" + key + "'.  The previous object would be overwritten.");
+            logger.warn("TransientRegistry already contains an object named '" + key + "'.  The previous object will be overwritten.");
+        }
+        registry.put(key, object);
+
+        registryLock.writeLock().unlock();
+    }
 
     protected void checkDisposed() throws RegistrationException
     {
@@ -309,11 +325,9 @@ public class TransientRegistry extends AbstractRegistry
      */
     public void unregisterObject(String key, Object metadata) throws RegistrationException
     {
-        Object obj;
-        synchronized (registry)
-        {
-            obj = registry.remove(key);
-        }
+        registryLock.writeLock().lock();
+        Object obj = registry.remove(key);
+        registryLock.writeLock().unlock();
 
         try
         {
@@ -347,5 +361,4 @@ public class TransientRegistry extends AbstractRegistry
     {
         return false;
     }
-
 }

@@ -129,7 +129,6 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
         {
             //expected
         }
-
     }
 
     public void testObjectLifecycleRestart() throws Exception
@@ -206,7 +205,6 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
         assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
     }
 
-
     public void testLifecycleStateOutOfSequenceDisposeFirst() throws Exception
     {
         muleContext.dispose();
@@ -223,10 +221,9 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
         }
     }
 
-
     public class InterfaceBasedTracker extends AbstractLifecycleTracker
     {
-
+        // no custom methods
     }
 
     public class JSR250ObjectLifecycleTracker implements MuleContextAware
@@ -254,5 +251,4 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
             tracker.add("dispose");
         }
     }
-
 }
