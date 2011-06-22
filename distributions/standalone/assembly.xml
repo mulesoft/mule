@@ -207,6 +207,7 @@
         <!-- Bootstrap -->
         <dependencySet>
             <outputDirectory>lib/boot</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.modules:mule-module-boot</include>
                 <include>org.mule.modules:mule-module-logging</include>
@@ -220,6 +221,7 @@
         <!-- Mule libraries -->
         <dependencySet>
             <outputDirectory>lib/mule</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <!-- Core -->
                 <include>org.mule:mule-core</include>
@@ -279,6 +281,7 @@
         <!-- 3rd-party libraries -->
         <dependencySet>
             <outputDirectory>lib/opt</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
 
             <!-- Since we don't define any "includes" here, this will suck in the whole
     universe of transitive dependencies.  Therefore, we need to explicitly
@@ -385,6 +388,7 @@
         <!-- Mule testing framework -->
         <dependencySet>
             <outputDirectory>lib/user</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <scope>test</scope>
             <includes>
                 <include>junit:junit</include>
@@ -403,6 +407,7 @@
         -->
         <dependencySet>
             <outputDirectory>lib/endorsed</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>xml-apis:xml-apis</include>
                 <include>xerces:xercesImpl</include>
@@ -414,72 +419,84 @@
         <!-- Examples -->
         <dependencySet>
             <outputDirectory>examples/bookstore</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.examples:mule-example-bookstore</include>
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>examples/cep</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.examples:mule-example-cep</include>
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>examples/echo</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.examples:mule-example-echo</include>
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>examples/hello</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.examples:mule-example-hello</include>
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>examples/errorhandler</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.examples:mule-example-errorhandler</include>
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>examples/loanbroker-bpm</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.examples:mule-example-loanbroker-bpm</include>
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>examples/loanbroker-simple</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.examples:mule-example-loanbroker-simple</include>
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>examples/scripting</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.examples:mule-example-scripting</include>
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>examples/gpswalker</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.examples:mule-example-gpswalker</include>
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>examples/notifications</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.examples:mule-example-notifications</include>
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>examples/stockquote</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.examples:mule-example-stockquote</include>
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>examples/mule-example-launcher</outputDirectory>
+            <useStrictFiltering>true</useStrictFiltering>
             <includes>
                 <include>org.mule.examples:mule-example-launcher</include>
             </includes>
