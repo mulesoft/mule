@@ -11,10 +11,10 @@
 package org.mule.module.ibeans;
 
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.module.ibeans.annotations.AbstractIBeansTestCase;
 import org.mule.transport.ibean.IBeansConnector;
 
-public class IBeansConnectorFactoryTestCase extends AbstractMuleTestCase
+public class IBeansConnectorFactoryTestCase extends AbstractIBeansTestCase
 {
     public void testCreateFromFactory() throws Exception
     {

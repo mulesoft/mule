@@ -11,9 +11,13 @@ package org.mule.module.ibeans;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.transport.DispatchException;
+import org.mule.module.ibeans.config.IBeanHolderConfigurationBuilder;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.tck.FunctionalTestCase;
+
+import java.util.List;
 
 import org.w3c.dom.Document;
 
@@ -30,6 +34,12 @@ public class IBeansHostIpFunctionalTestCase extends FunctionalTestCase
         return "hostip-functional-test.xml";
     }
 
+    @Override
+    protected void addBuilders(List<ConfigurationBuilder> builders)
+    {
+        IBeanHolderConfigurationBuilder builder = new IBeanHolderConfigurationBuilder("org.mule");
+        builders.add(0, builder);
+    }
 
     public void testHostIp() throws Exception
     {
@@ -69,7 +79,7 @@ public class IBeansHostIpFunctionalTestCase extends FunctionalTestCase
         MuleClient client = muleContext.getClient();
         MuleMessage response = client.send("vm://in", params, null);
         assertNotNull(response.getExceptionPayload());
-        assertTrue(response.getExceptionPayload().getException() instanceof DispatchException);        
+        assertTrue(response.getExceptionPayload().getException() instanceof DispatchException);
         assertTrue(response.getExceptionPayload().getRootException() instanceof NoSuchMethodException);
     }
 

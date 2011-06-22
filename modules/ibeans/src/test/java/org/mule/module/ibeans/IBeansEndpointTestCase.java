@@ -14,9 +14,9 @@ import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.module.ibeans.annotations.AbstractIBeansTestCase;
 
-public class IBeansEndpointTestCase extends AbstractMuleTestCase
+public class IBeansEndpointTestCase extends AbstractIBeansTestCase
 {
     public void testValidEndpointURI() throws Exception
     {

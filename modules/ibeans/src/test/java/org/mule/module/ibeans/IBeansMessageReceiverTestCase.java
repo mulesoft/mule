@@ -10,16 +10,27 @@
 
 package org.mule.module.ibeans;
 
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
+import org.mule.module.ibeans.config.IBeanHolderConfigurationBuilder;
 import org.mule.transport.AbstractMessageReceiverTestCase;
 import org.mule.transport.ibean.IBeansMessageReceiver;
 
 import com.mockobjects.dynamic.Mock;
 
+import java.util.List;
+
 public class IBeansMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
+    @Override
+    protected void addBuilders(List<ConfigurationBuilder> builders)
+    {
+        IBeanHolderConfigurationBuilder builder = new IBeanHolderConfigurationBuilder("org.mule");
+        builders.add(builder);
+    }
+
     @Override
     public MessageReceiver getMessageReceiver() throws Exception
     {
