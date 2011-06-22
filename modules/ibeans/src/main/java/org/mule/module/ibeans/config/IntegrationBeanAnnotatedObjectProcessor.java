@@ -31,6 +31,7 @@ public class IntegrationBeanAnnotatedObjectProcessor implements InjectProcessor,
 
     public IntegrationBeanAnnotatedObjectProcessor()
     {
+        super();
     }
 
     public IntegrationBeanAnnotatedObjectProcessor(MuleContext muleContext)
