@@ -42,7 +42,7 @@
         <profile>
             <!--
                 A convenience profile so that one can exclude regular tests, but still
-                be able to run IT tests (surefure and shitty plugin use different variables,
+                be able to run IT tests (surefire and shitty plugin use different variables,
                 -Dtest= vs -Dtests=
 
                 Just run 'mvn -DskipTests -Pit
