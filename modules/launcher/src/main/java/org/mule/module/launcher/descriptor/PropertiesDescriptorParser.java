@@ -32,6 +32,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
     protected static final String PROPERTY_CONFIG_RESOURCES = "config.resources";
     protected static final String PROPERTY_REDEPLOYMENT_ENABLED = "redeployment.enabled";
     protected static final String PROPERTY_PRIVILEDGED = "priviledged";
+    protected static final String PROPERTY_SCAN_PACKAGES = "scan.packages";
 
     public ApplicationDescriptor parse(File descriptor) throws IOException
     {
@@ -42,6 +43,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
         d.setEncoding(p.getProperty(PROPERTY_ENCODING));
         d.setConfigurationBuilder(p.getProperty(PROPERTY_CONFIG_BUILDER));
         d.setDomain(p.getProperty(PROPERTY_DOMAIN));
+        d.setPackagesToScan(p.getProperty(PROPERTY_SCAN_PACKAGES));
 
         // supports 'true' (case insensitive), 'yes', 'on' as positive values
         d.setParentFirstClassLoader(BooleanUtils.toBoolean(p.getProperty(PROPERTY_CLASSLOADER_PARENT_FIRST, Boolean.TRUE.toString())));

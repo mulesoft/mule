@@ -33,6 +33,7 @@ public class IBeanHolderConfigurationBuilder extends AbstractAnnotationConfigura
 
     public IBeanHolderConfigurationBuilder()
     {
+        super();
     }
 
     public IBeanHolderConfigurationBuilder(String... basepackages)
@@ -50,11 +51,14 @@ public class IBeanHolderConfigurationBuilder extends AbstractAnnotationConfigura
         super(classLoader, basepackages);
     }
 
+    @Override
     protected String getScanPackagesProperty()
     {
         return "ibeans.scan.packages";
     }
 
+    @SuppressWarnings("rawtypes")
+    @Override
     protected void doConfigure(MuleContext muleContext) throws Exception
     {
         Set<Class> ibeanClasses = new HashSet<Class>();
@@ -73,9 +77,8 @@ public class IBeanHolderConfigurationBuilder extends AbstractAnnotationConfigura
             throw new ConfigurationException(e);
         }
 
-        for (Class ibeanClass : ibeanClasses)
+        for (Class<?> ibeanClass : ibeanClasses)
         {
-
             muleContext.getRegistry().registerObject(IBeansNotationHelper.getIBeanShortID(ibeanClass), new IBeanHolder(ibeanClass));
         }
     }

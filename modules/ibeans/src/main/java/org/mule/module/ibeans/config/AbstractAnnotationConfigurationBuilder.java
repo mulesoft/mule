@@ -70,13 +70,16 @@ public abstract class AbstractAnnotationConfigurationBuilder extends Annotations
 
     protected ClasspathScanner createClasspathScanner() throws IOException
     {
-        if(Arrays.equals(DEFAULT_BASE_PACKAGE, basepackages))
+        if (Arrays.equals(DEFAULT_BASE_PACKAGE, basepackages))
         {
             basepackages = findPackages();
         }
 
         String[] paths = convertPackagesToPaths(basepackages);
-        if(logger.isInfoEnabled()) logger.info("Scanning for annotations using the following paths: " + StringMessageUtils.toString(paths));
+        if(logger.isInfoEnabled())
+        {
+            logger.info("Scanning for annotations using the following paths: " + StringMessageUtils.toString(paths));
+        }
         return new ClasspathScanner(classLoader, paths);
     }
 
@@ -91,6 +94,7 @@ public abstract class AbstractAnnotationConfigurationBuilder extends Annotations
         }
         return paths;
     }
+
     protected String[] findPackages() throws IOException
     {
         List<String> paths = new ArrayList<String>();
@@ -124,6 +128,4 @@ public abstract class AbstractAnnotationConfigurationBuilder extends Annotations
         }
         return paths.toArray(new String[]{});
     }
-
-
 }

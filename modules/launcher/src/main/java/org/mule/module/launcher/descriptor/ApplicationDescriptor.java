@@ -30,6 +30,7 @@ public class ApplicationDescriptor
     private String encoding;
     private String configurationBuilder;
     private String domain;
+    private String packagesToScan;
     private boolean parentFirstClassLoader = true;
     private String[] configResources = new String[] {DEFAULT_CONFIGURATION_RESOURCE};
     private Map<String, String> appProperties = new HashMap<String, String>();
@@ -138,5 +139,15 @@ public class ApplicationDescriptor
     public void setPriviledged(boolean priviledged)
     {
         this.priviledged = priviledged;
+    }
+
+    public String getPackagesToScan()
+    {
+        return packagesToScan;
+    }
+
+    public void setPackagesToScan(String packages)
+    {
+        this.packagesToScan = packages;
     }
 }

@@ -85,12 +85,17 @@ public class MuleServer implements Runnable
     public static final String CLASSNAME_ANNOTATIONS_CONFIG_BUILDER = "org.mule.config.AnnotationsConfigurationBuilder";
 
     /**
+     * If the iBeans module is on the classpath, this config builder can be used to scan for iBeans annotations.
+     */
+    public static final String CLASSNAME_IBEANS_CONFIG_BUILDER = "org.mule.module.ibeans.config.IBeanHolderConfigurationBuilder";
+
+    /**
      * logger used by this class
      */
     private static final Log logger = LogFactory.getLog(MuleServer.class);
 
     public static final String DEFAULT_CONFIGURATION = "mule-config.xml";
-    
+
     public static final String DEFAULT_APP_CONFIGURATION = "mule-app.properties";
 
     /**
@@ -99,7 +104,7 @@ public class MuleServer implements Runnable
     private String configurationResources = null;
 
     private String appConfigurationResource = null;
-    
+
     /**
      * A FQN of the #configBuilder class, required in case MuleServer is
      * reinitialised.
@@ -198,7 +203,7 @@ public class MuleServer implements Runnable
         {
             setConfigurationResources(config);
         }
-        
+
         String appconfig = (String) commandlineOptions.get("appconfig");
         this.appConfigurationResource = appconfig;
 
@@ -355,8 +360,8 @@ public class MuleServer implements Runnable
         if (!cfgBuilder.isConfigured())
         {
             List<ConfigurationBuilder> configBuilders = new ArrayList<ConfigurationBuilder>(3);
-            
-            // need to add the annotations config builder before Spring so we can use Mule 
+
+            // need to add the annotations config builder before Spring so we can use Mule
             // annotations in Spring
             addAnnotationsConfigBuilder(configBuilders);
             addStartupPropertiesConfigBuilder(configBuilders);
@@ -386,14 +391,14 @@ public class MuleServer implements Runnable
     }
 
     /**
-     * If the annotations module is on the classpath, add the annotations config builder to the 
+     * If the annotations module is on the classpath, add the annotations config builder to the
      * list. This will enable annotations config for this instance.
      */
     protected void addAnnotationsConfigBuilder(List<ConfigurationBuilder> builders) throws Exception
     {
         if (ClassUtils.isClassOnPath(CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
         {
-            Object configBuilder = ClassUtils.instanciateClass(CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, 
+            Object configBuilder = ClassUtils.instanciateClass(CLASSNAME_ANNOTATIONS_CONFIG_BUILDER,
                 ClassUtils.NO_ARGS, getClass());
             builders.add((ConfigurationBuilder) configBuilder);
         }
@@ -406,7 +411,7 @@ public class MuleServer implements Runnable
         {
             startupProperties = PropertiesUtils.loadProperties(getStartupPropertiesFile(), getClass());
         }
-       
+
         builders.add(new SimpleConfigurationBuilder(startupProperties));
     }
 
@@ -421,7 +426,7 @@ public class MuleServer implements Runnable
         {
             appPropertiesFile = this.appConfigurationResource;
         }
-        
+
         return new PropertiesMuleConfigurationFactory(appPropertiesFile).createConfiguration();
     }
 
@@ -556,7 +561,7 @@ public class MuleServer implements Runnable
         {
             super();
         }
-        
+
         @Override
         public void run()
         {
