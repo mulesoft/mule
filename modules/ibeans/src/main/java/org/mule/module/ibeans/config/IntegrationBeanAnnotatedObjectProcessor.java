@@ -47,7 +47,7 @@ public class IntegrationBeanAnnotatedObjectProcessor implements InjectProcessor,
 
     public Object process(Object object)
     {
-        Set<AnnotationMetaData> annos = AnnotationUtils.getFieldAnnotationsForHeirarchy(object.getClass(), IntegrationBean.class);
+        Set<AnnotationMetaData> annos = AnnotationUtils.getFieldAnnotationsForHierarchy(object.getClass(), IntegrationBean.class);
 
         for (AnnotationMetaData data : annos)
         {
