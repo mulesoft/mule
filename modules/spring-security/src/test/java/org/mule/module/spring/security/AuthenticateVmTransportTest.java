@@ -1,5 +1,5 @@
 /*
- * $Id: AuthorizationFilterTestCase.java 21020 2011-01-14 08:13:37Z dirk.olmes $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
