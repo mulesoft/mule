@@ -19,6 +19,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.config.i18n.CoreMessages;
+import org.mule.transport.http.ntlm.NTLMScheme;
 import org.mule.transport.tcp.TcpConnector;
 
 import java.io.UnsupportedEncodingException;
@@ -29,12 +30,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 
@@ -123,6 +127,8 @@ public class HttpConnector extends TcpConnector
         props.add(HTTP_VERSION_PROPERTY);
         props.add(HTTP_ENCODE_PARAMVALUE);
         HTTP_INBOUND_PROPERTIES = props;
+
+        AuthPolicy.registerAuthScheme(AuthPolicy.NTLM, NTLMScheme.class);
     }
     
     public static final String HTTP_COOKIE_SPEC_PROPERTY = "cookieSpec";
@@ -139,6 +145,8 @@ public class HttpConnector extends TcpConnector
     private String proxyUsername = null;
 
     private String proxyPassword = null;
+
+    private boolean proxyNtlmAuthentication;
 
     private String cookieSpec;
 
@@ -329,9 +337,19 @@ public class HttpConnector extends TcpConnector
 
         if (getProxyUsername() != null)
         {
-            state.setProxyCredentials(
-                    new AuthScope(null, -1, null, null),
-                    new UsernamePasswordCredentials(getProxyUsername(), getProxyPassword()));
+            Credentials credentials;
+            if (isProxyNtlmAuthentication())
+            {
+                credentials = new NTCredentials(getProxyUsername(), getProxyPassword(), getProxyHostname(), "");
+            }
+            else
+            {
+                credentials = new UsernamePasswordCredentials(getProxyUsername(), getProxyPassword());
+            }
+
+            AuthScope authscope = new AuthScope(getProxyHostname(), getProxyPort());
+
+            state.setProxyCredentials(authscope, credentials);
         }
 
         HttpClient client = new HttpClient();
@@ -398,5 +416,15 @@ public class HttpConnector extends TcpConnector
             url = "/" + url;
         }
         return url;
+    }
+
+    public boolean isProxyNtlmAuthentication()
+    {
+        return proxyNtlmAuthentication;
+    }
+
+    public void setProxyNtlmAuthentication(boolean proxyNtlmAuthentication)
+    {
+        this.proxyNtlmAuthentication = proxyNtlmAuthentication;
     }
 }

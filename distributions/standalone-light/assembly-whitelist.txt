@@ -237,6 +237,7 @@
 /mule-standalone-nodocs-${productVersion}/lib/opt/jbpm-jpdl-4.4.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jbpm-log-4.4.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jbpm-pvm-4.4.jar
+/mule-standalone-nodocs-${productVersion}/lib/opt/jcifs-1.3.3
 /mule-standalone-nodocs-${productVersion}/lib/opt/jdom-1.1.1.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jersey-client-1.6.jar
 /mule-standalone-nodocs-${productVersion}/lib/opt/jersey-core-1.6.jar

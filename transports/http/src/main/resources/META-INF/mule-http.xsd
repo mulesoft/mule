@@ -94,6 +94,11 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="proxyNtlmAuthentication" type="mule:substitutableBoolean" use="optional">
+                    <xsd:annotation>
+                        <xsd:documentation>Whether the proxy authentication scheme is NTLM or not. This property is required in order to use the right credentials under that scheme. Default is false</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="enableCookies" type="mule:substitutableBoolean">
                     <xsd:annotation>
                         <xsd:documentation>
