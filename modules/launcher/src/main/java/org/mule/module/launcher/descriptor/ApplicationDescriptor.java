@@ -34,6 +34,7 @@ public class ApplicationDescriptor
     private String encoding;
     private String configurationBuilder;
     private String domain;
+    private String packagesToScan;
     private String[] configResources = new String[] {DEFAULT_CONFIGURATION_RESOURCE};
     private Map<String, String> appProperties = new HashMap<String, String>();
 
@@ -168,5 +169,15 @@ public class ApplicationDescriptor
     public void setPlugins(Set<PluginDescriptor> plugins)
     {
         this.plugins = plugins;
+    }
+
+    public String getPackagesToScan()
+    {
+        return packagesToScan;
+    }
+
+    public void setPackagesToScan(String packages)
+    {
+        this.packagesToScan = packages;
     }
 }

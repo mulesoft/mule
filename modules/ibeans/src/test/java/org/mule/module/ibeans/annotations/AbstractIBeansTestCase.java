@@ -9,9 +9,11 @@
  */
 package org.mule.module.ibeans.annotations;
 
+import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.module.ibeans.config.IBeanHolderConfigurationBuilder;
 import org.mule.module.ibeans.spi.MuleIBeansPlugin;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.ibeans.annotation.Return;
@@ -61,7 +64,13 @@ public abstract class AbstractIBeansTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().registerObject("testcase", this);
     }
 
-////
+    @Override
+    protected void addBuilders(List<ConfigurationBuilder> builders)
+    {
+        IBeanHolderConfigurationBuilder builder = new IBeanHolderConfigurationBuilder("org.mule");
+        builders.add(builder);
+    }
+
     protected Answer withXmlData(final String resource, final Object ibean)
     {
         return withData(resource, MimeTypes.XML, null, ibean);

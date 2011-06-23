@@ -37,6 +37,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
     protected static final String PROPERTY_LEGACY_PRIVILEGED = "priviledged";
     protected static final String PROPERTY_PRIVILEGED = "privileged";
     protected static final String PROPERTY_LOADER_OVERRIDE = "loader.override";
+    protected static final String PROPERTY_SCAN_PACKAGES = "scan.packages";
 
     public ApplicationDescriptor parse(File descriptor) throws IOException
     {
@@ -47,6 +48,7 @@ public class PropertiesDescriptorParser implements DescriptorParser
         d.setEncoding(p.getProperty(PROPERTY_ENCODING));
         d.setConfigurationBuilder(p.getProperty(PROPERTY_CONFIG_BUILDER));
         d.setDomain(p.getProperty(PROPERTY_DOMAIN));
+        d.setPackagesToScan(p.getProperty(PROPERTY_SCAN_PACKAGES));
 
         final String resProps = p.getProperty(PROPERTY_CONFIG_RESOURCES);
         String[] urls;

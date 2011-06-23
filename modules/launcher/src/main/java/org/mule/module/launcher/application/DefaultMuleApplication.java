@@ -186,15 +186,9 @@ public class DefaultMuleApplication implements Application
                 List<ConfigurationBuilder> builders = new ArrayList<ConfigurationBuilder>(3);
                 builders.add(createConfigurationBuilderFromApplicationProperties());
 
-                // If the annotations module is on the classpath, add the annotations config builder to the list
-                // This will enable annotations config for this instance
-                //We need to add this builder before spring so that we can use Mule annotations in Spring or any other builder
-                if (ClassUtils.isClassOnPath(MuleServer.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
-                {
-                    Object configBuilder = ClassUtils.instanciateClass(
-                        MuleServer.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, ClassUtils.NO_ARGS, getClass());
-                    builders.add((ConfigurationBuilder) configBuilder);
-                }
+                // We need to add this builder before spring so that we can use Mule annotations in Spring or any other builder
+                addAnnotationsConfigBuilderIfPresent(builders);
+                addIBeansConfigurationBuilderIfPackagesConfiguredForScanning(builders);
 
                 builders.add(cfgBuilder);
 
@@ -252,6 +246,31 @@ public class DefaultMuleApplication implements Application
         appProperties.put(MuleProperties.APP_NAME_PROPERTY, getAppName());
 
         return new SimpleConfigurationBuilder(appProperties);
+    }
+
+    protected void addAnnotationsConfigBuilderIfPresent(List<ConfigurationBuilder> builders) throws Exception
+    {
+        // If the annotations module is on the classpath, add the annotations config builder to
+        // the list. This will enable annotations config for this instance.
+        if (ClassUtils.isClassOnPath(MuleServer.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, getClass()))
+        {
+            Object configBuilder = ClassUtils.instanciateClass(
+                MuleServer.CLASSNAME_ANNOTATIONS_CONFIG_BUILDER, ClassUtils.NO_ARGS, getClass());
+            builders.add((ConfigurationBuilder) configBuilder);
+        }
+    }
+
+    protected void addIBeansConfigurationBuilderIfPackagesConfiguredForScanning(List<ConfigurationBuilder> builders)
+        throws Exception
+    {
+        String packagesToScan = descriptor.getPackagesToScan();
+        if (StringUtils.isNotEmpty(packagesToScan))
+        {
+            String[] paths = packagesToScan.split(",");
+            Object configBuilder = ClassUtils.instanciateClass(
+                MuleServer.CLASSNAME_IBEANS_CONFIG_BUILDER, new Object[] { paths }, getClass());
+            builders.add((ConfigurationBuilder) configBuilder);
+        }
     }
 
     @Override
