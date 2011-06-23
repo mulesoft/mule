@@ -121,7 +121,8 @@ public class DynamicOutboundEndpoint extends DynamicURIOutboundEndpoint
             final MuleEndpointURI uri = new MuleEndpointURI(newUriString, getMuleContext());
             uri.initialise();
             setEndpointURI(uri);
-            return getEndpointURI();
+
+            return uri;
         }
         catch (final Exception e)
         {
