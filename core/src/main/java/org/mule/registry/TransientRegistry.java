@@ -158,7 +158,7 @@ public class TransientRegistry extends AbstractRegistry
 
     public <T> T lookupObject(String key)
     {
-        return registryMap.get(key);
+        return registryMap.<T>get(key);
     }
 
     @SuppressWarnings("unchecked")
