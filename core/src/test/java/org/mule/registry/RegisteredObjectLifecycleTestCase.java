@@ -21,10 +21,10 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleTestCase
 {
     private static final long TIMEOUT = 1000;
 
-    private Latch initLatch;
-    private Latch startLatch;
-    private Latch stopLatch;
-    private Latch disposeLatch;
+    protected Latch initLatch;
+    protected Latch startLatch;
+    protected Latch stopLatch;
+    protected Latch disposeLatch;
 
     private DummyBean bean = new DummyBean();
 
@@ -40,7 +40,6 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleTestCase
 
     public void testLifecycleForMuleContext() throws Exception
     {
-
         muleContext.getRegistry().registerObject("dummy", bean);
         assertTrue(initLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
         assertFalse(startLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
@@ -62,7 +61,6 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleTestCase
 
     public void testLifecycleForUnregisteredObject() throws Exception
     {
-
         muleContext.getRegistry().registerObject("dummy", bean);
         assertTrue(initLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
         assertFalse(startLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
