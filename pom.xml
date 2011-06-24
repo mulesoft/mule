@@ -1322,19 +1322,6 @@
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>1.3</version>
                 </plugin>
-                <!--
-                    2.2-beta-2 is broken due to a regression. Attempting
-                    to configure permissions via multiple includes/excludes
-                    adds duplicate entries to the assembly:
-
-                    http://jira.codehaus.org/browse/MASSEMBLY-285
-
-                    2.2-beta-1 is broken too:
-                    http://jira.codehaus.org/browse/MASSEMBLY-194
-                    Fixed in 2.2-beta-2, but it has a blocker regression in turn.
-
-                    WT$%#^!
-                -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
