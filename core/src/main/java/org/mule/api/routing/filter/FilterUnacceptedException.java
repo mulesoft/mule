@@ -13,10 +13,9 @@ package org.mule.api.routing.filter;
 import org.mule.api.MessagingException;
 import org.mule.api.MuleEvent;
 import org.mule.config.i18n.Message;
-import org.mule.processor.InternalProcessingException;
 
 
-public class FilterUnacceptedException extends MessagingException implements InternalProcessingException
+public class FilterUnacceptedException extends MessagingException
 {
     private static final long serialVersionUID = -1828111078295716525L;
     

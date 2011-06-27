@@ -21,6 +21,7 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
+import org.junit.Test;
 
 public class ExceptionStrategyFilterTestCase extends FunctionalTestCase
 {
@@ -48,6 +49,7 @@ public class ExceptionStrategyFilterTestCase extends FunctionalTestCase
         simpleFlow.setExceptionListener(new TestMessagingExceptionHandler(exceptionHandlerLatch));
     }
 
+    @Test
     public void testExceptionThrownFromMessageFilterIsHandledByExceptionHandler() throws Exception
     {
         muleContext.getClient().send("vm://in", TEST_MESSAGE, null);
