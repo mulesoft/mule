@@ -21,13 +21,19 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorBuilder;
 import org.mule.api.processor.MessageProcessorChain;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.ObjectUtils;
 
 import org.junit.Test;
 
-public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class DefaultMessageProcessorChainTestCase extends AbstractMuleContextTestCase
 {
 
     @Test
@@ -38,6 +44,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         assertEquals("0123", builder.build().process(getTestEventUsingFlow("0")).getMessageAsString());
     }
 
+    @Test
     public void testMPChainWithNullReturn() throws MuleException, Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
@@ -63,6 +70,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testMPChainWithNullReturnAtEnd() throws MuleException, Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
@@ -337,6 +345,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         assertLifecycle(mpb);
     }
 
+    @Test
     public void testNoneIntercepting() throws Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
@@ -345,6 +354,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
         assertEquals("MessageProcessorMessageProcessorMessageProcessor", restul.getMessageAsString());
     }
 
+    @Test
     public void testAllIntercepting() throws Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
@@ -354,6 +364,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             restul.getMessageAsString());
     }
 
+    @Test
     public void testMix() throws Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
@@ -365,6 +376,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             restul.getMessageAsString());
     }
 
+    @Test
     public void testMixStaticFactoryt() throws Exception
     {
         MessageProcessorChain chain = DefaultMessageProcessorChain.from(new TestIntercepting(),
@@ -376,6 +388,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             restul.getMessageAsString());
     }
 
+    @Test
     public void testMix2() throws Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
@@ -387,6 +400,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractMuleTestCase
             restul.getMessageAsString());
     }
 
+    @Test
     public void testMix2StaticFactory() throws Exception
     {
         MessageProcessorChain chain = DefaultMessageProcessorChain.from(new TestNonIntercepting(),

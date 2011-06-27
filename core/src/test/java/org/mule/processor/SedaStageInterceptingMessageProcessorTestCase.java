@@ -30,6 +30,11 @@ import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class SedaStageInterceptingMessageProcessorTestCase extends
     OptionalAsyncInterceptingMessageProcessorTestCase implements ExceptionListener
@@ -78,6 +83,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends
         return mp;
     }
 
+    @Test
     public void testSpiWorkThrowableHandling() throws Exception
     {
         try

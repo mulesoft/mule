@@ -18,7 +18,7 @@ import org.mule.api.context.WorkManager;
 import org.mule.api.context.WorkManagerSource;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.Transaction;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.transaction.TransactionCoordination;
 import org.mule.util.concurrent.Latch;
@@ -26,8 +26,17 @@ import org.mule.util.concurrent.Latch;
 import java.beans.ExceptionListener;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
 
-public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleContextTestCase
     implements ExceptionListener
 {
 
@@ -48,6 +57,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
         messageProcessor = createAsyncInterceptingMessageProcessor(target);
     }
 
+    @Test
     public void testProcessOneWay() throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
@@ -65,6 +75,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
         assertNull(exceptionThrown);
     }
 
+    @Test
     public void testProcessRequestResponse() throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
@@ -72,6 +83,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
         assertAsync(messageProcessor, event);
     }
 
+    @Test
     public void testProcessOneWayWithTx() throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE,
@@ -95,6 +107,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleTestC
         }
     }
 
+    @Test
     public void testProcessRequestResponseWithTx() throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE,
