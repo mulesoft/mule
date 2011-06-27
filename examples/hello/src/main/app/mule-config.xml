@@ -39,22 +39,20 @@
     <flow name="Hello World">
         <composite-source>
             <!-- Incoming HTTP requests -->
-            <inbound-endpoint address="http://localhost:8888" transformer-refs="HttpRequestToNameString" exchange-pattern="request-response">
-                <not-filter>
-                    <wildcard-filter pattern="/favicon.ico"/>
-                </not-filter>
-            </inbound-endpoint>
+            <inbound-endpoint address="http://localhost:8888" transformer-refs="HttpRequestToNameString" exchange-pattern="request-response"/>
 
             <!-- Incoming Servlet requests -->
-            <inbound-endpoint address="servlet://name" transformer-refs="HttpRequestToNameString" exchange-pattern="request-response">
-                <not-filter>
-                    <wildcard-filter pattern="/favicon.ico"/>
-                </not-filter>
-            </inbound-endpoint>
+            <inbound-endpoint address="servlet://name" transformer-refs="HttpRequestToNameString" exchange-pattern="request-response"/>
 
             <!-- Incoming VM requests -->
             <vm:inbound-endpoint path="greeter" transformer-refs="StringToNameString" exchange-pattern="request-response"/>
         </composite-source>
+
+        <message-filter>
+            <not-filter>
+                <wildcard-filter pattern="/favicon.ico"/>
+            </not-filter>
+        </message-filter>
 
         <component class="org.mule.example.hello.Greeter"/>
 
