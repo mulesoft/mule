@@ -62,16 +62,17 @@
     </modules>
 
     <properties>
+        <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+        <coberturaVersion>2.5</coberturaVersion>
+        <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
+        <javadocPluginVersion>2.8</javadocPluginVersion>
+        <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
+
         <!--
             The above project.url will not be picked up in the manifest,
             instead a module artifact id is erroneously substituted.
          -->
         <productUrl>http://www.mulesoft.org</productUrl>
-
-        <coberturaVersion>2.5</coberturaVersion>
-        <eclipsePluginVersion>2.5.1</eclipsePluginVersion>
-        <javadocPluginVersion>2.7</javadocPluginVersion>
-        <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
 
         <!--
              Use the name of an Eclipse Java execution environment, Eclipse will
@@ -1366,8 +1367,18 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${javadocPluginVersion}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jxr-plugin</artifactId>
                     <version>2.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>2.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1642,7 +1653,6 @@
                         <reportPlugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-project-info-reports-plugin</artifactId>
-                            <version>2.1</version>
                             <reportSets>
                                 <reportSet>
                                     <reports>
@@ -1660,15 +1670,12 @@
                         <reportPlugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-javadoc-plugin</artifactId>
-                            <version>${javadocPluginVersion}</version>
                             <configuration>
                                 <minmemory>128m</minmemory>
                                 <maxmemory>512m</maxmemory>
                                 <charset>ISO-8859-1</charset>
                                 <encoding>ISO-8859-1</encoding>
                                 <source>1.6</source>
-                                <!-- aggregate all when built from the top-level directory -->
-                                <aggregate>true</aggregate>
                                 <!-- Link to the external online JavaDoc -->
                                 <links>
                                     <link>http://java.sun.com/j2se/1.6.0/docs/api/</link>
@@ -1710,20 +1717,45 @@
                                     </group>
                                 </groups>
                             </configuration>
+                            <reportSets>
+                                <!--
+                                    Aggregated javadocs currently don't work as part
+                                    of the site build. The plugin forks the complete
+                                    lifecycle for each and every module.
+
+                                <reportSet>
+                                    <id>aggregate</id>
+                                    <reports>
+                                        <report>aggregate</report>
+                                    </reports>
+                                </reportSet>
+                                -->
+                                <reportSet>
+                                    <id>non-aggregate</id>
+                                    <reports>
+                                        <report>javadoc</report>
+                                    </reports>
+                                </reportSet>
+                            </reportSets>
                         </reportPlugin>
                         <!--
                             When there is JXR cross-refernce output available,
                             it will be linked to in case of test failures
                         -->
+                        <!--
+                            This plugin is currently disabled, it causes trouble with
+                            the dependency unpack goal in the catalog archetype
+
                         <reportPlugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-surefire-report-plugin</artifactId>
-                            <version>2.4.2</version>
+                            <version>2.9</version>
                             <configuration>
-                                <!-- Display failed tests only -->
+                                Display failed tests only
                                 <showSuccess>false</showSuccess>
                             </configuration>
                         </reportPlugin>
+                        -->
                         <reportPlugin>
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-checkstyle-plugin</artifactId>
@@ -1738,11 +1770,16 @@
                             </configuration>
                         </reportPlugin>
                         <!-- Code Coverage by Cobertura -->
+                        <!--
+                            This plugin is currently disabled, it causes trouble with
+                            the dependency unpack goal in the catalog archetype
+
                         <reportPlugin>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>cobertura-maven-plugin</artifactId>
                             <version>${coberturaVersion}</version>
                         </reportPlugin>
+                        -->
                     </reportPlugins>
                 </configuration>
             </plugin>
@@ -1819,6 +1856,7 @@
             <id>ci-server</id>
             <distributionManagement>
                 <site>
+                    <id>mule-site</id>
                     <url>file:///home/luntbuild/publish/mule/docs/${project.version}</url>
                 </site>
             </distributionManagement>
