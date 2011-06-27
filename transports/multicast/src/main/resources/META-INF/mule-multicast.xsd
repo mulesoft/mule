@@ -25,7 +25,7 @@
                 <schemadoc:transport-features receiveEvents="true" dispatchEvents="true"
     requestEvents="true"
     transactions="false" streaming="false">
-                    <schemadoc:MEPs supported="one-way" default="one-way"/>
+                    <schemadoc:MEPs supported="one-way, request-response" default="request-response"/>
                 </schemadoc:transport-features>
             </xsd:appinfo>
     </xsd:annotation>
