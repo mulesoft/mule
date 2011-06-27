@@ -10,35 +10,51 @@
 
 package org.mule.routing;
 
-import org.mule.api.MuleEvent;
-import org.mule.api.MuleMessage;
-import org.mule.config.i18n.CoreMessages;
-
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
+
+import org.mule.api.MuleEvent;
+import org.mule.config.i18n.CoreMessages;
+import org.mule.routing.outbound.AbstractMessageSequenceSplitter;
+import org.mule.routing.outbound.CollectionMessageSequence;
+import org.mule.routing.outbound.IteratorMessageSequence;
 
 /**
- * Splits a message that has a list payload invoking the next message processor one
- * for each item in the list in order.
+ * Splits a message that has a Collection, Iterable, MessageSequence or Iterator
+ * payload invoking the next message processor one
+ * for each item in it.
  * <p>
- * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http://www.eaipatterns.com/Sequencer.html</a>
+ * <b>EIP Reference:</b> <a href="http://www.eaipatterns.com/Sequencer.html">http
+ * ://www.eaipatterns.com/Sequencer.html</a>
  */
-public class CollectionSplitter extends AbstractSplitter
+public class CollectionSplitter extends AbstractMessageSequenceSplitter
 {
-
-    protected List<MuleMessage> splitMessage(MuleEvent event)
+    @SuppressWarnings("unchecked")
+    protected MessageSequence<?> splitMessageIntoSequence(MuleEvent event)
     {
-        MuleMessage message = event.getMessage();
-        if (message.getPayload() instanceof Collection)
+        Object payload = event.getMessage().getPayload();
+        if (payload instanceof MessageSequence<?>)
         {
-            return new LinkedList((Collection) message.getPayload());
+            return ((MessageSequence<?>) payload);
+        }
+        if (payload instanceof Iterator<?>)
+        {
+            return new IteratorMessageSequence<Object>(((Iterator<Object>) payload));
+        }
+        if (payload instanceof Collection)
+        {
+            return new CollectionMessageSequence(new LinkedList((Collection) payload));
+        }
+        if (payload instanceof Iterable<?>)
+        {
+            return new IteratorMessageSequence<Object>(((Iterable<Object>) payload).iterator());
         }
         else
         {
-            throw new IllegalArgumentException(CoreMessages.objectNotOfCorrectType(
-                message.getPayload().getClass(), List.class).getMessage());
+            throw new IllegalArgumentException(CoreMessages.objectNotOfCorrectType(payload.getClass(),
+                new Class[]{Iterable.class, Iterator.class, MessageSequence.class, Collection.class})
+                .getMessage());
         }
     }
-
 }
