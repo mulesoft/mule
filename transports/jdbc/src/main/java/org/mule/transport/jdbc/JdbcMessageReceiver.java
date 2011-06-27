@@ -38,15 +38,15 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
 
     public static final String RECEIVE_MESSAGE_IN_TRANSCTION = "receiveMessageInTransaction";
     public static final String RECEIVE_MESSAGES_IN_XA_TRANSCTION = "receiveMessagesInXaTransaction";
-    
+
     protected JdbcConnector connector;
     protected String readStmt;
     protected String ackStmt;
-    protected List readParams;
-    protected List ackParams;
+    protected List<?> readParams;
+    protected List<?> ackParams;
     public boolean receiveMessagesInXaTransaction = false;
     private volatile boolean aggregateResult;
-    
+
     public JdbcMessageReceiver(Connector connector,
                                FlowConstruct flowConstruct,
                                InboundEndpoint endpoint,
@@ -59,7 +59,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         boolean transactedEndpoint = endpoint.getTransactionConfig().isTransacted();
         boolean xaTransactedEndpoint = (transactedEndpoint &&
             endpoint.getTransactionConfig().getFactory() instanceof XaTransactionFactory);
-        
+
         boolean receiveMessageInTransaction = MapUtils.getBooleanValue(endpoint.getProperties(),
             RECEIVE_MESSAGE_IN_TRANSCTION, false);
         this.setReceiveMessagesInTransaction(receiveMessageInTransaction && transactedEndpoint);
@@ -68,7 +68,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             logger.warn(JdbcMessages.forcePropertyNoTransaction(RECEIVE_MESSAGE_IN_TRANSCTION, "transaction"));
             receiveMessageInTransaction = false;
         }
-        
+
         receiveMessagesInXaTransaction = MapUtils.getBooleanValue(endpoint.getProperties(),
             RECEIVE_MESSAGES_IN_XA_TRANSCTION, false);
         if (receiveMessagesInXaTransaction && !receiveMessageInTransaction)
@@ -81,7 +81,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
             logger.warn(JdbcMessages.forcePropertyNoTransaction(RECEIVE_MESSAGES_IN_XA_TRANSCTION, "XA transaction"));
             receiveMessagesInXaTransaction = false;
         }
-        
+
         this.connector = (JdbcConnector) connector;
         this.setReceiveMessagesInTransaction(endpoint.getTransactionConfig().isTransacted()
             && !this.connector.isTransactionPerMessage());
@@ -94,9 +94,9 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
      */
     protected void parseStatements(String readStmt, String ackStmt)
     {
-        this.readParams = new ArrayList();
+        this.readParams = new ArrayList<Object>();
         this.readStmt = this.connector.parseStatement(readStmt, this.readParams);
-        this.ackParams = new ArrayList();
+        this.ackParams = new ArrayList<Object>();
         this.ackStmt = this.connector.parseStatement(ackStmt, this.ackParams);
     }
 
@@ -253,6 +253,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
         return nbRows;
     }
 
+    @Override
     public List getMessages() throws Exception
     {
         Connection con = null;
@@ -269,7 +270,7 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
                 singleResultList.add(resultList);
                 return singleResultList;
             }
-            
+
             return resultList;
         }
         finally

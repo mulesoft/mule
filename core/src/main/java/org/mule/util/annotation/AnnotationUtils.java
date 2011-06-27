@@ -61,7 +61,7 @@ public class AnnotationUtils
 
 
 
-    public static List<AnnotationMetaData> getClassAndMethodAnnotations(Class c)
+    public static List<AnnotationMetaData> getClassAndMethodAnnotations(Class<?> c)
     {
         List<AnnotationMetaData> annotations = new ArrayList<AnnotationMetaData>();
 
@@ -74,7 +74,7 @@ public class AnnotationUtils
         return annotations;
     }
 
-    public static List<AnnotationMetaData> getAllMethodAnnotations(Class c)
+    public static List<AnnotationMetaData> getAllMethodAnnotations(Class<?> c)
     {
         List<AnnotationMetaData> annotations = new ArrayList<AnnotationMetaData>();
 
@@ -89,7 +89,7 @@ public class AnnotationUtils
         return annotations;
     }
 
-    public static List<AnnotationMetaData> getMethodAnnotations(Class c, Class<? extends Annotation> ann)
+    public static List<AnnotationMetaData> getMethodAnnotations(Class<?> c, Class<? extends Annotation> ann)
     {
         List<AnnotationMetaData> annotations = new ArrayList<AnnotationMetaData>();
 
@@ -107,7 +107,7 @@ public class AnnotationUtils
         return annotations;
     }
 
-    public static List<AnnotationMetaData> getMethodMetaAnnotations(Class c, Class<? extends Annotation> metaAnn)
+    public static List<AnnotationMetaData> getMethodMetaAnnotations(Class<?> c, Class<? extends Annotation> metaAnn)
     {
         List<AnnotationMetaData> annotations = new ArrayList<AnnotationMetaData>();
 
@@ -125,7 +125,7 @@ public class AnnotationUtils
         return annotations;
     }
 
-    public static List<AnnotationMetaData> getAllFieldAnnotations(Class c)
+    public static List<AnnotationMetaData> getAllFieldAnnotations(Class<?> c)
     {
         List<AnnotationMetaData> annotations = new ArrayList<AnnotationMetaData>();
 
@@ -140,7 +140,7 @@ public class AnnotationUtils
         return annotations;
     }
 
-    public static List<AnnotationMetaData> getFieldAnnotations(Class c, Class<? extends Annotation> annotation)
+    public static List<AnnotationMetaData> getFieldAnnotations(Class<?> c, Class<? extends Annotation> annotation)
     {
         List<AnnotationMetaData> annotations = new ArrayList<AnnotationMetaData>();
 
@@ -158,14 +158,23 @@ public class AnnotationUtils
         return annotations;
     }
 
-    public static AnnotationMetaData getClassAnnotationInHeirarchy(Class<? extends Annotation> annotation, Class bottom)
+    /**
+     * @deprecated use getClassAnnotationInHierarchy(Class, Class)
+     */
+    @Deprecated
+    public static AnnotationMetaData getClassAnnotationInHeirarchy(Class<? extends Annotation> annotation, Class<?> bottom)
+    {
+        return getClassAnnotationInHierarchy(annotation, bottom);
+    }
+
+    public static AnnotationMetaData getClassAnnotationInHierarchy(Class<? extends Annotation> annotation, Class<?> bottom)
     {
         AnnotationMetaData anno = getClassAnnotationForSuperClasses(annotation, bottom);
         if (anno == null)
         {
             for (int i = 0; i < bottom.getInterfaces().length; i++)
             {
-                Class aClass = bottom.getInterfaces()[i];
+                Class<?> aClass = bottom.getInterfaces()[i];
                 if (aClass.isAnnotationPresent(annotation))
                 {
                     anno = new AnnotationMetaData(aClass, null, ElementType.TYPE, aClass.getAnnotation(annotation));
@@ -176,7 +185,16 @@ public class AnnotationUtils
         return anno;
     }
 
-    public static List<AnnotationMetaData> getClassAnnotationInHeirarchy(Class bottom)
+    /**
+     * @deprecated use getClassAnnotationInHierarchy(Class)
+     */
+    @Deprecated
+    public static List<AnnotationMetaData> getClassAnnotationInHeirarchy(Class<?> bottom)
+    {
+        return getClassAnnotationInHierarchy(bottom);
+    }
+
+    public static List<AnnotationMetaData> getClassAnnotationInHierarchy(Class<?> bottom)
     {
         List<AnnotationMetaData> annos = new ArrayList<AnnotationMetaData>();
 
@@ -186,7 +204,7 @@ public class AnnotationUtils
         return annos;
     }
 
-    protected static AnnotationMetaData getClassAnnotationForSuperClasses(Class<? extends Annotation> annotation, Class bottom)
+    protected static AnnotationMetaData getClassAnnotationForSuperClasses(Class<? extends Annotation> annotation, Class<?> bottom)
     {
         if (bottom.isAnnotationPresent(annotation))
         {
@@ -199,7 +217,7 @@ public class AnnotationUtils
         return null;
     }
 
-    protected static void getClassAnnotationForSuperClasses(Class bottom, List<AnnotationMetaData> annos)
+    protected static void getClassAnnotationForSuperClasses(Class<?> bottom, List<AnnotationMetaData> annos)
     {
         for (Annotation annotation : bottom.getAnnotations())
         {
@@ -212,9 +230,9 @@ public class AnnotationUtils
         }
     }
 
-    protected static void getClassAnnotationForInterfaces(Class bottom, List<AnnotationMetaData> annos)
+    protected static void getClassAnnotationForInterfaces(Class<?> bottom, List<AnnotationMetaData> annos)
     {
-        for (Class aClass : bottom.getInterfaces())
+        for (Class<?> aClass : bottom.getInterfaces())
         {
             for (Annotation annotation : aClass.getAnnotations())
             {
@@ -223,7 +241,16 @@ public class AnnotationUtils
         }
     }
 
-    public static Set<AnnotationMetaData> getFieldAnnotationsForHeirarchy(Class bottom)
+    /**
+     * @deprecated use getFieldAnnotationsForHierarchy(Class)
+     */
+    @Deprecated
+    public static Set<AnnotationMetaData> getFieldAnnotationsForHeirarchy(Class<?> bottom)
+    {
+        return getFieldAnnotationsForHierarchy(bottom);
+    }
+
+    public static Set<AnnotationMetaData> getFieldAnnotationsForHierarchy(Class<?> bottom)
     {
         Set<AnnotationMetaData> annos = new HashSet<AnnotationMetaData>();
         getFieldAnnotationsForSuperClasses(bottom, annos);
@@ -231,17 +258,17 @@ public class AnnotationUtils
         return annos;
     }
 
-    public static void getFieldAnnotationsForInterfaces(Class clazz, Set<AnnotationMetaData> annos)
+    public static void getFieldAnnotationsForInterfaces(Class<?> clazz, Set<AnnotationMetaData> annos)
     {
         for (int i = 0; i < clazz.getInterfaces().length; i++)
         {
-            Class aClass = clazz.getInterfaces()[i];
+            Class<?> aClass = clazz.getInterfaces()[i];
             annos.addAll(getAllFieldAnnotations(aClass));
             getFieldAnnotationsForInterfaces(aClass, annos);
         }
     }
 
-    protected static void getFieldAnnotationsForSuperClasses(Class bottom, Set<AnnotationMetaData> annos)
+    protected static void getFieldAnnotationsForSuperClasses(Class<?> bottom, Set<AnnotationMetaData> annos)
     {
         annos.addAll(getAllFieldAnnotations(bottom));
 
@@ -251,8 +278,16 @@ public class AnnotationUtils
         }
     }
 
+    /**
+     * @deprecated use getFieldAnnotationsForHierarchy(Class, Class)
+     */
+    @Deprecated
+    public static Set<AnnotationMetaData> getFieldAnnotationsForHeirarchy(Class<?> bottom, Class<? extends Annotation> annotation)
+    {
+        return getFieldAnnotationsForHierarchy(bottom, annotation);
+    }
 
-    public static Set<AnnotationMetaData> getFieldAnnotationsForHeirarchy(Class bottom, Class<? extends Annotation> annotation)
+    public static Set<AnnotationMetaData> getFieldAnnotationsForHierarchy(Class<?> bottom, Class<? extends Annotation> annotation)
     {
         Set<AnnotationMetaData> annos = new HashSet<AnnotationMetaData>();
         getFieldAnnotationsForSuperClasses(bottom, annos, annotation);
@@ -260,17 +295,17 @@ public class AnnotationUtils
         return annos;
     }
 
-    public static void getFieldAnnotationsForInterfaces(Class clazz, Set<AnnotationMetaData> annos, Class<? extends Annotation> annotation)
+    public static void getFieldAnnotationsForInterfaces(Class<?> clazz, Set<AnnotationMetaData> annos, Class<? extends Annotation> annotation)
     {
         for (int i = 0; i < clazz.getInterfaces().length; i++)
         {
-            Class aClass = clazz.getInterfaces()[i];
+            Class<?> aClass = clazz.getInterfaces()[i];
             annos.addAll(getFieldAnnotations(aClass, annotation));
             getFieldAnnotationsForInterfaces(aClass, annos, annotation);
         }
     }
 
-    protected static void getFieldAnnotationsForSuperClasses(Class bottom, Set<AnnotationMetaData> annos, Class<? extends Annotation> annotation)
+    protected static void getFieldAnnotationsForSuperClasses(Class<?> bottom, Set<AnnotationMetaData> annos, Class<? extends Annotation> annotation)
     {
         annos.addAll(getFieldAnnotations(bottom, annotation));
 
@@ -281,7 +316,7 @@ public class AnnotationUtils
     }
 
 
-    public static boolean hasAnnotation(Class<? super Annotation> annotation, Class clazz) throws IOException
+    public static boolean hasAnnotation(Class<? super Annotation> annotation, Class<?> clazz) throws IOException
     {
         for (Annotation anno : clazz.getDeclaredAnnotations())
         {
@@ -316,7 +351,7 @@ public class AnnotationUtils
         return false;
     }
 
-    public static boolean hasAnnotationWithPackage(String packageName, Class clazz) throws IOException
+    public static boolean hasAnnotationWithPackage(String packageName, Class<?> clazz) throws IOException
     {
         for (Annotation anno : clazz.getDeclaredAnnotations())
         {

@@ -25,7 +25,6 @@ import javax.annotation.PreDestroy;
 
 public class TransientRegistryLifecycleTestCase extends TransientRegistryTestCase
 {
-
     public void testObjectLifecycleWithTransientRegistryDirectly() throws Exception
     {
         TransientRegistry reg = new TransientRegistry(muleContext);
@@ -73,7 +72,6 @@ public class TransientRegistryLifecycleTestCase extends TransientRegistryTestCas
         reg.registerObject("test", tracker, MuleRegistry.LIFECYCLE_BYPASS_FLAG + MuleRegistry.INJECT_PROCESSORS_BYPASS_FLAG);
         reg.dispose();
         assertEquals("[stop, dispose]", tracker.getTracker().toString());
-
     }
 
     public void testObjectLifecycleStatesWithTransientRegistryDirectly() throws Exception
@@ -125,7 +123,6 @@ public class TransientRegistryLifecycleTestCase extends TransientRegistryTestCas
             //expected
         }
     }
-
 
     public void testLifecycleState() throws Exception
     {
@@ -201,7 +198,7 @@ public class TransientRegistryLifecycleTestCase extends TransientRegistryTestCas
 
     public class InterfaceBasedTracker extends AbstractLifecycleTracker
     {
-
+        // no custom methods
     }
 
     public class JSR250ObjectLifecycleTracker implements MuleContextAware
@@ -229,5 +226,4 @@ public class TransientRegistryLifecycleTestCase extends TransientRegistryTestCas
             tracker.add("dispose");
         }
     }
-
 }

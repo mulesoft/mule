@@ -20,7 +20,6 @@ public class IntegrationBeanAnnotationTestCase extends AbstractMuleTestCase
         setStartContext(true);
     }
 
-    @SuppressWarnings("unused")    
     @IntegrationBean
     private HostIpIBean hostip;
 
@@ -30,14 +29,13 @@ public class IntegrationBeanAnnotationTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().registerObject("test", this);
     }
 
-    public void testIBeanInjection() throws Exception {
+    public void testIBeanInjection() throws Exception
+    {
         assertNotNull(hostip);
         String result = hostip.getHostInfo("192.215.42.198");
         assertNotNull(result);
-        System.out.println(result);
-//
+//        System.out.println(result);
 //        System.out.println(hostip.getHostInfoName("192.215.42.198"));
-
         assertTrue("has ip", hostip.hasIp("192.215.42.198"));
     }
 }
