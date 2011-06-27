@@ -19,7 +19,7 @@ import org.mule.tck.transformer.NoActionTransformer;
 
 public class TestNamespaceHandler extends AbstractMuleNamespaceHandler
 {
-
+    @Override
     public void init()
     {
         registerStandardTransportEndpoints(TestConnector.TEST, URIBuilder.PATH_ATTRIBUTES);
@@ -32,5 +32,4 @@ public class TestNamespaceHandler extends AbstractMuleNamespaceHandler
         registerIgnoredElement("callback");
         registerBeanDefinitionParser("no-action-transformer", new MessageProcessorDefinitionParser(NoActionTransformer.class));
     }
-
 }

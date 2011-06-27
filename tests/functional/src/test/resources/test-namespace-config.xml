@@ -27,7 +27,7 @@
         </service>
 
         <service name="testService2">
-            <test:component throwException="true" exceptionToThrow="java.io.IOException">
+            <test:component throwException="true" exceptionToThrow="java.io.IOException" exceptionText="boom">
                 <test:return-data file="test-data.txt"/>
                 <test:callback class="org.mule.tck.functional.ResponseWriterCallback"/>
             </test:component>

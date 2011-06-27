@@ -20,6 +20,7 @@ import org.mule.api.lifecycle.Callable;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.Initialisable;
 import org.mule.tck.exceptions.FunctionalTestException;
+import org.mule.util.ClassUtils;
 import org.mule.util.NumberUtils;
 import org.mule.util.StringMessageUtils;
 import org.mule.util.SystemUtils;
@@ -27,6 +28,7 @@ import org.mule.util.SystemUtils;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -50,14 +52,16 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
 
     public static final int STREAM_SAMPLE_SIZE = 4;
     public static final int STREAM_BUFFER_SIZE = 4096;
+    
     private EventCallback eventCallback;
     private Object returnData = null;
     private boolean throwException = false;
+    private Class<? extends Throwable> exceptionToThrow;
+    private String exceptionText = "";
     private boolean enableMessageHistory = true;
     private boolean enableNotifications = true;
     private boolean doInboundTransform = true;
     private String appendString;
-    private Class<? extends Throwable> exceptionToThrow;
     private long waitTime = 0;
     private boolean logMessageDetails = false;
     private MuleContext muleContext;
@@ -69,20 +73,22 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      */
     private List<Object> messageHistory;
 
-    @SuppressWarnings("unchecked")
+    @Override
     public void initialise()
     {
         if (enableMessageHistory)
         {
-            messageHistory = new CopyOnWriteArrayList();
+            messageHistory = new CopyOnWriteArrayList<Object>();
         }
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
     }
 
+    @Override
     public void dispose()
     {
         // nothing to do
@@ -91,6 +97,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object onCall(MuleEventContext context) throws Exception
     {
         if (isThrowException())
@@ -129,6 +136,7 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
      * @return the processed message
      * @throws Exception
      */
+    @Override
     public Object onReceive(Object data) throws Exception
     {
         MuleEventContext context = RequestContext.getEventContext();
@@ -151,11 +159,27 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     {
         if (getExceptionToThrow() != null)
         {
-            throw (Exception)getExceptionToThrow().newInstance();
+            if (StringUtils.isNotBlank(exceptionText))
+            {
+                Throwable exception = ClassUtils.instanciateClass(getExceptionToThrow(), 
+                    new Object[] { exceptionText });
+                throw (Exception) exception;
+            }
+            else
+            {
+                throw (Exception) getExceptionToThrow().newInstance();
+            }
         }
         else
         {
-            throw new FunctionalTestException();
+            if (StringUtils.isNotBlank(exceptionText))
+            {
+                throw new FunctionalTestException(exceptionText);
+            }
+            else
+            {
+                throw new FunctionalTestException();
+            }
         }
     }
 
@@ -465,5 +489,15 @@ public class FunctionalTestComponent implements Callable, Initialisable, Disposa
     public void setLogMessageDetails(boolean logMessageDetails)
     {
         this.logMessageDetails = logMessageDetails;
+    }
+    
+    public String getExceptionText()
+    {
+        return exceptionText;
+    }
+    
+    public void setExceptionText(String text)
+    {
+        exceptionText = text;
     }
 }

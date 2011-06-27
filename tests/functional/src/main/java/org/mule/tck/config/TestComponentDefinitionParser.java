@@ -41,8 +41,8 @@ import org.w3c.dom.NodeList;
 //TODO This should really extend StaticComponentDefinitionParser from mule-core as it is quite similar.
 public class TestComponentDefinitionParser extends ComponentDefinitionParser
 {
-    private static Class OBJECT_FACTORY_TYPE = SingletonObjectFactory.class;
-    private Class componentInstanceClass = FunctionalTestComponent.class;
+    private static Class<?> OBJECT_FACTORY_TYPE = SingletonObjectFactory.class;
+    private Class<?> componentInstanceClass = FunctionalTestComponent.class;
 
     public TestComponentDefinitionParser()
     {
@@ -52,17 +52,19 @@ public class TestComponentDefinitionParser extends ComponentDefinitionParser
         addIgnored("enableNotifications");
         addIgnored("throwException");
         addIgnored("exceptionToThrow");
+        addIgnored("exceptionText");
         addIgnored("waitTime");
         addIgnored("doInboundTransform");
         addIgnored("logMessageDetails");
     }
 
-    public TestComponentDefinitionParser(Class componentInstanceClass)
+    public TestComponentDefinitionParser(Class<?> componentInstanceClass)
     {
         this();
         this.componentInstanceClass = componentInstanceClass;
     }
 
+    @Override
     protected void parseChild(Element element, ParserContext parserContext, BeanDefinitionBuilder builder)
     {
         // Create a BeanDefinition for the nested object factory and set it a
@@ -73,11 +75,11 @@ public class TestComponentDefinitionParser extends ComponentDefinitionParser
                 componentInstanceClass);
         objectFactoryBeanDefinition.setInitMethodName(Initialisable.PHASE_NAME);
         objectFactoryBeanDefinition.setDestroyMethodName(Disposable.PHASE_NAME);
-        Map props = new HashMap();
+        Map<String, Object> props = new HashMap<String, Object>();
         for (int i = 0; i < element.getAttributes().getLength(); i++)
         {
             Node n = element.getAttributes().item(i);
-                props.put(n.getLocalName(), n.getNodeValue());
+            props.put(n.getLocalName(), n.getNodeValue());
         }
         String returnData = null;
 
@@ -132,5 +134,4 @@ public class TestComponentDefinitionParser extends ComponentDefinitionParser
 
         super.parseChild(element, parserContext, builder);
     }
-
 }

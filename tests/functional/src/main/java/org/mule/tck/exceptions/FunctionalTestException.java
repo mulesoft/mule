@@ -19,8 +19,11 @@ public class FunctionalTestException extends MuleException
 
     public FunctionalTestException()
     {
-        super(MessageFactory.createStaticMessage(EXCEPTION_MESSAGE));
+        this(EXCEPTION_MESSAGE);
+    }
+
+    public FunctionalTestException(String exceptionText)
+    {
+        super(MessageFactory.createStaticMessage(exceptionText));
     }
 }
-
-

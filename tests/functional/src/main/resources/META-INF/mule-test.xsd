@@ -94,6 +94,13 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
+                <xsd:attribute name="exceptionText" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation>
+                            The text of the exception that is thrown. Used in conjunction with {{throwException}}. If this is not specified, an empty message will be used.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
                 <xsd:attribute name="enableMessageHistory" type="xsd:boolean">
                     <xsd:annotation>
                         <xsd:documentation>

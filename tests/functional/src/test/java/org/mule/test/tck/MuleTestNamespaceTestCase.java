@@ -24,21 +24,7 @@ import java.io.IOException;
 
 public class MuleTestNamespaceTestCase extends FunctionalTestCase
 {
-
-    public static class StubConfigurableKeyedObjectPool extends DefaultConfigurableKeyedObjectPool
-    {
-
-    }
-
-    public static class StubDispatcherPoolFactory implements ConfigurableKeyedObjectPoolFactory
-    {
-
-        public ConfigurableKeyedObjectPool createObjectPool()
-        {
-            return new StubConfigurableKeyedObjectPool();
-        }
-    }
-
+    @Override
     protected String getConfigResources()
     {
         return "test-namespace-config.xml";
@@ -70,6 +56,7 @@ public class MuleTestNamespaceTestCase extends FunctionalTestCase
         assertTrue(ftc.isThrowException());
         assertNotNull(ftc.getExceptionToThrow());
         assertTrue(ftc.getExceptionToThrow().isAssignableFrom(IOException.class));
+        assertEquals("boom", ftc.getExceptionText());
 
         assertEquals(testData, ftc.getReturnData());
 
@@ -78,7 +65,6 @@ public class MuleTestNamespaceTestCase extends FunctionalTestCase
         assertNull(ftc.getAppendString());
         assertNotNull(ftc.getEventCallback());
         assertTrue(ftc.getEventCallback() instanceof ResponseWriterCallback);
-
     }
 
     public void testComponent3Config() throws Exception
@@ -113,5 +99,19 @@ public class MuleTestNamespaceTestCase extends FunctionalTestCase
         TestConnector testConnector = (TestConnector) connector;
         assertEquals(StubDispatcherPoolFactory.class, testConnector.getDispatcherPoolFactory().getClass());
         assertEquals(StubConfigurableKeyedObjectPool.class, testConnector.getDispatchers().getClass());
+    }
+
+    public static class StubConfigurableKeyedObjectPool extends DefaultConfigurableKeyedObjectPool
+    {
+        // no custom methods
+    }
+
+    public static class StubDispatcherPoolFactory implements ConfigurableKeyedObjectPoolFactory
+    {
+        @Override
+        public ConfigurableKeyedObjectPool createObjectPool()
+        {
+            return new StubConfigurableKeyedObjectPool();
+        }
     }
 }
