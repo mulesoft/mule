@@ -266,7 +266,7 @@ public class MuleClient implements Disposable
     public void dispatch(String url, MuleMessage message) throws MuleException
     {
         OutboundEndpoint endpoint = getOutboundEndpoint(url, MessageExchangePattern.ONE_WAY, null);
-        MuleEvent event = getEvent(message, MessageExchangePattern.ONE_WAY);
+        MuleEvent event = getEvent(message, MessageExchangePattern.ONE_WAY, endpoint);
         endpoint.process(event);
     }
 
@@ -621,7 +621,7 @@ public class MuleClient implements Disposable
         OutboundEndpoint endpoint = 
             getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, timeout);
         
-        MuleEvent event = getEvent(message, MessageExchangePattern.REQUEST_RESPONSE);
+        MuleEvent event = getEvent(message, MessageExchangePattern.REQUEST_RESPONSE, endpoint);
         event.setTimeout(timeout);
 
         MuleEvent response = endpoint.process(event);
@@ -694,7 +694,7 @@ public class MuleClient implements Disposable
         return request(url, timeout);
     }
 
-    protected MuleEvent getEvent(MuleMessage message, MessageExchangePattern exchangePattern) throws MuleException
+    protected MuleEvent getEvent(MuleMessage message, MessageExchangePattern exchangePattern, OutboundEndpoint endpoint) throws MuleException
     {
         DefaultMuleSession session = new DefaultMuleSession(new DefaultLocalMuleClient.MuleClientFlowConstruct(muleContext), muleContext);
 
@@ -702,7 +702,7 @@ public class MuleClient implements Disposable
         {
             message.setOutboundProperty(MuleProperties.MULE_USER_PROPERTY, MuleCredentials.createHeader(user.getUsername(), user.getPassword()));
         }
-        return new DefaultMuleEvent(message, exchangePattern, session);
+        return new DefaultMuleEvent(message, exchangePattern, session, null, endpoint);
     }
 
     protected InboundEndpoint getInboundEndpoint(String uri) throws MuleException
@@ -824,7 +824,7 @@ public class MuleClient implements Disposable
         
         OutboundEndpoint endpoint = 
             getOutboundEndpoint(url, MessageExchangePattern.REQUEST_RESPONSE, null);
-        MuleEvent event = getEvent(message, MessageExchangePattern.REQUEST_RESPONSE);
+        MuleEvent event = getEvent(message, MessageExchangePattern.REQUEST_RESPONSE, endpoint);
         endpoint.process(event);
     }
 

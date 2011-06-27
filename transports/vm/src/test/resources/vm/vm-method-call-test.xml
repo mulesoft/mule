@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
+
+    <spring:bean id="methodTestComponent" class="org.mule.transport.vm.functional.VMMethodCallTestCase$MethodTestComponent" />
+
+    <vm:connector name="vm1"/>
+    <vm:connector name="vm2"/>
+
+    <flow name="methodTestFlow">
+        <vm:inbound-endpoint path="methodTest" connector-ref="vm1"  exchange-pattern="request-response" />
+
+        <component>
+            <spring-object bean="methodTestComponent" />
+        </component>
+    </flow>
+</mule>

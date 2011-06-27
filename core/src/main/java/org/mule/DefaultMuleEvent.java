@@ -21,12 +21,15 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
+import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.ServiceType;
 import org.mule.api.security.Credentials;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
+import org.mule.api.transport.PropertyScope;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.endpoint.DefaultEndpointFactory;
 import org.mule.endpoint.DefaultInboundEndpoint;
@@ -160,10 +163,22 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     public DefaultMuleEvent(MuleMessage message,
                             MessageExchangePattern exchangePattern,
                             MuleSession session,
+                            ResponseOutputStream outputStream,
+                            OutboundEndpoint ep)
+    {
+        this(message, new NullInboundEndpoint(exchangePattern, message.getMuleContext()), session, outputStream);
+        if (ep != null)
+        {
+            fillOutputProperties(ep);
+        }
+    }
+
+    public DefaultMuleEvent(MuleMessage message,
+                            MessageExchangePattern exchangePattern,
+                            MuleSession session,
                             ResponseOutputStream outputStream)
     {
-        this(message, new NullInboundEndpoint(exchangePattern, message.getMuleContext()), session,
-            outputStream);
+        this(message, exchangePattern, session, outputStream, null);
     }
 
     public DefaultMuleEvent(MuleMessage message, MessageExchangePattern exchangePattern, MuleSession session)
@@ -242,23 +257,37 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
 
     protected void fillProperties()
     {
-        if (endpoint != null && endpoint.getProperties() != null)
+        fillProperties(endpoint, PropertyScope.INVOCATION);
+    }
+
+        /**
+     * set the message's output properties from endpoint properties.
+     */
+    protected void fillOutputProperties(OutboundEndpoint ep)
+    {
+        fillProperties(ep, PropertyScope.OUTBOUND);
+    }
+
+    protected void fillProperties(ImmutableEndpoint ep, PropertyScope scope)
+    {
+        if (ep != null && ep.getProperties() != null)
         {
-            for (Iterator<?> iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
+            for (Iterator<?> iterator = ep.getProperties().keySet().iterator(); iterator.hasNext();)
             {
                 String prop = (String) iterator.next();
-                Object value = endpoint.getProperties().get(prop);
+                Object value = ep.getProperties().get(prop);
                 // don't overwrite property on the message
                 if (!ignoreProperty(prop))
                 {
                     //inbound endpoint properties are in the invocation scope
-                    message.setInvocationProperty(prop, value);
+                    message.setProperty(prop, value, scope);
                 }
             }
         }
 
-        setCredentials();
+        setCredentials(ep);
     }
+
 
     /**
      * This method is used to determine if a property on the previous event should be
@@ -290,12 +319,12 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         return null != message.getOutboundProperty(key);
     }
 
-    protected void setCredentials()
+    protected void setCredentials(ImmutableEndpoint ep)
     {
-        if (null != endpoint && null != endpoint.getEndpointURI() && null != endpoint.getEndpointURI().getUserInfo())
+        if (null != ep && null != ep.getEndpointURI() && null != ep.getEndpointURI().getUserInfo())
         {
-            final String userName = endpoint.getEndpointURI().getUser();
-            final String password = endpoint.getEndpointURI().getPassword();
+            final String userName = ep.getEndpointURI().getUser();
+            final String password = ep.getEndpointURI().getPassword();
             if (password != null && userName != null)
             {
                 credentials = new MuleCredentials(userName, password.toCharArray());
