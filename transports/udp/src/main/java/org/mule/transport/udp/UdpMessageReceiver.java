@@ -10,6 +10,7 @@
 
 package org.mule.transport.udp;
 
+import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
@@ -259,7 +260,7 @@ public class UdpMessageReceiver extends AbstractMessageReceiver implements Work
                 MuleEvent event = routeMessage(message);
                 returnMessage = event == null ? null : event.getMessage();
 
-                if (returnMessage != null)
+                if (endpoint.getExchangePattern().hasResponse() && returnMessage != null)
                 {
                     byte[] data= returnMessage.getPayloadAsBytes();
                     DatagramPacket result = new DatagramPacket(data, data.length,
