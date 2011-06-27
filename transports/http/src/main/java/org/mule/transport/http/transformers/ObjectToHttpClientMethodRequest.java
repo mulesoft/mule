@@ -235,15 +235,19 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
         {
             setupEntityMethod(src, outputEncoding, msg, postMethod);
         }
+        checkForContentType(msg, postMethod);
 
+        return postMethod;
+    }
+
+    private void checkForContentType(MuleMessage msg, EntityEnclosingMethod method)
+    {
         // if a content type was specified on the endpoint, use it
         String outgoingContentType = msg.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE);
         if (outgoingContentType != null)
         {
-            postMethod.setRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, outgoingContentType);
+            method.setRequestHeader(HttpConstants.HEADER_CONTENT_TYPE, outgoingContentType);
         }
-
-        return postMethod;
     }
 
     protected String getBodyParameterName(MuleMessage message)
@@ -263,7 +267,7 @@ public class ObjectToHttpClientMethodRequest extends AbstractMessageTransformer
 
         Object payload = msg.getPayload();
         setupEntityMethod(payload, outputEncoding, msg, putMethod);
-
+        checkForContentType(msg, putMethod);
         return putMethod;
     }
 
