@@ -90,4 +90,4 @@ org.mule.test.integration.spring.events.async.SpringEventsJmsAsyncExampleTestCas
 org.mule.test.integration.exceptions.SystemExceptionStrategyTestCase
 
 # MULE-5578
-org.mule.test.integration.exceptions.ExceptionStrategyFilterTestCase
+#org.mule.test.integration.exceptions.ExceptionStrategyFilterTestCase

@@ -27,16 +27,7 @@ public class ExceptionHandlingMessageProcessor extends AbstractInterceptingMessa
         catch (Exception e)
         {
             e = (Exception) ExceptionHelper.sanitizeIfNeeded(e);
-            if (e instanceof InternalProcessingException)
-            {
-                event.getMessage().setPayload(NullPayload.getInstance());
-                event.getMessage().setExceptionPayload(new DefaultExceptionPayload(e));
-                return event;
-            }
-            else
-            {
-                return event.getFlowConstruct().getExceptionListener().handleException(e, event);
-            }
+            return event.getFlowConstruct().getExceptionListener().handleException(e, event);
         }
     }
 }
