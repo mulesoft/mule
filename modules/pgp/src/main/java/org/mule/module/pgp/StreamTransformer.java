@@ -17,7 +17,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 /**
  * A writer of {@link OutputStream}
  */
-public interface OutputStreamWriter
+public interface StreamTransformer
 {
 
     /**
@@ -33,7 +33,7 @@ public interface OutputStreamWriter
      * 
      * @param out the OutputStream where this writer is going to write information
      * @param bytesRequested how many bytes this writer needs to write
-     * @return whether this writer has finished writing (no more bytes need to be written
+     * @return whether this writer has finished writing (no more bytes need to be written)
      * @throws Exception
      */
     boolean write(OutputStream out, AtomicLong bytesRequested) throws Exception;

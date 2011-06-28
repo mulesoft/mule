@@ -4,11 +4,13 @@
        xmlns:spring="http://www.springframework.org/schema/beans"
        xmlns:file="http://www.mulesoft.org/schema/mule/file"
        xmlns:pgp="http://www.mulesoft.org/schema/mule/pgp"
+       xmlns:vm="http://www.mulesource.org/schema/mule/vm"
     xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.1/mule-file.xsd
-       http://www.mulesoft.org/schema/mule/pgp http://www.mulesoft.org/schema/mule/pgp/3.1/mule-pgp.xsd">
+       http://www.mulesoft.org/schema/mule/pgp http://www.mulesoft.org/schema/mule/pgp/3.1/mule-pgp.xsd
+       http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.1/mule-vm.xsd">
 
     <spring:bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl" init-method="initialise">
         <spring:property name="publicKeyRingFileName" value="serverPublic.gpg"/>
@@ -19,7 +21,7 @@
     
     <spring:bean id="credentialAccessor" class="org.mule.security.MuleHeaderCredentialsAccessor"/>
 
-    <file:connector name="sendConnector" outputPattern="[TARGET_FILE]"/>
+	<vm:connector name="c" queueEvents="true" />
 
     <pgp:security-manager>
         <pgp:security-provider name="pgpSecurityProvider" keyManager-ref="pgpKeyManager"/>
@@ -39,11 +41,11 @@
             <echo-component/>
             <outbound>
                 <pass-through-router>
-                    <outbound-endpoint address="file://output" exchange-pattern="one-way">
+                    <vm:outbound-endpoint path="output">
                         <pgp:security-filter strategyName="keyBasedEncryptionStrategy" signRequired="true"
                                              credentialsAccessor-ref="credentialAccessor"
                                              keyManager-ref="pgpKeyManager"/>
-                    </outbound-endpoint>
+                    </vm:outbound-endpoint>
                 </pass-through-router>
             </outbound>
         </service>

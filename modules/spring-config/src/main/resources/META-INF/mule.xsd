@@ -2803,7 +2803,7 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
-
+    
     <xsd:attributeGroup name="restrictedEndpointAttributes">
         <xsd:attributeGroup ref="mimeTypeAttributes"/>
         <xsd:attribute name="responseTimeout" type="substitutableInt">
@@ -3297,7 +3297,6 @@
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
-
 
     <!--==============================================================-->
     <!--   Transformer elements                                       -->

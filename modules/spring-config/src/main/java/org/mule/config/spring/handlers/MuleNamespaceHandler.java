@@ -508,7 +508,7 @@ public class MuleNamespaceHandler extends AbstractMuleNamespaceHandler
         registerBeanDefinitionParser("encryption-security-filter", new SecurityFilterDefinitionParser(MuleEncryptionEndpointSecurityFilter.class));
         registerBeanDefinitionParser("custom-security-filter", new SecurityFilterDefinitionParser());
         registerBeanDefinitionParser("username-password-filter", new SecurityFilterDefinitionParser(UsernamePasswordAuthenticationFilter.class));
-        
+
         //Interceptors
         registerMuleBeanDefinitionParser("interceptor-stack", new InterceptorStackDefinitionParser());
         registerBeanDefinitionParser("custom-interceptor", new InterceptorDefinitionParser());

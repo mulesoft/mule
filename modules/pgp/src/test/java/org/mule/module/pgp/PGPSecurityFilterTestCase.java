@@ -31,7 +31,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
 {
     protected static final String TARGET = "/encrypted.txt";
     protected static final String DIRECTORY = "output";
-    protected static final String MESSAGE_EXCEPTION = "The required object/property \"UserId\" is null. Message payload is of type: String";
+    protected static final String MESSAGE_EXCEPTION = "Crypto Failure";
 
     @Override
     protected boolean isDisabledInThisEnvironment()
@@ -56,36 +56,9 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         MuleMessage reply = client.send("vm://echo", new String(msg), props);
         assertNull(reply.getExceptionPayload());
         
-        //poll for the output file; wait for a max of 5 seconds
-        File pollingFile = null;
-        for(int i = 0; i < 5; i++)
-        {
-            pollingFile = new File(DIRECTORY + TARGET);
-            if(!pollingFile.exists())
-            {
-                Thread.sleep(1000);
-            }
-        }
-        pollingFile = null;
-        
-        try
-        {
-            // check if file exists
-            FileReader outputFile = new FileReader(DIRECTORY + TARGET);
-            String fileContents = IOUtils.toString(outputFile);
-            outputFile.close();
-            
-            // see the GenerateTestMessage class for the content of the message
-            assertTrue(fileContents.contains("This is a test message")); 
-            
-            // delete file not to be confused with tests to be performed later
-            File f = FileUtils.newFile(DIRECTORY + TARGET);
-            assertTrue("Deleting the output file failed", f.delete());
-        }
-        catch (FileNotFoundException fileNotFound)
-        {
-            fail("File not successfully created");
-        }
+        MuleMessage message = client.request("vm://output", RECEIVE_TIMEOUT);
+
+        assertEquals("This is a test message.\r\nThis is another line.\r\n", message.getPayloadAsString()); 
     }
     
     private byte[] loadEncryptedMessage() throws IOException
@@ -103,8 +76,10 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
     public void testAuthenticationNotAuthorised() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-
-        MuleMessage reply = client.send("vm://echo", "An unsigned message", null);
+        Map<String, String> props = new HashMap<String, String>();
+        props.put("TARGET_FILE", TARGET);
+        props.put(MuleProperties.MULE_USER_PROPERTY, "Mule server <mule_server@mule.com>");
+        MuleMessage reply = client.send("vm://echo", "An unsigned message", props);
         
         assertNotNull(reply.getExceptionPayload());
         ExceptionPayload excPayload = reply.getExceptionPayload();

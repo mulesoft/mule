@@ -75,7 +75,7 @@ public class PropertiesMuleConfigurationFactory
         DefaultMuleConfiguration configuration = new DefaultMuleConfiguration();
         if (this.properties != null)
         {
-            this.initializeFromProperties(configuration);
+            this.initializeFromProperties(configuration); 
         }
         return configuration;
     }
