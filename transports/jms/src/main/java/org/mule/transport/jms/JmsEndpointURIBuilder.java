@@ -30,7 +30,8 @@ public class JmsEndpointURIBuilder extends ResourceNameEndpointURIBuilder
 		
 		String oldUri = uri.toString();
 		
-		if (oldUri.startsWith("jms://queue") || oldUri.startsWith("jms://topic")) {
+		if (oldUri.startsWith("jms://queue") || oldUri.startsWith("jms://topic")) 
+		{
 			oldUri = oldUri.substring(6);
 		}
 		
