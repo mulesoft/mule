@@ -27,12 +27,19 @@ public class JmsEndpointURIBuilder extends ResourceNameEndpointURIBuilder
         super.setEndpoint(uri, props);
 
         String newUri = null;
-        if (uri.getScheme().equals("topic"))
+		
+		String oldUri = uri.toString();
+		
+		if (oldUri.startsWith("jms://queue") || oldUri.startsWith("jms://topic")) {
+			oldUri = oldUri.substring(6);
+		}
+		
+        if (oldUri.startsWith("topic"))
         {
             props.setProperty(RESOURCE_INFO_PROPERTY, "topic");
-            newUri = uri.toString().replace("topic://", "jms://");
+            newUri = oldUri.replace("topic://", "jms://");
         }
-        else if (uri.getScheme().equals("queue"))
+        else if (oldUri.startsWith("queue"))
         {
             newUri = uri.toString().replace("queue://", "jms://");
         }
