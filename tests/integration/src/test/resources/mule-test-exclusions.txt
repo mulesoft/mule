@@ -101,4 +101,4 @@ org.mule.test.integration.exceptions.ExceptionStrategyReturnMessageTestCase
 org.mule.test.integration.transport.jms.scripting.JmsRequestFromScriptWithXaTransactionTestCase
 
 # MULE-5578
-#org.mule.test.integration.exceptions.ExceptionStrategyFilterTestCase
+org.mule.test.integration.exceptions.ExceptionStrategyFilterTestCase
