@@ -63,8 +63,5 @@ public class JmsEndpointURIBuilder extends ResourceNameEndpointURIBuilder
         {
             throw new MalformedEndpointException(e);
         }
-
     }
-}
-
 }
