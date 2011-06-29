@@ -10,52 +10,30 @@
 
 package org.mule.test.integration.exceptions;
 
-import org.mule.api.MuleEvent;
+import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.routing.filter.Filter;
-import org.mule.api.transaction.RollbackMethod;
-import org.mule.construct.Flow;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.util.concurrent.Latch;
 
-import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
 public class ExceptionStrategyFilterTestCase extends FunctionalTestCase
 {
-    private Latch exceptionHandlerLatch = new Latch();
-
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/exceptions/exception-strategy-filter.xml";
     }
 
-    @Override
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        installCustomExceptionHandler();
-    }
-
-    private void installCustomExceptionHandler() throws Exception
-    {
-        FlowConstruct flow = getFlowConstruct("filter");
-        assertNotNull(flow);
-
-        Flow simpleFlow = (Flow) flow;
-        simpleFlow.setExceptionListener(new TestMessagingExceptionHandler(exceptionHandlerLatch));
-    }
-
     @Test
     public void testExceptionThrownFromMessageFilterIsHandledByExceptionHandler() throws Exception
     {
-        muleContext.getClient().send("vm://in", TEST_MESSAGE, null);
-
-        assertTrue("Exception thrown by MessageFilter was not handled by the flow's MessagingExceptionHandler",
-            exceptionHandlerLatch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
+        try {
+            muleContext.getClient().send("vm://in", TEST_MESSAGE, null);
+            fail("Message Filter should have thrown FilterUnacceptedException");
+        } catch(MessagingException e) {
+            // Exception expected
+        }
     }
 
     public static class FalseFilter implements Filter
@@ -64,31 +42,6 @@ public class ExceptionStrategyFilterTestCase extends FunctionalTestCase
         public boolean accept(MuleMessage message)
         {
             return false;
-        }
-    }
-
-    private static class TestMessagingExceptionHandler implements MessagingExceptionHandler
-    {
-        private Latch latch;
-
-        public TestMessagingExceptionHandler(Latch latch)
-        {
-            super();
-            this.latch = latch;
-        }
-
-        @Override
-        public MuleEvent handleException(Exception exception, MuleEvent event, RollbackMethod method)
-        {
-            latch.release();
-            return event;
-        }
-
-        @Override
-        public MuleEvent handleException(Exception exception, MuleEvent event)
-        {
-            latch.release();
-            return null;
         }
     }
 }
