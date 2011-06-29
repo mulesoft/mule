@@ -98,6 +98,7 @@
                 <exclude>**/*.iml</exclude>
                 <exclude>**/*.ipr</exclude>
                 <exclude>**/*.iws</exclude>
+                <exclude>**/derby.log</exclude>
                 <!-- Exclude this example until someone gets it working -->
                 <exclude>geomail/**</exclude>
                 <!-- Legacy LoanBroker example, used for testing only -->
