@@ -10,12 +10,11 @@
 
 package org.mule.test.integration.exceptions;
 
-import org.mule.api.MessagingException;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
+import org.mule.api.routing.filter.FilterUnacceptedException;
+import org.mule.api.transport.DispatchException;
 import org.mule.tck.FunctionalTestCase;
-
-import org.junit.Test;
 
 public class ExceptionStrategyFilterTestCase extends FunctionalTestCase
 {
@@ -25,15 +24,34 @@ public class ExceptionStrategyFilterTestCase extends FunctionalTestCase
         return "org/mule/test/integration/exceptions/exception-strategy-filter.xml";
     }
 
-    @Test
     public void testExceptionThrownFromMessageFilterIsHandledByExceptionHandler() throws Exception
     {
-        try {
+        try
+        {
             muleContext.getClient().send("vm://in", TEST_MESSAGE, null);
             fail("Message Filter should have thrown FilterUnacceptedException");
-        } catch(MessagingException e) {
-            // Exception expected
         }
+        catch(DispatchException e)
+        {
+            assertThatRootCauseIsFilterUnacceptedException(e);
+        }
+    }
+
+    private void assertThatRootCauseIsFilterUnacceptedException(DispatchException e)
+    {
+        boolean filterUnacceptedExceptionFound = false;
+        Throwable currentException = e;
+        while (currentException.getCause() != null)
+        {
+            currentException = currentException.getCause();
+            if (currentException instanceof FilterUnacceptedException)
+            {
+                filterUnacceptedExceptionFound = true;
+                break;
+            }
+        }
+
+        assertTrue(filterUnacceptedExceptionFound);
     }
 
     public static class FalseFilter implements Filter
