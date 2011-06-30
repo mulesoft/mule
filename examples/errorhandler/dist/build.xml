@@ -42,8 +42,8 @@
     <!-- Download any additional libraries needed to run the application -->
     <target name="get.libraries">
         <mkdir dir="${dir.build}/lib"/>
-        <get src="${url.maven.repo2}/org/apache/activemq/activemq-core/4.1.2/activemq-core-4.1.2.jar"
-             dest="${dir.build}/activemq-core-4.1.2.jar"
+        <get src="${url.maven.repo2}/org/apache/activemq/activemq-core/5.5.0/activemq-core-5.5.0.jar"
+             dest="${dir.build}/activemq-core-5.5.0.jar"
              verbose="true"
              usetimestamp="true"/>
     </target>
