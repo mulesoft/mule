@@ -15,6 +15,7 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.api.routing.filter.FilterUnacceptedException;
 import org.mule.api.transport.DispatchException;
 import org.mule.tck.FunctionalTestCase;
+import org.mule.util.ExceptionUtils;
 
 public class ExceptionStrategyFilterTestCase extends FunctionalTestCase
 {
@@ -24,7 +25,7 @@ public class ExceptionStrategyFilterTestCase extends FunctionalTestCase
         return "org/mule/test/integration/exceptions/exception-strategy-filter.xml";
     }
 
-    public void testExceptionThrownFromMessageFilterIsHandledByExceptionHandler() throws Exception
+    public void testExceptionThrownFromMessageFilterIsSeenBySender() throws Exception
     {
         try
         {
@@ -39,19 +40,8 @@ public class ExceptionStrategyFilterTestCase extends FunctionalTestCase
 
     private void assertThatRootCauseIsFilterUnacceptedException(DispatchException e)
     {
-        boolean filterUnacceptedExceptionFound = false;
-        Throwable currentException = e;
-        while (currentException.getCause() != null)
-        {
-            currentException = currentException.getCause();
-            if (currentException instanceof FilterUnacceptedException)
-            {
-                filterUnacceptedExceptionFound = true;
-                break;
-            }
-        }
-
-        assertTrue(filterUnacceptedExceptionFound);
+        int index = ExceptionUtils.indexOfThrowable(e, FilterUnacceptedException.class);
+        assertTrue(index > -1);
     }
 
     public static class FalseFilter implements Filter
