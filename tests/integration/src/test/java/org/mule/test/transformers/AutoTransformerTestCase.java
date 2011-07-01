@@ -11,23 +11,39 @@
 package org.mule.test.transformers;
 
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.util.concurrent.Latch;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-public class AutoTransformerTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class AutoTransformerTestCase extends AbstractServiceAndFlowTestCase
 {
-    private static Latch latch;
-    protected String getConfigResources()
+    public AutoTransformerTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/transformer/auto-transformer-test.xml";
+        super(variant, configResources);
     }
 
+    private static Latch latch;
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/transformer/auto-transformer-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/transformer/auto-transformer-test-flow.xml"}
+        });
+    }
+
+    @Test
     public void testInboundAutoTransform() throws Exception
     {
         latch = new Latch();
