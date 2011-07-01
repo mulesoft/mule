@@ -13,20 +13,34 @@ package org.mule.test.integration.exceptions;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
-public class AsyncExceptionHandlingTestCase extends FunctionalTestCase
-{
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
+public class AsyncExceptionHandlingTestCase extends AbstractServiceAndFlowTestCase
+{
     String request = "Hello World";
 
-    protected String getConfigResources()
+    public AsyncExceptionHandlingTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/exceptions/async-exception-handling.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/async-exception-handling-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/async-exception-handling-flow.xml"}
+        });
+    }
+
+    @Test
     public void testAsyncExceptionHandlingTestCase() throws Exception
     {
         MuleClient client1 = new MuleClient(muleContext);
