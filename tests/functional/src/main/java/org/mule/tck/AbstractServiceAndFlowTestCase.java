@@ -13,6 +13,8 @@ package org.mule.tck;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -21,6 +23,9 @@ public abstract class AbstractServiceAndFlowTestCase extends FunctionalTestCase
 {
     protected ConfigVariant variant;
     protected String configResources;
+
+    @Rule
+    public TestName name = new TestName();
 
     public AbstractServiceAndFlowTestCase(ConfigVariant variant, String configResources)
     {
@@ -36,6 +41,7 @@ public abstract class AbstractServiceAndFlowTestCase extends FunctionalTestCase
     @Before
     public void before() throws Exception
     {
+        setName(name.getMethodName());
         setUp();
     }
 
@@ -80,6 +86,12 @@ public abstract class AbstractServiceAndFlowTestCase extends FunctionalTestCase
     protected String getConfigResources()
     {
         return configResources;
+    }
+
+    @Override
+    protected String getTestHeader()
+    {
+        return String.format("Testing: %s (%s)", getName(), variant);
     }
 
     public static enum ConfigVariant

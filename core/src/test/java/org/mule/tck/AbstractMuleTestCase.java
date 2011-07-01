@@ -126,9 +126,9 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     private TestCaseWatchdog watchdog;
 
     protected int numPorts = 0;
-    
-    public List<Integer> ports = null;   
-    
+
+    public List<Integer> ports = null;
+
     static
     {
         String muleOpts = SystemUtils.getenv("MULE_TEST_OPTS");
@@ -411,7 +411,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         // start a watchdog thread
         watchdog = createWatchdog();
         watchdog.start();
-       
+
         // set up the free ports
         if (numPorts > 0)
         {
@@ -420,14 +420,11 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
 
             //set the port properties
             setPortProperties();
-        }                
-        
+        }
+
         currentTestRunningThread = Thread.currentThread();
 
-        if (verbose)
-        {
-            System.out.println(StringMessageUtils.getBoilerPlate("Testing: " + getName(), '=', 80));
-        }
+        printTestHeader();
 
         try
         {
@@ -445,7 +442,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
                 // We dispose here just in case
                 disposeManager();
             }
-            
+
             muleContext = createMuleContext();
 
             // wait for Mule to fully start when requested (default)
@@ -481,6 +478,19 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
             getTestInfo().incRunCount();
             throw e;
         }
+    }
+
+    protected void printTestHeader()
+    {
+        if (verbose)
+        {
+            System.out.println(StringMessageUtils.getBoilerPlate(getTestHeader(), '=', 80));
+        }
+    }
+
+    protected String getTestHeader()
+    {
+        return "Testing: " + getName();
     }
 
     protected MuleContext createMuleContext() throws Exception
@@ -693,13 +703,13 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, null, transformers, null, null);
     }
 
-    public static InboundEndpoint getTestInboundEndpoint(String name, String uri, 
+    public static InboundEndpoint getTestInboundEndpoint(String name, String uri,
         List<Transformer> transformers, Filter filter, Map<Object, Object> properties, Connector connector) throws Exception
     {
         return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, transformers, filter, properties, connector);
     }
 
-    public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri, 
+    public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri,
         List<Transformer> transformers, Filter filter, Map<Object, Object> properties) throws Exception
     {
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties);
@@ -714,7 +724,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
         return MuleTestUtils.getTestInboundEndpoint(name, muleContext, uri, transformers, filter, properties);
     }
 
-    public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri, 
+    public static OutboundEndpoint getTestOutboundEndpoint(String name, String uri,
         List<Transformer> transformers, Filter filter, Map<Object, Object> properties, Connector connector) throws Exception
     {
         return MuleTestUtils.getTestOutboundEndpoint(name, muleContext, uri, transformers, filter, properties, connector);
@@ -734,7 +744,7 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         return MuleTestUtils.getTestEvent(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
     }
-    
+
     public static MuleEvent getTestEventUsingFlow(Object data) throws Exception
     {
         return MuleTestUtils.getTestEventUsingFlow(data, MessageExchangePattern.REQUEST_RESPONSE, muleContext);
@@ -1000,12 +1010,12 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     {
         muleContext.getRegistry().registerObject(String.valueOf(o.hashCode()), o);
     }
-    
+
     public SensingNullMessageProcessor getSensingNullMessageProcessor()
     {
         return new SensingNullMessageProcessor();
     }
-    
+
     public TriggerableMessageSource getTriggerableMessageSource(MessageProcessor listener)
     {
         return new TriggerableMessageSource(listener);
@@ -1030,5 +1040,5 @@ public abstract class AbstractMuleTestCase extends TestCase implements TestCaseW
     public List<Integer> getPorts()
     {
         return ports;
-    }    
+    }
 }
