@@ -63,6 +63,7 @@
         <fileSet>
             <directory>../../target/site/apidocs</directory>
             <outputDirectory>docs/api</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
 
         <!-- Copy source bundle (the build must be run with -DperformRelease=true) -->
@@ -88,6 +89,7 @@
         <fileSet>
             <directory>../../examples</directory>
             <outputDirectory>examples</outputDirectory>
+            <fileMode>0644</fileMode>
             <excludes>
                 <exclude>**/pom.xml</exclude>
                 <exclude>pom.xml</exclude>
@@ -110,14 +112,17 @@
         <fileSet>
             <directory>../../examples/cep/dist</directory>
             <outputDirectory>examples/cep</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         <fileSet>
             <directory>../../examples/echo/dist</directory>
             <outputDirectory>examples/echo</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         <fileSet>
             <directory>../../examples/errorhandler/dist</directory>
             <outputDirectory>examples/errorhandler</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         <!--
             dependencySet decided to omit 'hidden' files like ".empty".
@@ -127,36 +132,44 @@
         <fileSet>
             <directory>../../examples/errorhandler/src/main/app/test-data/in</directory>
             <outputDirectory>examples/errorhandler/src/main/app/test-data/in</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         <fileSet>
             <directory>../../examples/errorhandler/src/main/app/test-data/exceptions</directory>
             <outputDirectory>examples/errorhandler/src/main/app/test-data/exceptions</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         <!--
         <fileSet>
             <directory>../../examples/geomail/dist</directory>
             <outputDirectory>examples/geomail</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         -->
         <fileSet>
             <directory>../../examples/gpswalker/dist</directory>
             <outputDirectory>examples/gpswalker</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         <fileSet>
             <directory>../../examples/hello/dist</directory>
             <outputDirectory>examples/hello</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         <fileSet>
             <directory>../../examples/loanbroker-simple/dist</directory>
             <outputDirectory>examples/loanbroker-simple</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         <fileSet>
             <directory>../../examples/loanbroker-bpm/dist</directory>
             <outputDirectory>examples/loanbroker-bpm</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         <fileSet>
             <directory>../../examples/notifications/dist</directory>
             <outputDirectory>examples/notifications</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         <!--
             dependencySet decided to omit 'hidden' files like ".empty".
@@ -166,22 +179,27 @@
         <fileSet>
             <directory>../../examples/notifications/src/test/java</directory>
             <outputDirectory>examples/notifications/src/test/java</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         <fileSet>
             <directory>../../examples/notifications/src/test/resources</directory>
             <outputDirectory>examples/notifications/src/test/resources</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         <fileSet>
             <directory>../../examples/scripting/dist</directory>
             <outputDirectory>examples/scripting</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         <fileSet>
             <directory>../../examples/stockquote/dist</directory>
             <outputDirectory>examples/stockquote</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
         <fileSet>
             <directory>../../examples/bookstore/dist</directory>
             <outputDirectory>examples/bookstore</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
 
         <!--
@@ -192,6 +210,7 @@
         <fileSet>
             <directory>../../examples/mule-example-launcher/dist</directory>
             <outputDirectory>examples/mule-example-launcher</outputDirectory>
+            <fileMode>0644</fileMode>
         </fileSet>
     </fileSets>
 
@@ -421,6 +440,7 @@
         <dependencySet>
             <outputDirectory>examples/bookstore</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-bookstore</include>
             </includes>
@@ -428,6 +448,7 @@
         <dependencySet>
             <outputDirectory>examples/cep</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-cep</include>
             </includes>
@@ -435,6 +456,7 @@
         <dependencySet>
             <outputDirectory>examples/echo</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-echo</include>
             </includes>
@@ -442,6 +464,7 @@
         <dependencySet>
             <outputDirectory>examples/hello</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-hello</include>
             </includes>
@@ -449,6 +472,7 @@
         <dependencySet>
             <outputDirectory>examples/errorhandler</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-errorhandler</include>
             </includes>
@@ -456,6 +480,7 @@
         <dependencySet>
             <outputDirectory>examples/loanbroker-bpm</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-loanbroker-bpm</include>
             </includes>
@@ -463,6 +488,7 @@
         <dependencySet>
             <outputDirectory>examples/loanbroker-simple</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-loanbroker-simple</include>
             </includes>
@@ -470,6 +496,7 @@
         <dependencySet>
             <outputDirectory>examples/scripting</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-scripting</include>
             </includes>
@@ -477,6 +504,7 @@
         <dependencySet>
             <outputDirectory>examples/gpswalker</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-gpswalker</include>
             </includes>
@@ -484,6 +512,7 @@
         <dependencySet>
             <outputDirectory>examples/notifications</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-notifications</include>
             </includes>
@@ -491,6 +520,7 @@
         <dependencySet>
             <outputDirectory>examples/stockquote</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-stockquote</include>
             </includes>
@@ -498,6 +528,7 @@
         <dependencySet>
             <outputDirectory>examples/mule-example-launcher</outputDirectory>
             <useStrictFiltering>true</useStrictFiltering>
+            <fileMode>0644</fileMode>
             <includes>
                 <include>org.mule.examples:mule-example-launcher</include>
             </includes>
