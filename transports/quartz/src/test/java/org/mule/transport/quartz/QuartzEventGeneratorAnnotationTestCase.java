@@ -27,7 +27,7 @@ public class QuartzEventGeneratorAnnotationTestCase extends FunctionalTestCase
     {
         MuleClient client = new MuleClient(muleContext);
 
-        MuleMessage result = client.request("vm://intervalQueue", RECEIVE_TIMEOUT);
+        MuleMessage result = client.request("vm://intervalQueue", RECEIVE_TIMEOUT * 2);
         assertNotNull(result);
         assertFalse(result.getPayload() instanceof NullPayload);
         assertEquals("pinged! (interval)", result.getPayload());
@@ -37,7 +37,4 @@ public class QuartzEventGeneratorAnnotationTestCase extends FunctionalTestCase
         assertFalse(result.getPayload() instanceof NullPayload);
         assertEquals("pinged! (cron)", result.getPayload());
     }
-    
 }
-
-
