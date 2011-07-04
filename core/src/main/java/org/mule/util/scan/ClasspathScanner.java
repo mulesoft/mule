@@ -110,6 +110,10 @@ public class ClasspathScanner
                 {
                     classes.addAll(processJarUrl(url, basepath, clazz, flags));
                 }
+                else if (url.getProtocol().equalsIgnoreCase("bundleresource"))
+                {
+                    logger.debug("Classpath contains an OSGi bundle resource which Mule does not know how to access, therefore this resource will be ignored: + " + url.toString());
+                }
                 else
                 {
                     throw new IllegalArgumentException("Do not understand how to handle protocol: " + url.getProtocol());
