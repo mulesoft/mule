@@ -11,8 +11,8 @@ package org.mule.module.atom.event;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.api.client.MuleClient;
+import org.mule.tck.DynamicPortTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,14 +30,18 @@ import org.apache.abdera.model.Feed;
 import org.apache.abdera.protocol.client.AbderaClient;
 import org.apache.abdera.protocol.client.ClientResponse;
 
-public class AtomEventTestCase extends FunctionalTestCase
+public class AtomEventTestCase extends DynamicPortTestCase
 {
-    private Repository repository;
-
     @Override
     protected String getConfigResources()
     {
         return "atom-builder-conf.xml";
+    }
+
+    @Override
+    protected int getNumPortsToFind()
+    {
+        return 1;
     }
 
     @Override
@@ -47,17 +51,16 @@ public class AtomEventTestCase extends FunctionalTestCase
         super.doTearDown();
     }
 
-    public void testCustomerProvider() throws Exception
+    public void testCustomProvider() throws Exception
     {
-        repository = (Repository) muleContext.getRegistry().lookupObject("jcrRepository");
-
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.send("vm://in", createOutboundMessage());
 
         Thread.sleep(1000);
 
         AbderaClient aClient = new AbderaClient();
-        ClientResponse res = aClient.get("http://localhost:9003/events");
+        String url = "http://localhost:" + getPorts().get(0) + "/events";
+        ClientResponse res = aClient.get(url);
 
         Document<Feed> doc = res.getDocument();
         Feed feed = doc.getRoot();
@@ -71,7 +74,7 @@ public class AtomEventTestCase extends FunctionalTestCase
 
     public void testMessageTransformation() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
+        MuleClient client = muleContext.getClient();
         client.dispatch("vm://fromTest", createOutboundMessage());
 
         MuleMessage response = client.request("vm://toTest", RECEIVE_TIMEOUT);
@@ -91,16 +94,17 @@ public class AtomEventTestCase extends FunctionalTestCase
 
     private void clearJcrRepository()
     {
+        Repository repository = (Repository) muleContext.getRegistry().lookupObject("jcrRepository");
+        if (repository == null)
+        {
+            return;
+        }
+
         try
         {
-            if (repository == null)
-            {
-                return;
-            }
             Session session = repository.login(new SimpleCredentials("username", "password".toCharArray()));
 
             Node node = session.getRootNode();
-
             for (NodeIterator itr = node.getNodes(); itr.hasNext();)
             {
                 Node child = itr.nextNode();

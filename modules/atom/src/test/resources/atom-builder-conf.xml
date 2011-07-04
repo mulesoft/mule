@@ -5,12 +5,12 @@
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:atom="http://www.mulesoft.org/schema/mule/atom"
       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-      xsi:schemaLocation="
-               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
-               http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.1/mule-http.xsd
-               http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/3.1/mule-atom.xsd
-               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd">
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.1/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/atom http://www.mulesoft.org/schema/mule/atom/3.1/mule-atom.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd">
 
     <spring:beans>
         <spring:import resource="classpath:eventqueue-atom.xml"/>
@@ -29,7 +29,7 @@
     <flow name="EventPublisher">
         <vm:inbound-endpoint path="in" exchange-pattern="request-response"/>
 
-        <outbound-endpoint address="http://localhost:9003/events" exchange-pattern="request-response"
+        <outbound-endpoint address="http://localhost:${port1}/events" exchange-pattern="request-response"
                            mimeType="application/atom+xml;type=entry">
             <transformer ref="defaultEntryBuilder"/>
         </outbound-endpoint>
@@ -43,7 +43,7 @@
     </flow>
 
     <flow name="atomPubEventStore">
-        <inbound-endpoint address="http://localhost:9003" exchange-pattern="request-response"/>
+        <inbound-endpoint address="http://localhost:${port1}" exchange-pattern="request-response"/>
         <atom:component provider-ref="provider"/>
     </flow>
 
