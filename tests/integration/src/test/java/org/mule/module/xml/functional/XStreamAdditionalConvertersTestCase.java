@@ -16,6 +16,8 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
+import com.thoughtworks.xstream.converters.extended.ISO8601DateConverter;
+
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +44,9 @@ public class XStreamAdditionalConvertersTestCase extends FunctionalTestCase
 
     public void testAdditionalConverters() throws Exception
     {
-        String input = "<test-bean><createDate>2009-05-19T07:40:00</createDate></test-bean>";
+        ISO8601DateConverter converter = new ISO8601DateConverter();
+        String timestamp = converter.toString(new Date(System.currentTimeMillis()));
+        String input = "<test-bean><createDate>" + timestamp + "</createDate></test-bean>";
         
         MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://FromTest", input, null);
