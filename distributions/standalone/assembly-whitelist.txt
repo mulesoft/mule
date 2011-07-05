@@ -46,6 +46,7 @@
 # /docs
 #
 /mule-standalone-${productVersion}/docs/api
+/mule-standalone-${productVersion}/docs/api/+
 
 
 #
