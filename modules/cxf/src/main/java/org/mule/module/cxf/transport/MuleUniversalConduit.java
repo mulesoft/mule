@@ -254,6 +254,8 @@ public class MuleUniversalConduit extends AbstractConduit
                 m.getExchange().put(ClientImpl.FINISHED, Boolean.TRUE);
                 return;
             }
+
+            m.getExchange().put(CxfConstants.MULE_EVENT, resEvent);
             
             // If we have a result, send it back to CXF
             MuleMessage result = resEvent.getMessage();
@@ -264,7 +266,8 @@ public class MuleUniversalConduit extends AbstractConduit
 
                 String encoding = result.getEncoding();
                 inMessage.put(Message.ENCODING, encoding);
-                String contentType = result.getOutboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
+                
+                String contentType = result.getInboundProperty(HttpConstants.HEADER_CONTENT_TYPE, "text/xml");
                 if (encoding != null && contentType.indexOf("charset") < 0)
                 {
                     contentType += "; charset=" + result.getEncoding();

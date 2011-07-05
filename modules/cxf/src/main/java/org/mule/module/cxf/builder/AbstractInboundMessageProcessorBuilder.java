@@ -70,22 +70,22 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     private List<Interceptor<? extends Message>> outFaultInterceptors = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
     protected MuleContext muleContext;
     private String port;
-    private Map<String,Object> properties;
+    private Map<String,Object> properties = new HashMap<String, Object>();
     private boolean validationEnabled;
     private List<String> schemaLocations;
-    
+
     public CxfInboundMessageProcessor build() throws MuleException
     {
         if (muleContext == null)
         {
             throw new IllegalStateException("MuleContext must be supplied.");
         }
-        
+
         if (configuration == null)
         {
             configuration = CxfConfiguration.getConfiguration(muleContext);
         }
-        
+
         if (configuration == null)
         {
             throw new IllegalStateException("A CxfConfiguration object must be supplied.");
@@ -106,44 +106,39 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         {
             sfb.setBindingId(bindingId);
         }
-        
+
         if (features != null)
         {
             sfb.getFeatures().addAll(features);
         }
-        
+
         if (mtomEnabled != null)
         {
-            Map<String, Object> properties = sfb.getProperties();
-            if (properties == null)
-            {
-                properties = new HashMap<String, Object>();
-                sfb.setProperties(properties);
-            }
             properties.put("mtom-enabled", mtomEnabled);
             properties.put(AttachmentOutInterceptor.WRITE_ATTACHMENTS, true);
         }
-        
+
         if (inInterceptors != null)
         {
             sfb.getInInterceptors().addAll((Collection<? extends Interceptor<? extends Message>>) inInterceptors);
         }
-        
+
+
         if (inFaultInterceptors != null)
         {
             sfb.getInFaultInterceptors().addAll((Collection<? extends Interceptor<? extends Message>>) inFaultInterceptors);
         }
-        
+
         if (outInterceptors != null)
         {
             sfb.getOutInterceptors().addAll((Collection<? extends Interceptor<? extends Message>>) outInterceptors);
         }
-        
+
         if (outFaultInterceptors != null)
         {
             sfb.getOutFaultInterceptors().addAll((Collection<? extends Interceptor<? extends Message>>) outFaultInterceptors);
         }
-        
+
         if (enableMuleSoapHeaders && !configuration.isEnableMuleSoapHeaders())
         {
             sfb.getInInterceptors().add(new MuleHeadersInInterceptor());
@@ -151,11 +146,11 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
             sfb.getOutInterceptors().add(new MuleHeadersOutInterceptor());
             sfb.getOutFaultInterceptors().add(new MuleHeadersOutInterceptor());
         }
-        
+
         String address = getAddress();
       //hack for CXF to work correctly with servlet and jetty urls
-        address = address.replace("servlet://", "http://localhost/"); 
-        address = address.replace("jetty://", "http://localhost/"); 
+        address = address.replace("servlet://", "http://localhost/");
+        address = address.replace("jetty://", "http://localhost/");
         sfb.setAddress(address); // dummy URL for CXF
 
         if (wsdlLocation != null)
@@ -164,7 +159,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         }
 
         sfb.setSchemaLocations(schemaLocations);
-        
+
         ReflectionServiceFactoryBean svcFac = sfb.getServiceFactory();
         initServiceFactory(svcFac);
 
@@ -176,19 +171,14 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         Bus bus = configuration.getCxfBus();
         sfb.setBus(bus);
         svcFac.setBus(bus);
-        
+
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer)
         {
             configurer.configureBean(svcFac.getEndpointName().toString(), sfb);
         }
-        
-        if (properties == null)
-        {
-            properties = new HashMap<String, Object>();
-        }
-        
-        if (validationEnabled) 
+
+        if (validationEnabled)
         {
             properties.put("schema-validation-enabled", "true");
         }
