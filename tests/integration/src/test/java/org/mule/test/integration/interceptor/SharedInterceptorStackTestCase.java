@@ -10,22 +10,37 @@
 
 package org.mule.test.integration.interceptor;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.interceptor.Interceptor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class SharedInterceptorStackTestCase extends FunctionalTestCase
+public class SharedInterceptorStackTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    
+    public SharedInterceptorStackTestCase(ConfigVariant variant, String configResources)
     {
-        return "shared-interceptor-stack.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "shared-interceptor-stack-service.xml"},
+            {ConfigVariant.FLOW, "shared-interceptor-stack-flow.xml"}
+        });
     }
     
+    @Test
     public void testSharedInterceptorOnServiceOne() throws MuleException
     {
         MuleClient client = muleContext.getClient();
@@ -34,6 +49,7 @@ public class SharedInterceptorStackTestCase extends FunctionalTestCase
         assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentOne", response.getPayload());
     }
 
+    @Test
     public void testSharedInterceptorOnServiceTwo() throws MuleException
     {
         MuleClient client = muleContext.getClient();

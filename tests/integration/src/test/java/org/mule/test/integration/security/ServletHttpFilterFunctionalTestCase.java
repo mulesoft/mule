@@ -10,22 +10,35 @@
 
 package org.mule.test.integration.security;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.module.spring.security.HttpFilterFunctionalTestCase;
 import org.mule.transport.servlet.MuleReceiverServlet;
 import org.mule.transport.servlet.jetty.util.EmbeddedJettyServer;
 
 public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTestCase
 {
+
     public static final int HTTP_PORT = 4567;
 
     private EmbeddedJettyServer httpServer;
 
-    @Override
-    protected String getConfigResources()
+    public ServletHttpFilterFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/security/servlet-http-filter-test.xml";
+        super(variant, configResources);
+
     }
-    
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/security/servlet-http-filter-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/security/servlet-http-filter-test-flow.xml"}});
+    }
+
     @Override
     protected String getUrl()
     {
@@ -33,10 +46,10 @@ public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTes
     }
 
     @Override
-    protected void doSetUp() throws Exception 
+    protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        
+
         httpServer = new EmbeddedJettyServer(HTTP_PORT, "/", "/*", new MuleReceiverServlet(), muleContext);
         httpServer.start();
     }
@@ -51,7 +64,7 @@ public class ServletHttpFilterFunctionalTestCase extends HttpFilterFunctionalTes
 
         super.doTearDown();
     }
-    
+
     protected String getNoContextErrorResponse()
     {
         return "Registered authentication is set to org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter "

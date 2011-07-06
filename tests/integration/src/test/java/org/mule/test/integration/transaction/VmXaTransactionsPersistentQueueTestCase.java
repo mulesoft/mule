@@ -10,22 +10,38 @@
 
 package org.mule.test.integration.transaction;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class VmXaTransactionsPersistentQueueTestCase extends FunctionalTestCase
+public class VmXaTransactionsPersistentQueueTestCase extends AbstractServiceAndFlowTestCase
 {
 
     private static final String TEST_MESSAGE = "TEST_MESSAGE";
 
     private final long timeout = getTestTimeoutSecs() * 1000 / 30;
 
-    protected String getConfigResources()
+    public VmXaTransactionsPersistentQueueTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/transaction/vm-xa-transaction-persistent-queue.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/transaction/vm-xa-transaction-persistent-queue-service.xml"},
+            {ConfigVariant.FLOW,
+                "org/mule/test/integration/transaction/vm-xa-transaction-persistent-queue-flow.xml"}});
+    }
+
+    @Test
     public void testOutboundRouterTransactions() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

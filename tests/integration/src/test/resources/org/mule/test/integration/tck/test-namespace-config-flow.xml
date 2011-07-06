@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:test="http://www.mulesoft.org/schema/mule/test"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+
+
+
+    <flow name="testService1">
+
+        <inbound-endpoint address="vm://service1"
+            exchange-pattern="request-response" />
+
+        <test:component enableNotifications="false"
+            enableMessageHistory="false">
+            <test:return-data>Foo Bar Car Jar</test:return-data>
+        </test:component>
+    </flow>
+
+    <flow name="testService2">
+
+        <inbound-endpoint address="vm://service2"
+            exchange-pattern="request-response" />
+
+        <test:component>
+            <test:return-data
+                file="org/mule/test/integration/tck/test-data.txt" />
+        </test:component>
+    </flow>
+
+    <flow name="testService3">
+
+        <inbound-endpoint address="vm://service3"
+            exchange-pattern="request-response" />
+
+        <test:component enableMessageHistory="false"
+            appendString=" received in #[mule:context.serviceName]" />
+    </flow>
+
+    <flow name="testService4">
+
+        <inbound-endpoint address="vm://service4"
+            exchange-pattern="request-response" />
+
+        <test:component throwException="true" />
+    </flow>
+
+    <flow name="testService5">
+
+        <inbound-endpoint address="vm://service5"
+            exchange-pattern="request-response" />
+
+        <test:component throwException="true"
+            exceptionToThrow="java.io.FileNotFoundException" />
+    </flow>
+
+</mule>

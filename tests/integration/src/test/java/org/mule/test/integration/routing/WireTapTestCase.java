@@ -10,23 +10,35 @@
 
 package org.mule.test.integration.routing;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
 import org.mule.util.concurrent.Latch;
 
-import java.util.concurrent.TimeUnit;
-
-public class WireTapTestCase extends FunctionalTestCase
+public class WireTapTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    protected String getConfigResources()
+    public WireTapTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/routing/wire-tap.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/wire-tap-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/routing/wire-tap-flow.xml"}});
+    }
+
+    @Test
     public void testWireTap() throws Exception
     {
         final Latch receiverLatch = new Latch();

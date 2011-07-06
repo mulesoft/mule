@@ -10,13 +10,17 @@
 
 package org.mule.module.xml.functional;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.custommonkey.xmlunit.XMLAssert;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class XPathNodeExpressionEvaluatorTestCase extends FunctionalTestCase
+public class XPathNodeExpressionEvaluatorTestCase extends AbstractServiceAndFlowTestCase
 {
 
     private static final String SAMPLE_REQUEST =
@@ -32,12 +36,21 @@ public class XPathNodeExpressionEvaluatorTestCase extends FunctionalTestCase
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<name>African Coffee Table</name>";
 
-    @Override
-    protected String getConfigResources()
+    public XPathNodeExpressionEvaluatorTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/module/xml/xpath-node-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/module/xml/xpath-node-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/module/xml/xpath-node-config-flow.xml"}
+        });
+    }
+    
+    @Test
     public void testExpressionTransformerUsingXpathNode() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

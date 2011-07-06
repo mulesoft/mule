@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
+       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
+
+    <vm:connector name="default"/>
+    <vm:connector name="queue"/>
+
+    <vm:endpoint name="in" address="vm://in" connector-ref="default" exchange-pattern="one-way"/>
+    <vm:endpoint name="notxml" path="notxml" connector-ref="queue" exchange-pattern="one-way"/>
+    <endpoint name="self" address="vm://self" connector-ref="queue" exchange-pattern="one-way"/>
+    <endpoint name="other" address="vm://other" connector-ref="queue" exchange-pattern="one-way"/>
+
+    
+    <flow name="test for xml">
+        
+        <inbound-endpoint ref="in"/>
+        
+        <message-filter>
+            <mxml:is-xml-filter/>
+        </message-filter>        
+        
+        <outbound-endpoint address="vm://xml" connector-ref="default" exchange-pattern="one-way"/>            
+        
+        <message-filter>
+        	<not-filter>
+        	    <mxml:is-xml-filter/>
+        	</not-filter>            
+        </message-filter>
+        
+        <outbound-endpoint ref="notxml"/>
+            
+        
+    </flow>
+
+    <flow name="filter xml for content">
+        
+        <vm:inbound-endpoint path="xml" connector-ref="default" exchange-pattern="one-way"/>            
+        
+        <message-filter>        	
+            <mxml:jxpath-filter pattern="/mule:mule/mule:model/mule:service[2]/@name"
+                               expectedValue="filter xml for content">
+                <mxml:namespace prefix="spring" uri="http://www.springframework.org/schema/beans"/>
+                <mxml:namespace prefix="mule" uri="http://www.mulesoft.org/schema/mule/core"/>                
+            </mxml:jxpath-filter>
+        </message-filter>
+        
+        
+        <outbound-endpoint ref="other"/>
+        
+    </flow>
+    
+</mule>

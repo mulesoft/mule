@@ -7,20 +7,34 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.transformer;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class TransformerTrackerLifecycleTestCase extends FunctionalTestCase
+public class TransformerTrackerLifecycleTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public TransformerTrackerLifecycleTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/transformers/transformer-lifecycle.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/transformers/transformer-lifecycle-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/transformers/transformer-lifecycle-flow.xml"}});
+    }
+
+    @Test
     public void testLifecycle() throws Exception
     {
 
@@ -32,8 +46,8 @@ public class TransformerTrackerLifecycleTestCase extends FunctionalTestCase
 
         muleContext.dispose();
 
-        //TODO MULE-5002 initialise called twice
-        assertEquals("[setProperty, setMuleContext, initialise, setMuleContext, initialise, start, stop]", 
+        // TODO MULE-5002 initialise called twice
+        assertEquals("[setProperty, setMuleContext, initialise, setMuleContext, initialise, start, stop]",
             ltt.getTracker().toString());
     }
 }

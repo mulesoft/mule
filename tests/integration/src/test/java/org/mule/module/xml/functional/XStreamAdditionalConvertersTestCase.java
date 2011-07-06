@@ -10,22 +10,37 @@
 
 package org.mule.module.xml.functional;
 
-import org.mule.api.MuleEventContext;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.functional.EventCallback;
-import org.mule.tck.functional.FunctionalTestComponent;
-
-import com.thoughtworks.xstream.converters.extended.ISO8601DateConverter;
-
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class XStreamAdditionalConvertersTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleEventContext;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.functional.EventCallback;
+import org.mule.tck.functional.FunctionalTestComponent;
+
+public class XStreamAdditionalConvertersTestCase extends AbstractServiceAndFlowTestCase
 {
     private CountDownLatch latch = new CountDownLatch(1);
-    
+
+    public XStreamAdditionalConvertersTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/module/xml/xstream-additional-converters-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/module/xml/xstream-additional-converters-flow.xml"}});
+    }
+
     @Override
     protected void doSetUp() throws Exception
     {
@@ -36,24 +51,17 @@ public class XStreamAdditionalConvertersTestCase extends FunctionalTestCase
         testComponent.setEventCallback(new Callback(latch));
     }
 
-    @Override
-    protected String getConfigResources()
-    {
-        return "org/mule/module/xml/xstream-additional-converters.xml";
-    }
-
+    @Test
     public void testAdditionalConverters() throws Exception
     {
-        ISO8601DateConverter converter = new ISO8601DateConverter();
-        String timestamp = converter.toString(new Date(System.currentTimeMillis()));
-        String input = "<test-bean><createDate>" + timestamp + "</createDate></test-bean>";
-        
+        String input = "<test-bean><createDate>2009-05-19T07:40:00</createDate></test-bean>";
+
         MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://FromTest", input, null);
-        
+
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
     }
-        
+
     private static class Callback implements EventCallback
     {
         private CountDownLatch testLatch;
@@ -68,7 +76,7 @@ public class XStreamAdditionalConvertersTestCase extends FunctionalTestCase
             Object payload = context.getMessage().getPayload();
             assertTrue(payload instanceof TestBean);
             assertNotNull(((TestBean) payload).getCreateDate());
-            
+
             testLatch.countDown();
         }
     }
@@ -88,5 +96,3 @@ public class XStreamAdditionalConvertersTestCase extends FunctionalTestCase
         }
     }
 }
-
-

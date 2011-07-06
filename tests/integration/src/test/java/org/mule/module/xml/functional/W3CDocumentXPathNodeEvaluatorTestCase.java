@@ -10,14 +10,18 @@
 
 package org.mule.module.xml.functional;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.w3c.dom.Node;
 
-public class W3CDocumentXPathNodeEvaluatorTestCase extends FunctionalTestCase
+public class W3CDocumentXPathNodeEvaluatorTestCase extends AbstractServiceAndFlowTestCase
 {
     private static final String XML_INPUT =
         "<root>" +
@@ -27,13 +31,23 @@ public class W3CDocumentXPathNodeEvaluatorTestCase extends FunctionalTestCase
         "    <length>120</length>" +
         "  </table>" +
         "</root>";
-
-    @Override
-    protected String getConfigResources()
+    
+    public W3CDocumentXPathNodeEvaluatorTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/module/xml/w3c-dom-xpath-node-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/module/xml/w3c-dom-xpath-node-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/module/xml/w3c-dom-xpath-node-config-flow.xml"}
+        });
+    }
+
+   
+    @Test
     public void testW3CDocument() throws Exception
     {
         MuleClient client = muleContext.getClient();

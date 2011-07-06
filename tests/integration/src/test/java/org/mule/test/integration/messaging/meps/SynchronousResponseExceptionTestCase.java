@@ -10,19 +10,34 @@
 
 package org.mule.test.integration.messaging.meps;
 
-import org.mule.tck.FunctionalTestCase;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 /**
  * @see MULE-4512
  */
-public class SynchronousResponseExceptionTestCase extends FunctionalTestCase
+public class SynchronousResponseExceptionTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public SynchronousResponseExceptionTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/messaging/meps/synchronous-response-exception.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/messaging/meps/synchronous-response-exception-service.xml"},
+            {ConfigVariant.FLOW,
+                "org/mule/test/integration/messaging/meps/synchronous-response-exception-flow.xml"}});
+    }
+
+    @Test
     public void testComponentException() throws Exception
     {
         try
@@ -36,6 +51,7 @@ public class SynchronousResponseExceptionTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testOutboundRoutingException() throws Exception
     {
         try
@@ -49,6 +65,7 @@ public class SynchronousResponseExceptionTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testInboundTransformerException() throws Exception
     {
         try
@@ -62,6 +79,7 @@ public class SynchronousResponseExceptionTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testOutboundTransformerException() throws Exception
     {
         try
@@ -75,6 +93,7 @@ public class SynchronousResponseExceptionTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testResponseTransformerException() throws Exception
     {
         try
@@ -88,5 +107,3 @@ public class SynchronousResponseExceptionTestCase extends FunctionalTestCase
         }
     }
 }
-
-

@@ -10,27 +10,42 @@
 
 package org.mule.module.xml.functional;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.custommonkey.xmlunit.XMLAssert;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-
-import org.custommonkey.xmlunit.XMLAssert;
 import org.w3c.dom.Document;
 
 public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
 
-    public static final String SIMPLE_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<parent><child name=\"poot\"/></parent>";
+	public static final String SIMPLE_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<parent><child name=\"poot\"/></parent>";
     public static final String CHILDLESS_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<parent/>";
     public static final String SERIALIZED = "<org.mule.module.xml.functional.XmlTransformerFunctionalTestCase_-Parent>\n" +
             "  <child/>\n" +
             "</org.mule.module.xml.functional.XmlTransformerFunctionalTestCase_-Parent>";
 
-    protected String getConfigResources()
+    public XmlTransformerFunctionalTestCase(ConfigVariant variant,
+			String configResources) {
+		super(variant, configResources);
+		
+	}
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "org/mule/module/xml/xml-transformer-functional-test.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/module/xml/xml-transformer-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/module/xml/xml-transformer-functional-test-flow.xml"}
+        });
     }
-
+    
+    
     protected MuleClient sendXml() throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);
@@ -50,35 +65,41 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
         return client;
     }
 
+    @Test
     public void testXmlOut() throws Exception
     {
         String xml = (String) request(sendXml(), "xml-out", String.class);
         XMLAssert.assertXMLEqual(SIMPLE_XML, xml);
     }
 
+    @Test
     public void testXmlDomOut() throws MuleException
     {
         Document dom = (Document) request(sendXml(), "xml-dom-out", Document.class);
         assertEquals("parent", dom.getDocumentElement().getLocalName());
     }
 
+    @Test
     public void testXmlXsltOut() throws Exception
     {
         String xml = (String) request(sendXml(), "xml-xslt-out-string", String.class);
         XMLAssert.assertXMLEqual(CHILDLESS_XML, xml);
     }
 
+    @Test
     public void testDomXmlOut() throws Exception
     {
         String xml = (String) request(sendXml(), "dom-xml-out", String.class);
         XMLAssert.assertXMLEqual(SIMPLE_XML, xml);
     }
 
+    @Test
     public void testObjectOut() throws Exception
     {
         request(sendObject(), "object-out", Parent.class);
     }
 
+    @Test
     public void testObjectXmlOut() throws Exception
     {
         String xml = (String) request(sendObject(), "object-xml-out", String.class);
@@ -92,6 +113,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
     //    request(sendObject(), "xml-object-out", Parent.class);
     //}
 
+    @Test
     public void testXmlJxpathOut() throws Exception
     {
         String xml = (String) request(sendXml(), "xml-jxpath-out", String.class);

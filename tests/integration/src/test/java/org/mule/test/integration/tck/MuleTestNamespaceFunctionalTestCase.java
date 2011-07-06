@@ -10,20 +10,33 @@
 
 package org.mule.test.integration.tck;
 
+import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.ExceptionUtils;
 
-import java.io.FileNotFoundException;
-
-public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
+public class MuleTestNamespaceFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-    protected String getConfigResources()
+    public MuleTestNamespaceFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/tck/test-namespace-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/tck/test-namespace-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/tck/test-namespace-config-flow.xml"}});
+    }
+
+    @Test
     public void testService1() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -33,6 +46,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
         assertEquals("Foo Bar Car Jar", message.getPayloadAsString());
     }
 
+    @Test
     public void testService2() throws Exception
     {
         String result = loadResourceAsString("org/mule/test/integration/tck/test-data.txt");
@@ -43,6 +57,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
         assertEquals(result, message.getPayloadAsString());
     }
 
+    @Test
     public void testService3() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -52,6 +67,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
         assertEquals("foo received in testService3", message.getPayloadAsString());
     }
 
+    @Test
     public void testService4() throws Exception
     {
         try
@@ -64,6 +80,7 @@ public class MuleTestNamespaceFunctionalTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testService5() throws Exception
     {
         try

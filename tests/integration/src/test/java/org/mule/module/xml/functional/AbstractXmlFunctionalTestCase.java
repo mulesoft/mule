@@ -10,17 +10,21 @@
 
 package org.mule.module.xml.functional;
 
-import org.mule.tck.FunctionalTestCase;
-
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public abstract class AbstractXmlFunctionalTestCase extends FunctionalTestCase
+public abstract class AbstractXmlFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    public static final long TIMEOUT = 3000L;
+    public AbstractXmlFunctionalTestCase(ConfigVariant variant,
+			String configResources) {
+		super(variant, configResources);		
+	}
+
+	public static final long TIMEOUT = 3000L;
 
     protected String getConfigAsString() throws IOException
     {

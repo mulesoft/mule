@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xmlns:stdio="http://www.mulesoft.org/schema/mule/stdio"
+    xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/stdio http://www.mulesoft.org/schema/mule/stdio/3.2/mule-stdio.xsd
+        http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+
+
+    <flow name="Echo">
+        
+            <inbound-endpoint
+                address="http://localhost:${port1}/services/EchoUMO"
+                exchange-pattern="request-response">
+                <cxf:simple-service
+                    serviceClass="org.mule.api.component.simple.EchoService" />
+            </inbound-endpoint>
+            <wire-tap>
+                <vm:outbound-endpoint path="ToTapper"
+                    exchange-pattern="one-way" />
+            </wire-tap>
+        
+        <echo-component />
+    </flow>
+
+    <flow name="WireTapper">
+        
+            <vm:inbound-endpoint path="ToTapper"
+                exchange-pattern="one-way" />
+        
+        <!-- Something is utterly broken with the entry point resolving in 
+            this case. From the stacktrace it seems that the wrong Java method is looked 
+            up. Hardcoding the lookup makes things work for this test. -->
+        <component
+            class="org.mule.tck.testmodels.services.TestServiceComponent">
+            <callable-entry-point-resolver />
+        </component>
+    </flow>
+
+</mule>

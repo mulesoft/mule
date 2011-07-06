@@ -10,55 +10,135 @@
 
 package org.mule.module.xml.config;
 
-import org.mule.api.routing.OutboundRouterCollection;
-import org.mule.api.service.Service;
-import org.mule.module.xml.filters.IsXmlFilter;
-import org.mule.module.xml.filters.JXPathFilter;
-import org.mule.routing.filters.logic.NotFilter;
-import org.mule.routing.outbound.FilteringOutboundRouter;
-import org.mule.tck.FunctionalTestCase;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class XmlFilterNamespaceHandlerTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.routing.OutboundRouterCollection;
+import org.mule.api.service.Service;
+import org.mule.construct.Flow;
+import org.mule.module.xml.filters.IsXmlFilter;
+import org.mule.module.xml.filters.JXPathFilter;
+import org.mule.routing.MessageFilter;
+import org.mule.routing.filters.logic.NotFilter;
+import org.mule.routing.outbound.FilteringOutboundRouter;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    protected String getConfigResources()
+    public XmlFilterNamespaceHandlerTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/module/xml/xml-filter-functional-test.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/module/xml/xml-filter-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/module/xml/xml-filter-functional-test-flow.xml"}});
     }
 
     /**
      * IsXmlFilter doesn't have any properties to test, so just check it is created
      */
+    @Test
     public void testIsXmlFilter()
     {
-        Service service = muleContext.getRegistry().lookupService("test for xml");
-        List routers = ((OutboundRouterCollection) service.getOutboundMessageProcessor()).getRoutes();
-        assertEquals(2, routers.size());
-        assertTrue(routers.get(0).getClass().getName(), routers.get(0) instanceof FilteringOutboundRouter);
-        assertTrue(((FilteringOutboundRouter) routers.get(0)).getFilter() instanceof IsXmlFilter);
-        assertTrue(routers.get(1).getClass().getName(), routers.get(1) instanceof FilteringOutboundRouter);
-        assertTrue(((FilteringOutboundRouter) routers.get(1)).getFilter() instanceof NotFilter);
-        assertTrue(((NotFilter) ((FilteringOutboundRouter) routers.get(1)).getFilter()).getFilter() instanceof IsXmlFilter);
+        Object serviceFlow = null;
+
+        serviceFlow = muleContext.getRegistry().lookupObject("test for xml");
+
+        if (serviceFlow instanceof Service)
+        {
+            List routers = ((OutboundRouterCollection) ((Service) serviceFlow).getOutboundMessageProcessor()).getRoutes();
+
+            assertEquals(2, routers.size());
+            assertTrue(routers.get(0).getClass().getName(), routers.get(0) instanceof FilteringOutboundRouter);
+            assertTrue(((FilteringOutboundRouter) routers.get(0)).getFilter() instanceof IsXmlFilter);
+            assertTrue(routers.get(1).getClass().getName(), routers.get(1) instanceof FilteringOutboundRouter);
+            assertTrue(((FilteringOutboundRouter) routers.get(1)).getFilter() instanceof NotFilter);
+            assertTrue(((NotFilter) ((FilteringOutboundRouter) routers.get(1)).getFilter()).getFilter() instanceof IsXmlFilter);
+
+        }
+        else if (serviceFlow instanceof Flow)
+        {
+            List outEndpoints = new ArrayList(2);
+            outEndpoints.add(((Flow) serviceFlow).getMessageProcessors().get(0));
+            outEndpoints.add(((Flow) serviceFlow).getMessageProcessors().get(2));
+
+            assertEquals(2, outEndpoints.size());
+            assertTrue(outEndpoints.get(0).getClass().getName(), outEndpoints.get(0) instanceof MessageFilter);
+            assertTrue(((MessageFilter) outEndpoints.get(0)).getFilter() instanceof IsXmlFilter);
+            assertTrue(outEndpoints.get(1).getClass().getName(), outEndpoints.get(1) instanceof MessageFilter);
+            assertTrue(((MessageFilter) outEndpoints.get(1)).getFilter() instanceof NotFilter);
+            assertTrue(((NotFilter) ((MessageFilter) outEndpoints.get(1)).getFilter()).getFilter() instanceof IsXmlFilter);
+        }
+        else
+        {
+            fail("Unexpected Object");
+        }
+
     }
 
+    @Test
     public void testJXPathFilter()
     {
-        Service service = muleContext.getRegistry().lookupService("filter xml for content");
-        List routers = ((OutboundRouterCollection) service.getOutboundMessageProcessor()).getRoutes();
-        assertEquals(1, routers.size());
-        assertTrue(routers.get(0).getClass().getName(), routers.get(0) instanceof FilteringOutboundRouter);
-        assertTrue(((FilteringOutboundRouter) routers.get(0)).getFilter() instanceof JXPathFilter);
-        JXPathFilter filter = (JXPathFilter) ((FilteringOutboundRouter) routers.get(0)).getFilter();
-        assertEquals("filter xml for content", filter.getExpectedValue());
-        assertEquals("/mule:mule/mule:model/mule:service[2]/@name", filter.getPattern());
-        assertNotNull(filter.getNamespaces());
-        Map namespaces = filter.getNamespaces();
-        assertEquals(2, namespaces.size());
-        assertEquals("http://www.springframework.org/schema/beans", namespaces.get("spring"));
-        assertTrue(namespaces.get("mule").toString().startsWith("http://www.mulesoft.org/schema/mule/core"));
+        Object serviceFlow = null;
+
+        serviceFlow = muleContext.getRegistry().lookupObject("filter xml for content");
+
+        if (serviceFlow instanceof Service)
+        {
+
+            List routers = ((OutboundRouterCollection) ((Service) serviceFlow).getOutboundMessageProcessor()).getRoutes();
+            assertEquals(1, routers.size());
+            assertTrue(routers.get(0).getClass().getName(), routers.get(0) instanceof FilteringOutboundRouter);
+            assertTrue(((FilteringOutboundRouter) routers.get(0)).getFilter() instanceof JXPathFilter);
+            JXPathFilter filter = (JXPathFilter) ((FilteringOutboundRouter) routers.get(0)).getFilter();
+            assertEquals("filter xml for content", filter.getExpectedValue());
+            assertEquals("/mule:mule/mule:model/mule:service[2]/@name", filter.getPattern());
+            assertNotNull(filter.getNamespaces());
+            Map namespaces = filter.getNamespaces();
+            assertEquals(2, namespaces.size());
+            assertEquals("http://www.springframework.org/schema/beans", namespaces.get("spring"));
+            assertTrue(namespaces.get("mule")
+                .toString()
+                .startsWith("http://www.mulesoft.org/schema/mule/core"));
+
+        }
+        else if (serviceFlow instanceof Flow)
+        {
+
+            List outEndpoints = new ArrayList(1);
+            outEndpoints.add(((Flow) serviceFlow).getMessageProcessors().get(0));
+
+            assertEquals(1, outEndpoints.size());
+            assertTrue(outEndpoints.get(0).getClass().getName(), outEndpoints.get(0) instanceof MessageFilter);
+
+            assertTrue(((MessageFilter) outEndpoints.get(0)).getFilter() instanceof JXPathFilter);
+            JXPathFilter filter = (JXPathFilter) ((MessageFilter) outEndpoints.get(0)).getFilter();
+            assertEquals("filter xml for content", filter.getExpectedValue());
+            assertEquals("/mule:mule/mule:model/mule:service[2]/@name", filter.getPattern());
+            assertNotNull(filter.getNamespaces());
+            Map namespaces = filter.getNamespaces();
+            assertEquals(2, namespaces.size());
+            assertEquals("http://www.springframework.org/schema/beans", namespaces.get("spring"));
+            assertTrue(namespaces.get("mule")
+                .toString()
+                .startsWith("http://www.mulesoft.org/schema/mule/core"));
+
+        }
+        else
+        {
+            fail("Unexpected Object");
+        }
+
     }
 
 }

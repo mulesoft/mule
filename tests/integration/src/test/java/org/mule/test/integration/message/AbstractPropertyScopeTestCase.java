@@ -20,6 +20,12 @@ import org.mule.tck.DynamicPortTestCase;
  */
 public abstract class AbstractPropertyScopeTestCase extends DynamicPortTestCase
 {
+    public AbstractPropertyScopeTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+        
+    }
+
     public void testRequestResponse() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();

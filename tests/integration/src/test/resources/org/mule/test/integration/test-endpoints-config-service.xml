@@ -79,7 +79,7 @@
             </outbound>
         </service>
 
-        <!-- test Uri receiver endpoint specifying a provider with endpoint overrriden and
+        <!-- test Uri receiver endpoint specifying a provider with endpoint overriden and
              test outbound router config combining endpoints -->
         <service name="TestComponent4">
             <inbound>
