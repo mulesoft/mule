@@ -13,21 +13,34 @@ package org.mule.test.routing;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class CollectionAggregatorRouterTimeoutTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class CollectionAggregatorRouterTimeoutTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    protected String getConfigResources()
+    public CollectionAggregatorRouterTimeoutTestCase(ConfigVariant variant, String configResources)
     {
-        return "collection-aggregator-router-timeout-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "collection-aggregator-router-timeout-test-service.xml"},
+            {ConfigVariant.FLOW, "collection-aggregator-router-timeout-test-flow.xml"}});
+    }
+
+    @Test
     public void testNoFailOnTimeout() throws Exception
     {
         // correlation timeouts should not fire in this scenario, check it
@@ -60,14 +73,17 @@ public class CollectionAggregatorRouterTimeoutTestCase extends FunctionalTestCas
         assertEquals("Wrong message received", "second", vortex.getLastReceivedMessage());
 
         // should receive only the first part
-        assertEquals("Aggregator received wrong number of messages.", 1, aggregator.getReceivedMessagesCount());
+        assertEquals("Aggregator received wrong number of messages.", 1,
+            aggregator.getReceivedMessagesCount());
         assertEquals("Wrong message received", Arrays.asList("first"), aggregator.getLastReceivedMessage());
 
-        // wait for the vortex timeout (6000ms for vortext + 2000ms for aggregator timeout + some extra for a test)
+        // wait for the vortex timeout (6000ms for vortext + 2000ms for aggregator
+        // timeout + some extra for a test)
         Thread.sleep(9000);
 
         // now get the messages which were lagging behind
-        // it will receive only one (first) as second will be discarded by the worker because it has already dispatched one with the same group id
+        // it will receive only one (first) as second will be discarded by the worker
+        // because it has already dispatched one with the same group id
         assertEquals("Other messages never received by aggregator.", 1, aggregator.getReceivedMessagesCount());
         assertNotNull(client.request("vm://out?connector=queue", 10000));
     }
