@@ -20,10 +20,10 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.IntegrationDynamicPortTestCase;
 import org.mule.util.StringUtils;
 
-public class HttpProxyTestCase extends DynamicPortTestCase
+public class HttpProxyTestCase extends IntegrationDynamicPortTestCase
 {
     public HttpProxyTestCase(ConfigVariant variant, String configResources)
     {

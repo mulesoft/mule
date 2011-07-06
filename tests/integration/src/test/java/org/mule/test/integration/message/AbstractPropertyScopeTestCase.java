@@ -14,12 +14,12 @@ import org.junit.Test;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.IntegrationDynamicPortTestCase;
 
 /**
  * TODO
  */
-public abstract class AbstractPropertyScopeTestCase extends DynamicPortTestCase
+public abstract class AbstractPropertyScopeTestCase extends IntegrationDynamicPortTestCase
 {
     public AbstractPropertyScopeTestCase(ConfigVariant variant, String configResources)
     {

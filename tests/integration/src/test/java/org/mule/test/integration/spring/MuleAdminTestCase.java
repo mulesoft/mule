@@ -18,9 +18,9 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.IntegrationDynamicPortTestCase;
 
-public class MuleAdminTestCase extends DynamicPortTestCase
+public class MuleAdminTestCase extends IntegrationDynamicPortTestCase
 {
     public MuleAdminTestCase(ConfigVariant variant, String configResources)
     {

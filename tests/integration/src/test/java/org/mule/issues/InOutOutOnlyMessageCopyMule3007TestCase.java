@@ -18,9 +18,9 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.IntegrationDynamicPortTestCase;
 
-public class InOutOutOnlyMessageCopyMule3007TestCase extends DynamicPortTestCase
+public class InOutOutOnlyMessageCopyMule3007TestCase extends IntegrationDynamicPortTestCase
 {
     public InOutOutOnlyMessageCopyMule3007TestCase(ConfigVariant variant, String configResources)
     {

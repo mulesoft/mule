@@ -19,11 +19,11 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.IntegrationDynamicPortTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
 import org.mule.util.concurrent.Latch;
 
-public class WireTapCxfTestCase extends DynamicPortTestCase
+public class WireTapCxfTestCase extends IntegrationDynamicPortTestCase
 {
     static final Latch tapLatch = new Latch();
 

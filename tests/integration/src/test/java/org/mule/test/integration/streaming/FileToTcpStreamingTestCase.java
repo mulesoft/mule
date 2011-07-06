@@ -16,10 +16,10 @@ import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.IntegrationDynamicPortTestCase;
 import org.mule.util.FileUtils;
 
-public class FileToTcpStreamingTestCase extends DynamicPortTestCase
+public class FileToTcpStreamingTestCase extends IntegrationDynamicPortTestCase
 {
     public FileToTcpStreamingTestCase(ConfigVariant variant, String configResources)
     {

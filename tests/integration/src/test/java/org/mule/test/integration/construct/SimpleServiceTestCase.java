@@ -21,12 +21,12 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleException;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.construct.SimpleService;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.IntegrationDynamicPortTestCase;
 import org.mule.test.integration.tck.WeatherForecaster;
 import org.mule.util.StringUtils;
 import org.springframework.util.FileCopyUtils;
 
-public class SimpleServiceTestCase extends DynamicPortTestCase
+public class SimpleServiceTestCase extends IntegrationDynamicPortTestCase
 {
     public SimpleServiceTestCase(ConfigVariant variant, String configResources)
     {

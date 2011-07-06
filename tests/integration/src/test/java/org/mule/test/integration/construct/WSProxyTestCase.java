@@ -16,10 +16,10 @@ import java.util.Collection;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.IntegrationDynamicPortTestCase;
 import org.mule.test.integration.tck.WeatherForecaster;
 
-public class WSProxyTestCase extends DynamicPortTestCase
+public class WSProxyTestCase extends IntegrationDynamicPortTestCase
 {
     public WSProxyTestCase(ConfigVariant variant, String configResources)
     {

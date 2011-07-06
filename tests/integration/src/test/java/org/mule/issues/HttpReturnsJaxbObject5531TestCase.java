@@ -18,10 +18,10 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.IntegrationDynamicPortTestCase;
 import org.mule.transformer.simple.ObjectToString;
 
-public class HttpReturnsJaxbObject5531TestCase extends DynamicPortTestCase
+public class HttpReturnsJaxbObject5531TestCase extends IntegrationDynamicPortTestCase
 {
     public HttpReturnsJaxbObject5531TestCase(ConfigVariant variant, String configResources)
     {

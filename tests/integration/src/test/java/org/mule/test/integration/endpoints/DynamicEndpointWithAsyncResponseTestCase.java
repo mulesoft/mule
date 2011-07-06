@@ -18,9 +18,10 @@ import org.junit.runners.Parameterized.Parameters;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.client.DefaultLocalMuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant;
+import org.mule.tck.IntegrationDynamicPortTestCase;
 
-public class DynamicEndpointWithAsyncResponseTestCase extends DynamicPortTestCase
+public class DynamicEndpointWithAsyncResponseTestCase extends IntegrationDynamicPortTestCase
 {
 
     public DynamicEndpointWithAsyncResponseTestCase(ConfigVariant variant, String configResources)
