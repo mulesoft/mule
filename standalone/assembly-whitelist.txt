@@ -149,9 +149,7 @@
 /mule-standalone-${productVersion}/examples/cep/src/test/java/org/mule/example
 /mule-standalone-${productVersion}/examples/cep/src/test/java/org/mule/example/cep
 /mule-standalone-${productVersion}/examples/cep/src/test/java/org/mule/example/cep/BrokerTestCase.java
-/mule-standalone-${productVersion}/examples/cep/src/test/java/org/mule/example/cep/TestExample.java
 /mule-standalone-${productVersion}/examples/cep/src/test/resources
-/mule-standalone-${productVersion}/examples/cep/src/test/resources/cep-mule-config.xml
 /mule-standalone-${productVersion}/examples/cep/src/test/resources/log4j.properties
 /mule-standalone-${productVersion}/examples/cep/src/test/resources/mule-test-exclusions.txt
 
