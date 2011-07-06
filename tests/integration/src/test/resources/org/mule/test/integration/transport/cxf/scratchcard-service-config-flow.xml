@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf"
+    xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+           http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+           http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd">
+
+
+    <flow name="ScratchCardServiceV1">
+
+        <inbound-endpoint address="http://localhost:28182/ScratchCardServiceV1"
+            exchange-pattern="request-response">
+            <cxf:proxy-service service="IntegrationLayerService"
+                namespace="http://www.wcs.com/2010/07/14/emop.wsdl"
+                wsdlLocation="org/mule/test/integration/transport/cxf/scratchcard.wsdl"
+                payload="envelope" />
+        </inbound-endpoint>
+
+
+
+        <outbound-endpoint address="http://localhost:28081/ESB2B/LotteryService"
+            exchange-pattern="request-response">
+            <cxf:proxy-client payload="envelope" />
+        </outbound-endpoint>
+        <outbound-endpoint
+            address="http://localhost:28081/EMOP/TicketSecurityService"
+            exchange-pattern="request-response">
+            <cxf:proxy-client payload="envelope" />
+        </outbound-endpoint>
+
+
+    </flow>
+    <flow name="ESB2BServiceV1">
+
+        <http:inbound-endpoint
+            address="http://localhost:28081/ESB2B/LotteryService"
+            exchange-pattern="request-response" contentType="text/xml" />
+
+        <echo-component />
+    </flow>
+    <flow name="EMOPServiceV1">
+
+        <http:inbound-endpoint
+            address="http://localhost:28081/EMOP/TicketSecurityService"
+            exchange-pattern="request-response" contentType="text/xml" />
+
+        <echo-component />
+    </flow>
+
+</mule>

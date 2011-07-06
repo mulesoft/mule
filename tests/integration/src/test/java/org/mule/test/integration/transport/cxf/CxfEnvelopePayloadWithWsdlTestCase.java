@@ -10,34 +10,45 @@
 
 package org.mule.test.integration.transport.cxf;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.custommonkey.xmlunit.XMLAssert;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class CxfEnvelopePayloadWithWsdlTestCase extends FunctionalTestCase
+public class CxfEnvelopePayloadWithWsdlTestCase extends AbstractServiceAndFlowTestCase
 {
 
     final String msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" "
-                       + "xmlns:emop=\"http://www.wcs.com/2010/07/14/emop\">"
-                       + "  <soapenv:Header>\n"
+                       + "xmlns:emop=\"http://www.wcs.com/2010/07/14/emop\">" + "  <soapenv:Header>\n"
                        + "    <header UserName=\"nothing\" Password=\"important\"/>\n"
-                       + "  </soapenv:Header>\n"
-                       + "  <soapenv:Body>\n"
+                       + "  </soapenv:Header>\n" + "  <soapenv:Body>\n"
                        + "    <emop:ScratchcardValidateAndPayRequestBody>\n"
                        + "       <ScratchcardNumber>1</ScratchcardNumber>\n"
                        + "       <VirnNumber>2</VirnNumber>\n"
-                       + "    </emop:ScratchcardValidateAndPayRequestBody>\n"
-                       + "  </soapenv:Body>\n"
+                       + "    </emop:ScratchcardValidateAndPayRequestBody>\n" + "  </soapenv:Body>\n"
                        + "</soapenv:Envelope>";
 
-    @Override
-    protected String getConfigResources()
+    public CxfEnvelopePayloadWithWsdlTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/transport/cxf/scratchcard-service-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/transport/cxf/scratchcard-service-config-service.xml"},
+            {ConfigVariant.FLOW,
+                "org/mule/test/integration/transport/cxf/scratchcard-service-config-flow.xml"}});
+    }
+
+    @Test
     public void testEnvelopePayloadIsProcessedWhenMessageAndWsdlContainsHeaders() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
