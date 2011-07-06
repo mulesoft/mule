@@ -69,7 +69,7 @@ public class TransactionalQueueManager extends AbstractXAResourceManager impleme
         QueueInfo q = queues.get(name);
         if (q == null)
         {
-            q = new QueueInfo(name, defaultQueueConfiguration);
+            q = new QueueInfo(name, muleContext, defaultQueueConfiguration);
             queues.put(name, q);
         }
         return q;

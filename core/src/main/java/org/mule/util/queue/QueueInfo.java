@@ -10,6 +10,7 @@
 
 package org.mule.util.queue;
 
+import org.mule.api.MuleContext;
 import org.mule.api.store.ListableObjectStore;
 import org.mule.api.store.ObjectStore;
 
@@ -25,11 +26,14 @@ public class QueueInfo
     private QueueConfiguration config;
     private String name;
     private QueueInfoDelegate delegate;
+    private MuleContext muleContext;
+
     private static Map<Class<? extends ObjectStore>, QueueInfoDelegateFactory> delegateFactories = new HashMap<Class<? extends ObjectStore>, QueueInfoDelegateFactory>();
 
-    public QueueInfo(String name, QueueConfiguration config)
+    public QueueInfo(String name, MuleContext muleContext, QueueConfiguration config)
     {
         this.name = name;
+        this.muleContext = muleContext;
         setConfigAndDelegate(config);
     }
 
@@ -51,7 +55,7 @@ public class QueueInfo
         }
         if (delegate == null || (config != null && !hadConfig))
         {
-            this.delegate = factory != null ? factory.createDelegate(this) : new DefaultQueueInfoDelegate(capacity);
+            this.delegate = factory != null ? factory.createDelegate(this, muleContext) : new DefaultQueueInfoDelegate(capacity);
         }
     }
 
@@ -130,6 +134,6 @@ public class QueueInfo
         /**
          * Create a delegate
          */
-        QueueInfoDelegate createDelegate(QueueInfo parent);
+        QueueInfoDelegate createDelegate(QueueInfo parent, MuleContext muleContext);
     }
 }
