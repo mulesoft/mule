@@ -36,7 +36,7 @@ import org.bouncycastle.openpgp.PGPUtil;
 public class DecryptStreamTransformer implements StreamTransformer
 {
     private static final long offset = 1 << 24;
-    
+
     private InputStream toBeDecrypted;
     private PGPPublicKey publicKey;
     private PGPSecretKey secretKey;
@@ -92,7 +92,7 @@ public class DecryptStreamTransformer implements StreamTransformer
 
         // This loop looks like it is ready for multiple encrypted
         // objects, but really only one is expected.
-        Iterator it = enc.getEncryptedDataObjects();
+        Iterator<?> it = enc.getEncryptedDataObjects();
         PGPPublicKeyEncryptedData pbe = null;
         PGPPrivateKey privateKey = null;
         while (privateKey == null && it.hasNext())

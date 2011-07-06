@@ -29,17 +29,10 @@ import org.mule.module.pgp.SignedMessage;
 import org.mule.module.pgp.i18n.PGPMessages;
 import org.mule.security.AbstractEndpointSecurityFilter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.openpgp.PGPPublicKey;
 
 public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
 {
-    /**
-     * logger used by this class
-     */
-    protected static final Log logger = LogFactory.getLog(PGPSecurityFilter.class);
-
     private EncryptionStrategy strategy;
 
     private String strategyName;
@@ -170,7 +163,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
     {
         if (strategyName != null)
         {
-            strategy = endpoint.getMuleContext().getSecurityManager().getEncryptionStrategy(strategyName);
+            strategy = muleContext.getSecurityManager().getEncryptionStrategy(strategyName);
         }
 
         if (strategy == null)

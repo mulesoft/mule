@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:file="http://www.mulesoft.org/schema/mule/file"
-       xmlns:pgp="http://www.mulesoft.org/schema/mule/pgp"
-       xmlns:vm="http://www.mulesource.org/schema/mule/vm"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:file="http://www.mulesoft.org/schema/mule/file"
+      xmlns:pgp="http://www.mulesoft.org/schema/mule/pgp"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
     xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
-       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.1/mule-file.xsd
-       http://www.mulesoft.org/schema/mule/pgp http://www.mulesoft.org/schema/mule/pgp/3.1/mule-pgp.xsd
-       http://www.mulesource.org/schema/mule/vm http://www.mulesource.org/schema/mule/vm/3.1/mule-vm.xsd">
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.1/mule-file.xsd
+        http://www.mulesoft.org/schema/mule/pgp http://www.mulesoft.org/schema/mule/pgp/3.1/mule-pgp.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd">
 
     <spring:bean id="pgpKeyManager" class="org.mule.module.pgp.PGPKeyRingImpl" init-method="initialise">
         <spring:property name="publicKeyRingFileName" value="serverPublic.gpg"/>
@@ -18,21 +18,19 @@
         <spring:property name="secretAliasId" value="6247672658342245276"/>
         <spring:property name="secretPassphrase" value="TestingPassphrase"/>
     </spring:bean>
-    
-    <spring:bean id="credentialAccessor" class="org.mule.security.MuleHeaderCredentialsAccessor"/>
 
-	<vm:connector name="c" queueEvents="true" />
+    <spring:bean id="credentialAccessor" class="org.mule.security.MuleHeaderCredentialsAccessor"/>
 
     <pgp:security-manager>
         <pgp:security-provider name="pgpSecurityProvider" keyManager-ref="pgpKeyManager"/>
-        <pgp:keybased-encryption-strategy name="keyBasedEncryptionStrategy" keyManager-ref="pgpKeyManager" 
+        <pgp:keybased-encryption-strategy name="keyBasedEncryptionStrategy" keyManager-ref="pgpKeyManager"
             credentialsAccessor-ref="credentialAccessor"/>
     </pgp:security-manager>
 
     <model name="test">
         <service name="echo">
             <inbound>
-                <inbound-endpoint address="vm://echo" exchange-pattern="one-way">
+                <inbound-endpoint address="vm://echo" exchange-pattern="request-response">
                     <pgp:security-filter strategyName="keyBasedEncryptionStrategy" signRequired="true"
                                          credentialsAccessor-ref="credentialAccessor"
                                          keyManager-ref="pgpKeyManager"/>

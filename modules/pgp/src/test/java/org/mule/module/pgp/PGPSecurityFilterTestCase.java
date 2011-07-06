@@ -12,16 +12,12 @@ package org.mule.module.pgp;
 
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
+import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
-import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
-import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -38,7 +34,8 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
     {
         return (AbstractEncryptionStrategyTestCase.isCryptographyExtensionInstalled() == false);
     }
-    
+
+    @Override
     protected String getConfigResources()
     {
         return "test-pgp-encrypt-config.xml";
@@ -46,21 +43,27 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
 
     public void testAuthenticationAuthorised() throws Exception
     {
+        MuleClient client = muleContext.getClient();
+
         byte[] msg = loadEncryptedMessage();
+        Map<String, Object> props = createMessageProperties();
 
-        Map<String, String> props = new HashMap<String, String>();
-        props.put("TARGET_FILE", TARGET);
-        props.put(MuleProperties.MULE_USER_PROPERTY, "Mule server <mule_server@mule.com>");
-
-        MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://echo", new String(msg), props);
         assertNull(reply.getExceptionPayload());
-        
-        MuleMessage message = client.request("vm://output", RECEIVE_TIMEOUT);
 
-        assertEquals("This is a test message.\r\nThis is another line.\r\n", message.getPayloadAsString()); 
+        MuleMessage message = client.request("vm://output", RECEIVE_TIMEOUT);
+        assertEquals("This is a test message.\r\nThis is another line.\r\n", message.getPayloadAsString());
     }
-    
+
+    public void testAuthenticationNotAuthorised() throws Exception
+    {
+        Map<String, Object> props = createMessageProperties();
+        MuleMessage reply = muleContext.getClient().send("vm://echo", "An unsigned message", props);
+        assertNotNull(reply.getExceptionPayload());
+        ExceptionPayload excPayload = reply.getExceptionPayload();
+        assertEquals(MESSAGE_EXCEPTION, excPayload.getMessage());
+    }
+
     private byte[] loadEncryptedMessage() throws IOException
     {
         URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-signed.asc");
@@ -68,21 +71,15 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         FileInputStream in = new FileInputStream(url.getFile());
         byte[] msg = IOUtils.toByteArray(in);
         in.close();
-        
+
         return msg;
     }
 
-    // see MULE-3672
-    public void testAuthenticationNotAuthorised() throws Exception
+    private Map<String, Object> createMessageProperties()
     {
-        MuleClient client = new MuleClient(muleContext);
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, Object> props = new HashMap<String, Object>();
         props.put("TARGET_FILE", TARGET);
         props.put(MuleProperties.MULE_USER_PROPERTY, "Mule server <mule_server@mule.com>");
-        MuleMessage reply = client.send("vm://echo", "An unsigned message", props);
-        
-        assertNotNull(reply.getExceptionPayload());
-        ExceptionPayload excPayload = reply.getExceptionPayload();
-        assertEquals(MESSAGE_EXCEPTION, excPayload.getMessage());
+        return props;
     }
 }
