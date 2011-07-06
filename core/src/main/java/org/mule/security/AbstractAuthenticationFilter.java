@@ -10,7 +10,6 @@
 
 package org.mule.security;
 
-import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
@@ -26,11 +25,9 @@ import org.mule.api.security.UnknownAuthenticationTypeException;
  * <code>AbstractEndpointSecurityFilter</code> provides a framework to perform inbound
  * or outbound authentication for messages.
  */
-
 public abstract class AbstractAuthenticationFilter extends AbstractSecurityFilter implements AuthenticationFilter
 {
     private boolean authenticate;
-    protected MuleContext muleContext;
     private CredentialsAccessor credentialsAccessor;
 
     public CredentialsAccessor getCredentialsAccessor()
