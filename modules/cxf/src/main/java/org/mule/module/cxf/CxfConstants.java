@@ -41,4 +41,7 @@ public class CxfConstants
     public static final String IN_FAULT_INTERCEPTORS = "inFaultInterceptors";
     public static final String OUT_INTERCEPTORS = "outInterceptors";
     public static final String OUT_FAULT_INTERCEPTORS = "outFaultInterceptors";
+    
+    public static final String CREATE_SOAP_FAULT = "CREATE_SOAP_FAULT";
+    public static final String INVOKE_EXCEPTION_STRATEGY = "INVOKE_EXCEPTION_STRATEGY";
 }
