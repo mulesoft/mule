@@ -113,7 +113,6 @@
         <geronimoSpecsStaxVersion>1.0.1</geronimoSpecsStaxVersion>
         <geronimoSpecsWsMetadataVersion>1.1.2</geronimoSpecsWsMetadataVersion>
         <hibernateVersion>3.6.0.Final</hibernateVersion>
-        <ibeansVersion>1.0-SNAPSHOT</ibeansVersion>
         <jacksonVersion>1.8.0</jacksonVersion>
         <jerseyVersion>1.6</jerseyVersion>
         <jaxbApiVersion>2.1</jaxbApiVersion>
