@@ -10,10 +10,14 @@
 
 package org.mule.test.integration.construct;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.DynamicPortTestCase;
@@ -21,13 +25,22 @@ import org.mule.util.StringUtils;
 
 public class HttpProxyTestCase extends DynamicPortTestCase
 {
-    private MuleClient muleClient;
-
-    @Override
-    protected String getConfigResources()
+    public HttpProxyTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/construct/http-proxy-config.xml";
+        super(variant, configResources);
+
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+            "org/mule/test/integration/construct/http-proxy-config.xml"}
+
+        });
+    }
+
+    private MuleClient muleClient;
 
     @Override
     protected int getNumPortsToFind()
@@ -42,37 +55,44 @@ public class HttpProxyTestCase extends DynamicPortTestCase
         muleClient = new MuleClient(muleContext);
     }
 
+    @Test
     public void testDirect() throws Exception
     {
         testDirectRequest(0);
     }
 
+    @Test
     public void testEndpointChildren() throws Exception
     {
         testDirectRequest(1);
     }
 
+    @Test
     public void testExceptionStrategy() throws Exception
     {
         testDirectRequest(2);
     }
 
+    @Test
     public void testTransforming() throws Exception
     {
         testRequest(3, "fooinbarout");
     }
 
+    @Test
     public void testInheritance() throws Exception
     {
         testRequest(4, "fooinbarout");
     }
 
+    @Test
     public void testDynamicAddress() throws Exception
     {
         testExtraHeadersRequest(5, Collections.singletonMap("proxyTarget", "bar-appender"));
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testPathExtensions() throws Exception
     {
         testRequest(1, "/extension", "foobar", Collections.EMPTY_MAP);

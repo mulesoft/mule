@@ -7,8 +7,14 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.endpoints;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.client.DefaultLocalMuleClient;
@@ -17,10 +23,25 @@ import org.mule.tck.DynamicPortTestCase;
 public class DynamicEndpointWithAsyncResponseTestCase extends DynamicPortTestCase
 {
 
+    public DynamicEndpointWithAsyncResponseTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+
+    }
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/endpoints/dynamic-endpoint-with-async-response-config.xml";
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+            "org/mule/test/integration/endpoints/dynamic-endpoint-with-async-response-config.xml"}
+
+        });
     }
 
     @Override
@@ -29,6 +50,7 @@ public class DynamicEndpointWithAsyncResponseTestCase extends DynamicPortTestCas
         return 1;
     }
 
+    @Test
     public void testDynamicEndpointWithAsyncResponse() throws Exception
     {
 

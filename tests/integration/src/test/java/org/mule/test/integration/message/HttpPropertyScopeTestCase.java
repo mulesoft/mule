@@ -7,13 +7,28 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.integration.message;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.runners.Parameterized.Parameters;
 
 public class HttpPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public HttpPropertyScopeTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/message/http-property-scope.xml";
+        super(variant, configResources);
+
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+            "org/mule/test/message/http-property-scope.xml"}
+
+        });
     }
 }

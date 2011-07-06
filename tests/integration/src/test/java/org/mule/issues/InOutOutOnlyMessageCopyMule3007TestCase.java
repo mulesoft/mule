@@ -10,6 +10,11 @@
 
 package org.mule.issues;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -17,10 +22,17 @@ import org.mule.tck.DynamicPortTestCase;
 
 public class InOutOutOnlyMessageCopyMule3007TestCase extends DynamicPortTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public InOutOutOnlyMessageCopyMule3007TestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/issues/inout-outonly-message-copy-mule3007-test.xml";
+        super(variant, configResources);
+
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+            "org/mule/issues/inout-outonly-message-copy-mule3007-test.xml"},});
     }
 
     @Override
@@ -29,6 +41,7 @@ public class InOutOutOnlyMessageCopyMule3007TestCase extends DynamicPortTestCase
         return 1;
     }
 
+    @Test
     public void testStreamMessage() throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);
@@ -38,5 +51,3 @@ public class InOutOutOnlyMessageCopyMule3007TestCase extends DynamicPortTestCase
         assertNull(response.getExceptionPayload());
     }
 }
-
-

@@ -10,9 +10,20 @@
 
 package org.mule.module.xml.functional;
 
+import org.junit.Test;
+
 public class FilteringXmlMessageExpressionSplitterFunctionalTestCase extends AbstractXmlExpressionSplitterOutboundFunctionalTestCase
 {
 
+    public FilteringXmlMessageExpressionSplitterFunctionalTestCase(ConfigVariant variant,
+                                                                   String configResources)
+    {
+        super(variant, configResources);
+        
+    }
+    
+    
+    @Test
     public void testSplit() throws Exception
     {
         doSend("split");

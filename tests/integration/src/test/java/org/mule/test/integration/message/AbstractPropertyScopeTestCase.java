@@ -10,6 +10,7 @@
 
 package org.mule.test.integration.message;
 
+import org.junit.Test;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -25,7 +26,8 @@ public abstract class AbstractPropertyScopeTestCase extends DynamicPortTestCase
         super(variant, configResources);
         
     }
-
+    
+    @Test
     public void testRequestResponse() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();

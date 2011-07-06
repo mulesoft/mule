@@ -10,17 +10,18 @@
 
 package org.mule.module.xml.functional;
 
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
 
 public abstract class AbstractXmlSplitterOutboundFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
@@ -32,9 +33,19 @@ public abstract class AbstractXmlSplitterOutboundFunctionalTestCase extends Abst
     public static final String ROUND_ROBIN_ENDPOINT_PREFIX = "robin";
     public static final String NAME = "name";
 
-    protected String getConfigResources()
+    public AbstractXmlSplitterOutboundFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/module/xml/xml-outbound-functional-test.xml";
+        super(variant, configResources);
+
+    }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/module/xml/xml-outbound-functional-test.xml"}
+            
+        });
     }
 
     protected void doSend(String endpoint) throws IOException, MuleException
@@ -57,9 +68,11 @@ public abstract class AbstractXmlSplitterOutboundFunctionalTestCase extends Abst
         assertEquals(service, element.attributeValue(NAME));
     }
 
-    protected void assertServices(String prefix, int index, String[] services) throws MuleException, IOException
+    protected void assertServices(String prefix, int index, String[] services)
+        throws MuleException, IOException
     {
-        List remaining = new LinkedList(Arrays.asList(services)); // asList is immutable
+        List remaining = new LinkedList(Arrays.asList(services)); // asList is
+                                                                  // immutable
         while (remaining.size() > 0)
         {
             MuleClient client = new MuleClient(muleContext);

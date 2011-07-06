@@ -10,6 +10,11 @@
 
 package org.mule.test.integration.spring;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
@@ -17,11 +22,22 @@ import org.mule.tck.DynamicPortTestCase;
 
 public class MuleAdminTestCase extends DynamicPortTestCase
 {
-    protected String getConfigResources()
+    public MuleAdminTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/spring/mule-admin-spring.xml";
+        super(variant, configResources);
+
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+            "org/mule/test/integration/spring/mule-admin-spring.xml"}
+
+        });
+    }
+
+    @Test
     public void testMuleAdminChannelInSpring() throws Exception
     {
         MuleClient mc = new MuleClient(muleContext);

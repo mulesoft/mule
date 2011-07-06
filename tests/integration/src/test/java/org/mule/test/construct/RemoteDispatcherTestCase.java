@@ -9,6 +9,11 @@
  */
 package org.mule.test.construct;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
@@ -20,11 +25,21 @@ import org.mule.tck.DynamicPortTestCase;
  */
 public class RemoteDispatcherTestCase extends DynamicPortTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public RemoteDispatcherTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/construct/remote-dispatcher.xml";
+        super(variant, configResources);
+        
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/construct/remote-dispatcher.xml"}
+            
+        });
+    }   
+    
 
     @Override
     protected int getNumPortsToFind()
@@ -32,6 +47,7 @@ public class RemoteDispatcherTestCase extends DynamicPortTestCase
         return 1;  
     }
 
+    @Test
     public void testRemoting() throws Exception
     {
         String[] targets = {"service1", "nosuch", "vmConnector", "flow1"};

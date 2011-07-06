@@ -10,23 +10,38 @@
 
 package org.mule.module.xml.functional;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Random;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-
-import java.util.Random;
 
 public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
 
+    public XmlFilterFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+
+    }
+
     public static final int MAX_COUNT = 100;
     public static final String STRING_MESSAGE = "Hello world";
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "org/mule/module/xml/xml-filter-functional-test.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/module/xml/xml-filter-functional-test-service.xml"}
+            //,{ConfigVariant.FLOW, "org/mule/module/xml/xml-filter-functional-test-flow.xml"}
+
+        });
     }
 
+    @Test
     public void testNotXml() throws Exception
     {
         logger.debug("not xml");
@@ -38,12 +53,14 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
         assertEquals(STRING_MESSAGE, response.getPayloadAsString());
     }
 
+    @Test
     public void testOther() throws Exception
     {
         logger.debug("other");
         doTestXml("other", getResourceAsString("org/mule/issues/many-sends-mule-1758-test.xml"));
     }
 
+    @Test
     public void testSelf() throws Exception
     {
         logger.debug("self");
@@ -60,6 +77,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
         assertEquals(xml, response.getPayloadAsString());
     }
 
+    @Test
     public void testMany() throws Exception
     {
         Random random = new Random();
@@ -67,17 +85,17 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
         {
             switch (random.nextInt(3))
             {
-            case 0:
-                testNotXml();
-                break;
-            case 1:
-                testOther();
-                break;
-            case 2:
-                testSelf();
-                break;
-            default:
-                throw new IllegalStateException("Bad case");
+                case 0 :
+                    testNotXml();
+                    break;
+                case 1 :
+                    testOther();
+                    break;
+                case 2 :
+                    testSelf();
+                    break;
+                default :
+                    throw new IllegalStateException("Bad case");
             }
         }
     }

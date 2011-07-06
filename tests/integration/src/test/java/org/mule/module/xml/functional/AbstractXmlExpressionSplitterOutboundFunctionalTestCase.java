@@ -10,11 +10,27 @@
 
 package org.mule.module.xml.functional;
 
+import java.util.Arrays;
+import java.util.Collection;
 
-public abstract class AbstractXmlExpressionSplitterOutboundFunctionalTestCase extends AbstractXmlSplitterOutboundFunctionalTestCase
+import org.junit.runners.Parameterized.Parameters;
+
+public abstract class AbstractXmlExpressionSplitterOutboundFunctionalTestCase extends
+    AbstractXmlSplitterOutboundFunctionalTestCase
 {
-    protected String getConfigResources()
+    public AbstractXmlExpressionSplitterOutboundFunctionalTestCase(ConfigVariant variant,
+                                                                   String configResources)
     {
-        return "org/mule/module/xml/xml-outbound-expression-functional-test.xml";
+        super(variant, configResources);
+
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+            "org/mule/module/xml/xml-outbound-expression-functional-test.xml"}
+
+        });
     }
 }

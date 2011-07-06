@@ -10,24 +10,37 @@
 
 package org.mule.test.integration.streaming;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
 
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.tck.DynamicPortTestCase;
 import org.mule.util.FileUtils;
 
-import java.io.File;
-
 public class FileToTcpStreamingTestCase extends DynamicPortTestCase
 {
-    @Override
-    protected void doTearDown() throws Exception
+    public FileToTcpStreamingTestCase(ConfigVariant variant, String configResources)
     {
-        FileUtils.deleteDirectory(FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory() + "/test-data"));
+        super(variant, configResources);
+
     }
 
     @Override
-    protected String getConfigResources()
+    protected void doTearDown() throws Exception
     {
-        return "org/mule/test/integration/streaming/file-to-tcp-streaming.xml";
+        FileUtils.deleteDirectory(FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory()
+                                                    + "/test-data"));
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+            "org/mule/test/integration/streaming/file-to-tcp-streaming.xml"}
+
+        });
     }
 
     @Override
@@ -36,15 +49,16 @@ public class FileToTcpStreamingTestCase extends DynamicPortTestCase
         return 1;
     }
 
+    @Test
     public void testStreamingFromFileToTcp() throws Exception
     {
-        String text = "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah " +
-                "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah " +
-                "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah " +
-                "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah\n\n";
+        String text = "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah "
+                      + "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah "
+                      + "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah "
+                      + "\nblah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah\n\n";
 
         String basepath = muleContext.getConfiguration().getWorkingDirectory() + "/test-data";
-        
+
         FileUtils.stringToFile(basepath + "/in/foo.txt", text);
 
         Thread.sleep(4000);

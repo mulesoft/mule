@@ -10,13 +10,21 @@
 
 package org.mule.module.xml.functional;
 
-import org.mule.api.MuleException;
-
 import java.io.IOException;
+
+import org.junit.Test;
+import org.mule.api.MuleException;
 
 public class RoundRobinXmlSplitterFunctionalTestCase extends AbstractXmlSplitterOutboundFunctionalTestCase
 {
 
+    public RoundRobinXmlSplitterFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+        
+    }
+
+    @Test
     public void testSimple() throws MuleException, IOException
     {
         doSend("roundrobin-det");
@@ -24,6 +32,7 @@ public class RoundRobinXmlSplitterFunctionalTestCase extends AbstractXmlSplitter
         assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 2, ROUND_ROBIN_DET);
     }
 
+    @Test
     public void testDeterministic() throws MuleException, IOException
     {
         doSend("roundrobin-det");
@@ -38,6 +47,7 @@ public class RoundRobinXmlSplitterFunctionalTestCase extends AbstractXmlSplitter
         assertServices(ROUND_ROBIN_ENDPOINT_PREFIX, 2, new String[]{ROUND_ROBIN_DET, ROUND_ROBIN_DET});
     }
 
+    @Test
     public void testIndeterministic() throws MuleException, IOException
     {
         doSend("roundrobin-indet");

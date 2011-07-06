@@ -10,25 +10,40 @@
 
 package org.mule.test.integration.client;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 
-import java.util.Date;
-
-public class RemoteExceptionTestCase extends FunctionalTestCase
+public class RemoteExceptionTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    protected String getConfigResources()
+    public RemoteExceptionTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/client/remote-exception-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/client/remote-exception-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/client/remote-exception-config-flow.xml"}
+        });
+    }
+    
+
+    @Test
     public void testClientTransformerException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -41,6 +56,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
         assertTrue(exceptionPayload.getRootException() instanceof Exception);
     }
 
+    @Test
     public void testClientMalformedEndpointException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -52,6 +68,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
         assertTrue(exceptionPayload.getRootException() instanceof MalformedEndpointException);
     }
 
+    @Test
     public void testClientComponentException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

@@ -10,21 +10,30 @@
 
 package org.mule.test.integration.construct;
 
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.math.RandomUtils;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleException;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.construct.SimpleService;
 import org.mule.tck.DynamicPortTestCase;
 import org.mule.test.integration.tck.WeatherForecaster;
 import org.mule.util.StringUtils;
-
-import java.io.InputStream;
-
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.math.RandomUtils;
 import org.springframework.util.FileCopyUtils;
 
 public class SimpleServiceTestCase extends DynamicPortTestCase
 {
+    public SimpleServiceTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+
+    }
+
     private LocalMuleClient muleClient;
 
     @Override
@@ -40,57 +49,70 @@ public class SimpleServiceTestCase extends DynamicPortTestCase
         return 2;
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "org/mule/test/integration/construct/simple-service-config.xml";
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+            "org/mule/test/integration/construct/simple-service-config.xml"}
+
+        });
     }
 
+    @Test
     public void testPureAttributes() throws Exception
     {
         doTestMathsService("vm://maths1.in");
     }
 
+    @Test
     public void testAbstractInheritence() throws Exception
     {
         doTestMathsService("vm://maths2.in");
     }
 
+    @Test
     public void testEndpointReference() throws Exception
     {
         doTestMathsService("vm://maths3.in");
     }
 
+    @Test
     public void testComponentReference() throws Exception
     {
         doTestMathsService("vm://maths4.in");
     }
 
+    @Test
     public void testChildComponent() throws Exception
     {
         doTestMathsService("vm://maths5.in");
     }
 
+    @Test
     public void testTransformerReferences() throws Exception
     {
         doTestStringMassager("vm://bam1.in");
     }
 
+    @Test
     public void testConcreteInheritence() throws Exception
     {
         doTestStringMassager("vm://bam2.in");
     }
 
+    @Test
     public void testComponentWithEntryPointResolver() throws Exception
     {
         doTestMathsService("vm://maths6.in");
     }
 
+    @Test
     public void testChildEndpoint() throws Exception
     {
         doTestMathsService("vm://maths7.in");
     }
 
+    @Test
     public void testInheritedExceptionStrategy() throws Exception
     {
         try
@@ -104,11 +126,13 @@ public class SimpleServiceTestCase extends DynamicPortTestCase
         }
     }
 
+    @Test
     public void testJaxWsService() throws Exception
     {
         doTestJaxWsService(1);
     }
 
+    @Test
     public void testJaxbConsumer() throws Exception
     {
         final String result = muleClient.send(
@@ -122,6 +146,7 @@ public class SimpleServiceTestCase extends DynamicPortTestCase
         assertTrue(StringUtils.isNotBlank(result));
     }
 
+    @Test
     public void testXpathConsumer() throws Exception
     {
         final String result = muleClient.send(
@@ -135,11 +160,13 @@ public class SimpleServiceTestCase extends DynamicPortTestCase
         assertTrue(StringUtils.isNotBlank(result));
     }
 
+    @Test
     public void testFunctionalTestComponent() throws Exception
     {
         doTestFunctionalTestComponent("vm://ftc1.in", "functional-test-component-1");
     }
 
+    @Test
     public void testInheritedType() throws Exception
     {
         doTestJaxWsService(2);
@@ -186,6 +213,7 @@ public class SimpleServiceTestCase extends DynamicPortTestCase
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
     }
 
+    @Test
     public void testInheritedElementsUnique() throws Exception
     {
         final SimpleService child1 = (SimpleService) getFlowConstruct("child-service-1");
