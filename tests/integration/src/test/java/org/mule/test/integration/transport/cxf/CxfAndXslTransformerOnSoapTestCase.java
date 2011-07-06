@@ -10,18 +10,22 @@
 
 package org.mule.test.integration.transport.cxf;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.cxf.support.OutputPayloadInterceptor;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy.ExceptionCallback;
 import org.mule.util.concurrent.Latch;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-public class CxfAndXslTransformerOnSoapTestCase extends FunctionalTestCase
+public class CxfAndXslTransformerOnSoapTestCase extends AbstractServiceAndFlowTestCase
 {
     final String msg = "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:emop=\"http://www.wcs.com/2010/07/14/emop\">"
                        + "  <soapenv:Header>\n"
@@ -44,10 +48,18 @@ public class CxfAndXslTransformerOnSoapTestCase extends FunctionalTestCase
         connectorExceptionCounter.set(0);
     }
 
-    @Override
-    protected String getConfigResources()
+    public CxfAndXslTransformerOnSoapTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/transport/cxf/scratchcard-service-v1.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/transport/cxf/scratchcard-service-v1-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/transport/cxf/scratchcard-service-v1-flow.xml"}});
     }
 
     /**
@@ -57,6 +69,7 @@ public class CxfAndXslTransformerOnSoapTestCase extends FunctionalTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testUsesTransformersCorrectly() throws Exception
     {
         TestExceptionStrategy exceptionStrategy = new TestExceptionStrategy();
@@ -84,5 +97,3 @@ public class CxfAndXslTransformerOnSoapTestCase extends FunctionalTestCase
         assertEquals("There shouldn't have been any exceptions", 0, connectorExceptionCounter.get());
     }
 }
-
-
