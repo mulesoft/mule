@@ -11,20 +11,20 @@
 package org.mule.tck;
 
 
+
 /**
  * Extend this class instead of FunctionalTestCase to add dynamic port support to
  * your tests. The test will need to only implement 'getNumPortsToFind' to tell this
  * class how many free test ports to find.
  */
-public abstract class DynamicPortTestCase extends FunctionalTestCase
+public abstract class DynamicPortTestCase extends AbstractServiceAndFlowTestCase
 {
     protected abstract int getNumPortsToFind();
-
-    public DynamicPortTestCase()
+    
+    public DynamicPortTestCase(ConfigVariant variant, String configResources)
     {
-        super();
-
-        // each test class sets the number of free ports to find
+        super(variant, configResources);
+        
         numPorts = getNumPortsToFind();
     }
 

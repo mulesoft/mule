@@ -10,27 +10,43 @@
 
 package org.mule.module.spring.security;
 
-import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.http.HttpConstants;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.http.HttpConstants;
 
-public class HttpFilterFunctionalTestCase extends FunctionalTestCase
+public class HttpFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    protected String getConfigResources()
+    public HttpFilterFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "http-filter-test.xml";
+        super(variant, configResources);
+        
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            
+            {ConfigVariant.FLOW, "http-filter-test.xml"}
+        });
+    }   
+
 
     protected String getUrl()
     {
         return "http://localhost:4567/authenticate";
     }
 
+    @Test
     public void testAuthenticationFailureNoContext() throws Exception
     {
         HttpClient client = new HttpClient();
@@ -51,6 +67,7 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testAuthenticationFailureBadCredentials() throws Exception
     {
         doRequest(null, "localhost", "anonX", "anonX", getUrl(), false, 401);
@@ -62,11 +79,13 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
     //    doRequest("blah", "localhost", "anon", "anon", getUrl(), false, 401);
     //}
 
+    @Test
     public void testAuthenticationAuthorised() throws Exception
     {
         doRequest(null, "localhost", "anon", "anon", getUrl(), false, 200);
     }
 
+    @Test
     public void testAuthenticationAuthorisedWithHandshake() throws Exception
     {
         doRequest(null, "localhost", "anon", "anon", getUrl(), true, 200);
@@ -78,6 +97,7 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
     //    doRequest("blah", "localhost", "anon", "anon", getUrl(), true, 401);
     //}
 
+    @Test
     public void testAuthenticationAuthorisedWithHandshakeAndRealm() throws Exception
     {
         doRequest("mule-realm", "localhost", "ross", "ross", getUrl(), true, 200);
