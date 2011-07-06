@@ -27,11 +27,11 @@ import org.mule.module.pgp.PGPCryptInfo;
 import org.mule.module.pgp.PGPKeyRing;
 import org.mule.module.pgp.SignedMessage;
 import org.mule.module.pgp.i18n.PGPMessages;
-import org.mule.security.AbstractEndpointSecurityFilter;
+import org.mule.security.AbstractAuthenticationFilter;
 
 import org.bouncycastle.openpgp.PGPPublicKey;
 
-public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
+public class PGPSecurityFilter extends AbstractAuthenticationFilter
 {
     private EncryptionStrategy strategy;
 
@@ -103,7 +103,7 @@ public class PGPSecurityFilter extends AbstractEndpointSecurityFilter
         }
         catch (Exception e2)
         {
-            throw new UnauthorisedException(event, context, event.getEndpoint(), this);
+            throw new UnauthorisedException(event, context, this);
         }
     }
 
