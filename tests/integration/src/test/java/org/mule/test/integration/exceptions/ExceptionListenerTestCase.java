@@ -14,18 +14,32 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.message.ExceptionMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class ExceptionListenerTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class ExceptionListenerTestCase extends AbstractServiceAndFlowTestCase
 {
     private MuleClient client;
 
-    @Override
-    protected String getConfigResources()
+    public ExceptionListenerTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/exceptions/exception-listener-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-listener-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-listener-config-flow.xml"}
+        });
+    }      
+    
     @Override
     protected void doSetUp() throws Exception
     {
@@ -33,6 +47,7 @@ public class ExceptionListenerTestCase extends FunctionalTestCase
         client = new MuleClient(muleContext);
     }
 
+    @Test
     public void testExceptionStrategyFromComponent() throws Exception
     {
         assertQueueIsEmpty("vm://error.queue");

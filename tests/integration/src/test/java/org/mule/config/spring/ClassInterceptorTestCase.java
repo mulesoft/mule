@@ -13,14 +13,29 @@ package org.mule.config.spring;
 import org.mule.module.client.MuleClient;
 import org.mule.api.MuleException;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public class ClassInterceptorTestCase extends AbstractInterceptorTestCase
 {
 
-    protected String getConfigResources()
+    public ClassInterceptorTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/config/spring/class-interceptor-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/config/spring/class-interceptor-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/config/spring/class-interceptor-test-flow.xml"}});
+    }
+
+    @Test
     public void testInterceptor() throws MuleException, InterruptedException
     {
         MuleClient client = new MuleClient(muleContext);

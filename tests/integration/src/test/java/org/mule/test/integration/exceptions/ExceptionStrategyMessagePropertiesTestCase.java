@@ -12,21 +12,35 @@ package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ExceptionStrategyMessagePropertiesTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceAndFlowTestCase
 {
     int numMessages = 100;
     
-    @Override
-    protected String getConfigResources()
+    public ExceptionStrategyMessagePropertiesTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/exceptions/exception-strategy-message-properties.xml";
+        super(variant, configResources);
     }
-
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-strategy-message-properties-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-strategy-message-properties-flow.xml"}
+        });
+    }      
+    
+    @Test
     public void testException() throws Exception
     {
         Thread tester1 = new Tester();

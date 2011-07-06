@@ -12,12 +12,16 @@ package org.mule.test.integration.resolvers;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Map;
 
-public abstract class AbstractEntryPointResolverTestCase extends FunctionalTestCase
+public abstract class AbstractEntryPointResolverTestCase extends AbstractServiceAndFlowTestCase
 {
+    public AbstractEntryPointResolverTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
 
     protected void doTest(String path, Object payload, String result) throws Exception
     {

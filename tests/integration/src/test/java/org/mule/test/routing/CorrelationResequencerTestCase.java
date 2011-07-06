@@ -12,39 +12,52 @@ package org.mule.test.routing;
 
 import org.mule.api.MuleEventContext;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class CorrelationResequencerTestCase extends FunctionalTestCase
-{    
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class CorrelationResequencerTestCase extends AbstractServiceAndFlowTestCase
+{
     CountDownLatch receiveLatch = new CountDownLatch(6);
-    
+
+    public CorrelationResequencerTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        
+
         FunctionalTestComponent testComponent = getFunctionalTestComponent("test validator");
         testComponent.setEventCallback(new EventCallback()
         {
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
-                receiveLatch.countDown();                
+                receiveLatch.countDown();
             }
         });
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "correlation-resequencer-test.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "correlation-resequencer-test-service.xml"},
+            {ConfigVariant.FLOW, "correlation-resequencer-test-flow.xml"}});
     }
 
+    @Test
     public void testResequencer() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

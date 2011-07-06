@@ -10,19 +10,36 @@
 
 package org.mule.test.integration.resolvers;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public class NoArgsEntryPointResolverTestCase extends AbstractEntryPointResolverTestCase
 {
 
-    protected String getConfigResources()
+    public NoArgsEntryPointResolverTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/resolvers/no-args-entry-point-resolver-test.xml";
+        super(variant, configResources);
     }
-
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/resolvers/no-args-entry-point-resolver-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/resolvers/no-args-entry-point-resolver-test-flow.xml"}
+        });
+    }      
+    
+    @Test
     public void testIgnored() throws Exception
     {
         doTest("not-ignored", new Object(), "notIgnored");
     }
 
+    @Test
     public void testSelected() throws Exception
     {
         doTest("selected", new Object(), "selected");

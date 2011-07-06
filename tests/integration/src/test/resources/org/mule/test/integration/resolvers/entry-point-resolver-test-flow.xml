@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
+
+    <spring:bean name="target" class="org.mule.test.integration.resolvers.Target"/>
+
+    <flow name="Array2">
+        <vm:inbound-endpoint path="array2" exchange-pattern="request-response"/>
+        <component>
+            <array-entry-point-resolver/>
+            <spring-object bean="target"/>
+        </component>
+    </flow>
+
+    <flow name="Callable2">
+        <vm:inbound-endpoint path="callable2" exchange-pattern="request-response"/>
+        <component>
+            <callable-entry-point-resolver/>
+            <spring-object bean="target"/>
+        </component>
+    </flow>
+
+    <flow name="Custom2">
+        <vm:inbound-endpoint path="custom2" exchange-pattern="request-response"/>
+        <component>
+            <custom-entry-point-resolver class="org.mule.test.integration.resolvers.CustomEntryPointResolver"/>
+            <spring-object bean="target"/>
+        </component>
+    </flow>
+
+    <flow name="Method2">
+        <vm:inbound-endpoint path="method2" exchange-pattern="request-response"/>
+        <component>
+            <method-entry-point-resolver>
+                <include-entry-point method="methodString"/>
+                <include-entry-point method="methodInteger"/>
+            </method-entry-point-resolver>
+            <spring-object bean="target"/>
+        </component>
+    </flow>
+
+    <flow name="NoArgs2">
+        <vm:inbound-endpoint path="no-arguments2" exchange-pattern="request-response"/>
+        <component>
+            <no-arguments-entry-point-resolver/>
+            <spring-object bean="target"/>
+        </component>
+    </flow>
+
+    <flow name="Property2">
+        <vm:inbound-endpoint path="property2" exchange-pattern="request-response"/>
+        <component>
+            <property-entry-point-resolver property="propertyName"/>
+            <spring-object bean="target"/>
+        </component>
+    </flow>
+
+    <flow name="Reflection2">
+        <vm:inbound-endpoint path="reflection2" exchange-pattern="request-response"/>
+        <component>
+            <reflection-entry-point-resolver/>
+            <spring-object bean="target"/>
+        </component>
+    </flow>
+
+    <flow name="Legacy2">
+        <vm:inbound-endpoint path="legacy2" exchange-pattern="request-response"/>
+        <component>
+            <legacy-entry-point-resolver-set/>
+            <spring-object bean="target"/>
+        </component>
+    </flow>
+
+</mule>

@@ -10,22 +10,37 @@
 
 package org.mule.test.integration.routing.nested;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.ExceptionUtils;
 
-public class BindingExceptionOnInterfaceMethodTestCase extends FunctionalTestCase
+public class BindingExceptionOnInterfaceMethodTestCase extends AbstractServiceAndFlowTestCase
 {
 
     private static final String PREFIX = "Exception in service component: ";
 
-    @Override
-    protected String getConfigResources()
+    public BindingExceptionOnInterfaceMethodTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/routing/nested/binding-exception-on-interface-method.xml";
+        super(variant, configResources);
     }
-    
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/routing/nested/binding-exception-on-interface-method-service.xml"},
+            {ConfigVariant.FLOW,
+                "org/mule/test/integration/routing/nested/binding-exception-on-interface-method-flow.xml"}});
+    }
+
+    @Test
     public void testExceptionOnBinding() throws Exception
     {
         try
@@ -42,7 +57,7 @@ public class BindingExceptionOnInterfaceMethodTestCase extends FunctionalTestCas
     public static class Component
     {
         private BindigInterface binding;
-        
+
         public String invoke(String payload)
         {
             try
@@ -53,7 +68,7 @@ public class BindingExceptionOnInterfaceMethodTestCase extends FunctionalTestCas
             {
                 return PREFIX + muleException.toString();
             }
-            
+
             return "ERROR, should not have come here";
         }
 
@@ -67,7 +82,7 @@ public class BindingExceptionOnInterfaceMethodTestCase extends FunctionalTestCas
             this.binding = binding;
         }
     }
-    
+
     public static class ExceptionThrowingService
     {
         public String process(String s, Integer v)
@@ -75,12 +90,10 @@ public class BindingExceptionOnInterfaceMethodTestCase extends FunctionalTestCas
             throw new MuleRuntimeException(MessageFactory.createStaticMessage("Boom"));
         }
     }
-    
+
     public interface BindigInterface
     {
         String process(String s, Integer v) throws MuleRuntimeException;
     }
 
 }
-
-

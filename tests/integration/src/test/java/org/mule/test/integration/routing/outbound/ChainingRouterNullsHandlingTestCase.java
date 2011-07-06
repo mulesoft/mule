@@ -13,18 +13,34 @@ package org.mule.test.integration.routing.outbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.util.ExceptionUtils;
 
-public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class ChainingRouterNullsHandlingTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public ChainingRouterNullsHandlingTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/routing/outbound/chaining-router-null-handling.xml";
+        super(variant, configResources);
     }
-
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/chaining-router-null-handling-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/chaining-router-null-handling-flow.xml"}
+        });
+    }      
+    
+    @Test
     public void testNoComponentFails() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);
@@ -34,6 +50,7 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
         assertEquals("thePayload Received component1 Received component2Pass", result.getPayloadAsString());
     }
 
+    @Test
     public void testLastComponentFails() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("thePayload", muleContext);
@@ -44,10 +61,12 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
         }
         catch (Exception e)
         {
-            assertTrue("Exception raised in wrong service", ExceptionUtils.getRootCause(e) instanceof Component2Exception);
+            assertTrue("Exception raised in wrong service",
+                ExceptionUtils.getRootCause(e) instanceof Component2Exception);
         }
     }
 
+    @Test
     public void testFirstComponentFails() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("thePayload", muleContext);
@@ -58,7 +77,8 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
         }
         catch (Exception e)
         {
-            assertTrue("Exception raised in wrong service", ExceptionUtils.getRootCause(e) instanceof Component1Exception);
+            assertTrue("Exception raised in wrong service",
+                ExceptionUtils.getRootCause(e) instanceof Component1Exception);
         }
     }
 }

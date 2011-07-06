@@ -10,28 +10,17 @@
 
 package org.mule.test.integration.routing.outbound;
 
-import org.mule.api.service.Service;
-import org.mule.api.service.ServiceAware;
-
 import org.dom4j.Document;
-import org.dom4j.Element;
 
 /**
  * TODO
  */
-public class AddReceivedNodeService implements ServiceAware
+public class AddReceivedNodeService
 {
-    private Service service;
-
-    public void setService(Service service)
-    {
-        this.service = service;
-    }
-
     public Document addNodeTo(Document doc)
     {
-        Element e = doc.getRootElement().addElement("Received");
-        e.setText(service.getName());
+        doc.getRootElement().addElement("Received");
+
         return doc;
     }
 }

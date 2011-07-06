@@ -7,21 +7,36 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 package org.mule.test.routing;
 
 import org.mule.api.FutureMessageResult;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class DynamicEndpointRoutingTestCase  extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class DynamicEndpointRoutingTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public DynamicEndpointRoutingTestCase(ConfigVariant variant, String configResources)
     {
-        return "dynamic-endpoint-routing-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "dynamic-endpoint-routing-test-service.xml"},
+            {ConfigVariant.FLOW, "dynamic-endpoint-routing-test-flow.xml"}});
+    }
+
+    @Test
     public void testDynamicEndpoint() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

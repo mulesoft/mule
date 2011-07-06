@@ -12,16 +12,31 @@ package org.mule.test.integration.routing;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class EndpointBridgingTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class EndpointBridgingTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    protected String getConfigResources()
+    public EndpointBridgingTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/routing/bridge-mule.xml";
+        super(variant, configResources);
+    }
+   
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/bridge-mule-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/routing/bridge-mule-flow.xml"}});
     }
 
+    @Test
     public void testSynchronousBridging() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

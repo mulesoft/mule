@@ -13,52 +13,83 @@ package org.mule.test.integration.exceptions;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.api.service.Service;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
 import org.mule.message.ExceptionMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.routing.outbound.MulticastingRouter;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class DefaultServiceExceptionStrategyTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public DefaultServiceExceptionStrategyTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/exceptions/default-service-exception-strategy-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/exceptions/default-service-exception-strategy-config-service.xml"},
+            {ConfigVariant.FLOW,
+                "org/mule/test/integration/exceptions/default-service-exception-strategy-config-flow.xml"}});
+    }
+
+    @Test
     public void testDefaultExceptionStrategySingleEndpoint() throws MuleException
     {
-        Service service = muleContext.getRegistry().lookupService("testService1");
+        FlowConstruct service;
+
+        if (variant.equals(ConfigVariant.FLOW))
+            service = muleContext.getRegistry().lookupFlowConstruct("testService1");
+        else
+            service = muleContext.getRegistry().lookupService("testService1");
+
         assertNotNull(service);
         assertNotNull(service.getExceptionListener());
         assertTrue(service.getExceptionListener() instanceof DefaultMessagingExceptionStrategy);
-        assertEquals(1, ((DefaultMessagingExceptionStrategy) service.getExceptionListener()).getMessageProcessors().size());
+        assertEquals(1,
+            ((DefaultMessagingExceptionStrategy) service.getExceptionListener()).getMessageProcessors()
+                .size());
 
         MuleClient mc = new MuleClient(muleContext);
         mc.dispatch("vm://in1", "test", null);
         assertExceptionMessage(mc.request("vm://out1", RECEIVE_TIMEOUT));
-        // request one more time to ensure that only one exception message was sent per exception
+        // request one more time to ensure that only one exception message was sent
+        // per exception
         assertNull(mc.request("vm://out1", RECEIVE_TIMEOUT));
     }
 
+    @Test
     public void testDefaultExceptionStrategyMultipleEndpoints() throws MuleException
     {
-        Service service = muleContext.getRegistry().lookupService("testService2");
+        FlowConstruct service;
+
+        if (variant.equals(ConfigVariant.FLOW))
+            service = muleContext.getRegistry().lookupFlowConstruct("testService2");
+        else
+            service = muleContext.getRegistry().lookupService("testService2");
+
         assertNotNull(service);
         assertNotNull(service.getExceptionListener());
         assertTrue(service.getExceptionListener() instanceof DefaultMessagingExceptionStrategy);
-        DefaultMessagingExceptionStrategy exceptionListener = 
-            (DefaultMessagingExceptionStrategy) service.getExceptionListener();
+        DefaultMessagingExceptionStrategy exceptionListener = (DefaultMessagingExceptionStrategy) service.getExceptionListener();
         MessageProcessor mp = exceptionListener.getMessageProcessors().iterator().next();
         assertTrue(mp.getClass().getName(), mp instanceof MulticastingRouter);
         assertEquals(2, ((MulticastingRouter) mp).getRoutes().size());
@@ -72,7 +103,8 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         assertNotSame(out2, out3);
         assertEquals(out2.getPayload(), out3.getPayload());
     }
-    
+
+    @Test
     public void testDefaultExceptionStrategyNonEndpoint() throws Exception
     {
         LocalMuleClient mc = muleContext.getClient();
@@ -83,6 +115,7 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         assertEquals("ERROR!", out4.getPayloadAsString());
     }
 
+    @Test
     public void testSerializablePayload() throws MuleException
     {
         Map<String, String> map = new HashMap<String, String>();
@@ -95,16 +128,22 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
 
         assertTrue(message.getPayload() instanceof ExceptionMessage);
         Object payload = ((ExceptionMessage) message.getPayload()).getPayload();
-        assertTrue("payload shoud be a Map, but is " + payload.getClass().getName(), 
+        assertTrue("payload shoud be a Map, but is " + payload.getClass().getName(),
             payload instanceof Map<?, ?>);
         Map<?, ?> payloadMap = (Map<?, ?>) payload;
         assertEquals("value1", payloadMap.get("key1"));
         assertEquals("value2", payloadMap.get("key2"));
     }
 
+    @Test
     public void testStopsServiceOnException() throws MuleException, InterruptedException
     {
-        final Service service = muleContext.getRegistry().lookupService("testService5");
+        final FlowConstruct service;
+
+        if (variant.equals(ConfigVariant.FLOW))
+            service = muleContext.getRegistry().lookupFlowConstruct("testService5");
+        else
+            service = muleContext.getRegistry().lookupService("testService5");
 
         MuleClient mc = new MuleClient(muleContext);
         mc.dispatch("vm://in5", "test", null);
@@ -116,7 +155,7 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         {
             public boolean isSatisfied()
             {
-                return !service.isStarted();
+                return !service.getLifecycleState().isStarted();
             }
 
             public String describeFailure()

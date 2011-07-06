@@ -12,43 +12,57 @@ package org.mule.test.integration.routing.outbound;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ExceptionBasedRouterTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class ExceptionBasedRouterTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public ExceptionBasedRouterTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/routing/outbound/exception-based-router.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+            "org/mule/test/integration/routing/outbound/exception-based-router-service.xml"},});
+    }
+
+    @Test
     public void testStaticEndpointsByName() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        
+
         MuleMessage reply = client.send("vm://in1", "request", null);
         assertNotNull(reply);
         assertEquals("success", reply.getPayload());
     }
 
+    @Test
     public void testStaticEndpointsByURI() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        
+
         MuleMessage reply = client.send("vm://in2", "request", null);
         assertNotNull(reply);
         assertEquals("success", reply.getPayload());
     }
 
+    @Test
     public void testDynamicEndpointsByName() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        
+
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("recipients", "service1,service2,service3");
         MuleMessage reply = client.send("vm://in3", "request", props);
@@ -56,10 +70,11 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
         assertEquals("success", reply.getPayload());
     }
 
+    @Test
     public void testDynamicEndpointsByURI() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        
+
         Map<String, Object> props = new HashMap<String, Object>();
         List<String> recipients = new ArrayList<String>();
         recipients.add("vm://service4?responseTransformers=validateResponse&exchangePattern=request-response");
@@ -72,12 +87,14 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
     }
 
     /**
-     * Test endpoints which generate a natural exception because they don't even exist.
+     * Test endpoints which generate a natural exception because they don't even
+     * exist.
      */
+    @Test
     public void testIllegalEndpoint() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        
+
         Map<String, Object> props = new HashMap<String, Object>();
         List<String> recipients = new ArrayList<String>();
         recipients.add("vm://service998?exchangePattern=request-response");
@@ -89,5 +106,3 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
         assertEquals("success", reply.getPayload());
     }
 }
-
-

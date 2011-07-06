@@ -13,21 +13,34 @@ package org.mule.test.components;
 import org.mule.api.MuleMessage;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test an entry-point resolver used for multiple classes
  */
-public class EntryPointResolverCacheTestCase extends FunctionalTestCase
+public class EntryPointResolverCacheTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public EntryPointResolverCacheTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/components/entry-point-resolver-cache.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/components/entry-point-resolver-cache-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/components/entry-point-resolver-cache-flow.xml"}});
+    }
+
+    @Test
     public void testCache() throws Exception
     {
         MuleClient clt = new MuleClient(muleContext);
@@ -39,15 +52,15 @@ public class EntryPointResolverCacheTestCase extends FunctionalTestCase
         response = clt.send("refOneInbound", "a request", propertyMap);
         Object payload = response.getPayload();
 
-        assertTrue("should be a string", payload instanceof String );
+        assertTrue("should be a string", payload instanceof String);
         assertEquals("ServiceOne", payload);
 
         response = clt.send("refTwoInbound", "another request", propertyMap);
         payload = response.getPayload();
-        if((payload == null) || (response.getExceptionPayload() != null))
+        if ((payload == null) || (response.getExceptionPayload() != null))
         {
-            DefaultExceptionPayload exPld = (DefaultExceptionPayload)response.getExceptionPayload();
-            if(exPld.getException() != null)
+            DefaultExceptionPayload exPld = (DefaultExceptionPayload) response.getExceptionPayload();
+            if (exPld.getException() != null)
             {
                 fail(exPld.getException().getMessage());
             }
@@ -56,7 +69,7 @@ public class EntryPointResolverCacheTestCase extends FunctionalTestCase
                 fail(exPld.toString());
             }
         }
-        assertTrue("should be a string", payload instanceof String );
+        assertTrue("should be a string", payload instanceof String);
         assertEquals("ServiceTwo", payload);
 
     }

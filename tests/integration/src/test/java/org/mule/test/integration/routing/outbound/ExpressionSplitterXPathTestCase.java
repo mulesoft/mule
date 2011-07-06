@@ -13,13 +13,17 @@ package org.mule.test.integration.routing.outbound;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
+public class ExpressionSplitterXPathTestCase extends AbstractServiceAndFlowTestCase
 {
     private final String MESSAGE = "<Batch xmlns=\"http://acme.com\">\n" +
             "    <Trade>\n" +
@@ -53,21 +57,24 @@ public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
             "    </Trade>";
 
 
-    public ExpressionSplitterXPathTestCase()
+    public ExpressionSplitterXPathTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
         XMLUnit.setIgnoreWhitespace(true);
     }
-
-    @Override
-    protected String getConfigResources()
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test.xml";
-    }
-
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test-flow.xml"}
+        });
+    }      
+    
+    @Test
     public void testRecipientList() throws Exception
     {
-
-
         MuleClient client = new MuleClient(muleContext);
         MuleMessage result = client.send("vm://distributor.queue", MESSAGE, null);
 

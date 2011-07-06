@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+        http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+
+
+    <http:endpoint name="out" address="http://localhost:62345/testPath" exchange-pattern="request-response"/>
+
+    <flow name="service1A">
+        <vm:inbound-endpoint path="in1" exchange-pattern="request-response"/>
+        <outbound-endpoint address="http://localhost:62345/#[header:INBOUND:testProp]"
+            exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="service1B">
+        <vm:inbound-endpoint path="in2" exchange-pattern="request-response"/>
+        <outbound-endpoint ref="out"/>
+    </flow>
+
+    <flow name="service1C">
+        <vm:inbound-endpoint path="in3" exchange-pattern="request-response"/>
+        <http:outbound-endpoint host="localhost" port="62346" path="xxx#[header:INBOUND:testProp]"
+            exchange-pattern="request-response"/>
+    </flow>
+
+    <flow name="service2">
+        <http:inbound-endpoint host="localhost" port="62345" path="testPath"/>
+        <test:component appendString=" Received" logMessageDetails="true"/>
+    </flow>
+
+    <flow name="service3">
+        <http:inbound-endpoint host="localhost" port="62346" path="xxxtestPath"/>
+        <test:component appendString=" Also Received" logMessageDetails="true"/>
+    </flow>
+
+</mule>

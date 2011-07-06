@@ -17,38 +17,64 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
+import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.service.Service;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.session.DefaultMuleSession;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.construct.Flow;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 
-public class EventMetaDataPropagationTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class EventMetaDataPropagationTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public EventMetaDataPropagationTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/event-metadata-propagation-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/event-metadata-propagation-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/event-metadata-propagation-config-flow.xml"}});
+    }
+
+    @Test
     public void testEventMetaDataPropagation() throws MuleException
     {
-        Service service = muleContext.getRegistry().lookupService("component1");
-        MuleSession session = new DefaultMuleSession(service, muleContext);
-        MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
-            ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0), session);
-        service.sendEvent(event);
+        if (variant.equals(ConfigVariant.FLOW))
+        {
+            Flow flow = muleContext.getRegistry().lookupObject("component1");
+            MuleSession session = new DefaultMuleSession(flow, muleContext);
+            MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
+                ((InboundEndpoint) flow.getMessageSource()), session);
+            flow.process(event);
+        }
+        else
+        {
+            Service service = muleContext.getRegistry().lookupService("component1");
+            MuleSession session = new DefaultMuleSession(service, muleContext);
+            MuleEvent event = new DefaultMuleEvent(new DefaultMuleMessage("Test MuleEvent", muleContext),
+                ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0), session);
+            service.sendEvent(event);
+        }
     }
 
     public static class DummyComponent implements Callable
@@ -95,9 +121,9 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
                 assertEquals("param1", msg.getInboundProperty("stringParam"));
                 final Object o = msg.getInboundProperty("objectParam");
                 assertTrue(o instanceof Apple);
-                assertEquals(12345.6, 12345.6, msg.<Double>getInboundProperty("doubleParam", 0d));
-                assertEquals(12345, msg.<Integer>getInboundProperty("integerParam", 0).intValue());
-                assertEquals(123456789, msg.<Long>getInboundProperty("longParam", 0L).longValue());
+                assertEquals(12345.6, 12345.6, msg.<Double> getInboundProperty("doubleParam", 0d));
+                assertEquals(12345, msg.<Integer> getInboundProperty("integerParam", 0).intValue());
+                assertEquals(123456789, msg.<Long> getInboundProperty("longParam", 0L).longValue());
                 assertEquals(Boolean.TRUE, msg.getInboundProperty("booleanParam", Boolean.FALSE));
                 assertNotNull(msg.getInboundAttachment("test1"));
             }
@@ -106,8 +132,8 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
     }
 
     /**
-     * Extend AbstractMessageAwareTransformer, even though it's deprecated, to ensure that it
-     * keeps working for compatibility with older user-written transformers.
+     * Extend AbstractMessageAwareTransformer, even though it's deprecated, to ensure
+     * that it keeps working for compatibility with older user-written transformers.
      */
     @SuppressWarnings("deprecation")
     public static class DummyTransformer extends AbstractMessageAwareTransformer
@@ -118,9 +144,9 @@ public class EventMetaDataPropagationTestCase extends FunctionalTestCase
             assertEquals("param1", msg.getOutboundProperty("stringParam"));
             final Object o = msg.getOutboundProperty("objectParam");
             assertTrue(o instanceof Apple);
-            assertEquals(12345.6, 12345.6, msg.<Double>getOutboundProperty("doubleParam", 0d));
-            assertEquals(12345, msg.<Integer>getOutboundProperty("integerParam", 0).intValue());
-            assertEquals(123456789, msg.<Long>getOutboundProperty("longParam", 0L).longValue());
+            assertEquals(12345.6, 12345.6, msg.<Double> getOutboundProperty("doubleParam", 0d));
+            assertEquals(12345, msg.<Integer> getOutboundProperty("integerParam", 0).intValue());
+            assertEquals(123456789, msg.<Long> getOutboundProperty("longParam", 0L).longValue());
             assertEquals(Boolean.TRUE, msg.getOutboundProperty("booleanParam", Boolean.FALSE));
             return msg;
         }

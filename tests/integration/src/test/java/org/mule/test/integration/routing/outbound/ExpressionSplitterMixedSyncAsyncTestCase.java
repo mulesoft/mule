@@ -13,22 +13,37 @@ package org.mule.test.integration.routing.outbound;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
-public class ExpressionSplitterMixedSyncAsyncTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class ExpressionSplitterMixedSyncAsyncTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public ExpressionSplitterMixedSyncAsyncTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/routing/outbound/expression-splitter-mixed-sync-async-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/routing/outbound/expression-splitter-mixed-sync-async-test-service.xml"},
+            {ConfigVariant.FLOW,
+                "org/mule/test/integration/routing/outbound/expression-splitter-mixed-sync-async-test-flow.xml"}});
+    }
+
+    @Test
     public void testRecipientList() throws Exception
     {
         FruitBowl fruitBowl = new FruitBowl(new Apple(), new Banana());
@@ -43,7 +58,7 @@ public class ExpressionSplitterMixedSyncAsyncTestCase extends FunctionalTestCase
         assertEquals(2, coll.size());
         List<?> results = (List<?>) coll.getPayload();
 
-        //ServiceTwo endpoint is async
+        // ServiceTwo endpoint is async
         assertTrue(results.contains("Apple Received in ServiceOne"));
         assertTrue(results.contains("Orange Received in ServiceThree"));
     }

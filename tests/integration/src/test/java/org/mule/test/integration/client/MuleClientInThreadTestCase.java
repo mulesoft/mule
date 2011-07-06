@@ -12,18 +12,34 @@ package org.mule.test.integration.client;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.FunctionalTestCase;
 
-public class MuleClientInThreadTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class MuleClientInThreadTestCase extends AbstractServiceAndFlowTestCase
 {
     int numMessages = 100000;
-    
-    @Override
-    protected String getConfigResources()
+
+    public MuleClientInThreadTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/client/client-in-thread.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/client/client-in-thread-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/client/client-in-thread-flow.xml"}
+        });
+    }    
+    
+    @Test
     public void testException() throws Exception
     {
         Thread tester1 = new Tester();

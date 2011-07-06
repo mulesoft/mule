@@ -12,17 +12,31 @@ package org.mule.test.components;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transport.NullPayload;
 
-public class ComponentReturningNullFlowTestCase extends FunctionalTestCase
-{
+import java.util.Arrays;
+import java.util.Collection;
 
-    protected String getConfigResources()
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class ComponentReturningNullFlowTestCase extends AbstractServiceAndFlowTestCase
+{
+    public ComponentReturningNullFlowTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/components/component-returned-null.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/components/component-returned-null-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/components/component-returned-null-flow.xml"}});
+    }
+
+    @Test
     public void testNullReturnStopsFlow() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

@@ -14,16 +14,30 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.message.ExceptionMessage;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 
-public class DLQExceptionHandlerTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class DLQExceptionHandlerTestCase extends AbstractServiceAndFlowTestCase
 {
-    protected String getConfigResources()
+    public DLQExceptionHandlerTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/exceptions/exception-dlq.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/exception-dlq-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/exception-dlq-flow.xml"}});
+    }
+
+    @Test
     public void testDLQ() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -42,7 +56,7 @@ public class DLQExceptionHandlerTestCase extends FunctionalTestCase
         }
         assertNotNull(message);
 
-        ExceptionMessage em = (ExceptionMessage)message.getPayload();
+        ExceptionMessage em = (ExceptionMessage) message.getPayload();
         assertEquals("testing 1 2 3", em.getPayload());
     }
 }

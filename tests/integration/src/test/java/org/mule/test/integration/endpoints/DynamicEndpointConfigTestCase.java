@@ -13,20 +13,35 @@ package org.mule.test.integration.endpoints;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.FunctionalTestCase;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  *
  */
-public class DynamicEndpointConfigTestCase extends FunctionalTestCase
+public class DynamicEndpointConfigTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    @Override
-    protected String getConfigResources()
+    public DynamicEndpointConfigTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/endpoints/dynamic-endpoint-config.xml";
+        super(variant, configResources);
     }
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/endpoints/dynamic-endpoint-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/endpoints/dynamic-endpoint-config-flow.xml"}
+        });
+    }       
 
+    @Test
     public void testName() throws Exception
     {
 

@@ -10,11 +10,17 @@
 
 package org.mule.config.spring;
 
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.api.MuleException;
 
-public abstract class AbstractInterceptorTestCase extends FunctionalTestCase
+public abstract class AbstractInterceptorTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    public AbstractInterceptorTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources); 
+    }
 
     public static final String MESSAGE = "boo";
 

@@ -13,19 +13,33 @@ package org.mule.test.integration.routing.outbound;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ExpressionRecipientListSyncTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class ExpressionRecipientListSyncTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public ExpressionRecipientListSyncTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/routing/outbound/expression-recipient-list-sync-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/expression-recipient-list-sync-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/expression-recipient-list-sync-test-flow.xml"}
+        });
+    }      
+    
+    @Test
     public void testRecipientList() throws Exception
     {
         String message = "test";
