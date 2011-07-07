@@ -16,8 +16,6 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.message.ExceptionMessage;
 import org.mule.tck.FunctionalTestCase;
 
-import org.junit.Test;
-
 public class ExceptionStrategyFilterMule5342TestCase extends FunctionalTestCase
 {
     @Override
@@ -26,7 +24,6 @@ public class ExceptionStrategyFilterMule5342TestCase extends FunctionalTestCase
         return "org/mule/test/integration/exceptions/exception-strategy-filter-mule-5342.xml";
     }
 
-    @Test
     public void testExceptionThrownFromMessageFilterIsHandledByExceptionHandler() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -34,10 +31,9 @@ public class ExceptionStrategyFilterMule5342TestCase extends FunctionalTestCase
         MuleMessage handleException = client.request("vm://handleException", RECEIVE_TIMEOUT);
         assertNotNull(handleException);
         assertTrue(handleException.getPayload() instanceof ExceptionMessage);
-        assertEquals(TEST_MESSAGE, ((ExceptionMessage)handleException.getPayload()).getPayload());
-
+        assertEquals(TEST_MESSAGE, ((ExceptionMessage) handleException.getPayload()).getPayload());
     }
-
+    
     public static class FalseFilter implements Filter
     {
         public boolean accept(MuleMessage message)
@@ -45,6 +41,4 @@ public class ExceptionStrategyFilterMule5342TestCase extends FunctionalTestCase
             return false;
         }
     }
-
-
 }
