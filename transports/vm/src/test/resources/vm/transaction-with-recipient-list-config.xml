@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.1/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd">
+
+    <spring:bean name="txFactory" class="org.mule.tck.testmodels.mule.TestTransactionFactory">
+        <spring:property name="value" value="foo"/>
+    </spring:bean>
+
+    <model>
+        <service name="InputService">
+            <inbound>
+                <vm:inbound-endpoint path="input" exchange-pattern="request-response">
+                    <custom-transaction factory-class="org.mule.transport.vm.VMTransactionFactory"
+                                        action="ALWAYS_BEGIN"/>
+                </vm:inbound-endpoint>
+            </inbound>
+            <echo-component/>
+
+            <outbound>
+                <static-recipient-list-router synchronous="true">
+                    <custom-transaction factory-class="org.mule.transport.vm.VMTransactionFactory"
+                                        action="ALWAYS_JOIN"/>
+                    <recipients>
+                        <spring:value>vm://output</spring:value>
+                    </recipients>
+                </static-recipient-list-router>
+            </outbound>
+        </service>
+
+        <service name="OutputService">
+            <inbound>
+                <inbound-endpoint address="vm://output" exchange-pattern="request-response">
+                    <custom-transaction factory-class="org.mule.transport.vm.VMTransactionFactory"
+                                        action="ALWAYS_JOIN"/>
+                </inbound-endpoint>
+            </inbound>
+            <test:component appendString=" Received"/>
+        </service>
+    </model>
+</mule>
