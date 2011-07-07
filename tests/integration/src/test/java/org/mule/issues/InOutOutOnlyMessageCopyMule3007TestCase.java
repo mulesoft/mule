@@ -13,15 +13,21 @@ package org.mule.issues;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.IntegrationDynamicPortTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class InOutOutOnlyMessageCopyMule3007TestCase extends IntegrationDynamicPortTestCase
+public class InOutOutOnlyMessageCopyMule3007TestCase extends AbstractServiceAndFlowTestCase
 {
+    
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+    
     public InOutOutOnlyMessageCopyMule3007TestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -35,17 +41,11 @@ public class InOutOutOnlyMessageCopyMule3007TestCase extends IntegrationDynamicP
             "org/mule/issues/inout-outonly-message-copy-mule3007-test.xml"},});
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
     @Test
     public void testStreamMessage() throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);
-        String url = String.format("http://localhost:%1d/services", getPorts().get(0));
+        String url = String.format("http://localhost:%1d/services", port1.getNumber());
         System.out.println(url);
         MuleMessage response = client.send(url, "test", null);
         assertNull(response.getExceptionPayload());

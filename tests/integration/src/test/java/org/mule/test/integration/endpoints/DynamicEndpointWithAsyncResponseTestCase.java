@@ -13,27 +13,25 @@ package org.mule.test.integration.endpoints;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.client.DefaultLocalMuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant;
-import org.mule.tck.IntegrationDynamicPortTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class DynamicEndpointWithAsyncResponseTestCase extends IntegrationDynamicPortTestCase
+public class DynamicEndpointWithAsyncResponseTestCase extends AbstractServiceAndFlowTestCase
 {
+
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
 
     public DynamicEndpointWithAsyncResponseTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
 
-    }
-
-    @Override
-    protected String getConfigResources()
-    {
-        return "org/mule/test/integration/endpoints/dynamic-endpoint-with-async-response-config.xml";
     }
 
     @Parameters
@@ -45,19 +43,13 @@ public class DynamicEndpointWithAsyncResponseTestCase extends IntegrationDynamic
         });
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
     @Test
     public void testDynamicEndpointWithAsyncResponse() throws Exception
     {
 
         DefaultMuleMessage message = new DefaultMuleMessage("hello", muleContext);
         message.setOutboundProperty("host", "localhost");
-        message.setOutboundProperty("port", getPorts().get(0));
+        message.setOutboundProperty("port", port1.getNumber());
         message.setOutboundProperty("path", "/TEST");
 
         DefaultLocalMuleClient client = new DefaultLocalMuleClient(muleContext);

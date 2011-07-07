@@ -16,15 +16,24 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.IntegrationDynamicPortTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.StringUtils;
 
-public class HttpProxyTestCase extends IntegrationDynamicPortTestCase
+public class HttpProxyTestCase extends AbstractServiceAndFlowTestCase
 {
+    
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+    
+    @Rule
+    public DynamicPort port2 = new DynamicPort("port2");
+    
     public HttpProxyTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -41,12 +50,6 @@ public class HttpProxyTestCase extends IntegrationDynamicPortTestCase
     }
 
     private MuleClient muleClient;
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
-    }
 
     @Override
     protected void doSetUp() throws Exception
@@ -133,7 +136,7 @@ public class HttpProxyTestCase extends IntegrationDynamicPortTestCase
             "X-Custom-Header", "w00t"));
         headers.putAll(extraHeaders);
 
-        final MuleMessage result = muleClient.send("http://localhost:" + getPorts().get(0) + "/http-proxy/"
+        final MuleMessage result = muleClient.send("http://localhost:" + port1.getNumber() + "/http-proxy/"
                                                    + proxyId + pathExtension, "foo", headers,
             getTestTimeoutSecs() * 1000);
         assertEquals(expectedResult, result.getPayloadAsString());

@@ -13,19 +13,24 @@ package org.mule.test.construct;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
-import org.mule.tck.IntegrationDynamicPortTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 /**
  * Test remote dispatcher using serialization wire format
  */
-public class RemoteDispatcherTestCase extends IntegrationDynamicPortTestCase
+public class RemoteDispatcherTestCase extends AbstractServiceAndFlowTestCase
 {
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+    
     public RemoteDispatcherTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -41,13 +46,7 @@ public class RemoteDispatcherTestCase extends IntegrationDynamicPortTestCase
 
         });
     }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
+    
     @Test
     public void testRemoting() throws Exception
     {
@@ -55,7 +54,7 @@ public class RemoteDispatcherTestCase extends IntegrationDynamicPortTestCase
         String expectedResponses[] = {"Hellogoodbye", null, null, "Helloaloha"};
 
         MuleClient client = new MuleClient(muleContext);
-        RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:" + getPorts().get(0));
+        RemoteDispatcher dispatcher = client.getRemoteDispatcher("http://localhost:" + port1.getNumber());
         for (int i = 0; i < targets.length; i++)
         {
             String construct = targets[i];

@@ -14,17 +14,22 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.IntegrationDynamicPortTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
-public class WireTapCxfTestCase extends IntegrationDynamicPortTestCase
+public class WireTapCxfTestCase extends AbstractServiceAndFlowTestCase
 {
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+
     static final Latch tapLatch = new Latch();
 
     public WireTapCxfTestCase(ConfigVariant variant, String configResources)
@@ -54,16 +59,10 @@ public class WireTapCxfTestCase extends IntegrationDynamicPortTestCase
         });
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
     @Test
     public void testWireTap() throws Exception
     {
-        String url = "http://localhost:" + getPorts().get(0) + "/services/EchoUMO";
+        String url = "http://localhost:" + port1.getNumber() + "/services/EchoUMO";
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                      + "<soap:Body><echo><text>foo</text></echo></soap:Body></soap:Envelope>";
 

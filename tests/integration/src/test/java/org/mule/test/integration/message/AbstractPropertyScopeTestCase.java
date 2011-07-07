@@ -10,17 +10,22 @@
 
 package org.mule.test.integration.message;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.IntegrationDynamicPortTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 /**
  * TODO
  */
-public abstract class AbstractPropertyScopeTestCase extends IntegrationDynamicPortTestCase
+public abstract class AbstractPropertyScopeTestCase extends AbstractServiceAndFlowTestCase
 {
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");    
+    
     public AbstractPropertyScopeTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -39,9 +44,4 @@ public abstract class AbstractPropertyScopeTestCase extends IntegrationDynamicPo
         assertEquals("fooValue", result.<Object> getInboundProperty("foo"));
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

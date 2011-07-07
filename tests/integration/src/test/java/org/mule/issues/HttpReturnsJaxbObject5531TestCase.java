@@ -13,16 +13,21 @@ package org.mule.issues;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleEventContext;
 import org.mule.api.lifecycle.Callable;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.IntegrationDynamicPortTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transformer.simple.ObjectToString;
 
-public class HttpReturnsJaxbObject5531TestCase extends IntegrationDynamicPortTestCase
+public class HttpReturnsJaxbObject5531TestCase extends AbstractServiceAndFlowTestCase
 {
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+    
     public HttpReturnsJaxbObject5531TestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -38,11 +43,7 @@ public class HttpReturnsJaxbObject5531TestCase extends IntegrationDynamicPortTes
                                                + "<Pressure>29.91R</Pressure><Visibility /><WindChill /><Remarks /></GetCityWeatherByZIPResult>"
                                                + "</GetCityWeatherByZIPResponse></soap:Body></soap:Envelope>";
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
+    
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -56,7 +57,7 @@ public class HttpReturnsJaxbObject5531TestCase extends IntegrationDynamicPortTes
     @Test
     public void testGetWeather() throws Exception
     {
-        String testUrl = "http://localhost:" + getPorts().get(0) + "/test/weather";
+        String testUrl = "http://localhost:" + port1.getNumber() + "/test/weather";
         MuleClient client = new MuleClient(muleContext);
         Object response = client.send(testUrl, "hello", null);
         assertNotNull(response);

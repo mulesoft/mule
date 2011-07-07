@@ -13,14 +13,22 @@ package org.mule.test.integration.construct;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.IntegrationDynamicPortTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.integration.tck.WeatherForecaster;
 
-public class WSProxyTestCase extends IntegrationDynamicPortTestCase
+public class WSProxyTestCase extends AbstractServiceAndFlowTestCase
 {
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+    
+    @Rule
+    public DynamicPort port2 = new DynamicPort("port2");
+    
     public WSProxyTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -28,12 +36,6 @@ public class WSProxyTestCase extends IntegrationDynamicPortTestCase
     }
 
     private MuleClient muleClient;
-
-    @Override
-    protected String getConfigResources()
-    {
-        return "org/mule/test/integration/construct/ws-proxy-config.xml";
-    }
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -44,11 +46,6 @@ public class WSProxyTestCase extends IntegrationDynamicPortTestCase
         });
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
-    }
 
     @Override
     protected void doSetUp() throws Exception
@@ -126,7 +123,7 @@ public class WSProxyTestCase extends IntegrationDynamicPortTestCase
     private void testWsdlRequest(final int proxyId) throws Exception
     {
         final String wsdl = muleClient.request(
-            "http://localhost:" + getPorts().get(0) + "/weather-forecast/" + proxyId + "?wsdl",
+            "http://localhost:" + port1.getNumber() + "/weather-forecast/" + proxyId + "?wsdl",
             getTestTimeoutSecs() * 1000L).getPayloadAsString();
         assertTrue(wsdl.contains("GetWeatherByZipCode"));
     }
@@ -134,7 +131,7 @@ public class WSProxyTestCase extends IntegrationDynamicPortTestCase
     private void testWebServiceRequest(final int proxyId) throws Exception
     {
         final String weatherForecast = muleClient.send(
-            "wsdl-cxf:http://localhost:" + getPorts().get(0) + "/weather-forecast/" + proxyId
+            "wsdl-cxf:http://localhost:" + port1.getNumber() + "/weather-forecast/" + proxyId
                             + "?wsdl&method=GetWeatherByZipCode", "95050", null, getTestTimeoutSecs() * 1000)
             .getPayloadAsString();
 

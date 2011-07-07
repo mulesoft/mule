@@ -16,18 +16,26 @@ import java.util.Collection;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.math.RandomUtils;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleException;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.construct.SimpleService;
-import org.mule.tck.IntegrationDynamicPortTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.test.integration.tck.WeatherForecaster;
 import org.mule.util.StringUtils;
 import org.springframework.util.FileCopyUtils;
 
-public class SimpleServiceTestCase extends IntegrationDynamicPortTestCase
+public class SimpleServiceTestCase extends AbstractServiceAndFlowTestCase
 {
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+    
+    @Rule
+    public DynamicPort port2 = new DynamicPort("port2");
+    
     public SimpleServiceTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -43,11 +51,7 @@ public class SimpleServiceTestCase extends IntegrationDynamicPortTestCase
         muleClient = muleContext.getClient();
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 2;
-    }
+    
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -197,8 +201,8 @@ public class SimpleServiceTestCase extends IntegrationDynamicPortTestCase
 
     private void doTestJaxWsService(final int portId) throws Exception
     {
-        final Integer port = getPorts().get(portId - 1);
-
+        final Integer port = (portId == 1) ? port1.getNumber() : port2.getNumber();
+        
         final String wsdl = new String(
             FileCopyUtils.copyToByteArray((InputStream) muleClient.request(
                 "http://localhost:" + port + "/weather-forecast?wsdl", getTestTimeoutSecs() * 1000L)

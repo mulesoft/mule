@@ -14,13 +14,18 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.IntegrationDynamicPortTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.FileUtils;
 
-public class FileToTcpStreamingTestCase extends IntegrationDynamicPortTestCase
+public class FileToTcpStreamingTestCase extends AbstractServiceAndFlowTestCase
 {
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+
     public FileToTcpStreamingTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -41,12 +46,6 @@ public class FileToTcpStreamingTestCase extends IntegrationDynamicPortTestCase
             "org/mule/test/integration/streaming/file-to-tcp-streaming.xml"}
 
         });
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
     }
 
     @Test

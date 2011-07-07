@@ -13,15 +13,20 @@ package org.mule.test.integration.spring;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
-import org.mule.tck.IntegrationDynamicPortTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
-public class MuleAdminTestCase extends IntegrationDynamicPortTestCase
+public class MuleAdminTestCase extends AbstractServiceAndFlowTestCase
 {
+    @Rule
+    public DynamicPort port1 = new DynamicPort("port1");
+    
     public MuleAdminTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -41,14 +46,10 @@ public class MuleAdminTestCase extends IntegrationDynamicPortTestCase
     public void testMuleAdminChannelInSpring() throws Exception
     {
         MuleClient mc = new MuleClient(muleContext);
-        RemoteDispatcher rd = mc.getRemoteDispatcher("tcp://localhost:" + getPorts().get(0));
+        RemoteDispatcher rd = mc.getRemoteDispatcher("tcp://localhost:" + port1.getNumber());
         MuleMessage result = rd.sendToRemoteComponent("appleComponent", "string", null);
         assertNotNull(result);
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
+    
 }
