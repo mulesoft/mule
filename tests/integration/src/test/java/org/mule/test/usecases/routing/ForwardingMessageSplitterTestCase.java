@@ -12,18 +12,33 @@ package org.mule.test.usecases.routing;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
-public class ForwardingMessageSplitterTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class ForwardingMessageSplitterTestCase extends AbstractServiceAndFlowTestCase
 {
-    protected String getConfigResources()
+    public ForwardingMessageSplitterTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/usecases/routing/forwarding-message-splitter.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/usecases/routing/forwarding-message-splitter-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/usecases/routing/forwarding-message-splitter-flow.xml"}
+        });
+    }      
+    
+    @Test
     public void testSyncResponse() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

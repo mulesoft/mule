@@ -10,21 +10,35 @@
 
 package org.mule.test.integration.persistence;
 
-
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
 
-public class FilePersistenceTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class FilePersistenceTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    protected String getConfigResources()
+    public FilePersistenceTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/persistence/file-persistence-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/persistence/file-persistence-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/persistence/file-persistence-config-flow.xml"}});
+    }
+
+    @Test
     public void testFilesStored() throws Exception
     {
         // Note that the FunctionalTestCase will remove the working directory after
@@ -35,13 +49,17 @@ public class FilePersistenceTestCase extends FunctionalTestCase
 
         MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://test.queue", "test", null);
-        // Give the vm dispatcher chance to persist message.  Cannot use send because send does not use queue.
+        // Give the vm dispatcher chance to persist message. Cannot use send because
+        // send does not use queue.
         Thread.sleep(500);
         File[] files = store.listFiles();
         assertNotNull(files);
         assertEquals(1, files.length);
 
-        muleContext.getRegistry().lookupService("TestComponent").start();
+        if (variant.equals(ConfigVariant.SERVICE))
+        {
+            muleContext.getRegistry().lookupService("TestComponent").start();
+        }
         // give the service some time to initialise
         Thread.sleep(2000);
         files = store.listFiles();

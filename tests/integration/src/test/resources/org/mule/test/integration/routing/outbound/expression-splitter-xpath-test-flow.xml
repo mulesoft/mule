@@ -22,8 +22,7 @@
         <vm:inbound-endpoint path="distributor.queue" exchange-pattern="request-response">
             <mulexml:xml-to-dom-transformer returnClass="org.dom4j.Document"/>
         </vm:inbound-endpoint>
-        <splitter evaluator="xpath" expression="//acme:Trade"/>
-        <!-- <expression-splitter-router evaluator="xpath" expression="//acme:Trade"> -->
+        <splitter evaluator="xpath" expression="//acme:Trade"/>        
         <round-robin>
             <vm:outbound-endpoint path="service1.queue" exchange-pattern="request-response"/>
             <vm:outbound-endpoint path="service2.queue" exchange-pattern="request-response"/>

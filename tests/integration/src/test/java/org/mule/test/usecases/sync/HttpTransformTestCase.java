@@ -12,22 +12,34 @@ package org.mule.test.usecases.sync;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transformer.compression.GZipUncompressTransformer;
 import org.mule.transformer.simple.ByteArrayToSerializable;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.Arrays;
+import java.util.Collection;
 
-public class HttpTransformTestCase extends FunctionalTestCase
-{
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-    @Override
-    protected String getConfigResources()
+public class HttpTransformTestCase extends AbstractServiceAndFlowTestCase
+{   
+    public HttpTransformTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/usecases/sync/http-transform.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/usecases/sync/http-transform-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/usecases/sync/http-transform-flow.xml"}
+        });
+    }
+    
+    @Test
     public void testTransform() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -41,6 +53,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
         assertEquals("<string>payload</string>", result);
     }
 
+    @Test
     public void testBinary() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -54,6 +67,7 @@ public class HttpTransformTestCase extends FunctionalTestCase
         assertEquals(payload, result);
     }
 
+    @Test
     public void testBinaryWithBridge() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

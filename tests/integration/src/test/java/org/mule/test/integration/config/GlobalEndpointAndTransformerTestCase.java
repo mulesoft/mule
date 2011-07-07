@@ -14,14 +14,21 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 /*
  * This test has been added due to MULE-610
  */
-public class GlobalEndpointAndTransformerTestCase extends FunctionalTestCase
+public class GlobalEndpointAndTransformerTestCase extends AbstractServiceAndFlowTestCase
 {
     
+    @Test
     public void testNormal() throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);
@@ -29,10 +36,19 @@ public class GlobalEndpointAndTransformerTestCase extends FunctionalTestCase
         assertTrue(msg.getPayload() instanceof byte[]);        
     }
 
-    protected String getConfigResources()
-    {        
-        return "org/mule/test/integration/config/globalendpointandtransformer-mule-config.xml";
+    public GlobalEndpointAndTransformerTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/config/globalendpointandtransformer-mule-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/config/globalendpointandtransformer-mule-config-flow.xml"}
+        });
+    }      
 }
 
 

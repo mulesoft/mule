@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
+
+    <vm:connector name="vmConnector"/>
+
+    <jms:activemq-connector name="jmsConnector"/>
+
+    <jms:activemq-connector name="jmsLegacyConnector">
+        <service-overrides sessionHandler="org.mule.session.LegacySessionHandler"/>
+    </jms:activemq-connector>
+
+    <custom-transformer name="GetProperty" class="org.mule.test.integration.message.GetProperty"/>
+    <custom-transformer name="SetProperty" class="org.mule.test.integration.message.SetProperty"/>
+
+
+    <!-- Send old format, receive old format -->
+    <flow name="s1">
+        <vm:inbound-endpoint path="in1" exchange-pattern="one-way">
+            <transformer ref="SetProperty"/>
+        </vm:inbound-endpoint>
+        <jms:outbound-endpoint queue="q1" exchange-pattern="one-way" connector-ref="jmsLegacyConnector"/>
+    </flow>
+    
+    <flow name="r1">
+        <jms:inbound-endpoint queue="q1" exchange-pattern="one-way" connector-ref="jmsLegacyConnector"/>
+        <vm:outbound-endpoint path="out1" exchange-pattern="one-way">
+            <transformer ref="GetProperty"/>
+        </vm:outbound-endpoint>
+    </flow>
+
+    <!-- Send old format, receive new format -->
+    <flow name="s2">
+        <vm:inbound-endpoint path="in2" exchange-pattern="one-way">
+            <transformer ref="SetProperty"/>
+        </vm:inbound-endpoint>
+        <jms:outbound-endpoint queue="q2" exchange-pattern="one-way" connector-ref="jmsLegacyConnector"/>
+    </flow>
+    
+    <flow name="r2">
+        <jms:inbound-endpoint queue="q2" exchange-pattern="one-way" connector-ref="jmsConnector"/>
+        <vm:outbound-endpoint path="out2" exchange-pattern="one-way">
+            <transformer ref="GetProperty"/>
+        </vm:outbound-endpoint>
+    </flow>
+
+    <!-- Send new format, receive old format -->
+    <flow name="s3">
+        <vm:inbound-endpoint path="in3" exchange-pattern="one-way">
+            <transformer ref="SetProperty"/>
+        </vm:inbound-endpoint>
+        <jms:outbound-endpoint queue="q3" exchange-pattern="one-way" connector-ref="jmsConnector"/>
+    </flow>
+    
+    <flow name="r3">
+        <jms:inbound-endpoint queue="q3" exchange-pattern="one-way" connector-ref="jmsLegacyConnector"/>
+        <vm:outbound-endpoint path="out3" exchange-pattern="one-way">
+            <transformer ref="GetProperty"/>
+        </vm:outbound-endpoint>
+    </flow>
+
+    <!-- Send new format, receive new format -->
+    <flow name="s4">
+        <vm:inbound-endpoint path="in4" exchange-pattern="one-way">
+            <transformer ref="SetProperty"/>
+        </vm:inbound-endpoint>
+        <jms:outbound-endpoint queue="q4" exchange-pattern="one-way" connector-ref="jmsConnector"/>
+    </flow>
+    
+    <flow name="r4">
+        <jms:inbound-endpoint queue="q4" exchange-pattern="one-way" connector-ref="jmsConnector"/>
+        <vm:outbound-endpoint path="out4" exchange-pattern="one-way">
+            <transformer ref="GetProperty"/>
+        </vm:outbound-endpoint>
+    </flow>
+
+</mule>

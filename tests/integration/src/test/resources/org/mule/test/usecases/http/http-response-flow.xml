@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+
+    <flow name="HttpAsync">
+        <inbound-endpoint address="http://localhost:8990" exchange-pattern="one-way">
+            <byte-array-to-string-transformer/>
+        </inbound-endpoint>
+        <echo-component/>
+    </flow>
+
+    <flow name="HttpWithoutRemoteSynch">
+        <inbound-endpoint address="http://localhost:8999" exchange-pattern="request-response">
+            <byte-array-to-string-transformer/>
+        </inbound-endpoint>
+        <echo-component/>
+    </flow>
+
+    <flow name="HttpWithRemoteSynch">
+        <inbound-endpoint address="http://localhost:8989" exchange-pattern="request-response">
+            <byte-array-to-string-transformer/>
+        </inbound-endpoint>
+        <echo-component/>
+    </flow>
+
+    <flow name="HttpWithChunking">
+        <inbound-endpoint address="http://localhost:8988" exchange-pattern="request-response">
+            <response>
+                <message-properties-transformer>
+                    <add-message-property key="Transfer-Encoding" value="chunked"/>
+                </message-properties-transformer>
+            </response>
+        </inbound-endpoint>
+        <echo-component/>
+    </flow>
+
+    <flow name="HttpWithNoChunking">
+        <inbound-endpoint address="http://localhost:8987" exchange-pattern="request-response"/>
+        <echo-component/>
+    </flow>
+
+</mule>

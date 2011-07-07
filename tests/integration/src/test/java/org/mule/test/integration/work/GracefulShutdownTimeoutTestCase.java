@@ -11,21 +11,35 @@
 package org.mule.test.integration.work;
 
 import org.mule.api.MuleEventContext;
+import org.mule.api.construct.FlowConstruct;
 import org.mule.api.service.Service;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.construct.Flow;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.util.concurrent.Latch;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-public class GracefulShutdownTimeoutTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class GracefulShutdownTimeoutTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public GracefulShutdownTimeoutTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/work/graceful-shutdown-timeout.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/work/graceful-shutdown-timeout-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/work/graceful-shutdown-timeout-flow.xml"}});
     }
 
     @Override
@@ -43,10 +57,12 @@ public class GracefulShutdownTimeoutTestCase extends FunctionalTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testGracefulShutdownTimeout() throws Exception
     {
         final Latch latch = new Latch();
-        Service service = muleContext.getRegistry().lookupService("TestService");
+  
+        FlowConstruct service = muleContext.getRegistry().lookupFlowConstruct("TestService");
         FunctionalTestComponent testComponent = (FunctionalTestComponent) getComponent(service);
         testComponent.setEventCallback(new EventCallback()
         {
@@ -58,10 +74,21 @@ public class GracefulShutdownTimeoutTestCase extends FunctionalTestCase
 
             }
         });
-        service.dispatchEvent(getTestEvent("test"));
-        Thread.sleep(200);
-        service.dispose();
-        assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
+
+        if (variant.equals(ConfigVariant.FLOW))
+        {
+            ((Flow) service).process(getTestEvent("test"));
+            Thread.sleep(200);
+            ((Flow) service).dispose();
+            assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
+        }
+        else
+        {
+            ((Service) service).dispatchEvent(getTestEvent("test"));
+            Thread.sleep(200);
+            ((Service) service).dispose();
+            assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
+        }
     }
 
 }

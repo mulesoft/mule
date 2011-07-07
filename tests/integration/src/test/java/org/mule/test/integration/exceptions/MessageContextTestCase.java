@@ -13,21 +13,36 @@ package org.mule.test.integration.exceptions;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class MessageContextTestCase extends FunctionalTestCase 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class MessageContextTestCase extends AbstractServiceAndFlowTestCase 
 {
     String request = "Hello World";
 
-    @Override
-    protected String getConfigResources() 
+    public MessageContextTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/exceptions/message-context-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/exceptions/message-context-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/exceptions/message-context-test-flow.xml"}
+        });
+    }      
+   
     /**
      * Test for MULE-4361
      */
+    @Test
     public void testAlternateExceptionStrategy() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

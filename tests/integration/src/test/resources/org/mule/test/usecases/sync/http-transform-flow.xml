@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:xm="http://www.mulesoft.org/schema/mule/xml" 
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd">
+
+    <http:endpoint name="httpEndpoint" address="http://localhost:18080/RemoteService" exchange-pattern="request-response"
+        contentType="text/plain"/>
+    <endpoint name="httpEndpoint2" address="http://localhost:18081/RemoteService?method=post" exchange-pattern="request-response"/>
+    <endpoint name="vmEndpoint" address="vm://LocalService" exchange-pattern="request-response"/>
+
+    <byte-array-to-string-transformer name="ByteArrayToString"/>
+    <byte-array-to-serializable-transformer name="ByteArrayToSerializable"/>
+    <serializable-to-byte-array-transformer name="SerializableToByteArray"/>
+    <xm:object-to-xml-transformer name="ObjectToXml"/>
+    <gzip-compress-transformer name="Compress"/>
+    <http:message-to-http-response-transformer name="ToHttpResponse"/>
+
+    <flow name="HttpService">
+        <inbound-endpoint ref="httpEndpoint">
+            <transformer ref="ByteArrayToString"/>
+            <response>
+                <transformer ref="ObjectToXml"/>
+                <transformer ref="Compress"/>
+                <transformer ref="ToHttpResponse"/>
+            </response>
+        </inbound-endpoint>
+        <echo-component/>
+    </flow>
+
+    <flow name="HttpService2">
+        <inbound-endpoint ref="httpEndpoint2" transformer-refs="ByteArrayToSerializable"
+            responseTransformer-refs="SerializableToByteArray ToHttpResponse"/>
+        <echo-component/>
+    </flow>
+
+    <flow name="LocalService">
+        <inbound-endpoint ref="vmEndpoint"/>
+        <outbound-endpoint ref="httpEndpoint2" transformer-refs="SerializableToByteArray"/>
+    </flow>
+
+</mule>

@@ -13,65 +13,62 @@ package org.mule.module.xml.functional;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class JXPathTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class JXPathTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    @Override
-    protected String getConfigResources()
+    public JXPathTestCase(ConfigVariant variant, String configResources)
     {
-        return "jxpath-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "jxpath-config-service.xml"},
+            {ConfigVariant.FLOW, "jxpath-config-flow.xml"}});
+    }
+
+    @Test
     public void testSetMessagePropertyFromXmlWithNamespacesDefinedWithSamePrefix() throws Exception
     {
-        String xml = "<root " +
-                     "xmlns:h=\"http://www.w3.org/TR/html4/\" " +
-                     "xmlns:f=\"http://www.w3schools.com/furniture\">" +
+        String xml = "<root " + "xmlns:h=\"http://www.w3.org/TR/html4/\" "
+                     + "xmlns:f=\"http://www.w3schools.com/furniture\">" +
 
-                     "<h:table>" +
-                     "<h:tr>" +
-                     "<h:td>Apples</h:td>" +
-                     "<h:td>Bananas</h:td>" +
-                     "</h:tr>" +
-                     "</h:table>" +
+                     "<h:table>" + "<h:tr>" + "<h:td>Apples</h:td>" + "<h:td>Bananas</h:td>" + "</h:tr>"
+                     + "</h:table>" +
 
-                     "<f:table>" +
-                     "<f:name>African Coffee Table</f:name>" +
-                     "<f:width>80</f:width>" +
-                     "<f:length>120</f:length>" +
-                     "</f:table>" +
+                     "<f:table>" + "<f:name>African Coffee Table</f:name>" + "<f:width>80</f:width>"
+                     + "<f:length>120</f:length>" + "</f:table>" +
 
                      "</root>";
 
         doTest(xml);
     }
 
+    @Test
     public void testSetMessagePropertyFromXmlWithNamespacesDefinedWithDifferentPrefix() throws Exception
     {
-        String xml = "<root " +
-                     "xmlns:h=\"http://www.w3.org/TR/html4/\" " +
-                     "xmlns:z=\"http://www.w3schools.com/furniture\">" +
+        String xml = "<root " + "xmlns:h=\"http://www.w3.org/TR/html4/\" "
+                     + "xmlns:z=\"http://www.w3schools.com/furniture\">" +
 
-                     "<h:table>" +
-                     "<h:tr>" +
-                     "<h:td>Apples</h:td>" +
-                     "<h:td>Bananas</h:td>" +
-                     "</h:tr>" +
-                     "</h:table>" +
+                     "<h:table>" + "<h:tr>" + "<h:td>Apples</h:td>" + "<h:td>Bananas</h:td>" + "</h:tr>"
+                     + "</h:table>" +
 
-                     "<z:table>" +
-                     "<z:name>African Coffee Table</z:name>" +
-                     "<z:width>80</z:width>" +
-                     "<z:length>120</z:length>" +
-                     "</z:table>" +
+                     "<z:table>" + "<z:name>African Coffee Table</z:name>" + "<z:width>80</z:width>"
+                     + "<z:length>120</z:length>" + "</z:table>" +
 
                      "</root>";
 
         doTest(xml);
     }
-
+    
     private void doTest(String xml) throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);
@@ -81,4 +78,3 @@ public class JXPathTestCase extends FunctionalTestCase
         assertEquals("African Coffee Table", response.getInboundProperty("nameProperty"));
     }
 }
-

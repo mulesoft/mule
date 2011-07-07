@@ -10,10 +10,9 @@
 
 package org.mule.test.integration.transport.file;
 
-
 import org.mule.api.MuleEventContext;
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
 import org.mule.tck.functional.FunctionalTestComponent;
@@ -24,8 +23,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 
-public class FileFunctionalTestCase extends FunctionalTestCase implements FunctionalTestNotificationListener
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class FileFunctionalTestCase extends AbstractServiceAndFlowTestCase
+    implements FunctionalTestNotificationListener
 {
     private Object receivedData = null;
 
@@ -43,19 +47,27 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
         muleContext.unregisterListener(this);
     }
 
-    @Override
-    protected String getConfigResources()
+    public FileFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/providers/file/file-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/providers/file/file-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/providers/file/file-config-flow.xml"}});
+    }
+
+    @Test
     public void testRelative() throws IOException, InterruptedException
     {
         // create binary file data to be written
         byte[] data = new byte[100000];
         for (int i = 0; i < data.length; i++)
         {
-            data[i] = (byte)(Math.random() * 128);
+            data[i] = (byte) (Math.random() * 128);
         }
 
         File f = FileUtils.newFile("./test/testfile.temp");
@@ -74,7 +86,7 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
         {
             assertNotNull(receivedData);
             assertTrue(receivedData instanceof byte[]);
-            byte[] receivedBytes = (byte[])receivedData;
+            byte[] receivedBytes = (byte[]) receivedData;
             assertEquals(data.length, receivedBytes.length);
             assertTrue(Arrays.equals(data, receivedBytes));
         }
@@ -86,7 +98,7 @@ public class FileFunctionalTestCase extends FunctionalTestCase implements Functi
         {
             logger.debug("received notification: " + notification);
             // save the received message data for verification
-            this.receivedData = ((FunctionalTestNotification)notification).getReplyMessage();
+            this.receivedData = ((FunctionalTestNotification) notification).getReplyMessage();
         }
     }
 

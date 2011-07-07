@@ -12,61 +12,116 @@ package org.mule.test.integration.components;
 
 import org.mule.lifecycle.JSR250LifecycleTrackerComponent;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class JSR250LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class JSR250LifecycleTrackerComponentFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    @Override
-    protected String getConfigResources()
+    public JSR250LifecycleTrackerComponentFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/components/jsr250-component-lifecycle-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/components/jsr250-component-lifecycle-config-service.xml"},
+            {ConfigVariant.FLOW,
+                "org/mule/test/integration/components/jsr250-component-lifecycle-config-flow.xml"}});
     }
 
     /**
-     * ASSERT:
-     * - Mule lifecycle methods invoked
-     * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
+     * ASSERT: - Mule lifecycle methods invoked - Service and muleContext injected
+     * (Component implements ServiceAware/MuleContextAware)
+     * 
      * @throws Exception
      */
+    @Test
     public void testSingletonServiceLifecycle() throws Exception
     {
-        testComponentLifecycle("MuleSingletonService",
-            "[setProperty, setService, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+        if (variant.equals(ConfigVariant.FLOW))
+        {
+            testComponentLifecycle("MuleSingletonService",
+                "[setProperty, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+        }
+        else
+        {
+            testComponentLifecycle("MuleSingletonService",
+                "[setProperty, setService, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+        }
     }
 
     /**
-     * ASSERT:
-     * - Mule lifecycle methods invoked
-     * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
+     * ASSERT: - Mule lifecycle methods invoked - Service and muleContext injected
+     * (Component implements ServiceAware/MuleContextAware)
+     * 
      * @throws Exception
      */
+    @Test
     public void testMulePrototypeServiceLifecycle() throws Exception
     {
-        testComponentLifecycle("MulePrototypeService",
-            "[setProperty, setService, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+        if (variant.equals(ConfigVariant.FLOW))
+        {
+            testComponentLifecycle("MulePrototypeService",
+                "[setProperty, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+        }
+        else
+        {
+            testComponentLifecycle("MulePrototypeService",
+                "[setProperty, setService, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+        }
     }
 
     /**
-     * ASSERT:
-     * - Mule lifecycle methods invoked
-     * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
+     * ASSERT: - Mule lifecycle methods invoked - Service and muleContext injected
+     * (Component implements ServiceAware/MuleContextAware)
+     * 
      * @throws Exception
      */
     public void testMulePooledPrototypeServiceLifecycle() throws Exception
     {
-        testComponentLifecycle("MulePooledPrototypeService", "[setProperty, setService, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+        if (variant.equals(ConfigVariant.FLOW))
+        {
+            testComponentLifecycle("MulePooledPrototypeService",
+                "[setProperty, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+        }
+        else
+        {
+            testComponentLifecycle("MulePooledPrototypeService",
+                "[setProperty, setService, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
+        }
     }
-    
+
     /**
-     * ASSERT:
-     * - Mule lifecycle methods invoked each time singleton is used to create new object in pool
-     * - Service and muleContext injected each time singleton is used to create new object in pool (Component implements ServiceAware/MuleContextAware)
+     * ASSERT: - Mule lifecycle methods invoked each time singleton is used to create
+     * new object in pool - Service and muleContext injected each time singleton is
+     * used to create new object in pool (Component implements
+     * ServiceAware/MuleContextAware)
+     * 
      * @throws Exception
      */
+    @Test
     public void testMulePooledSingletonServiceLifecycle() throws Exception
     {
-        testComponentLifecycle("MulePooledSingletonService", "[setProperty, setService, setMuleContext, jsr250 initialise, jsr250 initialise, jsr250 initialise, start, start, start, stop, stop, stop, jsr250 dispose, jsr250 dispose, jsr250 dispose]");
+        if (variant.equals(ConfigVariant.FLOW))
+        {
+            testComponentLifecycle(
+                "MulePooledSingletonService",
+                "[setProperty, setMuleContext, jsr250 initialise, jsr250 initialise, jsr250 initialise, start, start, start, stop, stop, stop, jsr250 dispose, jsr250 dispose, jsr250 dispose]");
+        }
+        else
+        {
+            testComponentLifecycle(
+                "MulePooledSingletonService",
+                "[setProperty, setService, setMuleContext, jsr250 initialise, jsr250 initialise, jsr250 initialise, start, start, start, stop, stop, stop, jsr250 dispose, jsr250 dispose, jsr250 dispose]");
+        }
     }
 
     private void testComponentLifecycle(final String serviceName, final String expectedLifeCycle)

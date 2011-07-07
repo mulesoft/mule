@@ -12,16 +12,31 @@ package org.mule.test.integration.message;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class MessagePropertyScopesTestCase extends FunctionalTestCase {
+import java.util.Arrays;
+import java.util.Collection;
 
-    @Override
-    protected String getConfigResources()
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class MessagePropertyScopesTestCase extends AbstractServiceAndFlowTestCase {
+
+    public MessagePropertyScopesTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/messaging/message-property-scopes-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/messaging/message-property-scopes-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/messaging/message-property-scopes-config-flow.xml"}
+        });
+    }      
+    
+    @Test
     public void testSessionProperty() throws Exception {
 
         MuleClient client = new MuleClient(muleContext);

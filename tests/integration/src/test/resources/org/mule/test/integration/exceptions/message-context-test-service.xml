@@ -20,7 +20,6 @@
                 <vm:inbound-endpoint ref="testin" />
             </inbound>
             <outbound>
-
                 <filtering-router>
                     <vm:outbound-endpoint ref="vmExceptionEndpoint" />
                 </filtering-router>

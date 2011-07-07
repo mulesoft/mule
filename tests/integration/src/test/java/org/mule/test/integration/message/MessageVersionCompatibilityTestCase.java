@@ -12,20 +12,36 @@ package org.mule.test.integration.message;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test case for EE-1820
  */
-public class MessageVersionCompatibilityTestCase extends FunctionalTestCase
+public class MessageVersionCompatibilityTestCase extends AbstractServiceAndFlowTestCase
 {
     private int TIMEOUT = 5000;
-    @Override
-    protected String getConfigResources()
+    
+    public MessageVersionCompatibilityTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/messaging/message-version-compatibility.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/messaging/message-version-compatibility-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/messaging/message-version-compatibility-flow.xml"}
+        });
+    }    
+
+    @Test
     public void testOldToOld() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -36,6 +52,7 @@ public class MessageVersionCompatibilityTestCase extends FunctionalTestCase
         assertEquals("test", reply.getPayload());
     }
 
+    @Test
     public void testOldToNew() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -46,6 +63,7 @@ public class MessageVersionCompatibilityTestCase extends FunctionalTestCase
         assertEquals("test", reply.getPayload());
     }
 
+    @Test
     public void testNewToOld() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -57,6 +75,7 @@ public class MessageVersionCompatibilityTestCase extends FunctionalTestCase
         assertNull(reply);
     }
     
+    @Test
     public void testNewToNew() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

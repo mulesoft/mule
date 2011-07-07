@@ -10,19 +10,33 @@
 
 package org.mule.test.integration.transport.file;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
 
-public class FileExceptionStrategyFunctionalTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class FileExceptionStrategyFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    protected String getConfigResources()
+    public FileExceptionStrategyFunctionalTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/providers/file/file-exception-strategy.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/providers/file/file-exception-strategy-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/providers/file/file-exception-strategy-flow.xml"}});
+    }
+
+    @Test
     public void testExceptionInTransformer() throws Exception
     {
         File f = FileUtils.newFile("./.mule/in/test.txt");

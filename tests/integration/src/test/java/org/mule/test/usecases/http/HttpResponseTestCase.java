@@ -13,18 +13,35 @@ package org.mule.test.usecases.http;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
-public class HttpResponseTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class HttpResponseTestCase extends AbstractServiceAndFlowTestCase
 {
-    protected String getConfigResources()
+    public HttpResponseTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/usecases/http/http-response.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/usecases/http/http-response-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/usecases/http/http-response-flow.xml"}
+        });
+    } 
+    
+    @Test
     public void testNullPayloadUsingAsync() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -37,6 +54,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         assertEquals(0, reply.getPayloadAsString().length());
     }
 
+    @Test
     public void testPayloadIsNotEmptyNoRemoteSynch() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -46,6 +64,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         assertEquals("test", reply.getPayloadAsString());
     }
 
+    @Test
     public void testPayloadIsNotEmptyWithRemoteSynch() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -59,6 +78,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
      * See MULE-4522
      * @throws Exception
      */
+    @Test
     public void testChunkingContentLength() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -69,6 +89,7 @@ public class HttpResponseTestCase extends FunctionalTestCase
         assertNull(reply.getInboundProperty(HttpConstants.HEADER_CONTENT_LENGTH));
     }
 
+    @Test
     public void testNoChunkingContentLength() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

@@ -14,11 +14,33 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.FunctionalTestCase;
 
-public class IdempotentRouterWithFilterTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class IdempotentRouterWithFilterTestCase extends AbstractServiceAndFlowTestCase
 {
 
+    public IdempotentRouterWithFilterTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/inbound/idempotent-router-with-filter-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/routing/inbound/idempotent-router-with-filter-flow.xml"}
+        });
+    }      
+    
+    @Test
     public void testWithValidData()
     {
         /*
@@ -45,6 +67,7 @@ public class IdempotentRouterWithFilterTestCase extends FunctionalTestCase
         assertEquals("Mule is the best!", response.getPayload());
     }
 
+    @Test
     public void testWithInvalidData()
     {
         /*
@@ -67,12 +90,6 @@ public class IdempotentRouterWithFilterTestCase extends FunctionalTestCase
         }
 
         assertNull(response);
-    }
-
-    @Override
-    protected String getConfigResources()
-    {
-        return "org/mule/test/integration/routing/inbound/idempotent-router-with-filter.xml";
     }
 
 }

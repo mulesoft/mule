@@ -12,14 +12,29 @@ package org.mule.test.integration.resolvers;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class MethodEntryPointWithTransformerTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class MethodEntryPointWithTransformerTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public MethodEntryPointWithTransformerTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/resolvers/method-entrypoint-with-transformer-config.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/resolvers/method-entrypoint-with-transformer-config-service.xml"},
+            {ConfigVariant.FLOW,
+                "org/mule/test/integration/resolvers/method-entrypoint-with-transformer-config-flow.xml"}});
     }
 
     /**
@@ -27,6 +42,7 @@ public class MethodEntryPointWithTransformerTestCase extends FunctionalTestCase
      * from a MessagePropertyTransformer, that means that the transformer is applied
      * before resolving that property.
      */
+    @Test
     public void testReceivesMethodPropertyFromAPropertyTransformer() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -34,14 +50,5 @@ public class MethodEntryPointWithTransformerTestCase extends FunctionalTestCase
         assertNotNull(response);
         assertNotNull(response.getPayload());
         assertEquals("Transformed payload", response.getPayloadAsString());
-    }
-
-    /**
-     * Transforms a message for testing purposes. 
-     * <p> Is referenced by the test configuration because it implements the test component method which should be call by the MethodEntryPointResolver.
-     */
-    public String transformMessage(String message)
-    {
-        return "Transformed " + message;
     }
 }

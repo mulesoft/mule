@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+       http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/3.2/mule-jms.xsd">
+
+    <object-to-string-transformer name="toString"/>
+
+    <flow name="bridge">
+        <http:inbound-endpoint host="localhost" port="4444" path="in" exchange-pattern="request-response">
+            <transformer ref="toString"/>
+        </http:inbound-endpoint>
+        <test:component logMessageDetails="true"/>
+        <vm:outbound-endpoint path="out" exchange-pattern="one-way">
+            <message-properties-transformer>
+                <!-- TODO this should be replaced with enhanced MPT: copy-property syntax -->
+                <add-message-property key="X-Custom-Header" value="#[header:INBOUND:X-Custom-Header]"/>
+            </message-properties-transformer>
+        </vm:outbound-endpoint>
+    </flow>
+
+</mule>

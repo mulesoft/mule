@@ -12,16 +12,32 @@ package org.mule.test.usecases.http;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class HttpPostTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class HttpPostTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    protected String getConfigResources()
+    public HttpPostTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/usecases/http/http-post.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/usecases/http/http-post-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/usecases/http/http-post-flow.xml"}
+        });
+    }      
+    
+    @Test
     public void testPost() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
