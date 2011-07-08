@@ -25,6 +25,10 @@ import org.mule.tck.testmodels.mule.TestMessageProcessor;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 /**
  * Unit test for configuring message processors on an inbound endpoint.
  */
@@ -47,6 +51,7 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
         requestEvent = createTestRequestEvent(endpoint);
     }
 
+    @Test
     public void testProcessors() throws Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();
@@ -57,6 +62,7 @@ public class InboundEndpointMessageProcessorsTestCase extends AbstractMessagePro
         assertEquals(TEST_MESSAGE + ":1:2:3", result.getMessage().getPayload());
     }
 
+    @Test
     public void testNoProcessors() throws Exception
     {
         DefaultMessageProcessorChainBuilder builder = new DefaultMessageProcessorChainBuilder();

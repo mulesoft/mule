@@ -11,12 +11,18 @@
 package org.mule.endpoint;
 
 import org.mule.api.MuleException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Properties;
 
-public class MuleEndpointURITestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+public class MuleEndpointURITestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testEquality() throws Exception
     {
         MuleEndpointURI u1 = new MuleEndpointURI("test://mule:secret@jabber.org:6666/ross@jabber.org", muleContext);
@@ -36,6 +42,7 @@ public class MuleEndpointURITestCase extends AbstractMuleTestCase
         assertEquals(u2.hashCode(), u3.hashCode());
     }
 
+    @Test
     public void testUriWithHostOnly() throws Exception
     {
         MuleEndpointURI uri = buildEndpointUri("test://theHost");
@@ -44,6 +51,7 @@ public class MuleEndpointURITestCase extends AbstractMuleTestCase
         assertEquals(0, uri.getParams().size());
     }
 
+    @Test
     public void testUriWithHostAndPort() throws Exception
     {
         MuleEndpointURI uri = buildEndpointUri("test://theHost:9999");
@@ -52,6 +60,7 @@ public class MuleEndpointURITestCase extends AbstractMuleTestCase
         assertEquals(0, uri.getParams().size());
     }
     
+    @Test
     public void testUriWithUsername() throws Exception
     {
         MuleEndpointURI uri = buildEndpointUri("test://theUser@theHost");
@@ -61,6 +70,7 @@ public class MuleEndpointURITestCase extends AbstractMuleTestCase
         assertEquals(0, uri.getParams().size());
     }
         
+    @Test
     public void testUriWithUsernameAndPassword() throws Exception
     {
         MuleEndpointURI uri = buildEndpointUri("test://theUser:secret@theHost");
@@ -72,6 +82,7 @@ public class MuleEndpointURITestCase extends AbstractMuleTestCase
         assertEquals(0, uri.getParams().size());
     }
     
+    @Test
     public void testUriWithUsernameContainingAtSignAndPassword() throws Exception
     {
         MuleEndpointURI uri = buildEndpointUri("test://theUser%40theEmailHost:secret@theHost");
@@ -82,6 +93,7 @@ public class MuleEndpointURITestCase extends AbstractMuleTestCase
         assertEquals(0, uri.getParams().size());
     }
 
+    @Test
     public void testUriWithUsernameAndPasswordContainingAtSign() throws Exception
     {
         MuleEndpointURI uri = buildEndpointUri("test://theUser:secret%40secret@theHost");
@@ -92,6 +104,7 @@ public class MuleEndpointURITestCase extends AbstractMuleTestCase
         assertEquals(0, uri.getParams().size());
     }
 
+    @Test
     public void testUriWithPath() throws Exception
     {
         MuleEndpointURI uri = buildEndpointUri("test://theHost/thePath");
@@ -101,6 +114,7 @@ public class MuleEndpointURITestCase extends AbstractMuleTestCase
         assertEquals(0, uri.getParams().size());
     }
     
+    @Test
     public void testUriWithQuery() throws Exception
     {
         MuleEndpointURI uri = buildEndpointUri("test://theHost?query=xxx");
@@ -113,6 +127,7 @@ public class MuleEndpointURITestCase extends AbstractMuleTestCase
         assertEquals("xxx", params.getProperty("query"));
     }
     
+    @Test
     public void testUriWithQueryContainingAtSign() throws Exception
     {
         MuleEndpointURI uri = buildEndpointUri("test://theHost?query=xxx@yyy");
@@ -125,6 +140,7 @@ public class MuleEndpointURITestCase extends AbstractMuleTestCase
         assertEquals("xxx@yyy", params.getProperty("query"));
     }
 
+    @Test
     public void testUriWithPathAndQuery() throws Exception
     {
         MuleEndpointURI uri = buildEndpointUri("test://theHost/thePath?query=xxx");
@@ -138,12 +154,14 @@ public class MuleEndpointURITestCase extends AbstractMuleTestCase
         assertEquals("xxx", params.getProperty("query"));
     }
     
+    @Test
     public void testPasswordMasking() throws Exception
     {
         MuleEndpointURI uri = new MuleEndpointURI("test://theUser:password@theHost", muleContext);
         assertEquals("test://theUser:****@theHost", uri.toString());
     }
     
+    @Test
     public void testPasswordMaskingWithUsernameContainingAtSign() throws Exception
     {
         MuleEndpointURI uri = new MuleEndpointURI("test://theUser%40theEmailHost:password@theHost", muleContext);

@@ -18,14 +18,22 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transformer.Transformer;
 import org.mule.retry.policies.NoRetryPolicyTemplate;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transformer.simple.StringAppendTransformer;
 import org.mule.util.ObjectNameHelper;
 
-public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class EndpointURIEndpointBuilderTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testBuildInboundEndpoint() throws Exception
     {
         String uri = "test://address";
@@ -42,6 +50,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         testDefaultCommonEndpointAttributes(ep);
     }
 
+    @Test
     public void testBuildOutboundEndpoint() throws MuleException
     {
         String uri = "test://address";
@@ -76,6 +85,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         assertEquals(ImmutableEndpoint.INITIAL_STATE_STARTED, ep.getInitialState());
     }
     
+    @Test
     public void testHasSetEncodingMethod() throws Exception
     {
         String uri = "test://address";
@@ -83,6 +93,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
         assertNotNull(endpointBuilder.getClass().getMethod("setEncoding", new Class[]{String.class}));
     }
     
+    @Test
     public void testEndpointBuilderFromEndpoint() throws Exception
     {
         String uri = "test://address";
@@ -106,6 +117,7 @@ public class EndpointURIEndpointBuilderTestCase extends AbstractMuleTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testEndpointBuilderTransformersState() throws Exception
     {
         muleContext.getRegistry().registerObject("tran1", new StringAppendTransformer("1"));

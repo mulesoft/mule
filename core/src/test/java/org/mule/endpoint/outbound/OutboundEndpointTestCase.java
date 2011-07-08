@@ -37,6 +37,14 @@ import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests flow of messages from {@link OutboundEndpoint#process(MuleEvent)} down to
@@ -48,6 +56,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
     protected FakeMessageDispatcher dispacher;
     protected MuleEvent testOutboundEvent;
 
+    @Test
     public void testDefaultFlowSync() throws Exception
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
@@ -69,6 +78,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
     }
 
+    @Test
     public void testDefaultFlowAsync() throws Exception
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
@@ -82,6 +92,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertNull(result);
     }
 
+    @Test
     public void testSecurityFilterAccept() throws Exception
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, new TestSecurityFilter(true), 
@@ -102,6 +113,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
     }
 
+    @Test
     public void testSecurityFilterNotAccept() throws Exception
     {
         TestSecurityNotificationListener securityNotificationListener = new TestSecurityNotificationListener();
@@ -127,6 +139,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
             TestSecurityFilter.StaticMessageUnauthorisedException.class.getName());
     }
 
+    @Test
     public void testSendNotfication() throws Exception
     {
         TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
@@ -146,6 +159,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
             ((MuleMessage) listener.messageNotification.getSource()).getPayload());
     }
 
+    @Test
     public void testDispatchNotfication() throws Exception
     {
         TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
@@ -165,6 +179,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
             ((MuleMessage) listener.messageNotification.getSource()).getPayload());
     }
 
+    @Test
     public void testTransformers() throws Exception
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, new OutboundAppendTransformer(),
@@ -181,6 +196,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertEquals(RESPONSE_MESSAGE + ResponseAppendTransformer.APPEND_STRING, result.getMessageAsString());
     }
 
+    @Test
     public void testConnectorNotStarted() throws Exception
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
@@ -199,6 +215,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         }
     }
 
+    @Test
     public void testTimeoutSetOnEvent() throws Exception
     {
 
@@ -215,6 +232,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertEquals(testTimeout, dispacher.sensedSendEvent.getTimeout());
     }
     
+    @Test
     public void testObjectAwareInjection() throws Exception
     {
         EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URI, muleContext);
@@ -229,11 +247,13 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertEquals(endpoint, objectAware.endpoint);
     }
 
+    @Test
     public void testTransaction()
     {
         // TODO
     }
 
+    @Test
     public void testExceptionHandling()
     {
         // TODO

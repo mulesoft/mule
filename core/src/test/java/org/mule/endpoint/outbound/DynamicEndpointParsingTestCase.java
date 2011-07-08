@@ -20,17 +20,24 @@ import org.mule.api.transport.DispatchException;
 import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.endpoint.dynamic.NullConnector;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
+import org.junit.Test;
 
-public class DynamicEndpointParsingTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+
+public class DynamicEndpointParsingTestCase extends AbstractMuleContextTestCase
 {
     public DynamicEndpointParsingTestCase()
     {
         setStartContext(true);
     }
 
+    @Test
     public void testSingleExpression() throws Exception
     {
         OutboundEndpoint endpoint = createEndpoint("test://localhost:#[header:port]");
@@ -48,6 +55,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testSingleMultiExpression() throws Exception
     {
         OutboundEndpoint endpoint = createEndpoint("test://#[header:host]:#[header:port]");
@@ -64,6 +72,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleTestCase
         assertTrue(endpoint.getConnector() instanceof TestConnector);
     }
 
+    @Test
     public void testMissingExpressionResult() throws Exception
     {
         OutboundEndpoint endpoint = createEndpoint("test://#[header:host]:#[header:port]");
@@ -87,6 +96,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testExpressionInScheme() throws Exception
     {
         try
@@ -100,6 +110,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMalformedEndpoint() throws Exception
     {
         try
@@ -113,6 +124,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testInboundEndpoint() throws Exception
     {
         //Dynamic inbound endpoints not allowed
@@ -128,6 +140,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testConnectorURIParam() throws Exception
     {
         TestConnector tc = new TestConnector(muleContext);
@@ -149,6 +162,7 @@ public class DynamicEndpointParsingTestCase extends AbstractMuleTestCase
         assertEquals("myTestConnector", endpoint.getConnector().getName());
     }
 
+    @Test
     public void testMEPURIParam() throws Exception
     {
         OutboundEndpoint endpoint = createEndpoint("test://#[header:host]:#[header:port]");
