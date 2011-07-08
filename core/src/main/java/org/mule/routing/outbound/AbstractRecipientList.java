@@ -11,9 +11,11 @@
 package org.mule.routing.outbound;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.DefaultMuleException;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.RegistrationException;
@@ -46,7 +48,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
 
         List<Object> recipients = getRecipients(event);
         List<MuleEvent> results = new ArrayList<MuleEvent>();
-        
+
         if (enableCorrelation != CorrelationMode.NEVER)
         {
             boolean correlationSet = message.getCorrelationGroupSize() != -1;
@@ -70,10 +72,10 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
             try
             {
                 endpoint = getRecipientEndpoint(request, recipient);
-    
-                boolean sync = 
+
+                boolean sync =
                     (this.synchronous == null ? endpoint.getExchangePattern().hasResponse() : this.synchronous.booleanValue());
-                
+
                 if (sync)
                 {
                     results.add(sendRequest(event, request, endpoint, true));
@@ -126,7 +128,7 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         OutboundEndpoint endpoint = null;
         if (null != getMuleContext() && null != getMuleContext().getRegistry())
         {
-            endpoint = getMuleContext().getEndpointFactory().getOutboundEndpoint(uri.getAddress());
+            endpoint = buildOutboundEndpoint(uri.getAddress());
         }
         if (null != endpoint)
         {
@@ -141,9 +143,26 @@ public abstract class AbstractRecipientList extends FilteringOutboundRouter
         OutboundEndpoint endpoint = recipientCache.get(recipient);
         if (null == endpoint && null != getMuleContext() && null != getMuleContext().getRegistry())
         {
-            endpoint = getMuleContext().getEndpointFactory().getOutboundEndpoint(recipient);
+            endpoint = buildOutboundEndpoint(recipient);
         }
         return endpoint;
+    }
+
+    protected OutboundEndpoint buildOutboundEndpoint(String recipient) throws MuleException
+    {
+        EndpointBuilder endpointBuilder = getMuleContext().getEndpointFactory().getEndpointBuilder(recipient);
+
+        try
+        {
+            endpointBuilder = (EndpointBuilder) endpointBuilder.clone();
+            endpointBuilder.setTransactionConfig(transactionConfig);
+        }
+        catch (CloneNotSupportedException e)
+        {
+            throw new DefaultMuleException(e);
+        }
+
+        return endpointBuilder.buildOutboundEndpoint();
     }
 
     public Boolean getSynchronous()
