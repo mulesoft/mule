@@ -10,24 +10,37 @@
 
 package org.mule.test.integration.messaging.meps;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
 import org.mule.util.concurrent.Latch;
 
-import java.util.concurrent.TimeUnit;
-
 // START SNIPPET: full-class
-public class InOnlyTestCase extends FunctionalTestCase
+public class InOnlyTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final long TIMEOUT = 3000;
 
-    protected String getConfigResources()
+    public InOnlyTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/messaging/meps/pattern_In-Only.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/messaging/meps/pattern_In-Only-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_In-Only-flow.xml"}});
+    }
+
+    @Test
     public void testExchange() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

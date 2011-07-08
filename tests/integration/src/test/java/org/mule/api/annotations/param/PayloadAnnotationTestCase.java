@@ -10,28 +10,38 @@
 
 package org.mule.api.annotations.param;
 
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.IOUtils;
 
-import java.io.InputStream;
-
-public class PayloadAnnotationTestCase extends FunctionalTestCase
+public class PayloadAnnotationTestCase extends AbstractServiceAndFlowTestCase
 {
-    public PayloadAnnotationTestCase()
+
+    public PayloadAnnotationTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
+
         setDisposeManagerPerSuite(true);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "org/mule/test/annotations/payload-annotation.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/annotations/payload-annotation-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/annotations/payload-annotation-flow.xml"}});
     }
 
+    @Test
     public void testPayloadNoTransform() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -41,15 +51,17 @@ public class PayloadAnnotationTestCase extends FunctionalTestCase
         assertEquals("foo", message.getPayload());
     }
 
+    @Test
     public void testPayloadAutoTransform() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage message = client.send("vm://payload2", "foo", null);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a String", message.getPayload() instanceof InputStream);
-        assertEquals("foo", IOUtils.toString((InputStream)message.getPayload()));
+        assertEquals("foo", IOUtils.toString((InputStream) message.getPayload()));
     }
 
+    @Test
     public void testPayloadFailedTransform() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

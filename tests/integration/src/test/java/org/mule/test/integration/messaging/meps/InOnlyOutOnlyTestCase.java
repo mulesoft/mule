@@ -10,23 +10,37 @@
 
 package org.mule.test.integration.messaging.meps;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+
 // START SNIPPET: full-class
-public class InOnlyOutOnlyTestCase extends FunctionalTestCase
+public class InOnlyOutOnlyTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final long TIMEOUT = 3000;
 
-    protected String getConfigResources()
+    public InOnlyOutOnlyTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/messaging/meps/pattern_In-Only_Out-Only.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/messaging/meps/pattern_In-Only_Out-Only-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/messaging/meps/pattern_In-Only_Out-Only-flow.xml"}
+        });
+    }
+        
+    @Test
     public void testExchange() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

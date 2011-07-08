@@ -10,25 +10,39 @@
 
 package org.mule.test.properties;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
 
-import java.util.Map;
-
-public class PropertiesTestCase extends FunctionalTestCase
+public class PropertiesTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public PropertiesTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/properties/properties-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/properties/properties-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/properties/properties-config-flow.xml"}
+        });
+    }
+
+    
     /**
      * Test that the VM transport correctly copies outbound to inbound properties both for requests amd responses
      */
+    @Test
     public void testProperties() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

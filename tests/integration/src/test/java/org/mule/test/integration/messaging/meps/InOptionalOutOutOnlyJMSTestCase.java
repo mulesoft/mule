@@ -10,18 +10,21 @@
 
 package org.mule.test.integration.messaging.meps;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.transport.NullPayload;
-
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.activemq.broker.BrokerService;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.NullPayload;
 
 // START SNIPPET: full-class
-public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase
+public class InOptionalOutOutOnlyJMSTestCase extends AbstractServiceAndFlowTestCase
 {
     public static final long TIMEOUT = 3000;
 
@@ -34,18 +37,29 @@ public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase
         broker.addConnector("tcp://localhost:61616");
         broker.start();
     }
-    
+
     @Override
     protected void suitePostTearDown() throws Exception
     {
         broker.stop();
     }
 
-    protected String getConfigResources()
+    public InOptionalOutOutOnlyJMSTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only_JMS.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only_JMS-service.xml"},
+            {ConfigVariant.FLOW,
+                "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only_JMS-flow.xml"}});
+    }
+
+    @Test
     public void testExchange() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -57,11 +71,12 @@ public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase
         Map<String, String> props = new HashMap<String, String>();
         props.put("foo", "bar");
         result = client.send("inboundEndpoint", "some data", props, 20000);
-        
+
         // Give JMS some time to dispatch
         Thread.sleep(200);
 
-        // No temporary queues should have been created, used, or be being waited on for a result 
+        // No temporary queues should have been created, used, or be being waited on
+        // for a result
         // See MULE-4617
         assertEquals(0, broker.getAdminView().getTemporaryQueues().length);
 

@@ -10,7 +10,8 @@
 
 package org.mule.test.integration.transport.jms;
 
-import org.mule.tck.FunctionalTestCase;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -23,14 +24,27 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class QosHeadersTestCase extends FunctionalTestCase
+public class QosHeadersTestCase extends AbstractServiceAndFlowTestCase
 {
-    protected String getConfigResources()
+    public QosHeadersTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/providers/jms/qosheaders-test.xml";
+        super(variant, configResources);
+
     }
-    
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/providers/jms/qosheaders-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/providers/jms/qosheaders-test-flow.xml"}});
+    }
+
+    @Test
     public void testQosHeadersHonored() throws JMSException
     {
         String producerQueue = "test.in.kind";
@@ -38,6 +52,7 @@ public class QosHeadersTestCase extends FunctionalTestCase
         doSendReceiveCycle(producerQueue, consumerQueue, true);
     }
 
+    @Test
     public void testQosHeadersNotHonored() throws JMSException
     {
         String producerQueue = "test.in.selfish";
@@ -48,11 +63,12 @@ public class QosHeadersTestCase extends FunctionalTestCase
     /**
      * @param honorProperties indicate which assertion path to take
      */
-    protected void doSendReceiveCycle(final String producerQueue, final String consumerQueue, final boolean honorProperties)
-            throws JMSException
+    protected void doSendReceiveCycle(final String producerQueue,
+                                      final String consumerQueue,
+                                      final boolean honorProperties) throws JMSException
     {
-        ActiveMQConnectionFactory connectionFactory =
-                new ActiveMQConnectionFactory("vm://localhost?broker.persistent=false&broker.useJmx=false");
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
+            "vm://localhost?broker.persistent=false&broker.useJmx=false");
         Connection producerConnection = null;
         Connection consumerConnection = null;
 
@@ -82,7 +98,8 @@ public class QosHeadersTestCase extends FunctionalTestCase
 
             Message response = consumer.receive(10000);
 
-            // this is ugly, but will do for this test. Man, I wish I could just pass in a closure here...
+            // this is ugly, but will do for this test. Man, I wish I could just pass
+            // in a closure here...
             if (honorProperties)
             {
                 performHeadersHonoredAssertions(response);
@@ -122,24 +139,20 @@ public class QosHeadersTestCase extends FunctionalTestCase
 
     }
 
-    protected void performHeadersHonoredAssertions(final Message response)
-            throws JMSException
+    protected void performHeadersHonoredAssertions(final Message response) throws JMSException
     {
         assertNotNull(response);
         assertEquals("JMS Priority should've been honored.", 7, response.getJMSPriority());
-        assertEquals("JMS Delivery mode should've been honored",
-                     DeliveryMode.PERSISTENT, response.getJMSDeliveryMode());
+        assertEquals("JMS Delivery mode should've been honored", DeliveryMode.PERSISTENT,
+            response.getJMSDeliveryMode());
     }
 
-    protected void performHeadersNotHonoredAssertions(final Message response)
-            throws JMSException
+    protected void performHeadersNotHonoredAssertions(final Message response) throws JMSException
     {
         assertNotNull(response);
         // default priority
         assertEquals("JMS Priority should have not been honored.", 4, response.getJMSPriority());
-        assertEquals("JMS Delivery mode should have not been honored",
-                     DeliveryMode.NON_PERSISTENT, response.getJMSDeliveryMode());
+        assertEquals("JMS Delivery mode should have not been honored", DeliveryMode.NON_PERSISTENT,
+            response.getJMSDeliveryMode());
     }
 }
-
-
