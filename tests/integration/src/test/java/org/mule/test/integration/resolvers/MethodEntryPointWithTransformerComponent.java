@@ -1,5 +1,5 @@
 /*
- * $Id: MethodEntryPointWithTransformerTestCase.java 19692 2010-09-21 23:50:35Z aperepel $
+ * $Id$
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
