@@ -10,8 +10,6 @@
 
 package org.mule.module.ws.construct;
 
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -25,6 +23,11 @@ import org.mule.tck.MuleTestUtils;
 
 import java.net.URI;
 
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 
@@ -66,17 +69,18 @@ public class WSProxyPathBugTestCase extends AbstractFlowConstuctTestCase
 
     }
 
+    @Test
     public void testWithSamePath() throws Exception
     {
         assertOnUriRewrite(WSDL_LOCATION_SAME_PATH);
     }
 
 
+    @Test
     public void testWithDifferentPath() throws Exception
     {
         assertOnUriRewrite(WSDL_LOCATION_DIFFERENT_PATH);
     }
-
 
     private void assertOnUriRewrite(String wsdlLocation) throws Exception
     {

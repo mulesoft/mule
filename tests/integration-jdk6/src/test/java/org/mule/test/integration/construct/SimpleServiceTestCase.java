@@ -19,6 +19,8 @@ import org.mule.transport.http.HttpConstants;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
 public class SimpleServiceTestCase extends FunctionalTestCase
 {
     private LocalMuleClient muleClient;
@@ -37,6 +39,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         return "org/mule/test/integration/construct/simple-service-config.xml";
     }
 
+    @Test
     public void testJaxRsService() throws Exception
     {
         final Map<String, Object> props = new HashMap<String, Object>();

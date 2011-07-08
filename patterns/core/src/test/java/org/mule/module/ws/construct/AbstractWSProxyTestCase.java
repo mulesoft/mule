@@ -29,6 +29,10 @@ import org.mule.transport.AbstractMessageRequesterFactory;
 
 import java.net.InetAddress;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public abstract class AbstractWSProxyTestCase extends AbstractFlowConstuctTestCase
 {
     protected Connector testConnector;
@@ -62,6 +66,7 @@ public abstract class AbstractWSProxyTestCase extends AbstractFlowConstuctTestCa
         wsProxy.start();
     }
 
+    @Test
     public void testProcessNonHttpRequest() throws Exception
     {
         startWsProxy();
@@ -72,6 +77,7 @@ public abstract class AbstractWSProxyTestCase extends AbstractFlowConstuctTestCa
         assertEquals("hello", response.getMessageAsString());
     }
 
+    @Test
     public void testProcessHttpWsdlRequest() throws Exception
     {
         startWsProxy();
@@ -100,6 +106,7 @@ public abstract class AbstractWSProxyTestCase extends AbstractFlowConstuctTestCa
         assertEquals("fake_wsdl " + InetAddress.getLocalHost().getHostName(), response.getMessageAsString());
     }
 
+    @Test
     public void testProcessHttpServiceRequest() throws Exception
     {
         startWsProxy();

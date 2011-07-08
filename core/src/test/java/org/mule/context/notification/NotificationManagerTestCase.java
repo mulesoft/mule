@@ -10,7 +10,15 @@
 
 package org.mule.context.notification;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 public class NotificationManagerTestCase extends AbstractMuleTestCase
 {
@@ -19,7 +27,8 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase
     protected Listener2 listener2;
     protected ServerNotificationManager manager;
 
-    protected void doSetUp() throws Exception
+    @Before
+    public void setUpListeners()
     {
         listener1 = new Listener1();
         listener2 = new Listener2();
@@ -32,6 +41,7 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase
         manager.addInterfaceToType(Listener2.class, Event2.class);
     }
 
+    @Test
     public void testNoListenersMeansNoEvents() throws ClassNotFoundException
     {
         registerDefaultEvents();
@@ -54,6 +64,7 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase
         manager.addListener(listener2);
     }
 
+    @Test
     public void testAssociationOfInterfacesAndEvents() throws ClassNotFoundException
     {
         registerDefaultEvents();
@@ -71,6 +82,7 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase
         assertFalse("not specified at all", manager.isNotificationEnabled(Event3.class));
     }
 
+    @Test
     public void testDynamicResponseToDisablingEvents() throws ClassNotFoundException
     {
         registerDefaultEvents();
@@ -92,6 +104,7 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase
         assertFalse("not specified at all", manager.isNotificationEnabled(Event3.class));
     }
 
+    @Test
     public void testDynamicResponseToDisablingInterfaces() throws ClassNotFoundException
     {
         registerDefaultEvents();
@@ -110,6 +123,7 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase
     /**
      * A new policy should only be generated when the configuration changes
      */
+    @Test
     public void testPolicyCaching() throws ClassNotFoundException
     {
         registerDefaultEvents();
@@ -121,6 +135,7 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase
         assertNotSame(policy, manager.getPolicy());
     }
 
+    @Test
     public void testDynamicManagerDecisions() throws ClassNotFoundException
     {
         registerDefaultEvents();
@@ -135,6 +150,7 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase
     /**
      * When the manager is not dynamic (the default), decisions should not change
      */
+    @Test
     public void testNonDynamicManagerDecisions() throws ClassNotFoundException
     {
         registerDefaultEvents();
@@ -145,6 +161,7 @@ public class NotificationManagerTestCase extends AbstractMuleTestCase
         assertTrue(decision.isNotificationEnabled(Event2.class));
     }
 
+    @Test
     public void testNotification() throws ClassNotFoundException
     {
         registerDefaultEvents();

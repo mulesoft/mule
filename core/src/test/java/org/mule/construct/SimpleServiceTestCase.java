@@ -16,6 +16,10 @@ import org.mule.construct.SimpleService.Type;
 import org.mule.tck.MuleTestUtils;
 import org.mule.util.StringUtils;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
 {
     private SimpleService simpleService;
@@ -35,6 +39,7 @@ public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
         return simpleService;
     }
 
+    @Test
     public void testProcess() throws Exception
     {
         simpleService.initialise();

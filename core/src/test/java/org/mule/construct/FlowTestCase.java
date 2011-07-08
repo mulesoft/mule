@@ -22,6 +22,13 @@ import org.mule.transformer.simple.StringAppendTransformer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 public class FlowTestCase extends AbstractFlowConstuctTestCase
 {
 
@@ -63,6 +70,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
         return flow;
     }
 
+    @Test
     public void testProcessOneWayEndpoint() throws Exception
     {
         flow.initialise();
@@ -78,6 +86,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
             "thread"));
     }
 
+    @Test
     public void testProcessRequestResponseEndpoint() throws Exception
     {
         flow.initialise();
@@ -96,6 +105,7 @@ public class FlowTestCase extends AbstractFlowConstuctTestCase
 
     }
 
+    @Test
     public void testProcessStopped() throws Exception
     {
         flow.initialise();

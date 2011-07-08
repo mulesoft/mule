@@ -13,10 +13,15 @@ package org.mule.construct.builder;
 import org.mule.construct.Validator;
 import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class ValidatorBuilderTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class ValidatorBuilderTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testConfigurationWithoutErrorExpression() throws Exception
     {
         final Validator validator = new ValidatorBuilder().name("test-validator-no-error")
@@ -31,6 +36,7 @@ public class ValidatorBuilderTestCase extends AbstractMuleTestCase
         assertEquals("test-validator-no-error", validator.getName());
     }
 
+    @Test
     public void testFullConfiguration() throws Exception
     {
         final Validator validator = new ValidatorBuilder().name("test-validator-full")

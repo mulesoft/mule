@@ -25,7 +25,7 @@ public class PreferredComparatorTestCase extends AbstractMuleTestCase
     private PreferredComparator comparator;
 
     @Before
-    public void doSetUp()
+    public void setUpComparator()
     {
         comparator = new PreferredComparator();
     }
