@@ -96,7 +96,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
     /**
      * Authenticates the current message if authenticate is set to true. This method
      * will always populate the secure context in the session
-     * 
+     *
      * @param event the current message recieved
      * @throws org.mule.api.security.SecurityException if authentication fails
      */
@@ -187,7 +187,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
     /**
      * Authenticates the current message if authenticate is set to true. This method
      * will always populate the secure context in the session
-     * 
+     *
      * @param event the current event being dispatched
      * @throws org.mule.api.security.SecurityException if authentication fails
      */
@@ -195,12 +195,12 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
     public void authenticateOutbound(MuleEvent event)
         throws SecurityException, SecurityProviderNotFoundException
     {
-        if (event.getSession().getSecurityContext() == null)
+        SecurityContext securityContext = event.getSession().getSecurityContext();
+        if (securityContext == null)
         {
             if (isAuthenticate())
             {
-                throw new UnauthorisedException(event, event.getSession().getSecurityContext(),
-                    event.getEndpoint(), this);
+                throw new UnauthorisedException(event, securityContext, this);
             }
             else
             {
@@ -208,7 +208,7 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
             }
         }
 
-        Authentication auth = event.getSession().getSecurityContext().getAuthentication();
+        Authentication auth = securityContext.getAuthentication();
         if (isAuthenticate())
         {
             auth = getSecurityManager().authenticate(auth);
@@ -225,5 +225,4 @@ public class HttpBasicAuthenticationFilter extends AbstractEndpointSecurityFilte
 
         event.getMessage().setOutboundProperty(HttpConstants.HEADER_AUTHORIZATION, header.toString());
     }
-
 }

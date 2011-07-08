@@ -23,7 +23,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentMap;
 
 /**
  * Cache endpoints in order to prevent memory leaks.
- * 
+ *
  * @see MULE-5422
  */
 public class SimpleEndpointCache implements EndpointCache
@@ -37,9 +37,6 @@ public class SimpleEndpointCache implements EndpointCache
         this.muleContext = muleContext;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.endpoint.EndpointCache#getOutboundEndpoint(java.lang.String, org.mule.MessageExchangePattern, java.lang.Long)
-     */
     public OutboundEndpoint getOutboundEndpoint(String uri,
                                                    MessageExchangePattern mep,
                                                    Long responseTimeout) throws MuleException
@@ -48,8 +45,7 @@ public class SimpleEndpointCache implements EndpointCache
                                                                                  + ":" + responseTimeout);
         if (endpoint == null)
         {
-            EndpointBuilder endpointBuilder = muleContext.getRegistry()
-                .lookupEndpointFactory()
+            EndpointBuilder endpointBuilder = muleContext.getEndpointFactory()
                 .getEndpointBuilder(uri);
             endpointBuilder.setExchangePattern(mep);
             if (responseTimeout != null && responseTimeout > 0)
@@ -67,16 +63,12 @@ public class SimpleEndpointCache implements EndpointCache
         return endpoint;
     }
 
-    /* (non-Javadoc)
-     * @see org.mule.endpoint.EndpointCache#getInboundEndpoint(java.lang.String, org.mule.MessageExchangePattern)
-     */
     public InboundEndpoint getInboundEndpoint(String uri, MessageExchangePattern mep) throws MuleException
     {
         InboundEndpoint endpoint = (InboundEndpoint) inboundEndpointCache.get(uri + ":" + mep.toString());
         if (endpoint == null)
         {
-            EndpointBuilder endpointBuilder = muleContext.getRegistry()
-                .lookupEndpointFactory()
+            EndpointBuilder endpointBuilder = muleContext.getEndpointFactory()
                 .getEndpointBuilder(uri);
             endpointBuilder.setExchangePattern(mep);
             endpoint = muleContext.getEndpointFactory().getInboundEndpoint(endpointBuilder);

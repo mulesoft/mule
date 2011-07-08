@@ -65,7 +65,7 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
             // Authentication failed
             if (logger.isDebugEnabled())
             {
-                logger.debug("Authentication request for user: " + user.getUsername() 
+                logger.debug("Authentication request for user: " + user.getUsername()
                     + " failed: " + e.toString());
             }
             throw new UnauthorisedException(
@@ -87,19 +87,20 @@ public class MuleEncryptionEndpointSecurityFilter extends AbstractEndpointSecuri
     protected void authenticateOutbound(MuleEvent event)
         throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
     {
-        if (event.getSession().getSecurityContext() == null)
+        SecurityContext securityContext = event.getSession().getSecurityContext();
+        if (securityContext == null)
         {
             if (isAuthenticate())
             {
-                throw new UnauthorisedException(event, event.getSession().getSecurityContext(),
-                    event.getEndpoint(), this);
+                throw new UnauthorisedException(event, securityContext, this);
             }
             else
             {
                 return;
             }
         }
-        Authentication auth = event.getSession().getSecurityContext().getAuthentication();
+
+        Authentication auth = securityContext.getAuthentication();
         if (isAuthenticate())
         {
             auth = getSecurityManager().authenticate(auth);

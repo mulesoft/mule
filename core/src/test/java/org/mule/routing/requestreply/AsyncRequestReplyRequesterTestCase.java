@@ -20,7 +20,6 @@ import org.mule.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.service.Service;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
-import org.mule.routing.requestreply.AbstractAsyncRequestReplyRequester;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
 
@@ -56,12 +55,12 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
         AsyncInterceptingMessageProcessor asyncMP = new AsyncInterceptingMessageProcessor(
             new WorkManagerSource()
             {
-
                 public WorkManager getWorkManager() throws MuleException
                 {
                     return muleContext.getWorkManager();
                 }
-            }, true);
+            }
+        );
 
         asyncMP.setListener(target);
         asyncReplyMP.setListener(asyncMP);
@@ -91,7 +90,8 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
                 {
                     return muleContext.getWorkManager();
                 }
-            }, true);
+            }
+        );
 
         asyncMP.setListener(target);
         asyncReplyMP.setListener(asyncMP);
@@ -124,7 +124,8 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
                 {
                     return muleContext.getWorkManager();
                 }
-            }, true);
+            }
+        );
 
         asyncMP.setListener(target);
         asyncReplyMP.setListener(asyncMP);
@@ -157,7 +158,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
 
                 public void release()
                 {
-
+                    // nop
                 }
             });
         }
@@ -168,9 +169,9 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
         e.printStackTrace();
         fail(e.getMessage());
     }
-    
+
     class TestAsyncRequestReplyRequester extends AbstractAsyncRequestReplyRequester
     {
-
+        // no custom methods
     }
 }

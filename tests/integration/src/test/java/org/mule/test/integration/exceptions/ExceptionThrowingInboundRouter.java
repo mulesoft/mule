@@ -15,6 +15,15 @@ import org.mule.routing.MessageFilter;
 
 public class ExceptionThrowingInboundRouter extends MessageFilter
 {
+    /**
+     * For IoC only
+     */
+    @Deprecated
+    public ExceptionThrowingInboundRouter()
+    {
+        super();
+    }
+
     @Override
     public boolean accept(MuleEvent event)
     {

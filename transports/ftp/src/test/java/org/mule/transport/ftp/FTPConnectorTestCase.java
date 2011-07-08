@@ -74,7 +74,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
         Map<Object, Object> props = new HashMap<Object, Object>();
         // Endpoint wants String-typed properties
         props.put(FtpConnector.PROPERTY_POLLING_FREQUENCY, String.valueOf(POLLING_FREQUENCY_OVERRIDE));
-        
+
         InboundEndpoint endpoint = getTestInboundEndpoint("mock", null, null, null, props, null);
 
         Service service = getTestService("apple", Apple.class);
@@ -92,8 +92,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
     {
         final String testObject = "custom object";
 
-        final ImmutableEndpoint endpoint = muleContext.getRegistry()
-            .lookupEndpointFactory()
+        final ImmutableEndpoint endpoint = muleContext.getEndpointFactory()
             .getOutboundEndpoint("ftp://test:test@example.com");
         final EndpointURI endpointURI = endpoint.getEndpointURI();
 
@@ -148,5 +147,5 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
         }
 
     }
-    
+
 }

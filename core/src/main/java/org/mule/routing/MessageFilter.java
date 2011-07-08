@@ -41,17 +41,19 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
 {
     protected Filter filter;
 
-    /** 
+    /**
      * For IoC only
-     * @deprecated Use MessageFilter(Filter filter) 
+     * @deprecated Use MessageFilter(Filter filter)
      */
+    @Deprecated
     public MessageFilter()
     {
-        // empty
+        super();
     }
 
     public MessageFilter(Filter filter)
     {
+        super();
         this.filter = filter;
     }
 
@@ -88,9 +90,9 @@ public class MessageFilter extends AbstractFilteringMessageProcessor implements 
     @Override
     protected MuleException filterUnacceptedException(MuleEvent event)
     {
-        return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event, filter);        
+        return new FilterUnacceptedException(CoreMessages.messageRejectedByFilter(), event, filter);
     }
-    
+
     public Filter getFilter()
     {
         return filter;
