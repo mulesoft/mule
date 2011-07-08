@@ -14,15 +14,20 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.processor.policy.AroundPolicy;
 import org.mule.api.processor.policy.PolicyInvocation;
 import org.mule.processor.chain.DefaultMessageProcessorChain;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
-/**
- *
- */
-public class PolicyTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+
+public class PolicyTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testSinglePolicy() throws Exception
     {
         AroundPolicy ap = new TestPolicy("test around policy");
@@ -53,6 +58,7 @@ public class PolicyTestCase extends AbstractMuleTestCase
         assertEquals("No policies should have been registered.", 0, chain.getPolicies().list().size());
     }
 
+    @Test
     public void testMultiplePolicies() throws Exception
     {
 
@@ -87,6 +93,7 @@ public class PolicyTestCase extends AbstractMuleTestCase
         assertEquals("No policies should have been registered.", 0, chain.getPolicies().list().size());
     }
 
+    @Test
     public void testDuplicateName() throws Exception
     {
         MessageProcessorChain chain = DefaultMessageProcessorChain.from();

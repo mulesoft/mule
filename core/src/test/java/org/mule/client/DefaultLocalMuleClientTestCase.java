@@ -10,11 +10,6 @@
 
 package org.mule.client;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
-import static org.mockito.Mockito.verify;
-
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
@@ -23,15 +18,23 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 
-public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
+import static org.mockito.Mockito.verify;
+
+public class DefaultLocalMuleClientTestCase extends AbstractMuleContextTestCase
 {
 
     protected final String PROP_KEY_1 = "key1";
@@ -59,6 +62,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         responseEvent = getTestEvent("RESPONSE");
     }
 
+    @Test
     public void testProcessOutboundEndpointObjectMapOfStringObject() throws MuleException
     {
         stub(outboundEndpoint.process(any(MuleEvent.class))).toReturn(responseEvent);
@@ -76,6 +80,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         assertSame(responseEvent.getMessage(), response);
     }
 
+    @Test
     public void testProcessOutboundEndpointMuleMessage() throws MuleException
     {
         stub(outboundEndpoint.process(any(MuleEvent.class))).toReturn(responseEvent);
@@ -90,6 +95,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         assertSame(responseEvent.getMessage(), response);
     }
 
+    @Test
     public void testRequestInboundEndpointLong() throws Exception
     {
         stub(inboundEndpoint.request(Matchers.anyLong())).toReturn(responseEvent.getMessage());
@@ -97,6 +103,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         assertSame(responseEvent.getMessage(), result);
     }
 
+    @Test
     public void testDispatchStringObjectMapOfStringObject() throws MuleException
     {
         ArgumentCaptor<MuleEvent> argument = ArgumentCaptor.forClass(MuleEvent.class);
@@ -111,6 +118,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         assertSame(outboundEndpoint, argument.getValue().getEndpoint());
     }
 
+    @Test
     public void testSendStringObjectMapOfStringObject() throws MuleException
     {
         stub(outboundEndpoint.process(any(MuleEvent.class))).toReturn(responseEvent);
@@ -128,6 +136,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         assertSame(responseEvent.getMessage(), response);
     }
 
+    @Test
     public void testSendStringMuleMessage() throws MuleException
     {
         stub(outboundEndpoint.process(any(MuleEvent.class))).toReturn(responseEvent);
@@ -143,6 +152,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         assertSame(responseEvent.getMessage(), response);
     }
 
+    @Test
     public void testSendStringObjectMapOfStringObjectInt() throws MuleException
     {
         stub(outboundEndpoint.process(any(MuleEvent.class))).toReturn(responseEvent);
@@ -160,6 +170,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         assertSame(responseEvent.getMessage(), response);
     }
 
+    @Test
     public void testSendStringMuleMessageInt() throws MuleException
     {
         stub(outboundEndpoint.process(any(MuleEvent.class))).toReturn(responseEvent);
@@ -175,6 +186,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         assertSame(responseEvent.getMessage(), response);
     }
 
+    @Test
     public void testDispatchStringMuleMessage() throws MuleException
     {
         ArgumentCaptor<MuleEvent> argument = ArgumentCaptor.forClass(MuleEvent.class);
@@ -187,6 +199,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         assertSame(outboundEndpoint, argument.getValue().getEndpoint());
     }
 
+    @Test
     public void testRequestStringLong() throws Exception
     {
         stub(inboundEndpoint.request(Matchers.anyLong())).toReturn(responseEvent.getMessage());
@@ -194,6 +207,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         assertSame(responseEvent.getMessage(), result);
     }
 
+    @Test
     public void testProcessStringMessageExchangePatternObjectMapOfStringObject() throws MuleException
     {
         stub(outboundEndpoint.process(any(MuleEvent.class))).toReturn(responseEvent);
@@ -211,6 +225,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         assertSame(responseEvent.getMessage(), response);
     }
 
+    @Test
     public void testProcessStringMessageExchangePatternMuleMessage() throws MuleException
     {
         stub(outboundEndpoint.process(any(MuleEvent.class))).toReturn(responseEvent);
@@ -226,6 +241,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         assertSame(responseEvent.getMessage(), response);
     }
 
+    @Test
     public void testInboundEndpointCreation() throws MuleException
     {
         InboundEndpoint endpoint = client.createInboundEndpoint(TEST_URI, TEST_MEP);
@@ -233,6 +249,7 @@ public class DefaultLocalMuleClientTestCase extends AbstractMuleTestCase
         assertEquals(TEST_MEP, endpoint.getExchangePattern());
     }
 
+    @Test
     public void testOutboundEndpointCreation() throws MuleException
     {
         OutboundEndpoint endpoint = client.createOutboundEndpoint(TEST_URI, TEST_MEP, new Long(

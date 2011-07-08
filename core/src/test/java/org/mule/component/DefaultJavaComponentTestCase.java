@@ -18,6 +18,14 @@ import org.mule.model.seda.SedaService;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.tck.testmodels.fruit.Orange;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
 {
 
@@ -28,6 +36,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
         return objectFactory;
     }
 
+    @Test
     public void testComponentCreation() throws Exception
     {
         ObjectFactory objectFactory = createObjectFactory();
@@ -39,6 +48,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
         assertEquals(Orange.class, component.getObjectType());
     }
 
+    @Test
     public void testLifecycle() throws Exception
     {
         DefaultJavaComponent component = new DefaultJavaComponent(createObjectFactory());
@@ -62,6 +72,7 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
 
     }
 
+    @Test
     public void testComponentDisposal() throws Exception
     {
         DefaultJavaComponent component = new DefaultJavaComponent(
@@ -81,7 +92,8 @@ public class DefaultJavaComponentTestCase extends AbstractComponentTestCase
         assertNull(lifecycleAdapter.componentObject);
     }
     
-    public void testServicePropogatedLifecycle() throws InitialisationException
+    @Test
+    public void testServicePropagatedLifecycle() throws InitialisationException
     {
         Service service = new SedaService(muleContext);
         service.setName("service");

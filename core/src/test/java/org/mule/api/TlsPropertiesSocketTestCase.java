@@ -12,11 +12,16 @@ package org.mule.api;
 
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.api.security.tls.TlsPropertiesSocketFactory;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class TlsPropertiesSocketTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testSimpleSocket() throws Exception
     {
         TlsConfiguration configuration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);

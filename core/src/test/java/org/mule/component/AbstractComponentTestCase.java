@@ -10,9 +10,9 @@
 
 package org.mule.component;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public abstract class AbstractComponentTestCase extends AbstractMuleTestCase
+public abstract class AbstractComponentTestCase extends AbstractMuleContextTestCase
 {
 
 }
