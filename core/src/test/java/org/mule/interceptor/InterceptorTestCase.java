@@ -16,12 +16,17 @@ import org.mule.api.service.Service;
 import org.mule.component.AbstractComponent;
 import org.mule.management.stats.ProcessingTime;
 import org.mule.model.seda.SedaService;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class InterceptorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class InterceptorTestCase extends AbstractMuleContextTestCase
 {
 
     private final String BEFORE = "Before";
@@ -38,6 +43,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
                                                        + INTERCEPTOR_THREE + AFTER + INTERCEPTOR_TWO + AFTER
                                                        + INTERCEPTOR_ONE + AFTER;
 
+    @Test
     public void testSingleInterceptor() throws Exception
     {
         Service service = createUninitializedService();
@@ -54,6 +60,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
         assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
 
+    @Test
     public void testMultipleInterceptor() throws Exception
     {
         Service service = createUninitializedService();
@@ -72,6 +79,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
         assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
 
+    @Test
     public void testSingleInterceptorStack() throws Exception
     {
         Service service = createUninitializedService();
@@ -90,6 +98,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
         assertEquals(SINGLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
 
+    @Test
     public void testMultipleInterceptorStack() throws Exception
     {
         Service service = createUninitializedService();
@@ -110,6 +119,7 @@ public class InterceptorTestCase extends AbstractMuleTestCase
         assertEquals(MULTIPLE_INTERCEPTOR_RESULT, result.getMessageAsString());
     }
 
+    @Test
     public void testMultipleInterceptorStack2() throws Exception
     {
         Service service = createUninitializedService();

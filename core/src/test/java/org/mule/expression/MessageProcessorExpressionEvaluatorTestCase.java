@@ -19,9 +19,13 @@ import org.mule.api.expression.ExpressionManager;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class MessageProcessorExpressionEvaluatorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class MessageProcessorExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
 
     private ExpressionManager expressionManager;
@@ -43,6 +47,7 @@ public class MessageProcessorExpressionEvaluatorTestCase extends AbstractMuleTes
         });
     }
 
+    @Test
     public void testNameOnly() throws Exception
     {
         MessageProcessorExpressionEvaluator evaluator = new MessageProcessorExpressionEvaluator();
@@ -50,12 +55,14 @@ public class MessageProcessorExpressionEvaluatorTestCase extends AbstractMuleTes
             ((MuleMessage) evaluator.evaluate("processor", createTestMessage())).getPayloadAsString());
     }
 
+    @Test
     public void testNameOnlyExpressionManager() throws ExpressionRuntimeException, Exception
     {
         assertEquals("0123", ((MuleMessage) expressionManager.evaluate("#[process:processor]",
             createTestMessage())).getPayloadAsString());
     }
 
+    @Test
     public void testNestedPayloadExpression() throws Exception
     {
         MessageProcessorExpressionEvaluator evaluator = new MessageProcessorExpressionEvaluator();
@@ -63,12 +70,14 @@ public class MessageProcessorExpressionEvaluatorTestCase extends AbstractMuleTes
             ((MuleMessage) evaluator.evaluate("processor:payload", createTestMessage())).getPayloadAsString());
     }
 
+    @Test
     public void testNestedPayloadExpressionExpressionManager() throws ExpressionRuntimeException, Exception
     {
         assertEquals("0123", ((MuleMessage) expressionManager.evaluate("#[process:processor:#[payload]]",
             createTestMessage())).getPayloadAsString());
     }
 
+    @Test
     public void testNestedHeaderExpression() throws Exception
     {
         MessageProcessorExpressionEvaluator evaluator = new MessageProcessorExpressionEvaluator();
@@ -76,6 +85,7 @@ public class MessageProcessorExpressionEvaluatorTestCase extends AbstractMuleTes
             createTestMessage())).getPayloadAsString());
     }
 
+    @Test
     public void testNestedHeaderExpressionExpressionManager() throws ExpressionRuntimeException, Exception
     {
         assertEquals("value123", ((MuleMessage) expressionManager.evaluate(

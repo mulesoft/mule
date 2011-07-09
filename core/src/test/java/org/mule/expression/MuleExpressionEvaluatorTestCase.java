@@ -17,7 +17,7 @@ import org.mule.api.MuleRuntimeException;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.transformer.Transformer;
 import org.mule.message.DefaultExceptionPayload;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBasket;
@@ -33,7 +33,16 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
-public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class MuleExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
     private Map props;
 
@@ -68,6 +77,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testSingleAttachment() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
@@ -101,6 +111,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMapAttachments() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
@@ -160,6 +171,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testListAttachments() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
@@ -218,6 +230,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testSingleAttachmentUsingManager() throws Exception
     {
         Object result = muleContext.getExpressionManager().evaluate("#[mule:message.attachment(foo)]", createMessageWithAttachments());
@@ -247,6 +260,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMapAttachmentsUsingManager() throws Exception
     {
         Object result = muleContext.getExpressionManager().evaluate("#[mule:message.attachments(foo, baz)]", createMessageWithAttachments());
@@ -301,6 +315,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testListAttachmentsUsingManager() throws Exception
     {
         Object result = muleContext.getExpressionManager().evaluate("#[mule:message.attachments-list(foo,baz)]", createMessageWithAttachments());
@@ -360,6 +375,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testGettingAllAttachments() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
@@ -377,6 +393,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testGettingAllAttachmentsUsingManager() throws Exception
     {
         Object result = muleContext.getExpressionManager().evaluate("#[mule:message.attachments(*)]", createMessageWithAttachments());
@@ -391,6 +408,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testSingleHeader() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
@@ -419,6 +437,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMapHeaders() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
@@ -463,6 +482,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testListHeaders() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
@@ -510,6 +530,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testGettingAllHeaders() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
@@ -528,6 +549,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals(3, ((List)result).size());
     }
 
+    @Test
     public void testGettingAllHeadersUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
@@ -543,6 +565,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals(3, ((List)result).size());
     }
 
+    @Test
     public void testSingleHeaderUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
@@ -569,6 +592,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMapHeadersUsingManager() throws Exception
     {
 
@@ -614,6 +638,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testListHeadersUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
@@ -658,6 +683,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testContextExpressions() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", muleContext);
@@ -696,6 +722,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testContextExpressionsFromExtractorManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", muleContext);
@@ -731,6 +758,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMissingEventContext() throws Exception
     {
         RequestContext.clear();
@@ -751,9 +779,9 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         {
             //expected
         }
-
     }
 
+    @Test
     public void testMessagePropertiesUsingEvaluatorDirectly() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
@@ -801,6 +829,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
      *
      * @throws Exception if the test fails
      */
+    @Test
     public void testMessagePropertiesUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", muleContext);
@@ -833,6 +862,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMessagePayloadWithNulls() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
@@ -848,6 +878,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
      *
      * @throws Exception if the test fails
      */
+    @Test
     public void testMessagePayloadWithNullsUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", muleContext);
@@ -863,6 +894,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNull(result);
     }
 
+    @Test
     public void testMessagePayloadWithTransform() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
@@ -882,6 +914,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("test2", result);
     }
 
+    @Test
     public void testMessagePayloadWithTransformUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", muleContext);
@@ -899,6 +932,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("test2", result);
     }
 
+    @Test
     public void testMessagePayloadWithMoreComplexTransform() throws Exception
     {
         MuleExpressionEvaluator eval = new MuleExpressionEvaluator();
@@ -918,6 +952,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(fb.hasApple());
     }
 
+    @Test
     public void testMessagePayloadWithMoreComplexTransformUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(new FruitBowl(new Apple(), new Banana()), muleContext);
@@ -935,6 +970,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(fb.hasApple());
     }
 
+    @Test
     public void testMapPayloadUsingManager() throws Exception
     {
         Map map = new HashMap(1);
@@ -994,6 +1030,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testSimpleRegistryLookup() throws Exception
     {
         FruitBowlToFruitBasket trans = new FruitBowlToFruitBasket();
@@ -1023,6 +1060,7 @@ public class MuleExpressionEvaluatorTestCase extends AbstractMuleTestCase
         //We can't test bean properties since it requires have the XML module on the classpath
     }
 
+    @Test
     public void testSimpleRegistryLookupUsingMAnager() throws Exception
     {
         FruitBowlToFruitBasket trans = new FruitBowlToFruitBasket();

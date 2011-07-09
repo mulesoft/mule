@@ -16,7 +16,7 @@ import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.routing.correlation.CorrelationPropertiesExpressionEvaluator;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.UUID;
 
 import java.util.Collections;
@@ -24,7 +24,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class HeadersExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
     private Map<String, Object> props;
 
@@ -37,6 +46,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         props.put("baz", "bazvalue");
     }
 
+    @Test
     public void testSingleHeader() throws Exception
     {
         MessageHeaderExpressionEvaluator eval = new MessageHeaderExpressionEvaluator();
@@ -75,6 +85,7 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("value", result);
     }
 
+    @Test
     public void testMapHeaders() throws Exception
     {
         MessageHeadersExpressionEvaluator eval = new MessageHeadersExpressionEvaluator();
@@ -126,7 +137,8 @@ public class HeadersExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertTrue(((Map)result).values().contains("barvalue"));
     }
 
-public void testHeadersWithScopes() throws Exception
+@Test
+    public void testHeadersWithScopes() throws Exception
     {
         MessageHeadersExpressionEvaluator eval = new MessageHeadersExpressionEvaluator();
         DefaultMuleMessage message = new DefaultMuleMessage("test", props, muleContext);
@@ -193,6 +205,7 @@ public void testHeadersWithScopes() throws Exception
     }
 
 
+    @Test
     public void testListHeaders() throws Exception
     {
         MessageHeadersListExpressionEvaluator eval = new MessageHeadersListExpressionEvaluator();
@@ -236,6 +249,7 @@ public void testHeadersWithScopes() throws Exception
         }
     }
 
+    @Test
     public void testListHeadersWithScopes() throws Exception
     {
         MessageHeadersListExpressionEvaluator eval = new MessageHeadersListExpressionEvaluator();
@@ -287,6 +301,7 @@ public void testHeadersWithScopes() throws Exception
 
     }
 
+    @Test
     public void testListHeadersWithWildcard() throws Exception
     {
         MessageHeadersListExpressionEvaluator eval = new MessageHeadersListExpressionEvaluator();
@@ -326,6 +341,7 @@ public void testHeadersWithScopes() throws Exception
     }
 
 
+    @Test
     public void testMapHeadersWithWildcards() throws Exception
     {
         MessageHeadersExpressionEvaluator eval = new MessageHeadersExpressionEvaluator();
@@ -366,6 +382,7 @@ public void testHeadersWithScopes() throws Exception
         assertTrue(((Map)result).values().contains("barvalue"));
     }
     
+    @Test
     public void testSingleHeaderUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
@@ -397,6 +414,7 @@ public void testHeadersWithScopes() throws Exception
 
     }
 
+    @Test
     public void testMapHeadersUsingManager() throws Exception
     {
 
@@ -439,6 +457,7 @@ public void testHeadersWithScopes() throws Exception
 
     }
 
+    @Test
     public void testMapHeadersWithWildcardsUsingManager() throws Exception
     {
 
@@ -479,6 +498,7 @@ public void testHeadersWithScopes() throws Exception
 
     }
 
+    @Test
     public void testListHeadersUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
@@ -519,6 +539,7 @@ public void testHeadersWithScopes() throws Exception
         }
     }
 
+    @Test
     public void testListHeadersWithWildCardsUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", props, muleContext);
@@ -557,6 +578,7 @@ public void testHeadersWithScopes() throws Exception
         assertTrue(((List)result).contains("barvalue"));
     }
     
+    @Test
     public void testCorrelationManagerCorrelationId()
     {
         CorrelationPropertiesExpressionEvaluator evaluator = new CorrelationPropertiesExpressionEvaluator();
@@ -570,6 +592,7 @@ public void testHeadersWithScopes() throws Exception
         assertEquals(correlationId, result);
     }
     
+    @Test
     public void testCorrelationManagerNullResult()
     {
         CorrelationPropertiesExpressionEvaluator evaluator = new CorrelationPropertiesExpressionEvaluator();
@@ -588,6 +611,7 @@ public void testHeadersWithScopes() throws Exception
         }
     }    
     
+    @Test
     public void testCorrelationManagerUniqueId()
     {
         CorrelationPropertiesExpressionEvaluator evaluator = new CorrelationPropertiesExpressionEvaluator();
@@ -598,12 +622,14 @@ public void testHeadersWithScopes() throws Exception
         assertEquals(message.getUniqueId(), result);
     }
     
+//    @Test
 //    public void testCorrelationManagerNullInput()
 //    {
 //        CorrelationPropertiesExpressionEvaluator evaluator = new CorrelationPropertiesExpressionEvaluator();
 //        evaluator.evaluate(MuleProperties.MULE_CORRELATION_ID_PROPERTY, null);
 //    }
     
+    @Test
     public void testCorrelationManagerInvalidKey()
     {
         CorrelationPropertiesExpressionEvaluator evaluator = new CorrelationPropertiesExpressionEvaluator();

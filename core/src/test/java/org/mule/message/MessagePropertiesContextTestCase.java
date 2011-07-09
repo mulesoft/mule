@@ -13,13 +13,19 @@ import org.mule.MessagePropertiesContext;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Set;
 
 import org.apache.commons.lang.SerializationUtils;
+import org.junit.Test;
 
-public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class MessagePropertiesContextTestCase extends AbstractMuleContextTestCase
 {
     @Override
     public void doTearDown()
@@ -27,6 +33,7 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         RequestContext.clear();
     }
     
+    @Test
     public void testPropertiesCase() throws Exception
     {
         //Default scope
@@ -37,6 +44,7 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         doTest(mpc);
     }
 
+    @Test
     public void testSessionScope() throws Exception
     {
         MuleEvent e = getTestEvent("testing");
@@ -51,6 +59,7 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         assertNull(mpc.getProperty("SESSION_X", PropertyScope.SESSION));
     }
 
+    @Test
     public void testPropertyScopeOrder() throws Exception
     {
         MuleEvent e = getTestEvent("testing");
@@ -74,6 +83,7 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         assertNull(mpc.getProperty("Prop", PropertyScope.OUTBOUND));
     }
 
+    @Test
     public void testPropertiesCaseAfterSerialization() throws Exception
     {
         //Default scope
@@ -89,7 +99,8 @@ public class MessagePropertiesContextTestCase extends AbstractMuleTestCase
         doTest(mpc);
     }
 
-    /*public void testInboundScopeIsImmutable() throws Exception
+    /*@Test
+    public void testInboundScopeIsImmutable() throws Exception
     {        
         MessagePropertiesContext mpc = new MessagePropertiesContext();
         try

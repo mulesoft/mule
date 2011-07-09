@@ -12,12 +12,19 @@ package org.mule.model;
 
 import org.mule.api.MuleException;
 import org.mule.api.service.Service;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public abstract class AbstractServiceTestCase extends AbstractMuleContextTestCase
 {
     protected abstract Service getService();
 
+    @Test
     public void testStart() throws MuleException
     {
         try
@@ -46,6 +53,7 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testPause() throws MuleException
     {
         assertFalse(getService().isStarted());
@@ -90,6 +98,7 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testResume() throws MuleException
     {
         assertFalse(getService().isStarted());
@@ -142,6 +151,7 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testStop() throws MuleException
     {
         assertFalse(getService().isStarted());
@@ -192,6 +202,7 @@ public abstract class AbstractServiceTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testDispose() throws MuleException
     {
         assertFalse(getService().isStarted());

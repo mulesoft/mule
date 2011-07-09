@@ -11,15 +11,24 @@ package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.net.InetAddress;
 import java.sql.Timestamp;
 import java.util.Date;
 
-public class FunctionExpressionEvaluatorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class FunctionExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testFunctions() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);
@@ -61,6 +70,7 @@ public class FunctionExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testFunctionsFromExtractorManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);

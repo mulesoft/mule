@@ -13,14 +13,20 @@ package org.mule.mule.model;
 import org.mule.api.model.InvocationResult;
 import org.mule.model.resolvers.AbstractArgumentEntryPointResolver;
 import org.mule.model.resolvers.ArrayEntryPointResolver;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 import org.mule.tck.testmodels.fruit.Orange;
 
-public class ArrayEntryPointResolverTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class ArrayEntryPointResolverTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testArrayMatch() throws Exception
     {
         AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
@@ -29,6 +35,7 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testArrayMatchGenericFail() throws Exception
     {
         AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();
@@ -37,6 +44,7 @@ public class ArrayEntryPointResolverTestCase extends AbstractMuleTestCase
     }
 
 
+    @Test
     public void testArrayMatchFail() throws Exception
     {
         AbstractArgumentEntryPointResolver resolver = new ArrayEntryPointResolver();

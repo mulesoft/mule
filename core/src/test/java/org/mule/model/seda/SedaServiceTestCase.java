@@ -27,17 +27,20 @@ import org.mule.tck.MuleTestUtils;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.queue.QueueManager;
 
-import junit.framework.AssertionFailedError;
-
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import junit.framework.AssertionFailedError;
+import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class SedaServiceTestCase extends AbstractServiceTestCase
 {
     private SedaService service;
-    private Thread mainThread = Thread.currentThread();
 
     public SedaServiceTestCase()
     {
@@ -67,6 +70,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
      * the queue that is used. 2) The queue used by the SedaService has the correct
      * name.
      */
+    @Test
     public void testQueueConfiguration() throws Exception
     {
         boolean persistent = true;
@@ -101,6 +105,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         }
     }
 
+    @Test
     public void testSedaModelEventTimeoutDefault() throws Exception
     {
         service.initialise();
@@ -112,6 +117,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
     /**
      * SEE MULE-3684
      */
+    @Test
     public void testDispatchToPausedService() throws Exception
     {
         service.initialise();
@@ -126,6 +132,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
     /**
      * SEE MULE-3974
      */
+    @Test
     public void testMaxActiveThreadsEqualsOneWhenExhaustedActionWait() throws Exception
     {
         final Latch latch = new Latch();
@@ -158,6 +165,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
     /**
      * SEE MULE-3975
      */
+    @Test
     public void testDoThreadingFalse() throws Exception
     {
         final Latch latch = new Latch();
@@ -167,6 +175,8 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         ChainedThreadingProfile threadingProfile = (ChainedThreadingProfile) muleContext.getDefaultServiceThreadingProfile();
         threadingProfile.setDoThreading(false);
         service.setThreadingProfile(threadingProfile);
+        final Thread mainThread = Thread.currentThread();
+
         final SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(new Callable()
         {
             public Object onCall(MuleEventContext eventContext) throws Exception
@@ -189,6 +199,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
     /**
      * SEE MULE-3975
      */
+    @Test
     public void testDoThreadingTrue() throws Exception
     {
         final Latch latch = new Latch();

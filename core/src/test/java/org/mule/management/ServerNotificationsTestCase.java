@@ -26,6 +26,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Test;
 
 public class ServerNotificationsTestCase extends AbstractMuleTestCase
         implements ModelNotificationListener, MuleContextNotificationListener
@@ -50,6 +51,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         managerStoppedEvents.set(0);
     }
 
+    @Test
     public void testStandardNotifications() throws Exception
     {
         muleContext.registerListener(this);
@@ -58,6 +60,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertTrue(managerStopped.get());
     }
 
+    @Test
     public void testMultipleRegistrations() throws Exception
     {
         muleContext.registerListener(this);
@@ -67,6 +70,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertEquals(1, managerStoppedEvents.get());
     }
 
+    @Test
     public void testMultipleRegistrationsDifferentSubscriptions() throws Exception
     {
         muleContext.registerListener(this, "_mule*");
@@ -76,6 +80,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertEquals(2, modelStoppedEvents.get());
     }
     
+    @Test
     public void testUnregistering() throws Exception
     {
         muleContext.registerListener(this);
@@ -86,6 +91,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertFalse(managerStopped.get());
     }
 
+    @Test
     public void testMismatchingUnregistrations() throws Exception
     {
         // this has changed in 2.x.  now, unregistering removes all related entries
@@ -100,6 +106,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertEquals(1, managerStoppedEvents.get());
     }
 
+    @Test
     public void testStandardNotificationsWithSubscription() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);
@@ -125,6 +132,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertEquals(1, componentStartedCount.get());
     }
 
+    @Test
     public void testStandardNotificationsWithWildcardSubscription() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(2);
@@ -152,6 +160,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertEquals(2, componentStartedCount.get());
     }
 
+    @Test
     public void testCustomNotifications() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(2);
@@ -177,6 +186,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertEquals(2, customNotificationCount.get());
     }
 
+    @Test
     public void testCustomNotificationsWithWildcardSubscription() throws Exception
     {
 

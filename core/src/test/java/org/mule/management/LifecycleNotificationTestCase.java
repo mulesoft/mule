@@ -9,11 +9,16 @@
  */
 package org.mule.management;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class LifecycleNotificationTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
+public class LifecycleNotificationTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testManageLifecycle() throws Exception
     {
         assertTrue(muleContext.isInitialised());

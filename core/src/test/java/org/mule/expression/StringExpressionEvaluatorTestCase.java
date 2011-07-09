@@ -11,13 +11,18 @@ package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class StringExpressionEvaluatorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class StringExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
     private Map props;
 
@@ -30,7 +35,8 @@ public class StringExpressionEvaluatorTestCase extends AbstractMuleTestCase
             props.put("baz", "maz");
         }
 
-    public void teststring() throws Exception
+    @Test
+    public void testString() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(new Apple(), props, muleContext);
         StringExpressionEvaluator extractor = new StringExpressionEvaluator();
@@ -45,6 +51,7 @@ public class StringExpressionEvaluatorTestCase extends AbstractMuleTestCase
     }
 
 
+    @Test
     public void testStringUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(new Apple(), props, muleContext);

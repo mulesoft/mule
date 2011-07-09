@@ -13,13 +13,20 @@ package org.mule.mule.model;
 import org.mule.api.model.InvocationResult;
 import org.mule.model.resolvers.AbstractArgumentEntryPointResolver;
 import org.mule.model.resolvers.NoArgumentsEntryPointResolver;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 import org.mule.transport.NullPayload;
 
-public class NoArgsEntryPointResolverTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class NoArgsEntryPointResolverTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testExplicitMethodMatch() throws Exception
     {
         AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
@@ -28,6 +35,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
+    @Test
     public void testExplicitMethodMatch2() throws Exception
     {
         AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
@@ -36,6 +44,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
+    @Test
     public void testDynamicMethodMatchFail() throws Exception
     {
         AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
@@ -44,6 +53,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleTestCase
                 result.getState(), InvocationResult.State.FAILED);
     }
 
+    @Test
     public void testDynamicMethodMatchPass() throws Exception
     {
         AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
@@ -51,6 +61,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
+    @Test
     public void testDynamicMethodMatchFailOnWildcardMatch() throws Exception
     {
         AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();
@@ -61,6 +72,7 @@ public class NoArgsEntryPointResolverTestCase extends AbstractMuleTestCase
     }
 
     /** Having a null payload should make no difference */
+    @Test
     public void testExplicitMethodMatchAndNullPayload() throws Exception
     {
         AbstractArgumentEntryPointResolver resolver = new NoArgumentsEntryPointResolver();

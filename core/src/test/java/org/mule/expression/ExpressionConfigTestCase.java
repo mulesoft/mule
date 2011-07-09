@@ -11,10 +11,16 @@ package org.mule.expression;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class ExpressionConfigTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+public class ExpressionConfigTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testConfig() throws Exception
     {
         ExpressionConfig config = new ExpressionConfig("foo=bar", "header", null, "$[", "]");
@@ -31,9 +37,9 @@ public class ExpressionConfigTestCase extends AbstractMuleTestCase
         assertEquals("attachment", config.getEvaluator());
         assertEquals("baz", config.getExpression());
         assertNull(config.getCustomEvaluator());
-
     }
 
+    @Test
     public void testCustomConfig() throws Exception
     {
         muleContext.getExpressionManager().registerEvaluator(new ExpressionEvaluator()
