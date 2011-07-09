@@ -17,6 +17,12 @@ import org.mule.tck.testmodels.fruit.RedApple;
 
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class LookupEntrypointInjectionTestCase extends AbstractAnnotatedEntrypointResolverTestCase
 {
 
@@ -26,6 +32,7 @@ public class LookupEntrypointInjectionTestCase extends AbstractAnnotatedEntrypoi
         return new LookupComponent();
     }
 
+    @Test
     public void testLookups() throws Exception
     {
         RedApple redApple = new RedApple();

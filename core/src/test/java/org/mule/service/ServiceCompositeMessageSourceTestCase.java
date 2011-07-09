@@ -21,6 +21,12 @@ import org.mule.routing.MessageFilter;
 import org.mule.source.StartableCompositeMessageSource;
 import org.mule.source.StartableCompositeMessageSourceTestCase;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 public class ServiceCompositeMessageSourceTestCase extends StartableCompositeMessageSourceTestCase
 {
 
@@ -29,6 +35,7 @@ public class ServiceCompositeMessageSourceTestCase extends StartableCompositeMes
         return new ServiceCompositeMessageSource();
     }
 
+    @Test
     public void testInboundRouters() throws MuleException
     {
         ServiceCompositeMessageSource serviceCompositeMessageSource = (ServiceCompositeMessageSource) compositeSource;
@@ -45,6 +52,7 @@ public class ServiceCompositeMessageSourceTestCase extends StartableCompositeMes
         assertEquals(TEST_MESSAGE + "one" + "two", listener.event.getMessageAsString());
     }
 
+    @Test
     public void testInboundRouterCatchAll() throws MuleException
     {
         ServiceCompositeMessageSource serviceCompositeMessageSource = (ServiceCompositeMessageSource) compositeSource;

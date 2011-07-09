@@ -16,6 +16,8 @@ import org.mule.tck.FunctionalTestCase;
 
 import java.util.Map;
 
+import org.junit.Test;
+
 public class OutboundHeadersAnnotationTestCase extends FunctionalTestCase
 {
     public OutboundHeadersAnnotationTestCase()
@@ -29,6 +31,7 @@ public class OutboundHeadersAnnotationTestCase extends FunctionalTestCase
         return "org/mule/test/annotations/outbound-headers-annotation.xml";
     }
 
+    @Test
     public void testProcessHeader() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -39,6 +42,7 @@ public class OutboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals("barValue", result.get("bar"));
     }
 
+    @Test
     public void testProcessHeaderWithExistingOutHeaders() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -50,6 +54,7 @@ public class OutboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals("fooValue", result.get("foo"));
     }
 
+    @Test
     public void testInvalidParamType() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

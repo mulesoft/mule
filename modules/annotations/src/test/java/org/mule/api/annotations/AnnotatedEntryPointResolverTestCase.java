@@ -15,7 +15,7 @@ import org.mule.api.model.InvocationResult;
 import org.mule.api.transport.PropertyScope;
 import org.mule.component.simple.EchoComponent;
 import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -27,8 +27,11 @@ import java.util.HashMap;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import org.junit.Test;
 
-public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+
+public class AnnotatedEntryPointResolverTestCase extends AbstractMuleContextTestCase
 {
     public static final Fruit[] TEST_PAYLOAD = new Fruit[]{new Apple(), new Banana()};
 
@@ -38,6 +41,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().registerObject("trans", new Transformers());
     }
 
+    @Test
     public void testAnnotatedMethod() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -53,6 +57,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals(TEST_PAYLOAD.getClass().getName() + ":fooValue:" + FruitBowl.class, result.getResult());
     }
 
+    @Test
     public void testDefaultAnnotatedMethod() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -68,6 +73,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testAnnotatedMethodWithoutMethodHeader() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -77,6 +83,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals(result.getState(), InvocationResult.State.FAILED);
     }
 
+    @Test
     public void testNonAnnotatedMethod() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -85,6 +92,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
     }
 
     //Test that we don't toucvh any non-Mule evaluator annotations
+    @Test
     public void testNonMuleAnnotatedMethod() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -94,6 +102,7 @@ public class AnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals(result.getState(), InvocationResult.State.NOT_SUPPORTED);
     }
 
+    @Test
     public void testAnnotatedMethodOnProxyWithMethodSet() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();

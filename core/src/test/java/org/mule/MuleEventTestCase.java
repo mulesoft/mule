@@ -21,7 +21,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.simple.ByteArrayToObject;
 import org.mule.transformer.simple.SerializableToByteArray;
@@ -31,10 +31,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Test;
 
-public class MuleEventTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+
+public class MuleEventTestCase extends AbstractMuleContextTestCase
 {
 
+//    @Test
 //    public void testEventInitialise() throws Exception
 //    {
 //        String data = "Test Data";
@@ -63,6 +72,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 //        assertNotNull(event.getId());
 //    }
 //
+//    @Test
 //    public void testEventTransformer() throws Exception
 //    {
 //        String data = "Test Data";
@@ -78,6 +88,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 //            .transformMessageToBytes().length);
 //    }
 //
+//    @Test
 //    public void testEventRewrite() throws Exception
 //    {
 //        String data = "Test Data";
@@ -104,6 +115,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 //
 //    }
 //
+//    @Test
 //    public void testProperties() throws Exception
 //    {
 //        MuleEvent prevEvent;
@@ -160,6 +172,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
     /*
      * See http://mule.mulesoft.org/jira/browse/MULE-384 for details.
      */
+    @Test
     public void testNoPasswordNoNullPointerException() throws Exception
     {
         // provide the username, but not the password, as is the case for SMTP
@@ -171,6 +184,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertNull("Credentials must not be created for endpoints without a password.", credentials);
     }
 
+    @Test
     public void testEventSerialization() throws Exception
     {
         Transformer trans1 = new TestEventTransformer();
@@ -217,6 +231,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals(PayloadTypeFilter.class, deserialized.getEndpoint().getFilter().getClass());
     }
     
+    @Test
     public void testEventSerializationRestart() throws Exception
     {
         // Create and register artifacts
@@ -286,6 +301,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals(PayloadTypeFilter.class, deserialized.getEndpoint().getFilter().getClass());
     }
     
+    @Test
     public void testMuleCredentialsSerialization() throws Exception
     {
         String username = "mule";

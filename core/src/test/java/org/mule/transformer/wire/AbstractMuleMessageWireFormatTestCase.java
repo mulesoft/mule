@@ -18,6 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public abstract class AbstractMuleMessageWireFormatTestCase extends AbstractWireFormatTestCase
 {
 

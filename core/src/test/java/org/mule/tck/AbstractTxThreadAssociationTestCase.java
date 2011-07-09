@@ -13,6 +13,7 @@ package org.mule.tck;
 import org.mule.api.transaction.TransactionCallback;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transaction.TransactionManagerFactory;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transaction.MuleTransactionConfig;
 import org.mule.transaction.TransactionTemplate;
 import org.mule.transaction.XaTransaction;
@@ -22,11 +23,20 @@ import javax.transaction.Status;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Validate certain expectations when working with JTA API. It is called to catch discrepancies in TM implementations
  * and alert early. Subclasses are supposed to plug in specific transaction managers for tests.
  */
-public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTestCase
+public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleContextTestCase
 {
     /* To allow access from the dead TX threads we spawn. */
     private TransactionManager tm;
@@ -41,6 +51,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
         assertNull("There sould be no current transaction associated.", tm.getTransaction());
     }
 
+    @Test
     public void testTxHandleCommitKeepsThreadAssociation() throws Exception
     {
         // don't wait for ages, has to be set before TX is begun
@@ -71,6 +82,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
         assertNull(tm.getTransaction());
     }
 
+    @Test
     public void testTxManagerCommitDissassociatesThread() throws Exception
     {
         // don't wait for ages, has to be set before TX is begun
@@ -87,6 +99,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
                    tm.getTransaction());
     }
 
+    @Test
     public void testTxManagerRollbackDissassociatesThread() throws Exception
     {
         // don't wait for ages, has to be set before TX is begun
@@ -108,6 +121,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
      *
      * @throws Exception if any error
      */
+    @Test
     public void testAlwaysBeginXaTransactionSuspendResume() throws Exception
     {
         muleContext.setTransactionManager(tm);
@@ -191,6 +205,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
      *
      * @throws Exception if any error
      */
+    @Test
     public void testNoneXaTransactionSuspendResume() throws Exception
     {
         muleContext.setTransactionManager(tm);
@@ -257,6 +272,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
      *
      * @throws Exception in case of any error
      */
+    @Test
     public void testXaTransactionTermination() throws Exception
     {
         muleContext.setTransactionManager(tm);
@@ -285,6 +301,7 @@ public abstract class AbstractTxThreadAssociationTestCase extends AbstractMuleTe
      *
      * @throws Exception in case of any error
      */
+    @Test
     public void testNoNestedTxStarted() throws Exception
     {
         muleContext.setTransactionManager(tm);

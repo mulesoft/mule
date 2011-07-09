@@ -15,15 +15,19 @@ import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.ExceptionNotification;
 import org.mule.exception.DefaultSystemExceptionStrategy;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Test;
 
-public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+
+public class DefaultExceptionStrategyTestCase extends AbstractMuleContextTestCase
 {
     // MULE-1404
+    @Test
     public void testExceptions() throws Exception
     {
         InstrumentedExceptionStrategy strategy = new InstrumentedExceptionStrategy(muleContext);
@@ -33,6 +37,7 @@ public class DefaultExceptionStrategyTestCase extends AbstractMuleTestCase
     }
 
     // MULE-1627
+    @Test
     public void testExceptionNotifications() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);

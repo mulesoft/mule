@@ -10,14 +10,17 @@
 
 package org.mule.config.spring;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.ClassUtils;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.junit.Test;
 
-public class SchemaDefaultsTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+
+public class SchemaDefaultsTestCase extends AbstractMuleContextTestCase
 {
     private static String MULE_CORE_SCHEMA_FILE = "META-INF/mule.xsd";
     private Document schema;
@@ -36,6 +39,7 @@ public class SchemaDefaultsTestCase extends AbstractMuleTestCase
         return true;
     }
 
+    @Test
     public void testConfigurationDefaults()
     {
         Element configurationType = (Element) schema.selectSingleNode("/xsd:schema/xsd:complexType[@name='configurationType']");

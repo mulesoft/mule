@@ -10,7 +10,7 @@
 
 package org.mule.config.spring;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -26,8 +26,12 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.apache.commons.collections.map.HashedMap;
+import org.junit.Before;
+import org.junit.Test;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
+import static org.junit.Assert.assertNotNull;
 
 public abstract class AbstractSchemaValidationTestCase extends AbstractMuleTestCase
 {
@@ -36,7 +40,8 @@ public abstract class AbstractSchemaValidationTestCase extends AbstractMuleTestC
     private Map schemas = new HashedMap();
 
     // we define these locally so that tests use the latest version rather than grabbing xsi:location
-    protected void doSetUp() throws Exception
+    @Before
+    public void setUpSchemas()
     {
         addSchema("http://www.mulesoft.org/schema/mule/core", "META-INF/mule.xsd");
     }
@@ -83,6 +88,7 @@ public abstract class AbstractSchemaValidationTestCase extends AbstractMuleTestC
         return new StreamSource(stream);
     }
 
+    @Test
     public void testSchemaLocations() throws IOException
     {
         for (Iterator keys = schemas.keySet().iterator(); keys.hasNext();)

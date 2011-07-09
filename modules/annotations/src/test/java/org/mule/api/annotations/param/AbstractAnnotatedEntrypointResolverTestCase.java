@@ -18,7 +18,7 @@ import org.mule.api.model.EntryPointResolver;
 import org.mule.api.model.InvocationResult;
 import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
 import org.mule.session.DefaultMuleSession;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.IOUtils;
 import org.mule.util.StringDataSource;
 
@@ -29,7 +29,13 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
-public abstract class AbstractAnnotatedEntrypointResolverTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+public abstract class AbstractAnnotatedEntrypointResolverTestCase extends AbstractMuleContextTestCase
 {
     protected MuleEventContext eventContext;
     protected boolean inboundScope = true;

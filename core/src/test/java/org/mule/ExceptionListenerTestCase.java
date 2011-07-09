@@ -14,13 +14,20 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.exception.AbstractExceptionListener;
 import org.mule.exception.DefaultServiceExceptionStrategy;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExceptionListenerTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class ExceptionListenerTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testAddGoodEndpoint() throws Exception
     {
         AbstractExceptionListener router = new DefaultServiceExceptionStrategy(muleContext);
@@ -30,6 +37,7 @@ public class ExceptionListenerTestCase extends AbstractMuleTestCase
         assertTrue(router.getMessageProcessors().contains(endpoint));
     }
 
+    @Test
     public void testSetGoodEndpoints() throws Exception
     {
         List<MessageProcessor> list = new ArrayList<MessageProcessor>();

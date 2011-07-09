@@ -94,7 +94,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase
                 }
                 catch (MuleException e)
                 {
-                    ; // this is expected
+                    // this is expected
                 }
             }
         }

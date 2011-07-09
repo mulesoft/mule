@@ -20,6 +20,14 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntrypointResolverTestCase
 {
     @Override
@@ -28,6 +36,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         return new InboundAttachmentsAnnotationComponent();
     }
 
+    @Test
     public void testSingleAttachment() throws Exception
     {
         InvocationResult response = invokeResolver("processAttachment", eventContext);
@@ -35,7 +44,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertEquals("fooValue", readAttachment((DataHandler) response.getResult()));
     }
 
-
+    @Test
     public void testSingleAttachmentWithType() throws Exception
     {
         //These should really be in core, but the @Transformer annotation is not in core
@@ -46,6 +55,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertEquals("fooValue", response.getResult());
     }
 
+    @Test
     public void testSingleAttachmentOptional() throws Exception
     {
         InvocationResult response = invokeResolver("processAttachmentOptional", eventContext);
@@ -53,6 +63,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertEquals("faz not set", response.getResult());
     }
 
+    @Test
     public void testSingleAttachmentWithTypeNoMatchingTransform() throws Exception
     {
         //TODO this test still works because DataHandler.toString() gets called by the ObjectToString transformer
@@ -61,6 +72,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         //assertEquals("fooValue", response.getResult());
     }
 
+    @Test
     public void testMapAttachments() throws Exception
     {
         InvocationResult response = invokeResolver("processAttachments", eventContext);
@@ -72,6 +84,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertNull(result.get("baz"));
     }
 
+    @Test
     public void testMapAttachmentsMissing() throws Exception
     {
         //clear attachments
@@ -87,6 +100,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         }
     }
 
+    @Test
     public void testMapSingleAttachment() throws Exception
     {
         InvocationResult response = invokeResolver("processSingleMapAttachment", eventContext);
@@ -98,6 +112,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertNull(result.get("baz"));
     }
 
+    @Test
     public void testMapAttachmentsOptional() throws Exception
     {
         //restrict attachments
@@ -117,6 +132,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertNull(result.get("baz"));
     }
 
+    @Test
     public void testMapAttachmentsAllOptional() throws Exception
     {
         //clear attachments
@@ -128,6 +144,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertEquals(0, result.size());
     }
 
+    @Test
     public void testMapAttachmentsUnmodifiable() throws Exception
     {
         try
@@ -142,6 +159,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         }
     }
 
+    @Test
     public void testMapAttachmentsAll() throws Exception
     {
         InvocationResult response = invokeResolver("processAttachmentsAll", eventContext);
@@ -154,6 +172,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertEquals("bazValue", readAttachment(result.get("baz")));
     }
 
+    @Test
     public void testMapAttachmentsWildcard() throws Exception
     {
         InvocationResult response = invokeResolver("processAttachmentsWildcard", eventContext);
@@ -166,6 +185,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertNotNull(result.get("baz"));
     }
 
+    @Test
     public void testMapAttachmentsMultiWildcard() throws Exception
     {
         InvocationResult response = invokeResolver("processAttachmentsMultiWildcard", eventContext);
@@ -179,6 +199,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertNotNull(result.get("baz"));
     }
 
+    @Test
     public void testListAttachments() throws Exception
     {
         InvocationResult response = invokeResolver("processAttachmentsList", eventContext);
@@ -187,6 +208,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertEquals(3, result.size());
     }
 
+    @Test
     public void testListAttachmentsWithOptional() throws Exception
     {
         Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
@@ -200,6 +222,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertEquals(2, result.size());
     }
 
+    @Test
     public void testListAttachmentsWithAllOptional() throws Exception
     {
         eventContext = createEventContext(null, new HashMap<String, DataHandler>());
@@ -210,6 +233,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertEquals(0, result.size());
     }
 
+    @Test
     public void testListAttachmentsWithMissing() throws Exception
     {
         Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
@@ -227,6 +251,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         }
     }
 
+    @Test
     public void testSingleListAttachment() throws Exception
     {
         InvocationResult response = invokeResolver("processSingleAttachmentList", eventContext);
@@ -235,6 +260,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertEquals(1, result.size());
     }
 
+    @Test
     public void testListAttachmentsUnmodifiable() throws Exception
     {
         try
@@ -249,6 +275,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         }
     }
 
+    @Test
     public void testListAttachmentsAll() throws Exception
     {
         InvocationResult response = invokeResolver("processAttachmentsListAll", eventContext);
@@ -257,6 +284,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
         assertEquals(3, result.size());
     }
 
+    @Test
     public void testListAttachmentsWilcard() throws Exception
     {
         InvocationResult response = invokeResolver("processAttachmentsListWildcard", eventContext);
@@ -267,6 +295,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntry
 
     }
 
+    @Test
     public void testListAttachmentsMultiWilcard() throws Exception
     {
         InvocationResult response = invokeResolver("processAttachmentsListMultiWildcard", eventContext);

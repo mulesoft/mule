@@ -12,7 +12,7 @@ package org.mule;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.SimpleDataType;
@@ -25,13 +25,17 @@ import java.io.InputStream;
 import javax.activation.DataHandler;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
-
 import org.apache.commons.lang.SerializationUtils;
+import org.junit.Test;
 
-public class DefaultMuleMessageSerializationTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContextTestCase
 {
     private static final String INNER_TEST_MESSAGE = "TestTestTestHello";
     
+    @Test
     public void testSerializablePayload() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -43,6 +47,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleTestCas
         assertEquals("bar", deserializedMessage.getOutboundProperty("foo"));
     }
     
+    @Test
     public void testNonSerializablePayload() throws Exception
     {
         // add a transformer to the registry that can convert a NonSerializable to byte[]. This
@@ -58,6 +63,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleTestCas
         assertEquals(INNER_TEST_MESSAGE, deserializedMessage.getPayloadAsString());
     }
     
+    @Test
     public void testStreamPayloadSerialization() throws Exception
     {
         InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());

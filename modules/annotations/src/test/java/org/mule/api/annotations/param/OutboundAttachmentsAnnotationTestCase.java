@@ -15,6 +15,12 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class OutboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntrypointResolverTestCase
 {
     @Override
@@ -30,7 +36,9 @@ public class OutboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntr
         return new OutboundAttachmentsAnnotationComponent();
 
     }
-        public void testProcessAttachment() throws Exception
+
+    @Test
+    public void testProcessAttachment() throws Exception
     {
         InvocationResult response = invokeResolver("processAttachments", eventContext);
         assertTrue("Message payload should be a Map", response.getResult() instanceof Map);
@@ -38,6 +46,7 @@ public class OutboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntr
         assertEquals("barValue", readAttachment(result.get("bar")));
     }
 
+    @Test
     public void testProcessAttachmentWithExistingOutAttachments() throws Exception
     {
         InvocationResult response = invokeResolver("processAttachments", eventContext);
@@ -47,6 +56,7 @@ public class OutboundAttachmentsAnnotationTestCase extends AbstractAnnotatedEntr
         assertEquals("fooValue", readAttachment(result.get("foo")));
     }
 
+    @Test
     public void testInvalidParamType() throws Exception
     {
         try

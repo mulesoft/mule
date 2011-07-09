@@ -13,6 +13,12 @@ import org.mule.api.model.InvocationResult;
 
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class OutboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypointResolverTestCase
 {
     @Override
@@ -28,6 +34,7 @@ public class OutboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoi
         return new OutboundHeadersAnnotationComponent();
     }
 
+    @Test
     public void testProcessHeader() throws Exception
     {
         InvocationResult response = invokeResolver("processHeaders", eventContext);
@@ -36,6 +43,7 @@ public class OutboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoi
         assertEquals("barValue", result.get("bar"));
     }
 
+    @Test
     public void testProcessHeaderWithExistingOutHeaders() throws Exception
     {
         eventContext.getMessage().setOutboundProperty("foo", "changeme");
@@ -46,6 +54,7 @@ public class OutboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoi
         assertEquals("fooValue", result.get("foo"));
     }
 
+    @Test
     public void testInvalidParamType() throws Exception
     {
         try

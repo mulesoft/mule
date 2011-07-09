@@ -11,14 +11,21 @@
 package org.mule.transaction;
 
 import org.mule.api.MuleEvent;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.transaction.constraints.BatchConstraint;
 import org.mule.transaction.constraints.ConstraintFilter;
 
+import org.junit.Test;
 import org.mockito.Mockito;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 public class BatchConstraintTestCase extends AbstractMuleTestCase
 {
+    @Test
     public void testConstraintFilter() throws Exception
     {
         MuleEvent testEvent = Mockito.mock(MuleEvent.class);

@@ -18,6 +18,8 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
+import org.junit.Test;
+
 public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 {
     public OutboundAttachmentsAnnotationTestCase()
@@ -31,6 +33,7 @@ public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         return "org/mule/test/annotations/outbound-attachments-annotation.xml";
     }
 
+    @Test
     public void testProcessAttachment() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -41,6 +44,7 @@ public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals("barValue", result.get("bar").getContent());
     }
 
+    @Test
     public void testProcessAttachmentWithExistingOutAttachments() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -52,6 +56,7 @@ public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals("fooValue", result.get("foo").getContent());
     }
 
+    @Test
     public void testInvalidParamType() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

@@ -10,27 +10,19 @@
 
 package org.mule;
 
-import org.mule.api.MuleContext;
-import org.mule.config.StartupContext;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.ClassUtils;
 import org.mule.util.FilenameUtils;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class MuleServerTestCase extends AbstractMuleTestCase
 {
 
-    @Override
-    protected MuleContext createMuleContext() throws Exception
-    {
-        return null;
-    }
-    
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        super.doTearDown();
-    }
-    
+    @Test
     public void testMuleServer() throws Exception
     {
         MuleServer muleServer = new MuleServer();
@@ -40,6 +32,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         muleServer.initialize();
     }
 
+    @Test
     public void testMuleServerResource() throws Exception
     {
         MuleServer muleServer = new MuleServer("org/mule/test/spring/config1/test-xml-mule2-config.xml");
@@ -48,6 +41,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         muleServer.initialize();
     }
 
+    @Test
     public void testMuleServerConfigArg() throws Exception
     {
         MuleServer muleServer = new MuleServer(new String[]{"-config",
@@ -57,6 +51,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         muleServer.initialize();
     }
 
+    @Test
     public void testMuleServerMultipleSpringConfigArgs() throws Exception
     {
         MuleServer muleServer = new MuleServer(new String[]{"-config",
@@ -67,6 +62,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         muleServer.initialize();
     }
 
+    @Test
     public void testMuleServerBuilerArg() throws Exception
     {
         MuleServer muleServer = new MuleServer(new String[]{"-builder",
@@ -77,6 +73,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         muleServer.initialize();
     }
 
+    @Test
     public void testMuleServerSpringBuilerArg() throws Exception
     {
         MuleServer muleServer = new MuleServer(new String[]{"-builder", "spring"});
@@ -86,6 +83,7 @@ public class MuleServerTestCase extends AbstractMuleTestCase
         muleServer.initialize();
     }
     
+    @Test
     public void testMuleServerAppConfig() throws Exception
     {
         MuleServer muleServer = new MuleServer(new String[]{

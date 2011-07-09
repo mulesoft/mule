@@ -10,7 +10,7 @@
 package org.mule.transformer;
 
 import org.mule.api.transformer.DataType;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.transformer.types.CollectionDataType;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.MimeTypes;
@@ -21,11 +21,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class DataTypesTestCase extends AbstractMuleTestCase
 {
     //Just used for testing
     private List<Exception> listOfExceptions;
 
+    @Test
     public void testSimpleTypes() throws Exception
     {
         DataType dt = DataTypeFactory.create(Exception.class);
@@ -58,6 +65,7 @@ public class DataTypesTestCase extends AbstractMuleTestCase
         assertFalse(dt.equals(dt2));
     }
 
+    @Test
     public void testCollectionTypes() throws Exception
     {
         DataType dt = DataTypeFactory.create(List.class);
@@ -91,6 +99,7 @@ public class DataTypesTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testGenericCollectionTypes() throws Exception
     {
         DataType dt = DataTypeFactory.create(List.class, Exception.class);
@@ -125,6 +134,7 @@ public class DataTypesTestCase extends AbstractMuleTestCase
     }
 
 
+    @Test
     public void testGenericCollectionTypesFromMethodReturn() throws Exception
     {
         DataType dt = DataTypeFactory.createFromReturnType(getClass().getDeclaredMethod("listOfExceptionsMethod", String.class));
@@ -143,6 +153,7 @@ public class DataTypesTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testGenericCollectionTypesFromMethodParam() throws Exception
     {
         DataType dt = DataTypeFactory.createFromParameterType(getClass().getDeclaredMethod("listOfExceptionsMethod", Collection.class), 0);
@@ -160,6 +171,7 @@ public class DataTypesTestCase extends AbstractMuleTestCase
         assertFalse(dt.equals(dt2));
     }
 
+    @Test
     public void testGenericCollectionTypesFromField() throws Exception
     {
         DataType dt = DataTypeFactory.createFromField(getClass().getDeclaredField("listOfExceptions"));

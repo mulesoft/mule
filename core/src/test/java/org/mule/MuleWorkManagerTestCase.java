@@ -11,13 +11,17 @@
 package org.mule;
 
 import org.mule.api.config.ThreadingProfile;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.work.MuleWorkManager;
 
 import javax.resource.spi.work.Work;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Tests the following behavior:
@@ -29,10 +33,11 @@ import org.apache.commons.logging.LogFactory;
  * It's not really important to make a distinction between <code>scheduleWork()</code> and
  * <code>startWork()</code> for this test, thus they just check for async execution.
  */
-public class MuleWorkManagerTestCase extends AbstractMuleTestCase
+public class MuleWorkManagerTestCase extends AbstractMuleContextTestCase
 {
     private final transient Log logger = LogFactory.getLog(getClass());
 
+    @Test
     public void testDoWorkExecutesSynchronously() throws Exception
     {
         final Thread callerThread = Thread.currentThread();
@@ -74,6 +79,7 @@ public class MuleWorkManagerTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testScheduleWorkExecutesAsynchronously() throws Exception
     {
         final Thread callerThread = Thread.currentThread();
@@ -115,6 +121,7 @@ public class MuleWorkManagerTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testStartWorkExecutesAsynchronously() throws Exception
     {
         final Thread callerThread = Thread.currentThread();

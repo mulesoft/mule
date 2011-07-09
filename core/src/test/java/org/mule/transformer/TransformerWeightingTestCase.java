@@ -12,7 +12,7 @@ package org.mule.transformer;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.BloodOrange;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.tck.testmodels.fruit.FruitBowl;
@@ -27,9 +27,17 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-public class TransformerWeightingTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class TransformerWeightingTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testExactMatch() throws Exception
     {
         DummyTransformer trans = new DummyTransformer();
@@ -42,6 +50,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
         assertTrue(weighting.isExactMatch());
     }
 
+    @Test
     public void testNearMatch() throws Exception
     {
         ObjectToByteArray trans = new ObjectToByteArray();
@@ -55,6 +64,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testNoMatchWeighting() throws Exception
     {
         SerializableToByteArray trans = new SerializableToByteArray();
@@ -67,6 +77,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testCompareWeightingWithNearMatches() throws Exception
     {
         ObjectToByteArray trans1 = new ObjectToByteArray();
@@ -94,6 +105,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testCompareWeightingWithExactMatch() throws Exception
     {
         ObjectToByteArray trans1 = new ObjectToByteArray();
@@ -121,6 +133,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testCompareWeightingWithNoMatch() throws Exception
     {
         ObjectToByteArray trans1 = new ObjectToByteArray();
@@ -148,6 +161,7 @@ public class TransformerWeightingTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testPriorityMatching() throws Exception
     {
         DummyTransformer t1 = new DummyTransformer();

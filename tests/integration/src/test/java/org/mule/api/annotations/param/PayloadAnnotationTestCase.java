@@ -18,6 +18,8 @@ import org.mule.util.IOUtils;
 
 import java.io.InputStream;
 
+import org.junit.Test;
+
 public class PayloadAnnotationTestCase extends FunctionalTestCase
 {
     public PayloadAnnotationTestCase()
@@ -31,6 +33,7 @@ public class PayloadAnnotationTestCase extends FunctionalTestCase
         return "org/mule/test/annotations/payload-annotation.xml";
     }
 
+    @Test
     public void testPayloadNoTransform() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -40,6 +43,7 @@ public class PayloadAnnotationTestCase extends FunctionalTestCase
         assertEquals("foo", message.getPayload());
     }
 
+    @Test
     public void testPayloadAutoTransform() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -49,6 +53,7 @@ public class PayloadAnnotationTestCase extends FunctionalTestCase
         assertEquals("foo", IOUtils.toString((InputStream)message.getPayload()));
     }
 
+    @Test
     public void testPayloadFailedTransform() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

@@ -14,6 +14,10 @@ import org.mule.api.transformer.wire.WireFormat;
 import org.mule.transformer.simple.ByteArrayToSerializable;
 import org.mule.transformer.simple.SerializableToByteArray;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class SerializationWireFormatTestCase extends AbstractWireFormatTestCase
 {
 
@@ -22,12 +26,14 @@ public class SerializationWireFormatTestCase extends AbstractWireFormatTestCase
         return createObject(SerializationWireFormat.class);
     }
 
+    @Test
     public void testGetDefaultInboundTransformer()
     {
         SerializationWireFormat wireFormat = new SerializationWireFormat();
         assertEquals(ByteArrayToSerializable.class, wireFormat.getInboundTransformer().getClass());
     }
 
+    @Test
     public void testGetDefaultOutboundTransformer()
     {
         SerializationWireFormat wireFormat = new SerializationWireFormat();

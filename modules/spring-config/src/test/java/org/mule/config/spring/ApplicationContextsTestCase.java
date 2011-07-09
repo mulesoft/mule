@@ -13,15 +13,23 @@ package org.mule.config.spring;
 import org.mule.api.MuleContext;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 
+import org.junit.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ApplicationContextsTestCase extends AbstractMuleTestCase
 {
+
+    @Test
     public void testSanity() throws Exception
     {
         ApplicationContext appContext = new ClassPathXmlApplicationContext("application-context.xml");
@@ -44,6 +52,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
     /** 
      * Test that an existing appContext can be added to Mule's internal Registries 
      */
+    @Test
     public void testSpringConfigurationBuilder() throws Exception
     {
         MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
@@ -63,6 +72,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
     /** 
      * Test that the same bean from the 2nd appContext will have precedence over the 1st appContext 
      */
+    @Test
     public void testSpringConfigurationBuilderPrecedence() throws Exception
     {
         MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
@@ -83,6 +93,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
         assertEquals("Tropicana", ((Orange) orange).getBrand());
     }
 
+    @Test
     public void testSpringConfigurationBuilderBackwardsPrecedence() throws Exception
     {
         MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
@@ -106,6 +117,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
     /** 
      * Test that the same bean from the TransientRegistry will have precedence over the 1st appContext 
      */
+    @Test
     public void testTransientRegistryPrecedence() throws Exception
     {
         MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
@@ -127,6 +139,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
     /** 
      * Test that an existing appContext can be used as a parent AppContext for Mule 
      */
+    @Test
     public void testParentContext() throws Exception
     {
         MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();
@@ -148,6 +161,7 @@ public class ApplicationContextsTestCase extends AbstractMuleTestCase
     /**
      * Test the most common approach: Create the Spring config + Mule config in a single AppContext.
      */
+    @Test
     public void testAppContextTogetherWithMuleConfig() throws Exception
     {
         MuleContext muleContext = new DefaultMuleContextFactory().createMuleContext();

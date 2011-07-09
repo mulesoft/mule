@@ -21,6 +21,8 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
+import org.junit.Test;
+
 public class MixedAnnotationsTestCase extends FunctionalTestCase
 {
     private MuleMessage muleMessage;
@@ -61,6 +63,7 @@ public class MixedAnnotationsTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testProcessAllAnnotated() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -89,6 +92,7 @@ public class MixedAnnotationsTestCase extends FunctionalTestCase
         assertNotNull(attachments.get("baz"));
     }
 
+    @Test
     public void testPayloadNotAnnotated() throws Exception
     {
         //When using param annotations every param needs t obe annotated

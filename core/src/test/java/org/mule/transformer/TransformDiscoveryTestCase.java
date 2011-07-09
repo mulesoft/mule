@@ -11,14 +11,20 @@ package org.mule.transformer;
 
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.RedApple;
 import org.mule.transformer.types.DataTypeFactory;
 
-public class TransformDiscoveryTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class TransformDiscoveryTestCase extends AbstractMuleContextTestCase
 {
     @Override
     protected void doSetUp() throws Exception
@@ -27,6 +33,7 @@ public class TransformDiscoveryTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().registerTransformer(new StringToOrange());
     }
 
+    @Test
     public void testSimpleDiscovery() throws Exception
     {
         Transformer t = muleContext.getRegistry().lookupTransformer(DataTypeFactory.STRING, DataTypeFactory.create(Apple.class));
@@ -55,7 +62,6 @@ public class TransformDiscoveryTestCase extends AbstractMuleTestCase
         assertNotNull(t);
         assertEquals(StringToRedApple.class, t.getClass());
     }
-
 
     protected class StringToApple extends org.mule.transformer.AbstractDiscoverableTransformer
     {

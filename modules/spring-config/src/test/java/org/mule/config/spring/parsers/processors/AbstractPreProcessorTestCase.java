@@ -10,7 +10,7 @@
 
 package org.mule.config.spring.parsers.processors;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.config.spring.parsers.PreProcessor;
 import org.mule.util.ArrayUtils;
 
@@ -22,6 +22,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public abstract class AbstractPreProcessorTestCase extends AbstractMuleTestCase
 {
