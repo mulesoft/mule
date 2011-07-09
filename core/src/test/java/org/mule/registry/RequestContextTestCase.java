@@ -26,17 +26,23 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.management.stats.ProcessingTime;
 import org.mule.message.DefaultExceptionPayload;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.OutputStream;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class RequestContextTestCase extends AbstractMuleTestCase
 {
 
     private boolean threadSafeEvent;
+    private MuleContext muleContext = mock(MuleContext.class);
 
+    @Test
     public void testSetExceptionPayloadAcrossThreads() throws InterruptedException
     {
         threadSafeEvent = true;
@@ -45,6 +51,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         runThread(event, true);
     }
 
+    @Test
     public void testFailureWithoutThreadSafeEvent() throws InterruptedException
     {
         threadSafeEvent = false;

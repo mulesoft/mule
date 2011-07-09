@@ -12,7 +12,7 @@ package org.mule.registry;
 import org.mule.api.transformer.DiscoverableTransformer;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.types.DataTypeFactory;
@@ -20,8 +20,14 @@ import org.mule.transformer.types.SimpleDataType;
 
 import java.io.FilterInputStream;
 
-public class TransformerCachingTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class TransformerCachingTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testCacheUpdate() throws Exception
     {
         SimpleDataType<?> sourceType = new SimpleDataType<FilterInputStream>(FilterInputStream.class);
@@ -45,7 +51,6 @@ public class TransformerCachingTestCase extends AbstractMuleTestCase
         trans = muleContext.getRegistry().lookupTransformer(sourceType, DataTypeFactory.BYTE_ARRAY);
         assertNotNull(trans);
         assertTrue(trans instanceof ObjectToByteArray);
-
     }
 
     public static class FilterInputStreamToByteArray extends AbstractTransformer implements DiscoverableTransformer

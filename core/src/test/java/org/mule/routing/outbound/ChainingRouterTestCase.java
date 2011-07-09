@@ -19,8 +19,8 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import com.mockobjects.dynamic.Mock;
@@ -30,7 +30,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ChainingRouterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class ChainingRouterTestCase extends AbstractMuleContextTestCase
 {
     public ChainingRouterTestCase()
     {
@@ -76,6 +83,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         session.matchAndReturn("getFlowConstruct", getTestService("TEST", Apple.class));
     }
 
+    @Test
     public void testChainingOutboundRouterSynchronous() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
@@ -92,6 +100,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         mockendpoint2.verify();
     }
 
+    @Test
     public void testChainingOutboundRouterSynchronousWithTemplate() throws Exception
     {
         OutboundEndpoint endpoint3 = getTestOutboundEndpoint("Test3Provider", 
@@ -120,6 +129,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
         mockendpoint3.verify();
     }
 
+    @Test
     public void testChainingOutboundRouterAsynchronous() throws Exception
     {
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://test");
@@ -151,6 +161,7 @@ public class ChainingRouterTestCase extends AbstractMuleTestCase
     /**
      * One of the targets returns null and breaks the chain
      */
+    @Test
     public void testBrokenChain() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);

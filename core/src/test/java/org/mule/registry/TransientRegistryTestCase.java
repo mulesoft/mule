@@ -14,7 +14,7 @@ import org.mule.api.context.MuleContextAware;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.registry.MuleRegistry;
 import org.mule.api.registry.RegistrationException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +22,14 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-public class TransientRegistryTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class TransientRegistryTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testObjectLifecycle() throws Exception
     {
         muleContext.start();
@@ -35,6 +41,7 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
         assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testJSR250ObjectLifecycle() throws Exception
     {
         muleContext.start();
@@ -46,6 +53,7 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
         assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testObjectBypassLifecycle() throws Exception
     {
         muleContext.start();
@@ -56,6 +64,7 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
         assertEquals("[setMuleContext, stop, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testObjectBypassInjectors() throws Exception
     {
         muleContext.start();
@@ -65,6 +74,7 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
         assertEquals("[initialise, start, stop, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testObjectBypassLifecycleAndInjectors() throws Exception
     {
         muleContext.start();
@@ -75,6 +85,7 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
         assertEquals("[stop, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testObjectLifecycleStates() throws Exception
     {
         InterfaceBasedTracker tracker = new InterfaceBasedTracker();
@@ -131,6 +142,7 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testObjectLifecycleRestart() throws Exception
     {
         InterfaceBasedTracker tracker = new InterfaceBasedTracker();
@@ -149,6 +161,7 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
         assertEquals("[setMuleContext, initialise, start, stop, start, stop, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testLifecycleStateOutOfSequenceDisposeFirstWithTransientRegistryDirectly() throws Exception
     {
         TransientRegistry reg = new TransientRegistry(muleContext);
@@ -167,6 +180,7 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testLifecycleStateOutOfSequenceStartFirst() throws Exception
     {
         muleContext.start();
@@ -180,6 +194,7 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
         assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testLifecycleStateOutOfSequenceStopFirst() throws Exception
     {
         try
@@ -205,6 +220,7 @@ public class TransientRegistryTestCase extends AbstractMuleTestCase
         assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testLifecycleStateOutOfSequenceDisposeFirst() throws Exception
     {
         muleContext.dispose();

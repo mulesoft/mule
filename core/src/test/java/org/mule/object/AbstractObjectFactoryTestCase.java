@@ -11,11 +11,18 @@
 package org.mule.object;
 
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public abstract class AbstractObjectFactoryTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testInitialisationFailureWithoutObjectClass() throws Exception
     {
         AbstractObjectFactory factory = getUninitialisedObjectFactory();
@@ -31,6 +38,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
         }
     }
     
+    @Test
     public void testInstanceFailureGetInstanceWithoutObjectClass() throws Exception
     {
         AbstractObjectFactory factory = getUninitialisedObjectFactory();
@@ -46,18 +54,21 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
         }
     }
     
+    @Test
     public void testCreateWithClassButDoNotInitialise() throws Exception
     {
         AbstractObjectFactory factory = new DummyObjectFactory(Object.class);
         assertObjectClassAndName(factory);
     }
     
+    @Test
     public void testCreateWithClassNameButDoNotInitialise() throws Exception
     {
         AbstractObjectFactory factory = new DummyObjectFactory(Object.class.getName());
         assertObjectClassAndName(factory);
     }
     
+    @Test
     public void testSetObjectClassNameButDoNotInitialise() throws Exception
     {
         AbstractObjectFactory factory = getUninitialisedObjectFactory();
@@ -66,6 +77,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
         assertObjectClassAndName(factory);
     }
 
+    @Test
     public void testSetObjectClassButDoNotInitialise() throws Exception
     {
         AbstractObjectFactory factory = getUninitialisedObjectFactory();
@@ -80,6 +92,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
         assertEquals(Object.class.getName(), factory.getObjectClassName());
     }
     
+    @Test
     public void testInitialiseWithClass() throws Exception
     {
         AbstractObjectFactory factory = getUninitialisedObjectFactory();
@@ -90,6 +103,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
         assertNotNull(factory.getInstance(muleContext));
     }
 
+    @Test
     public void testInitialiseWithClassName() throws Exception
     {
         AbstractObjectFactory factory = getUninitialisedObjectFactory();
@@ -100,6 +114,7 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
         assertNotNull(factory.getInstance(muleContext));
     }
 
+    @Test
     public void testDispose() throws Exception
     {
         AbstractObjectFactory factory = getUninitialisedObjectFactory();
@@ -122,8 +137,10 @@ public abstract class AbstractObjectFactoryTestCase extends AbstractMuleTestCase
     
     public abstract AbstractObjectFactory getUninitialisedObjectFactory();
 
+    @Test
     public abstract void testGetObjectClass() throws Exception;
 
+    @Test
     public abstract void testGet() throws Exception;
     
     private static class DummyObjectFactory extends AbstractObjectFactory

@@ -12,12 +12,16 @@ package org.mule.registry;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.lifecycle.Lifecycle;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
 
-public class RegisteredObjectLifecycleTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class RegisteredObjectLifecycleTestCase extends AbstractMuleContextTestCase
 {
     private static final long TIMEOUT = 1000;
 
@@ -38,6 +42,7 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleTestCase
         disposeLatch = new Latch();
     }
 
+    @Test
     public void testLifecycleForMuleContext() throws Exception
     {
         muleContext.getRegistry().registerObject("dummy", bean);
@@ -59,6 +64,7 @@ public class RegisteredObjectLifecycleTestCase extends AbstractMuleTestCase
         assertTrue(disposeLatch.await(TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
+    @Test
     public void testLifecycleForUnregisteredObject() throws Exception
     {
         muleContext.getRegistry().registerObject("dummy", bean);

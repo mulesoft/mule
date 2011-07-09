@@ -18,11 +18,17 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
-public class MessageChunkAggregatorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+public class MessageChunkAggregatorTestCase extends AbstractMuleContextTestCase
 {
 
     public MessageChunkAggregatorTestCase()
@@ -30,6 +36,7 @@ public class MessageChunkAggregatorTestCase extends AbstractMuleTestCase
         setStartContext(true);
     }
 
+    @Test
     public void testMessageProcessor() throws Exception
     {
         MuleSession session = getTestSession(getTestService(), muleContext);

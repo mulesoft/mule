@@ -10,7 +10,6 @@
 
 package org.mule.routing;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.DefaultMuleException;
@@ -19,12 +18,17 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RoundRobinTestCase extends AbstractMuleTestCase
+import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class RoundRobinTestCase extends AbstractMuleContextTestCase
 {
     private final static int NUMBER_OF_ROUTES = 10;
     private final static int NUMBER_OF_MESSAGES = 10;
@@ -35,6 +39,7 @@ public class RoundRobinTestCase extends AbstractMuleTestCase
         setStartContext(true);
     }
 
+    @Test
     public void testRoundRobin() throws Exception
     {
         RoundRobin rr = new RoundRobin();

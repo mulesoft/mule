@@ -11,13 +11,20 @@
 package org.mule.registry;
 
 import org.mule.api.registry.RegistrationException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.StringUtils;
 
 import java.util.Collection;
 
-public class DuplicateRegistrationTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class DuplicateRegistrationTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testComponentAlreadyDefinedThrowsException() throws Exception
     {
         Collection components = muleContext.getRegistry().lookupServices();

@@ -10,26 +10,15 @@
 
 package org.mule.routing;
 
-import com.mockobjects.dynamic.Mock;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
-import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
-import org.mule.api.construct.FlowConstruct;
-import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
-import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.routing.outbound.ListMessageSplitter;
-import org.mule.routing.outbound.OutboundRoutingTestEvent;
-import org.mule.routing.outbound.RouterTestUtils;
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.MuleTestUtils;
-import org.mule.tck.testmodels.fruit.Apple;
-import org.mule.tck.testmodels.fruit.Orange;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,13 +26,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CollectionMessageSplitterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCase
 {
     public CollectionMessageSplitterTestCase()
     {
         setStartContext(true);
     }
 
+    @Test
     public void testRouter() throws Exception
     {
         Service fc = getTestService();

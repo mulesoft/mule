@@ -13,8 +13,7 @@ package org.mule.routing;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
-import org.mule.routing.EventGroup;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.UUID;
 
 import java.util.Arrays;
@@ -23,14 +22,22 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.junit.Test;
 
-public class EventGroupTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class EventGroupTestCase extends AbstractMuleContextTestCase
 {
     public EventGroupTestCase()
     {
         setStartContext(true);
     }
 
+    @Test
     public void testConcurrentIteration() throws Exception
     {
         EventGroup eg = new EventGroup(UUID.getUUID());
@@ -53,6 +60,7 @@ public class EventGroupTestCase extends AbstractMuleTestCase
         assertEquals(4, eg.size());
     }
 
+    @Test
     public void testEquals()
     {
         EventGroup g1 = new EventGroup("foo");
@@ -71,6 +79,7 @@ public class EventGroupTestCase extends AbstractMuleTestCase
         assertFalse(mg.equals(g1));
     }
 
+    @Test
     public void testHashCode()
     {
         String uuid = UUID.getUUID();
@@ -108,6 +117,7 @@ public class EventGroupTestCase extends AbstractMuleTestCase
         assertEquals(2, s.size());
     }
 
+    @Test
     public void testCompareTo() throws InterruptedException
     {
         String uuid = UUID.getUUID();
@@ -148,6 +158,7 @@ public class EventGroupTestCase extends AbstractMuleTestCase
         assertTrue(g2.compareTo(g1) > 0);
     }
 
+    @Test
     public void testToArray() throws Exception
     {
         EventGroup eg = new EventGroup(UUID.getUUID());
@@ -159,6 +170,7 @@ public class EventGroupTestCase extends AbstractMuleTestCase
         assertTrue(Arrays.equals(array1, array2));
     }
 
+    @Test
     public void testToString() throws Exception
     {
         EventGroup eg = new EventGroup(UUID.getUUID());

@@ -11,15 +11,29 @@
 package org.mule.routing.filters;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.api.config.MuleConfiguration;
+import org.mule.api.config.MuleProperties;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.regex.Pattern;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RegExFilterTestCase extends AbstractMuleTestCase
 {
     private static final String PATTERN = "(.*) brown fox";
 
+    @Test
     public void testRegexFilterNoPattern()
     {
         // start with default
@@ -36,6 +50,7 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
         assertFalse(filter.accept("oh-oh"));
     }
 
+    @Test
     public void testRegexFilter()
     {
         RegExFilter filter = new RegExFilter("The quick (.*)");
@@ -65,6 +80,7 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
         assertTrue(filter.accept("The quick brown fox"));
     }
 
+    @Test
     public void testNullInput()
     {
         RegExFilter filter = new RegExFilter("The quick (.*)");
@@ -72,17 +88,25 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
         assertFalse(filter.accept((Object) null));
     }
 
+    @Test
     public void testMuleMessageInput()
     {
         RegExFilter filter = new RegExFilter("The quick (.*)");
         assertNotNull(filter.getPattern());
 
+        MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
+        when(muleConfiguration.isCacheMessageAsBytes()).thenReturn(false);
+        MuleContext muleContext= mock(MuleContext.class);
+        when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
+
         MuleMessage message = new DefaultMuleMessage("The quick brown fox", muleContext);
         assertTrue(filter.accept(message));
     }
 
+    @Test
     public void testByteArrayInput()
     {
+        System.setProperty(MuleProperties.MULE_ENCODING_SYSTEM_PROPERTY, "UTF-8");
         RegExFilter filter = new RegExFilter("The quick (.*)");
         assertNotNull(filter.getPattern());
 
@@ -90,6 +114,7 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
         assertTrue(filter.accept(bytes));
     }
 
+    @Test
     public void testCharArrayInput()
     {
         RegExFilter filter = new RegExFilter("The quick (.*)");
@@ -99,6 +124,7 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
         assertTrue(filter.accept(chars));
     }
 
+    @Test
     public void testEqualsWithSamePattern()
     {
         RegExFilter filter1 = new RegExFilter(PATTERN);
@@ -106,6 +132,7 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
         assertEquals(filter1, filter2);
     }
 
+    @Test
     public void testEqualsWithDifferentPattern()
     {
         RegExFilter filter1 = new RegExFilter("foo");
@@ -113,6 +140,7 @@ public class RegExFilterTestCase extends AbstractMuleTestCase
         assertFalse(filter1.equals(filter2));
     }
 
+    @Test
     public void testEqualsWithEqualPatternAndDifferentFlags()
     {
         RegExFilter filter1 = new RegExFilter(PATTERN, Pattern.DOTALL);

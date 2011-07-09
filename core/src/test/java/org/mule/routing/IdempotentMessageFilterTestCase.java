@@ -17,15 +17,21 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.dynamic.Mock;
 
+import org.junit.Test;
 
-public class IdempotentMessageFilterTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+
+public class IdempotentMessageFilterTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testIdempotentReceiver() throws Exception
     {
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://Test1Provider?exchangePattern=one-way");

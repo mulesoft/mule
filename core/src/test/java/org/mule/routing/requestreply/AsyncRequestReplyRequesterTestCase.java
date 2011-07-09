@@ -20,17 +20,23 @@ import org.mule.api.processor.RequestReplyRequesterMessageProcessor;
 import org.mule.api.routing.ResponseTimeoutException;
 import org.mule.api.service.Service;
 import org.mule.processor.AsyncInterceptingMessageProcessor;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.beans.ExceptionListener;
 
 import javax.resource.spi.work.Work;
 
-public class AsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class AsyncRequestReplyRequesterTestCase extends AbstractMuleContextTestCase
     implements ExceptionListener
 {
 
+    @Test
     public void testSingleEventNoTimeout() throws Exception
     {
         RequestReplyRequesterMessageProcessor asyncReplyMP = new TestAsyncRequestReplyRequester();
@@ -48,6 +54,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
         assertEquals(event.getMessage().getUniqueId(), resultEvent.getMessage().getUniqueId());
     }
 
+    @Test
     public void testSingleEventNoTimeoutAsync() throws Exception
     {
         RequestReplyRequesterMessageProcessor asyncReplyMP = new TestAsyncRequestReplyRequester();
@@ -76,6 +83,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
         assertEquals(event.getMessage().getUniqueId(), resultEvent.getMessage().getUniqueId());
     }
 
+    @Test
     public void testSingleEventTimeout() throws Exception
     {
         TestAsyncRequestReplyRequester asyncReplyMP = new TestAsyncRequestReplyRequester();
@@ -111,6 +119,7 @@ public class AsyncRequestReplyRequesterTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMultiple() throws Exception
     {
         final RequestReplyRequesterMessageProcessor asyncReplyMP = new TestAsyncRequestReplyRequester();

@@ -23,13 +23,19 @@ import org.mule.api.service.Service;
 import org.mule.routing.correlation.CorrelationSequenceComparator;
 import org.mule.routing.correlation.EventCorrelatorCallback;
 import org.mule.routing.correlation.ResequenceMessagesCorrelatorCallback;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.Comparator;
 
-public class ResequencerTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+public class ResequencerTestCase extends AbstractMuleContextTestCase
 {
 
     public ResequencerTestCase()
@@ -37,6 +43,7 @@ public class ResequencerTestCase extends AbstractMuleTestCase
         setStartContext(true);
     }
 
+    @Test
     public void testMessageResequencer() throws Exception
     {
         MuleSession session = getTestSession(getTestService(), muleContext);

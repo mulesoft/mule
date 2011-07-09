@@ -14,13 +14,22 @@ import org.mule.DefaultMuleMessage;
 import org.mule.routing.filters.logic.AndFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.routing.filters.logic.OrFilter;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.LinkedList;
 
-public class LogicFiltersTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class LogicFiltersTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testAndFilter()
     {
         AndFilter filter = new AndFilter();
@@ -58,6 +67,7 @@ public class LogicFiltersTestCase extends AbstractMuleTestCase
         assertTrue(!filter.accept(new DefaultMuleMessage("blah.blah", muleContext)));
     }
 
+    @Test
     public void testOrFilter()
     {
         OrFilter filter = new OrFilter();
@@ -86,6 +96,7 @@ public class LogicFiltersTestCase extends AbstractMuleTestCase
         assertTrue(!filter.accept(new DefaultMuleMessage("blah.x.blah", muleContext)));
     }
 
+    @Test
     public void testNotFilter()
     {
         NotFilter notFilter = new NotFilter();

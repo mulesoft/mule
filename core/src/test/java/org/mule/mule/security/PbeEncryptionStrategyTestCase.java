@@ -11,10 +11,17 @@
 package org.mule.mule.security;
 
 import org.mule.security.PasswordBasedEncryptionStrategy;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
 public class PbeEncryptionStrategyTestCase extends AbstractMuleTestCase
 {
+
+    @Test
     public void testRoundTripEncryption() throws Exception
     {
         PasswordBasedEncryptionStrategy pbe = new PasswordBasedEncryptionStrategy();

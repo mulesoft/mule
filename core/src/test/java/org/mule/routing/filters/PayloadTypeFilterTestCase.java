@@ -11,11 +11,19 @@
 package org.mule.routing.filters;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class PayloadTypeFilterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class PayloadTypeFilterTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testPayloadTypeFilterNoExpectedType()
     {
         PayloadTypeFilter filter = new PayloadTypeFilter();
@@ -29,6 +37,7 @@ public class PayloadTypeFilterTestCase extends AbstractMuleTestCase
         assertFalse(filter.accept(new DefaultMuleMessage("test", muleContext)));
     }
 
+    @Test
     public void testPayloadTypeFilter()
     {
         PayloadTypeFilter filter = new PayloadTypeFilter(Exception.class);

@@ -23,8 +23,14 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 public class TransientRegistryLifecycleTestCase extends TransientRegistryTestCase
 {
+    @Test
     public void testObjectLifecycleWithTransientRegistryDirectly() throws Exception
     {
         TransientRegistry reg = new TransientRegistry(muleContext);
@@ -38,6 +44,7 @@ public class TransientRegistryLifecycleTestCase extends TransientRegistryTestCas
         assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testObjectBypassLifecycleWithTransientRegistryDirectly() throws Exception
     {
         TransientRegistry reg = new TransientRegistry(muleContext);
@@ -50,6 +57,7 @@ public class TransientRegistryLifecycleTestCase extends TransientRegistryTestCas
         assertEquals("[setMuleContext, stop, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testObjectBypassInjectorsWithTransientRegistryDirectly() throws Exception
     {
         TransientRegistry reg = new TransientRegistry(muleContext);
@@ -62,6 +70,7 @@ public class TransientRegistryLifecycleTestCase extends TransientRegistryTestCas
         assertEquals("[initialise, start, stop, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testObjectBypassLifecycleAndInjectorsWithTransientRegistryDirectly() throws Exception
     {
         TransientRegistry reg = new TransientRegistry(muleContext);
@@ -74,6 +83,7 @@ public class TransientRegistryLifecycleTestCase extends TransientRegistryTestCas
         assertEquals("[stop, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testObjectLifecycleStatesWithTransientRegistryDirectly() throws Exception
     {
         TransientRegistry reg = new TransientRegistry(muleContext);
@@ -124,6 +134,7 @@ public class TransientRegistryLifecycleTestCase extends TransientRegistryTestCas
         }
     }
 
+    @Test
     public void testLifecycleState() throws Exception
     {
         TransientRegistry reg = new TransientRegistry(muleContext);
@@ -138,6 +149,7 @@ public class TransientRegistryLifecycleTestCase extends TransientRegistryTestCas
         assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testLifecycleStateOutOfSequenceStartFirstWithTransientRegistryDirectly() throws Exception
     {
         TransientRegistry reg = new TransientRegistry(muleContext);
@@ -166,6 +178,7 @@ public class TransientRegistryLifecycleTestCase extends TransientRegistryTestCas
         assertEquals("[setMuleContext, initialise, start, stop, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testLifecycleStateOutOfSequenceStopFirstWithTransientRegistryDirectly() throws Exception
     {
         TransientRegistry reg = new TransientRegistry(muleContext);

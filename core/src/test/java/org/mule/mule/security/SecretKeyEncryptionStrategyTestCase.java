@@ -12,11 +12,17 @@ package org.mule.mule.security;
 
 import org.mule.security.SecretKeyEncryptionStrategy;
 import org.mule.security.SecretKeyFactory;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
 public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testRoundTripEncryptionBlowfish() throws Exception
     {
         SecretKeyEncryptionStrategy ske = new SecretKeyEncryptionStrategy();
@@ -31,6 +37,7 @@ public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase
         assertEquals("hello", s);
     }
 
+    @Test
     public void testRoundTripEncryptionBlowfishWithKeyFactory() throws Exception
     {
         SecretKeyEncryptionStrategy ske = new SecretKeyEncryptionStrategy();
@@ -51,6 +58,7 @@ public class SecretKeyEncryptionStrategyTestCase extends AbstractMuleTestCase
         assertEquals("hello", s);
     }
 
+    @Test
     public void testRoundTripEncryptionTripleDES() throws Exception
     {
         SecretKeyEncryptionStrategy ske = new SecretKeyEncryptionStrategy();

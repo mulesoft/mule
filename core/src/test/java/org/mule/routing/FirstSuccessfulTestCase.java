@@ -21,13 +21,20 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.message.DefaultExceptionPayload;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class FirstSuccessfulTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase
 {
     private static final String EXCEPTION_SEEN = "EXCEPTION WAS SEEN";
 
@@ -36,6 +43,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         setStartContext(true);
     }
 
+    @Test
     public void testFirstSuccessful() throws Exception
     {
         MuleSession session = getTestSession(getTestService(), muleContext);
@@ -53,6 +61,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         assertEquals(EXCEPTION_SEEN, getPayload(fs, session, "ABCDEFGHI"));
     }
 
+    @Test
     public void testFailureExpression() throws Exception
     {
         MessageProcessor intSetter = new MessageProcessor()
@@ -71,6 +80,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         assertEquals("abc", fs.process(getTestEvent("")).getMessageAsString());
     }
 
+    @Test
     public void testRouteReturnsNullEvent() throws Exception
     {
         MessageProcessor nullReturningMp = new MessageProcessor()
@@ -86,6 +96,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         assertNull(fs.process(getTestEvent("")));
     }
 
+    @Test
     public void testRouteReturnsNullMessage() throws Exception
     {
         MessageProcessor nullEventMp = new MessageProcessor()
@@ -109,6 +120,7 @@ public class FirstSuccessfulTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testProcessingIsForcedOnSameThread() throws Exception
     {
         MessageProcessor checkForceSyncFlag = new MessageProcessor()

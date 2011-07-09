@@ -17,18 +17,24 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.dynamic.Mock;
 
-public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+public class IdempotentSecureHashMessageFilterTestCase extends AbstractMuleContextTestCase
 {
     public IdempotentSecureHashMessageFilterTestCase()
     {
         setStartContext(true);
     }
 
+    @Test
     public void testIdempotentReceiver() throws Exception
     {
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", 
