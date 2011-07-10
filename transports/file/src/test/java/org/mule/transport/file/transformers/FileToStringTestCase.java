@@ -19,6 +19,11 @@ import org.mule.util.SystemUtils;
 import java.io.File;
 import java.io.FileWriter;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Test case for FileToString transformer
  */
@@ -72,6 +77,7 @@ public class FileToStringTestCase extends AbstractTransformerTestCase
     /**
      * Transform with a wrong encoding should result in an Exception to be thrown
      */
+    @Test
     public void testTransformExcEnc() throws Exception
     {
         try

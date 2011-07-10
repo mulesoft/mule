@@ -15,10 +15,11 @@ import org.mule.api.security.CryptoFailureException;
 import org.mule.api.transformer.Transformer;
 import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.transformer.AbstractTransformerTestCase;
-import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
+
+import static org.junit.Assert.fail;
 
 public class EncryptionTransformerTestCase extends AbstractTransformerTestCase
 {

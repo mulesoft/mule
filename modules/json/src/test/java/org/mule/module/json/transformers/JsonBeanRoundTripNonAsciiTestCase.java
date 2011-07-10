@@ -22,6 +22,8 @@ import org.mule.transformer.types.SimpleDataType;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
+import static org.junit.Assert.fail;
+
 public class JsonBeanRoundTripNonAsciiTestCase extends JsonBeanRoundTripTestCase
 {
     private static final String ENCODING = "Windows-31J";

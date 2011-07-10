@@ -26,6 +26,7 @@ import javax.activation.DataHandler;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 import org.apache.commons.lang.SerializationUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -76,9 +77,10 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
         byte[] payload = (byte[]) deserializedMessage.getPayload();
         assertTrue(Arrays.equals(TEST_MESSAGE.getBytes(), payload));
     }
-    
-    // disabled, see MULE-2964
-    public void _testAttachments() throws Exception
+
+    @Test
+    @Ignore("see MULE-2964")
+    public void testAttachments() throws Exception
     {
         String attachmentName = "the-attachment";
         

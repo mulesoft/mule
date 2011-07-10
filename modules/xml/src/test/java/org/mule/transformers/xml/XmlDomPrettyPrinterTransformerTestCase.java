@@ -18,6 +18,8 @@ import java.io.ByteArrayInputStream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import static org.junit.Assert.fail;
+
 public class XmlDomPrettyPrinterTransformerTestCase extends AbstractTransformerTestCase
 {
     private static final String rawData ="<?xml version=\"1.0\" encoding=\"UTF-8\"?><just><a><test>test</test></a></just>";

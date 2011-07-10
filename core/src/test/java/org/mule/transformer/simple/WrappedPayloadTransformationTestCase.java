@@ -13,10 +13,15 @@ package org.mule.transformer.simple;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.transformer.TransformerException;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class WrappedPayloadTransformationTestCase extends HexStringByteArrayTransformersTestCase
 {
 
     // extra test for MULE-1274: transforming Mule Messages with regular payload
+    @Test
     public void testPayloadWrappedInMuleMessage() throws TransformerException
     {
         Object wrappedPayload = new DefaultMuleMessage(this.getResultData(), muleContext);

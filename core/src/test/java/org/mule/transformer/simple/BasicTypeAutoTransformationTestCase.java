@@ -12,13 +12,18 @@ package org.mule.transformer.simple;
 
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.math.BigDecimal;
 
-public class BasicTypeAutoTransformationTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class BasicTypeAutoTransformationTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testTypes() throws TransformerException
     {
         testType("1", Integer.class, Integer.TYPE, Integer.valueOf(1));
@@ -28,7 +33,6 @@ public class BasicTypeAutoTransformationTestCase extends AbstractMuleTestCase
         testType("1.1", Float.class, Float.TYPE, Float.valueOf((float) 1.1));
         testType("1.1", BigDecimal.class, null, BigDecimal.valueOf(1.1));
         testType("true", Boolean.class, Boolean.TYPE, Boolean.TRUE);
-
     }
 
     protected void testType(String string, Class type, Class primitive, Object value)

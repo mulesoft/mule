@@ -20,6 +20,9 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class FileToByteArrayTestCase extends AbstractTransformerTestCase
 {
@@ -76,6 +79,7 @@ public class FileToByteArrayTestCase extends AbstractTransformerTestCase
         return testFile;
     }
 
+    @Test
     public void testTransformInputStream() throws Exception
     {
         FileInputStream fis = new FileInputStream(testFile);
@@ -89,6 +93,7 @@ public class FileToByteArrayTestCase extends AbstractTransformerTestCase
         }
     }
 
+    @Test
     public void testTransformByteArray() throws Exception
     {
         FileInputStream fis = new FileInputStream(testFile);
@@ -108,6 +113,7 @@ public class FileToByteArrayTestCase extends AbstractTransformerTestCase
         }
     }
 
+    @Test
     public void testTransformString() throws Exception
     {
         assertTrue(Arrays.equals(resultData, (byte[]) getTransformer().transform(TEST_STRING)));

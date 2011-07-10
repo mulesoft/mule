@@ -18,6 +18,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class HexStringByteArrayTransformersTestCase extends AbstractTransformerTestCase
 {
 
@@ -70,6 +74,7 @@ public class HexStringByteArrayTransformersTestCase extends AbstractTransformerT
     }
 
     // extra test for uppercase output
+    @Test
     public void testUppercase() throws TransformerException
     {
         ByteArrayToHexString t = new ByteArrayToHexString();
@@ -78,6 +83,7 @@ public class HexStringByteArrayTransformersTestCase extends AbstractTransformerT
         assertEquals(((String)getTestData()).toUpperCase(), t.transform(getResultData()));
     }
     
+    @Test
     public void testStreaming() throws TransformerException
     {
         ByteArrayToHexString transformer = new ByteArrayToHexString();

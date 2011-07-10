@@ -12,6 +12,7 @@ package org.mule.transformer.simple;
 
 import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.util.IOUtils;
 
@@ -21,12 +22,17 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import org.apache.commons.lang.SerializationUtils;
+import org.junit.Test;
 
-public class ObjectToInputStreamTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class ObjectToInputStreamTestCase extends AbstractMuleContextTestCase
 {
 
     private ObjectToInputStream transformer = new ObjectToInputStream();
 
+    @Test
     public void testTransformString() throws TransformerException, IOException
     {
         assertTrue(InputStream.class.isAssignableFrom(transformer.transform(AbstractMuleTestCase.TEST_MESSAGE)
@@ -35,6 +41,7 @@ public class ObjectToInputStreamTestCase extends AbstractMuleTestCase
             (InputStream) transformer.transform(AbstractMuleTestCase.TEST_MESSAGE)));
     }
 
+    @Test
     public void testTransformByteArray() throws TransformerException, IOException
     {
         assertTrue(InputStream.class.isAssignableFrom(transformer.transform(
@@ -43,6 +50,7 @@ public class ObjectToInputStreamTestCase extends AbstractMuleTestCase
             (InputStream) transformer.transform(AbstractMuleTestCase.TEST_MESSAGE)));
     }
 
+    @Test
     public void testTransformInputStream()
     {
         InputStream inputStream = new ByteArrayInputStream(AbstractMuleTestCase.TEST_MESSAGE.getBytes());
@@ -57,6 +65,7 @@ public class ObjectToInputStreamTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testTransformSerializable()
     {
         Apple apple = new Apple();
