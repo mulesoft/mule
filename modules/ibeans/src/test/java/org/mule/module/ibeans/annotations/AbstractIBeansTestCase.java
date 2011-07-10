@@ -15,7 +15,7 @@ import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.ibeans.config.IBeanHolderConfigurationBuilder;
 import org.mule.module.ibeans.spi.MuleIBeansPlugin;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.IOUtils;
 
 import java.io.IOException;
@@ -38,17 +38,16 @@ import org.ibeans.spi.IBeansPlugin;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-/**
- * TODO
- */
-public abstract class AbstractIBeansTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertNotNull;
+
+public abstract class AbstractIBeansTestCase extends AbstractMuleContextTestCase
 {
     protected IBeansPlugin plugin;
 
     protected AbstractIBeansTestCase()
     {
         setStartContext(true);
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     protected IBeansPlugin createPlugin()

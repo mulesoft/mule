@@ -11,7 +11,6 @@
 package org.mule.transformer.simple;
 
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.util.IOUtils;
@@ -35,25 +34,24 @@ public class ObjectToInputStreamTestCase extends AbstractMuleContextTestCase
     @Test
     public void testTransformString() throws TransformerException, IOException
     {
-        assertTrue(InputStream.class.isAssignableFrom(transformer.transform(AbstractMuleTestCase.TEST_MESSAGE)
-            .getClass()));
-        assertTrue(compare(new ByteArrayInputStream(AbstractMuleTestCase.TEST_MESSAGE.getBytes()),
-            (InputStream) transformer.transform(AbstractMuleTestCase.TEST_MESSAGE)));
+        assertTrue(InputStream.class.isAssignableFrom(transformer.transform(TEST_MESSAGE).getClass()));
+        assertTrue(compare(new ByteArrayInputStream(TEST_MESSAGE.getBytes()),
+                           (InputStream) transformer.transform(TEST_MESSAGE)));
     }
 
     @Test
     public void testTransformByteArray() throws TransformerException, IOException
     {
         assertTrue(InputStream.class.isAssignableFrom(transformer.transform(
-            AbstractMuleTestCase.TEST_MESSAGE.getBytes()).getClass()));
-        assertTrue(compare(new ByteArrayInputStream(AbstractMuleTestCase.TEST_MESSAGE.getBytes()),
-            (InputStream) transformer.transform(AbstractMuleTestCase.TEST_MESSAGE)));
+                TEST_MESSAGE.getBytes()).getClass()));
+        assertTrue(compare(new ByteArrayInputStream(TEST_MESSAGE.getBytes()),
+                           (InputStream) transformer.transform(TEST_MESSAGE)));
     }
 
     @Test
     public void testTransformInputStream()
     {
-        InputStream inputStream = new ByteArrayInputStream(AbstractMuleTestCase.TEST_MESSAGE.getBytes());
+        InputStream inputStream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
         try
         {
             assertEquals(inputStream, transformer.transform(inputStream));

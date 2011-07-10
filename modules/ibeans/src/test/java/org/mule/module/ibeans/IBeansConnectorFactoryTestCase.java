@@ -14,8 +14,15 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.module.ibeans.annotations.AbstractIBeansTestCase;
 import org.mule.transport.ibean.IBeansConnector;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class IBeansConnectorFactoryTestCase extends AbstractIBeansTestCase
 {
+    @Test
     public void testCreateFromFactory() throws Exception
     {
         InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(getEndpointURI());

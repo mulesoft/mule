@@ -18,6 +18,9 @@ import java.net.URL;
 import org.ibeans.annotation.IntegrationBean;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 @ContainsTransformerMethods
 public class ReturnAnnotationTestCase extends AbstractIBeansTestCase
 {

@@ -14,7 +14,7 @@ import org.mule.api.MuleMessage;
 import org.mule.json.model.EmailAddress;
 import org.mule.json.model.Item;
 import org.mule.json.model.Person;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.CollectionDataType;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.ListDataType;
@@ -23,7 +23,12 @@ import org.mule.transformer.types.SimpleDataType;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
-public class JsonCustomTransformerTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class JsonCustomTransformerTestCase extends AbstractMuleContextTestCase
 {
     public static final String PERSON_JSON = "{\"emailAddresses\":[{\"type\":\"home\",\"address\":\"john.doe@gmail.com\"},{\"type\":\"work\",\"address\":\"jdoe@bigco.com\"}],\"name\":\"John Doe\",\"dob\":\"01/01/1970\"}";
     public static final String EMAIL_JSON = "{\"type\":\"home\",\"address\":\"john.doe@gmail.com\"}";
@@ -35,6 +40,7 @@ public class JsonCustomTransformerTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().registerObject("trans", new JsonCustomTransformer());
     }
 
+    @Test
     public void testCustomTransform() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(PERSON_JSON, muleContext);
@@ -50,6 +56,7 @@ public class JsonCustomTransformerTestCase extends AbstractMuleTestCase
         assertEquals("jdoe@bigco.com", person.getEmailAddresses().get(1).getAddress());
     }
 
+    @Test
     public void testCustomTransformWithMuleMessage() throws Exception
     {
         ByteArrayInputStream in = new ByteArrayInputStream(EMAIL_JSON.getBytes());
@@ -61,6 +68,7 @@ public class JsonCustomTransformerTestCase extends AbstractMuleTestCase
         assertEquals("john.doe@gmail.com", emailAddress.getAddress());
     }
 
+    @Test
     public void testCustomListTransform() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(ITEMS_JSON, muleContext);
@@ -81,6 +89,7 @@ public class JsonCustomTransformerTestCase extends AbstractMuleTestCase
         assertEquals(2, people.size());
     }
 
+    @Test
     public void testDifferentListTransformer() throws Exception
     {
         //Test that we can resolve other collections

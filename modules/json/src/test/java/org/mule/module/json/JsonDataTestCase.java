@@ -10,14 +10,24 @@
 
 package org.mule.module.json;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.IOUtils;
 
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class JsonDataTestCase extends AbstractMuleTestCase
 {
+
+    @Test
     public void testReadingArrayData() throws Exception
     {
         JsonData jsonData = readJsonData("test-data.json");
@@ -60,6 +70,7 @@ public class JsonDataTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testReadingComplexData() throws Exception
     {
         JsonData jsonData = readJsonData("filters.json");
@@ -72,6 +83,7 @@ public class JsonDataTestCase extends AbstractMuleTestCase
         assertNotNull(jsonData.toString());
     }
 
+    @Test
     public void testReadingWithQuotedString() throws Exception
     {
         JsonData jsonData = readJsonData("bitly-response.json");
@@ -79,6 +91,7 @@ public class JsonDataTestCase extends AbstractMuleTestCase
             jsonData.getAsString("results/'http://rossmason.blogspot.com/2008/01/about-me.html'/hash"));
     }
 
+    @Test
     public void testReadingArray() throws Exception
     {
         JsonData jsonData = readJsonData("flickr-response.json");

@@ -11,21 +11,28 @@
 package org.mule.module.cxf.support;
 
 import org.mule.MuleServer;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.ExceptionUtils;
 
 import java.net.URL;
 
 import org.apache.cxf.service.factory.ServiceConstructionException;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ProxyServiceConfigurationTestCase extends AbstractMuleTestCase
 {
+
+    @Test
     public void testGetEndpointName_CorrectNameSpace()
     {
         String configFilePath = "/org/mule/module/cxf/support/test-proxy-mule-config-correct-namespace.xml";
         startServer(configFilePath);
     }
 
+    @Test
     public void testGetEndpointName_NoNameSpace()
     {
         String configFilePath = "/org/mule/module/cxf/support/test-proxy-mule-config-no-namespace.xml";

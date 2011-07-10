@@ -13,6 +13,12 @@ package org.mule.module.client;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
 public class MuleClientStandaloneTestCase extends AbstractMuleClientTestCase
 {
 
@@ -21,6 +27,7 @@ public class MuleClientStandaloneTestCase extends AbstractMuleClientTestCase
         return null;
     }
 
+    @Test
     public void testCreateMuleClient() throws MuleException
     {
         MuleClient muleClient = new MuleClient();

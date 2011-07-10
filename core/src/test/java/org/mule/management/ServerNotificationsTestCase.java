@@ -19,7 +19,7 @@ import org.mule.context.notification.CustomNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.ServiceNotification;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
@@ -28,7 +28,11 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Test;
 
-public class ServerNotificationsTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class ServerNotificationsTestCase extends AbstractMuleContextTestCase
         implements ModelNotificationListener, MuleContextNotificationListener
 {
 
@@ -79,7 +83,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertTrue(modelStopped.get());
         assertEquals(2, modelStoppedEvents.get());
     }
-    
+
     @Test
     public void testUnregistering() throws Exception
     {

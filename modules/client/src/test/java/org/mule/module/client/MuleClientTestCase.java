@@ -12,9 +12,16 @@ package org.mule.module.client;
 
 import org.mule.api.MuleException;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class MuleClientTestCase extends AbstractMuleClientTestCase
 {
 
+    @Test
     public void testCreateMuleClient() throws MuleException
     {
         assertNotNull(muleContext);

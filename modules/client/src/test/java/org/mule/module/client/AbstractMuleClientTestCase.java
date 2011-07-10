@@ -14,11 +14,17 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public abstract class AbstractMuleClientTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+
+public abstract class AbstractMuleClientTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testInboundEndpointCache() throws MuleException
     {
         MuleClient muleClient = new MuleClient(muleContext);
@@ -31,6 +37,7 @@ public abstract class AbstractMuleClientTestCase extends AbstractMuleTestCase
         assertNotSame(endpointa, endpointd);
     }
 
+    @Test
     public void testOutboundEndpointCache() throws MuleException
     {
         MuleClient muleClient = new MuleClient(muleContext);

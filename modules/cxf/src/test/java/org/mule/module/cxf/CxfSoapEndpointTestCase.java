@@ -13,10 +13,16 @@ package org.mule.module.cxf;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class CxfSoapEndpointTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class CxfSoapEndpointTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testEndpoint() throws Exception
     {
         String url = "cxf:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
@@ -41,6 +47,7 @@ public class CxfSoapEndpointTestCase extends AbstractMuleTestCase
         assertEquals(3, endpointUri.getParams().size());
     }
 
+    @Test
     public void testEndpointWithUserInfo() throws Exception
     {
         String url = "cxf:http://admin:pwd@www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";

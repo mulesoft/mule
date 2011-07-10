@@ -16,6 +16,11 @@ import org.mule.api.transport.Connector;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transport.AbstractConnectorTestCase;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 public class SslConnectorTestCase extends AbstractConnectorTestCase
 {
     @Override
@@ -34,6 +39,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         return cnn;
     }
 
+    @Test
     public void testClientConnector() throws Exception
     {
         SslConnector cnn = new SslConnector(muleContext);
@@ -54,6 +60,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         return "Hello".getBytes();
     }
 
+    @Test
     public void testValidListener() throws Exception
     {
         Service service = getTestService("orange", Orange.class);
@@ -74,6 +81,7 @@ public class SslConnectorTestCase extends AbstractConnectorTestCase
         }
     }
 
+    @Test
     public void testProperties() throws Exception
     {
         SslConnector c = (SslConnector)getConnector();

@@ -16,9 +16,14 @@ import org.mule.api.MuleException;
 import org.mule.api.component.simple.EchoService;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.cxf.builder.SimpleClientMessageProcessorBuilder;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class CxfOutboundMessageProcessorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class CxfOutboundMessageProcessorTestCase extends AbstractMuleContextTestCase
 {
     String msg = 
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
@@ -30,6 +35,7 @@ public class CxfOutboundMessageProcessorTestCase extends AbstractMuleTestCase
     boolean gotEvent = false;
     Object payload;
     
+    @Test
     public void testOutbound() throws Exception
     {
         CxfConfiguration config = new CxfConfiguration();

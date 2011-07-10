@@ -19,7 +19,7 @@ import org.mule.construct.SimpleService;
 import org.mule.module.launcher.application.Application;
 import org.mule.module.launcher.application.ApplicationWrapper;
 import org.mule.module.launcher.application.PriviledgedMuleApplication;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.CollectionUtils;
 import org.mule.util.FileUtils;
 import org.mule.util.StringUtils;
@@ -36,10 +36,17 @@ import java.util.Map;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-public class DeploymentServiceTestCase extends AbstractMuleTestCase
+public class DeploymentServiceTestCase extends AbstractMuleContextTestCase
 {
 
     protected static final int LATCH_TIMEOUT = 10000;
@@ -90,6 +97,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
     }
 
+    @Test
     public void testPriviledgedApp() throws Exception
     {
         final URL url = getClass().getResource("/priviledged-dummy-app.zip");
@@ -110,6 +118,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertTrue(((ApplicationWrapper) app).getDelegate() instanceof PriviledgedMuleApplication);
     }
 
+    @Test
     public void testPriviledgedCrossAppAccess() throws Exception
     {
         URL url = getClass().getResource("/priviledged-dummy-app.zip");
@@ -145,6 +154,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertEquals("Wrong component implementation class", "org.mule.module.launcher.EchoTest", clazz.getName());
     }
 
+    @Test
     public void testDeployZipOnStartup() throws Exception
     {
         final URL url = getClass().getResource("/dummy-app.zip");
@@ -168,6 +178,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertEquals("mule-app.properties should have been loaded.", "someValue", registry.get("myCustomProp"));
     }
 
+    @Test
     public void testUpdateAppViaZip() throws Exception
     {
         final URL url = getClass().getResource("/dummy-app.zip");
@@ -189,6 +200,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertAppsDir(NONE, new String[]{"dummy-app"}, true);
     }
 
+    @Test
     public void testBrokenAppArchive() throws Exception
     {
         final URL url = getClass().getResource("/broken-app.zip");
@@ -220,6 +232,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertFalse("Install was invoked again for the broken application file", installLatch.await(LATCH_TIMEOUT, TimeUnit.MILLISECONDS));
     }
 
+    @Test
     public void testBrokenAppName() throws Exception
     {
         final URL url = getClass().getResource("/app with spaces.zip");
@@ -245,6 +258,7 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase
         assertTrue("Invalid lastModified value for file URL.", zombie.getValue() != -1);
     }
     
+    @Test
     public void testConfigurableWorkingDirectoryApp() throws Exception
     {
         final URL url1 = getClass().getResource("/configurableApp.zip");

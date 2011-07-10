@@ -10,6 +10,7 @@
 
 package org.mule.transport.email.connectors;
 
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.transformer.NoActionTransformer;
 import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.email.GreenMailUtilities;
@@ -22,12 +23,18 @@ import javax.mail.Message;
 import javax.mail.internet.MimeMessage;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Rule;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Start a (greenmail) mail server with a known message, for use in subclasses.
  */
 public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractConnectorTestCase
 {
+
     public static final String LOCALHOST = "127.0.0.1";
     public static final String USER = "bob";
     public static final String PROVIDER = "example.com";
@@ -51,26 +58,28 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     private String protocol;
     private int port;
 
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     protected AbstractMailConnectorFunctionalTestCase(boolean initialEmail, String protocol)
     {
         super();
         this.initialEmail = initialEmail;
         this.protocol = protocol;
-        // request one port in AbstractMuleTestCase
-        numPorts = 1;
     }
-    
+
     @Override
     protected synchronized void doSetUp() throws Exception
     {
-        super.doSetUp();   
-        this.port = getPorts().get(0);
+        super.doSetUp();
+        //TODO(pablo.kraan): looks like port is redundant. Remove it
+        this.port = dynamicPort.getNumber();
         startServers();
-        muleContext.getRegistry().registerObject("noActionTransformer",new NoActionTransformer());
+        muleContext.getRegistry().registerObject("noActionTransformer", new NoActionTransformer());
     }
-    
+
     @Override
-    protected synchronized void doTearDown() throws Exception 
+    protected synchronized void doTearDown() throws Exception
     {
         stopServers();
         super.doTearDown();
@@ -78,11 +87,11 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
 
     private synchronized void storeEmail() throws Exception
     {
-        GreenMailUtilities.storeEmail(servers.getManagers().getUserManager(), EMAIL, USER, 
-            PASSWORD, (MimeMessage) getValidMessage());
+        GreenMailUtilities.storeEmail(servers.getManagers().getUserManager(), EMAIL, USER,
+                                      PASSWORD, (MimeMessage) getValidMessage());
         assertEquals(1, servers.getReceivedMessages().length);
     }
-    
+
     private synchronized void startServers() throws Exception
     {
         servers = new GreenMail(getSetups());
@@ -95,7 +104,7 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
 
     private ServerSetup[] getSetups()
     {
-        return new ServerSetup[]{new ServerSetup(port, null, protocol)};
+        return new ServerSetup[] {new ServerSetup(port, null, protocol)};
     }
 
     private synchronized void stopServers() throws Exception
@@ -105,7 +114,7 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
             try
             {
                 servers.stop();
-            } 
+            }
             catch (RuntimeException e)
             {
                 e.printStackTrace();
@@ -127,7 +136,7 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
         }
         return message;
     }
-    
+
     @Override
     public String getTestEndpointURI()
     {
@@ -144,21 +153,21 @@ public abstract class AbstractMailConnectorFunctionalTestCase extends AbstractCo
     {
         return false;
     }
-    
+
     protected void assertMessageOk(Object mailMessage) throws Exception
     {
         assertTrue("Did not receive a MimeMessage", mailMessage instanceof MimeMessage);
-        
+
         MimeMessage received = (MimeMessage) mailMessage;
-        
+
         // for some reason, something is adding a newline at the end of messages
         // so we need to strip that out for comparison
         assertTrue("Did not receive a message with String contents",
-            received.getContent() instanceof String);
-        
+                   received.getContent() instanceof String);
+
         String receivedText = ((String) received.getContent()).trim();
         assertEquals(MESSAGE, receivedText);
-        
+
         Address[] recipients = received.getRecipients(Message.RecipientType.TO);
         assertNotNull(recipients);
         assertEquals("recipients", 1, recipients.length);

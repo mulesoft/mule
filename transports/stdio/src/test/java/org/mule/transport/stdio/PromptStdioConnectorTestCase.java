@@ -17,6 +17,10 @@ import org.mule.transport.AbstractConnectorTestCase;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class PromptStdioConnectorTestCase extends AbstractConnectorTestCase
 {
     @Override
@@ -39,6 +43,7 @@ public class PromptStdioConnectorTestCase extends AbstractConnectorTestCase
         return "Test Message";
     }
 
+    @Test
     public void testContextClassLoaderResourceLookup() throws InitialisationException
     {
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();

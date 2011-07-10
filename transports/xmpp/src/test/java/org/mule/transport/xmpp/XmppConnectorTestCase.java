@@ -42,7 +42,7 @@ public class XmppConnectorTestCase extends AbstractConnectorTestCase
     {
         return "xmpp";
     }
-    
+
     public String getTestEndpointURI()
     {
         return this.getProtocol() + "://mule1:mule@jabber.org.au/ross@jabber.org";

@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+import org.junit.Test;
+
 /**
  * Test suite for jar utilities.
  */
@@ -29,6 +31,7 @@ public class JarUtilsTestCase extends AbstractMuleTestCase
      *  <li>Read jar file and compare against previous entries written</li>
      * </ol>
      */
+    @Test
     public void testCreateAppendReadJarFileEntries()
     {
         File jarFile = null;

@@ -10,7 +10,7 @@
 
 package org.mule.module.cxf.support;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,19 +20,25 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 public class OutputPayloadInterceptorTestCase extends AbstractMuleTestCase
 {
 
     private OutputPayloadInterceptor interceptor;
 
-    @Override
-    protected void doSetUp() throws Exception
+    @Before
+    public void setUpInterceptor()
     {
-        super.doSetUp();
         interceptor = new OutputPayloadInterceptor();
     }
 
+    @Test
     public void testCleanUpPayload_NotAnArray() throws Exception
     {
         final List<?> someList = new ArrayList<Object>();
@@ -42,6 +48,7 @@ public class OutputPayloadInterceptorTestCase extends AbstractMuleTestCase
         assertSame(someString, interceptor.cleanUpPayload(someString));
     }
 
+    @Test
     public void testCleanUpPayload_NonObjectArray() throws Exception
     {
         final String someString = "Some String";
@@ -55,6 +62,7 @@ public class OutputPayloadInterceptorTestCase extends AbstractMuleTestCase
             (Object[]) interceptor.cleanUpPayload(arrayOf2Strings1Null)));
     }
 
+    @Test
     public void testCleanUpPayload_ArrayOfObjects()
     {
         final Integer someInteger = Integer.valueOf(1);
@@ -69,6 +77,7 @@ public class OutputPayloadInterceptorTestCase extends AbstractMuleTestCase
             (Object[]) interceptor.cleanUpPayload(arrayOf2Objects1Null)));
     }
 
+    @Test
     public void testAddsMissingPartContentOnHandleMessage() {
         MessageContentsList messageContentsList = new MessageContentsList();
         Object content1 = new Object();
@@ -87,6 +96,7 @@ public class OutputPayloadInterceptorTestCase extends AbstractMuleTestCase
         assertEquals(content1, messageContentsList.get(1));
     }
 
+    @Test
     public void testAddsMissingPartContentWithUnsortedPartListOnHandleMessage() {
         MessageContentsList messageContentsList = new MessageContentsList();
         Object content1 = new Object();

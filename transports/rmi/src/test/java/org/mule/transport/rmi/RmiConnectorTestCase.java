@@ -12,7 +12,11 @@ package org.mule.transport.rmi;
 
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.transport.rmi.RmiConnector;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class RmiConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -36,6 +40,7 @@ public class RmiConnectorTestCase extends AbstractConnectorTestCase
         return "Hello".getBytes();
     }
 
+    @Test
     public void testProperties() throws Exception
     {
         RmiConnector c = (RmiConnector)getConnector();

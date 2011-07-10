@@ -19,17 +19,24 @@ import org.mule.api.transport.MessageDispatcherFactory;
 import org.mule.api.transport.MessageRequesterFactory;
 import org.mule.api.transport.MuleMessageFactory;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * <code>AbstractConnectorTestCase</code> tests common behaviour of all endpoints and
  * provides 'reminder' methods for implementation specific interface methods
  */
-public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
+public abstract class AbstractConnectorTestCase extends AbstractMuleContextTestCase
 {
     protected String connectorName;
     protected String encoding;
@@ -51,7 +58,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
     protected void doTearDown() throws Exception
     {
         Connector connector = getConnector();
-        if (connector.isDisposed())
+        if (connector != null && connector.isDisposed())
         {
             fail("Connector has been disposed prematurely - lifecycle problem? Instance: " + connector);
         }
@@ -60,7 +67,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
     /** Look up the connector from the Registry */
     protected Connector getConnector()
     {
-        return muleContext.getRegistry().lookupConnector(connectorName);
+        return (muleContext == null) ?  null : muleContext.getRegistry().lookupConnector(connectorName);
     }
     
     protected Connector getConnectorAndAssert()
@@ -70,6 +77,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         return connector;
     }
 
+    @Test
     public void testConnectorExceptionHandling() throws Exception
     {
         Connector connector = getConnectorAndAssert();
@@ -104,6 +112,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testConnectorLifecycle() throws Exception
     {
         // this test used to use the connector created for this test, but since we need to
@@ -136,6 +145,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testConnectorListenerSupport() throws Exception
     {
         Connector connector = getConnectorAndAssert();
@@ -212,6 +222,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().unregisterService(service.getName());
     }
 
+    @Test
     public void testConnectorBeanProps() throws Exception
     {
         Connector connector = getConnectorAndAssert();
@@ -237,6 +248,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
      * MuleMessageFactory. For exhaustive tests of MuleMessageFactory implementations see
      * {@link AbstractMuleMessageFactoryTestCase} and subclasses.
      */
+    @Test
     public void testConnectorMuleMessageFactory() throws Exception
     {
         Connector connector = getConnectorAndAssert();
@@ -245,6 +257,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         assertNotNull(factory);
     }
 
+    @Test
     public void testConnectorMessageDispatcherFactory() throws Exception
     {
         Connector connector = getConnectorAndAssert();
@@ -253,6 +266,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         assertNotNull(factory);
     }
 
+    @Test
     public void testConnectorMessageRequesterFactory() throws Exception
     {
         Connector connector = getConnectorAndAssert();
@@ -261,6 +275,7 @@ public abstract class AbstractConnectorTestCase extends AbstractMuleTestCase
         assertNotNull(factory);
     }
 
+    @Test
     public void testConnectorInitialise() throws Exception
     {
         Connector connector = getConnector();

@@ -12,15 +12,24 @@ package org.mule.module.atom.endpoint;
 import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.registry.ServiceException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.file.FileConnector;
 import org.mule.transport.http.HttpPollingConnector;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Simple test that endpoints get parsed correctly
  */
-public class AtomEndpointTestCase extends AbstractMuleTestCase
+public class AtomEndpointTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testHttpInboundEndpointCreation() throws Exception
     {
         String uri = "atom:http://blog.com/atom";
@@ -33,6 +42,7 @@ public class AtomEndpointTestCase extends AbstractMuleTestCase
         assertTrue(in instanceof AtomInboundEndpoint);
     }
 
+    @Test
     public void testHttpOutboundEndpointCreation() throws Exception
     {
         String uri = "atom:http://blog.com/atom";
@@ -48,6 +58,7 @@ public class AtomEndpointTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testFileInboundEndpointCreation() throws Exception
     {
         String uri = "atom:file://./src/foo";
@@ -60,6 +71,7 @@ public class AtomEndpointTestCase extends AbstractMuleTestCase
         assertTrue(in instanceof AtomInboundEndpoint);
     }
 
+    @Test
     public void testFileOutboundEndpointCreation() throws Exception
     {
         String uri = "atom:file://./src/foo";
@@ -75,6 +87,7 @@ public class AtomEndpointTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testXXInboundEndpointCreation() throws Exception
     {
         String uri = "atom:xxx://./src/foo";

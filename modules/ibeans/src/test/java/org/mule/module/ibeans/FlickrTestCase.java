@@ -11,7 +11,7 @@ package org.mule.module.ibeans;
 
 import org.mule.ibeans.flickr.FlickrIBean;
 import org.mule.ibeans.flickr.FlickrTransformers;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -19,13 +19,17 @@ import java.util.List;
 
 import org.ibeans.annotation.IntegrationBean;
 import org.ibeans.api.CallException;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import static org.ibeans.impl.IBeansSupport.prettyPrintXml;
 import static org.ibeans.impl.IBeansSupport.select;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class FlickrTestCase extends AbstractMuleTestCase
+public class FlickrTestCase extends AbstractMuleContextTestCase
 {
     public static final String SEARCH_TERM = "food";
     public static final String BAD_SEARCH_TERM = "bad";
@@ -54,6 +58,7 @@ public class FlickrTestCase extends AbstractMuleTestCase
         return flickr;
     }
 
+    @Test
     public void testFlickrSearch() throws Exception
     {
         Document doc = getFlickr().search(SEARCH_TERM);
@@ -69,6 +74,7 @@ public class FlickrTestCase extends AbstractMuleTestCase
     }
 
     //This will fail since "badkey" is not a recognised key
+    @Test
     public void testFlickrError() throws Exception
     {
         getFlickr().init("badkey", FlickrIBean.FORMAT.XML, Document.class);
@@ -84,6 +90,7 @@ public class FlickrTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testSizeEnum() throws Exception
     {
         assertEquals("o", FlickrIBean.IMAGE_SIZE.Original.toString());
@@ -123,6 +130,7 @@ public class FlickrTestCase extends AbstractMuleTestCase
 //    }
 
     //TODO upload not working yet, suspect it has something to do with the way form-data is handled
+//    @Test
 //    public void testUpload() throws Exception
 //    {
 //        URL url = new URL("file:///projects/ibeans-contrib/twitter/src/test/resources/profile.png");

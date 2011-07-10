@@ -12,7 +12,11 @@ package org.mule.transport.ejb;
 
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.transport.ejb.EjbConnector;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class EjbConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -35,6 +39,7 @@ public class EjbConnectorTestCase extends AbstractConnectorTestCase
         return "Hello".getBytes();
     }
 
+    @Test
     public void testProperties() throws Exception
     {
         EjbConnector c = (EjbConnector) getConnector();

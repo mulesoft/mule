@@ -20,18 +20,22 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.session.DefaultMuleSession;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.AbstractConnector;
 
 import org.custommonkey.xmlunit.XMLAssert;
+import org.junit.Test;
 import org.w3c.dom.Document;
 
-public class CxfWsdlTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertNotNull;
+
+public class CxfWsdlTestCase extends AbstractMuleContextTestCase
 {
     public static final String TEST_URL = "wsdl-cxf:http://localhost:8080/mule-tests-external-cxf/services/TestService?WSDL&method=getTest";
     public static final String TEST_URL_NOWSDL = "wsdl-cxf:http://localhost:8080/mule-tests-external-cxf/services/TestService?method=getTest";
     public static final String TEST_URL_WSDL = "http://localhost:8080/mule-tests-external-cxf/services/TestService?wsdl";
 
+    @Test
     public void testCxfWsdlService() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -52,6 +56,7 @@ public class CxfWsdlTestCase extends AbstractMuleTestCase
      * This tests the endpoint propery of wsdlUrl which specifies an alternative WSDL
      * location (see MULE-1368)
      */
+    @Test
     public void testCxfWsdlServiceWithEndpointParam() throws Exception
     {
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URL_NOWSDL, muleContext);

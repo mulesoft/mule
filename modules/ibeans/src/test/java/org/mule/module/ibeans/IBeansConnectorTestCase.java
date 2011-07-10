@@ -14,6 +14,8 @@ import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.ibean.IBeansConnector;
 
+import org.junit.Test;
+
 public class IBeansConnectorTestCase extends AbstractConnectorTestCase
 {
     @Override
@@ -40,7 +42,7 @@ public class IBeansConnectorTestCase extends AbstractConnectorTestCase
         return "123.34.56.7";
     }
 
-
+    @Test
     public void testProperties() throws Exception
     {
         // TODO test setting and retrieving any custom properties on the
@@ -51,13 +53,11 @@ public class IBeansConnectorTestCase extends AbstractConnectorTestCase
     public void testConnectorMessageRequesterFactory() throws Exception
     {
         //No support for Message Requester
-        assertTrue(true);
     }
 
     @Override
     public void testConnectorListenerSupport() throws Exception
     {
-        //No support for Message Receiver        
-        assertTrue(true);
+        //No support for Message Receiver
     }
 }

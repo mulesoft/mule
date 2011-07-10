@@ -26,6 +26,9 @@ import java.util.Map;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Given an endpoint ({@link #getTestEndpointURI()}) this waits for up to 10 seconds,
@@ -42,6 +45,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
         super(SEND_INITIAL_EMAIL, protocol);
     }
 
+    @Test
     public void testReceiver() throws Exception
     {
         final CountDownLatch countDown = new CountDownLatch(1);

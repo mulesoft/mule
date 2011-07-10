@@ -16,8 +16,15 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.endpoint.MuleEndpointURI;
 import org.mule.module.ibeans.annotations.AbstractIBeansTestCase;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class IBeansEndpointTestCase extends AbstractIBeansTestCase
 {
+    @Test
     public void testValidEndpointURI() throws Exception
     {
         EndpointURI uri = new MuleEndpointURI("ibean://hostip.getHostInfo", muleContext);
@@ -28,6 +35,7 @@ public class IBeansEndpointTestCase extends AbstractIBeansTestCase
         assertEquals("ibean://hostip.getHostInfo", uri.toString());
     }
 
+    @Test
     public void testValidEndpointURIWithParams() throws Exception
     {
         EndpointURI uri = new MuleEndpointURI("ibean://hostip.getHostInfo?param1=value1", muleContext);
@@ -40,6 +48,7 @@ public class IBeansEndpointTestCase extends AbstractIBeansTestCase
 
     }
 
+    @Test
     public void testMissingIBeanEndpointURI() throws Exception
     {
         try
@@ -55,6 +64,7 @@ public class IBeansEndpointTestCase extends AbstractIBeansTestCase
         }
     }
 
+    @Test
     public void testBanIBeanMethodEndpointURI() throws Exception
     {
         try
