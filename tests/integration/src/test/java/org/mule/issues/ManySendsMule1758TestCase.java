@@ -12,17 +12,33 @@ package org.mule.issues;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class ManySendsMule1758TestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class ManySendsMule1758TestCase extends AbstractServiceAndFlowTestCase
 {
     private static int NUM_MESSAGES = 3000;
 
-    protected String getConfigResources()
+    public ManySendsMule1758TestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/issues/many-sends-mule-1758-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/issues/many-sends-mule-1758-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/issues/many-sends-mule-1758-test-flow.xml"}
+        });
+    }      
+       
+    @Test
     public void testSingleSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -31,6 +47,7 @@ public class ManySendsMule1758TestCase extends FunctionalTestCase
         assertEquals("Polo", response.getPayload());
     }
 
+    @Test
     public void testManySends() throws Exception
     {
         long then = System.currentTimeMillis();

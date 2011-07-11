@@ -33,14 +33,16 @@ public class InOutOutOnlyMessageCopyMule3007TestCase extends AbstractServiceAndF
         super(variant, configResources);
 
     }
-
+    
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/issues/inout-outonly-message-copy-mule3007-test.xml"},});
-    }
-
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/issues/inout-outonly-message-copy-mule3007-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/issues/inout-outonly-message-copy-mule3007-test-flow.xml"}
+        });
+    }      
+    
     @Test
     public void testStreamMessage() throws MuleException
     {

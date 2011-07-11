@@ -35,7 +35,8 @@ public class EndpointMessageNotificationTestCase extends AbstractNotificationTes
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/notifications/endpoint-message-notification-test.xml"},            
+            {ConfigVariant.SERVICE, "org/mule/test/integration/notifications/endpoint-message-notification-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/notifications/endpoint-message-notification-test-flow.xml"}
         });
     }         
 

@@ -56,7 +56,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
     public void testOther() throws Exception
     {
         logger.debug("other");
-        doTestXml("other", getResourceAsString("org/mule/issues/many-sends-mule-1758-test.xml"));
+        doTestXml("other", getResourceAsString("org/mule/issues/many-sends-mule-1758-test-service.xml"));
     }
 
     @Test
