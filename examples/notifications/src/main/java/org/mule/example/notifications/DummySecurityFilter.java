@@ -10,8 +10,8 @@
 package org.mule.example.notifications;
 
 import org.mule.api.MuleEvent;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.security.UnauthorisedException;
+import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.security.AbstractAuthenticationFilter;
 import org.mule.transformer.types.DataTypeFactory;
@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public class DummySecurityFilter extends AbstractAuthenticationFilter
 {
-
+    @Override
     public void authenticate(MuleEvent event) throws UnauthorisedException
     {
         try
@@ -32,23 +32,16 @@ public class DummySecurityFilter extends AbstractAuthenticationFilter
             String user = (String) payload.get("user");
             if (user == null)
             {
-                throw new UnauthorisedException(CoreMessages.authNoCredentials());
+                throw new UnauthorisedException(CoreMessages.authNoCredentials(), event);
             }
             if ("anonymous".equals(user))
             {
-                throw new UnauthorisedException(CoreMessages.authFailedForUser("anonymous"));
+                throw new UnauthorisedException(CoreMessages.authFailedForUser("anonymous"), event);
             }
         }
-        catch (Exception e)
+        catch (TransformerException te)
         {
-            throw new UnauthorisedException(CoreMessages.authFailedForUser("anonymous"), e);
+            throw new UnauthorisedException(CoreMessages.transformFailed("Object", "Map"), event, te);
         }
-
-    }
-
-    @Override
-    protected void doInitialise() throws InitialisationException
-    {
-        // nothing to do
     }
 }
