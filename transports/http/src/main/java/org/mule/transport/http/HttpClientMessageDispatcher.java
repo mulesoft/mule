@@ -14,6 +14,7 @@ import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.DataType;
@@ -113,7 +114,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             if (returnException(event, httpMethod))
             {
                 logger.error(httpMethod.getResponseBodyAsString());
-                
+
                 Exception cause = new Exception(String.format("Http call returned a status of: %1d %1s",
                     httpMethod.getStatusCode(), httpMethod.getStatusText()));
                 throw new DispatchException(event, (OutboundEndpoint) endpoint, cause);
@@ -140,6 +141,7 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
             URI uri = event.getEndpoint().getEndpointURI().getUri();
 
             this.processCookies(event);
+            this.processMuleSession(event, httpMethod);
 
             // TODO can we use the return code for better reporting?
             client.executeMethod(getHostConfig(uri), httpMethod);
@@ -158,12 +160,21 @@ public class HttpClientMessageDispatcher extends AbstractMessageDispatcher
 
     }
 
+    private void processMuleSession(MuleEvent event, HttpMethod httpMethod)
+    {
+        httpMethod.setRequestHeader(new Header(HttpConstants.HEADER_MULE_SESSION, event.getMessage().<String>getOutboundProperty(MuleProperties.MULE_SESSION_PROPERTY)));
+    }
+
     protected void processCookies(MuleEvent event)
     {
         MuleMessage msg = event.getMessage();
 
-        Object cookiesProperty = msg.getOutboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
-        String cookieSpecProperty = (String) msg.getOutboundProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY);
+        Object cookiesProperty = msg.getInboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
+        String cookieSpecProperty = (String) msg.getInboundProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY);
+        processCookies(cookiesProperty, cookieSpecProperty, event);
+
+        cookiesProperty = msg.getOutboundProperty(HttpConnector.HTTP_COOKIES_PROPERTY);
+        cookieSpecProperty = (String) msg.getOutboundProperty(HttpConnector.HTTP_COOKIE_SPEC_PROPERTY);
         processCookies(cookiesProperty, cookieSpecProperty, event);
 
         cookiesProperty = endpoint.getProperty(HttpConnector.HTTP_COOKIES_PROPERTY);

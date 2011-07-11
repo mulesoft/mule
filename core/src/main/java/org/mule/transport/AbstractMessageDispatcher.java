@@ -11,9 +11,11 @@
 package org.mule.transport;
 
 import org.mule.DefaultMuleEvent;
+import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
+import org.mule.api.MuleSession;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.OutboundEndpoint;
@@ -75,12 +77,16 @@ public abstract class AbstractMessageDispatcher extends AbstractTransportMessage
             boolean forceSync = Boolean.TRUE.equals(forceSyncPropertyValue);
             boolean hasResponse = endpoint.getExchangePattern().hasResponse();
             boolean isTransacted = endpoint.getTransactionConfig().isTransacted();
-            if (forceSync || hasResponse || isTransacted)            
+            connector.getSessionHandler().storeSessionInfoToMessage(event.getSession(),event.getMessage());
+            if (forceSync || hasResponse || isTransacted)
             {
                 MuleMessage resultMessage = doSend(event);
                 if (hasResponse && resultMessage != null)
                 {
-                    resultEvent = new DefaultMuleEvent(resultMessage, event);
+                    MuleSession storedSession = connector.getSessionHandler().retrieveSessionInfoFromMessage(resultMessage);
+                    event.getSession().merge(storedSession);
+                    resultEvent = new DefaultMuleEvent(resultMessage, endpoint, event, event.getSession());
+                    RequestContext.setEvent(resultEvent);
                     // TODO It seems like this should go here but it causes unwanted behaviour and breaks test cases.
                     //if (!disableTransportTransformer)
                     //{

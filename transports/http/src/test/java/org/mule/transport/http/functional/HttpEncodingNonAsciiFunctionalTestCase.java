@@ -119,7 +119,6 @@ public class HttpEncodingNonAsciiFunctionalTestCase extends DynamicPortTestCase
 
         assertTrue(latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS));
         assertNotNull(reply);
-        assertEquals(expectedContentTypeHeader, reply.getInvocationProperty(HttpConstants.HEADER_CONTENT_TYPE));
         assertEquals("EUC-JP", reply.getEncoding());
         assertEquals(getTestMessage(Locale.JAPAN) + " Received", reply.getPayloadAsString());
     }
