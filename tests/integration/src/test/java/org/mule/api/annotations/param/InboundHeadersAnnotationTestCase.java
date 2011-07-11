@@ -14,33 +14,42 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.util.ExceptionUtils;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTestCase
 {
     private Map<String, Object> props;
 
-    public InboundHeadersAnnotationTestCase()
+    public InboundHeadersAnnotationTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
         setDisposeManagerPerSuite(true);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "org/mule/test/annotations/inbound-headers-annotation.xml";
-    }
-
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/annotations/inbound-headers-annotation-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/annotations/inbound-headers-annotation-flow.xml"}            
+        });
+    }      
+    
     @Override
     public void doSetUp() throws Exception
     {
@@ -52,6 +61,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         props.put("baz", "bazValue");
     }
 
+    @Test
     public void testSingleHeader() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -60,6 +70,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals("fooValue", message.getPayload());
     }
 
+    @Test
     public void testSingleHeaderOptional() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -68,7 +79,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals("faz not set", message.getPayload());
     }
 
-
+    @Test
     public void testSingleHeaderWithType() throws Exception
     {
         Apple apple = new Apple();
@@ -80,6 +91,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals(apple, message.getPayload());
     }
 
+    @Test
     public void testSingleHeaderWithBaseType() throws Exception
     {
         Apple apple = new Apple();
@@ -91,6 +103,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals(apple, message.getPayload());
     }
 
+    @Test
     public void testMapHeaders() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -104,6 +117,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertNull(result.get("baz"));
     }
 
+    @Test
     public void testMapHeadersMissing() throws Exception
     {
         props.remove("foo");
@@ -118,6 +132,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testMapSingleHeader() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -131,6 +146,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertNull(result.get("baz"));
     }
 
+    @Test
     public void testMapHeadersOptional() throws Exception
     {
         props.remove("baz");
@@ -146,6 +162,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertNull(result.get("baz"));
     }
 
+    @Test
     public void testMapHeadersAllOptional() throws Exception
     {
         props.clear();
@@ -159,6 +176,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals(0, result.size());
     }
 
+    @Test
     public void testMapHeadersUnmodifiable() throws Exception
     {
         try
@@ -172,6 +190,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testMapHeadersAll() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -186,6 +205,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals("bazValue", result.get("baz"));
     }
 
+    @Test
     public void testMapHeadersWildcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -200,6 +220,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.keySet().contains(MuleProperties.MULE_SESSION_PROPERTY));
     }
 
+    @Test
     public void testMapHeadersMultiWildcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -221,6 +242,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
 
     }
 
+    @Test
     public void testMapHeadersWithGenerics() throws Exception
     {
         props.put("apple", new Apple());
@@ -240,6 +262,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertNull(result.get("banana"));
     }
 
+    @Test
     public void testListHeaders() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -253,6 +276,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.contains("bazValue"));
     }
 
+    @Test
     public void testListHeadersWithOptional() throws Exception
     {
         props.remove("baz");
@@ -266,6 +290,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.contains("barValue"));
     }
 
+    @Test
     public void testListHeadersWithMissing() throws Exception
     {
         props.remove("bar");
@@ -280,6 +305,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testSingleListHeader() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -291,6 +317,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.contains("fooValue"));
     }
 
+    @Test
     public void testListHeadersUnmodifiable() throws Exception
     {
         try
@@ -304,6 +331,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testListHeadersAll() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -318,6 +346,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.contains("bazValue"));
     }
 
+    @Test
     public void testMapHeadersListAllOptional() throws Exception
     {
         props.clear();
@@ -331,6 +360,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals(0, result.size());
     }
 
+    @Test
     public void testListHeadersWilcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -347,6 +377,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         //The last value is the encoded session
     }
 
+    @Test
     public void testListHeadersMultiWilcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -372,6 +403,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.contains("bazValue"));
     }
 
+    @Test
     public void testListHeadersWithGenerics() throws Exception
     {
         Apple apple = new Apple();
@@ -393,7 +425,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.contains(orange));
         assertFalse(result.contains(banana));
     }
-
+    
     public void printResult(List<?> result)
     {
         for(int i = 0; i < result.size(); i++)
@@ -401,7 +433,7 @@ public class InboundHeadersAnnotationTestCase extends FunctionalTestCase
             System.out.println("result #" + i + ": " + result.get(i));
         }
     }    
-    
+        
     public void printResult(Map<?, ?> result)
     {
         Set keys = result.keySet();         // The set of keys in the map.
