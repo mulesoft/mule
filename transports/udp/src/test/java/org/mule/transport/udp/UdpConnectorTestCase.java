@@ -29,11 +29,13 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
         return c;
     }
 
+    @Override
     public String getTestEndpointURI()
     {
         return "udp://localhost:61024";
     }
 
+    @Override
     public Object getValidMessage() throws Exception
     {
         return new DatagramPacket("Hello".getBytes(), 5);
@@ -44,8 +46,7 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
         Service service = getTestService("orange", Orange.class);
         Connector connector = getConnector();
 
-        InboundEndpoint endpoint2 = muleContext.getRegistry()
-            .lookupEndpointFactory()
+        InboundEndpoint endpoint2 = muleContext.getEndpointFactory()
             .getInboundEndpoint("udp://localhost:3456");
 
         connector.registerListener(endpoint2, getSensingNullMessageProcessor(), service);

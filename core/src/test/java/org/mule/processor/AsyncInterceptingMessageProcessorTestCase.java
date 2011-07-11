@@ -26,6 +26,7 @@ import org.mule.util.concurrent.Latch;
 import java.beans.ExceptionListener;
 import java.util.concurrent.TimeUnit;
 
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -159,7 +160,7 @@ public class AsyncInterceptingMessageProcessorTestCase extends AbstractMuleConte
         throws Exception
     {
         AsyncInterceptingMessageProcessor mp = new AsyncInterceptingMessageProcessor(
-            new TestWorkManagerSource(), true);
+            new TestWorkManagerSource());
         mp.setListener(listener);
         return mp;
     }

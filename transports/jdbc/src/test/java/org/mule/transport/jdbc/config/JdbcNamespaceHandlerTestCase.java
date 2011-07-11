@@ -27,7 +27,8 @@ import org.apache.commons.dbutils.QueryRunner;
  */
 public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
 {
-    
+
+    @Override
     protected String getConfigResources()
     {
         return "jdbc-namespace-config.xml";
@@ -36,7 +37,7 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
     public void testWithDataSource() throws Exception
     {
         JdbcConnector c = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector1");
-        assertNotNull(c);        
+        assertNotNull(c);
 
         assertTrue(c.getDataSource() instanceof TestDataSource);
         assertNull(c.getQueries());
@@ -47,75 +48,74 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
     {
         JdbcConnector c = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector2");
         assertNotNull(c);
-        
+
         assertTrue(c.getDataSource() instanceof TestDataSource);
         assertNull(c.getQueries());
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
         assertEquals(3, c.getQueryTimeout());
     }
-    
+
     public void testFullyConfigured() throws Exception
     {
         JdbcConnector c = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector3");
         assertNotNull(c);
-        
+
         assertTrue(c.getDataSource() instanceof TestDataSource);
-        
+
         assertNotNull(c.getQueries());
         assertEquals(3, c.getQueries().size());
 
         assertTrue(c.isConnected());
         assertTrue(c.isStarted());
     }
-    
-    
+
+
     public void testEndpointQueryOverride() throws Exception
     {
         JdbcConnector c = (JdbcConnector) muleContext.getRegistry().lookupConnector("jdbcConnector3");
-        ImmutableEndpoint testJdbcEndpoint = muleContext.getRegistry()
-            .lookupEndpointFactory()
+        ImmutableEndpoint testJdbcEndpoint = muleContext.getEndpointFactory()
             .getInboundEndpoint("testJdbcEndpoint");
-        
+
         //On connector, not overridden
         assertNotNull(c.getQuery(testJdbcEndpoint, "getTest"));
-        
+
         //On connector, overridden on endpoint
         assertNotNull(c.getQuery(testJdbcEndpoint, "getTest2"));
         assertEquals("OVERRIDDEN VALUE", c.getQuery(testJdbcEndpoint, "getTest2"));
-        
+
         //Only on endpoint
         assertNotNull(c.getQuery(testJdbcEndpoint, "getTest3"));
 
         //Does not exist on either
         assertNull(c.getQuery(testJdbcEndpoint, "getTest4"));
         assertEquals("3", testJdbcEndpoint.getProperty("queryTimeout"));
-        
+
         QueryRunner queryRunner = c.getQueryRunnerFor(testJdbcEndpoint);
         assertEquals(ExtendedQueryRunner.class, queryRunner.getClass());
         assertEquals(3, ((ExtendedQueryRunner) queryRunner).getQueryTimeout());
     }
-    
+
     public void testEndpointWithTransaction() throws Exception
     {
         ImmutableEndpoint endpoint = muleContext.getRegistry().
             lookupEndpointBuilder("endpointWithTransaction").buildInboundEndpoint();
         assertNotNull(endpoint);
-        assertEquals(JdbcTransactionFactory.class, 
+        assertEquals(JdbcTransactionFactory.class,
             endpoint.getTransactionConfig().getFactory().getClass());
-        assertEquals(MuleTransactionConfig.ACTION_NONE, 
+        assertEquals(MuleTransactionConfig.ACTION_NONE,
             endpoint.getTransactionConfig().getAction());
         assertEquals("-1", endpoint.getProperty("queryTimeout"));
     }
-    
+
     public void testEndpointWithXaTransaction() throws Exception
     {
         ImmutableEndpoint endpoint = muleContext.getRegistry().
             lookupEndpointBuilder("endpointWithXaTransaction").buildInboundEndpoint();
         assertNotNull(endpoint);
-        assertEquals(XaTransactionFactory.class, 
+        assertEquals(XaTransactionFactory.class,
             endpoint.getTransactionConfig().getFactory().getClass());
-        assertEquals(MuleTransactionConfig.ACTION_ALWAYS_BEGIN, 
+        assertEquals(MuleTransactionConfig.ACTION_ALWAYS_BEGIN,
             endpoint.getTransactionConfig().getAction());
     }
 
@@ -134,6 +134,6 @@ public class JdbcNamespaceHandlerTestCase extends FunctionalTestCase
 
     public static class TestSqlStatementStrategyFactory extends DefaultSqlStatementStrategyFactory
     {
-        
+        // no custom methods
     }
 }

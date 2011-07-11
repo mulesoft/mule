@@ -14,7 +14,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.email.GreenMailUtilities;
 
-import java.io.StringBufferInputStream;
+import java.io.StringReader;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -27,7 +27,6 @@ import javax.mail.internet.MimeMultipart;
 
 public class EmailMessageToStringTestCase extends AbstractMuleTestCase
 {
-
     private EmailMessageToString transformer;
     private static String TEXT = "text";
     private static String TO = "me@me.com";
@@ -48,7 +47,7 @@ public class EmailMessageToStringTestCase extends AbstractMuleTestCase
     public void testSimpleNonTextMessage() throws MessagingException, TransformerException
     {
         MimeMessage message = new MimeMessage(Session.getDefaultInstance(new Properties()));
-        message.setContent(new StringBufferInputStream(TEXT), "application/octet-stream");
+        message.setContent(new StringReader(TEXT), "application/octet-stream");
         message.setRecipient(Message.RecipientType.TO, new InternetAddress(TO));
         assertEquals("", transformer.transform(message));
     }
@@ -70,11 +69,10 @@ public class EmailMessageToStringTestCase extends AbstractMuleTestCase
         MimeMessage message = new MimeMessage(Session.getDefaultInstance(new Properties()));
         MimeMultipart mimeMultipart = new MimeMultipart();
         MimeBodyPart bp1 = new MimeBodyPart();
-        bp1.setContent(new StringBufferInputStream(TEXT), "binary");
+        bp1.setContent(new StringReader(TEXT), "binary");
         mimeMultipart.addBodyPart(bp1);
         message.setContent(mimeMultipart);
         message.setRecipient(Message.RecipientType.TO, new InternetAddress(TO));
         assertEquals("", transformer.transform(message));
     }
-
 }

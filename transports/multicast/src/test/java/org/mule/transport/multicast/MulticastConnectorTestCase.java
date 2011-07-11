@@ -29,11 +29,13 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
         return c;
     }
 
+    @Override
     public String getTestEndpointURI()
     {
         return "multicast://228.3.4.5:60106";
     }
 
+    @Override
     public Object getValidMessage() throws Exception
     {
         return new DatagramPacket("Hello".getBytes(), 5);
@@ -44,8 +46,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
         Service service = getTestService("orange", Orange.class);
         Connector connector = getConnector();
 
-        InboundEndpoint endpoint2 = muleContext.getRegistry()
-            .lookupEndpointFactory()
+        InboundEndpoint endpoint2 = muleContext.getEndpointFactory()
             .getInboundEndpoint("multicast://228.2.3.4:10100");
 
         connector.registerListener(endpoint2, getSensingNullMessageProcessor(), service);

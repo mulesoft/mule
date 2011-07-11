@@ -420,17 +420,14 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
         CollectionUtils.removeType(procs, SecurityFilterMessageProcessor.class);
         receiverEndpointBuilder.setMessageProcessors(procs);
 
-        InboundEndpoint serviceEndpoint = muleContext.getRegistry()
-            .lookupEndpointFactory()
+        InboundEndpoint serviceEndpoint = muleContext.getEndpointFactory()
             .getInboundEndpoint(serviceEndpointbuilder);
 
-        InboundEndpoint receiverEndpoint = muleContext.getRegistry()
-            .lookupEndpointFactory()
+        InboundEndpoint receiverEndpoint = muleContext.getEndpointFactory()
             .getInboundEndpoint(receiverEndpointBuilder);
 
         receiver.setEndpoint(receiverEndpoint);
 
-        
         ((CompositeMessageSource) axisComponent.getMessageSource()).addSource(serviceEndpoint);
     }
 
@@ -451,7 +448,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
 
     // This initialization could be performed in the initialize() method.  Putting it here essentially makes
     // it a lazy-create/lazy-init
-    // Another option would be to put it in the default-axis-config.xml (MULE-2102) with lazy-init="true" 
+    // Another option would be to put it in the default-axis-config.xml (MULE-2102) with lazy-init="true"
     // but that makes us depend on Spring.
     // Another consideration is how/when this implicit component gets disposed.
     protected Service getOrCreateAxisComponent() throws MuleException
@@ -677,7 +674,7 @@ public class AxisConnector extends AbstractConnector implements MuleContextNotif
                         axisComponent = getOrCreateAxisComponent();
                     }
                     muleContext.getRegistry().registerService(axisComponent);
-    
+
                     // We have to perform a small hack here to rewrite servlet://
                     // endpoints with the
                     // real http:// address

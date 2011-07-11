@@ -10,14 +10,15 @@
 
 package org.mule.test.integration.message;
 
+import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleMessage;
+import org.mule.api.client.LocalMuleClient;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.DefaultMuleMessage;
-import org.mule.api.MuleMessage;
-import org.mule.api.client.LocalMuleClient;
 
 public class VmPropertyScopeTestCase extends AbstractPropertyScopeTestCase
 {

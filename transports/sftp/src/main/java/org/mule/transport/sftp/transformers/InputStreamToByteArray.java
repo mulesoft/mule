@@ -13,6 +13,7 @@ package org.mule.transport.sftp.transformers;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.transformer.AbstractTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -31,11 +32,12 @@ public class InputStreamToByteArray extends AbstractTransformer
 
     public InputStreamToByteArray()
     {
-        registerSourceType(InputStream.class);
-        setReturnClass(byte[].class);
+        registerSourceType(DataTypeFactory.INPUT_STREAM);
+        setReturnDataType(DataTypeFactory.BYTE_ARRAY);
     }
 
-    public Object doTransform(Object msg, String encoding) throws TransformerException
+    @Override
+    public Object doTransform(Object msg, String outputEncoding) throws TransformerException
     {
         if (msg instanceof InputStream)
         {
@@ -64,7 +66,6 @@ public class InputStreamToByteArray extends AbstractTransformer
             {
                 IOUtils.closeQuietly(inputStream);
             }
-
         }
         else
         {

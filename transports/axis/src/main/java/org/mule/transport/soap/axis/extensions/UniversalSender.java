@@ -78,34 +78,34 @@ public class UniversalSender extends BasicHandler
         {
             boolean sync = true;
             Call call = (Call)msgContext.getProperty("call_object");
-        
+
             if (call == null)
             {
                 throw new IllegalStateException(
                     "The call_object property must be set on the message context to the client Call object");
             }
-        
+
             muleContext = (MuleContext)call.getProperty(MuleProperties.MULE_CONTEXT_PROPERTY);
             if(muleContext==null)
             {
                 throw new IllegalArgumentException("Property org.mule.MuleContext not set on Axis MessageContext");
             }
-        
+
             // Get the event stored in call if a request call is made there will be no event
             MuleEvent event = (MuleEvent)call.getProperty(MuleProperties.MULE_EVENT_PROPERTY);
-        
+
             if (Boolean.TRUE.equals(call.getProperty("axis.one.way")))
             {
                 sync = false;
             }
-        
+
             // Get the dispatch endpoint
             String uri = msgContext.getStrProp(MessageContext.TRANS_URL);
             ImmutableEndpoint requestEndpoint = (ImmutableEndpoint)call
                 .getProperty(MuleProperties.MULE_ENDPOINT_PROPERTY);
-            
+
             OutboundEndpoint endpoint;
-        
+
             // put username and password in URI if they are set on the current event
             if (msgContext.getUsername() != null)
             {
@@ -125,7 +125,7 @@ public class UniversalSender extends BasicHandler
                 msgContext.setTypeMappingRegistry(((AxisConnector)requestEndpoint.getConnector())
                     .getAxis().getTypeMappingRegistry());
             }
-            
+
             Map<String, Object> props = new HashMap<String, Object>();
             Object payload;
             int contentLength = 0;
@@ -170,7 +170,7 @@ public class UniversalSender extends BasicHandler
             {
                 props = AxisCleanAndAddProperties.cleanAndAdd(RequestContext.getEventContext());
             }
-            
+
             // with jms and vm the default SOAPAction will result in the name of the endpoint, which we may not necessarily want. This should be set manually on the endpoint
             String scheme = requestEndpoint.getEndpointURI().getScheme();
             if (!("vm".equalsIgnoreCase(scheme) || "jms".equalsIgnoreCase(scheme)))
@@ -189,14 +189,14 @@ public class UniversalSender extends BasicHandler
                 // httpclient
             }
 
-            
+
             if (props.get(HttpConstants.HEADER_CONTENT_TYPE) == null)
             {
                 if (contentType == null)
                 {
                     contentType = "text/xml";
                 }
-                
+
                 props.put(HttpConstants.HEADER_CONTENT_TYPE, contentType);
             }
             MuleMessage message = new DefaultMuleMessage(payload, props, muleContext);
@@ -221,8 +221,7 @@ public class UniversalSender extends BasicHandler
             {
                 EndpointBuilder builder = new EndpointURIEndpointBuilder(endpoint);
                 builder.setExchangePattern(MessageExchangePattern.REQUEST_RESPONSE);
-                OutboundEndpoint syncEndpoint = muleContext.getRegistry()
-                    .lookupEndpointFactory()
+                OutboundEndpoint syncEndpoint = muleContext.getEndpointFactory()
                     .getOutboundEndpoint(builder);
                 MuleEvent dispatchEvent = new DefaultMuleEvent(message,
                     MessageExchangePattern.REQUEST_RESPONSE, session);
@@ -292,8 +291,7 @@ public class UniversalSender extends BasicHandler
                     {
                         logger.debug("Dispatch Endpoint uri: " + uri
                                      + " not found on the cache. Creating the endpoint instead.");
-                        ep = muleContext.getRegistry().lookupEndpointFactory()
-                                .getOutboundEndpoint(uri);
+                        ep = muleContext.getEndpointFactory().getOutboundEndpoint(uri);
                     }
                     else
                     {
@@ -308,8 +306,7 @@ public class UniversalSender extends BasicHandler
         }
         else
         {
-            ep = muleContext.getRegistry().lookupEndpointFactory()
-                    .getOutboundEndpoint(uri);
+            ep = muleContext.getEndpointFactory().getOutboundEndpoint(uri);
         }
         return ep;
     }

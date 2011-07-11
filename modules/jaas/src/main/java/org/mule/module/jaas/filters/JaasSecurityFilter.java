@@ -60,7 +60,7 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
             // Security Exception occurred
             if (logger.isDebugEnabled())
             {
-                logger.debug("Security Exception raised. Authentication request for user: " + user.getUsername() 
+                logger.debug("Security Exception raised. Authentication request for user: " + user.getUsername()
                     + " failed: " + se.toString());
             }
             throw se;
@@ -70,7 +70,7 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
             // Authentication failed
             if (logger.isDebugEnabled())
             {
-                logger.debug("Authentication request for user: " + user.getUsername() 
+                logger.debug("Authentication request for user: " + user.getUsername()
                     + " failed: " + e.toString());
             }
             throw new UnauthorisedException(
@@ -92,19 +92,20 @@ public class JaasSecurityFilter extends AbstractEndpointSecurityFilter
     protected void authenticateOutbound(MuleEvent event)
         throws SecurityException, SecurityProviderNotFoundException, CryptoFailureException
     {
-        if (event.getSession().getSecurityContext() == null)
+        SecurityContext securityContext = event.getSession().getSecurityContext();
+        if (securityContext == null)
         {
             if (isAuthenticate())
             {
-                throw new UnauthorisedException(event, event.getSession().getSecurityContext(), endpoint,
-                    this);
+                throw new UnauthorisedException(event, securityContext, this);
             }
             else
             {
                 return;
             }
         }
-        Authentication auth = event.getSession().getSecurityContext().getAuthentication();
+
+        Authentication auth = securityContext.getAuthentication();
         if (isAuthenticate())
         {
             auth = getSecurityManager().authenticate(auth);

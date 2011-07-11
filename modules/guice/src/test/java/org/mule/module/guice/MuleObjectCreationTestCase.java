@@ -47,7 +47,7 @@ public class MuleObjectCreationTestCase extends AbstractMuleTestCase
         assertNotNull(t);
         assertEquals(DataTypeFactory.create(RedApple.class), t.getReturnDataType());
 
-        assertEquals(2, muleContext.getRegistry().getConnectors().size());
+        assertEquals(2, muleContext.getRegistry().lookupObjects(Connector.class).size());
     }
 
     public void testObjectLifecycle() throws Exception
@@ -83,7 +83,7 @@ public class MuleObjectCreationTestCase extends AbstractMuleTestCase
     public class MuleObjectsModule extends AbstractModule
     {
         @Override
-        protected void configure() 
+        protected void configure()
         {
             //lets test injection of properties into providers
             bindConstant().annotatedWith(Names.named("connectorProperty")).to("boundProperty");

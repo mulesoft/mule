@@ -57,12 +57,12 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCa
             //Expected
         }
     }
-    
+
     /**
      * If a method with correct name is available then it should be used is the
      * parameter type is assignable from the payload type and not just if there is an
      * exact match. See MULE-3636.
-     * 
+     *
      * @throws Exception
      */
     public void testMethodPropertyParameterAssignableFromPayload() throws Exception
@@ -78,7 +78,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCa
      * If a method with correct name is available then it should be used even if one
      * or more parameter types in the payload are null, as long as the parameter
      * count matches.
-     * 
+     *
      * @throws Exception
      */
     public void testMethodPropertyParameterNull() throws Exception
@@ -87,7 +87,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCa
         resolver.addMethod("someOtherBusinessMethod");
         InvocationResult result = resolver.invoke(new MultiplePayloadsTestObject(),
             getTestEventContext(new Object[]{null, "blah"}));
-        assertEquals(result.getState(), InvocationResult.STATE_INVOKED_SUCESSFUL);
+        assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
     public static class TestFruitCleaner

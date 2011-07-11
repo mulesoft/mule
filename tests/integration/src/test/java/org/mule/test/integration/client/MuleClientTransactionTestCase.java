@@ -37,7 +37,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
     {
         return "org/mule/test/integration/client/test-client-jms-mule-config.xml";
     }
-    
+
     public void testTransactionsWithSetRollbackOnly() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
@@ -62,8 +62,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             new URIBuilder("jms://test.queue", muleContext));
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
-        ImmutableEndpoint inboundEndpoint = muleContext.getRegistry()
-                .lookupEndpointFactory()
+        ImmutableEndpoint inboundEndpoint = muleContext.getEndpointFactory()
                 .getOutboundEndpoint(endpointBuilder);
         client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
 
@@ -111,8 +110,7 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             new URIBuilder("jms://test.queue", muleContext));
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
-        ImmutableEndpoint inboundEndpoint = muleContext.getRegistry()
-                .lookupEndpointFactory()
+        ImmutableEndpoint inboundEndpoint = muleContext.getEndpointFactory()
                 .getOutboundEndpoint(endpointBuilder);
         client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
 
@@ -166,11 +164,9 @@ public class MuleClientTransactionTestCase extends FunctionalTestCase
             new URIBuilder("jms://test.queue", muleContext));
         endpointBuilder.setTransactionConfig(tc);
         endpointBuilder.setName("TransactedTest.Queue");
-        ImmutableEndpoint inboundEndpoint = muleContext.getRegistry()
-                .lookupEndpointFactory()
+        ImmutableEndpoint inboundEndpoint = muleContext.getEndpointFactory()
                 .getOutboundEndpoint(endpointBuilder);
         client.getMuleContext().getRegistry().registerEndpoint(inboundEndpoint);
-
 
         TransactionTemplate<Void> tt = new TransactionTemplate<Void>(tc, muleContext);
         tt.execute(new TransactionCallback<Void>()

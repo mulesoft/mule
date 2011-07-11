@@ -24,9 +24,9 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("deprecation") // we're testing a deprecated class
 public class JXPathExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
-
     private static final String XML_USING_UNDEFINED_NAMESPACE = "<root " +
                                                                 "xmlns:z=\"http://www.w3schools.com/furniture\">" +
                                                                 "<z:table>" +
@@ -103,7 +103,7 @@ public class JXPathExpressionEvaluatorTestCase extends AbstractMuleTestCase
     public void testXmlWithInvalidNameSpaceIfNameSpaceAliasIsDefined() throws MalformedURLException, RegistrationException
     {
         NamespaceManager namespaceManager = new NamespaceManager();
-        Map namespaces = new HashMap();
+        Map<String, Object> namespaces = new HashMap<String, Object>();
         namespaces.put("f", "http://www.w3schools.com/furniture");
         namespaceManager.setNamespaces(namespaces);
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_MULE_NAMESPACE_MANAGER, namespaceManager);

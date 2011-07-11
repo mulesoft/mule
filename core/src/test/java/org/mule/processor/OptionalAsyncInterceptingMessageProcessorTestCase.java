@@ -25,6 +25,7 @@ public class OptionalAsyncInterceptingMessageProcessorTestCase extends
     AsyncInterceptingMessageProcessorTestCase implements ExceptionListener
 {
 
+    @Override
     @Test
     public void testProcessRequestResponse() throws Exception
     {
@@ -34,6 +35,7 @@ public class OptionalAsyncInterceptingMessageProcessorTestCase extends
         assertSync(messageProcessor, event);
     }
 
+    @Override
     @Test
     public void testProcessOneWay() throws Exception
     {
@@ -42,6 +44,7 @@ public class OptionalAsyncInterceptingMessageProcessorTestCase extends
         assertAsync(messageProcessor, event);
     }
 
+    @Override
     @Test
     public void testProcessOneWayWithTx() throws Exception
     {
@@ -60,6 +63,7 @@ public class OptionalAsyncInterceptingMessageProcessorTestCase extends
         }
     }
 
+    @Override
     @Test
     public void testProcessRequestResponseWithTx() throws Exception
     {
@@ -78,13 +82,13 @@ public class OptionalAsyncInterceptingMessageProcessorTestCase extends
         }
     }
 
+    @Override
     protected AsyncInterceptingMessageProcessor createAsyncInterceptingMessageProcessor(MessageProcessor listener)
         throws Exception
     {
         AsyncInterceptingMessageProcessor mp = new OptionalAsyncInterceptingMessageProcessor(
-            new TestWorkManagerSource(), true);
+            new TestWorkManagerSource());
         mp.setListener(listener);
         return mp;
     }
-
 }

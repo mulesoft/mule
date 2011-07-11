@@ -41,7 +41,7 @@ public class MixedAnnotationsTestCase extends FunctionalTestCase
     public void doSetUp() throws Exception
     {
         super.doSetUp();
-        
+
         Map<String, Object> props = new HashMap<String, Object>(3);
         props.put("foo", "fooValue");
         props.put("bar", "barValue");
@@ -51,9 +51,9 @@ public class MixedAnnotationsTestCase extends FunctionalTestCase
 
         try
         {
-            muleMessage.addAttachment("foo", new DataHandler(new StringDataSource("fooValue")));
-            muleMessage.addAttachment("bar", new DataHandler(new StringDataSource("barValue")));
-            muleMessage.addAttachment("baz", new DataHandler(new StringDataSource("bazValue")));
+            muleMessage.addOutboundAttachment("foo", new DataHandler(new StringDataSource("fooValue")));
+            muleMessage.addOutboundAttachment("bar", new DataHandler(new StringDataSource("barValue")));
+            muleMessage.addOutboundAttachment("baz", new DataHandler(new StringDataSource("bazValue")));
         }
         catch (Exception e)
         {

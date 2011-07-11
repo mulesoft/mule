@@ -83,7 +83,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         muleContext.getRegistry().registerObject(MuleProperties.OBJECT_QUEUE_MANAGER,
             mockTransactionalQueueManager);
 
-        ListableObjectStore<Serializable> objectStore = 
+        ListableObjectStore<Serializable> objectStore =
             muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_STORE_DEFAULT_PERSISTENT_NAME);
         service.setQueueProfile(new QueueProfile(capacity, objectStore));
 
@@ -114,25 +114,20 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
 
     /**
      * SEE MULE-3684
-     * 
-     * @throws Exception
      */
     public void testDispatchToPausedService() throws Exception
     {
         service.initialise();
         service.start();
         service.pause();
-        service.dispatchEvent(MuleTestUtils.getTestEvent("test", 
+        service.process(MuleTestUtils.getTestEvent("test",
             getTestInboundEndpoint(MessageExchangePattern.ONE_WAY), muleContext));
 
         // This test will timeout and fail if dispatch() blocks
-
     }
 
     /**
      * SEE MULE-3974
-     * 
-     * @throws Exception
      */
     public void testMaxActiveThreadsEqualsOneWhenExhaustedActionWait() throws Exception
     {
@@ -145,7 +140,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         service.setThreadingProfile(threadingProfile);
         final SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(new Callable()
         {
-
+            @Override
             public Object onCall(MuleEventContext eventContext) throws Exception
             {
                 latch.countDown();
@@ -156,18 +151,14 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         service.setComponent(component);
         muleContext.getRegistry().registerService(service);
 
-        service.dispatchEvent(MuleTestUtils.getTestEvent("test", service, muleContext));
-
+        service.process(MuleTestUtils.getTestEvent("test", service, muleContext));
         assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
 
         // This test will fail with RejectedExcecutionException if dispatch() blocks
-
     }
 
     /**
      * SEE MULE-3975
-     * 
-     * @throws Exception
      */
     public void testDoThreadingFalse() throws Exception
     {
@@ -180,6 +171,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         service.setThreadingProfile(threadingProfile);
         final SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(new Callable()
         {
+            @Override
             public Object onCall(MuleEventContext eventContext) throws Exception
             {
                 assertEquals(mainThread, Thread.currentThread());
@@ -191,17 +183,14 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         service.setComponent(component);
         muleContext.getRegistry().registerService(service);
 
-        service.dispatchEvent(MuleTestUtils.getTestEvent("test", 
+        service.process(MuleTestUtils.getTestEvent("test",
             getTestInboundEndpoint(MessageExchangePattern.ONE_WAY), muleContext));
 
         assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
-
     }
 
     /**
      * SEE MULE-3975
-     * 
-     * @throws Exception
      */
     public void testDoThreadingTrue() throws Exception
     {
@@ -214,6 +203,7 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         service.setThreadingProfile(threadingProfile);
         final SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(new Callable()
         {
+            @Override
             public Object onCall(MuleEventContext eventContext) throws Exception
             {
                 assertTrue(Thread.currentThread().getName().startsWith("seda." + serviceName));
@@ -225,11 +215,9 @@ public class SedaServiceTestCase extends AbstractServiceTestCase
         service.setComponent(component);
         muleContext.getRegistry().registerService(service);
 
-        service.dispatchEvent(MuleTestUtils.getTestEvent("test", 
+        service.process(MuleTestUtils.getTestEvent("test",
             getTestInboundEndpoint(MessageExchangePattern.ONE_WAY), muleContext));
 
         assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
-
     }
-
 }
