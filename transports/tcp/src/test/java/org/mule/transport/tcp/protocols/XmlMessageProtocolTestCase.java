@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,7 +40,8 @@ public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
         return(byte[]) xmp.read(is);
     }
 
-    protected void doSetUp() throws Exception
+    @Before
+    public void doSetUp()
     {
         setProtocol(new XmlMessageProtocol());
     }
