@@ -17,6 +17,8 @@ import org.mule.api.processor.InterceptingMessageProcessor;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.transport.NullPayload;
 
+import org.junit.Test;
+
 public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessageProcessorTestCase
 {
     private TestExceptionListener exceptionListener;
@@ -28,6 +30,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
         exceptionListener = new TestExceptionListener();
     }
 
+    @Test
     public void testNoCatch() throws Exception
     {
         OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null);
@@ -44,6 +47,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
         assertNull(exceptionListener.sensedException);
     }
 
+    @Test
     public void testCatchRuntimeExceptionSync() throws Exception
     {
         OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null);
@@ -61,6 +65,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
         assertNotNull(exceptionListener.sensedException);
     }
 
+    @Test
     public void testCatchRuntimeExceptionAsync() throws Exception
     {
         OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, 
@@ -79,6 +84,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
         assertNotNull(exceptionListener.sensedException);
     }
 
+    @Test
     public void testCatchDispatchExceptionSync() throws Exception
     {
         OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null);
@@ -96,6 +102,7 @@ public class ExceptionHandlingMessageProcessorTestCase extends AbstractMessagePr
         assertNotNull(exceptionListener.sensedException);
     }
 
+    @Test
     public void testCatchDispatchExceptionAsync() throws Exception
     {
         OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null, 

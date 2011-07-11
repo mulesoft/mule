@@ -30,6 +30,12 @@ import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class SedaStageInterceptingMessageProcessorTestCase extends
     OptionalAsyncInterceptingMessageProcessorTestCase implements ExceptionListener
 {
@@ -79,6 +85,7 @@ public class SedaStageInterceptingMessageProcessorTestCase extends
         return mp;
     }
 
+    @Test
     public void testSpiWorkThrowableHandling() throws Exception
     {
         try
@@ -104,11 +111,13 @@ public class SedaStageInterceptingMessageProcessorTestCase extends
     {
         return new Work()
         {
+            @Override
             public void release()
             {
                 // noop
             }
 
+            @Override
             public void run()
             {
                 // noop
@@ -121,16 +130,19 @@ public class SedaStageInterceptingMessageProcessorTestCase extends
         int incCount;
         int decCount;
 
+        @Override
         public void decQueuedEvent()
         {
             decCount++;
         }
 
+        @Override
         public void incQueuedEvent()
         {
             incCount++;
         }
 
+        @Override
         public boolean isEnabled()
         {
             return true;
@@ -146,26 +158,31 @@ public class SedaStageInterceptingMessageProcessorTestCase extends
         AtomicBoolean initialised = new AtomicBoolean(false);
         AtomicBoolean paused = new AtomicBoolean(false);
 
+        @Override
         public boolean isDisposed()
         {
             return disposed.get();
         }
 
+        @Override
         public boolean isDisposing()
         {
             return false;
         }
 
+        @Override
         public boolean isInitialised()
         {
             return initialised.get();
         }
 
+        @Override
         public boolean isInitialising()
         {
             return false;
         }
 
+        @Override
         public boolean isPhaseComplete(String phase)
         {
             if (Pausable.PHASE_NAME.equals(phase))
@@ -178,36 +195,43 @@ public class SedaStageInterceptingMessageProcessorTestCase extends
             }
         }
 
+        @Override
         public boolean isPhaseExecuting(String phase)
         {
             return false;
         }
 
+        @Override
         public boolean isStarted()
         {
             return started.get();
         }
 
+        @Override
         public boolean isStarting()
         {
             return false;
         }
 
+        @Override
         public boolean isStopped()
         {
             return stopped.get();
         }
 
+        @Override
         public boolean isStopping()
         {
             return false;
         }
 
+        @Override
         public void initialise() throws InitialisationException
         {
             initialised.set(true);
         }
 
+        @Override
         public void start() throws MuleException
         {
             initialised.set(false);
@@ -215,22 +239,24 @@ public class SedaStageInterceptingMessageProcessorTestCase extends
             started.set(true);
         }
 
+        @Override
         public void stop() throws MuleException
         {
             started.set(false);
             stopped.set(true);
         }
 
+        @Override
         public void dispose()
         {
             stopped.set(true);
             disposed.set(true);
         }
 
+        @Override
         public boolean isValidTransition(String phase)
         {
             return false;
         }
     }
-
 }

@@ -19,10 +19,13 @@ import org.mule.transaction.TransactionCoordination;
 
 import java.beans.ExceptionListener;
 
+import org.junit.Test;
+
 public class OptionalAsyncInterceptingMessageProcessorTestCase extends
     AsyncInterceptingMessageProcessorTestCase implements ExceptionListener
 {
 
+    @Test
     public void testProcessRequestResponse() throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE,
@@ -31,6 +34,7 @@ public class OptionalAsyncInterceptingMessageProcessorTestCase extends
         assertSync(messageProcessor, event);
     }
 
+    @Test
     public void testProcessOneWay() throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE, getTestInboundEndpoint(MessageExchangePattern.ONE_WAY));
@@ -38,6 +42,7 @@ public class OptionalAsyncInterceptingMessageProcessorTestCase extends
         assertAsync(messageProcessor, event);
     }
 
+    @Test
     public void testProcessOneWayWithTx() throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE,
@@ -55,6 +60,7 @@ public class OptionalAsyncInterceptingMessageProcessorTestCase extends
         }
     }
 
+    @Test
     public void testProcessRequestResponseWithTx() throws Exception
     {
         MuleEvent event = getTestEvent(TEST_MESSAGE,

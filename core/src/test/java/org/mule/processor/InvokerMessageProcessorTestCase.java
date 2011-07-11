@@ -15,14 +15,20 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
 {
 
     private InvokerMessageProcessor invoker;
@@ -36,6 +42,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         invoker.setMuleContext(muleContext);
     }
 
+    @Test
     public void testMethodWithNoArgs() throws MuleException, Exception
     {
         invoker.setMethodName("testNoArgs");
@@ -43,6 +50,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         invoker.process(getTestEvent(""));
     }
 
+    @Test
     public void testMethodFound() throws MuleException, Exception
     {
         invoker.setMethodName("testMethod");
@@ -51,6 +59,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         invoker.process(getTestEvent(""));
     }
 
+    @Test
     public void testMethodFoundNestedExpression() throws MuleException, Exception
     {
         invoker.setMethodName("testMethod3");
@@ -59,6 +68,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         assertEquals("1 echo", invoker.process(getTestEvent("")).getMessageAsString());
     }
 
+    @Test
     public void testMethodFoundParseStringWithExpressions() throws MuleException, Exception
     {
         invoker.setMethodName("testMethod3");
@@ -67,6 +77,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         assertEquals("1-2-3 echo", invoker.process(getTestEvent("")).getMessageAsString());
     }
 
+    @Test
     public void testMethodFoundParseStringNoExpressions() throws MuleException, Exception
     {
         invoker.setMethodName("testMethod3");
@@ -75,6 +86,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         assertEquals("1 echo", invoker.process(getTestEvent("")).getMessageAsString());
     }
 
+    @Test
     public void testMethodFoundNullArgument() throws MuleException, Exception
     {
         invoker.setMethodName("testMethod3");
@@ -83,6 +95,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         assertEquals("null echo", invoker.process(getTestEvent("")).getMessageAsString());
     }
 
+    @Test
     public void testMethodNameNotFound() throws MuleException, Exception
     {
         invoker.setMethodName("testMethodNotHere");
@@ -98,6 +111,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMethodWithArgsNotFound() throws MuleException, Exception
     {
         invoker.setMethodName("testMethod");
@@ -113,6 +127,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMethodWithArgTypes() throws MuleException, Exception
     {
         invoker.setMethodName("testDuplicateNameMethod");
@@ -123,6 +138,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testCantTransform() throws MuleException, Exception
     {
         invoker.setMethodName("testMethod2");
@@ -140,6 +156,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testReplacePayload() throws MuleException, Exception
     {
         invoker.setMethodName("testMethod3");
@@ -148,6 +165,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         assertEquals("hello echo", invoker.process(getTestEvent("hello")).getMessageAsString());
     }
 
+    @Test
     public void testArrayArg() throws MuleException, Exception
     {
         invoker.setMethodName("testArrayArg");
@@ -159,6 +177,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         assertEquals("2", ((String[]) result.getMessage().getPayload())[1]);
     }
 
+    @Test
     public void testListArg() throws MuleException, Exception
     {
         invoker.setMethodName("testListArg");
@@ -169,6 +188,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         assertEquals("1", ((List) result.getMessage().getPayload()).get(0));
     }
 
+    @Test
     public void testListNestedMapArg() throws MuleException, Exception
     {
         invoker.setMethodName("testListArg");
@@ -180,6 +200,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         assertEquals("val", ((Map) ((List) result.getMessage().getPayload()).get(0)).get("key"));
     }
 
+    @Test
     public void testMapArg() throws MuleException, Exception
     {
         invoker.setMethodName("testMapArg");
@@ -191,6 +212,7 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleTestCase
         assertEquals("val", ((Map) result.getMessage().getPayload()).get("key"));
     }
 
+    @Test
     public void testLookupClassInstance() throws MuleException, Exception
     {
         muleContext.getRegistry().registerObject("object", new TestInvokeObject());

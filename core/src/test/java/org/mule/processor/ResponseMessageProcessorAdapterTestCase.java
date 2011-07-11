@@ -14,12 +14,14 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.processor.chain.DefaultMessageProcessorChainBuilder;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
 import org.junit.Test;
 
-public class ResponseMessageProcessorAdapterTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+
+public class ResponseMessageProcessorAdapterTestCase extends AbstractMuleContextTestCase
 {
 
     @Test
