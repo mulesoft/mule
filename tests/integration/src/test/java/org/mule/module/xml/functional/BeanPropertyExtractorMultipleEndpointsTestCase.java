@@ -16,9 +16,10 @@ import java.util.Properties;
 
 public class BeanPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlPropertyExtractorTestCase
 {
-    public BeanPropertyExtractorMultipleEndpointsTestCase()
+
+    public BeanPropertyExtractorMultipleEndpointsTestCase(ConfigVariant variant, String configResources)
     {
-        super(false);
+        super(variant, configResources, false);
     }
 
     @Override
@@ -33,7 +34,7 @@ public class BeanPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlP
     @Override
     protected Object getMatchMessage()
     {
-        //Model a simple bean graph. Path is: endpointsHolder.endpoints
+        // Model a simple bean graph. Path is: endpointsHolder.endpoints
         List<String> endpoints = new ArrayList<String>(2);
         endpoints.add("matchingEndpoint1");
         endpoints.add("matchingEndpoint2");

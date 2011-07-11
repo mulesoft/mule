@@ -14,9 +14,10 @@ import java.util.Properties;
 
 public class BeanPropertyExtractorTestCase extends AbstractXmlPropertyExtractorTestCase
 {
-    public BeanPropertyExtractorTestCase()
+
+    public BeanPropertyExtractorTestCase(ConfigVariant variant, String configResources)
     {
-        super(true);
+        super(variant, configResources, true);
     }
 
     protected Properties getStartUpProperties()
@@ -30,7 +31,7 @@ public class BeanPropertyExtractorTestCase extends AbstractXmlPropertyExtractorT
 
     protected Object getMatchMessage()
     {
-        //Model a simple bean graph. Path is: childBean.value
+        // Model a simple bean graph. Path is: childBean.value
         return new TestRootBean(new TestValueBean("matchingEndpoint1"));
     }
 

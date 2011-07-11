@@ -21,9 +21,9 @@ public class Dom4jXPathExpressionWithNamespaceTestCase extends AbstractXmlProper
 
     public static final String MESSAGE = "<foo:endpoint xmlns:foo=\"http://foo.com\">{0}</foo:endpoint>";
 
-    public Dom4jXPathExpressionWithNamespaceTestCase()
+    public Dom4jXPathExpressionWithNamespaceTestCase(ConfigVariant variant, String configResources)
     {
-        super(true);
+        super(variant, configResources, true);
     }
 
     protected Properties getStartUpProperties()

@@ -10,24 +10,31 @@
 
 package org.mule.module.xml.functional;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.runners.Parameterized.Parameters;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class W3CDomPropertyExtractorStaticTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    public W3CDomPropertyExtractorStaticTestCase()
+    public W3CDomPropertyExtractorStaticTestCase(ConfigVariant variant, String configResources)
     {
-        super(true);
+        super(variant, configResources, true);
     }
 
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "org/mule/module/xml/property-extractor-static-test.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/module/xml/property-extractor-static-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/module/xml/property-extractor-static-test-flow.xml"}});
     }
 
     protected Object getMatchMessage() throws ParserConfigurationException

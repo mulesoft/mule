@@ -13,15 +13,14 @@ package org.mule.module.xml.functional;
 import java.text.MessageFormat;
 import java.util.Properties;
 
-
 public class JXPathExpressionTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
     public static final String MESSAGE = "<endpoint>{0}</endpoint>";
 
-    public JXPathExpressionTestCase()
+    public JXPathExpressionTestCase(ConfigVariant variant, String configResources)
     {
-        super(true);
+        super(variant, configResources, true);
     }
 
     protected Properties getStartUpProperties()

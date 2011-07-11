@@ -22,9 +22,9 @@ import org.w3c.dom.Element;
 public class W3CDomPropertyExtractorTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    public W3CDomPropertyExtractorTestCase()
+    public W3CDomPropertyExtractorTestCase(ConfigVariant variant, String configResources)
     {
-        super(true);
+        super(variant, configResources, true);
     }
 
     protected Properties getStartUpProperties()

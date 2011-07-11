@@ -10,29 +10,41 @@
 
 package org.mule.module.xml.functional;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transport.NullPayload;
 
-public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTestCase
+public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractServiceAndFlowTestCase
 {
-    private boolean matchSingle = true;
-
-    protected AbstractXmlPropertyExtractorTestCase(boolean matchSingle)
+    public AbstractXmlPropertyExtractorTestCase(ConfigVariant variant, String configResources, boolean matchSingle)
     {
-        this.matchSingle = matchSingle;
+        super(variant, configResources);
+        this.matchSingle = matchSingle;       
     }
+
+    private boolean matchSingle = true;
 
     protected abstract Object getMatchMessage() throws Exception;
 
     protected abstract Object getErrorMessage() throws Exception;
-
-    protected String getConfigResources()
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "org/mule/module/xml/property-extractor-test.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/module/xml/property-extractor-test.xml"}
+            
+        });
     }
+    
 
+    @Test
     public void testMatch() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -49,7 +61,7 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
         }
     }
     
-
+    @Test
     public void testError() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

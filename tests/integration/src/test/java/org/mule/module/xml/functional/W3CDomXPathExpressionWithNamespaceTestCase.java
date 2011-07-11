@@ -24,9 +24,9 @@ public class W3CDomXPathExpressionWithNamespaceTestCase extends AbstractXmlPrope
 
     public static final String MESSAGE = "<foo:endpoint xmlns:foo=\"http://foo.com\">{0}</foo:endpoint>";
 
-    public W3CDomXPathExpressionWithNamespaceTestCase()
+    public W3CDomXPathExpressionWithNamespaceTestCase(ConfigVariant variant, String configResources)
     {
-        super(true);
+        super(variant, configResources, true);
     }
 
     protected Properties getStartUpProperties()
@@ -53,7 +53,7 @@ public class W3CDomXPathExpressionWithNamespaceTestCase extends AbstractXmlPrope
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         DocumentBuilder builder = factory.newDocumentBuilder();
-       
+
         String s = MessageFormat.format(MESSAGE, name);
         Document doc = builder.parse(new ByteArrayInputStream(s.getBytes()));
         return doc;

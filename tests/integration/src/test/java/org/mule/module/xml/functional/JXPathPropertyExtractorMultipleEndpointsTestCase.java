@@ -12,13 +12,12 @@ package org.mule.module.xml.functional;
 
 import java.util.Properties;
 
-
 public class JXPathPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    public JXPathPropertyExtractorMultipleEndpointsTestCase()
+    public JXPathPropertyExtractorMultipleEndpointsTestCase(ConfigVariant variant, String configResources)
     {
-        super(true);
+        super(variant, configResources, true);
     }
 
     protected Properties getStartUpProperties()

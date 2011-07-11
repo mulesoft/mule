@@ -18,9 +18,9 @@ import org.dom4j.DocumentHelper;
 public class Dom4jPropertyExtractorTestCase extends AbstractXmlPropertyExtractorTestCase
 {
 
-    public Dom4jPropertyExtractorTestCase()
+    public Dom4jPropertyExtractorTestCase(ConfigVariant variant, String configResources)
     {
-        super(true);
+        super(variant, configResources, true);
     }
 
     protected Properties getStartUpProperties()

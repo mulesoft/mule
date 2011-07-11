@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans"
+    xmlns:mxml="http://www.mulesoft.org/schema/mule/xml" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
+
+    <expression-transformer evaluator="groovy"
+        name="RemoveForceSynch"
+        expression="message.setProperty(org.mule.api.config.MuleProperties.MULE_FORCE_SYNC_PROPERTY, Boolean.FALSE, org.mule.api.transport.PropertyScope.INBOUND);
+            return message;">
+    </expression-transformer>
+    
+    <flow name="test">
+
+        <vm:inbound-endpoint path="in"
+            exchange-pattern="one-way" />
+
+        <first-successful>
+            <vm:outbound-endpoint path="unreliable"
+                exchange-pattern="request-response" />
+            <vm:outbound-endpoint path="error"
+                exchange-pattern="one-way" transformer-refs="RemoveForceSynch" />
+        </first-successful>
+    </flow>
+
+    <flow name="unreliable">
+
+        <vm:inbound-endpoint address="vm://unreliable"
+            exchange-pattern="request-response" />
+        <choice>
+            <when evaluator="xpath" expression="/endpoint='matchingEndpoint1'">
+                <vm:outbound-endpoint name="matchingEndpoint1"
+                    path="match1" exchange-pattern="one-way" />
+            </when>
+            <when evaluator="xpath" expression="/endpoint='matchingEndpoint2'">
+                <vm:outbound-endpoint name="matchingEndpoint2"
+                    path="match2" exchange-pattern="one-way" />
+            </when>
+        </choice>
+
+    </flow>
+
+</mule>
