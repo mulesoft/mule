@@ -13,18 +13,18 @@ import org.mule.RequestContext;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XQueryTransformer;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.util.Iterator;
 
 import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Test;
 
-public class ParallelXQueryTransformerTestCase extends AbstractMuleTestCase
+public class ParallelXQueryTransformerTestCase extends AbstractMuleContextTestCase
 {
     private String srcData;
     private String resultData;
@@ -61,6 +61,7 @@ public class ParallelXQueryTransformerTestCase extends AbstractMuleTestCase
         if (--running == 0) this.notify();
     }
 
+    @Test
     public void testParallelTransformation() throws Exception
     {
         final Transformer transformer = getTransformer();

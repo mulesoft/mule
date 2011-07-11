@@ -10,18 +10,25 @@
 
 package org.mule.transport.email;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Map;
 
 import javax.mail.Part;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 
 import org.apache.commons.collections.map.HashedMap;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class MailUtilsTestCase extends AbstractMuleTestCase
 {
+
     private static final String EMAIL_1 = "vasya@pupkin.com";
     private static final String EMAIL_2 = "zhora@buryakov.com";
     private InternetAddress inetAddress1;
@@ -29,25 +36,28 @@ public class MailUtilsTestCase extends AbstractMuleTestCase
     private static final String MULTIPLE_EMAILS_WITH_WHITESPACE = EMAIL_1 + ", " + EMAIL_2;
     private static final String MULTIPLE_EMAILS_WITHOUT_WHITESPACE = EMAIL_1 + "," + EMAIL_2;
 
-    @Override
-    protected void doSetUp() throws Exception
+    @Before
+    public void createInternetAddresses() throws AddressException
     {
         inetAddress1 = new InternetAddress(EMAIL_1);
         inetAddress2 = new InternetAddress(EMAIL_2);
     }
 
+    @Test
     public void testSingleInternetAddressToString() throws Exception
     {
         String result = MailUtils.internetAddressesToString(inetAddress1);
         assertEquals("Wrong internet address conversion.", EMAIL_1, result);
     }
 
+    @Test
     public void testMultipleInternetAddressesToString()
     {
         String result = MailUtils.internetAddressesToString(new InternetAddress[]{inetAddress1, inetAddress2});
         assertEquals("Wrong internet address conversion.", MULTIPLE_EMAILS_WITH_WHITESPACE, result);
     }
 
+    @Test
     public void testStringToSingleInternetAddresses() throws Exception
     {
         InternetAddress[] result = MailUtils.stringToInternetAddresses(EMAIL_1);
@@ -56,6 +66,7 @@ public class MailUtilsTestCase extends AbstractMuleTestCase
         assertEquals("Wrong internet address conversion.", inetAddress1, result[0]);
     }
 
+    @Test
     public void testStringWithWhitespaceToMultipleInternetAddresses() throws Exception
     {
         InternetAddress[] result = MailUtils.stringToInternetAddresses(MULTIPLE_EMAILS_WITH_WHITESPACE);
@@ -65,6 +76,7 @@ public class MailUtilsTestCase extends AbstractMuleTestCase
         assertEquals("Wrong internet address conversion.", inetAddress2, result[1]);
     }
 
+    @Test
     public void testStringWithoutWhitespaceToMultipleInternetAddresses() throws Exception
     {
         InternetAddress[] result = MailUtils.stringToInternetAddresses(MULTIPLE_EMAILS_WITHOUT_WHITESPACE);
@@ -74,6 +86,7 @@ public class MailUtilsTestCase extends AbstractMuleTestCase
         assertEquals("Wrong internet address conversion.", inetAddress2, result[1]);
     }
 
+    @Test
     public void testGetAttachmentName() throws Exception
     {
         @SuppressWarnings("unchecked")

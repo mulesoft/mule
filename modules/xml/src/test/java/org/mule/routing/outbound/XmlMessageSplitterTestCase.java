@@ -21,8 +21,8 @@ import org.mule.module.xml.routing.XmlMessageSplitter;
 import org.mule.module.xml.util.NamespaceManager;
 import org.mule.module.xml.util.XMLUtils;
 import org.mule.routing.CorrelationMode;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.IOUtils;
 
 import com.mockobjects.constraint.Constraint;
@@ -38,8 +38,14 @@ import javax.xml.transform.dom.DOMResult;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
+import org.junit.Test;
 
-public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class XmlMessageSplitterTestCase extends AbstractMuleContextTestCase
 {
     private OutboundEndpoint endpoint1;
     private OutboundEndpoint endpoint2;
@@ -108,12 +114,14 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         asyncXmlSplitter.initialise();
     }
 
+    @Test
     public void testStringPayloadXmlMessageSplitter() throws Exception
     {
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
         internalTestSuccessfulXmlSplitter(payload);
     }
 
+    @Test
     public void testStringPayloadXmlMessageSplitterWithoutXsd() throws Exception
     {
         syncXmlSplitter.setExternalSchemaLocation(null);
@@ -122,6 +130,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         internalTestSuccessfulXmlSplitter(payload);
     }
 
+    @Test
     public void testDom4JDocumentPayloadXmlMessageSplitter() throws Exception
     {
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
@@ -129,6 +138,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         internalTestSuccessfulXmlSplitter(doc);
     }
 
+    @Test
     public void testW3CDocumentPayloadXmlMessageSplitter() throws Exception
     {
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
@@ -139,12 +149,14 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         internalTestSuccessfulXmlSplitter(result.getNode());
     }
 
+    @Test
     public void testByteArrayPayloadXmlMessageSplitter() throws Exception
     {
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
         internalTestSuccessfulXmlSplitter(payload.getBytes());
     }
 
+    @Test
     public void testByteArrayPayloadCorrelateNever() throws Exception
     {
         String payload = IOUtils.getResourceAsString("purchase-order.xml", getClass());
@@ -182,6 +194,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
         mockendpoint5.verify();
     }
 
+    @Test
     public void testXsdNotFoundThrowsException() throws Exception
     {
         final String invalidSchemaLocation = "non-existent.xsd";
@@ -211,6 +224,7 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
     }
 
 
+    @Test
     public void testInvalidPayloadTypeThrowsException() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
@@ -230,9 +244,9 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
             assertTrue("Wrong exception message.", iaex.getMessage().startsWith(
                     "Failed to initialise the payload: "));
         }
-
     }
 
+    @Test
     public void testInvalidXmlPayloadThrowsException() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
@@ -252,9 +266,9 @@ public class XmlMessageSplitterTestCase extends AbstractMuleTestCase
             assertTrue("Wrong exception message.", iaex.getMessage().startsWith(
                     "Failed to initialise the payload: "));
         }
-
     }
 
+    @Test
     public void testGlobalNamespaceManagerLookup() throws Exception
     {
         // clear any configured namespaces

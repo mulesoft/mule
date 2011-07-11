@@ -13,16 +13,22 @@ package org.mule.transport.soap.axis;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.List;
 import java.util.Map;
 
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
+import org.junit.Test;
 
-public class AxisMessageDispatcherTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class AxisMessageDispatcherTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testNullParametersInCallAllowed() throws Exception
     {
         OutboundEndpoint ep = muleContext.getEndpointFactory().getOutboundEndpoint(

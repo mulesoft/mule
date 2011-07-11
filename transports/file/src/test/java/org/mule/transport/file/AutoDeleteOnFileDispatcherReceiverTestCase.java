@@ -14,13 +14,18 @@ import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.Connector;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.InputStream;
 
-public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleContextTestCase
 {
 
     private File validMessage;
@@ -28,6 +33,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
     File tempDir;
     Connector connector;
 
+    @Test
     public void testAutoDeleteFalseOnDispatcher() throws Exception
     {
         ((FileConnector)connector).setAutoDelete(false);
@@ -48,6 +54,7 @@ public class AutoDeleteOnFileDispatcherReceiverTestCase extends AbstractMuleTest
         }
     }
 
+    @Test
     public void testAutoDeleteTrueOnDispatcher() throws Exception
     {
         ((FileConnector)connector).setAutoDelete(true);

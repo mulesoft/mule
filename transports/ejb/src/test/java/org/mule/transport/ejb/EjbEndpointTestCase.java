@@ -13,10 +13,18 @@ package org.mule.transport.ejb;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class EjbEndpointTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+public class EjbEndpointTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testHostPortUrl() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("ejb://localhost:1099", muleContext);
@@ -30,6 +38,7 @@ public class EjbEndpointTestCase extends AbstractMuleTestCase
         assertEquals(0, url.getParams().size());
     }
 
+    @Test
     public void testQueryParams1() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("ejb://localhost:1099/BeeShirtsejbServer?method=testMethod", muleContext);
@@ -45,6 +54,7 @@ public class EjbEndpointTestCase extends AbstractMuleTestCase
         assertEquals("testMethod", url.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
     }
 
+    @Test
     public void testQueryParams2() throws Exception
     {
         EndpointURI url = new MuleEndpointURI(

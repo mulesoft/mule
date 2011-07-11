@@ -43,7 +43,6 @@ public class OptionalParamsTestCase extends AbstractIBeansTestCase
     public void paramNull() throws UnknownHostException
     {
         test.doSomethingElse("x", null);
-        fail("Null argument is not optional");
     }
 
 }

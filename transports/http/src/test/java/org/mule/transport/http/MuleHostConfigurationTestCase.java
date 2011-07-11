@@ -10,7 +10,7 @@
 
 package org.mule.transport.http;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -26,12 +26,17 @@ import org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
 {
     
     private static final String HTTPX = "httpx";
     
+    @Test
     public void testSetHostViaUri() throws Exception
     {
         HostConfiguration hostConfig = createHostConfiguration();
@@ -44,6 +49,7 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
         assertEquals(8080, hostConfig.getPort());
     }
 
+    @Test
     public void testSetHostViaUriWithDifferentProtocol() throws Exception
     {
         new DifferentProtocolTemplate()
@@ -62,6 +68,7 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
         }.test();
     }
 
+    @Test
     public void testSetHostViaHttpHost()
     {
         HostConfiguration hostConfig = createHostConfiguration();
@@ -74,6 +81,7 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
         assertEquals(8080, hostConfig.getPort());
     }
 
+    @Test
     public void testSetHostViaHostAndPortAndProtocolName()
     {
         HostConfiguration hostConfig = createHostConfiguration();
@@ -85,6 +93,7 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
         assertEquals(8080, hostConfig.getPort());
     }
 
+    @Test
     public void testSetHostViaHostAndPortAndProtocolNameWithDifferentProtocol() throws Exception
     {
         new DifferentProtocolTemplate()
@@ -103,6 +112,7 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
     }
 
     @SuppressWarnings("deprecation")
+    @Test
     public void testSetHostViaHostAndVirtualHostAndPortAndProtocol()
     {
         HostConfiguration hostConfig = createHostConfiguration();
@@ -117,6 +127,7 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
     }
 
     @SuppressWarnings("deprecation")
+    @Test
     public void testSetHostViaHostAndVirtualHostAndPortAndProtocolWithDifferentProtocol() throws Exception
     {
         new DifferentProtocolTemplate()
@@ -136,6 +147,7 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
         }.test();
     }
 
+    @Test
     public void testSetHostViaHostAndPort()
     {
         HostConfiguration hostConfig = createHostConfiguration();
@@ -147,6 +159,7 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
         assertEquals(8080, hostConfig.getPort());
     }
 
+    @Test
     public void testSetHostViaHost()
     {
         HostConfiguration hostConfig = createHostConfiguration();
@@ -157,6 +170,7 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
         assertMockSocketFactory(hostConfig);
     }
 
+    @Test
     public void testClone()
     {
         HostConfiguration hostConfig = createHostConfiguration();
@@ -194,7 +208,8 @@ public class MuleHostConfigurationTestCase extends AbstractMuleTestCase
             super();
         }
         
-        public void test() throws Exception
+        @Test
+    public void test() throws Exception
         {
             try
             {

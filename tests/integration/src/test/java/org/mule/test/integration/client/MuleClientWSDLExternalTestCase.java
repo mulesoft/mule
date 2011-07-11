@@ -14,15 +14,23 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.cxf.SoapConstants;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class MuleClientWSDLExternalTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class MuleClientWSDLExternalTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testRequestResponse() throws Throwable
     {
         if (isOffline("org.mule.test.integration.client.MuleClientWSDLExternalTestCase.testRequestResponse()"))

@@ -36,16 +36,25 @@ import org.mule.model.resolvers.NoArgumentsEntryPointResolver;
 import org.mule.model.resolvers.ReflectionEntryPointResolver;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.object.SingletonObjectFactory;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.mule.TestComponentLifecycleAdapterFactory;
 
+import org.junit.Test;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
 {
 
     private MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
+    private MuleContext muleContext;
 
+    @Test
     public void testDefaultJavaComponentShortcut() throws Exception
     {
         ConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(
@@ -67,6 +76,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
             .toArray()[1] instanceof CallableEntryPointResolver));
     }
 
+    @Test
     public void testDefaultJavaComponentPrototype() throws Exception
     {
         ConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(
@@ -86,6 +96,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
             .toArray()[0] instanceof CallableEntryPointResolver));
     }
 
+    @Test
     public void testDefaultJavaComponentSingleton() throws Exception
     {
         ConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(
@@ -106,6 +117,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testDefaultJavaComponentSpringBean() throws Exception
     {
         ConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(
@@ -139,6 +151,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         assertEquals("wait:", 3, profile.getMaxWait());
     }
 
+    @Test
     public void testPooledJavaComponentShortcut() throws Exception
     {
         ConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(
@@ -160,6 +173,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testPooledJavaComponentPrototype() throws Exception
     {
         ConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(
@@ -181,6 +195,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testPooledJavaComponentSingleton() throws Exception
     {
         ConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(
@@ -202,6 +217,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testPooledJavaComponentSpringBean() throws Exception
     {
         ConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(
@@ -217,6 +233,7 @@ public class ComponentDefinitionParserTestCase extends AbstractMuleTestCase
         assertNull(((JavaComponent) service.getComponent()).getEntryPointResolverSet());
     }
 
+    @Test
     public void testClassAttributeAndObjectFactory() throws Exception
     {
         try

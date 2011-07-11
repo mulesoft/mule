@@ -13,15 +13,22 @@ package org.mule.transformers.simple;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MessagePropertiesTransformerScopesTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+public class MessagePropertiesTransformerScopesTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testPropertyScopes() throws Exception
     {
         MuleMessage msg = new DefaultMuleMessage("message", muleContext);

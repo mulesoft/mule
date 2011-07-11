@@ -19,10 +19,15 @@ import org.mule.api.lifecycle.InitialisationException;
 import org.mule.config.builders.AutoConfigurationBuilder;
 import org.mule.config.builders.SimpleConfigurationBuilder;
 import org.mule.context.DefaultMuleContextFactory;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestExceptionStrategy;
 
-public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class AutoConfigurationBuilderTestCase extends AbstractMuleContextTestCase
 {
 
     protected MuleContext createMuleContext() throws Exception
@@ -31,6 +36,7 @@ public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase
         return muleContextFactory.createMuleContext(new SimpleConfigurationBuilder(null));
     }
 
+    @Test
     public void testConfigureSpring() throws ConfigurationException, InitialisationException
     {
         ConfigurationBuilder configurationBuilder = new AutoConfigurationBuilder(
@@ -43,17 +49,20 @@ public class AutoConfigurationBuilderTestCase extends AbstractMuleTestCase
         assertTrue(es instanceof TestExceptionStrategy);
     }
 
-    // public void testConfigureGroovy()
+    // @Test
+    //public void testConfigureGroovy()
     // {
     // // TODO
     // }
     //
-    // public void testConfigureGalaxySpring()
+    // @Test
+    //public void testConfigureGalaxySpring()
     // {
     // // TODO
     // }
     //
-    // public void testConfigureUnkownExtension() throws ConfigurationException
+    // @Test
+    //public void testConfigureUnkownExtension() throws ConfigurationException
     // {
     // ConfigurationBuilder configurationBuilder = new AutoConfigurationBuilder("my.dtd");
     //

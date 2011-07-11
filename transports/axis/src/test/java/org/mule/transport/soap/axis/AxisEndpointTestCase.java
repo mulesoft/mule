@@ -14,12 +14,17 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.registry.ServiceType;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.service.TransportServiceDescriptor;
 
-public class AxisEndpointTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class AxisEndpointTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testEndpoint() throws Exception
     {
         String url = "axis:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
@@ -45,6 +50,7 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
         assertEquals(3, endpointUri.getParams().size());
     }
 
+    @Test
     public void testEndpointWithUserInfo() throws Exception
     {
         String url = "axis:http://admin:pwd@www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";
@@ -65,6 +71,7 @@ public class AxisEndpointTestCase extends AbstractMuleTestCase
                 endpointUri.toString());
     }
 
+    @Test
     public void testEndpointFinder() throws Exception
     {
         String url = "soap:http://www.xmethods.net/wsdl/query.wsdl?method=getSomething&param1=1&param2=2";

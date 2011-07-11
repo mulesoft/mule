@@ -11,7 +11,8 @@
 package org.mule.module.xml.filters;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.api.MuleContext;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -19,8 +20,16 @@ import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPathFactory;
 
+import org.junit.Test;
+import org.mockito.Mockito;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Ryan Heaton
@@ -31,9 +40,11 @@ public class XPathFilterTestCase extends AbstractMuleTestCase
     /**
      * tests accepting the mule message.
      */
+    @Test
     public void testAcceptMessage() throws Exception
     {
         final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        MuleContext muleContext = Mockito.mock(MuleContext.class);
         DefaultMuleMessage message = new DefaultMuleMessage(null, muleContext);
         XPathFilter filter = new XPathFilter()
         {
@@ -68,6 +79,7 @@ public class XPathFilterTestCase extends AbstractMuleTestCase
     /**
      * tests accepting a node.
      */
+    @Test
     public void testAcceptNode() throws Exception
     {
         InputStream testXml = getClass().getResourceAsStream("/test.xml");
@@ -95,6 +107,7 @@ public class XPathFilterTestCase extends AbstractMuleTestCase
     /**
      * tests accepting a node.
      */
+    @Test
     public void testAcceptSoapNode() throws Exception
     {
         InputStream soapEnvelope = getClass().getResourceAsStream("/request.xml");

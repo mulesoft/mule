@@ -11,7 +11,7 @@
 package org.mule.test.integration.transaction;
 
 import org.mule.module.jboss.transaction.JBossArjunaTransactionManagerFactory;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.xa.AbstractTransactionContext;
 import org.mule.util.xa.AbstractXAResourceManager;
 import org.mule.util.xa.DefaultXASession;
@@ -23,8 +23,9 @@ import javax.transaction.xa.XAResource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
-public class XAResourceManagerTestCase extends AbstractMuleTestCase
+public class XAResourceManagerTestCase extends AbstractMuleContextTestCase
 {
     private TransactionManager tm;
 
@@ -38,6 +39,7 @@ public class XAResourceManagerTestCase extends AbstractMuleTestCase
         tm = null;
     }
 
+    @Test
     public void testTxBehaviour() throws Exception
     {
         TestXAResourceManager rm = new TestXAResourceManager();
@@ -50,7 +52,6 @@ public class XAResourceManagerTestCase extends AbstractMuleTestCase
 
         tx.delistResource(s, XAResource.TMSUCCESS);
         tx.commit();
-
     }
 
     protected static class TestXAResourceManager extends AbstractXAResourceManager

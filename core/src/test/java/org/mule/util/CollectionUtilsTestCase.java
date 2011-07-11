@@ -40,7 +40,6 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
     public void testToArrayOfComponentTypeNullType()
     {
         CollectionUtils.toArrayOfComponentType(Collections.EMPTY_LIST, null);
-        fail("should have thrown IllegalArgumentException");
     }
 
     @Test
@@ -54,7 +53,6 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
     public void testToArrayOfComponentTypeWrongElement()
     {
         CollectionUtils.toArrayOfComponentType(Collections.singleton("foo"), Integer.class);
-        fail("should have thrown ArrayStoreException");
     }
 
     @Test

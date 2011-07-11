@@ -17,8 +17,8 @@ import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.module.xml.routing.XmlMessageSplitter;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.IOUtils;
 
 import com.mockobjects.constraint.Constraint;
@@ -29,8 +29,14 @@ import java.util.Map;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
+import org.junit.Test;
 
-public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class RoundRobinXmlSplitterTestCase extends AbstractMuleContextTestCase
 {
     private OutboundEndpoint endpoint1;
     private OutboundEndpoint endpoint2;
@@ -96,12 +102,14 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         syncXmlSplitter.addRoute((OutboundEndpoint) mockendpoint6.proxy());
     }
 
+    @Test
     public void testStringPayloadXmlMessageSplitter() throws Exception
     {
         String payload = IOUtils.getResourceAsString("purchase-order2.xml", getClass());
         internalTestSuccessfulXmlSplitter(payload);
     }
 
+    @Test
     public void testDom4JDocumentPayloadXmlMessageSplitter() throws Exception
     {
         String payload = IOUtils.getResourceAsString("purchase-order2.xml", getClass());
@@ -109,6 +117,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         internalTestSuccessfulXmlSplitter(doc);
     }
 
+    @Test
     public void testByteArrayPayloadXmlMessageSplitter() throws Exception
     {
         String payload = IOUtils.getResourceAsString("purchase-order2.xml", getClass());
@@ -151,6 +160,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
         mockendpoint6.verify();
     }
 
+    @Test
     public void testXsdNotFoundThrowsException() throws Exception
     {
         final String invalidSchemaLocation = "non-existent.xsd";
@@ -180,6 +190,7 @@ public class RoundRobinXmlSplitterTestCase extends AbstractMuleTestCase
     }
 
 
+    @Test
     public void testInvalidXmlPayloadThrowsException() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();

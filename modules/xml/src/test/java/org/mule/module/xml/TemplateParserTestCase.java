@@ -12,12 +12,17 @@ package org.mule.module.xml;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @see EE-1734
  */
-public class TemplateParserTestCase extends AbstractMuleTestCase
+public class TemplateParserTestCase extends AbstractMuleContextTestCase
 {
     private static final String TEST_MULE_STRING_EXPRESSION_XML = 
         "<xml><t2><tag1 attr1='blahattr1'>BLAH1</tag1><tag1 attr1='blahattr2'>BLAH2</tag1></t2></xml>";
@@ -32,6 +37,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         message = new DefaultMuleMessage(TEST_MULE_STRING_EXPRESSION_XML, muleContext);
     }
 
+    @Test
     public void testXPathExpression() throws Exception
     {
         String result = (String) muleContext.getExpressionManager().evaluate(
@@ -40,6 +46,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertEquals("BLAH1", result);
     }
 
+    @Test
     public void testStringExpression() throws Exception
     {
         String result = (String) muleContext.getExpressionManager().evaluate(
@@ -48,6 +55,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertEquals("BLAH1", result);
     }
 
+    @Test
     public void testXPathExpressionWithAsterisk() throws Exception
     {
         String result = (String) muleContext.getExpressionManager().evaluate(
@@ -56,6 +64,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertEquals("BLAH1", result);
     }
 
+    @Test
     public void testStringExpressionWithAsterisk() throws Exception
     {
         String result = (String) muleContext.getExpressionManager().evaluate(
@@ -64,6 +73,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertEquals("BLAH1", result);
     }
 
+    @Test
     public void testStringExpressionDoParse() throws Exception
     {
         String result = muleContext.getExpressionManager().parse(
@@ -72,6 +82,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertEquals("BLAH1", result);
     }
 
+    @Test
     public void testStringExpressionDoParseEmbedded() throws Exception
     {
         String result = muleContext.getExpressionManager().parse(

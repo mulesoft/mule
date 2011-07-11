@@ -16,6 +16,7 @@ import org.mule.transport.jdbc.JdbcTransactionFactory;
 public class JdbcTransactionalJdbcFunctionalTestCase extends AbstractJdbcTransactionalFunctionalTestCase
 {
 
+    @Override
     protected TransactionFactory getTransactionFactory()
     {
         return new JdbcTransactionFactory();

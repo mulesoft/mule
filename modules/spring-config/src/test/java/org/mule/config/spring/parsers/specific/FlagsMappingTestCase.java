@@ -11,44 +11,45 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.config.spring.parsers.specific.RegExFilterDefinitionParser.FlagsMapping;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.regex.Pattern;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 public class FlagsMappingTestCase extends AbstractMuleTestCase
 {
+
     private FlagsMapping flagsMapping;
 
-    @Override
-    protected void doSetUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        super.doSetUp();
         flagsMapping = new FlagsMapping();
     }
 
+    @Test
     public void testSetSingleFlagString()
     {
         int result = rewrite("DOTALL");
         assertEquals(Pattern.DOTALL, result);
     }
 
+    @Test
     public void testMultipleFlagsString()
     {
         int result = rewrite("DOTALL,MULTILINE");
         assertEquals(Pattern.DOTALL | Pattern.MULTILINE, result);
     }
 
+    @Test(expected = IllegalArgumentException.class)
     public void testInvalidFlagsString()
     {
-        try
-        {
-            flagsMapping.rewrite("WRONG_FLAG");
-            fail();
-        }
-        catch (IllegalArgumentException iae)
-        {
-            // this one was expected
-        }
+        flagsMapping.rewrite("WRONG_FLAG");
     }
 
     private int rewrite(String input)

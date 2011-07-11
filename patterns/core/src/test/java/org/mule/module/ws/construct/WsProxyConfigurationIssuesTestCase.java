@@ -10,16 +10,22 @@
 
 package org.mule.module.ws.construct;
 
+import org.mule.MessageExchangePattern;
+import org.mule.api.construct.FlowConstructInvalidException;
+import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
 import java.net.URI;
 import java.util.concurrent.Callable;
 
-import org.mule.MessageExchangePattern;
-import org.mule.api.construct.FlowConstructInvalidException;
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.MuleTestUtils;
+import org.junit.Test;
 
-public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class WsProxyConfigurationIssuesTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testNullMessageSource()
     {
         runTestFailingWithExpectedFlowConstructInvalidException(new Callable<WSProxy>()
@@ -33,6 +39,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
         });
     }
 
+    @Test
     public void testNullOutboundEndpoint()
     {
         runTestFailingWithExpectedFlowConstructInvalidException(new Callable<WSProxy>()
@@ -45,6 +52,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
         });
     }
 
+    @Test
     public void testNullOutboundEndpointWithWsdl()
     {
         runTestFailingWithExpectedFlowConstructInvalidException(new Callable<WSProxy>()
@@ -57,6 +65,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
         });
     }
 
+    @Test
     public void testBlankWsdlContents()
     {
         runTestFailingWithExpectedFlowConstructInvalidException(new Callable<WSProxy>()
@@ -71,6 +80,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
         });
     }
 
+    @Test
     public void testNullWsdlUri()
     {
         runTestFailingWithExpectedFlowConstructInvalidException(new Callable<WSProxy>()
@@ -85,6 +95,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
         });
     }
 
+    @Test
     public void testOneWayInboundEndpoint()
     {
         runTestFailingWithExpectedFlowConstructInvalidException(new Callable<WSProxy>()
@@ -99,6 +110,7 @@ public class WsProxyConfigurationIssuesTestCase extends AbstractMuleTestCase
         });
     }
 
+    @Test
     public void testOneWayOutboundEndpoint()
     {
         runTestFailingWithExpectedFlowConstructInvalidException(new Callable<WSProxy>()

@@ -13,10 +13,20 @@ package org.mule.transformers.xml.xstream;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XStreamFactory;
 import org.mule.module.xml.transformer.XmlToObject;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests configuration and creation of XStream-based transformers
@@ -34,20 +44,19 @@ public class XStreamTransformerConfigurationTestCase extends AbstractMuleTestCas
         }
     }
 
-    @Override
-    protected void doSetUp() throws Exception
+    @Before
+    public void doSetUp()
     {
-        super.doSetUp();
         MyDriverDidInitialize = true;
     }
 
-    @Override
-    protected void doTearDown() throws Exception
+    @After
+    public void doTearDown()
     {
         MyDriverDidInitialize = false;
-        super.doTearDown();
     }
 
+    @Test
     public void testDefaultDriver() throws Exception
     {
         XmlToObject transformer = new XmlToObject();
@@ -55,6 +64,7 @@ public class XStreamTransformerConfigurationTestCase extends AbstractMuleTestCas
         assertEquals(XStreamFactory.XSTREAM_XPP_DRIVER, transformer.getDriverClass());
     }
 
+    @Test
     public void testCustomDriver() throws Exception
     {
         XmlToObject transformer = new XmlToObject();
@@ -67,6 +77,7 @@ public class XStreamTransformerConfigurationTestCase extends AbstractMuleTestCas
         assertTrue(MyDriverDidInitialize);
     }
 
+    @Test
     public void testBadDriver() throws Exception
     {
         XmlToObject transformer = new XmlToObject();
@@ -85,6 +96,7 @@ public class XStreamTransformerConfigurationTestCase extends AbstractMuleTestCas
         }
     }
 
+    @Test
     public void testClassLoader()
     {
 

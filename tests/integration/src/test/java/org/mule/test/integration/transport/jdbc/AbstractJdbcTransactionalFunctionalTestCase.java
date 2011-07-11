@@ -35,6 +35,12 @@ import org.mule.tck.functional.EventCallback;
 import org.mule.transaction.MuleTransactionConfig;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicBoolean;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractJdbcTransactionalFunctionalTestCase extends AbstractJdbcFunctionalTestCase  implements TransactionNotificationListener<TransactionNotification>
 {
@@ -50,6 +56,7 @@ public abstract class AbstractJdbcTransactionalFunctionalTestCase extends Abstra
         currentTx = null;
     }
 
+    @Test
     public void testReceiveAndSendWithException() throws Exception
     {
         final AtomicBoolean called = new AtomicBoolean(false);

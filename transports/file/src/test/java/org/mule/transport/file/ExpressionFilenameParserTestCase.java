@@ -12,14 +12,21 @@ package org.mule.transport.file;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Date;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test the syntax of the SimpleFilename parser
  */
-public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
+public class ExpressionFilenameParserTestCase extends AbstractMuleContextTestCase
 {
     private ExpressionFilenameParser parser;
     private MuleMessage message;
@@ -38,6 +45,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
         message.setOutboundProperty(FileConnector.PROPERTY_FILENAME, "newName");
     }
 
+    @Test
     public void testWigglyMuleStyleParsing()
     {
         String result = parser.getFilename(message, "Test1_#[function:count].txt");
@@ -78,6 +86,7 @@ public class ExpressionFilenameParserTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testSquareStyleParsing()
     {
         String result = parser.getFilename(message, "Test1_[function:count].txt");

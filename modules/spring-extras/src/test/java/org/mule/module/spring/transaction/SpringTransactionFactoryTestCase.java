@@ -11,17 +11,19 @@
 package org.mule.module.spring.transaction;
 
 import org.mule.api.transaction.Transaction;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
+import org.junit.Test;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 
-public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
+public class SpringTransactionFactoryTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testCommit() throws Exception
     {
         Mock mockPTM = new Mock(PlatformTransactionManager.class);
@@ -37,6 +39,7 @@ public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
         tx.commit();
     }
 
+    @Test
     public void testRollback() throws Exception
     {
         Mock mockPTM = new Mock(PlatformTransactionManager.class);

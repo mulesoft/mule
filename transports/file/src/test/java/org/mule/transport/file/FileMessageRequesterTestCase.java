@@ -13,12 +13,16 @@ package org.mule.transport.file;
 import org.mule.MessageExchangePattern;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.endpoint.DefaultInboundEndpoint;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class FileMessageRequesterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class FileMessageRequesterTestCase extends AbstractMuleContextTestCase
 {
     
     private static final String CONNECTOR_MOVE_DIR = "connector/moveto";
@@ -38,12 +42,14 @@ public class FileMessageRequesterTestCase extends AbstractMuleTestCase
         connector.setMoveToPattern(CONNECTOR_MOVE_TO_PATTERN);
     }
 
+    @Test
     public void testMoveDirectoryFromConnector() throws Exception
     {
         FileMessageRequester requester = new FileMessageRequester(createEndpoint());        
         assertEquals(CONNECTOR_MOVE_DIR, requester.getMoveDirectory());
     }
     
+    @Test
     public void testMoveDirectoryFromEndpoint() throws Exception
     {
         InboundEndpoint endpoint = createEndpoint(FileConnector.PROPERTY_MOVE_TO_DIRECTORY, 
@@ -52,12 +58,14 @@ public class FileMessageRequesterTestCase extends AbstractMuleTestCase
         assertEquals(ENDPOINT_MOVE_DIR, requester.getMoveDirectory());
     }
     
+    @Test
     public void testMoveToPatternFromConnector() throws Exception
     {
         FileMessageRequester requester = new FileMessageRequester(createEndpoint());
         assertEquals(CONNECTOR_MOVE_TO_PATTERN, requester.getMoveToPattern());
     }
     
+    @Test
     public void testMoveToPatternFromEndpoint() throws Exception
     {
         InboundEndpoint endpoint = createEndpoint(FileConnector.PROPERTY_MOVE_TO_PATTERN,

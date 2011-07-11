@@ -13,12 +13,21 @@ import org.mule.api.endpoint.EndpointFactory;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.registry.ServiceException;
 import org.mule.module.rss.endpoint.RssInboundEndpoint;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.file.FileConnector;
 import org.mule.transport.http.HttpPollingConnector;
 
-public class RssEndpointTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class RssEndpointTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testHttpInboundEndpointCreation() throws Exception
     {
         String uri = "rss:http://blog.com/rss";
@@ -31,21 +40,16 @@ public class RssEndpointTestCase extends AbstractMuleTestCase
         assertTrue(in instanceof RssInboundEndpoint);
     }
 
+    @Test(expected = UnsupportedOperationException.class)
     public void testHttpOutboundEndpointCreation() throws Exception
     {
         String uri = "rss:http://blog.com/rss";
         EndpointFactory factory = muleContext.getEndpointFactory();
-        try
-        {
-            factory.getEndpointBuilder(uri).buildOutboundEndpoint();
-            fail("RSS outbound endpoints are not supported");
-        }
-        catch (UnsupportedOperationException e)
-        {
-            //exprected
-        }
+
+        factory.getEndpointBuilder(uri).buildOutboundEndpoint();
     }
 
+    @Test
     public void testFileInboundEndpointCreation() throws Exception
     {
         String uri = "rss:file://./src/foo";
@@ -58,33 +62,21 @@ public class RssEndpointTestCase extends AbstractMuleTestCase
         assertTrue(in instanceof RssInboundEndpoint);
     }
 
+    @Test(expected = UnsupportedOperationException.class)
     public void testFileOutboundEndpointCreation() throws Exception
     {
         String uri = "rss:file://./src/foo";
         EndpointFactory factory = muleContext.getEndpointFactory();
-        try
-        {
-            factory.getEndpointBuilder(uri).buildOutboundEndpoint();
-            fail("RSS outbound endpoints are not supported");
-        }
-        catch (UnsupportedOperationException e)
-        {
-            //exprected
-        }
+
+        factory.getEndpointBuilder(uri).buildOutboundEndpoint();
     }
 
+    @Test(expected = ServiceException.class)
     public void testXXInboundEndpointCreation() throws Exception
     {
         String uri = "rss:xxx://./src/foo";
         EndpointFactory factory = muleContext.getEndpointFactory();
-        try
-        {
-            factory.getEndpointBuilder(uri).buildInboundEndpoint();
-            fail("xxx is not a valid transport");
-        }
-        catch (ServiceException e)
-        {
-            //expected
-        }
+
+        factory.getEndpointBuilder(uri).buildInboundEndpoint();
     }
 }

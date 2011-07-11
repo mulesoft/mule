@@ -12,12 +12,20 @@ package org.mule.test.config;
 
 import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.Message;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.MissingResourceException;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class MessagesTestCase extends AbstractMuleTestCase
 {
+
+    @Test
     public void testMessageLoading() throws Exception
     {
         Message message = CoreMessages.authFailedForUser("Fred");
@@ -25,6 +33,7 @@ public class MessagesTestCase extends AbstractMuleTestCase
         assertEquals(135, message.getCode());
     }
 
+    @Test
     public void testBadBundle()
     {
         try
@@ -40,6 +49,7 @@ public class MessagesTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testGoodBundle()
     {
         Message message = TestMessages.testMessage("one", "two", "three");

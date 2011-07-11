@@ -10,12 +10,19 @@
 
 package org.mule.transport.file.filters;
 
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.file.filters.FilenameRegexFilter;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class FilenameRegexFilterTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testFilenameRegexFilter()
     {
         FilenameRegexFilter filter = new FilenameRegexFilter();

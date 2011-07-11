@@ -10,21 +10,29 @@
 
 package org.mule.module.ws.construct.builder;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationException;
 import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.module.ws.construct.WSProxy;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.compression.GZipCompressTransformer;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
 
-public class WSProxyBuilderTestCase extends AbstractMuleTestCase
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class WSProxyBuilderTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testConfigurationInvalidFileWsdl()
     {
         try
@@ -42,6 +50,7 @@ public class WSProxyBuilderTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testFullConfigurationFileWsdl() throws Exception
     {
         final WSProxy wsProxy = new WSProxyBuilder().name("test-ws-proxy-full-file-wsdl")
@@ -56,6 +65,7 @@ public class WSProxyBuilderTestCase extends AbstractMuleTestCase
         assertEquals("test-ws-proxy-full-file-wsdl", wsProxy.getName());
     }
 
+    @Test
     public void testConfigurationUriWsdl() throws Exception
     {
         final WSProxy wsProxy = new WSProxyBuilder().name("test-ws-proxy-uri-wsdl").wsldLocation(
@@ -64,6 +74,7 @@ public class WSProxyBuilderTestCase extends AbstractMuleTestCase
         assertEquals("test-ws-proxy-uri-wsdl", wsProxy.getName());
     }
 
+    @Test
     public void testConfigurationNoWsdl() throws Exception
     {
         final WSProxy wsProxy = new WSProxyBuilder().name("test-ws-proxy-no-wsdl").inboundAddress(

@@ -13,13 +13,21 @@ package org.mule.test.config;
 import org.mule.api.DefaultMuleException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 public class ExceptionHelperTestCase extends AbstractMuleTestCase
 {
+
+    @Test
     public void testNestedExceptionRetreval() throws Exception
     {
         Exception testException = getException();
@@ -42,6 +50,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase
         assertNotNull(info.get("JavaDoc"));
     }
     
+    @Test
     public void testSummarizeWithDepthBeyondStackTraceLength()
     {
         Exception exception = getException();

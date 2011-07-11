@@ -15,10 +15,16 @@ import org.mule.api.routing.RoutingException;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class StatusCodeMappingsTestCase extends AbstractMuleTestCase
 {
+
+    @Test
     public void testErrorMappings()
     {
         String code = ExceptionHelper.getErrorMapping("http", RoutingException.class);
@@ -36,6 +42,7 @@ public class StatusCodeMappingsTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testHttpsErrorMappings()
     {
         String code = ExceptionHelper.getErrorMapping("httpS", RoutingException.class);

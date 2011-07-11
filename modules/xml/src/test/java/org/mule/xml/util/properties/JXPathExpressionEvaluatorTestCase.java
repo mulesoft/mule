@@ -15,7 +15,7 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.registry.RegistrationException;
 import org.mule.module.xml.expression.JXPathExpressionEvaluator;
 import org.mule.module.xml.util.NamespaceManager;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
@@ -24,8 +24,15 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 @SuppressWarnings("deprecation") // we're testing a deprecated class
-public class JXPathExpressionEvaluatorTestCase extends AbstractMuleTestCase
+public class JXPathExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
     private static final String XML_USING_UNDEFINED_NAMESPACE = "<root " +
                                                                 "xmlns:z=\"http://www.w3schools.com/furniture\">" +
@@ -36,6 +43,7 @@ public class JXPathExpressionEvaluatorTestCase extends AbstractMuleTestCase
                                                                 "</z:table>" +
                                                                 "</root>";
 
+    @Test
     public void testBean()
     {
         Apple apple = new Apple();
@@ -53,6 +61,7 @@ public class JXPathExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNull(value);
     }
 
+    @Test
     public void testXmlContainingNoNameSpaces() throws MalformedURLException
     {
         String payload = "<?xml version=\"1.0\" ?>" +
@@ -69,6 +78,7 @@ public class JXPathExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("Orchard Road", (String) value);
     }
 
+    @Test
     public void testXmlIfNameSpaceIsDefinedWithTheSamePrefix() throws MalformedURLException
     {
         String payload = "<root " +
@@ -89,6 +99,7 @@ public class JXPathExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("African Coffee Table", (String) value);
     }
 
+    @Test
     public void testXmlWithInvalidNameSpaceIfNameSpaceAliasIsUndefined() throws MalformedURLException
     {
         final String xpathExpression = "//f:table/f:name";
@@ -100,6 +111,7 @@ public class JXPathExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNull(value);
     }
 
+    @Test
     public void testXmlWithInvalidNameSpaceIfNameSpaceAliasIsDefined() throws MalformedURLException, RegistrationException
     {
         NamespaceManager namespaceManager = new NamespaceManager();

@@ -11,11 +11,17 @@ package org.mule.transport.ftp;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class FtpEndpointTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+public class FtpEndpointTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testHostPortAndUserInfo() throws Exception
     {
         EndpointURI endpointUri = new MuleEndpointURI("ftp://admin:pwd@localhost:18080", muleContext);

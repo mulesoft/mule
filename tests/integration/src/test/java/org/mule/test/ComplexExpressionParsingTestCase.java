@@ -11,15 +11,20 @@
 package org.mule.test;
 
 import org.mule.module.scripting.expression.GroovyExpressionEvaluator;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.jdbc.JdbcConnector;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ComplexExpressionParsingTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class ComplexExpressionParsingTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testComplexExpressionJdbcParsing() throws Exception
     {
         muleContext.getExpressionManager().registerEvaluator(new GroovyExpressionEvaluator());

@@ -11,10 +11,12 @@
 package org.mule.test.integration.spring.transaction;
 
 import org.mule.api.transaction.Transaction;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transaction.TransactionCoordination;
 
-public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+public class SpringTransactionFactoryTestCase extends AbstractMuleContextTestCase
 {
 
     @Override
@@ -27,6 +29,7 @@ public class SpringTransactionFactoryTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testTransactionFactoryBinding() throws Exception
     {
         // Init a data source
