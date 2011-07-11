@@ -10,28 +10,36 @@
 
 package org.mule.api.annotations.param;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.util.ExceptionUtils;
-
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.activation.DataHandler;
 
-public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.util.ExceptionUtils;
+
+public class OutboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlowTestCase
 {
-    public OutboundAttachmentsAnnotationTestCase()
+    public OutboundAttachmentsAnnotationTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
         setDisposeManagerPerSuite(true);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "org/mule/test/annotations/outbound-attachments-annotation.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/annotations/outbound-attachments-annotation-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/annotations/outbound-attachments-annotation-flow.xml"}});
     }
 
+    @Test
     public void testProcessAttachment() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -42,6 +50,7 @@ public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals("barValue", result.get("bar").getContent());
     }
 
+    @Test
     public void testProcessAttachmentWithExistingOutAttachments() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -53,6 +62,7 @@ public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals("fooValue", result.get("foo").getContent());
     }
 
+    @Test
     public void testInvalidParamType() throws Exception
     {
         try
@@ -65,7 +75,7 @@ public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
             assertTrue(ExceptionUtils.getRootCause(e) instanceof IllegalArgumentException);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     private Map<String, DataHandler> getMapPayload(MuleMessage message)
     {

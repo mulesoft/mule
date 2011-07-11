@@ -10,25 +10,41 @@
 
 package org.mule.test.integration.xml;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.util.IOUtils;
-
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.util.IOUtils;
 
 //START SNIPPET: test-code
-public class XSLTWikiDocsTestCase extends FunctionalTestCase
-{
-    @Override
-    protected String getConfigResources()
+public class XSLTWikiDocsTestCase extends AbstractServiceAndFlowTestCase
+{    
+    
+    public XSLTWikiDocsTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/xml/xslt-functional-test.xml";
+        super(variant, configResources);
+        
     }
 
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/xml/xslt-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/xml/xslt-functional-test-flow.xml"}
+        });
+    }
+    
+    
+    @Test
     public void testMessageTransform() throws Exception
         {
             //We're using Xml Unit to compare results
@@ -55,7 +71,9 @@ public class XSLTWikiDocsTestCase extends FunctionalTestCase
             assertNotNull(message);
             assertNull(message.getExceptionPayload());
             //Compare results
+            
             assertTrue(XMLUnit.compareXML(message.getPayloadAsString(), resultData).similar());
+            
         }
     }
 //END SNIPPET: test-code

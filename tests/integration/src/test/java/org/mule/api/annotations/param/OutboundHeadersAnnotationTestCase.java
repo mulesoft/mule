@@ -10,26 +10,35 @@
 
 package org.mule.api.annotations.param;
 
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.util.ExceptionUtils;
-
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 
-public class OutboundHeadersAnnotationTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.util.ExceptionUtils;
+
+public class OutboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTestCase
 {
-    public OutboundHeadersAnnotationTestCase()
+
+    public OutboundHeadersAnnotationTestCase(ConfigVariant variant, String configResources)
     {
+        super(variant, configResources);
         setDisposeManagerPerSuite(true);
     }
 
-    @Override
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "org/mule/test/annotations/outbound-headers-annotation.xml";
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/annotations/outbound-headers-annotation-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/annotations/outbound-headers-annotation-flow.xml"}});
     }
 
+    @Test
     public void testProcessHeader() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -40,6 +49,7 @@ public class OutboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals("barValue", result.get("bar"));
     }
 
+    @Test
     public void testProcessHeaderWithExistingOutHeaders() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -51,6 +61,7 @@ public class OutboundHeadersAnnotationTestCase extends FunctionalTestCase
         assertEquals("fooValue", result.get("foo"));
     }
 
+    @Test
     public void testInvalidParamType() throws Exception
     {
         try

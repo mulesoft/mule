@@ -10,27 +10,43 @@
 
 package org.mule.test.integration.security;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 /**
  * See MULE-3851
  */
-public class OutboundHttpEndpointAuthenticationTestCase extends FunctionalTestCase
+public class OutboundHttpEndpointAuthenticationTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    @Override
-    protected String getConfigResources()
+    public OutboundHttpEndpointAuthenticationTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/security/outbound-http-endpoint-authentication-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/security/outbound-http-endpoint-authentication-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/security/outbound-http-endpoint-authentication-test-flow.xml"}
+        });
+    }
+    
+
+    @Test
     public void testOutboundAutenticationSend() throws Exception
     {
         MuleClient mc = new MuleClient(muleContext);
         assertEquals(TEST_MESSAGE, mc.send("outbound", TEST_MESSAGE, null).getPayloadAsString());
     }
 
+    @Test
     public void testOutboundAutenticationDispatch() throws Exception
     {
         MuleClient mc = new MuleClient(muleContext);

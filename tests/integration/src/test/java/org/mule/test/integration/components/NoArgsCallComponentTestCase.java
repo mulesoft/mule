@@ -10,15 +10,20 @@
 
 package org.mule.test.integration.components;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 /**
  * This test re-written to use entry point resolvers.  As a consequence, some tests, which verified
  * implementation details rather than functionality, were dropped.
  */
-public class NoArgsCallComponentTestCase extends FunctionalTestCase
+public class NoArgsCallComponentTestCase extends AbstractServiceAndFlowTestCase
 {
 
     public static final String INPUT_DC_QUEUE_NAME = "vm://in";
@@ -37,11 +42,21 @@ public class NoArgsCallComponentTestCase extends FunctionalTestCase
 
     public static final int TIMEOUT = 5000;
 
-    protected String getConfigResources()
+    public NoArgsCallComponentTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/components/no-args-call-component-functional-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/components/no-args-call-component-functional-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/components/no-args-call-component-functional-test-flow.xml"}
+        });
+    }
+    
+    @Test
     public void testDelegateClass() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -53,6 +68,7 @@ public class NoArgsCallComponentTestCase extends FunctionalTestCase
 
     }
 
+    @Test
     public void testWithInjectedDelegate() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

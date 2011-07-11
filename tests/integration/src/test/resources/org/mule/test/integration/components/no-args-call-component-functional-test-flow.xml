@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:spring="http://www.springframework.org/schema/beans" xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+    xsi:schemaLocation="
+               http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+               http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
+
+    <vm:connector name="VmConnector" />
+
+    <spring:bean name="containerDelegate" class="org.mule.tck.testmodels.fruit.Apple" />
+
+
+    <flow name="WORMS">
+
+        <inbound-endpoint address="vm://in"
+            connector-ref="VmConnector" exchange-pattern="one-way" />
+
+        <component>
+            <no-arguments-entry-point-resolver>
+                <include-entry-point method="toString" />
+            </no-arguments-entry-point-resolver>
+            <singleton-object class="org.mule.tck.testmodels.fruit.Apple" />
+        </component>
+
+        <outbound-endpoint address="vm://out"
+            connector-ref="VmConnector" exchange-pattern="one-way" />
+
+    </flow>
+
+    <flow name="TIRANA">
+
+        <inbound-endpoint address="vm://invokeWithInjected"
+            connector-ref="VmConnector" exchange-pattern="one-way" />
+
+        <component>
+            <no-arguments-entry-point-resolver>
+                <include-entry-point method="wash" />
+            </no-arguments-entry-point-resolver>
+            <spring-object bean="containerDelegate" />
+        </component>
+
+
+        <outbound-endpoint address="vm://outWithInjected"
+            connector-ref="VmConnector" exchange-pattern="one-way" />
+
+    </flow>
+
+</mule>
