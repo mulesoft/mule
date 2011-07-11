@@ -13,14 +13,21 @@ package org.mule.management.agents;
 import org.mule.module.management.agent.DefaultJmxSupportAgent;
 import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
 import org.mule.module.management.agent.JmxAgent;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Map;
 
 import javax.management.remote.rmi.RMIConnectorServer;
 
-public class DefaultJmxSupportAgentTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class DefaultJmxSupportAgentTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testHostPropertyEnablesClientSocketFactory () throws Exception
     {
         DefaultJmxSupportAgent agent = new DefaultJmxSupportAgent();

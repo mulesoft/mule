@@ -19,6 +19,11 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.util.Arrays;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class FileContentsMuleMessageFactoryTestCase extends AbstractFileMuleMessageFactoryTestCase
 {
     @Override
@@ -52,6 +57,7 @@ public class FileContentsMuleMessageFactoryTestCase extends AbstractFileMuleMess
         assertPayload(message);
     }
     
+    @Test
     public void testPayloadFromInputStream() throws Exception
     {
         MuleMessageFactory factory = createMuleMessageFactory();

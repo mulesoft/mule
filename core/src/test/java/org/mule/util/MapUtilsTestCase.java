@@ -10,7 +10,7 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,10 +18,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.map.CaseInsensitiveMap;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class MapUtilsTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testMapCreationNullClass()
     {
         try
@@ -35,12 +41,14 @@ public class MapUtilsTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMapCreationWithoutElements()
     {
         Map m = MapUtils.mapWithKeysAndValues(HashMap.class, (List)null, (List)null);
         assertTrue(m.isEmpty());
     }
 
+    @Test
     public void testCaseInsensitiveMapCreation()
     {
         List strings = Arrays.asList(new String[]{"foo"});
@@ -53,6 +61,7 @@ public class MapUtilsTestCase extends AbstractMuleTestCase
         assertEquals("foo", m.get("FOO"));
     }
 
+    @Test
     public void testToStringNull() throws Exception
     {
         Map props = null;
@@ -60,6 +69,7 @@ public class MapUtilsTestCase extends AbstractMuleTestCase
         assertEquals("{}", MapUtils.toString(props, true));
     }
 
+    @Test
     public void testToStringEmpty() throws Exception
     {
         Map props = new HashMap();
@@ -67,6 +77,7 @@ public class MapUtilsTestCase extends AbstractMuleTestCase
         assertEquals("{}", MapUtils.toString(props, true));
     }
 
+    @Test
     public void testToStringSingleElement() throws Exception
     {
         Map props = MapUtils.mapWithKeysAndValues(HashMap.class, new Object[]{"foo"}, new Object[]{"bar"});
@@ -76,6 +87,7 @@ public class MapUtilsTestCase extends AbstractMuleTestCase
             MapUtils.toString(props, true));
     }
 
+    @Test
     public void testToStringMultipleElements() throws Exception
     {
         Map props = MapUtils.mapWithKeysAndValues(HashMap.class, new Object[]{"foo", "foozle"}, new Object[]{

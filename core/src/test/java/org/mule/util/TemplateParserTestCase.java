@@ -10,16 +10,24 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class TemplateParserTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testStringParserSquareBraces()
     {
         TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
@@ -38,6 +46,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertEquals("smtp://[toAddress]", result);
     }
 
+    @Test
     public void testParserValidationSquareBraces()
     {
         TemplateParser tp = TemplateParser.createSquareBracesStyleParser();
@@ -46,6 +55,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertFalse(tp.isValid("[[][]"));
     }
 
+    @Test
     public void testParserValidationAntStyle()
     {
         TemplateParser tp = TemplateParser.createAntStyleParser();
@@ -59,6 +69,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testParserValidationMuleStyle()
     {
         TemplateParser tp = TemplateParser.createMuleStyleParser();
@@ -79,6 +90,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testStringParserAntBraces()
     {
         TemplateParser tp = TemplateParser.createAntStyleParser();
@@ -113,6 +125,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertEquals("start" + whitespaceValue + "end", result);
     }
 
+    @Test
     public void testListParserAntBraces()
     {
         TemplateParser tp = TemplateParser.createAntStyleParser();
@@ -133,6 +146,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertEquals(0, result.size());
     }
 
+    @Test
     public void testMapParserAntBraces()
     {
         TemplateParser tp = TemplateParser.createAntStyleParser();
@@ -152,6 +166,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase
         assertEquals(0, result.size());
     }
 
+    @Test
     public void testStringParserAntBracesWithSimilarNames()
     {
         TemplateParser tp = TemplateParser.createAntStyleParser();

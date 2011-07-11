@@ -10,12 +10,20 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.io.IOException;
 
 import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class FileUtilsTestCase extends AbstractMuleTestCase
 {
@@ -23,21 +31,22 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
     private final String TEST_DIRECTORY = "target" + File.separator + "testDirectory";
     private final File toDir = FileUtils.newFile(TEST_DIRECTORY);
 
-    protected void doSetUp() throws Exception
+    @Before
+    public void createDirs()
     {
-        super.doSetUp();
         if (!toDir.exists())
         {
             toDir.mkdirs();
         }
     }
 
-    protected void doTearDown() throws Exception
+    @After
+    public void deleteDir()
     {
-        super.doTearDown();
         toDir.delete();
     }
 
+    @Test
     public void testFileTools() throws Exception
     {
         File file = null;
@@ -95,6 +104,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testFileNameTools() throws Exception
     {
         String filename = "Blah<Blah>.txt";
@@ -110,6 +120,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         assertEquals("B-la-h(Blah-a-b-c-d=e_f-g).txt", result);
     }
 
+    @Test
     public void testDirectoryTools() throws Exception
     {
         File dir = FileUtils.openDirectory("src");
@@ -126,6 +137,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         FileUtils.deleteTree(dir);
     }
 
+    @Test
     public void testExtractResource() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-1";
@@ -145,6 +157,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         FileUtils.deleteTree(outputDir);
     }
 
+    @Test
     public void testExtractResources() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-2";
@@ -163,6 +176,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         FileUtils.deleteTree(outputDir);
     }
 
+    @Test
     public void testExtractFileResource() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-3";
@@ -182,6 +196,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         FileUtils.deleteTree(outputDir);
     }
 
+    @Test
     public void testExtractFileResources() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-4";
@@ -200,6 +215,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         FileUtils.deleteTree(outputDir);
     }
 
+    @Test
     public void testExtractResourceWithoutKeepingDirStructure() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-5";
@@ -220,6 +236,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         FileUtils.deleteTree(outputDir);
     }
 
+    @Test
     public void testExtractResourcesWithoutKeepingDirStructure() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-6";
@@ -240,6 +257,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         FileUtils.deleteTree(outputDir);
     }
 
+    @Test
     public void testExtractFileResourceWithoutKeepingDirStructure() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-7";
@@ -260,6 +278,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         FileUtils.deleteTree(outputDir);
     }
 
+    @Test
     public void testExtractFileResourcesWithoutKeepingDirStructure() throws Exception
     {
         String testDir = TEST_DIRECTORY + File.separator + "Test-8";
@@ -280,6 +299,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         FileUtils.deleteTree(outputDir);
     }
 
+    @Test
     public void testDeleteTreeWithIgnoredDirectories() throws Exception
     {
         final String testDir = TEST_DIRECTORY + File.separator + "Test-deleting";
@@ -304,6 +324,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         FileUtils.deleteTree(outputDir);
     }
     
+    @Test
     public void testRenameFile()
     {
         try
@@ -322,6 +343,7 @@ public class FileUtilsTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testRenameFileAcrossFolders()
     {
         try

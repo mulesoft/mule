@@ -20,7 +20,13 @@ import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.MessageRequester;
 import org.mule.api.transport.MuleMessageFactory;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 
 /**
  * This test verifies and illustrates various usage patterns with {@link MuleMessageFactory}. It 
@@ -28,7 +34,7 @@ import org.mule.tck.AbstractMuleTestCase;
  * {@link MessageReceiver} and {@link MessageRequester} as well as all of the code resides in their
  * abstract superclasses.
  */
-public class MuleMessageFactoryUsagePatternsTestCase extends AbstractMuleTestCase
+public class MuleMessageFactoryUsagePatternsTestCase extends AbstractMuleContextTestCase
 {
     private OutboundEndpoint endpoint;
     private AbstractConnector connector;
@@ -44,6 +50,7 @@ public class MuleMessageFactoryUsagePatternsTestCase extends AbstractMuleTestCas
         factoryFromConnector = connector.getMuleMessageFactory();
     }
 
+    @Test
     public void testSharedMuleMessageFactoryWithConnector() throws Exception
     {
         connector.setDispatcherFactory(new FakeDispatcherFactory());
@@ -57,6 +64,7 @@ public class MuleMessageFactoryUsagePatternsTestCase extends AbstractMuleTestCas
         assertSame(factoryFromConnector, factoryFromDispatcher);
     }
     
+    @Test
     public void testMessageDispatcherCreatesOwnMuleMessageFactory() throws Exception
     {
         connector.setDispatcherFactory(new CustomDispatcherFactory());

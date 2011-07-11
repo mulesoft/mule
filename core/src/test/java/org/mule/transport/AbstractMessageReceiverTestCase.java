@@ -13,10 +13,15 @@ package org.mule.transport;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 
-public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public abstract class AbstractMessageReceiverTestCase extends AbstractMuleContextTestCase
 {
     protected Service service;
     protected InboundEndpoint endpoint;
@@ -27,6 +32,7 @@ public abstract class AbstractMessageReceiverTestCase extends AbstractMuleTestCa
         endpoint = getEndpoint();
     }
 
+    @Test
     public void testCreate() throws Exception
     {
         Service service = getTestService("orange", Orange.class);

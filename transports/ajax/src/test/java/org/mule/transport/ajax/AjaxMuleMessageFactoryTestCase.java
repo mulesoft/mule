@@ -22,6 +22,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.cometd.Bayeux;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class AjaxMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
@@ -63,6 +69,7 @@ public class AjaxMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertEquals("mp-value", message.getInvocationProperty("message-property"));
     }
     
+    @Test
     public void testMapPayloadWithoutData() throws Exception
     {
         Map<?, ?> payload = (Map<?, ?>) getValidTransportMessage();
@@ -80,6 +87,7 @@ public class AjaxMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         }
     }
     
+    @Test
     public void testJsonStringPayloadWithoutData() throws Exception
     {
         String payload = "{\"value1\" : \"foo\", \"value2\" : \"bar\"}";
@@ -90,6 +98,7 @@ public class AjaxMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertTrue(message.getPayload() instanceof String);
     }
     
+    @Test
     public void testJsonStringWithData() throws Exception
     {
         String data = JSON_STRING;
@@ -103,6 +112,7 @@ public class AjaxMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertEquals("/replyEndpoint", message.getReplyTo());
     }
     
+    @Test
     public void testNonMapNonJsonPayload() throws Exception
     {
         FruitBowl payload = new FruitBowl(new Apple(), new Banana());

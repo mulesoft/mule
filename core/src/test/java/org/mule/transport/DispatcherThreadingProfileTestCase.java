@@ -17,7 +17,7 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.config.ImmutableThreadingProfile;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestMessageDispatcher;
 import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
@@ -25,6 +25,10 @@ import org.mule.tck.testmodels.mule.TestMessageDispatcherFactory;
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This test case tests the both dispatcher threading profile and it's rejection
@@ -32,7 +36,7 @@ import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
  * TestConnector with varying threading profile configurations and asserting the
  * correct outcome. See: MULE-4752
  */
-public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
+public class DispatcherThreadingProfileTestCase extends AbstractMuleContextTestCase
 {
 
     public static int DELAY_TIME = 500;
@@ -54,6 +58,7 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
         counter.set(0);
     }
 
+    @Test
     public void testDefaultThreadingProfileConfiguration() throws MuleException
     {
         TestConnector connector = new TestConnector(muleContext);
@@ -72,6 +77,7 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
             .getThreadWaitTimeout());
     }
 
+    @Test
     public void testDefaultRunExhaustedAction() throws Exception
     {
         // Default is RUN.
@@ -88,6 +94,7 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
         assertTrue(latch.await(WAIT_TIME, TimeUnit.MILLISECONDS));
     }
 
+    @Test
     public void testWaitExhaustedAction() throws Exception
     {
         // Second job waits in workQueue for first job to complete.
@@ -101,6 +108,7 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
         assertTrue(latch.await(SERIAL_WAIT_TIME, TimeUnit.MILLISECONDS));
     }
 
+    @Test
     public void testWaitTimeoutExhaustedAction() throws Exception
     {
         // Second job attempts to wait in workQueue but waiting job times out/
@@ -117,6 +125,7 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
         assertEquals(1, counter.get());
     }
 
+    @Test
     public void testAbortExhaustedAction() throws Exception
     {
         // Second job is aborted
@@ -133,6 +142,7 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
         assertEquals(1, counter.get());
     }
 
+    @Test
     public void testDiscardExhaustedAction() throws Exception
     {
         // Second job is discarded
@@ -149,6 +159,7 @@ public class DispatcherThreadingProfileTestCase extends AbstractMuleTestCase
         assertEquals(1, counter.get());
     }
 
+    @Test
     public void testDiscardOldestExhaustedAction() throws Exception
     {
         // The third job is discarded when the fourth job is submitted

@@ -10,21 +10,29 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class MapCombinerTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testBasicMerge()
     {
         doTestMerge(new MapCombiner(), "[a:[b:B,c:C]]", "[a:[d:D]]", "[a:[b:B,c:C,d:D]]");
     }
 
+    @Test
     public void testOverwrite()
     {
         MapCombiner combiner = new MapCombiner();
@@ -32,11 +40,13 @@ public class MapCombinerTestCase extends AbstractMuleTestCase
         doTestMerge(combiner, "[a:[b:B,c:C]]", "[a:[d:D]]", "[a:[d:D]]");
     }
 
+    @Test
     public void testDeepMerge()
     {
         doTestMerge(new MapCombiner(), "[a:[b:B,c:C,d:[e:E,f:F]]]", "[a:[d:[g:G]]]", "[a:[b:B,c:C,d:[e:E,f:F,g:G]]]");
     }
 
+    @Test
     public void testRestrictedMerge()
     {
         MapCombiner combiner = new MapCombiner();
@@ -44,6 +54,7 @@ public class MapCombinerTestCase extends AbstractMuleTestCase
         doTestMerge(combiner, "[a:[b:B,c:C,d:[e:E,f:F]]]", "[a:[d:[g:G]]]", "[a:[b:B,c:C,d:[g:G]]]");
     }
 
+    @Test
     public void testMergeLists()
     {
         doTestMerge(new MapCombiner(), "[a:(b,c)]", "[a:(d)]", "[a:(b,c,d)]");
@@ -61,6 +72,7 @@ public class MapCombinerTestCase extends AbstractMuleTestCase
         assertEquals(combiner, map3);
     }
 
+    @Test
     public void testInfrastructure()
     {
         Map map = buildMap("[a:(b,c)]");

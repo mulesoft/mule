@@ -10,15 +10,21 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Date;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DateUtilsTestCase extends AbstractMuleTestCase
 {
     private final String TEST_DATE_FORMAT = "dd/MM/yyyy hh:mm:ss";
     private final String TEST_DATE_FORMAT_2 = "dd-MM-yy, hh:mm";
 
+    @Test
     public void testDateUtils() throws Exception
     {
         String date = "12/11/2002 12:06:47";

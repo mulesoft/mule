@@ -10,7 +10,7 @@
 
 package org.mule.tck.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.IOUtils;
 import org.mule.util.StringUtils;
 
@@ -38,8 +38,8 @@ public class WebServiceOnlineCheck
             URLConnection conn = new URL(TEST_URL).openConnection();
             // setting these timeouts ensures the client does not deadlock indefinitely
             // when the server has problems.
-            conn.setConnectTimeout(AbstractMuleTestCase.RECEIVE_TIMEOUT);
-            conn.setReadTimeout(AbstractMuleTestCase.RECEIVE_TIMEOUT);
+            conn.setConnectTimeout(AbstractMuleContextTestCase.RECEIVE_TIMEOUT);
+            conn.setReadTimeout(AbstractMuleContextTestCase.RECEIVE_TIMEOUT);
             InputStream in = conn.getInputStream();
 
             input = new BufferedReader(new InputStreamReader(in));            

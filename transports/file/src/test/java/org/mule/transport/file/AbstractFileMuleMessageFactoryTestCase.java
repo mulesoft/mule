@@ -15,6 +15,8 @@ import org.mule.util.FileUtils;
 
 import java.io.File;
 
+import static org.junit.Assert.assertTrue;
+
 public abstract class AbstractFileMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
     protected File tempFile;

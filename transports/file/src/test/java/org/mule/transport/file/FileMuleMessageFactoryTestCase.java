@@ -13,6 +13,11 @@ package org.mule.transport.file;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MuleMessageFactory;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFactoryTestCase
 {
     @Override
@@ -27,6 +32,7 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
         return tempFile;
     }
 
+    @Test
     public void testMessageProperties() throws Exception
     {
         MuleMessageFactory factory = createMuleMessageFactory();
@@ -36,6 +42,7 @@ public class FileMuleMessageFactoryTestCase extends AbstractFileMuleMessageFacto
         assertMessageProperties(message);
     }
 
+    @Test
     public void testCreateMessageFromStream() throws Exception
     {
         MuleMessageFactory factory = createMuleMessageFactory();

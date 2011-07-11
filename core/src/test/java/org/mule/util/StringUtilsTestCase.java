@@ -10,13 +10,22 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Arrays;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class StringUtilsTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testSplitAndTrim1()
     {
         String[] result = StringUtils.splitAndTrim(null, ",,");
@@ -31,6 +40,7 @@ public class StringUtilsTestCase extends AbstractMuleTestCase
         assertTrue(Arrays.equals(ArrayUtils.EMPTY_STRING_ARRAY, result));
     }
 
+    @Test
     public void testSplitAndTrim2()
     {
         String[] inputValues = new String[]{"foo", "bar", "baz", "kaboom"};
@@ -49,6 +59,7 @@ public class StringUtilsTestCase extends AbstractMuleTestCase
         assertTrue(Arrays.equals(inputValues, StringUtils.splitAndTrim(inputString, ",")));
     }
 
+    @Test
     public void testSplitAndTrim3()
     {
         String[] inputValues = new String[]{"foo", "bar", "baz", "kaboom"};
@@ -56,6 +67,7 @@ public class StringUtilsTestCase extends AbstractMuleTestCase
         assertTrue(Arrays.equals(inputValues, StringUtils.splitAndTrim(inputString, ",")));
     }
 
+    @Test
     public void testHexStringToByteArray()
     {
         assertNull(StringUtils.hexStringToByteArray(null));
@@ -79,6 +91,7 @@ public class StringUtilsTestCase extends AbstractMuleTestCase
         assertTrue(Arrays.equals(new byte[]{10, (byte)0xff}, StringUtils.hexStringToByteArray("0aff")));
     }
 
+    @Test
     public void testByteArrayToHexString()
     {
         assertNull(StringUtils.toHexString(null));

@@ -10,16 +10,25 @@
 
 package org.mule.util.counters;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.counters.CounterFactory.Type;
 
 import java.util.Iterator;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class CountersTestCase extends AbstractMuleTestCase
 {
 
     private static final double delta = 1E-10;
 
+    @Test
     public void testCreate()
     {
         assertNotNull(CounterFactory.createCounter("create1", Type.NUMBER));
@@ -49,6 +58,7 @@ public class CountersTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testNumber()
     {
         Counter ct = CounterFactory.createCounter("testNumber", Type.NUMBER);
@@ -64,6 +74,7 @@ public class CountersTestCase extends AbstractMuleTestCase
         assertEquals("decrement", 12.0, ct.nextValue(), delta);
     }
 
+    @Test
     public void testMinMax()
     {
         Counter ct = CounterFactory.createCounter("testMinMax", Type.NUMBER);
@@ -80,6 +91,7 @@ public class CountersTestCase extends AbstractMuleTestCase
         assertEquals("Max", 18.0, max.nextValue(), delta);
     }
 
+    @Test
     public void testDelta()
     {
         Counter ct = CounterFactory.createCounter("testDelta", Type.NUMBER);
@@ -96,6 +108,7 @@ public class CountersTestCase extends AbstractMuleTestCase
         assertEquals("Delta", 0.0, dt.nextValue(), delta);
     }
 
+    @Test
     public void testSum()
     {
         Counter ct = CounterFactory.createCounter("testSum", Type.NUMBER);
@@ -112,6 +125,7 @@ public class CountersTestCase extends AbstractMuleTestCase
         assertEquals("Sum", 56.0, sum.nextValue(), delta);
     }
 
+    @Test
     public void testAverage()
     {
         Counter ct = CounterFactory.createCounter("testAverage", Type.NUMBER);
@@ -153,6 +167,7 @@ public class CountersTestCase extends AbstractMuleTestCase
         assertTrue("InstantRate", Double.isNaN(rate.nextValue()));
     }
 
+    @Test
     public void testRatePerUnit() throws InterruptedException
     {
         Counter ct = CounterFactory.createCounter("testRatePerUnit", Type.NUMBER);

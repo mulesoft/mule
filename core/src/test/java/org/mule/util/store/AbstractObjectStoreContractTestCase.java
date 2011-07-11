@@ -14,15 +14,20 @@ import org.mule.api.store.ObjectAlreadyExistsException;
 import org.mule.api.store.ObjectDoesNotExistException;
 import org.mule.api.store.ObjectStore;
 import org.mule.api.store.ObjectStoreException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.Serializable;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * This test verifies the contract described in {@link ObjectStore}
  */
-public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTestCase
+public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testContainsWithNullKey()
     {
         try
@@ -36,6 +41,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
         }
     }
     
+    @Test
     public void testStoreWithNullKey()
     {
         try
@@ -50,6 +56,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
         }
     }
     
+    @Test
     public void testRetrieveWithNullKey()
     {
         try
@@ -63,6 +70,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
         }
     }
     
+    @Test
     public void testRemoveWithNullKey()
     {
         try
@@ -76,6 +84,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
         }
     }
     
+    @Test
     public void testRetrieveUnboundKey() throws ObjectStoreException
     {
         try
@@ -89,6 +98,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
         }
     }
     
+    @Test
     public void testRemoveWithUnboundKey() throws ObjectStoreException
     {
         try
@@ -102,6 +112,7 @@ public abstract class AbstractObjectStoreContractTestCase extends AbstractMuleTe
         }
     }
     
+    @Test
     public void testStoreWithExistingKey() throws ObjectStoreException
     {
         String key = "theKey";

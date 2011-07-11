@@ -10,15 +10,26 @@
 package org.mule.routing.filters;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
 import org.mule.module.ognl.expression.OgnlExpressionEvaluator;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+
 public class OgnlExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
 
+    private MuleContext muleContext = mock(MuleContext.class);
+
+    @Test
     public void testWithExpressions()
     {
         Apple apple = new Apple();

@@ -16,6 +16,10 @@ import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 import org.mule.util.UUID;
 
 import org.jivesoftware.smack.packet.Message;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class XmppMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
@@ -39,6 +43,7 @@ public class XmppMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         return "this is an invalid transport message for XmppMuleMessageFactory";
     }
     
+    @Test
     public void testPacketWithMessageProperties() throws Exception
     {
         String uuid = UUID.getUUID();

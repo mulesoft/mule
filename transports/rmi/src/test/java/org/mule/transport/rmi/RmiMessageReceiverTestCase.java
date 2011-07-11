@@ -31,9 +31,13 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This is a UNIT TEST case, not a functional test case.
@@ -113,6 +117,7 @@ public class RmiMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         return messageReceiver;
     }
 
+    @Test
     public void testReceive() throws Exception
     {
         RmiMessageReceiver messageReceiver = this.getMessageReceiver();

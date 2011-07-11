@@ -16,6 +16,9 @@ import java.io.FileInputStream;
 import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class PGPSecurityProviderTestCase extends AbstractEncryptionStrategyTestCase
 {
@@ -45,6 +48,7 @@ public class PGPSecurityProviderTestCase extends AbstractEncryptionStrategyTestC
         super.doTearDown();
     }
 
+    @Test
     public void testAuthenticate() throws Exception
     {
         Authentication auth = new PGPAuthentication("Mule client <mule_client@mule.com>", message);

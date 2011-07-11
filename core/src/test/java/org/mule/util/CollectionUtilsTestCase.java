@@ -10,7 +10,7 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,53 +19,53 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
+import org.junit.Test;
+
+import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class CollectionUtilsTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testToArrayOfComponentTypeNullCollection()
     {
         assertNull(CollectionUtils.toArrayOfComponentType(null, String.class));
     }
 
+    @Test(expected = IllegalArgumentException.class)
     public void testToArrayOfComponentTypeNullType()
     {
-        try
-        {
-            CollectionUtils.toArrayOfComponentType(Collections.EMPTY_LIST, null);
-            fail("should have thrown IllegalArgumentException");
-        }
-        catch (IllegalArgumentException iex)
-        {
-            // OK
-        }
+        CollectionUtils.toArrayOfComponentType(Collections.EMPTY_LIST, null);
+        fail("should have thrown IllegalArgumentException");
     }
 
+    @Test
     public void testToArrayOfComponentTypeEmptyCollection()
     {
         assertTrue(Arrays.equals(new String[0], CollectionUtils.toArrayOfComponentType(
-            Collections.EMPTY_LIST, String.class)));
+                Collections.EMPTY_LIST, String.class)));
     }
 
+    @Test(expected = ArrayStoreException.class)
     public void testToArrayOfComponentTypeWrongElement()
     {
-        try
-        {
-            CollectionUtils.toArrayOfComponentType(Collections.singleton("foo"), Integer.class);
-            fail("should have thrown ArrayStoreException");
-        }
-        catch (ArrayStoreException asx)
-        {
-            // OK
-        }
+        CollectionUtils.toArrayOfComponentType(Collections.singleton("foo"), Integer.class);
+        fail("should have thrown ArrayStoreException");
     }
 
+    @Test
     public void testToArrayOfComponentTypeOK()
     {
-        String[] objects = new String[]{"foo", "bar", "baz"};
+        String[] objects = new String[] {"foo", "bar", "baz"};
         assertTrue(Arrays.equals(objects, CollectionUtils.toArrayOfComponentType(Arrays.asList(objects),
-            String.class)));
+                                                                                 String.class)));
     }
 
+    @Test
     public void testToStringNull() throws Exception
     {
         Collection c = null;
@@ -73,6 +73,7 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
         assertEquals("[]", CollectionUtils.toString(c, true));
     }
 
+    @Test
     public void testToStringEmpty() throws Exception
     {
         Collection c = new ArrayList();
@@ -80,15 +81,17 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
         assertEquals("[]", CollectionUtils.toString(c, true));
     }
 
+    @Test
     public void testToStringSingleElement() throws Exception
     {
         Collection<String> c = Arrays.asList("foo");
 
         assertEquals("[foo]", CollectionUtils.toString(c, false));
         assertEquals("[" + SystemUtils.LINE_SEPARATOR + "foo" + SystemUtils.LINE_SEPARATOR + "]",
-            CollectionUtils.toString(c, true));
+                     CollectionUtils.toString(c, true));
     }
 
+    @Test
     public void testToStringMultipleElements() throws Exception
     {
         Collection<Serializable> c = Arrays.asList("foo", this.getClass());
@@ -96,10 +99,11 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
         assertEquals("[foo, " + this.getClass().getName() + "]", CollectionUtils.toString(c, false));
 
         assertEquals("[" + SystemUtils.LINE_SEPARATOR + "foo" + SystemUtils.LINE_SEPARATOR
-                        + this.getClass().getName() + SystemUtils.LINE_SEPARATOR + "]", CollectionUtils
-            .toString(c, true));
+                     + this.getClass().getName() + SystemUtils.LINE_SEPARATOR + "]", CollectionUtils
+                .toString(c, true));
     }
 
+    @Test
     public void testToStringTooManyElements()
     {
         Collection<Number> test = new ArrayList<Number>(100);
@@ -113,7 +117,8 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
         assertTrue(result.endsWith("[..]]"));
         assertEquals(9, StringUtils.countMatches(result, ","));
     }
-    
+
+    @Test
     public void testContainsTypeTrue()
     {
         Collection c = new ArrayList();
@@ -122,6 +127,7 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
         assertTrue(CollectionUtils.containsType(c, Date.class));
     }
 
+    @Test
     public void testContainsTypeFalse()
     {
         Collection c = new ArrayList();
@@ -130,6 +136,7 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
         assertFalse(CollectionUtils.containsType(c, Date.class));
     }
 
+    @Test
     public void testContainsTypeNullChecks()
     {
         Collection c = new ArrayList();
@@ -138,7 +145,8 @@ public class CollectionUtilsTestCase extends AbstractMuleTestCase
         assertFalse(CollectionUtils.containsType(c, null));
         assertFalse(CollectionUtils.containsType(null, Date.class));
     }
-    
+
+    @Test
     public void testRemoveType()
     {
         Collection c = new ArrayList();

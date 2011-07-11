@@ -27,6 +27,10 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
     @Override
@@ -49,6 +53,7 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         return "this is not a valid transport message for MailMuleMessageFactory";
     }
 
+    @Test
     public void testAttachments() throws Exception
     {
         Message payload = createMimeMessageWithAttachment();
@@ -58,6 +63,7 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertEquals(2, muleMessage.getInboundAttachmentNames().size());
     }
 
+    @Test
     public void testAddRecipientProperties() throws Exception
     {
         String to = "Information <info@domain.com>";
@@ -77,6 +83,7 @@ public class MailMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertEquals(bcc, muleMessage.getOutboundProperty(MailProperties.INBOUND_BCC_ADDRESSES_PROPERTY));
     }
 
+    @Test
     public void testAttachmentsWithSameName() throws Exception
     {
         Message payload = createMimeMessageWithSameAttachmentNames();

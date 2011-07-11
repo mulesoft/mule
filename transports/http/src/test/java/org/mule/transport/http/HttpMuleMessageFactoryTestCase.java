@@ -10,9 +10,6 @@
 
 package org.mule.transport.http;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageTypeNotSupportedException;
@@ -29,6 +26,14 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.StatusLine;
 import org.apache.commons.httpclient.URI;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
@@ -69,6 +74,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertEquals("foo-value", message.getInboundProperty("foo-header"));
     }
     
+    @Test
     public void testInvalidPayloadOnHttpMuleMessageFactory() throws Exception
     {
         HttpMuleMessageFactory factory = new HttpMuleMessageFactory(muleContext);
@@ -83,6 +89,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         }
     }
     
+    @Test
     public void testHttpRequestPostPayload() throws Exception
     {
         HttpMuleMessageFactory factory = (HttpMuleMessageFactory) createMuleMessageFactory();
@@ -104,6 +111,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         return new HttpRequest(requestLine, HEADERS, stream, encoding);
     }
     
+    @Test
     public void testHttpMethodGet() throws Exception
     {
         InputStream body = new ByteArrayInputStream("/services/Echo".getBytes());
@@ -118,6 +126,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         assertEquals("200", message.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY));
     }
     
+    @Test
     public void testHttpMethodPost() throws Exception
     {
         InputStream body = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
@@ -145,6 +154,7 @@ public class HttpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
         return httpMethod;
     }
 
+    @Test
     public void testMultipleHeaderWithSameName() throws Exception
     {
         HttpMuleMessageFactory messageFactory = new HttpMuleMessageFactory(null);

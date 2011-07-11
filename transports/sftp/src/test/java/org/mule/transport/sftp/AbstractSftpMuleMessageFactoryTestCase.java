@@ -14,7 +14,8 @@ import org.mule.transport.AbstractMuleMessageFactoryTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
-import java.io.InputStream;
+
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractSftpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
@@ -23,7 +24,6 @@ public abstract class AbstractSftpMuleMessageFactoryTestCase extends AbstractMul
 
     protected byte[] testBytes;
     protected String testString;
-    protected InputStream testInputstream;
 
     @Override
     protected void doSetUp() throws Exception

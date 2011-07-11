@@ -21,6 +21,9 @@ import javax.jms.TextMessage;
 
 import org.apache.commons.collections.IteratorUtils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class JmsMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
     private static final String MESSAGE_TEXT = "Test JMS Message";

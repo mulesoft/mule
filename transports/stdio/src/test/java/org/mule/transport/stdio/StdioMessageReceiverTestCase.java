@@ -17,9 +17,15 @@ import org.mule.api.transport.MessageReceiver;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transport.AbstractMessageReceiverTestCase;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
 
+    @Test
     public void testReceiver() throws Exception
     {
         // FIX A bit hard testing receive from a unit test as we need to reg
@@ -27,6 +33,7 @@ public class StdioMessageReceiverTestCase extends AbstractMessageReceiverTestCas
         // file endpoint functions tests for this
     }
 
+    @Test
     public void testOtherProperties() throws Exception
     {
         StdioMessageReceiver receiver = (StdioMessageReceiver) getMessageReceiver();

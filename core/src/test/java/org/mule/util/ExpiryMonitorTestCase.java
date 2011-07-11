@@ -10,11 +10,14 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.monitor.Expirable;
 import org.mule.util.monitor.ExpiryMonitor;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class ExpiryMonitorTestCase extends AbstractMuleTestCase
 {
@@ -25,6 +28,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
         expired = false;
     }
 
+    @Test
     public void testExpiry() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor("test", 100);
@@ -41,6 +45,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
         assertTrue(!monitor.isRegistered(e));
     }
 
+    @Test
     public void testNotExpiry() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor("test", 100);
@@ -59,6 +64,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
         assertTrue(!monitor.isRegistered(e));
     }
 
+    @Test
     public void testExpiryWithReset() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor("test", 100);
@@ -81,6 +87,7 @@ public class ExpiryMonitorTestCase extends AbstractMuleTestCase
         assertTrue(!monitor.isRegistered(e));
     }
 
+    @Test
     public void testNotExpiryWithRemove() throws InterruptedException
     {
         ExpiryMonitor monitor = new ExpiryMonitor("test", 100);

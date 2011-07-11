@@ -10,13 +10,19 @@
 
 package org.mule.transport;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.apache.commons.lang.SerializationUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 
 public class NullPayloadTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testUniqueDeserialization()
     {
         NullPayload result = NullPayload.getInstance();

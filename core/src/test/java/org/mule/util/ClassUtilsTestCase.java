@@ -10,7 +10,7 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.AbstractFruit;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -27,6 +27,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class ClassUtilsTestCase extends AbstractMuleTestCase
 {
 
@@ -35,6 +45,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
     protected final Set<String> ignoreMethods = new HashSet<String>(Arrays.asList("equals",
                                                                                   "getInvocationHandler"));
 
+    @Test
     public void testIsConcrete() throws Exception
     {
         assertTrue(ClassUtils.isConcrete(Orange.class));
@@ -52,6 +63,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testLoadClass() throws Exception
     {
         Class clazz = ClassUtils.loadClass("java.lang.String", getClass());
@@ -71,6 +83,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
 
     }
     
+    @Test
     public void testLoadPrimitiveClass() throws Exception
     {
         assertSame(ClassUtils.loadClass("boolean", getClass()), Boolean.TYPE);
@@ -83,6 +96,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertSame(ClassUtils.loadClass("short", getClass()), Short.TYPE);
     }
     
+    @Test
     public void testLoadClassOfType() throws Exception
     {
 
@@ -103,6 +117,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testInstanciateClass() throws Exception
     {
         Object object = ClassUtils.instanciateClass("org.mule.tck.testmodels.fruit.Orange");
@@ -130,6 +145,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testGetParameterTypes() throws Exception
     {
         FruitBowl bowl = new FruitBowl();
@@ -144,6 +160,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertEquals(0, classes.length);
     }
 
+    @Test
     public void testLoadingResources() throws Exception
     {
         URL resource = ClassUtils.getResource("log4j.properties", getClass());
@@ -153,6 +170,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertNull(resource);
     }
 
+    @Test
     public void testLoadingResourceEnumeration() throws Exception
     {
         Enumeration enumeration = ClassUtils.getResources("log4j.properties", getClass());
@@ -164,6 +182,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertTrue(!enumeration.hasMoreElements());
     }
 
+    @Test
     public void testGetSatisfiableMethods() throws Exception
     {
         List methods = ClassUtils.getSatisfiableMethods(FruitBowl.class, new Class[]{Apple.class}, true,
@@ -203,6 +222,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertEquals("setFruit", ((Method) methods.get(0)).getName());
     }
 
+    @Test
     public void testSimpleName()
     {
         simpleNameHelper("String", "foo".getClass());
@@ -211,6 +231,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         simpleNameHelper("null", null);
     }
 
+    @Test
     public void testEqual()
     {
         Object a1 = new HashBlob(1);
@@ -227,6 +248,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertFalse(ClassUtils.equal(b, null));
     }
 
+    @Test
     public void testHash()
     {
         Object a = new HashBlob(1);
@@ -237,6 +259,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertFalse(ClassUtils.hash(new Object[]{b, a, b, a}) == ClassUtils.hash(new Object[]{a, b, a, b}));
     }
 
+    @Test
     public void testClassTypesWithNullInArray()
     {
         Object[] array = new Object[]{"hello", null, "world"};
@@ -247,6 +270,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase
         assertEquals(String.class, classTypes[2]);
     }
 
+    @Test
     public void testCompareWithNull()
     {
         Class[] c1 = new Class[]{String.class, Integer.class};

@@ -12,14 +12,16 @@ package org.mule.management.agents;
 
 import org.mule.module.management.agent.JmxAgent;
 import org.mule.module.management.agent.Mx4jAgent;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.List;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 
-public class MuleAgentsTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+public class MuleAgentsTestCase extends AbstractMuleContextTestCase
 {
 
     protected JmxAgent jmxAgent;
@@ -36,12 +38,14 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
         jmxAgent = (JmxAgent) muleContext.getRegistry().lookupObject(JmxAgent.class);
     }
 
+    @Test
     public void testRemoveNonExistentAgent() throws Exception
     {
         muleContext.getRegistry().unregisterAgent("DOES_NOT_EXIST");
         // should not throw NPE
     }
 
+    @Test
     public void testAgentsRegistrationOrder() throws Exception
     {
         // If you specified "JmxAgent", it was the first one in the map,
@@ -64,6 +68,7 @@ public class MuleAgentsTestCase extends AbstractMuleTestCase
      * {@code locateServer} and {@code createServer} both
      * set to false.
      */
+    @Test
     public void testJmxAgentInjectedMBeanServer() throws Exception
     {
         List servers = MBeanServerFactory.findMBeanServer(null);

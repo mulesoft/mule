@@ -15,8 +15,15 @@ import org.mule.util.IOUtils;
 import java.io.FileInputStream;
 import java.net.URL;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrategyTestCase
 {
+
+    @Test
     public void testDecrypt() throws Exception
     {
         URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-signed.asc");
@@ -32,6 +39,7 @@ public class KeyBasedEncryptionStrategyTestCase extends AbstractEncryptionStrate
         assertEquals("This is a test message.\r\nThis is another line.\r\n", result);
     }
 
+    @Test
     public void testEncrypt() throws Exception
     {
         String msg = "Test Message";

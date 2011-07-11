@@ -10,14 +10,20 @@
 
 package org.mule.util.timer;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Timer;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class TimerTestCase extends AbstractMuleTestCase implements TimeEventListener
 {
-    volatile boolean fired;
+    private volatile boolean fired;
 
+    @Test
     public void testTimer() throws Exception
     {
         Timer timer = new Timer();
@@ -30,6 +36,7 @@ public class TimerTestCase extends AbstractMuleTestCase implements TimeEventList
         assertTrue(fired);
     }
 
+    @Test
     public void testStopTimer() throws Exception
     {
         fired = false;
@@ -47,6 +54,7 @@ public class TimerTestCase extends AbstractMuleTestCase implements TimeEventList
         assertTrue(!fired);
     }
 
+    @Test
     public void testMultipleListeners() throws Exception
     {
         fired = false;
@@ -71,6 +79,7 @@ public class TimerTestCase extends AbstractMuleTestCase implements TimeEventList
         assertTrue(!listener.wasFired());
     }
 
+    @Test
     public void testRemoveListeners() throws Exception
     {
         fired = false;

@@ -10,7 +10,7 @@
 
 package org.mule.util.queue;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.concurrent.Latch;
 import org.mule.util.xa.AbstractResourceManager;
 
@@ -18,8 +18,15 @@ import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
-public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMuleContextTestCase
 {
 
     /**
@@ -31,6 +38,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
     protected abstract boolean isPersistent();
 
+    @Test
     public void testPutTake() throws Exception
     {
         TransactionalQueueManager mgr = createQueueManager();
@@ -52,6 +60,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
     }
 
+    @Test
     public void testTakePut() throws Exception
     {
         final TransactionalQueueManager mgr = createQueueManager();
@@ -98,6 +107,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
     }
     
+    @Test
     public void testPutTakeUntake() throws Exception
     {
         final TransactionalQueueManager mgr = createQueueManager();
@@ -155,6 +165,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
 
     }
 
+    @Test
     public void testTakePutRollbackPut() throws Exception
     {
         final TransactionalQueueManager mgr = createQueueManager();
@@ -206,6 +217,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
     }
 
+    @Test
     public void testPutTakeUntakeRollbackUntake() throws Exception
     {
         final TransactionalQueueManager mgr = createQueueManager();
@@ -269,6 +281,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
     }
 
+    @Test
     public void testTakePutOverCapacity() throws Exception
     {
         final TransactionalQueueManager mgr = createQueueManager();
@@ -316,6 +329,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         mgr.stop(AbstractResourceManager.SHUTDOWN_MODE_NORMAL);
     }
 
+    @Test
     public void testPutWithPersistence() throws Exception
     {
         if (isPersistent())
@@ -360,6 +374,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         }
     }
 
+    @Test
     public void testTransactedPutCommitWithPersistence() throws Exception
     {
         if (isPersistent())
@@ -403,6 +418,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         }
     }
 
+    @Test
     public void testTransactedPutRollbackWithPersistence() throws Exception
     {
         if (isPersistent())
@@ -448,6 +464,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         }
     }
 
+    @Test
     public void testPutTake_RespectsOrderOnPersistence() throws Exception
     {
         if (isPersistent())
@@ -488,6 +505,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         }
     }
 
+    @Test
     public void testTransactionsOnMultipleQueues() throws Exception
     {
 
@@ -562,6 +580,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         }
     }
 
+    @Test
     public void testPoll() throws Exception
     {
 
@@ -616,6 +635,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         }
     }
 
+    @Test
     public void testPeek() throws Exception
     {
 
@@ -649,6 +669,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         }
     }
 
+    @Test
     public void testOffer() throws Exception
     {
 
@@ -695,6 +716,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         }
     }
 
+    @Test
     public void testBench() throws Exception
     {
 
@@ -743,6 +765,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         assertEquals("Queue must be fully consumed after successful test run. Queue size:", 0, queue.size());
     }
 
+    @Test
     public void testRecoverWarmRestart() throws Exception
     {
         TransactionalQueueManager mgr = createQueueManager();
@@ -769,6 +792,7 @@ public abstract class AbstractTransactionQueueManagerTestCase extends AbstractMu
         assertEquals(toPopulate, q.size());
     }
 
+    @Test
     public void testRecoverColdRestart() throws Exception
     {
         TransactionalQueueManager mgr = createQueueManager();

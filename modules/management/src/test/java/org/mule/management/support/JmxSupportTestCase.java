@@ -20,6 +20,11 @@ import java.util.List;
 
 import javax.management.ObjectName;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JmxSupportTestCase extends AbstractMuleJmxTestCase
 {
     private final String MANAGER_ID = "Test_Instance";
@@ -35,6 +40,7 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         contextBuilder.setMuleConfiguration(config);
     }
 
+    @Test
     public void testClashingDomains() throws Exception
     {
         // pre-register the same domain to simulate a clashing domain
@@ -48,6 +54,7 @@ public class JmxSupportTestCase extends AbstractMuleJmxTestCase
         assertTrue("Should have contained a new domain.", domains.contains(TEST_DOMAIN + ".1"));
     }
 
+    @Test
     public void testClashingSuffixedDomains() throws Exception
     {
 

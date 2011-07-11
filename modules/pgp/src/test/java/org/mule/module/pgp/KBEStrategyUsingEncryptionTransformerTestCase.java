@@ -10,9 +10,6 @@
 
 package org.mule.module.pgp;
 
-import java.io.InputStream;
-
-import org.apache.commons.io.IOUtils;
 import org.mule.DefaultMuleEvent;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
@@ -20,8 +17,17 @@ import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.encryption.EncryptionTransformer;
 import org.mule.transformer.simple.ByteArrayToObject;
 
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class KBEStrategyUsingEncryptionTransformerTestCase extends AbstractEncryptionStrategyTestCase
 {
+    @Test
     public void testEncrypt() throws Exception
     {
         String msg = "Test Message";

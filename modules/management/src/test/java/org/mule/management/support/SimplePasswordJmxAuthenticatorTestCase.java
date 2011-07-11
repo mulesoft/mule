@@ -11,7 +11,7 @@
 package org.mule.management.support;
 
 import org.mule.module.management.support.SimplePasswordJmxAuthenticator;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.security.Principal;
 import java.util.Collections;
@@ -22,17 +22,26 @@ import java.util.Set;
 import javax.management.remote.JMXPrincipal;
 import javax.security.auth.Subject;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
 {
     private static final String[] VALID_AUTH_TOKEN = {"mule", "mulepassword"};
     private SimplePasswordJmxAuthenticator authenticator;
 
-    protected void doSetUp () throws Exception
+    @Before
+    public void setUpAuthenticator () throws Exception
     {
-        super.doSetUp();
         authenticator = new SimplePasswordJmxAuthenticator();
     }
 
+    @Test
     public void testSuccessfulAuthentication()
     {
         Map<String, String> credentials = getValidCredentials();
@@ -64,6 +73,7 @@ public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
         assertEquals(VALID_AUTH_TOKEN[0], name);
     }
 
+    @Test
     public void testNullOrEmptyCredentialsConfigured()
     {
         Map<String, String> credentials = Collections.emptyMap();
@@ -96,6 +106,7 @@ public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testNullAuthToken()
     {
         try
@@ -109,6 +120,7 @@ public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testInvalidAuthToken ()
     {
         try
@@ -123,6 +135,7 @@ public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testAuthTokenTooLong()
     {
         try
@@ -137,6 +150,7 @@ public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testAuthTokenTooShort()
     {
         try
@@ -151,6 +165,7 @@ public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testNoSuchUser()
     {
         try
@@ -165,6 +180,7 @@ public class SimplePasswordJmxAuthenticatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testInvalidPassword()
     {
         authenticator.setCredentials(getValidCredentials());

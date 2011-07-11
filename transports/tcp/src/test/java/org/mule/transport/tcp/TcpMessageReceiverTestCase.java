@@ -22,6 +22,7 @@ import com.mockobjects.dynamic.Mock;
 public class TcpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 {
 
+    @Override
     public MessageReceiver getMessageReceiver() throws Exception
     {
         Mock mockComponent = new Mock(Service.class);
@@ -31,6 +32,7 @@ public class TcpMessageReceiverTestCase extends AbstractMessageReceiverTestCase
             (Service)mockComponent.proxy(), endpoint);
     }
 
+    @Override
     public InboundEndpoint getEndpoint() throws Exception
     {
         return muleContext.getEndpointFactory().getInboundEndpoint("tcp://localhost:1234");

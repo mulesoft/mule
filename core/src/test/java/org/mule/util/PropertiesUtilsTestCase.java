@@ -9,17 +9,24 @@
  */
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class PropertiesUtilsTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testRemoveNameSpacePrefix()
     {
         String temp = "this.is.a.namespace";
@@ -39,6 +46,7 @@ public class PropertiesUtilsTestCase extends AbstractMuleTestCase
         assertEquals("this_is-a-namespace", result);
     }
 
+    @Test
     public void testRemoveXMLNameSpacePrefix()
     {
         String temp = "j:namespace";
@@ -54,6 +62,7 @@ public class PropertiesUtilsTestCase extends AbstractMuleTestCase
         assertEquals("namespace", result);
     }
 
+    @Test
     public void testRemoveNamespaces() throws Exception
     {
         Map props = new HashMap();
@@ -73,6 +82,7 @@ public class PropertiesUtilsTestCase extends AbstractMuleTestCase
         assertEquals("string", MapUtils.getString(props, "stringProperty", ""));
     }
 
+    @Test
     public void testMaskedProperties()
     {
         // test nulls

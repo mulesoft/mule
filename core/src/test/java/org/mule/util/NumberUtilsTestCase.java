@@ -10,29 +10,38 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Calendar;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class NumberUtilsTestCase extends AbstractMuleTestCase
 {
     static final long l = 1000000000;
 
+    @Test
     public void testStringToLong()
     {
         assertEquals(l, NumberUtils.toLong("1000000000"));
     }
 
+    @Test
     public void testLongToLong()
     {
         assertEquals(l, NumberUtils.toLong(new Long(l)));
     }
 
+    @Test
     public void testIntegerToLong()
     {
         assertEquals(l, NumberUtils.toLong(new Integer(1000000000)));
     }
 
+    @Test
     public void testIncompatible()
     {
         try
@@ -46,6 +55,7 @@ public class NumberUtilsTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testNull()
     {
         try

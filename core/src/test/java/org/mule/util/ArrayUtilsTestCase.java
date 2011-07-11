@@ -10,13 +10,22 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ArrayUtilsTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testToArrayOfComponentType()
     {
         // null array
@@ -57,6 +66,7 @@ public class ArrayUtilsTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testToStringMaxLength()
     {
         Object test = new byte[100];

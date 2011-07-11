@@ -10,15 +10,23 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+
 public class SystemUtilsTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testEnvironment() throws Exception
     {
         Map env = SystemUtils.getenv();
@@ -41,6 +49,7 @@ public class SystemUtilsTestCase extends AbstractMuleTestCase
         assertNotNull(env.get(envVarToTest));
     }
 
+    @Test
     public void testParsePropertyDefinitions()
     {
         Map expected = Collections.EMPTY_MAP;

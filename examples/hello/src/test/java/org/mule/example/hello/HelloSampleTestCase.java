@@ -10,15 +10,23 @@
 
 package org.mule.example.hello;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class HelloSampleTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testGreeter()
     {
         NameString name = new NameString("Fred");
@@ -31,6 +39,7 @@ public class HelloSampleTestCase extends AbstractMuleTestCase
         assertNotNull(name.getGreeting());
     }
 
+    @Test
     public void testChitChatter()
     {
         NameString name = new NameString("Barney");
@@ -55,6 +64,7 @@ public class HelloSampleTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testStringToNameTransformer() throws Exception
     {
         String temp = "Wilma";
@@ -80,6 +90,7 @@ public class HelloSampleTestCase extends AbstractMuleTestCase
         assertEquals("Another Wilma", name.getName());
     }
 
+    @Test
     public void testHttpRequestToNameTransformer() throws Exception
     {
         String temp = "whateverUrl?name=Wilma";
@@ -105,6 +116,7 @@ public class HelloSampleTestCase extends AbstractMuleTestCase
         assertEquals("Another Wilma", name.getName());
     }
     
+    @Test
     public void testHttpRequestToNameStreamingTransformer() throws Exception
     {
         InputStream in = new ByteArrayInputStream("whateverUrl?name=Wilma".getBytes());
@@ -119,6 +131,7 @@ public class HelloSampleTestCase extends AbstractMuleTestCase
         assertNull(name.getGreeting());
     }
     
+    @Test
     public void testStdinToNameTransformer() throws Exception
     {
         String temp = "Wilma";
@@ -144,6 +157,7 @@ public class HelloSampleTestCase extends AbstractMuleTestCase
         assertEquals("Another Wilma", name.getName());
     }    
     
+    @Test
     public void testNameToChatTransformer() throws Exception
     {
         NameString temp = new NameString("the other one");
