@@ -18,7 +18,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -28,9 +28,15 @@ import org.mule.tck.testmodels.fruit.Orange;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbstractSplitterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class AbstractSplitterTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testSimpleSplitter() throws Exception
     {
         TestSplitter splitter = new TestSplitter();
@@ -61,7 +67,6 @@ public class AbstractSplitterTestCase extends AbstractMuleTestCase
         assertTrue(((MuleMessageCollection) resultEvent.getMessage()).getMessage(0).getPayload() instanceof Fruit);
         assertTrue(((MuleMessageCollection) resultEvent.getMessage()).getMessage(1).getPayload() instanceof Fruit);
         assertTrue(((MuleMessageCollection) resultEvent.getMessage()).getMessage(2).getPayload() instanceof Fruit);
-
     }
 
     private static class MultipleEventSensingMessageProcessor implements MessageProcessor

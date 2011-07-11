@@ -10,20 +10,19 @@
 
 package org.mule.api.annotations.param;
 
+import org.mule.api.MuleMessage;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.util.ExceptionUtils;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.util.ExceptionUtils;
 
 public class OutboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public OutboundHeadersAnnotationTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -41,8 +40,7 @@ public class OutboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTes
     @Test
     public void testProcessHeader() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://header", null, null);
+        MuleMessage message = muleContext.getClient().send("vm://header", null, null);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) message.getPayload();
@@ -52,8 +50,7 @@ public class OutboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTes
     @Test
     public void testProcessHeaderWithExistingOutHeaders() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        MuleMessage message = client.send("vm://header2", null, null);
+        MuleMessage message = muleContext.getClient().send("vm://header2", null, null);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) message.getPayload();

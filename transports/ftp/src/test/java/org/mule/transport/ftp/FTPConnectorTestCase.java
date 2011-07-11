@@ -23,6 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.pool.ObjectPool;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test configuration of FTP connector. It's all done in code, no configuration files
@@ -56,6 +59,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
     /**
      * Test polling frequency set on a connector.
      */
+    @Test
     public void testConnectorPollingFrequency() throws Exception
     {
         InboundEndpoint endpoint = getTestInboundEndpoint("mock");
@@ -69,6 +73,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
     /**
      * Test polling frequency overridden at an endpoint level.
      */
+    @Test
     public void testPollingFrequencyEndpointOverride() throws Exception
     {
         Map<Object, Object> props = new HashMap<Object, Object>();
@@ -88,6 +93,7 @@ public class FTPConnectorTestCase extends AbstractConnectorTestCase
      * Test setting a connection factory on a ftp endpoint.
      * @throws Exception
      */
+    @Test
     public void testCustomFtpConnectionFactory() throws Exception
     {
         final String testObject = "custom object";

@@ -20,8 +20,8 @@ import org.mule.api.transport.MessageDispatcher;
 import org.mule.routing.filters.PayloadTypeFilter;
 import org.mule.routing.outbound.DefaultOutboundRouterCollection;
 import org.mule.routing.outbound.FilteringOutboundRouter;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.util.CollectionUtils;
 
@@ -29,7 +29,13 @@ import com.mockobjects.constraint.Constraint;
 import com.mockobjects.dynamic.C;
 import com.mockobjects.dynamic.Mock;
 
-public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class CatchAllStrategiesTestCase extends AbstractMuleContextTestCase
 {
 
     public CatchAllStrategiesTestCase()
@@ -37,6 +43,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         setStartContext(true);
     }
 
+    @Test
     public void testLoggingOnlyStrategy() throws Exception
     {
         // Just test it works without failure
@@ -45,6 +52,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         strategy.process(event);
     }
 
+    @Test
     public void testForwardingStrategy() throws Exception
     {
         ForwardingCatchAllStrategy strategy = new ForwardingCatchAllStrategy();
@@ -68,6 +76,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
     /**
      * Test for MULE-3034
      */
+    @Test
     public void testForwardingStrategyNullEndpoint() throws Exception
     {
         ForwardingCatchAllStrategy strategy = new ForwardingCatchAllStrategy();
@@ -100,6 +109,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testForwardingStrategyWithTransform() throws Exception
     {
         ForwardingCatchAllStrategy strategy = new ForwardingCatchAllStrategy();
@@ -133,6 +143,7 @@ public class CatchAllStrategiesTestCase extends AbstractMuleTestCase
         assertNotNull(strategy.getEndpoint());
     }
 
+    @Test
     public void testFullRouter() throws Exception
     {
         final int[] count1 = new int[]{0};

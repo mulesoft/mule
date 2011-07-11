@@ -19,11 +19,15 @@ import org.mule.api.transport.Connector;
 import org.mule.config.QueueProfile;
 import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.transport.AbstractConnector;
 
-public class ServiceTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class ServiceTestCase extends AbstractMuleContextTestCase
 {
     private Connector testConnector;
     private Service service;
@@ -63,6 +67,7 @@ public class ServiceTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().unregisterObject(service.getName(), MuleRegistry.LIFECYCLE_BYPASS_FLAG);
     }
 
+    @Test
     public void testUnregisterListenersOnServiceDisposal() throws Exception
     {
         // Start muleContext, this starts connectors and services
@@ -78,6 +83,7 @@ public class ServiceTestCase extends AbstractMuleTestCase
         assertEquals(0, ((AbstractConnector) testConnector).getReceivers().size());
     }
 
+    @Test
     public void testUnregisterListenersOnServiceStop() throws Exception
     {
 

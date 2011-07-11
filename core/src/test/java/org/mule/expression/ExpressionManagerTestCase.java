@@ -13,13 +13,23 @@ import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
 import java.sql.Timestamp;
 
-public class ExpressionManagerTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class ExpressionManagerTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", muleContext);
@@ -30,6 +40,7 @@ public class ExpressionManagerTestCase extends AbstractMuleTestCase
         assertTrue(o instanceof Timestamp);
     }
 
+    @Test
     public void testRegistration() throws Exception
     {
         // http://mule.mulesoft.org/jira/browse/MULE-3809 . For now ignore duplicate registrations.
@@ -53,10 +64,10 @@ public class ExpressionManagerTestCase extends AbstractMuleTestCase
             //Expected
         }
         assertNull(muleContext.getExpressionManager().unregisterEvaluator(null));
-
     }
 
 
+    @Test
     public void testValidator() throws Exception
     {
         // fail for old-style ${}
@@ -76,9 +87,9 @@ public class ExpressionManagerTestCase extends AbstractMuleTestCase
        assertFalse(muleContext.getExpressionManager().isValidExpression("http://#[bean:user]]:##[bean:password]@#[header:host]:#[header:port]/foo/bar"));
        assertFalse(muleContext.getExpressionManager().isValidExpression("http://#[bean:user]:#[[bean:password]@#[header:host]:#[header:port]/foo/bar"));
        assertTrue(muleContext.getExpressionManager().isValidExpression("http://#[bean:user]:#[#bean:password]@#[header:host]:#[header:port]/foo/bar"));
-
     }
 
+    @Test
     public void testParsing() throws Exception
     {
         MuleMessage msg = new DefaultMuleMessage("test", muleContext);
@@ -92,6 +103,7 @@ public class ExpressionManagerTestCase extends AbstractMuleTestCase
         assertEquals("http://vasya:pupkin@example.com:12345/foo/bar", result);
     }
     
+    @Test
     public void testNestedParsing() throws Exception
     {
         muleContext.getRegistry().registerObject("proc1", new StringAppendTransformer("c"));
@@ -104,6 +116,7 @@ public class ExpressionManagerTestCase extends AbstractMuleTestCase
             "-#[string:1]-#[process:proc2:#[string:a#[process:proc1]d]]-#[string:2]-", event.getMessage()));
     }
 
+    @Test
     public void testBooleanEvaluation()
     {
         MuleMessage msg = new DefaultMuleMessage("test", muleContext);

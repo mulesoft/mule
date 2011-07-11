@@ -10,14 +10,19 @@
 
 package org.mule.config;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+
 public class PreferredObjectSelectorTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testSelectNoRegularClassIfThereIsNoPreferred()
     {
         List<Object> classes = new ArrayList<Object>();
@@ -28,6 +33,7 @@ public class PreferredObjectSelectorTestCase extends AbstractMuleTestCase
         assertNotNull("Selector selected a wrong object", object instanceof NonPreferred);
     }
 
+    @Test
     public void testSelectDefaultPreferredClassOverNoPreferredOne()
     {
         List<Object> classes = new ArrayList<Object>();
@@ -39,6 +45,7 @@ public class PreferredObjectSelectorTestCase extends AbstractMuleTestCase
         assertNotNull("Selector selected a wrong object", object instanceof PreferredWithDefaultWeight);
     }
 
+    @Test
     public void testSelectPreferredClassWithHighestWeight()
     {
         List<Object> classes = new ArrayList<Object>();

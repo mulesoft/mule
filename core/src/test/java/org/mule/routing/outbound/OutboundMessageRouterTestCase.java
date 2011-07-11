@@ -21,21 +21,27 @@ import org.mule.api.routing.RoutingException;
 import org.mule.routing.AbstractCatchAllStrategy;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class OutboundMessageRouterTestCase extends AbstractMuleContextTestCase
 {
     public OutboundMessageRouterTestCase()
     {
         setStartContext(true);        
     }
 
+    @Test
     public void testOutboundMessageRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
@@ -114,6 +120,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         mockendpoint2.verify();
     }
 
+    @Test
     public void testRouterWithCatchAll() throws Exception
     {
         final int[] count1 = new int[]{0};
@@ -182,6 +189,7 @@ public class OutboundMessageRouterTestCase extends AbstractMuleTestCase
         assertEquals(1, count2[0]);
     }
 
+    @Test
     public void testCorrelation() throws Exception
     {
         FilteringOutboundRouter filterRouter = new FilteringOutboundRouter();

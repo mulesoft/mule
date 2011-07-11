@@ -13,10 +13,14 @@ package org.mule.registry;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.construct.Flow;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
-public class RegistryBrokerTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class RegistryBrokerTestCase extends AbstractMuleContextTestCase
 {
 
     private String tracker;
@@ -34,6 +38,7 @@ public class RegistryBrokerTestCase extends AbstractMuleTestCase
         return false;
     }
 
+    @Test
     public void testCrossRegistryLifecycleOrder() throws MuleException
     {
 
@@ -60,7 +65,6 @@ public class RegistryBrokerTestCase extends AbstractMuleTestCase
 
         // Both services are stopped before either connector
         assertEquals("flow2-stop flow-stop conn2-stop conn-stop ", tracker);
-
     }
 
     class LifecycleTrackerConnector extends TestConnector

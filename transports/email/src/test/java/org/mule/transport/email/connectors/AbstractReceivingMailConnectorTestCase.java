@@ -26,6 +26,10 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
 /**
  * Given an endpoint ({@link #getTestEndpointURI()}) this waits for up to 10 seconds,
  * hoping to receive the message stored in the mail server.  It also runs the unit tests
@@ -41,6 +45,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
         super(SEND_INITIAL_EMAIL, protocol);
     }
 
+    @Test
     public void testReceiver() throws Exception
     {
         final CountDownLatch countDown = new CountDownLatch(1);
@@ -50,15 +55,15 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
         {
             public synchronized void eventReceived(MuleEventContext context, Object component)
             {
-                try 
+                try
                 {
                     logger.debug("woot - event received");
                     logger.debug("context: " + context);
                     logger.debug("component: " + component);
                     assertMessageOk(context.getMessage().getOriginalPayload());
                     countDown.countDown();
-                } 
-                catch (Exception e) 
+                }
+                catch (Exception e)
                 {
                     // counter will not be incremented
                     logger.error(e.getMessage(), e);
@@ -79,7 +84,7 @@ public abstract class AbstractReceivingMailConnectorTestCase extends AbstractMai
 
         logger.debug("waiting for count down");
         assertTrue(countDown.await(WAIT_PERIOD_MS, TimeUnit.MILLISECONDS));
-    }    
+    }
 
     protected static Map newEmailToStringServiceOverrides()
     {

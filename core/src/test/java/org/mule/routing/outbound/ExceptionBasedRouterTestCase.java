@@ -24,15 +24,23 @@ import org.mule.api.routing.RoutingException;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.routing.LoggingCatchAllStrategy;
 import org.mule.routing.filters.RegExFilter;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class ExceptionBasedRouterTestCase extends AbstractMuleContextTestCase
 {
     public ExceptionBasedRouterTestCase()
     {
@@ -44,6 +52,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
      * into sync mode. Test case ends here.
      */
     /* TODO MULE-4476
+    @Test
     public void testSuccessfulExceptionRouterAsynchronous() throws Exception
     {
         Mock mockSession = MuleTestUtils.getMockSession();
@@ -90,6 +99,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
     }
     */
 
+    @Test
     public void testSuccessfulExceptionRouterSynchronous() throws Exception
     {
         Mock mockSession = MuleTestUtils.getMockSession();
@@ -138,6 +148,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
      * Both targets fail during dispatch. The first endpoint should be forced into
      * sync mode.
      */
+    @Test
     public void testBothFailing() throws Exception
     {
         Mock mockSession = MuleTestUtils.getMockSession();
@@ -193,6 +204,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
      * The first endpoint fails, second succeeds. Events are being sent
      * synchronously.
      */
+    @Test
     public void testFailFirstSuccessSecondSync() throws Exception
     {
         Mock mockSession = MuleTestUtils.getMockSession();
@@ -234,6 +246,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
      * The first endpoint fails, second succeeds. Events are being forced into a sync
      * mode, until we reach the last one.
      */
+    @Test
     public void testFailFirstSuccessSecondAsync() throws Exception
     {
         Mock mockSession = MuleTestUtils.getMockSession();
@@ -275,6 +288,7 @@ public class ExceptionBasedRouterTestCase extends AbstractMuleTestCase
      * The first endpoint contains exception payload in return message, second
      * succeeds. Events are being sent synchronously.
      */
+    @Test
     public void testFirstHadExceptionPayloadSuccessSecondSyncWithExceptionPayload() throws Exception
     {
         Mock mockSession = MuleTestUtils.getMockSession();

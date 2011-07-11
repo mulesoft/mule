@@ -16,6 +16,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.ibeans.annotation.IntegrationBean;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Tests using an exception listener to intercept all exceptions on the ibean.  Also test that parsing the ibean will not barf if
  * the ibean extends {@link org.ibeans.api.ExceptionListenerAware}

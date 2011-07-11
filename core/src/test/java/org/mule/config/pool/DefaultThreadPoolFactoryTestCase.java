@@ -11,11 +11,16 @@
 package org.mule.config.pool;
 
 import org.mule.api.config.ThreadingProfile;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class DefaultThreadPoolFactoryTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
+public class DefaultThreadPoolFactoryTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testDefaults() throws Exception
     {
         final ThreadingProfile tp = muleContext.getDefaultThreadingProfile();

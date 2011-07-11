@@ -19,15 +19,20 @@ import org.mule.context.notification.CustomNotification;
 import org.mule.context.notification.ModelNotification;
 import org.mule.context.notification.MuleContextNotification;
 import org.mule.context.notification.ServiceNotification;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Test;
 
-public class ServerNotificationsTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class ServerNotificationsTestCase extends AbstractMuleContextTestCase
         implements ModelNotificationListener, MuleContextNotificationListener
 {
 
@@ -50,6 +55,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         managerStoppedEvents.set(0);
     }
 
+    @Test
     public void testStandardNotifications() throws Exception
     {
         muleContext.registerListener(this);
@@ -58,6 +64,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertTrue(managerStopped.get());
     }
 
+    @Test
     public void testMultipleRegistrations() throws Exception
     {
         muleContext.registerListener(this);
@@ -67,6 +74,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertEquals(1, managerStoppedEvents.get());
     }
 
+    @Test
     public void testMultipleRegistrationsDifferentSubscriptions() throws Exception
     {
         muleContext.registerListener(this, "_mule*");
@@ -75,7 +83,8 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertTrue(modelStopped.get());
         assertEquals(2, modelStoppedEvents.get());
     }
-    
+
+    @Test
     public void testUnregistering() throws Exception
     {
         muleContext.registerListener(this);
@@ -86,6 +95,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertFalse(managerStopped.get());
     }
 
+    @Test
     public void testMismatchingUnregistrations() throws Exception
     {
         // this has changed in 2.x.  now, unregistering removes all related entries
@@ -100,6 +110,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertEquals(1, managerStoppedEvents.get());
     }
 
+    @Test
     public void testStandardNotificationsWithSubscription() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);
@@ -125,6 +136,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertEquals(1, componentStartedCount.get());
     }
 
+    @Test
     public void testStandardNotificationsWithWildcardSubscription() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(2);
@@ -152,6 +164,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertEquals(2, componentStartedCount.get());
     }
 
+    @Test
     public void testCustomNotifications() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(2);
@@ -177,6 +190,7 @@ public class ServerNotificationsTestCase extends AbstractMuleTestCase
         assertEquals(2, customNotificationCount.get());
     }
 
+    @Test
     public void testCustomNotificationsWithWildcardSubscription() throws Exception
     {
 

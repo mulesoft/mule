@@ -14,14 +14,20 @@ import org.mule.api.ThreadSafeAccess;
 
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
 public class ThreadSafeAccessTestCase extends AbstractThreadSafeAccessTestCase
 {
+    @Test
     public void testConfig()
     {
         assertTrue(ThreadSafeAccess.AccessControl.isFailOnMessageScribbling());
         assertTrue(ThreadSafeAccess.AccessControl.isAssertMessageAccess());
     }
 
+    @Test
     public void testMessage() throws InterruptedException
     {
         Map<String, Object> nullMap = null;
@@ -30,6 +36,7 @@ public class ThreadSafeAccessTestCase extends AbstractThreadSafeAccessTestCase
         resetAccessControl(new DefaultMuleMessage(new Object(), nullMap, muleContext));
     }
 
+    @Test
     public void testEvent() throws Exception
     {
         basicPattern(dummyEvent());

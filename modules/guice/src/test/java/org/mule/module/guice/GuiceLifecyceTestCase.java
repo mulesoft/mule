@@ -12,13 +12,14 @@ package org.mule.module.guice;
 
 import org.mule.module.client.MuleClient;
 import org.mule.registry.AbstractLifecycleTracker;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.google.inject.AbstractModule;
 
 import org.junit.Assert;
+import org.junit.Test;
 
-public class GuiceLifecyceTestCase extends AbstractMuleTestCase
+public class GuiceLifecyceTestCase extends AbstractMuleContextTestCase
 {
     @Override
     protected void doSetUp() throws Exception
@@ -33,6 +34,7 @@ public class GuiceLifecyceTestCase extends AbstractMuleTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testSingletonServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MuleSingletonService",
@@ -45,6 +47,7 @@ public class GuiceLifecyceTestCase extends AbstractMuleTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testMulePrototypeServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MulePrototypeService",
@@ -59,6 +62,7 @@ public class GuiceLifecyceTestCase extends AbstractMuleTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testMulePooledSingletonServiceLifecycle() throws Exception
     {
         // Initialisation policy not enabled in iBeans

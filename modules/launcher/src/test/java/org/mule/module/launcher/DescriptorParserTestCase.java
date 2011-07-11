@@ -13,17 +13,23 @@ package org.mule.module.launcher;
 import org.mule.config.Preferred;
 import org.mule.module.launcher.descriptor.ApplicationDescriptor;
 import org.mule.module.launcher.descriptor.DescriptorParser;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.collections.map.MultiValueMap;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class DescriptorParserTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testOverridePreferred() throws Exception
     {
         DefaultAppBloodhound bh = new DefaultAppBloodhound();
@@ -38,6 +44,7 @@ public class DescriptorParserTestCase extends AbstractMuleTestCase
         assertTrue("@Preferred implementation ignored", result instanceof TestDescriptorParserDefault);
     }
 
+    @Test
     public void testBothPreferredWithWeight() throws Exception
     {
         DefaultAppBloodhound bh = new DefaultAppBloodhound();
@@ -53,6 +60,7 @@ public class DescriptorParserTestCase extends AbstractMuleTestCase
         assertTrue("@Preferred implementation ignored", result instanceof TestDescriptorParserPreferred);
     }
 
+    @Test
     public void testOverrideWithoutPreferred() throws Exception
     {
         DefaultAppBloodhound bh = new DefaultAppBloodhound();
@@ -67,6 +75,7 @@ public class DescriptorParserTestCase extends AbstractMuleTestCase
         assertTrue("@Preferred implementation ignored", result instanceof TestDescriptorParserNoAnnotation);
     }
 
+    @Test
     public void testMixedOverrides() throws Exception
     {
         DefaultAppBloodhound bh = new DefaultAppBloodhound();

@@ -13,14 +13,19 @@ package org.mule.module.cxf;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
-import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.OutputHandler;
 import org.mule.module.cxf.builder.WebServiceMessageProcessorBuilder;
 import org.mule.module.cxf.testmodels.Echo;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class CxfInboundMessageProcessorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class CxfInboundMessageProcessorTestCase extends AbstractMuleContextTestCase
 {
     String msg = 
         "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Body>" +
@@ -32,6 +37,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleTestCase
     boolean gotEvent = false;
     Object payload;
     
+    @Test
     public void testInbound() throws Exception
     {
         CxfInboundMessageProcessor processor = createCxfMessageProcessor();
@@ -60,7 +66,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleTestCase
         assertTrue(gotEvent);
     }
     
-
+    @Test
     public void testOneWay() throws Exception
     {
         CxfInboundMessageProcessor processor = createCxfMessageProcessor();
@@ -86,8 +92,7 @@ public class CxfInboundMessageProcessorTestCase extends AbstractMuleTestCase
         assertNull(response);
     }
 
-    private CxfInboundMessageProcessor createCxfMessageProcessor()
-        throws InitialisationException, MuleException
+    private CxfInboundMessageProcessor createCxfMessageProcessor() throws MuleException
     {
         CxfConfiguration config = new CxfConfiguration();
         config.setMuleContext(muleContext);

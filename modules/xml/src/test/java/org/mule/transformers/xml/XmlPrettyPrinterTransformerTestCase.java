@@ -15,6 +15,10 @@ import org.mule.module.xml.transformer.XmlPrettyPrinter;
 import org.mule.transformer.AbstractTransformerTestCase;
 
 import org.dom4j.io.OutputFormat;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class XmlPrettyPrinterTransformerTestCase extends AbstractTransformerTestCase
 {
@@ -51,6 +55,7 @@ public class XmlPrettyPrinterTransformerTestCase extends AbstractTransformerTest
         return createObject(XmlPrettyPrinter.class);
     }
 
+    @Test
     public void testOutputOptions()
     {
         XmlPrettyPrinter t = new XmlPrettyPrinter();

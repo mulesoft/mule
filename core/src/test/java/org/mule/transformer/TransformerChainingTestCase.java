@@ -11,18 +11,30 @@
 package org.mule.transformer;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.Collections;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+
 public class TransformerChainingTestCase extends AbstractMuleTestCase
 {
+
+    private MuleContext muleContext = mock(MuleContext.class);
+
+    @Test
     public void testSingleChainedTransformer() throws Exception
     {
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
@@ -37,6 +49,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         assertEquals(new Integer(1), transformedMessage);
     }
 
+    @Test
     public void testTwoChainedTransformers() throws Exception
     {
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
@@ -51,6 +64,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         assertEquals(new Integer(2), transformedMessage);
     }
 
+    @Test
     public void testThreeChainedTransformers() throws Exception
     {
         AbstractTransformer validTransformer = (AbstractTransformer) this.getIncreaseByOneTransformer();
@@ -65,6 +79,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         assertEquals(new Integer(3), transformedMessage);
     }
 
+    @Test
     public void testIgnoreBadInputDoesNotBreakChainWithTransformationOrderInvalidValid() throws Exception
     {
         AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
@@ -83,6 +98,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         assertEquals(new Integer(1), transformedMessage);
     }
 
+    @Test
     public void testIgnoreBadInputBreaksChainWithTransformationOrderInvalidValid() throws Exception
     {
         AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
@@ -106,6 +122,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testIgnoreBadInputDoesNotBreakChainWithTransformationOrderValidInvalid() throws Exception
     {
         AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();
@@ -124,6 +141,7 @@ public class TransformerChainingTestCase extends AbstractMuleTestCase
         assertEquals(new Integer(1), transformedMessage);
     }
 
+    @Test
     public void testIgnoreBadInputBreaksChainWithTransformationOrderValidInvalid() throws Exception
     {
         AbstractTransformer invalidTransformer = (AbstractTransformer) this.getInvalidTransformer();

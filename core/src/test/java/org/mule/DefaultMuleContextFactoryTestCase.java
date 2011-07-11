@@ -16,6 +16,7 @@ import org.mule.api.config.ConfigurationException;
 import org.mule.api.config.MuleConfiguration;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.WorkManager;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.model.Model;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.config.builders.AbstractConfigurationBuilder;
@@ -25,7 +26,7 @@ import org.mule.context.DefaultMuleContextFactory;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.model.seda.SedaModel;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
 
 import java.util.ArrayList;
@@ -33,6 +34,13 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.resource.spi.work.WorkListener;
+
+import org.junit.Test;
+
+import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
 {
@@ -44,16 +52,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
     private static String TEST_OBJECT_NAME = "testObject";
     private static String TEST_MODEL_NAME = "testModel";
 
-    /**
-     * Override, we don't want a {@link MuleContext} created for this test case.
-     */
-    @Override
-    protected MuleContext createMuleContext() throws Exception
-    {
-        return null;
-    }
-
-    public void testCreateMuleContext() throws Exception
+    @Test
+    public void testCreateMuleContext() throws InitialisationException, ConfigurationException
     {
         MuleContext context = muleContextFactory.createMuleContext();
 
@@ -61,7 +61,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertDefaults(context);
     }
 
-    public void testCreateMuleContextConfigurationBuilder() throws Exception
+    @Test
+    public void testCreateMuleContextConfigurationBuilder() throws InitialisationException, ConfigurationException
     {
         MuleContext context = muleContextFactory.createMuleContext(new TestConfigurationBuilder());
 
@@ -70,7 +71,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertNoDefaults(context);
     }
 
-    public void testCreateMuleContextListMuleContextBuilder() throws Exception
+    @Test
+    public void testCreateMuleContextListMuleContextBuilder() throws InitialisationException, ConfigurationException
     {
         List<ConfigurationBuilder> configBuilders = new ArrayList<ConfigurationBuilder>();
         configBuilders.add(new TestConfigurationBuilder());
@@ -85,7 +87,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertNoDefaults(context);
     }
 
-    public void testCreateMuleContextMuleContextBuilder() throws Exception
+    @Test
+    public void testCreateMuleContextMuleContextBuilder() throws InitialisationException, ConfigurationException
     {
         TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
         MuleContext context = muleContextFactory.createMuleContext(new SimpleConfigurationBuilder(null), muleContextBuilder);
@@ -94,7 +97,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertNoDefaults(context);
     }
 
-    public void testCreateMuleContextConfigurationBuilderMuleContextBuilder() throws Exception
+    @Test
+    public void testCreateMuleContextConfigurationBuilderMuleContextBuilder() throws InitialisationException, ConfigurationException
     {
         TestMuleContextBuilder muleContextBuilder = new TestMuleContextBuilder();
         MuleContext context = muleContextFactory.createMuleContext(new TestConfigurationBuilder2(),
@@ -105,7 +109,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertNoDefaults(context);
     }
 
-    public void testCreateMuleContextString() throws Exception
+    @Test
+    public void testCreateMuleContextString() throws InitialisationException, ConfigurationException
     {
         MuleContext context = null;
         try
@@ -122,7 +127,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertNull(context);
     }
 
-    public void testCreateMuleContextStringProperties() throws Exception
+    @Test
+    public void testCreateMuleContextStringProperties() throws InitialisationException, ConfigurationException
     {
         Properties properties = new Properties();
         properties.put("testKey1", "testValue1");
@@ -144,7 +150,8 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase
         assertNull(context);
     }
 
-    public void testCreateMuleContextConfigurationBuilderProperties() throws Exception
+    @Test
+    public void testCreateMuleContextConfigurationBuilderProperties() throws InitialisationException, ConfigurationException
     {
         Properties properties = new Properties();
         properties.put("testKey3", "testValue3");

@@ -18,6 +18,9 @@ import org.mule.transport.AbstractConnectorTestCase;
 import org.mule.transport.tcp.TcpConnector;
 
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class HttpConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -40,6 +43,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         return "Hello".getBytes();
     }
 
+    @Test
     public void testValidListener() throws Exception
     {
         Service service = getTestService("orange", Orange.class);
@@ -49,6 +53,7 @@ public class HttpConnectorTestCase extends AbstractConnectorTestCase
         getConnector().registerListener(endpoint, getSensingNullMessageProcessor(), service);
     }
 
+    @Test
     public void testProperties() throws Exception
     {
         HttpConnector c = (HttpConnector) getConnector();

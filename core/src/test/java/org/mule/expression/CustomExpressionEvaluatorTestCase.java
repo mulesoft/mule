@@ -13,16 +13,22 @@ package org.mule.expression;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Map;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests a custom expression evaluator using direct registration with the manager.
  */
-public class CustomExpressionEvaluatorTestCase extends AbstractMuleTestCase
+public class CustomExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testCustomExpressionEvaluator()
     {
         muleContext.getExpressionManager().registerEvaluator(new FooExpressionEvaluator());

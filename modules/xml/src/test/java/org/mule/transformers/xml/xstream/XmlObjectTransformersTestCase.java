@@ -20,6 +20,10 @@ import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCase
 {
     private Apple testObject = null;
@@ -61,6 +65,7 @@ public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCas
                + "  <washed>true</washed>\n" + "</apple>";
     }
 
+    @Test
     public void testStreaming() throws Exception
     {
         XmlToObject transformer = createObject(XmlToObject.class);

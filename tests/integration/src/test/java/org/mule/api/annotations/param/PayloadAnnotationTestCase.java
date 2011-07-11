@@ -10,12 +10,6 @@
 
 package org.mule.api.annotations.param;
 
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.client.MuleClient;
@@ -23,13 +17,18 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.IOUtils;
 
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public class PayloadAnnotationTestCase extends AbstractServiceAndFlowTestCase
 {
-
     public PayloadAnnotationTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-
         setDisposeManagerPerSuite(true);
     }
 

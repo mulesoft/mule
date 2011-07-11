@@ -13,7 +13,7 @@ package org.mule;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.session.DefaultMuleSession;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.types.MimeTypes;
@@ -25,11 +25,19 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
-public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
 {
     //
     // corner cases/errors
     //
+    @Test
     public void testConstructorWithNoMuleContext()
     {
         try
@@ -43,6 +51,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testConstructorWithNullPayload()
     {
         MuleMessage message = new DefaultMuleMessage(null, muleContext);
@@ -52,12 +61,14 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     //
     // payload-only ctor tests
     //
+    @Test
     public void testOneArgConstructor()
     {
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
         assertEquals(TEST_MESSAGE, message.getPayload());
     }
 
+    @Test
     public void testOneArgConstructorWithMuleMessageAsPayload()
     {
         MuleMessage oldMessage = createMuleMessage();
@@ -70,6 +81,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     //
     // ctor with message properties
     //
+    @Test
     public void testMessagePropertiesConstructor()
     {
         Map<String, Object> properties = createMessageProperties();
@@ -79,6 +91,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         assertOutboundMessageProperty("MessageProperties", message);
     }
 
+    @Test
     public void testMessagePropertiesAccessors()
     {
         Map<String, Object> properties = createMessageProperties();
@@ -119,6 +132,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testMessagePropertiesConstructorWithMuleMessageAsPayload()
     {
         Map<String, Object> properties = createMessageProperties();
@@ -133,6 +147,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     //
     // ctor with previous message
     //
+    @Test
     public void testPreviousMessageConstructorWithRegularPayloadAndMuleMessageAsPrevious()
     {
         MuleMessage previous = createMuleMessage();
@@ -143,6 +158,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         assertEquals(previous.getUniqueId(), message.getUniqueId());
     }
 
+    @Test
     public void testPreviousMessageConstructorWithMuleMessageAsPayloadAndMuleMessageAsPrevious()
     {
         MuleMessage payload = createMuleMessage();
@@ -158,6 +174,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         assertEquals(previous.getUniqueId(), message.getUniqueId());
     }
 
+    @Test
     public void testClearProperties()
     {
         MuleMessage payload = createMuleMessage();
@@ -180,6 +197,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     //
     // copy ctor
     //
+    @Test
     public void testCopyConstructor() throws Exception
     {
         DefaultMuleMessage original = (DefaultMuleMessage) createMuleMessage();
@@ -200,6 +218,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
     //
     // attachments
     //
+    @Test
     public void testLegacyAddingAttachment() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -211,6 +230,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         assertEquals(handler, message.getOutboundAttachment("attachment"));
     }
 
+    @Test
     public void testAddingOutboundAttachment() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -242,6 +262,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testAddingInboundAttachment() throws Exception
     {
         Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
@@ -257,6 +278,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testNewMuleMessageFromMuleMessageWithAttachment() throws Exception
     {
         MuleMessage previous = createMuleMessage();
@@ -268,6 +290,7 @@ public class DefaultMuleMessageTestCase extends AbstractMuleTestCase
         assertEquals(handler, message.getOutboundAttachment("attachment"));
     }
 
+    @Test
     public void testFindPropertiesInAnyScope() throws Exception
     {
         MuleMessage message = createMuleMessage();

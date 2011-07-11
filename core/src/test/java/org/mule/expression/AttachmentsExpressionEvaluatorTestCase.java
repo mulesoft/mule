@@ -12,7 +12,7 @@ package org.mule.expression;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionRuntimeException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.StringDataSource;
 
 import java.io.ByteArrayOutputStream;
@@ -22,14 +22,21 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
-public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
     private MuleMessage message;
 
     @Override
     protected void doSetUp() throws Exception
     {
-
         try
         {
             Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
@@ -46,6 +53,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testSingleAttachment() throws Exception
     {
         MessageAttachmentExpressionEvaluator eval = new MessageAttachmentExpressionEvaluator();
@@ -80,6 +88,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMapAttachments() throws Exception
     {
         MessageAttachmentsExpressionEvaluator eval = new MessageAttachmentsExpressionEvaluator();
@@ -121,6 +130,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testMapAttachmentsWithWildcards() throws Exception
     {
         MessageAttachmentsExpressionEvaluator eval = new MessageAttachmentsExpressionEvaluator();
@@ -158,6 +168,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNotNull(((Map)result).get("baz"));
     }
 
+    @Test
     public void testListAttachments() throws Exception
     {
         MessageAttachmentsListExpressionEvaluator eval = new MessageAttachmentsListExpressionEvaluator();
@@ -201,6 +212,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testListAttachmentsWithWildcards() throws Exception
     {
         MessageAttachmentsListExpressionEvaluator eval = new MessageAttachmentsListExpressionEvaluator();
@@ -230,6 +242,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals(3, ((List)result).size());
     }
 
+    @Test
     public void testSingleAttachmentUsingManager() throws Exception
     {
         Object result = muleContext.getExpressionManager().evaluate("#[attachment:foo]", message);
@@ -253,6 +266,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMapAttachmentsUsingManager() throws Exception
     {
         Object result = muleContext.getExpressionManager().evaluate("#[attachments:foo, baz]", message);
@@ -290,6 +304,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMapAttachmentsWithWildcardsUsingManager() throws Exception
     {
         Object result = muleContext.getExpressionManager().evaluate("#[attachments:*]", message);
@@ -321,6 +336,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNotNull(((Map)result).get("baz"));
     }
 
+    @Test
     public void testListAttachmentsUsingManager() throws Exception
     {
         Object result = muleContext.getExpressionManager().evaluate("#[attachments-list:foo,baz]", message);
@@ -356,6 +372,7 @@ public class AttachmentsExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testListAttachmentsWithWildcardsUsingManager() throws Exception
     {
         Object result = muleContext.getExpressionManager().evaluate("#[attachments-list:*]", message);

@@ -10,13 +10,15 @@
 package org.mule.api.annotations.transformer;
 
 import org.mule.config.transformer.AnnotatedTransformerProxy;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.lang.reflect.Method;
 
 import org.junit.Test;
 
-public class BadAnnotatedTransformerTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.fail;
+
+public class BadAnnotatedTransformerTestCase extends AbstractMuleContextTestCase
 {
     @Test
     public void testVoidTransformer() throws Exception
@@ -49,7 +51,7 @@ public class BadAnnotatedTransformerTestCase extends AbstractMuleTestCase
     }
 
     @Test
-    public void testprivateTransformer() throws Exception
+    public void testPrivateTransformer() throws Exception
     {
         Method m = getClass().getDeclaredMethod("privateTransformer", StringBuffer.class);
         try

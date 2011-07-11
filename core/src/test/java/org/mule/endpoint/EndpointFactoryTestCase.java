@@ -18,12 +18,21 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.registry.Registry;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
-public class EndpointFactoryTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class EndpointFactoryTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testCreateInboundEndpoint() throws Exception
     {
         String uri = "test://address";
@@ -35,6 +44,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         assertTrue(ep instanceof InboundEndpoint);
     }
 
+    @Test
     public void testCreateInboundEndpointFromGlobalEndpoint() throws Exception
     {
         muleContext.getRegistry().registerEndpointBuilder("myGlobalEndpoint",
@@ -55,6 +65,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testCreateInboundEndpointFromNamedConcreteEndpoint() throws Exception
     {
         muleContext.getRegistry().registerEndpointBuilder("&myNamedConcreateEndpoint",
@@ -68,6 +79,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         assertTrue(ep instanceof InboundEndpoint);
     }
 
+    @Test
     public void testCreateOutboundEndpoint() throws Exception
     {
         String uri = "test://address";
@@ -79,6 +91,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         assertTrue(ep instanceof OutboundEndpoint);
     }
 
+    @Test
     public void testCreateoutboundEndpointFromGlobalEndpoint() throws Exception
     {
         muleContext.getRegistry().registerEndpointBuilder("myGlobalEndpoint",
@@ -92,6 +105,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         assertTrue(ep instanceof OutboundEndpoint);
     }
 
+    @Test
     public void testCreateoutboundEndpointFromNamedConcreteEndpoint() throws Exception
     {
         muleContext.getRegistry().registerEndpointBuilder("&myNamedConcreateEndpoint",
@@ -105,6 +119,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         assertTrue(ep instanceof OutboundEndpoint);
     }
 
+    @Test
     public void testCreateInboundEndpointWithBuilder() throws Exception
     {
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://address", muleContext);
@@ -116,6 +131,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         assertTrue(ep instanceof InboundEndpoint);
     }
 
+    @Test
     public void testCreateOutboundEndpointWithBuilder() throws Exception
     {
         EndpointBuilder builder = new EndpointURIEndpointBuilder("test://address", muleContext);
@@ -127,6 +143,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         assertTrue(ep instanceof OutboundEndpoint);
     }
 
+    @Test
     public void testCreateEndpoint() throws MuleException
     {
         String uri = "test://address";
@@ -136,6 +153,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
     }
 
+    @Test
     public void testCreateEndpointFromGlobalEndpoint() throws MuleException
     {
         Registry r = muleContext.getRegistry();
@@ -154,6 +172,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testCreateEndpointFromNamedConcreteEndpoint() throws MuleException
     {
         Registry r = muleContext.getRegistry();
@@ -165,6 +184,7 @@ public class EndpointFactoryTestCase extends AbstractMuleTestCase
         assertEquals(ep.getEndpointURI().getUri().toString(), "test://address");
     }
 
+    @Test
     public void testCreateEndpointByCustomizingEndpointBuilder() throws MuleException
     {
         // Create and register two connectors

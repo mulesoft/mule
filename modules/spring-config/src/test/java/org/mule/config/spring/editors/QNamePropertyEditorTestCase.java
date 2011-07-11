@@ -10,13 +10,19 @@
 
 package org.mule.config.spring.editors;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import javax.xml.namespace.QName;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class QNamePropertyEditorTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testFullQNameString()
     {
         QName name = QNamePropertyEditor.convert("qname{e:echo:http://muleumo.org/echo}");
@@ -26,6 +32,7 @@ public class QNamePropertyEditorTestCase extends AbstractMuleTestCase
         assertEquals("http://muleumo.org/echo", name.getNamespaceURI());
     }
 
+    @Test
     public void testFullQNameStringWithColonsInNamespace()
     {
         QName name = QNamePropertyEditor.convert("qname{e:echo:urn:muleumo:echo}");
@@ -35,6 +42,7 @@ public class QNamePropertyEditorTestCase extends AbstractMuleTestCase
         assertEquals("urn:muleumo:echo", name.getNamespaceURI());
     }
 
+    @Test
     public void testNameAndNamespace()
     {
         QName name = QNamePropertyEditor.convert("qname{echo:http://muleumo.org/echo}");
@@ -44,6 +52,7 @@ public class QNamePropertyEditorTestCase extends AbstractMuleTestCase
         assertEquals("", name.getPrefix());
     }
 
+    @Test
     public void testNameOnly()
     {
         QName name = QNamePropertyEditor.convert("qname{echo}");
@@ -53,6 +62,7 @@ public class QNamePropertyEditorTestCase extends AbstractMuleTestCase
         assertEquals("", name.getPrefix());
     }
 
+    @Test
     public void testNameOnlyWithoutBraces()
     {
         QName name = QNamePropertyEditor.convert("echo");

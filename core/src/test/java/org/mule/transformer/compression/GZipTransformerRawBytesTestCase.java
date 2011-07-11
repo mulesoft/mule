@@ -15,6 +15,8 @@ import org.mule.api.transformer.Transformer;
 
 import java.io.UnsupportedEncodingException;
 
+import static org.junit.Assert.fail;
+
 public class GZipTransformerRawBytesTestCase extends GZipTransformerTestCase
 {
 

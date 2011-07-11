@@ -13,13 +13,18 @@ package org.mule.construct.builder;
 import org.mule.MessageExchangePattern;
 import org.mule.construct.Bridge;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.compression.GZipCompressTransformer;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
 
-public class BridgeBuilderTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class BridgeBuilderTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testFullConfiguration() throws Exception
     {
         Bridge bridge = new BridgeBuilder().name("test-bridge-full")
@@ -35,6 +40,7 @@ public class BridgeBuilderTestCase extends AbstractMuleTestCase
         assertEquals("test-bridge-full", bridge.getName());
     }
 
+    @Test
     public void testTransacted() throws Exception
     {
         Bridge bridge = new BridgeBuilder().name("test-bridge-transacted")

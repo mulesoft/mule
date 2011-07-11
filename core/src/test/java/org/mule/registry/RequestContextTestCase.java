@@ -27,16 +27,23 @@ import org.mule.api.transformer.DataType;
 import org.mule.api.transformer.TransformerException;
 import org.mule.management.stats.ProcessingTime;
 import org.mule.message.DefaultExceptionPayload;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class RequestContextTestCase extends AbstractMuleTestCase
 {
 
     private boolean threadSafeEvent;
+    private MuleContext muleContext = mock(MuleContext.class);
 
+    @Test
     public void testSetExceptionPayloadAcrossThreads() throws InterruptedException
     {
         threadSafeEvent = true;
@@ -45,6 +52,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         runThread(event, true);
     }
 
+    @Test
     public void testFailureWithoutThreadSafeEvent() throws InterruptedException
     {
         threadSafeEvent = false;
@@ -77,6 +85,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
             this.success = success;
         }
 
+        @Override
         public void run()
         {
             try
@@ -98,147 +107,158 @@ public class RequestContextTestCase extends AbstractMuleTestCase
 
         private MuleMessage message = new DefaultMuleMessage(null, muleContext);
 
+        @Override
         public MuleMessage getMessage()
         {
             return message;
         }
 
+        @Override
         public Credentials getCredentials()
         {
-            return null;  
+            return null;
         }
 
+        @Override
         public byte[] getMessageAsBytes() throws MuleException
         {
-            return new byte[0];  
+            return new byte[0];
         }
 
+        @Override
         public Object transformMessage() throws TransformerException
         {
-            return null;  
+            return null;
         }
 
+        @Override
         public Object transformMessage(Class outputType) throws TransformerException
         {
-            return null;  
+            return null;
         }
 
+        @Override
         @Deprecated
         public byte[] transformMessageToBytes() throws TransformerException
         {
-            return new byte[0];  
+            return new byte[0];
         }
 
+        @Override
         public String transformMessageToString() throws TransformerException
         {
-            return null;  
+            return null;
         }
 
+        @Override
         public String getMessageAsString() throws MuleException
         {
-            return null;  
+            return null;
         }
 
+        @Override
         public <T> T transformMessage(DataType<T> outputType) throws TransformerException
         {
             return null;
         }
 
-        public String getTransformedMessageAsString(String encoding) throws TransformerException
-        {
-            return null;  
-        }
-
+        @Override
         public String getMessageAsString(String encoding) throws MuleException
         {
-            return null;  
+            return null;
         }
 
+        @Override
         public String getId()
         {
-            return null;  
+            return null;
         }
 
-        public Object getProperty(String name)
+        @Override
+        public Object getProperty(String key)
         {
-            return null;  
+            return null;
         }
 
-        public Object getProperty(String name, Object defaultValue)
+        @Override
+        public Object getProperty(String key, Object defaultValue)
         {
-            return null;  
+            return null;
         }
 
+        @Override
         public InboundEndpoint getEndpoint()
         {
-            return null;  
+            return null;
         }
 
+        @Override
         public MuleSession getSession()
         {
-            return null;  
+            return null;
         }
 
+        @Override
         public FlowConstruct getFlowConstruct()
         {
-            return null;  
+            return null;
         }
 
+        @Override
         public boolean isStopFurtherProcessing()
         {
-            return false;  
+            return false;
         }
 
+        @Override
         public void setStopFurtherProcessing(boolean stopFurtherProcessing)
         {
             // no action
         }
 
-        public boolean isSynchronous()
-        {
-            return false;  
-        }
-
-        public void setSynchronous(boolean value)
-        {
-            // no action
-        }
-
+        @Override
         public int getTimeout()
         {
-            return 0;  
+            return 0;
         }
 
+        @Override
         public void setTimeout(int timeout)
         {
             // no action
         }
 
+        @Override
         public OutputStream getOutputStream()
         {
-            return null;  
+            return null;
         }
 
+        @Override
         public String getEncoding()
         {
-            return null;  
+            return null;
         }
 
+        @Override
         public MuleContext getMuleContext()
         {
-            return null;  
+            return null;
         }
 
+        @Override
         public void assertAccess(boolean write)
         {
             // no action
         }
 
+        @Override
         public void resetAccessControl()
         {
             // no action
         }
 
+        @Override
         public ThreadSafeAccess newThreadCopy()
         {
             if (threadSafeEvent)
@@ -251,6 +271,7 @@ public class RequestContextTestCase extends AbstractMuleTestCase
             }
         }
 
+        @Override
         public ProcessingTime getProcessingTime()
         {
             return null;

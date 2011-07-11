@@ -15,10 +15,18 @@ import org.mule.api.routing.filter.Filter;
 import org.mule.config.expression.ExpressionFilterParser;
 import org.mule.routing.filters.ExpressionFilter;
 import org.mule.routing.filters.logic.AndFilter;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class FilterExpressionParserTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class FilterExpressionParserTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testSimpleFilters() throws Exception
     {
         ExpressionFilterParser parser = new ExpressionFilterParser();
@@ -53,6 +61,5 @@ public class FilterExpressionParserTestCase extends AbstractMuleTestCase
 
         message = new DefaultMuleMessage("foo car", muleContext);
         assertTrue(f.accept(message));
-
     }
 }

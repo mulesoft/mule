@@ -15,6 +15,10 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.NullPayload;
 
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
+
 public class NullResultTestCase extends AbstractTransformerTestCase
 {
     private final NullResultTransformer transformer = new NullResultTransformer();
@@ -43,6 +47,7 @@ public class NullResultTestCase extends AbstractTransformerTestCase
         return null;
     }
 
+    @Test
     public void testNullNotExpected() throws Exception
     {
         transformer.setReturnDataType(DataTypeFactory.STRING);

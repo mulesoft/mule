@@ -26,6 +26,13 @@ import org.mule.util.FileUtils;
 import java.io.File;
 import java.util.Arrays;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class FileConnectorTestCase extends AbstractConnectorTestCase
 {
     private static final long POLLING_FREQUENCY = 1234;
@@ -84,6 +91,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
     /**
      * Test polling frequency set on a connector.
      */
+    @Test
     public void testConnectorPollingFrequency() throws Exception
     {
         FileConnector connector = (FileConnector) getConnector();
@@ -99,6 +107,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
     /**
      * Test polling frequency overridden at an endpoint level.
      */
+    @Test
     public void testPollingFrequencyEndpointOverride() throws Exception
     {
         FileConnector connector = (FileConnector) getConnector();
@@ -116,6 +125,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
                 ((FileMessageReceiver) receiver).getFrequency());
     }
 
+    @Test
     public void testOutputAppendEndpointOverride() throws Exception
     {
         FileConnector connector = (FileConnector) getConnector();
@@ -137,6 +147,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
         }
     }
 
+    @Test
     public void testOnlySingleDispatcherPerEndpoint() throws InitialisationException
     {
         // MULE-1773 implies that we must only have one dispatcher per endpoint
@@ -154,6 +165,7 @@ public class FileConnectorTestCase extends AbstractConnectorTestCase
      * If the connector is configured not to do streaming it converts to byte[] so the original
      * input payload is not the same as the payload in the MuleMessage
      */
+    @Test
     public void testConnectorMessageFactoryNonStreaming() throws Exception
     {
         Connector connector = getConnectorAndAssert();

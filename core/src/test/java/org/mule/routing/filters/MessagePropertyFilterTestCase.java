@@ -15,13 +15,20 @@ import org.mule.MessageExchangePattern;
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class MessagePropertyFilterTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testMessagePropertyFilter() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=bar");
@@ -31,6 +38,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
+    @Test
     public void testMessagePropertyFilterSessionScope() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("blah", muleContext);
@@ -42,6 +50,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
+    @Test
     public void testMessagePropertyFilterInboundScope() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("blah", muleContext);
@@ -54,6 +63,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
+    @Test
     public void testMessagePropertyFilterWithURL() throws Exception
     {
         DefaultMuleMessage message = new DefaultMuleMessage("blah", muleContext);
@@ -78,6 +88,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
+    @Test
     public void testMessagePropertyFilterWithNot() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo!=bar");
@@ -90,6 +101,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
+    @Test
     public void testMessagePropertyFilterWithNotNull() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo!=null");
@@ -102,6 +114,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
+    @Test
     public void testMessagePropertyFilterWithCaseSensitivity() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=Bar");
@@ -113,6 +126,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     }
 
 
+    @Test
     public void testMessagePropertyFilterWithWildcard() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=B*");
@@ -125,6 +139,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
+    @Test
     public void testMessagePropertyFilterDodgyValues() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter();
@@ -149,6 +164,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
     }
 
 
+    @Test
     public void testMessagePropertyFilterPropertyExists() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo!=null");
@@ -159,6 +175,7 @@ public class MessagePropertyFilterTestCase extends AbstractMuleTestCase
         assertTrue("Filter didn't accept the message", filter.accept(message));
     }
 
+    @Test
     public void testMessagePropertyWithEnum() throws Exception
     {
         MessagePropertyFilter filter = new MessagePropertyFilter("foo=ONE_WAY");

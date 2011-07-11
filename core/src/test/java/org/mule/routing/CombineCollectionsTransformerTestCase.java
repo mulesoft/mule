@@ -14,14 +14,20 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessageCollection;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.CombineCollectionsTransformer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CombineCollectionsTransformerTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class CombineCollectionsTransformerTestCase extends AbstractMuleContextTestCase
 {
     private CombineCollectionsTransformer merger;
 
@@ -33,6 +39,7 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleTestCase
         merger = new CombineCollectionsTransformer();
     }
 
+    @Test
     public void testMuleMessageCollectionMerge() throws Exception
     {   
         MuleEvent event = getTestEvent("hello");
@@ -52,6 +59,7 @@ public class CombineCollectionsTransformerTestCase extends AbstractMuleTestCase
         assertEquals(7, ((List)response.getMessage().getPayload()).size());
     }
     
+    @Test
     public void testMuleMessageMerge() throws Exception
     {
         MuleEvent event = getTestEvent("hello");

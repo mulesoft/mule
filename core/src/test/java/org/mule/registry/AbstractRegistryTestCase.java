@@ -11,16 +11,23 @@ package org.mule.registry;
 
 import org.mule.api.registry.RegistrationException;
 import org.mule.api.registry.Registry;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-public abstract class AbstractRegistryTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+public abstract class AbstractRegistryTestCase extends AbstractMuleContextTestCase
 {
     public abstract Registry getRegistry();
 
+    @Test
     public void testNotFoundCalls() throws RegistrationException
     {
         Registry r = getRegistry();

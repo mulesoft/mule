@@ -24,7 +24,7 @@ import org.mule.api.transport.OutputHandler;
 import org.mule.component.simple.PassThroughComponent;
 import org.mule.model.seda.SedaModel;
 import org.mule.model.seda.SedaService;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.AbstractTransformer;
 
 import java.io.IOException;
@@ -34,7 +34,14 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleContextTestCase
 {
     public DefaultOutboundRouterCollectionTestCase()
     {
@@ -76,6 +83,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * in isMatch or not . The outbound phase already has a new message copy.
      * @throws Exception if the test fails!
      */
+    @Test
     public void testSingleDoesNotRequireCopyRouterMatchAllFalse() throws Exception
     {
         getOutboundRouterCollection().setMatchAll(false);
@@ -94,6 +102,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * in isMatch or not . The outbound phase already has a new message copy.
      * @throws Exception if the test fails!
      */
+    @Test
     public void testSingleDoesNotRequireCopyRouterMatchAllTrue() throws Exception
     {
 
@@ -115,6 +124,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * in isMatch or not . The outbound phase already has a new message copy.
      * @throws Exception if the test fails!
      */
+    @Test
     public void testSingleRequiresCopyRouterMatchAllFalse() throws Exception
     {
         getOutboundRouterCollection().setMatchAll(false);
@@ -134,6 +144,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * in isMatch or not . The outbound phase already has a new message copy.
      * @throws Exception if the test fails!
      */
+    @Test
     public void testSingleRequiresCopyRouterMatchAllTrue() throws Exception
     {
         getOutboundRouterCollection().setMatchAll(true);
@@ -155,6 +166,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * to copy.
      * @throws Exception if the test fails!
      */
+    @Test
     public void testMultipleDoesNotRequireCopyRouterMatchAllFalse() throws Exception
     {
         getOutboundRouterCollection().setMatchAll(false);
@@ -176,6 +188,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * may mutate the message in isMatch or not. See MULE- 4352.
      * @throws Exception if the test fails!
      */
+    @Test
     public void testMultipleDoesNotRequireCopyRouterMatchAllTrue() throws Exception
     {
 
@@ -199,6 +212,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * isMatch.
      * @throws Exception if the test fails!
      */
+    @Test
     public void testMultipleRequiresCopyRouterMatchAllFalse() throws Exception
     {
         getOutboundRouterCollection().setMatchAll(false);
@@ -220,6 +234,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * may mutate the message in isMatch or not. See MULE- 4352.
      * @throws Exception if the test fails!
      */
+    @Test
     public void testMultipleRequiresCopyRouterMatchAllTrue() throws Exception
     {
         getOutboundRouterCollection().setMatchAll(true);
@@ -241,6 +256,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * If matchAll is true then we need a new message copy for each and every router except the last one.
      * @throws Exception if the test fails!
      */
+    @Test
     public void testMultipleMixMatchAllTrue() throws Exception
     {
         getOutboundRouterCollection().setMatchAll(true);
@@ -266,6 +282,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * mutate the message in isMatch unless it is the last router.
      * @throws Exception if the test fails!
      */
+    @Test
     public void testMultipleMixMatchAllFalse() throws Exception
     {
         getOutboundRouterCollection().setMatchAll(false);
@@ -293,6 +310,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
      * payload cannot be copied.
      * @throws Exception if the test fails!
      */
+    @Test
     public void testStreamPayload() throws Exception
     {
         getOutboundRouterCollection().setMatchAll(true);
@@ -303,6 +321,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
 
         testEvent.getMessage().setPayload(new OutputHandler()
         {
+            @Override
             public void write(MuleEvent event, OutputStream out) throws IOException
             {
                 // do nothing
@@ -315,7 +334,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         }
         catch (MessagingException e)
         {
-            // expected 
+            // expected
         }
     }
 
@@ -323,7 +342,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
     {
         return (OutboundRouterCollection) testService.getOutboundMessageProcessor();
     }
-    
+
     private static class TestRequiresNewMessageOutboundRouter extends OutboundPassThroughRouter
     {
         static CountDownLatch latch;
@@ -333,7 +352,7 @@ public class DefaultOutboundRouterCollectionTestCase extends AbstractMuleTestCas
         {
             this.expectCopy = expectCopy;
             List<Transformer> transformers = new ArrayList<Transformer>();
-            transformers.add(new AbstractTransformer() 
+            transformers.add(new AbstractTransformer()
             {
                 @Override
                 public Object doTransform(Object src, String encoding) throws TransformerException

@@ -13,6 +13,13 @@ import org.mule.api.model.InvocationResult;
 
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class MixedAnnotationsTestCase extends AbstractAnnotatedEntrypointResolverTestCase
 {
     @Override
@@ -21,6 +28,7 @@ public class MixedAnnotationsTestCase extends AbstractAnnotatedEntrypointResolve
         return new MixedAnnotationsComponent();
     }
 
+    @Test
     public void testProcessAllAnnotated() throws Exception
     {
         InvocationResult response = invokeResolver("processAllAnnotated", eventContext);
@@ -47,6 +55,7 @@ public class MixedAnnotationsTestCase extends AbstractAnnotatedEntrypointResolve
         assertNotNull(attachments.get("baz"));
     }
 
+    @Test
     public void testPayloadNotAnnotated() throws Exception
     {
         //When using param annotations every param needs t obe annotated

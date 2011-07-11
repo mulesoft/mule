@@ -10,11 +10,18 @@
 
 package org.mule.routing.filters;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class WildcardFilterTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testWildcardFilterNoPattern()
     {
         // start with default
@@ -30,6 +37,7 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
         assertFalse(filter.accept("oh-oh"));
     }
 
+    @Test
     public void testWildcardFilterPostfix()
     {
         WildcardFilter filter = new WildcardFilter("The quick *");
@@ -41,6 +49,7 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
         assertTrue(!filter.accept("he quick brown fox"));
     }
 
+    @Test
     public void testWildcardFilterPrefix()
     {
         WildcardFilter filter = new WildcardFilter();
@@ -53,6 +62,7 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testWildcardFilterExactMatch()
     {
         WildcardFilter filter = new WildcardFilter();
@@ -63,6 +73,7 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
         assertTrue(filter.accept(""));
     }
 
+    @Test
     public void testWildcardFilterPrePost()
     {
         WildcardFilter filter = new WildcardFilter();
@@ -89,6 +100,7 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
         assertTrue(filter.accept("test.txt"));
     }
 
+    @Test
     public void testWildcardFilterMultiplePatterns()
     {
         WildcardFilter filter = new WildcardFilter();
@@ -104,6 +116,7 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testWildcardFilterCasesensitive()
     {
         WildcardFilter filter = new WildcardFilter();
@@ -114,6 +127,7 @@ public class WildcardFilterTestCase extends AbstractMuleTestCase
         assertTrue(filter.accept("The quick Brown fox"));
     }
 
+    @Test
     public void testClassAndSubclass()
     {
         WildcardFilter filter = new WildcardFilter();

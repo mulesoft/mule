@@ -12,12 +12,18 @@ package org.mule.mule.model;
 
 import org.mule.api.model.InvocationResult;
 import org.mule.model.resolvers.CallableEntryPointResolver;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 
-public class CallableEntryPointDiscoveryTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class CallableEntryPointDiscoveryTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testBadMatch() throws Exception
     {
         CallableEntryPointResolver resolver = new CallableEntryPointResolver();
@@ -25,6 +31,7 @@ public class CallableEntryPointDiscoveryTestCase extends AbstractMuleTestCase
         assertEquals("Service doesn't implement Callable", result.getState(), InvocationResult.State.NOT_SUPPORTED);
     }
 
+    @Test
     public void testGoodMatch() throws Exception
     {
         CallableEntryPointResolver resolver = new CallableEntryPointResolver();

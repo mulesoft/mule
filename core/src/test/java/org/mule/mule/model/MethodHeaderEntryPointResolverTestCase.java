@@ -14,13 +14,18 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.model.InvocationResult;
 import org.mule.api.transport.PropertyScope;
 import org.mule.model.resolvers.MethodHeaderPropertyEntryPointResolver;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
 import org.mule.transport.NullPayload;
 
-public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleContextTestCase
 {
+
     private MethodHeaderPropertyEntryPointResolver resolver;
 
     @Override
@@ -30,6 +35,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
         resolver = new MethodHeaderPropertyEntryPointResolver();
     }
 
+    @Test
     public void testMethodSetPass() throws Exception
     {
         MuleEventContext ctx = getTestEventContext("blah");
@@ -39,6 +45,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
         assertInvocationWasSuccessful(result);
     }
 
+    @Test
     public void testMethodSetWithNoArgsPass() throws Exception
     {
         MuleEventContext ctx = getTestEventContext(NullPayload.getInstance());
@@ -49,6 +56,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals("wash", result.getMethodCalled());
     }
 
+    @Test
     public void testCustomMethodProperty() throws Exception
     {
         resolver.setMethodProperty("serviceMethod");
@@ -60,6 +68,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
         assertInvocationWasSuccessful(result);
     }
 
+    @Test
     public void testCustomMethodPropertyFail() throws Exception
     {
         resolver.setMethodProperty("serviceMethod");
@@ -71,6 +80,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
         assertInvocationFailed(result);
     }
 
+    @Test
     public void testMethodPropertyFail() throws Exception
     {
         resolver.setMethodProperty("serviceMethod");
@@ -82,6 +92,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
         assertInvocationFailed(result);
     }
 
+    @Test
     public void testMethodPropertyMismatch() throws Exception
     {
         MuleEventContext ctx = getTestEventContext("blah");
@@ -96,6 +107,7 @@ public class MethodHeaderEntryPointResolverTestCase extends AbstractMuleTestCase
      * parameter type is assignable from the payload type and not just if there is an
      * exact match. See MULE-3636.
      */
+    @Test
     public void testMethodPropertyParameterAssignableFromPayload() throws Exception
     {
         MuleEventContext ctx = getTestEventContext(new Apple());

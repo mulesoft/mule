@@ -14,8 +14,12 @@ import org.mule.config.spring.parsers.PreProcessor;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Test;
+
 public class CheckRequiredAttributesTestCase extends AbstractPreProcessorTestCase
 {
+
+    @Test
     public void testSingleSetSingleAttribute() throws ParserConfigurationException
     {
         String[][] groups = new String[][] {
@@ -35,6 +39,7 @@ public class CheckRequiredAttributesTestCase extends AbstractPreProcessorTestCas
         assertOk(groups, "x a1");
     }
 
+    @Test
     public void testSingleSetMultipleAttributes() throws ParserConfigurationException
     {
         String[][] groups = new String[][] {
@@ -63,6 +68,7 @@ public class CheckRequiredAttributesTestCase extends AbstractPreProcessorTestCas
         assertOk(groups, "x b1 b2");
     }
 
+    @Test
     public void testTwoSetsSingleAttribute() throws ParserConfigurationException
     {
         String[][] groups = new String[][] {
@@ -92,6 +98,7 @@ public class CheckRequiredAttributesTestCase extends AbstractPreProcessorTestCas
         assertOk(groups, "a1 b1");
     }
     
+    @Test
     public void testTwoSetsEmptySecondSet() throws ParserConfigurationException
     {
         String[][] groups = new String[][] {
@@ -113,6 +120,7 @@ public class CheckRequiredAttributesTestCase extends AbstractPreProcessorTestCas
         assertOk(groups, "x a1");
     }
     
+    @Test
     public void testTwoSetsMultipleAttributes() throws ParserConfigurationException
     {
         String[][] groups = new String[][] {
@@ -175,6 +183,7 @@ public class CheckRequiredAttributesTestCase extends AbstractPreProcessorTestCas
         assertOk(groups, "b1 b2 a2 x");
     }
 
+    @Test
     public void testTwoSetsOverlappingAttributes() throws ParserConfigurationException
     {
         String[][] groups = new String[][] {
@@ -205,6 +214,7 @@ public class CheckRequiredAttributesTestCase extends AbstractPreProcessorTestCas
         assertOk(groups, "a1 a2 b1");
     }
     
+    @Test
     public void testRealWorld() throws ParserConfigurationException
     {
         String[][] groups = new String[][] {

@@ -18,6 +18,10 @@ import org.mule.tck.MuleTestUtils;
 
 import java.util.Collections;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class BridgeTestCase extends AbstractFlowConstuctTestCase
 {
     private Bridge bridge;
@@ -45,6 +49,7 @@ public class BridgeTestCase extends AbstractFlowConstuctTestCase
         return bridge;
     }
 
+    @Test
     public void testProcess() throws Exception
     {
         bridge.initialise();

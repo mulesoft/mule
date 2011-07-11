@@ -10,10 +10,6 @@
 
 package org.mule.endpoint;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -27,15 +23,21 @@ import org.mule.api.security.EndpointSecurityFilter;
 import org.mule.api.transaction.TransactionConfig;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 
 public class EndpointTestCase extends AbstractMuleTestCase
 {
@@ -45,6 +47,7 @@ public class EndpointTestCase extends AbstractMuleTestCase
      * endpoint's information that has not ben set yet. Related to these issues:
      * EE-1937, MULE-3983
      */
+    @Test
     @SuppressWarnings("serial")
     public void testTransformersAreSetupAfterCompleteEndpointConfig()
     {

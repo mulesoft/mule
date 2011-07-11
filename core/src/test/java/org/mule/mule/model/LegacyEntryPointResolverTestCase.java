@@ -17,7 +17,7 @@ import org.mule.api.model.EntryPointResolverSet;
 import org.mule.model.resolvers.ArrayEntryPointResolver;
 import org.mule.model.resolvers.EntryPointNotFoundException;
 import org.mule.model.resolvers.LegacyEntryPointResolverSet;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -30,14 +30,22 @@ import org.mule.tck.testmodels.fruit.WaterMelon;
 
 import java.util.Arrays;
 
-public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class LegacyEntryPointResolverTestCase extends AbstractMuleContextTestCase
 {
+
     /** Name of the method override property on the event. */
     private static final String METHOD_PROPERTY_NAME = MuleProperties.MULE_METHOD_PROPERTY;
 
     /** Name of the non-existent method. */
     private static final String INVALID_METHOD_NAME = "nosuchmethod";
 
+    @Test
     public void testExplicitMethodMatch() throws Exception
     {
         try
@@ -51,6 +59,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testExplicitMethodMatchComplexObject() throws Exception
     {
         try
@@ -64,7 +73,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
         }
     }
 
-
+    @Test
     public void testExplicitMethodMatchSetArrayFail() throws Exception
     {
         try
@@ -72,7 +81,6 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
             LegacyEntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
             resolver.invoke(new FruitBowl(), getTestEventContext(new Fruit[]{new Apple(), new Orange()}));
             fail("Test should have failed because the arguments were not wrapped properly: ");
-
         }
         catch (MuleException e)
         {
@@ -80,6 +88,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testExplicitMethodMatchSetArrayPass() throws Exception
     {
         try
@@ -95,6 +104,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
 
     /* this tests the same as above except it uses the {@link ArrayEntryPointResolver} and does not wrap the args with an array
      */
+    @Test
     public void testExplicitMethodMatchSetArrayPassUsingExplicitResolver() throws Exception
     {
         try
@@ -153,6 +163,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
      * Tests entrypoint discovery when there is more than one discoverable method
      * with MuleEventContext parameter.
      */
+    @Test
     public void testFailEntryPointMultiplePayloadMatches() throws Exception
     {
         EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
@@ -174,6 +185,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
      * and no such method exists, an exception should be thrown, and no fallback to
      * the default discovery should take place.
      */
+    @Test
     public void testMethodOverrideDoesNotFallback() throws Exception
     {
         EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
@@ -193,6 +205,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
      * and a Callable instance is serving the request, call the Callable, ignore the
      * method override parameter.
      */
+    @Test
     public void testMethodOverrideIgnoredWithCallable() throws Exception
     {
         EntryPointResolverSet resolver = new LegacyEntryPointResolverSet();
@@ -224,6 +237,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
      * and a target instance has a method accepting MuleEventContext, proceed to call
      * this method, ignore the method override parameter.
      */
+    @Test
     public void testMethodOverrideIgnoredWithEventContext() throws Exception
     {
         EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
@@ -248,6 +262,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
 
     /** Test for proper resolution of a method that takes an array as argument. */
     // TODO MULE-1088: currently fails, therefore disabled
+    @Test
     public void testArrayArgumentResolution() throws Exception
     {
         EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
@@ -266,6 +281,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
     }
 
     /** Test for proper resolution of a method that takes a List as argument. */
+    @Test
     public void testListArgumentResolution() throws Exception
     {
         EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();
@@ -283,6 +299,7 @@ public class LegacyEntryPointResolverTestCase extends AbstractMuleTestCase
     }
 
     /** Test for proper resolution of an existing method specified as override */
+    @Test
     public void testExplicitOverride() throws Exception
     {
         EntryPointResolverSet resolverSet = new LegacyEntryPointResolverSet();

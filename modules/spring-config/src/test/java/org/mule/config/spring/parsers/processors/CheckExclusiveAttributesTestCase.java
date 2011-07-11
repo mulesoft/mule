@@ -12,8 +12,11 @@ package org.mule.config.spring.parsers.processors;
 
 import org.mule.config.spring.parsers.PreProcessor;
 
+import org.junit.Test;
+
 public class CheckExclusiveAttributesTestCase extends AbstractPreProcessorTestCase
 {
+    @Test
     public void testDisjointSingleAttributeGroups() throws Exception
     {
         String[][] groups = new String[][] {
@@ -26,6 +29,7 @@ public class CheckExclusiveAttributesTestCase extends AbstractPreProcessorTestCa
         assertOk(groups, "x");
     }
     
+    @Test
     public void testDisjointMultipleAttributes() throws Exception
     {
         String[][] groups = new String[][] {
@@ -58,6 +62,7 @@ public class CheckExclusiveAttributesTestCase extends AbstractPreProcessorTestCa
         assertBad(groups, "a1 b2 x", text);
     }
 
+    @Test
     public void testSecondGroupEmpty() throws Exception
     {
         String[][] groups = new String[][]{
@@ -74,6 +79,7 @@ public class CheckExclusiveAttributesTestCase extends AbstractPreProcessorTestCa
         assertOk(groups, "a1 x");
     }
     
+    @Test
     public void testGroupsWithOverlappingAttributes() throws Exception
     {
         String[][] groups = new String[][] {
@@ -96,6 +102,7 @@ public class CheckExclusiveAttributesTestCase extends AbstractPreProcessorTestCa
         assertOk(groups, "a1 b2");
     }
     
+    @Test
     public void testRealWorld() throws Exception
     {
         String[][] groups = new String[][] {

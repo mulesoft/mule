@@ -15,6 +15,8 @@ import org.mule.transformer.AbstractTransformerTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.Base64;
 
+import static org.junit.Assert.fail;
+
 public class Base64TransformersTestCase extends AbstractTransformerTestCase
 {
     private static final String TEST_DATA = "the quick brown fox jumped over the lazy dog";

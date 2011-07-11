@@ -12,6 +12,8 @@ package org.mule.module.ibeans.annotations;
 import org.ibeans.annotation.IntegrationBean;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class UriEncodingTestCase extends AbstractIBeansTestCase
 {
     @SuppressWarnings("unused")    

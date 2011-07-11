@@ -17,14 +17,19 @@ import org.mule.component.simple.EchoComponent;
 import org.mule.construct.SimpleService;
 import org.mule.construct.SimpleService.Type;
 import org.mule.exception.DefaultMessagingExceptionStrategy;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.services.SimpleMathsComponent;
 import org.mule.transformer.compression.GZipCompressTransformer;
 import org.mule.transformer.simple.ObjectToByteArray;
 import org.mule.transformer.simple.StringAppendTransformer;
 
-public class SimpleServiceBuilderTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class SimpleServiceBuilderTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testFullConfiguration() throws Exception
     {
         SimpleService simpleService = new SimpleServiceBuilder().name("test-simple-service-full")
@@ -41,6 +46,7 @@ public class SimpleServiceBuilderTestCase extends AbstractMuleTestCase
             ((AbstractJavaComponent) simpleService.getComponent()).getObjectType());
     }
 
+    @Test
     public void testShortConfiguration() throws Exception
     {
         SimpleService simpleService = new SimpleServiceBuilder().name("test-simple-service-short")
@@ -53,6 +59,7 @@ public class SimpleServiceBuilderTestCase extends AbstractMuleTestCase
             ((SimpleCallableJavaComponent) simpleService.getComponent()).getObjectType());
     }
 
+    @Test
     public void testPojoComponentConfiguration() throws Exception
     {
         SimpleMathsComponent pojoComponent = new SimpleMathsComponent();

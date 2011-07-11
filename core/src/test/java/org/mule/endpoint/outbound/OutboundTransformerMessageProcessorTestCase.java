@@ -12,8 +12,11 @@ package org.mule.endpoint.outbound;
 
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 
+import org.junit.Test;
+
 public class OutboundTransformerMessageProcessorTestCase extends AbstractMessageProcessorTestCase
 {
+    @Test
     public void testProcess()
     {
     }

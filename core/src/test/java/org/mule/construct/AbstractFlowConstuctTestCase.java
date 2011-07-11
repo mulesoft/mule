@@ -15,10 +15,17 @@ import org.mule.api.MuleException;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.ObjectUtils;
 
-public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public abstract class AbstractFlowConstuctTestCase extends AbstractMuleContextTestCase
 {
     public static class DirectInboundMessageSource implements MessageSource
     {
@@ -53,6 +60,7 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
 
     protected abstract AbstractFlowConstruct getFlowConstruct() throws Exception;
 
+    @Test
     public void testStart() throws Exception
     {
         try
@@ -81,6 +89,7 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testStop() throws Exception
     {
         assertFalse(getFlowConstruct().isStarted());
@@ -120,6 +129,7 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testDispose() throws Exception
     {
         assertFalse(getFlowConstruct().isStarted());
@@ -146,6 +156,7 @@ public abstract class AbstractFlowConstuctTestCase extends AbstractMuleTestCase
         }
     }
     
+    @Test
     public void testRegisterUnregister() throws MuleException, Exception
     {
         FlowConstruct construct = getFlowConstruct();

@@ -14,6 +14,8 @@ import org.mule.api.transformer.wire.WireFormat;
 import org.mule.transformer.simple.ByteArrayToMuleMessage;
 import org.mule.transformer.simple.MuleMessageToByteArray;
 
+import static org.junit.Assert.assertEquals;
+
 public class SerializedMuleMessageWireFormatTestCase extends AbstractMuleMessageWireFormatTestCase
 {
 

@@ -10,9 +10,10 @@
 
 package org.mule.transport.sftp;
 
-import org.mule.transport.AbstractConnectorTestCase;
-import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
+import org.mule.transport.AbstractConnectorTestCase;
+
+import org.junit.Test;
 
 public class SftpConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -45,12 +46,14 @@ public class SftpConnectorTestCase extends AbstractConnectorTestCase
         return "payload";
     }
 
+    @Test
     public void testProperties() throws Exception
     {
         // TODO test setting and retrieving any custom properties on the
         // Connector as necessary
     }
 
+    @Override
     public void testConnectorMessageRequesterFactory()
     {
         // No MessageRequesterFactory

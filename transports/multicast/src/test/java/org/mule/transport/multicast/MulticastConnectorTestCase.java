@@ -18,6 +18,12 @@ import org.mule.transport.AbstractConnectorTestCase;
 
 import java.net.DatagramPacket;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class MulticastConnectorTestCase extends AbstractConnectorTestCase
 {
 
@@ -41,6 +47,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
         return new DatagramPacket("Hello".getBytes(), 5);
     }
 
+    @Test
     public void testValidListener() throws Exception
     {
         Service service = getTestService("orange", Orange.class);
@@ -61,6 +68,7 @@ public class MulticastConnectorTestCase extends AbstractConnectorTestCase
         }
     }
 
+    @Test
     public void testProperties() throws Exception
     {
         MulticastConnector c = new MulticastConnector(muleContext);

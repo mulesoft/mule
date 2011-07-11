@@ -16,13 +16,21 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class OutboundRouterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class OutboundRouterTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testAddGoodEndpoint() throws Exception
     {
         AbstractOutboundRouter router = new DummyOutboundRouter();
@@ -32,6 +40,7 @@ public class OutboundRouterTestCase extends AbstractMuleTestCase
         assertTrue(router.getRoutes().contains(endpoint));
     }
 
+    @Test
     public void testSetGoodEndpoints() throws Exception
     {
         List<MessageProcessor> list= new ArrayList<MessageProcessor>();
@@ -47,6 +56,7 @@ public class OutboundRouterTestCase extends AbstractMuleTestCase
         assertEquals(2, router.getRoutes().size());
     }
 
+    @Test
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void testSetBadEndpoints() throws Exception
     {
@@ -66,6 +76,7 @@ public class OutboundRouterTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void testSetBad2Endpoints() throws Exception
     {

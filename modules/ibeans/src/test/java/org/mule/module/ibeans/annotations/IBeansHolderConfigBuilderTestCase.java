@@ -19,6 +19,8 @@ import java.util.TreeSet;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class IBeansHolderConfigBuilderTestCase extends AbstractIBeansTestCase
 {
     @Override

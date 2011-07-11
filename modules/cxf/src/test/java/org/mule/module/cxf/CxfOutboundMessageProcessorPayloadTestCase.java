@@ -10,16 +10,21 @@
 
 package org.mule.module.cxf;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.NullPayload;
 
-public class CxfOutboundMessageProcessorPayloadTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+public class CxfOutboundMessageProcessorPayloadTestCase extends AbstractMuleContextTestCase
 {
     private CxfOutboundMessageProcessor cxfMP;
     private CxfConfiguration configuration;
@@ -35,6 +40,7 @@ public class CxfOutboundMessageProcessorPayloadTestCase extends AbstractMuleTest
         cxfMP = new CxfOutboundMessageProcessor(null);
     }
 
+    @Test
     public void testGetArgs_withObjectAsPayload() throws Exception
     {
         Object payload = new Object();
@@ -46,6 +52,7 @@ public class CxfOutboundMessageProcessorPayloadTestCase extends AbstractMuleTest
         assertSame(payload, args[0]);
     }
 
+    @Test
     public void testGetArgs_withArrayAsPayload() throws Exception
     {
         Object[] payload = new Object[4];
@@ -55,6 +62,7 @@ public class CxfOutboundMessageProcessorPayloadTestCase extends AbstractMuleTest
         assertSame(payload, args);
     }
 
+    @Test
     public void testGetArgs_withNullPayloadAsPayload() throws Exception
     {
         Object payload = NullPayload.getInstance();
@@ -70,7 +78,7 @@ public class CxfOutboundMessageProcessorPayloadTestCase extends AbstractMuleTest
     {
         MuleEvent muleEvent = mock(MuleEvent.class);
         MuleMessage muleMessage = mock(MuleMessage.class);
-        
+
         when(muleEvent.getMessage()).thenReturn(muleMessage);
         when(muleEvent.getMessage().getPayload()).thenReturn(payload);
         when(muleMessage.getPayload()).thenReturn(payload);

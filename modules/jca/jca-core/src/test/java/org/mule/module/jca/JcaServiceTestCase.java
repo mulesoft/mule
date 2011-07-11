@@ -24,6 +24,11 @@ import javax.resource.spi.endpoint.MessageEndpoint;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 public class JcaServiceTestCase extends AbstractServiceTestCase
 {
     private Service service;
@@ -58,6 +63,7 @@ public class JcaServiceTestCase extends AbstractServiceTestCase
         service = null;
     }
 
+    @Test
     public void testSendEvent() throws Exception
     {
         getService().initialise();
@@ -76,6 +82,7 @@ public class JcaServiceTestCase extends AbstractServiceTestCase
         }
     }
 
+    @Test
     public void testDispatchEvent() throws Exception
     {
         getService().initialise();
@@ -89,6 +96,7 @@ public class JcaServiceTestCase extends AbstractServiceTestCase
         assertEquals(0, workManager.getDoWorkList().size());
     }
 
+    @Test
     public void testPause() throws MuleException
     {
         try
@@ -100,9 +108,9 @@ public class JcaServiceTestCase extends AbstractServiceTestCase
         {
             // expected
         }
-
     }
 
+    @Test
     public void testResume() throws MuleException
     {
         try

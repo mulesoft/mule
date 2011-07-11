@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.jackson.node.ObjectNode;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class JsonNodeExpressionEvaluatorTestCase extends JsonExpressionEvaluatorTestCase
 {
@@ -30,6 +33,7 @@ public class JsonNodeExpressionEvaluatorTestCase extends JsonExpressionEvaluator
         return "json-node";
     }
 
+    @Test
     public void testReturnTypes()
     {
         // String

@@ -20,6 +20,9 @@ import org.mule.transformer.wire.AbstractMuleMessageWireFormatTestCase;
 
 import java.util.Properties;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class XStreamWireFormatTestCase extends AbstractMuleMessageWireFormatTestCase
 {
 
@@ -28,11 +31,13 @@ public class XStreamWireFormatTestCase extends AbstractMuleMessageWireFormatTest
         return createObject(XStreamWireFormat.class);
     }
 
+    @Override
     public void testGetDefaultInboundTransformer() throws Exception
     {
         assertEquals(XmlToObject.class, ((XStreamWireFormat) getWireFormat()).getInboundTransformer().getClass());
     }
 
+    @Override
     public void testGetDefaultOutboundTransformer() throws Exception
     {
         assertEquals(ObjectToXml.class, ((XStreamWireFormat) getWireFormat()).getOutboundTransformer().getClass());

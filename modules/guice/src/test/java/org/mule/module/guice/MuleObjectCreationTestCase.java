@@ -11,7 +11,7 @@ package org.mule.module.guice;
 
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transport.Connector;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.RedApple;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.transformer.types.DataTypeFactory;
@@ -22,7 +22,14 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 
-public class MuleObjectCreationTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class MuleObjectCreationTestCase extends AbstractMuleContextTestCase
 {
     @Override
     protected void doSetUp() throws Exception
@@ -31,6 +38,7 @@ public class MuleObjectCreationTestCase extends AbstractMuleTestCase
         cb.configure(muleContext);
     }
 
+    @Test
     public void testObjectCreation() throws Exception
     {
         TestConnector c = (TestConnector) muleContext.getRegistry().lookupConnector("testConnector");
@@ -50,6 +58,7 @@ public class MuleObjectCreationTestCase extends AbstractMuleTestCase
         assertEquals(2, muleContext.getRegistry().lookupObjects(Connector.class).size());
     }
 
+    @Test
     public void testObjectLifecycle() throws Exception
     {
         TestConnector c = (TestConnector) muleContext.getRegistry().lookupConnector("testConnector");

@@ -15,6 +15,12 @@ import org.mule.util.IOUtils;
 
 import java.io.InputStream;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class PayloadAnnotationTestCase extends AbstractAnnotatedEntrypointResolverTestCase
 {
     @Override
@@ -23,6 +29,7 @@ public class PayloadAnnotationTestCase extends AbstractAnnotatedEntrypointResolv
         return new PayloadAnnotationComponent();
     }
 
+    @Test
     public void testPayloadNoTransform() throws Exception
     {
        InvocationResult response = invokeResolver("processNoTransformString", eventContext);
@@ -30,6 +37,7 @@ public class PayloadAnnotationTestCase extends AbstractAnnotatedEntrypointResolv
         assertEquals("test", response.getResult().toString());
     }
 
+    @Test
     public void testPayloadAutoTransform() throws Exception
     {
         InvocationResult response = invokeResolver("processAutoTransformString", eventContext);
@@ -37,6 +45,7 @@ public class PayloadAnnotationTestCase extends AbstractAnnotatedEntrypointResolv
         assertEquals("test", IOUtils.toString((InputStream)response.getResult()));
     }
 
+    @Test
     public void testPayloadFailedTransform() throws Exception
     {
         try

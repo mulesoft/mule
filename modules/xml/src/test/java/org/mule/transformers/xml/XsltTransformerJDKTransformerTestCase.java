@@ -29,6 +29,13 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransformerTestCase
 {
 
@@ -62,6 +69,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
     }
 
     @Override
+    @Test
     public void testRoundtripTransform() throws Exception
     {
         // disable this test
@@ -82,6 +90,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         return resultData;
     }
 
+    @Test
     public void testAllXmlMessageTypes() throws Exception
     {
         List list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");
@@ -100,6 +109,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         }
     }
 
+    @Test
     public void testTransformXMLStreamReader() throws Exception
     {
         Object expectedResult = getResultData();
@@ -115,6 +125,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         assertTrue("expected: " + expectedResult + "\nresult: " + result, compareResults(expectedResult, result));
     }
 
+    @Test
     public void testCustomTransformerFactoryClass() throws InitialisationException
     {
         XsltTransformer t = new XsltTransformer();
@@ -138,6 +149,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
         t.initialise();
     }
 
+    @Test
     public void testTransformWithStaticParam() throws TransformerException, InitialisationException
     {
 
@@ -193,6 +205,7 @@ public class XsltTransformerJDKTransformerTestCase extends AbstractXmlTransforme
 
     }
 
+    @Test
     public void testTransformWithDynamicParam() throws Exception
     {
 

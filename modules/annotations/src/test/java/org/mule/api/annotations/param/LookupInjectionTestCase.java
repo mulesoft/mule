@@ -10,11 +10,18 @@
 package org.mule.api.annotations.param;
 
 import org.mule.api.expression.RequiredValueException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.ObjectToString;
 
-public class LookupInjectionTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+public class LookupInjectionTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testInject() throws Exception
     {
         LookupComponent component = new LookupComponent();
@@ -30,6 +37,7 @@ public class LookupInjectionTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testInjectFail() throws Exception
     {
         try

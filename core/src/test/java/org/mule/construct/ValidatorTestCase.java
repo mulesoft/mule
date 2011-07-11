@@ -19,6 +19,10 @@ import org.mule.tck.MuleTestUtils;
 
 import java.util.Collections;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class ValidatorTestCase extends AbstractFlowConstuctTestCase
 {
     private Validator validator;
@@ -46,6 +50,7 @@ public class ValidatorTestCase extends AbstractFlowConstuctTestCase
         return validator;
     }
 
+    @Test
     public void testAck() throws Exception
     {
         validator.initialise();
@@ -56,6 +61,7 @@ public class ValidatorTestCase extends AbstractFlowConstuctTestCase
         assertEquals("GOOD:123", response.getMessageAsString());
     }
 
+    @Test
     public void testNack() throws Exception
     {
         validator.initialise();
@@ -66,6 +72,7 @@ public class ValidatorTestCase extends AbstractFlowConstuctTestCase
         assertEquals("BAD:abc", response.getMessageAsString());
     }
 
+    @Test
     @SuppressWarnings("unchecked")
     public void testErrorWithoutExpression() throws Exception
     {
@@ -80,6 +87,7 @@ public class ValidatorTestCase extends AbstractFlowConstuctTestCase
         testAck();
     }
 
+    @Test
     public void testErrorWithExpression() throws Exception
     {
         final OutboundEndpoint failingOutboundEndpoint = MuleTestUtils.getTestOutboundEndpoint(

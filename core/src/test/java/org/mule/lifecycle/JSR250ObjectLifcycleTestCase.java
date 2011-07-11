@@ -9,16 +9,22 @@
  */
 package org.mule.lifecycle;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 /**
  * Test lifecycle behaviour and restrictions on lifecyce methods
  */
-public class JSR250ObjectLifcycleTestCase extends AbstractMuleTestCase
+public class JSR250ObjectLifcycleTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testNormalBehaviour() throws Exception
     {
         JSR250ObjectLifecycleTracker tracker = new JSR250ObjectLifecycleTracker();
@@ -28,6 +34,7 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleTestCase
         assertEquals("[setMuleContext, initialise, dispose]", tracker.getTracker().toString());
     }
 
+    @Test
     public void testTwoPostConstructAnnotations() throws Exception
     {
         try
@@ -41,6 +48,7 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testTwoPreDestroyAnnotations() throws Exception
     {
         try
@@ -54,6 +62,7 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testBadReturnTypePostConstructMethod() throws Exception
     {
         try
@@ -67,6 +76,7 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testBadParamPreDestroyMethod() throws Exception
     {
         try
@@ -80,6 +90,7 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testBadStaticPreDestroyMethod() throws Exception
     {
         try
@@ -93,6 +104,7 @@ public class JSR250ObjectLifcycleTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testBadCheckedExceptionPreDestroyMethod() throws Exception
     {
         try

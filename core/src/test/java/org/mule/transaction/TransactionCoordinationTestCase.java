@@ -11,26 +11,34 @@
 package org.mule.transaction;
 
 import org.mule.api.transaction.Transaction;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mockito;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 public class TransactionCoordinationTestCase extends AbstractMuleTestCase
 {
     private TransactionCoordination tc;
 
-    @Override
-    protected void doSetUp() throws Exception
+    @Before
+    public void setUpTransaction() throws Exception
     {
         tc = TransactionCoordination.getInstance();
     }
 
-    @Override
-    protected void doTearDown() throws Exception
+    @After
+    public void unbindTransaction() throws Exception
     {
         tc.unbindTransaction(tc.getTransaction());
     }
 
+    @Test
     public void testBindTransaction() throws Exception
     {
         assertNull(tc.getTransaction());
@@ -41,6 +49,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
         tc.unbindTransaction(tx);
     }
 
+    @Test
     public void testBindTransactionWithAlreadyBound() throws Exception
     {
         assertNull(tc.getTransaction());
@@ -63,6 +72,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
         tc.unbindTransaction(tx);
     }
 
+    @Test
     public void testUnbindTransactionWithoutBound() throws Exception
     {
         assertNull(tc.getTransaction());
@@ -71,6 +81,7 @@ public class TransactionCoordinationTestCase extends AbstractMuleTestCase
         tc.unbindTransaction(tx);
     }
 
+    @Test
     public void testSetInstanceWithBound() throws Exception
     {
         assertNull(tc.getTransaction());

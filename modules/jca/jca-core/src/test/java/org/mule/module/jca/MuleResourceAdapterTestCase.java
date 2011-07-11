@@ -19,7 +19,7 @@ import org.mule.api.model.Model;
 import org.mule.api.service.Service;
 import org.mule.model.seda.SedaModel;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.lang.reflect.Method;
 import java.util.Timer;
@@ -36,7 +36,14 @@ import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.resource.spi.work.WorkManager;
 import javax.transaction.xa.XAResource;
 
-public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class MuleResourceAdapterTestCase extends AbstractMuleContextTestCase
 {
     private MuleResourceAdapter resourceAdapter;
 
@@ -54,6 +61,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         resourceAdapter = null;
     }
 
+    @Test
     public void testResolveModelName() throws ResourceException
     {
         MuleActivationSpec activationSpec = new MuleActivationSpec();
@@ -63,6 +71,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals("activationSpecModelName", modelName);
     }
 
+    @Test
     public void testResolveModelNameFromResourceAdaptor() throws ResourceException
     {
         MuleActivationSpec activationSpec = new MuleActivationSpec();
@@ -71,6 +80,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals("resourceAdaptorModelName", modelName);
     }
 
+    @Test
     public void testResolveModelNameFromActivationSpec() throws ResourceException
     {
         MuleActivationSpec activationSpec = new MuleActivationSpec();
@@ -79,6 +89,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals("activationSpecModelName", modelName);
     }
 
+    @Test
     public void testResolveModelModelNameMissing()
     {
         MuleActivationSpec activationSpec = new MuleActivationSpec();
@@ -93,12 +104,14 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testGetJcaModelCreateNew() throws MuleException, ResourceException
     {
         JcaModel jcaModel = resourceAdapter.getJcaModel("jca");
         assertEquals("jca", jcaModel.getName());
     }
 
+    @Test
     public void testGetJcaModelUseExisting() throws MuleException, ResourceException
     {
         Model jcaModel = new JcaModel();
@@ -109,6 +122,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals(jcaModel, jcaModel2);
     }
 
+    @Test
     public void testGetJcaModel3ExistingWrongType() throws MuleException
     {
         Model sedaModel = new SedaModel();
@@ -125,6 +139,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testCreateMessageInflowEndpoint() throws MuleException
     {
         MuleActivationSpec activationSpec = new MuleActivationSpec();
@@ -133,6 +148,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEndpointAttributes(endpoint);
     }
 
+    @Test
     public void testCreateJcaComponent() throws Exception
     {
         MessageEndpointFactory endpointFactory = new MockEndpointFactory();
@@ -163,6 +179,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals(endpointFactory, ((JcaComponent) service.getComponent()).messageEndpointFactory);
     }
 
+    @Test
     public void testendpointActivationOK() throws Exception
     {
         MuleActivationSpec activationSpec = new MuleActivationSpec();
@@ -199,6 +216,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testendpointActivationIncorrectActivationSpec()
     {
         try
@@ -215,6 +233,7 @@ public class MuleResourceAdapterTestCase extends AbstractMuleTestCase
         assertEquals(0, resourceAdapter.endpoints.size());
     }
 
+    @Test
     public void testendpointDeactivationOK() throws ResourceException
     {
         MuleActivationSpec activationSpec = new MuleActivationSpec();

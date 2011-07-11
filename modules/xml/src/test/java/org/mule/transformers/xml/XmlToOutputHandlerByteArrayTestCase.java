@@ -25,6 +25,8 @@ import java.io.InputStream;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.DOMWriter;
 
+import static org.junit.Assert.fail;
+
 public class XmlToOutputHandlerByteArrayTestCase extends AbstractXmlTransformerTestCase
 {
     private byte[] srcData;

@@ -18,8 +18,8 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transformer.TransformerException;
 import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.util.CollectionUtils;
 
@@ -30,13 +30,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
+public class FilteringOutboundRouterTestCase extends AbstractMuleContextTestCase
 {
     public FilteringOutboundRouterTestCase()
     {
         setStartContext(true);
     }
 
+    @Test
     public void testFilteringOutboundRouterAsync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
@@ -90,6 +98,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         assertTrue(router.isMatch(message));
     }
 
+    @Test
     public void testFilteringOutboundRouterSync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
@@ -119,6 +128,7 @@ public class FilteringOutboundRouterTestCase extends AbstractMuleTestCase
         session.verify();
     }
 
+    @Test
     public void testFilteringOutboundRouterWithTemplates() throws Exception
     {
         OutboundEndpoint endpoint1 = getTestOutboundEndpoint("Test1Provider", "test://foo?[barValue]");

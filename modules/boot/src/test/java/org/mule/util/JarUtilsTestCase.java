@@ -10,12 +10,19 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test suite for jar utilities.
@@ -29,6 +36,7 @@ public class JarUtilsTestCase extends AbstractMuleTestCase
      *  <li>Read jar file and compare against previous entries written</li>
      * </ol>
      */
+    @Test
     public void testCreateAppendReadJarFileEntries()
     {
         File jarFile = null;

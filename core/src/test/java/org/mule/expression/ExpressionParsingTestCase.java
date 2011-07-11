@@ -11,11 +11,15 @@ package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;
 
-public class ExpressionParsingTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class ExpressionParsingTestCase extends AbstractMuleContextTestCase
 {
 
     private ExpressionEvaluator newlyRegistered;
@@ -46,6 +50,7 @@ public class ExpressionParsingTestCase extends AbstractMuleTestCase
         muleContext.getExpressionManager().unregisterEvaluator(name);
     }
 
+    @Test
     public void testEvaluatorBraces()
     {
         String template = "#[map-payload:time] - #[map-payload:comment]";

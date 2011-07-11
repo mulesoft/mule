@@ -14,13 +14,21 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.routing.filters.ExpressionFilter;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.IOUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JsonExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
 
     protected JsonExpressionEvaluator eval;
@@ -47,6 +55,7 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
         return "json";
     }
 
+    @Test
     public void testExpressions() throws Exception
     {
         assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492", eval.evaluate("[0]/text",
@@ -57,6 +66,7 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNull(eval.evaluate("[9]/user/XXX", message));
     }
 
+    @Test
     public void testReturnTypes()
     {
         // String
@@ -74,6 +84,7 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals(ArrayList.class, ((List) eval.evaluate("[0]/anArray", message)).get(2).getClass());
     }
 
+    @Test
     public void testExpressionsUsingManager() throws Exception
     {
         assertEquals("test from Mule: 6ffca02b-9d52-475e-8b17-946acdb01492",
@@ -96,6 +107,7 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testExpressionFilter() throws Exception
     {
         ExpressionFilter filter = new ExpressionFilter("#[json:[0]/text]");
@@ -115,6 +127,7 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertFalse(filter.accept(message));
     }
 
+    @Test
     public void testExpressionFilterWithBooleanLogic() throws Exception
     {
         ExpressionFilter filter = new ExpressionFilter("#[json:[0]/text]");
@@ -135,6 +148,7 @@ public class JsonExpressionEvaluatorTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testExpressionFilterWithBooleanLogicWhereElementDoesNotExist() throws Exception
     {
         // Checks against elements that do not exist

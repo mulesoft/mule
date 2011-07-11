@@ -32,8 +32,12 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.DOMWriter;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
 {
@@ -77,6 +81,7 @@ public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
         return resultData;
     }
 
+    @Test
     public void testTransformXMLStreamReader() throws Exception
     {
         Object expectedResult = getResultData();
@@ -101,6 +106,7 @@ public class DomXmlTransformersTestCase extends AbstractXmlTransformerTestCase
         t.transform(new DOMSource(n), new StreamResult(os));
     }
     
+    @Test
     public void testAllXmlMessageTypes() throws Exception
     {
         List list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");

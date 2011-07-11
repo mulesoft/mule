@@ -17,15 +17,22 @@ import org.mule.api.MuleMessageCollection;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.dynamic.Mock;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SequenceRouterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class SequenceRouterTestCase extends AbstractMuleContextTestCase
 {
 
     private Mock session;
@@ -55,6 +62,7 @@ public class SequenceRouterTestCase extends AbstractMuleTestCase
         router.setRoutes(endpoints);
     }
 
+    @Test
     public void testSyncEndpointsOk() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -74,6 +82,7 @@ public class SequenceRouterTestCase extends AbstractMuleTestCase
         mockEndpoint2.verify();
     }
 
+    @Test
     public void testSyncEndpointsWithFirstOneFailing() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -86,6 +95,7 @@ public class SequenceRouterTestCase extends AbstractMuleTestCase
         assertNull(result);
     }
 
+    @Test
     public void testSyncEndpointsWithLastOneFailing() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, muleContext);

@@ -12,23 +12,28 @@ package org.mule.model.resolvers;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.model.InvocationResult;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.lang.reflect.Method;
 
 import junit.framework.AssertionFailedError;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class EntryPointResolverMethodCacheTestCase extends AbstractMuleTestCase
 {
     
     private static final String METHOD = "aMethod";
     
+    @Test
     public void testMethodCaching() throws Exception
     {
         Method method = this.getClass().getMethod(METHOD, new Class[] { String.class});
         Method anotherMethod = AnotherClass.class.getMethod(METHOD, new Class[] { String.class});
-        
-        MuleEventContext eventContext = getTestEventContext(null);
+
+        MuleEventContext eventContext = mock(MuleEventContext.class);
         MockEntryPointResolver epResolver = new MockEntryPointResolver();
 
         epResolver.addMethodByName(this, method, eventContext);

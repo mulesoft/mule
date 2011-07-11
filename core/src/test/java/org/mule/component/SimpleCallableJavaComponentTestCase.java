@@ -15,9 +15,17 @@ import org.mule.object.PrototypeObjectFactory;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
 public class SimpleCallableJavaComponentTestCase extends AbstractComponentTestCase
 {
 
+    @Test
     public void testComponentCreationWithObjectFactory() throws Exception
     {
         PrototypeObjectFactory objectFactory = new PrototypeObjectFactory(
@@ -47,6 +55,7 @@ public class SimpleCallableJavaComponentTestCase extends AbstractComponentTestCa
         }
     }
 
+    @Test
     public void testDirectComponentCreation() throws Exception
     {
         SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(Apple.class);
@@ -65,6 +74,7 @@ public class SimpleCallableJavaComponentTestCase extends AbstractComponentTestCa
         }
     }
 
+    @Test
     public void testSimpleComponentCreation() throws Exception
     {
         SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(
@@ -84,6 +94,7 @@ public class SimpleCallableJavaComponentTestCase extends AbstractComponentTestCa
         }
     }
 
+    @Test
     public void testLifecycle() throws Exception
     {
         SimpleCallableJavaComponent component = new SimpleCallableJavaComponent(

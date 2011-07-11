@@ -15,7 +15,7 @@ import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
@@ -23,7 +23,14 @@ import org.mule.util.IOUtils;
 import java.io.InputStream;
 import java.util.Arrays;
 
-public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public abstract class AbstractTransformerTestCase extends AbstractMuleContextTestCase
 {
 
     @Override
@@ -48,6 +55,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         return rawString.replaceAll("\t", "");
     }
 
+    @Test
     public void testTransform() throws Exception
     {
         Transformer trans = this.getTransformer();
@@ -65,6 +73,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testRoundtripTransform() throws Exception
     {
         Transformer roundTripTransformer = this.getRoundTripTransformer();
@@ -84,11 +93,13 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testBadReturnType() throws Exception
     {
         this.doTestBadReturnType(this.getTransformer(), this.getTestData());
     }
 
+    @Test
     public void testRoundtripBadReturnType() throws Exception
     {
         if (this.getRoundTripTransformer() != null)
@@ -97,6 +108,7 @@ public abstract class AbstractTransformerTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testRoundTrip() throws Exception
     {
         if (this.getRoundTripTransformer() != null)

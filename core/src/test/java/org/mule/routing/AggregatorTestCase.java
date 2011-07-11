@@ -21,13 +21,19 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.routing.correlation.EventCorrelatorCallback;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.Iterator;
 
-public class AggregatorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+public class AggregatorTestCase extends AbstractMuleContextTestCase
 {
 
     public AggregatorTestCase()
@@ -35,6 +41,7 @@ public class AggregatorTestCase extends AbstractMuleTestCase
         setStartContext(true);
     }
 
+    @Test
     public void testMessageAggregator() throws Exception
     {
         Service testService = getTestService("test", Apple.class);

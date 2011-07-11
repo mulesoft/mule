@@ -10,15 +10,25 @@
 
 package org.mule.transaction;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.api.MuleEvent;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.transaction.constraints.ConstraintFilter;
+
+import org.junit.Test;
+import org.mockito.Mockito;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 public class TransactionConstraintTestCase extends AbstractMuleTestCase
 {
+    @Test
     public void testConstraintFilter() throws Exception
     {
         ConstraintFilter filter = new ConstraintFilter();
-        assertTrue(filter.accept(getTestEvent("test")));
+        MuleEvent event = Mockito.mock(MuleEvent.class);
+        assertTrue(filter.accept(event));
 
         ConstraintFilter clone = (ConstraintFilter)filter.clone();
         assertNotNull(clone);

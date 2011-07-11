@@ -17,6 +17,9 @@ import org.mule.util.FileUtils;
 
 import java.io.File;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public abstract class AbstractBaseBackupMule2050TestCase extends ImapConnectorTestCase
 {
 
@@ -35,6 +38,7 @@ public abstract class AbstractBaseBackupMule2050TestCase extends ImapConnectorTe
         return connector;
     }
 
+    @Override
     public void testReceiver() throws Exception
     {
         File dir = FileUtils.newFile(muleContext.getConfiguration().getWorkingDirectory() + "/mail/INBOX");

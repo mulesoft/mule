@@ -21,6 +21,10 @@ import org.mule.transport.tcp.TcpConnector;
 
 import java.io.IOException;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 
 public class HttpsConnectorTestCase extends AbstractConnectorTestCase
 {
@@ -62,6 +66,7 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
         return "Hello".getBytes();
     }
 
+    @Test
     public void testValidListener() throws Exception
     {
         Service service = getTestService("orange", Orange.class);
@@ -71,6 +76,7 @@ public class HttpsConnectorTestCase extends AbstractConnectorTestCase
         getConnector().registerListener(endpoint, getSensingNullMessageProcessor(), service);
     }
 
+    @Test
     public void testProperties() throws Exception
     {
         HttpsConnector c = (HttpsConnector)getConnector();

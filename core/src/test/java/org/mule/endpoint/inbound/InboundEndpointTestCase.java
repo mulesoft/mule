@@ -37,6 +37,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 {
     private static final String TEST_MESSAGE = "test";
@@ -57,9 +66,10 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         inboundListener = new SensingNullMessageProcessor();
     }
 
+    @Test
     public void testDefaultFlowSync() throws Exception
     {
-        endpoint = createTestInboundEndpoint(null, null, null, null, 
+        endpoint = createTestInboundEndpoint(null, null, null, null,
             MessageExchangePattern.REQUEST_RESPONSE, null);
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
@@ -72,9 +82,10 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertEquals(responseEvent.getMessage(), result.getMessage());
     }
 
+    @Test
     public void testDefaultFlowAsync() throws Exception
     {
-        endpoint = createTestInboundEndpoint(null, null, null, null, 
+        endpoint = createTestInboundEndpoint(null, null, null, null,
             MessageExchangePattern.ONE_WAY, null);
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
@@ -87,9 +98,10 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertEquals(responseEvent.getMessage(), result.getMessage());
     }
 
+    @Test
     public void testFilterAccept() throws Exception
     {
-        endpoint = createTestInboundEndpoint(new TestFilter(true), null, null, null, 
+        endpoint = createTestInboundEndpoint(new TestFilter(true), null, null, null,
             MessageExchangePattern.REQUEST_RESPONSE, null);
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
@@ -103,9 +115,10 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
     }
 
+    @Test
     public void testFilterNotAccept() throws Exception
     {
-        endpoint = createTestInboundEndpoint(new TestFilter(false), null, null, null, 
+        endpoint = createTestInboundEndpoint(new TestFilter(false), null, null, null,
             MessageExchangePattern.REQUEST_RESPONSE, null);
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
@@ -126,9 +139,10 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertMessageNotSent();
     }
 
+    @Test
     public void testSecurityFilterAccept() throws Exception
     {
-        endpoint = createTestInboundEndpoint(null, new TestSecurityFilter(true), null, null, 
+        endpoint = createTestInboundEndpoint(null, new TestSecurityFilter(true), null, null,
             MessageExchangePattern.REQUEST_RESPONSE, null);
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
@@ -142,19 +156,20 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
 
     }
 
+    @Test
     public void testSecurityFilterNotAccept() throws Exception
     {
         TestSecurityNotificationListener securityNotificationListener = new TestSecurityNotificationListener();
         muleContext.registerListener(securityNotificationListener);
 
-        endpoint = createTestInboundEndpoint(null, new TestSecurityFilter(false), null, null, 
+        endpoint = createTestInboundEndpoint(null, new TestSecurityFilter(false), null, null,
             MessageExchangePattern.REQUEST_RESPONSE, null);
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
         responseEvent = createTestResponseEvent(endpoint);
 
         MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
-        
+
         // Required for UnauthorisedException creation
         RequestContext.setEvent(requestEvent);
 
@@ -179,10 +194,11 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
      * Assert that {@link EndpointSecurityFilter} is only invoked if endpoint
      * {@link Filter} accepts message.
      */
+    @Test
     public void testFilterFirstThenSecurityFilter() throws Exception
     {
         TestSecurityFilter securityFilter = new TestSecurityFilter(false);
-        endpoint = createTestInboundEndpoint(new TestFilter(false), securityFilter, null, null, 
+        endpoint = createTestInboundEndpoint(new TestFilter(false), securityFilter, null, null,
             MessageExchangePattern.REQUEST_RESPONSE, null);
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
@@ -204,9 +220,10 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertMessageNotSent();
     }
 
+    @Test
     public void testMessagePropertyErrorMapping() throws Exception
     {
-        endpoint = createTestInboundEndpoint(null, null, null, null, 
+        endpoint = createTestInboundEndpoint(null, null, null, null,
             MessageExchangePattern.REQUEST_RESPONSE, null);
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
@@ -222,6 +239,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertEquals(500, status);
     }
 
+    @Test
     public void testResponseTransformerExceptionDetailAfterRequestFlowInterupt() throws Exception
     {
         endpoint = createTestInboundEndpoint(null, new TestSecurityFilter(false), null,
@@ -232,7 +250,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         responseEvent.getMessage().setExceptionPayload(new DefaultExceptionPayload(new RuntimeException()));
 
         MessageProcessor mpChain = ((AbstractEndpoint) endpoint).getMessageProcessorChain(requestEvent.getFlowConstruct());
-        
+
         // Required for UnauthorisedException creation
         RequestContext.setEvent(requestEvent);
 
@@ -249,12 +267,13 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertMessageNotSent();
     }
 
+    @Test
     public void testNotfication() throws Exception
     {
         TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
         muleContext.registerListener(listener);
 
-        endpoint = createTestInboundEndpoint(null, null, null, null, 
+        endpoint = createTestInboundEndpoint(null, null, null, null,
             MessageExchangePattern.REQUEST_RESPONSE, null);
         endpoint.setListener(inboundListener);
         requestEvent = createTestRequestEvent(endpoint);
@@ -268,10 +287,10 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertEquals(endpoint.getEndpointURI().getUri().toString(),
             listener.messageNotification.getEndpoint());
         assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
-        assertEquals(inMessage.getPayload(),
-            ((MuleMessage) listener.messageNotification.getSource()).getPayload());
+        assertEquals(inMessage.getPayload(), listener.messageNotification.getSource().getPayload());
     }
 
+    @Test
     public void testTransformers() throws Exception
     {
         endpoint = createTestInboundEndpoint(null, null, new InboundAppendTransformer(),
@@ -291,7 +310,8 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertEquals(RESPONSE_MESSAGE + ResponseAppendTransformer.APPEND_STRING,
             result.getMessage().getPayloadAsString());
     }
-    
+
+    @Test
     public void testObjectAwareInjection() throws Exception
     {
         EndpointURIEndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(TEST_URI, muleContext);
@@ -303,7 +323,7 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         endpoint.start();
 
         ObjectAwareProcessor objectAware = (ObjectAwareProcessor) endpoint.getMessageProcessors().get(0);
-        
+
         assertEquals(muleContext, objectAware.context);
         assertEquals(endpoint, objectAware.endpoint);
 
@@ -317,15 +337,15 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         return new DefaultMuleMessage(TEST_MESSAGE, props, muleContext);
     }
 
-    protected MuleEvent createTestRequestEvent(InboundEndpoint endpoint) throws Exception
+    protected MuleEvent createTestRequestEvent(InboundEndpoint ep) throws Exception
     {
-        return new DefaultMuleEvent(inMessage, endpoint, getTestSession(getTestService(), muleContext));
+        return new DefaultMuleEvent(inMessage, ep, getTestSession(getTestService(), muleContext));
     }
-    
-    protected MuleEvent createTestResponseEvent(InboundEndpoint endpoint) throws Exception
+
+    protected MuleEvent createTestResponseEvent(InboundEndpoint ep) throws Exception
     {
         return new DefaultMuleEvent(new DefaultMuleMessage(RESPONSE_MESSAGE, muleContext),
-            endpoint, getTestSession(getTestService(), muleContext));
+            ep, getTestSession(getTestService(), muleContext));
     }
 
     protected MuleEvent assertMessageSent(boolean sync) throws MuleException
@@ -353,10 +373,11 @@ public class InboundEndpointTestCase extends AbstractMessageProcessorTestCase
         assertNull(event);
     }
 
-    class SensingNullMessageProcessor implements MessageProcessor
+    private class SensingNullMessageProcessor implements MessageProcessor
     {
         MuleEvent sensedEvent;
 
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             sensedEvent = event;

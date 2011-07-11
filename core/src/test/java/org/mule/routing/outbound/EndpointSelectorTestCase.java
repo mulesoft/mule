@@ -16,8 +16,8 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.routing.RoutingException;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.dynamic.Mock;
 
@@ -26,7 +26,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class EndpointSelectorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class EndpointSelectorTestCase extends AbstractMuleContextTestCase
 {
     public EndpointSelectorTestCase()
     {
@@ -68,6 +73,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         router.initialise();
     }
 
+    @Test
     public void testSelectEndpointDefaultProperty() throws Exception
     {
         Map<String, Object> props = new HashMap<String, Object>();
@@ -82,6 +88,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         mockendpoint3.verify();
     }
 
+    @Test
     public void testSelectEndpointCustomProperty() throws Exception
     {
         // The "wayOut" property will determine which endpoint the message gets sent to.
@@ -100,6 +107,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         mockendpoint2.verify();
     }
 
+    @Test
     public void testSelectEndpointNoMatch() throws Exception
     {
         Map<String, Object> props = new HashMap<String, Object>();
@@ -119,6 +127,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testSelectEndpointNoMatchUseDefault() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
@@ -130,6 +139,7 @@ public class EndpointSelectorTestCase extends AbstractMuleTestCase
         mockendpoint3.verify();
     }
 
+    @Test
     public void testSelectEndpointNoPropertySet() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);

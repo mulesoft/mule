@@ -13,10 +13,17 @@ package org.mule.routing;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class WireTapTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
+public class WireTapTestCase extends AbstractMuleContextTestCase
 {
 
     protected SensingNullMessageProcessor tapListener;
@@ -32,6 +39,7 @@ public class WireTapTestCase extends AbstractMuleTestCase
         wireTap.setTap(tapListener);
     }
 
+    @Test
     public void testWireTapNoFilter() throws Exception
     {
         MuleEvent event = getTestEvent("data");
@@ -43,6 +51,7 @@ public class WireTapTestCase extends AbstractMuleTestCase
         assertEquals(event.getMessage().getPayload(), tapListener.event.getMessage().getPayload());
     }
 
+    @Test
     public void testWireTapFilterAccepted() throws Exception
     {
         wireTap.setFilter(new Filter()
@@ -62,6 +71,7 @@ public class WireTapTestCase extends AbstractMuleTestCase
         assertEquals(event.getMessage().getPayload(), tapListener.event.getMessage().getPayload());
     }
 
+    @Test
     public void testWireTapFilterUnaccepted() throws Exception
     {
         wireTap.setFilter(new Filter()
@@ -80,6 +90,7 @@ public class WireTapTestCase extends AbstractMuleTestCase
         assertNull(tapListener.event);
     }
 
+    @Test
     public void testWireTapNullTap() throws Exception
     {
         wireTap.setTap(null);

@@ -14,21 +14,32 @@ import org.mule.api.MuleException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.management.stats.RouterStatistics;
 import org.mule.routing.filters.EqualsFilter;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
-public class ChoiceRouterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class ChoiceRouterTestCase extends AbstractMuleContextTestCase
 {
     private ChoiceRouter choiceRouter;
+
+    public ChoiceRouterTestCase()
+    {
+        setDisposeContextPerClass(true);
+    }
 
     @Override
     protected void doSetUp() throws Exception
     {
-        super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         choiceRouter = new ChoiceRouter();
     }
 
+    @Test
     public void testNoRoute() throws Exception
     {
         try
@@ -42,12 +53,14 @@ public class ChoiceRouterTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testOnlyDefaultRoute() throws Exception
     {
         choiceRouter.setDefaultRoute(new TestMessageProcessor("default"));
         assertEquals("foo:default", choiceRouter.process(getTestEvent("foo")).getMessageAsString());
     }
 
+    @Test
     public void testNoMatchingNorDefaultRoute() throws Exception
     {
         try
@@ -62,6 +75,7 @@ public class ChoiceRouterTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testNoMatchingRouteWithDefaultRoute() throws Exception
     {
         choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
@@ -69,6 +83,7 @@ public class ChoiceRouterTestCase extends AbstractMuleTestCase
         assertEquals("foo:default", choiceRouter.process(getTestEvent("foo")).getMessageAsString());
     }
 
+    @Test
     public void testMatchingRouteWithDefaultRoute() throws Exception
     {
         choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
@@ -76,6 +91,7 @@ public class ChoiceRouterTestCase extends AbstractMuleTestCase
         assertEquals("zap:bar", choiceRouter.process(getTestEvent("zap")).getMessageAsString());
     }
 
+    @Test
     public void testMatchingRouteWithStatistics() throws Exception
     {
         choiceRouter.addRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));
@@ -83,6 +99,7 @@ public class ChoiceRouterTestCase extends AbstractMuleTestCase
         assertEquals("zap:bar", choiceRouter.process(getTestEvent("zap")).getMessageAsString());
     }
 
+    @Test
     public void testAddAndDeleteRoute() throws Exception
     {
         try
@@ -100,6 +117,7 @@ public class ChoiceRouterTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testUpdateRoute() throws Exception
     {
         TestMessageProcessor mp = new TestMessageProcessor("bar");
@@ -108,6 +126,7 @@ public class ChoiceRouterTestCase extends AbstractMuleTestCase
         assertEquals("zap:bar", choiceRouter.process(getTestEvent("zap")).getMessageAsString());
     }
 
+    @Test
     public void testRemovingUpdatingMissingRoutes()
     {
         choiceRouter.updateRoute(new TestMessageProcessor("bar"), new EqualsFilter("zap"));

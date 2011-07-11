@@ -14,10 +14,16 @@ import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
-public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
     @Override
     protected void doSetUp() throws Exception
@@ -28,6 +34,7 @@ public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleTestCase
         RequestContext.setEvent(event);
     }
 
+    @Test
     public void testExpressions() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", muleContext);
@@ -66,6 +73,7 @@ public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testExpressionsFromExtractorManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", muleContext);
@@ -101,6 +109,7 @@ public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testMissingEventContext() throws Exception
     {
         RequestContext.clear();
@@ -121,6 +130,5 @@ public class MuleContextExpressionEvaluatorTestCase extends AbstractMuleTestCase
         {
             //expected
         }
-
     }
 }

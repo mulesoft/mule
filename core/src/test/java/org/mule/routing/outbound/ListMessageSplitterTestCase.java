@@ -18,8 +18,8 @@ import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Orange;
 
@@ -28,13 +28,20 @@ import com.mockobjects.dynamic.Mock;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListMessageSplitterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class ListMessageSplitterTestCase extends AbstractMuleContextTestCase
 {
     public ListMessageSplitterTestCase()
     {
         setStartContext(true);
     }
 
+    @Test
     public void testCorrelationGroupSizePropertySet() throws Exception
     {
         Service testService = getTestService("test", Apple.class);
@@ -63,6 +70,7 @@ public class ListMessageSplitterTestCase extends AbstractMuleTestCase
         assertEquals("There should be 4 results for 4 split messages.", 4, ((MuleMessageCollection) resultMessage).size());
     }
 
+    @Test
     public void testMessageSplitterRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();

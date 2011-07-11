@@ -14,12 +14,14 @@ import org.mule.api.MuleMessage;
 import org.mule.api.ThreadSafeAccess;
 import org.mule.model.seda.SedaService;
 import org.mule.session.DefaultMuleSession;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Map;
 
-public abstract class AbstractThreadSafeAccessTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+
+public abstract class AbstractThreadSafeAccessTestCase extends AbstractMuleContextTestCase
 {
     protected ThreadSafeAccess dummyEvent() throws Exception
     {

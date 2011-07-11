@@ -17,8 +17,8 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.dynamic.Mock;
 
@@ -27,13 +27,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class StaticRecipientListRouterTestCase extends AbstractMuleContextTestCase
 {
     public StaticRecipientListRouterTestCase()
     {
         setStartContext(true);        
     }
 
+    @Test
     public void testRecipientListRouterAsync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
@@ -62,7 +70,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         MuleMessage message = new DefaultMuleMessage("test event", muleContext);
         assertTrue(router.isMatch(message));
 
-       // Set up the mock targets as we discover them
+        // Set up the mock targets as we discover them
         final List<Mock> mockEndpoints = new ArrayList<Mock>();
         router.setMockEndpointListener(new MockEndpointListener()
         {
@@ -81,6 +89,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
     }
 
 
+    @Test
     public void testRecipientListRouterSync() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();
@@ -115,7 +124,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
         message = new DefaultMuleMessage("test event", muleContext);
         final MuleEvent event = new OutboundRoutingTestEvent(message, null, muleContext);
 
-        // Set up the mock targets as we discover them
+         // Set up the mock targets as we discover them
          final List<Mock> mockEndpoints = new ArrayList<Mock>();
          router.setMockEndpointListener(new MockEndpointListener()
          {
@@ -137,6 +146,7 @@ public class StaticRecipientListRouterTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testBadRecipientListRouter() throws Exception
     {
         Mock session = MuleTestUtils.getMockSession();

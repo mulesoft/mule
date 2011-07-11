@@ -24,6 +24,14 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
 {
     private Message message;
@@ -112,6 +120,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
         return super.compareResults(src, result);
     }
 
+    @Test
     public void testStringSourceType() throws Exception
     {
         try
@@ -127,6 +136,7 @@ public class MailMessageTransformersTestCase extends AbstractTransformerTestCase
         }
     }
 
+    @Test
     public void testStringSourceTypeWithIgnoreBadInput() throws Exception
     {
         AbstractTransformer trans = (AbstractTransformer) getTransformer();

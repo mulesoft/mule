@@ -10,20 +10,6 @@
 
 package org.mule.routing;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
@@ -34,30 +20,49 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.service.Service;
 import org.mule.routing.outbound.IteratorMessageSequence;
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.tck.MuleParameterized;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class CollectionMessageSplitterTestCase extends AbstractMuleTestCase
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+public class CollectionMessageSplitterTestCase extends AbstractMuleContextTestCase
 {
     private static final List<String> TEST_LIST = Arrays.asList("abc", "def", "ghi");
-
 
     public CollectionMessageSplitterTestCase()
     {
         setStartContext(true);
     }
-    
+
     /**
-     * Tests that a collection payload can be routed properly 
+     * Tests that a collection payload can be routed properly
      */
+    @Test
     public void testRouterCollection() throws Exception
     {
         assertRouted(TEST_LIST, 3, true);
     }
-    
+
     /**
      * Tests that an iterable payload can be routed properly
      */
+    @Test
     @SuppressWarnings("unchecked")
     public void testRouterIterable() throws Exception
     {
@@ -66,26 +71,29 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleTestCase
         assertRouted(mock, 3, false);
         verify(mock, times(1)).iterator();
     }
-    
+
     /**
      * Tests that an iterator payload can be routed properly
      */
+    @Test
     public void testRouterIterator() throws Exception
     {
         assertRouted(TEST_LIST.iterator(), 3, false) ;
     }
-    
+
     /**
      * Tests that a message sequence payload can be routed properly
      */
+    @Test
     public void testRouterMesseageSequence() throws Exception
     {
         assertRouted(new IteratorMessageSequence<String>(TEST_LIST.iterator()), 3 , false);
     }
-    
+
     /**
      *  Tests that an empty sequence can be routed properly
      */
+    @Test
     public void testEmptySequence() throws Exception
     {
         Object payload = Collections.emptySet();
@@ -103,22 +111,22 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleTestCase
         Service fc = getTestService();
         MuleSession session = getTestSession(fc, muleContext);
 
-        Map<String, Object> inboundProps = new HashMap();
+        Map<String, Object> inboundProps = new HashMap<String, Object>();
         inboundProps.put("inbound1", "1");
         inboundProps.put("inbound2", 2);
         inboundProps.put("inbound3", session);
 
-        Map<String, Object> outboundProps = new HashMap();
+        Map<String, Object> outboundProps = new HashMap<String, Object>();
         outboundProps.put("outbound1", "3");
         outboundProps.put("outbound2", 4);
         outboundProps.put("outbound3", session);
 
-        Map<String, Object> invocationProps = new HashMap();
+        Map<String, Object> invocationProps = new HashMap<String, Object>();
         invocationProps.put("invoke1", "5");
         invocationProps.put("invoke2", 6);
         invocationProps.put("invoke3", session);
 
-        Set expectedSequences = new HashSet();
+        Set<Integer> expectedSequences = new HashSet<Integer>();
         for (int i = 1; i <= count; i++)
         {
             expectedSequences.add(i);
@@ -137,12 +145,13 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleTestCase
         splitter.process(event);
         List<MuleMessage> splits =  grabber.getMessages();
         assertEquals(count, splits.size());
-        Set actualSequences = new HashSet();
+
+        Set<Object> actualSequences = new HashSet<Object>();
         for (MuleMessage msg : splits)
         {
             assertTrue(msg.getPayload() instanceof String);
-            assertEquals(counted ? count : -1, msg.getProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY));
-            actualSequences.add( msg.getProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY));
+            assertEquals(counted ? count : -1, msg.getOutboundProperty(MuleProperties.MULE_CORRELATION_GROUP_SIZE_PROPERTY));
+            actualSequences.add( msg.getOutboundProperty(MuleProperties.MULE_CORRELATION_SEQUENCE_PROPERTY));
             String str = (String) msg.getPayload();
             assertTrue(TEST_LIST.contains(str));
             for (String key : inboundProps.keySet())
@@ -160,12 +169,13 @@ public class CollectionMessageSplitterTestCase extends AbstractMuleTestCase
         }
         assertEquals(expectedSequences, actualSequences);
     }
-    
 
-    static class Grabber implements MessageProcessor
+
+    private static class Grabber implements MessageProcessor
     {
-        private List<MuleMessage> messages = new ArrayList();
+        private List<MuleMessage> messages = new ArrayList<MuleMessage>();
 
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             messages.add(event.getMessage());

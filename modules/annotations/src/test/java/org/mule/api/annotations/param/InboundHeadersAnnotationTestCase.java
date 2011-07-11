@@ -21,6 +21,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypointResolverTestCase
 {
     @Override
@@ -29,18 +37,21 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         return new InboundHeadersAnnotationComponent();
     }
 
+    @Test
     public void testSingleHeader() throws Exception
     {
         InvocationResult response = invokeResolver("processHeader", eventContext);
         assertEquals("fooValue", response.getResult());
     }
 
+    @Test
     public void testSingleHeaderOptional() throws Exception
     {
         InvocationResult response = invokeResolver("processHeaderOptional", eventContext);
         assertEquals("faz not set", response.getResult());
     }
 
+    @Test
     public void testSingleHeaderWithType() throws Exception
     {
         Apple apple = new Apple();
@@ -49,6 +60,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertEquals(apple, response.getResult());
     }
 
+    @Test
     public void testSingleHeaderWithBaseType() throws Exception
     {
         Apple apple = new Apple();
@@ -57,6 +69,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertEquals(apple, response.getResult());
     }
 
+    @Test
     public void testMapHeaders() throws Exception
     {
         InvocationResult response = invokeResolver("processHeaders", eventContext);
@@ -68,6 +81,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertNull(result.get("baz"));
     }
 
+    @Test
     public void testMapHeadersMissing() throws Exception
     {
         eventContext.getMessage().removeProperty("foo", PropertyScope.INBOUND);
@@ -82,6 +96,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         }
     }
 
+    @Test
     public void testMapSingleHeader() throws Exception
     {
         InvocationResult response = invokeResolver("processSingleMapHeader", eventContext);
@@ -93,6 +108,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertNull(result.get("baz"));
     }
 
+    @Test
     public void testMapHeadersOptional() throws Exception
     {
         eventContext.getMessage().removeProperty("baz", PropertyScope.INBOUND);
@@ -106,6 +122,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertNull(result.get("baz"));
     }
 
+    @Test
     public void testMapHeadersAllOptional() throws Exception
     {
         eventContext.getMessage().clearProperties(PropertyScope.INBOUND);
@@ -117,6 +134,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertEquals(0, result.size());
     }
 
+    @Test
     public void testMapHeadersUnmodifiable() throws Exception
     {
         try
@@ -131,6 +149,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         }
     }
 
+    @Test
     public void testMapHeadersAll() throws Exception
     {
         InvocationResult response = invokeResolver("processHeadersOptional", eventContext);
@@ -143,6 +162,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertEquals("bazValue", result.get("baz"));
     }
 
+    @Test
     public void testMapHeadersWildcard() throws Exception
     {
         eventContext.getMessage().setProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8", PropertyScope.INBOUND);
@@ -154,6 +174,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertEquals("UTF-8", result.get(MuleProperties.MULE_ENCODING_PROPERTY));
     }
 
+    @Test
     public void testMapHeadersMultiWildcard() throws Exception
     {
         eventContext.getMessage().setProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8", PropertyScope.INBOUND);
@@ -172,6 +193,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
 
     }
 
+    @Test
     public void testMapHeadersWithGenerics() throws Exception
     {
         eventContext.getMessage().setProperty("apple", new Apple(), PropertyScope.INBOUND);
@@ -190,6 +212,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertNull(result.get("banana"));
     }
 
+    @Test
     public void testListHeaders() throws Exception
     {
         InvocationResult response = invokeResolver("processHeadersList", eventContext);
@@ -201,6 +224,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertTrue(result.contains("bazValue"));
     }
 
+    @Test
     public void testListHeadersWithOptional() throws Exception
     {
         eventContext.getMessage().removeProperty("baz", PropertyScope.INBOUND);
@@ -212,6 +236,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertTrue(result.contains("barValue"));
     }
 
+    @Test
     public void testListHeadersWithMissing() throws Exception
     {
         eventContext.getMessage().removeProperty("bar", PropertyScope.INBOUND);
@@ -226,6 +251,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         }
     }
 
+    @Test
     public void testSingleListHeader() throws Exception
     {
         InvocationResult response = invokeResolver("processSingleHeaderList", eventContext);
@@ -235,6 +261,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertTrue(result.contains("fooValue"));
     }
 
+    @Test
     public void testListHeadersUnmodifiable() throws Exception
     {
        try
@@ -249,6 +276,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         }
     }
 
+    @Test
     public void testListHeadersAll() throws Exception
     {
         InvocationResult response = invokeResolver("processHeadersListAll", eventContext);
@@ -261,6 +289,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertTrue(result.contains("bazValue"));
     }
 
+    @Test
     public void testMapHeadersListAllOptional() throws Exception
     {
         eventContext.getMessage().clearProperties(PropertyScope.INBOUND);
@@ -272,6 +301,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertEquals(0, result.size());
     }
 
+    @Test
     public void testListHeadersWilcard() throws Exception
     {
         eventContext.getMessage().setProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8", PropertyScope.INBOUND);
@@ -284,6 +314,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertTrue(result.contains("UTF-8"));
     }
 
+    @Test
     public void testListHeadersMultiWilcard() throws Exception
     {
         eventContext.getMessage().setProperty(MuleProperties.MULE_ENCODING_PROPERTY, "UTF-8", PropertyScope.INBOUND);
@@ -305,6 +336,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractAnnotatedEntrypoin
         assertTrue(result.contains("bazValue"));
     }
 
+    @Test
     public void testListHeadersWithGenerics() throws Exception
     {
         Apple apple = new Apple();

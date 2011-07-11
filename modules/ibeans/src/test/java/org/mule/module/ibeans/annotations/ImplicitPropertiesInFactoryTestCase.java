@@ -13,6 +13,8 @@ import org.ibeans.annotation.IntegrationBean;
 import org.ibeans.api.CallException;
 import org.junit.Test;
 
+import static org.junit.Assert.fail;
+
 public class ImplicitPropertiesInFactoryTestCase extends AbstractIBeansTestCase
 {
     @SuppressWarnings("unused")

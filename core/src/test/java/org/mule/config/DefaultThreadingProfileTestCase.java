@@ -11,11 +11,17 @@
 package org.mule.config;
 
 import org.mule.api.config.ThreadingProfile;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class DefaultThreadingProfileTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class DefaultThreadingProfileTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testDefaultThreadingProfile()
     {
         assertNotNull(muleContext.getDefaultThreadingProfile());

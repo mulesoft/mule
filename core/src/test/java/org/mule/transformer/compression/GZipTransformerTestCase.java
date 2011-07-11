@@ -17,6 +17,8 @@ import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.SerializationUtils;
 import org.mule.util.compression.GZipCompression;
 
+import static org.junit.Assert.fail;
+
 public class GZipTransformerTestCase extends AbstractTransformerTestCase
 {
     protected static final String TEST_DATA = "the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog";

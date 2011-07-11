@@ -14,13 +14,20 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.json.model.Item;
 import org.mule.module.json.JsonData;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 
-public class JsonAutoTransformerTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class JsonAutoTransformerTestCase extends AbstractMuleContextTestCase
 {
     public static final String ITEM_JSON = "{\"code\":\"1234\",\"description\":\"Vacuum Cleaner\",\"in-stock\":true}";
 
+    @Test
     public void testCustomTransform() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(ITEM_JSON, muleContext);

@@ -17,14 +17,20 @@ import org.mule.api.model.InvocationResult;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
 import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.JsonNode;
+import org.junit.Test;
 
-public class JsonPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JsonPathAnnotatedEntryPointResolverTestCase extends AbstractMuleContextTestCase
 {
     public static final String TEST_PAYLOAD = "{\"foo\" : {\"bar\" : [4, 8] }}";
 
@@ -34,6 +40,7 @@ public class JsonPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTes
         muleContext.getRegistry().registerObject("primitives" , new PrimitveTransformers());
     }
 
+    @Test
     public void testAnnotatedMethod() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -51,6 +58,7 @@ public class JsonPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTes
         assertEquals("4", map.get("bar"));
     }
 
+    @Test
     public void testAnnotatedMethod2() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -68,6 +76,7 @@ public class JsonPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTes
         assertEquals(new Double(8), map.get("bar"));
     }
 
+    @Test
     public void testAnnotatedMethod3() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -85,6 +94,7 @@ public class JsonPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTes
         assertEquals(2, ((List)map.get("bar")).size());
     }
 
+    @Test
     public void testAnnotatedMethodRequiredMissing() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -103,6 +113,7 @@ public class JsonPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTes
         }
     }
 
+    @Test
     public void testAnnotatedMethodMissingNotRequired() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -118,6 +129,7 @@ public class JsonPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTes
         assertNull(map.get("foo"));
     }
 
+    @Test
     public void testIllegalAnnotatedMethod() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();

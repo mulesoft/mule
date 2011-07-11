@@ -10,11 +10,19 @@
 
 package org.mule.routing.filters;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class EqualsFilterTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testEqualsFilterNoPattern()
     {
         EqualsFilter filter = new EqualsFilter();
@@ -28,6 +36,7 @@ public class EqualsFilterTestCase extends AbstractMuleTestCase
         assertFalse(filter.accept("foo"));
     }
 
+    @Test
     public void testEqualsFilter()
     {
         Exception obj = new Exception("test");

@@ -18,15 +18,18 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleSession;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RoundRobinTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class RoundRobinTestCase extends AbstractMuleContextTestCase
 {
     private final static int NUMBER_OF_ROUTES = 10;
     private final static int NUMBER_OF_MESSAGES = 10;
@@ -37,6 +40,7 @@ public class RoundRobinTestCase extends AbstractMuleTestCase
         setStartContext(true);
     }
 
+    @Test
     public void testRoundRobin() throws Exception
     {
         RoundRobin rr = new RoundRobin();
@@ -46,7 +50,7 @@ public class RoundRobinTestCase extends AbstractMuleTestCase
         {
             routes.add(new TestProcessor());
         }
-        rr.setMessageProcessors(new ArrayList<MessageProcessor>(routes));
+        rr.setRoutes(new ArrayList<MessageProcessor>(routes));
         List<Thread> threads = new ArrayList<Thread>(NUMBER_OF_ROUTES);
         for (int i = 0; i < NUMBER_OF_ROUTES; i++)
         {
@@ -94,18 +98,6 @@ public class RoundRobinTestCase extends AbstractMuleTestCase
                 {
                     // this is expected
                 }
-            }
-        }
-
-        private InboundEndpoint createTestEndpoint()
-        {
-            try
-            {
-                return getTestInboundEndpoint(MessageExchangePattern.ONE_WAY);
-            }
-            catch (Exception e)
-            {
-                throw new RuntimeException(e);
             }
         }
     }

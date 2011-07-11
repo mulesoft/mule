@@ -18,14 +18,17 @@ import org.ibeans.api.CallException;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 public class MockIBeanTestCase extends AbstractIBeansTestCase
 {
+
     public static final String GOOD_IP = "12.215.42.19";
     public static final String BAD_IP = "12.215.42.";
 
-    @SuppressWarnings("unused")    
+    @SuppressWarnings("unused")
     @MockIntegrationBean
     private HostIpIBean hostip;
 
@@ -40,33 +43,26 @@ public class MockIBeanTestCase extends AbstractIBeansTestCase
         assertEquals("-88.4588,41.7696", loc);
     }
 
-//    @Test
-//    public void testSuccessfulHostipLookupWithReturn() throws Exception
-//    {
-//        hostip.init(Document.class);
-//        when(hostip.hasIp(GOOD_IP)).thenAnswer(withXmlData("mock/hostip-found-response.xml", hostip));
-//        when(hostip.hasIp(GOOD_IP)).thenAnswer(withXmlData("mock/hostip-found-response.xml", hostip));
-//
-//        assertTrue(hostip.hasIp(GOOD_IP));
-//    }
+    //    @Test
+    //    public void testSuccessfulHostipLookupWithReturn() throws Exception
+    //    {
+    //        hostip.init(Document.class);
+    //        when(hostip.hasIp(GOOD_IP)).thenAnswer(withXmlData("mock/hostip-found-response.xml", hostip));
+    //        when(hostip.hasIp(GOOD_IP)).thenAnswer(withXmlData("mock/hostip-found-response.xml", hostip));
+    //
+    //        assertTrue(hostip.hasIp(GOOD_IP));
+    //    }
 
     @Test(expected = CallException.class)
     public void testUnsuccessfulHostipLookup() throws Exception
     {
-        try
-        {
-            //Because we are testing this in the core module we cannot import the xml module, so
-            //we set the return type to sting and define a RegEx error filter on the iBean
-            hostip.init(String.class);
-            when(hostip.getHostInfo(BAD_IP)).thenAnswer(withXmlData("mock/hostip-not-found-response.xml", hostip));
+        //Because we are testing this in the core module we cannot import the xml module, so
+        //we set the return type to sting and define a RegEx error filter on the iBean
+        hostip.init(String.class);
+        when(hostip.getHostInfo(BAD_IP)).thenAnswer(withXmlData("mock/hostip-not-found-response.xml", hostip));
 
-            hostip.getHostInfo(BAD_IP);
-            fail("The iBean should have recognised a Bad ip");
-        }
-        catch (CallException e)
-        {
-            //expected
-        }
+        hostip.getHostInfo(BAD_IP);
+        fail("The iBean should have recognised a Bad ip");
     }
 
     @Test

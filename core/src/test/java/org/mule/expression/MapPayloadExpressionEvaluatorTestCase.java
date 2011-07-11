@@ -11,20 +11,32 @@
 package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 public class MapPayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
 {
 
     private Map<String, String> props = new HashMap<String, String>(3);
+    private MuleContext muleContext = mock(MuleContext.class);
 
-    @Override
-    public void doSetUp()
+    @Before
+    public void setUpProperties()
     {
         props.clear();
         props.put("foo", "moo");
@@ -32,6 +44,7 @@ public class MapPayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
         props.put("ba?z", "maz");
     }
 
+    @Test
     public void testExpressions() throws Exception
     {
         MapPayloadExpressionEvaluator eval = new MapPayloadExpressionEvaluator();
@@ -64,10 +77,9 @@ public class MapPayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
             // expected
             assertTrue(rex.getMessage().contains("fool"));
         }
-
-
     }
     
+    @Test
     public void testMultipleExpressions() throws Exception
     {
         MapPayloadExpressionEvaluator eval = new MapPayloadExpressionEvaluator();

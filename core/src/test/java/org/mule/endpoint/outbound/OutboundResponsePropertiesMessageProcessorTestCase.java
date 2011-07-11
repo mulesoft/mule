@@ -23,6 +23,11 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.endpoint.AbstractEndpointBuilder;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class OutboundResponsePropertiesMessageProcessorTestCase extends AbstractMessageProcessorTestCase
 {
 
@@ -30,6 +35,7 @@ public class OutboundResponsePropertiesMessageProcessorTestCase extends Abstract
     private static String MY_PROPERTY_VAL = "myPropertyValue";
     private static String MULE_CORRELATION_ID_VAL = "152";
 
+    @Test
     public void testProcess() throws Exception
     {
         OutboundEndpoint endpoint = createTestOutboundEndpoint(null, null);

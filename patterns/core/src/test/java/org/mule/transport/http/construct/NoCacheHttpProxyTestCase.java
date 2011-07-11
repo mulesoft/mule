@@ -22,6 +22,8 @@ import org.mule.tck.MuleTestUtils;
 
 import java.util.Collections;
 
+import static org.junit.Assert.assertEquals;
+
 public class NoCacheHttpProxyTestCase extends AbstractFlowConstuctTestCase
 {
     protected Connector testConnector;

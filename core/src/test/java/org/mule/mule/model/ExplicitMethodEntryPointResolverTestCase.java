@@ -12,12 +12,18 @@ package org.mule.mule.model;
 import org.mule.api.MuleEventContext;
 import org.mule.api.model.InvocationResult;
 import org.mule.model.resolvers.ExplicitMethodEntryPointResolver;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Fruit;
 
-public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testMethodSetPass() throws Exception
     {
         ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
@@ -26,6 +32,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCa
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
+    @Test
     public void testMethodSetMatchFirst() throws Exception
     {
         ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
@@ -35,6 +42,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCa
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
+    @Test
     public void testMethodNotFound() throws Exception
     {
         ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
@@ -44,6 +52,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCa
         assertEquals(result.getState(), InvocationResult.State.FAILED);
     }
 
+    @Test
     public void testNoMethodSet() throws Exception
     {
         ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
@@ -65,6 +74,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCa
      *
      * @throws Exception
      */
+    @Test
     public void testMethodPropertyParameterAssignableFromPayload() throws Exception
     {
         ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();
@@ -81,6 +91,7 @@ public class ExplicitMethodEntryPointResolverTestCase extends AbstractMuleTestCa
      *
      * @throws Exception
      */
+    @Test
     public void testMethodPropertyParameterNull() throws Exception
     {
         ExplicitMethodEntryPointResolver resolver = new ExplicitMethodEntryPointResolver();

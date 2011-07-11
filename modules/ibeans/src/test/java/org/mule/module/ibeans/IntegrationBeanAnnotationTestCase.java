@@ -9,11 +9,15 @@
  */
 package org.mule.module.ibeans;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.ibeans.annotation.IntegrationBean;
+import org.junit.Test;
 
-public class IntegrationBeanAnnotationTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class IntegrationBeanAnnotationTestCase extends AbstractMuleContextTestCase
 {
     public IntegrationBeanAnnotationTestCase()
     {
@@ -29,6 +33,7 @@ public class IntegrationBeanAnnotationTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().registerObject("test", this);
     }
 
+    @Test
     public void testIBeanInjection() throws Exception
     {
         assertNotNull(hostip);

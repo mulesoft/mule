@@ -10,6 +10,11 @@
 
 package org.mule.api.annotations.param;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.util.ExceptionUtils;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -18,10 +23,6 @@ import javax.activation.DataHandler;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.util.ExceptionUtils;
 
 public class OutboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlowTestCase
 {

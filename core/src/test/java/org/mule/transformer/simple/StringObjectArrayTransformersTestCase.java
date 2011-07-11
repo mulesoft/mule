@@ -13,6 +13,8 @@ package org.mule.transformer.simple;
 import org.mule.api.transformer.Transformer;
 import org.mule.transformer.AbstractTransformerTestCase;
 
+import static org.junit.Assert.assertEquals;
+
 public class StringObjectArrayTransformersTestCase extends AbstractTransformerTestCase
 {
 

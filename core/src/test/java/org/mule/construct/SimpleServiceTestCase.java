@@ -18,6 +18,10 @@ import org.mule.util.StringUtils;
 
 import java.util.Collections;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
 {
     private SimpleService simpleService;
@@ -38,6 +42,7 @@ public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
         return simpleService;
     }
 
+    @Test
     public void testProcess() throws Exception
     {
         simpleService.initialise();
@@ -56,5 +61,4 @@ public class SimpleServiceTestCase extends AbstractFlowConstuctTestCase
             return StringUtils.reverse(event.getMessageAsString());
         }
     }
-
 }

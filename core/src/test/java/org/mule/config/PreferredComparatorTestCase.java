@@ -10,8 +10,12 @@
 
 package org.mule.config;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -20,11 +24,13 @@ public class PreferredComparatorTestCase extends AbstractMuleTestCase
 
     private PreferredComparator comparator;
 
-    protected void doSetUp()
+    @Before
+    public void setUpComparator()
     {
         comparator = new PreferredComparator();
     }
 
+    @Test
     public void testCompareEqualInstances()
     {
         Preferred preferred1 = mock(Preferred.class);
@@ -36,6 +42,7 @@ public class PreferredComparatorTestCase extends AbstractMuleTestCase
         assertEquals(0, comparator.compare(preferred1, preferred2));
     }
 
+    @Test
     public void testCompareMinorThanInstance()
     {
         Preferred preferred1 = mock(Preferred.class);
@@ -47,6 +54,7 @@ public class PreferredComparatorTestCase extends AbstractMuleTestCase
         assertEquals(-1, comparator.compare(preferred1, preferred2));
     }
 
+    @Test
     public void testCompareGreaterThanInstance()
     {
         Preferred preferred1 = mock(Preferred.class);

@@ -14,14 +14,19 @@ import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MapSplitterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class MapSplitterTestCase extends AbstractMuleContextTestCase
 {
     private MapSplitter mapSplitter;
     private List<String> splitPayloads = new ArrayList<String>();
@@ -45,6 +50,7 @@ public class MapSplitterTestCase extends AbstractMuleTestCase
         });
     }
 
+    @Test
     public void testSplit() throws Exception
     {
         Map<String, Object> testMap = new HashMap<String, Object>();

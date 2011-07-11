@@ -10,16 +10,22 @@
 
 package org.mule.module.json.transformers;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
-public class JsonStringTestCase extends AbstractMuleTestCase
+public class JsonStringTestCase extends AbstractMuleContextTestCase
 {
     public static final String TEST_JSON_MESSAGE = "{\"data\" : {\"value1\" : \"foo\", \"value2\" : \"bar\"}, \"replyTo\" : \"/response\"}";
 
     /**
      * Test that a Json string doesn't get modified in any way
      */
+    @Test
     public void testTryConvertJsonStringToJsonString() throws Exception
     {
         ObjectToJson transformer = createObject(ObjectToJson.class);
@@ -29,6 +35,7 @@ public class JsonStringTestCase extends AbstractMuleTestCase
     }
 
 
+    @Test
     public void testTryConvertJsonStringToJustString() throws Exception
     {
         ObjectToJson transformer = createObject(ObjectToJson.class);

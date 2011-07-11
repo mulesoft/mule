@@ -12,6 +12,8 @@ package org.mule.module.ibeans.annotations;
 import org.ibeans.impl.support.util.UriParamFilter;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class UriParamFilterTestCase extends AbstractIBeansTestCase
 {
     private UriParamFilter filter = new UriParamFilter();

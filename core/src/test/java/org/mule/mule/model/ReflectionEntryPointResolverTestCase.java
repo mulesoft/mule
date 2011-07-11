@@ -14,7 +14,7 @@ import org.mule.RequestContext;
 import org.mule.api.MuleEventContext;
 import org.mule.api.model.InvocationResult;
 import org.mule.model.resolvers.ReflectionEntryPointResolver;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -27,13 +27,18 @@ import org.mule.transport.NullPayload;
 
 import java.lang.reflect.Method;
 
+import org.junit.Test;
 import org.mockito.cglib.proxy.Enhancer;
 import org.mockito.cglib.proxy.MethodInterceptor;
 import org.mockito.cglib.proxy.MethodProxy;
 
-public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class ReflectionEntryPointResolverTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testExplicitMethodMatch() throws Exception
     {
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
@@ -41,6 +46,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
+    @Test
     public void testExplicitMethodMatchComplexObject() throws Exception
     {
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
@@ -48,6 +54,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
     }
 
+    @Test
     public void testMethodMatchWithArguments() throws Exception
     {
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
@@ -67,6 +74,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals("addBananaAndApple", result.getMethodCalled());
     }
 
+    @Test
     public void testExplicitMethodMatchSetArrayFail() throws Exception
     {
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
@@ -75,6 +83,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
                 result.getState(), InvocationResult.State.FAILED);
     }
 
+    @Test
     public void testExplicitMethodMatchSetArrayPass() throws Exception
     {
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
@@ -86,6 +95,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
      * Tests entrypoint discovery when there is more than one discoverable method
      * with MuleEventContext parameter.
      */
+    @Test
     public void testFailEntryPointMultiplePayloadMatches() throws Exception
     {
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
@@ -94,6 +104,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals(result.getState(), InvocationResult.State.FAILED);
     }
 
+    @Test
     public void testMatchOnNoArgs() throws Exception
     {
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();
@@ -108,6 +119,7 @@ public class ReflectionEntryPointResolverTestCase extends AbstractMuleTestCase
         assertEquals("bite", result.getMethodCalled());
     }
 
+    @Test
     public void testAnnotatedMethodOnProxyWithMethodSet() throws Exception
     {
         ReflectionEntryPointResolver resolver = new ReflectionEntryPointResolver();

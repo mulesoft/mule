@@ -11,7 +11,7 @@ package org.mule.expression;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBasket;
@@ -20,8 +20,17 @@ import org.mule.tck.testmodels.fruit.FruitBowlToFruitBasket;
 
 import java.io.ByteArrayInputStream;
 
-public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class PayloadExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testSimple() throws Exception
     {
         MessagePayloadExpressionEvaluator eval = new MessagePayloadExpressionEvaluator();
@@ -42,6 +51,7 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
      *
      * @throws Exception if the test fails
      */
+    @Test
     public void testSimpleUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", muleContext);
@@ -57,6 +67,7 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNull(result);
     }
 
+    @Test
     public void testWithTransform() throws Exception
     {
         MessagePayloadExpressionEvaluator eval = new MessagePayloadExpressionEvaluator();
@@ -75,6 +86,7 @@ public class PayloadExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("test2", result);
     }
 
+    @Test
     public void testWithMoreComplexTransform() throws Exception
     {
         MessagePayloadExpressionEvaluator eval = new MessagePayloadExpressionEvaluator();

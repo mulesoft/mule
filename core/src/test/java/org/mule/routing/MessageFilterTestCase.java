@@ -13,12 +13,17 @@ package org.mule.routing;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleEvent;
 import org.mule.routing.filters.EqualsFilter;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;
 
-public class MessageFilterTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
+public class MessageFilterTestCase extends AbstractMuleContextTestCase
 {
 
     @Test
@@ -51,7 +56,7 @@ public class MessageFilterTestCase extends AbstractMuleTestCase
         assertNull(out.event);
         assertNull(resultEvent);
     }
-    
+
     @Test
     public void testFilterPassUnacceptedMP() throws Exception
     {

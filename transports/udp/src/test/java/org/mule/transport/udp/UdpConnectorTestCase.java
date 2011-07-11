@@ -18,6 +18,11 @@ import org.mule.transport.AbstractConnectorTestCase;
 
 import java.net.DatagramPacket;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 public class UdpConnectorTestCase extends AbstractConnectorTestCase
 {
 
@@ -41,6 +46,7 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
         return new DatagramPacket("Hello".getBytes(), 5);
     }
 
+    @Test
     public void testValidListener() throws Exception
     {
         Service service = getTestService("orange", Orange.class);
@@ -61,6 +67,7 @@ public class UdpConnectorTestCase extends AbstractConnectorTestCase
         }
     }
 
+    @Test
     public void testProperties() throws Exception
     {
         UdpConnector connector = (UdpConnector)this.getConnector();

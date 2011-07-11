@@ -13,6 +13,10 @@ package org.mule.transport.tcp;
 import org.mule.api.transport.Connector;
 import org.mule.transport.AbstractConnectorTestCase;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class TcpConnectorTestCase extends AbstractConnectorTestCase
 {
     public Connector createConnector() throws Exception
@@ -32,6 +36,7 @@ public class TcpConnectorTestCase extends AbstractConnectorTestCase
         return "Hello".getBytes();
     }
 
+    @Test
     public void testProperties() throws Exception
     {
         TcpConnector c = (TcpConnector) getConnector();

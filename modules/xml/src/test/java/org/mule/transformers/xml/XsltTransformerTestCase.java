@@ -29,6 +29,13 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
 {
 
@@ -81,6 +88,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         return resultData;
     }
 
+    @Test
     public void testAllXmlMessageTypes() throws Exception
     {
         List<?> list = XMLTestUtils.getXmlMessageVariants("cdcatalog.xml");
@@ -99,6 +107,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         }
     }
 
+    @Test
     public void testTransformXMLStreamReader() throws Exception
     {
         Object expectedResult = getResultData();
@@ -114,6 +123,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         assertTrue("expected: " + expectedResult + "\nresult: " + result, compareResults(expectedResult, result));
     }
     
+    @Test
     public void testCustomTransformerFactoryClass() throws InitialisationException
     {
         XsltTransformer t = new XsltTransformer();
@@ -137,6 +147,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         t.initialise();
     }
 
+    @Test
     public void testTransformWithStaticParam() throws TransformerException, InitialisationException
     {
 
@@ -196,6 +207,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
          "</xsl:stylesheet>";
     }
 
+    @Test
     public void testTransformWithDynamicParam() throws Exception
     {
 
@@ -242,6 +254,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         assertTrue(transformerResult.indexOf(expectedTransformedxml) > -1);
     }
 
+    @Test
     public void testInitialiseMustLoadXsltFile_dontLoadIfThereIsXslText() throws Exception
     {
         XsltTransformer xsltTransformer = new XsltTransformer();
@@ -257,6 +270,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         }
     }
 
+    @Test
     public void testInitialiseMustLoadXsltFile_ThrowExceptionIfNoXslTextNorFile() throws Exception
     {
         XsltTransformer xsltTransformer = new XsltTransformer();
@@ -271,6 +285,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         }
     }
 
+    @Test
     public void testInitialiseMustLoadXsltFile_ThrowExceptionIfXslFileDoesNotExist() throws Exception
     {
         XsltTransformer xsltTransformer = new XsltTransformer();
@@ -288,6 +303,7 @@ public class XsltTransformerTestCase extends AbstractXmlTransformerTestCase
         }
     }
 
+    @Test
     public void testInitialiseMustLoadXsltFile_LoadsFromXslFile() throws Exception
     {
         XsltTransformer xsltTransformer = new XsltTransformer();

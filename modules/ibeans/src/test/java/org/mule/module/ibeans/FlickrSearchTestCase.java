@@ -12,18 +12,22 @@ package org.mule.module.ibeans;
 import org.mule.ibeans.flickr.FlickrIBean;
 import org.mule.ibeans.flickr.FlickrSearchIBean;
 import org.mule.module.json.JsonData;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.codehaus.jackson.node.ArrayNode;
 import org.ibeans.annotation.IntegrationBean;
 import org.ibeans.api.CallException;
+import org.junit.Test;
 import org.w3c.dom.Document;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * This tests that we can use the FlickrSearch iBean without needing a 'secret_key' which is required for other
  * parts of the Flickr API
  */
-public class FlickrSearchTestCase extends AbstractMuleTestCase
+public class FlickrSearchTestCase extends AbstractMuleContextTestCase
 {
     public static final String SEARCH_TERM = "food";
     public static final String BAD_SEARCH_TERM = "bad";
@@ -51,6 +55,7 @@ public class FlickrSearchTestCase extends AbstractMuleTestCase
         return flickr;
     }
 
+    @Test
     public void testFlickrSearch() throws Exception
     {
         JsonData doc = getFlickr().search(SEARCH_TERM);
@@ -59,6 +64,7 @@ public class FlickrSearchTestCase extends AbstractMuleTestCase
     }
 
     //This will fail since "badkey" is not a recognised key
+    @Test
     public void testFlickrError() throws Exception
     {
         getFlickr().init("badkey", FlickrIBean.FORMAT.XML, Document.class);

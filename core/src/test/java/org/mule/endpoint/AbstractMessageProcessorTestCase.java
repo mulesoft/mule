@@ -42,7 +42,7 @@ import org.mule.context.notification.ServerNotificationManager;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.routing.MessageFilter;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.Latch;
 
@@ -50,7 +50,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class AbstractMessageProcessorTestCase extends AbstractMuleTestCase
+public abstract class AbstractMessageProcessorTestCase extends AbstractMuleContextTestCase
 {
     protected static final String TEST_URI = "test://myTestUri";
     protected static String RESPONSE_MESSAGE = "response-message";

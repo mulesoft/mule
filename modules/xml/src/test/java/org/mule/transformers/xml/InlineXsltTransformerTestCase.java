@@ -19,6 +19,11 @@ import org.mule.util.IOUtils;
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCase
 {
 
@@ -71,6 +76,7 @@ public class InlineXsltTransformerTestCase extends AbstractXmlTransformerTestCas
         return resultData;
     }
 
+    @Test
     public void testAllXmlMessageTypes() throws Exception
     {
         List list = XMLTestUtils.getXmlMessageVariants("simple.xml");

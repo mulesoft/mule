@@ -12,15 +12,22 @@ package org.mule.api;
 
 import org.mule.api.lifecycle.CreateException;
 import org.mule.api.security.tls.TlsConfiguration;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.net.URL;
 
 import javax.net.ssl.SSLSocketFactory;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class TlsConfigurationTestCase extends AbstractMuleTestCase
 {
+    @Test
     public void testEmptyConfiguration() throws Exception
     {
         TlsConfiguration configuration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
@@ -56,6 +63,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testSimpleSocket() throws Exception
     {
         TlsConfiguration configuration = new TlsConfiguration(TlsConfiguration.DEFAULT_KEYSTORE);
@@ -67,6 +75,7 @@ public class TlsConfigurationTestCase extends AbstractMuleTestCase
         assertTrue("socket is useless", socketFactory.getSupportedCipherSuites().length > 0);
     }
 
+    @Test
     public void testExceptionOnInvalidKeyAlias() throws Exception
     {
         URL keystoreUrl = getClass().getClassLoader().getResource("serverKeystore");

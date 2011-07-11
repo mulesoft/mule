@@ -15,13 +15,17 @@ import org.mule.api.context.notification.TransactionNotificationListener;
 import org.mule.api.transaction.Transaction;
 import org.mule.api.transaction.TransactionException;
 import org.mule.context.notification.TransactionNotification;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import org.junit.Test;
 
-public class TransactionNotificationsTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+
+public class TransactionNotificationsTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testTransactionNotifications() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(3);
@@ -67,7 +71,6 @@ public class TransactionNotificationsTestCase extends AbstractMuleTestCase
         latch.await(2000, TimeUnit.MILLISECONDS);
         assertEquals("There are still some notifications left unfired.", 0, latch.getCount());
     }
-
 
     private class DummyTransaction extends AbstractSingleResourceTransaction
     {

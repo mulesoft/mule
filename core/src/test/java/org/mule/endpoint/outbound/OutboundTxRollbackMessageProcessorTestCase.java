@@ -19,9 +19,15 @@ import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.transaction.TransactionCoordination;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
 public class OutboundTxRollbackMessageProcessorTestCase extends AbstractMessageProcessorTestCase
 {
 
+    @Test
     public void testNoRollback() throws InitialisationException, EndpointException, Exception
     {
         InterceptingMessageProcessor mp = new OutboundTxRollbackMessageProcessor();
@@ -34,6 +40,7 @@ public class OutboundTxRollbackMessageProcessorTestCase extends AbstractMessageP
         assertSame(event, listener.sensedEvent);
     }
 
+    @Test
     public void testRollback() throws InitialisationException, EndpointException, Exception
     {
         InterceptingMessageProcessor mp = new OutboundTxRollbackMessageProcessor();
@@ -56,6 +63,5 @@ public class OutboundTxRollbackMessageProcessorTestCase extends AbstractMessageP
         {
             TransactionCoordination.getInstance().unbindTransaction(tx);
         }
-
     }
 }

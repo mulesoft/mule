@@ -16,11 +16,17 @@ import org.mule.api.lifecycle.Startable;
 import org.mule.api.lifecycle.Stoppable;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.source.MessageSource;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.SensingNullMessageProcessor;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.ObjectUtils;
 
-public class StartableCompositeMessageSourceTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+public class StartableCompositeMessageSourceTestCase extends AbstractMuleContextTestCase
 {
     protected SensingNullMessageProcessor listener;
     protected SensingNullMessageProcessor listener2;
@@ -44,6 +50,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleTestCas
         return new StartableCompositeMessageSource();
     }
 
+    @Test
     public void testAddSourceStopped() throws MuleException
     {
         compositeSource.setListener(listener);
@@ -68,6 +75,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleTestCas
         assertEquals(testEvent, listener.event);
     }
 
+    @Test
     public void testAddSourceStarted() throws MuleException
     {
         compositeSource.setListener(listener);
@@ -79,6 +87,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleTestCas
         assertEquals(testEvent, listener.event);
     }
 
+    @Test
     public void testRemoveSource() throws MuleException
     {
         compositeSource.setListener(listener);
@@ -94,6 +103,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleTestCas
         assertNull(listener.event);
     }
 
+    @Test
     public void testSetListenerStarted() throws MuleException
     {
         compositeSource.addSource(source);
@@ -111,6 +121,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleTestCas
         assertEquals(testEvent, listener2.event);
     }
 
+    @Test
     public void testStart() throws MuleException
     {
         compositeSource.setListener(listener);
@@ -124,6 +135,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleTestCas
         assertEquals(testEvent, listener.event);
     }
 
+    @Test
     public void testStartNoListener() throws MuleException
     {
         compositeSource.addSource(source);
@@ -138,6 +150,7 @@ public class StartableCompositeMessageSourceTestCase extends AbstractMuleTestCas
 
     }
 
+    @Test
     public void testStop() throws MuleException
     {
         compositeSource.setListener(listener);

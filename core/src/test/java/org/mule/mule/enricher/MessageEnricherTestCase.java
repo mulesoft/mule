@@ -17,12 +17,18 @@ import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.enricher.MessageEnricher;
 import org.mule.enricher.MessageEnricher.EnrichExpressionPair;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.simple.StringAppendTransformer;
 
-public class MessageEnricherTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+public class MessageEnricherTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testEnrichHeaderWithPayload() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
@@ -42,6 +48,7 @@ public class MessageEnricherTestCase extends AbstractMuleTestCase
         assertEquals("", result.getPayload());
     }
 
+    @Test
     public void testEnrichHeaderWithHeader() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
@@ -61,6 +68,7 @@ public class MessageEnricherTestCase extends AbstractMuleTestCase
         assertEquals("", result.getPayload());
     }
 
+    @Test
     public void testEnrichHeadersMToN() throws Exception
     {
         MessageEnricher enricher = new MessageEnricher();
@@ -88,6 +96,7 @@ public class MessageEnricherTestCase extends AbstractMuleTestCase
         assertEquals("", result.getPayload());
     }
 
+    @Test
     public void testEnrichHeaderNestedEvaluator() throws Exception
     {
         muleContext.getRegistry().registerObject("appender", new StringAppendTransformer(" append"));

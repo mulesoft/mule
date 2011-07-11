@@ -16,9 +16,15 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 import org.mule.message.DefaultExceptionPayload;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class InboundExceptionDetailsProcessorTestCase extends AbstractMessageProcessorTestCase
 {
 
+    @Test
     public void testProcess() throws Exception
     {
         InboundEndpoint endpoint = createTestInboundEndpoint(null, null);
@@ -32,6 +38,5 @@ public class InboundExceptionDetailsProcessorTestCase extends AbstractMessagePro
         assertNotNull(result);
         final int status = result.getMessage().getOutboundProperty("status", 0);
         assertEquals(500, status);
-
     }
 }

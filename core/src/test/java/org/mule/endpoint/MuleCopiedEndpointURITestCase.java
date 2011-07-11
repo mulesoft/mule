@@ -12,19 +12,23 @@ package org.mule.endpoint;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class MuleCopiedEndpointURITestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class MuleCopiedEndpointURITestCase extends AbstractMuleContextTestCase
 {
 
     /**
      * See MULE-2164
      * @throws Exception
      */
+    @Test
     public void testCopyMetaSchemeEndpointURI() throws Exception
     {
-
         // Create and test values
         ImmutableEndpoint endpoint = MuleTestUtils.getTestSchemeMetaInfoOutboundEndpoint("testEndpoint", "protocol", muleContext);
         EndpointURI endpointUri = endpoint.getEndpointURI();

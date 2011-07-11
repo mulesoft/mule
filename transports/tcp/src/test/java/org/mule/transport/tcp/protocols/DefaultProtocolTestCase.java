@@ -12,7 +12,6 @@ package org.mule.transport.tcp.protocols;
 
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.transport.tcp.TcpProtocol;
-import org.mule.transport.tcp.protocols.DirectProtocol;
 
 public class DefaultProtocolTestCase extends AbstractMuleTestCase
 {
@@ -28,7 +27,7 @@ public class DefaultProtocolTestCase extends AbstractMuleTestCase
         this(new DirectProtocol(), SlowInputStream.FULL_LENGTH);
     }
 
-    public DefaultProtocolTestCase(TcpProtocol protocol, int expectedLength)
+    protected DefaultProtocolTestCase(TcpProtocol protocol, int expectedLength)
     {
         this.protocol = protocol;
         this.expectedLength = expectedLength;

@@ -31,12 +31,6 @@ public class MixedAnnotationsTestCase extends AbstractServiceAndFlowTestCase
 {
     private MuleMessage muleMessage;
 
-    @Override
-    protected String getConfigResources()
-    {
-        return "org/mule/test/annotations/mixed-annotations-flow.xml";
-    }
-
     public MixedAnnotationsTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);

@@ -16,12 +16,18 @@ import org.mule.config.DefaultMuleConfiguration;
 import org.mule.context.DefaultMuleContextBuilder;
 import org.mule.context.notification.ServerNotificationManager;
 import org.mule.lifecycle.MuleContextLifecycleManager;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.work.MuleWorkManager;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testBuildMuleContextDefault()
     {
         // Build
@@ -36,6 +42,7 @@ public class DefaultMuleContextBuilderTestCase extends AbstractMuleTestCase
         assertEquals(MuleWorkManager.class, muleContext.getWorkManager().getClass());
     }
 
+    @Test
     public void testBuildMuleContextCustom()
     {
         // Build

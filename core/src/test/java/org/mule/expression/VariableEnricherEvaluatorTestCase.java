@@ -14,10 +14,18 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.ExpressionManager;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class VariableEnricherEvaluatorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class VariableEnricherEvaluatorTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testEnrichEvaluate() throws Exception
     {
         VariableExpressionEvaluator eval = new VariableExpressionEvaluator();
@@ -49,6 +57,7 @@ public class VariableEnricherEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals("fooValue", result);
     }
 
+    @Test
     public void testEnrichEvaluateWithManager() throws Exception
     {
         ExpressionManager expressionManager = muleContext.getExpressionManager();

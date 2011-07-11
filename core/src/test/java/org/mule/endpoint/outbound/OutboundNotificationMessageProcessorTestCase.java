@@ -19,10 +19,15 @@ import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.endpoint.AbstractMessageProcessorTestCase;
 
 import java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class OutboundNotificationMessageProcessorTestCase extends AbstractMessageProcessorTestCase
 {
 
+    @Test
     public void testDispatch() throws Exception
     {
         TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
@@ -43,6 +48,7 @@ public class OutboundNotificationMessageProcessorTestCase extends AbstractMessag
             ((MuleMessage) listener.messageNotification.getSource()).getPayload());
     }
 
+    @Test
     public void testSend() throws Exception
     {
         TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();

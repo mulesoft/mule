@@ -17,11 +17,18 @@ import org.mule.api.context.MuleContextException;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class ExceptionsTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+
+public class ExceptionsTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testExceptionChaining()
     {
         String rootMsg = "Root Test Exception Message";

@@ -10,7 +10,7 @@
 
 package org.mule.api;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -18,8 +18,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeoutException;
+import org.junit.Test;
 
-public class FutureMessageResultTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class FutureMessageResultTestCase extends AbstractMuleContextTestCase
 {
     private static Callable Dummy = new Callable()
     {
@@ -29,14 +35,9 @@ public class FutureMessageResultTestCase extends AbstractMuleTestCase
         }
     };
 
-    volatile boolean wasCalled;
+    private volatile boolean wasCalled;
 
-    protected void doSetUp() throws Exception
-    {
-        super.doSetUp();
-        wasCalled = false;
-    }
-
+    @Test
     public void testCreation()
     {
         try
@@ -62,6 +63,7 @@ public class FutureMessageResultTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testExecute() throws ExecutionException, InterruptedException, MuleException
     {
         Callable c = new Callable()
@@ -80,6 +82,7 @@ public class FutureMessageResultTestCase extends AbstractMuleTestCase
         assertTrue(wasCalled);
     }
 
+    @Test
     public void testExecuteWithShutdownExecutor()
     {
         ExecutorService e = Executors.newCachedThreadPool();
@@ -99,6 +102,7 @@ public class FutureMessageResultTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testExecuteWithTimeout()
         throws ExecutionException, InterruptedException, MuleException
     {

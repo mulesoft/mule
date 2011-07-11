@@ -13,7 +13,7 @@ package org.mule.transformer.wire;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.wire.WireFormat;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.simple.ObjectToString;
 
@@ -23,9 +23,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public abstract class AbstractWireFormatTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public abstract class AbstractWireFormatTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testWriteReadMessage() throws Exception
     {
         // Create message to send over wire
@@ -41,6 +48,7 @@ public abstract class AbstractWireFormatTestCase extends AbstractMuleTestCase
         assertEquals("testMessage", outMessage);
     }
 
+    @Test
     public void testWriteReadPayload() throws Exception
     {
         // Create orange to send over the wire
@@ -72,6 +80,7 @@ public abstract class AbstractWireFormatTestCase extends AbstractMuleTestCase
         return outMessage;
     }
 
+    @Test
     public void testSetInboundTransformer() throws Exception
     {
         TransformerPairWireFormat transPairWireFormat = (TransformerPairWireFormat) getWireFormat();
@@ -79,6 +88,7 @@ public abstract class AbstractWireFormatTestCase extends AbstractMuleTestCase
         assertTrue(transPairWireFormat.getInboundTransformer() instanceof ObjectToString);
     }
 
+    @Test
     public void testSetOutboundTransformer() throws Exception
     {
         TransformerPairWireFormat transPairWireFormat = (TransformerPairWireFormat) getWireFormat();
@@ -86,8 +96,10 @@ public abstract class AbstractWireFormatTestCase extends AbstractMuleTestCase
         assertTrue(transPairWireFormat.getInboundTransformer() instanceof ObjectToString);
     }
 
+    @Test
     public abstract void testGetDefaultInboundTransformer() throws Exception;
 
+    @Test
     public abstract void testGetDefaultOutboundTransformer() throws Exception;
 
     protected abstract WireFormat getWireFormat() throws Exception;

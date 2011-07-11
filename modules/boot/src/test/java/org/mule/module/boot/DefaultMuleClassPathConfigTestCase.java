@@ -10,13 +10,20 @@
 
 package org.mule.module.boot;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.SystemUtils;
 
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase
 {
@@ -28,6 +35,7 @@ public class DefaultMuleClassPathConfigTestCase extends AbstractMuleTestCase
      * 
      * @throws Exception in case of any error
      */
+    @Test
     public void testMuleBaseUserFolderOverridesMuleHome() throws Exception
     {
         final File tempDir = SystemUtils.getJavaIoTmpDir();

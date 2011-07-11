@@ -13,14 +13,20 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
 import org.mule.module.json.JsonData;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformer.types.DataTypeFactory;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 //TODO: IBEANS-141. No support for Mixin resolution yet
-public class JsonAutoTransformerWithMixinsTestCase extends AbstractMuleTestCase
+public class JsonAutoTransformerWithMixinsTestCase extends AbstractMuleContextTestCase
 {
     public static final String APPLE_JSON = "{\"washed\":false,\"bitten\":true}";
 
@@ -36,6 +42,7 @@ public class JsonAutoTransformerWithMixinsTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().registerObject("mapper", mapper);
     }
 
+    @Test
     public void testCustomTransform() throws Exception
     {
         //Though the data is simple we are testing two things -

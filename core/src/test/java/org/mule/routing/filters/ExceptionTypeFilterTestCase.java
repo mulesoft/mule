@@ -11,15 +11,25 @@
 package org.mule.routing.filters;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.message.DefaultExceptionPayload;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class ExceptionTypeFilterTestCase extends AbstractMuleTestCase
 {
 
+    private MuleContext muleContext = mock(MuleContext.class);
+
+    @Test
     public void testExceptionTypeFilter()
     {
         ExceptionTypeFilter filter = new ExceptionTypeFilter();

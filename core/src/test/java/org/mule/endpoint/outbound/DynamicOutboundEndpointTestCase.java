@@ -35,6 +35,14 @@ import org.mule.transformer.simple.ResponseAppendTransformer;
 import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests flow of messages from {@link org.mule.endpoint.DynamicOutboundEndpoint#process(org.mule.api.MuleEvent)} down to
@@ -46,6 +54,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
     protected FakeMessageDispatcher dispacher;
     protected MuleEvent testOutboundEvent;
 
+    @Test
     public void testDefaultFlowRequestResponse() throws Exception
     {
          OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null,
@@ -73,6 +82,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
 
     }
 
+    @Test
     public void testDefaultFlowOneWay() throws Exception
     {
         OutboundEndpoint endpoint = createOutboundEndpoint( null, null, null,
@@ -94,6 +104,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         assertNull(result);
     }
 
+    @Test
     public void testSecurityFilterAccept() throws Exception
     {
 
@@ -121,6 +132,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         assertMessageEqualEncodingPropertyAdded(responseMessage, result.getMessage());
     }
 
+    @Test
     public void testSecurityFilterNotAccept() throws Exception
     {
         TestSecurityNotificationListener securityNotificationListener = new TestSecurityNotificationListener();
@@ -163,6 +175,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
             TestSecurityFilter.StaticMessageUnauthorisedException.class.getName());
     }
 
+    @Test
     public void testSendNotfication() throws Exception
     {
         TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
@@ -182,6 +195,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
             ((MuleMessage) listener.messageNotification.getSource()).getPayload());
     }
 
+    @Test
     public void testDispatchNotfication() throws Exception
     {
         TestEndpointMessageNotificationListener listener = new TestEndpointMessageNotificationListener();
@@ -201,6 +215,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
             ((MuleMessage) listener.messageNotification.getSource()).getPayload());
     }
 
+    @Test
     public void testTransformers() throws Exception
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, new OutboundAppendTransformer(),
@@ -224,6 +239,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         assertEquals(RESPONSE_MESSAGE + ResponseAppendTransformer.APPEND_STRING, result.getMessageAsString());
     }
 
+    @Test
     public void testConnectorNotStarted() throws Exception
     {
         OutboundEndpoint endpoint = createOutboundEndpoint(null, null, null, null, 
@@ -244,6 +260,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         }
     }
 
+    @Test
     public void testTimeoutSetOnEvent() throws Exception
     {
 
@@ -267,11 +284,13 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
         assertEquals(testTimeout, dispacher.sensedSendEvent.getTimeout());
     }
 
+    @Test
     public void testTransaction()
     {
         // TODO
     }
 
+    @Test
     public void testExceptionHandling()
     {
         // TODO

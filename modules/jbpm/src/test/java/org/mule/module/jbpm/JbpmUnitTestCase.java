@@ -10,14 +10,20 @@
 
 package org.mule.module.jbpm;
 
-import org.mule.module.jbpm.Jbpm;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the jBPM wrapper with a simple process.
  */
 public class JbpmUnitTestCase extends AbstractMuleTestCase
 {
+    @Test
     public void testDeployAndRun() throws Exception 
     {
         Jbpm jbpm = new Jbpm();

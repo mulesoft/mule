@@ -23,17 +23,24 @@ import org.mule.security.MuleCredentials;
 import org.mule.session.DefaultMuleSession;
 import org.mule.session.LegacySessionHandler;
 import org.mule.session.SerializeAndEncodeSessionHandler;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.SerializationException;
+import org.junit.Test;
 
-public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class MuleSessionHandlerTestCase extends AbstractMuleContextTestCase
 {
     /** @see EE-1705/MULE-4567 */
+    @Test
     public void testSessionProperties() throws Exception 
     {
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
@@ -70,6 +77,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     }
 
     /** @see EE-1774 */
+    @Test
     public void testNonSerializableSessionProperties() throws Exception 
     {
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
@@ -89,6 +97,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     }    
 
     /** @see EE-1820 */
+    @Test
     public void testBackwardsCompatibility() throws Exception 
     {
         MuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
@@ -118,6 +127,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     }    
     
     /** @see EE-1820 */
+    @Test
     public void testSessionPropertiesLegacyFormat() throws Exception 
     {
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
@@ -154,6 +164,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     }    
 
     /** @see MULE-4720 */
+    @Test
     public void testSecurityContext() throws Exception 
     {
         DefaultMuleMessage message = new DefaultMuleMessage("Test Message", muleContext);
@@ -176,6 +187,7 @@ public class MuleSessionHandlerTestCase extends AbstractMuleTestCase
     }    
     
     /** @see EE-1774 */
+    @Test
     public void testNotSerializableSecurityContext() throws Exception 
     {
         MuleMessage message = new DefaultMuleMessage("Test Message", muleContext);

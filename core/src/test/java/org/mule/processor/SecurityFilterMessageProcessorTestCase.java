@@ -20,9 +20,14 @@ import org.mule.tck.security.TestSecurityFilter;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+
 public class SecurityFilterMessageProcessorTestCase extends AbstractMessageProcessorTestCase
 {
-
     @Test
     public void testFilterPass() throws Exception
     {
@@ -58,14 +63,14 @@ public class SecurityFilterMessageProcessorTestCase extends AbstractMessageProce
 
         try
         {
-            MuleEvent resultEvent = mp.process(inEvent);
+            mp.process(inEvent);
             fail("Exception expected");
         }
         catch (TestSecurityFilter.StaticMessageUnauthorisedException e)
         {
             // expected
         }
-        
+
         assertNull(listner.sensedEvent);
     }
 }

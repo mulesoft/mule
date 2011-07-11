@@ -12,10 +12,18 @@ package org.mule.expression;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.message.DefaultExceptionPayload;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class MessageExpressionEvaluatorTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+public class MessageExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testUsingEvaluatorDirectly() throws Exception
     {
         MessageExpressionEvaluator eval = new MessageExpressionEvaluator();
@@ -62,6 +70,7 @@ public class MessageExpressionEvaluatorTestCase extends AbstractMuleTestCase
      *
      * @throws Exception if the test fails
      */
+    @Test
     public void testUsingManager() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage("test", muleContext);

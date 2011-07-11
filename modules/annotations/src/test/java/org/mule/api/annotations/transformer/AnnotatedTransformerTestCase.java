@@ -13,7 +13,7 @@ import org.mule.api.annotations.ContainsTransformerMethods;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.transformer.DataType;
 import org.mule.config.transformer.AnnotatedTransformerProxy;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.CollectionDataType;
 import org.mule.transformer.types.DataTypeFactory;
 
@@ -25,9 +25,13 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 
 @ContainsTransformerMethods
-public class AnnotatedTransformerTestCase extends AbstractMuleTestCase
+public class AnnotatedTransformerTestCase extends AbstractMuleContextTestCase
 {
     @Override
     protected void doSetUp() throws Exception
@@ -72,7 +76,6 @@ public class AnnotatedTransformerTestCase extends AbstractMuleTestCase
         assertTrue(trans.getSourceDataTypes().contains(DataTypeFactory.create(ByteArrayInputStream.class)));
         assertEquals(9, trans.getPriorityWeighting());
     }
-
 
     @Transformer
     public ArrayList dummy(InputStream in)

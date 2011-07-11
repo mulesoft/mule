@@ -12,6 +12,9 @@ package org.mule.module.ibeans.annotations;
 import org.ibeans.impl.view.TextView;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Basically, just test we don't get an error. Since the result is unstructured text it is hard to make many assertions
  * on it

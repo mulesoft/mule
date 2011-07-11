@@ -22,7 +22,7 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
 import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.PayloadTypeFilter;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.simple.ByteArrayToObject;
 import org.mule.transformer.simple.SerializableToByteArray;
@@ -32,17 +32,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Test;
 
-public class MuleEventTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+
+public class MuleEventTestCase extends AbstractMuleContextTestCase
 {
 
+//    @Test
 //    public void testEventInitialise() throws Exception
 //    {
 //        String data = "Test Data";
 //
 //        DefaultMuleEvent event = (DefaultMuleEvent)getTestEvent(data, getTestService("orange", Orange.class));
 //        RequestContext.setEvent(event);
-//        
+//
 //        assertEquals("MuleEvent data should equal " + data, data, event.getMessage().getPayload());
 //        assertEquals("MuleEvent data should equal " + data, data, event.getMessageAsString());
 //        assertEquals("MuleEvent data should equal " + data, data, event.transformMessage());
@@ -64,13 +73,14 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 //        assertNotNull(event.getId());
 //    }
 //
+//    @Test
 //    public void testEventTransformer() throws Exception
 //    {
 //        String data = "Test Data";
 //        ImmutableEndpoint endpoint = getTestOutboundEndpoint("Test",CollectionUtils.singletonList(new TestEventTransformer()));
 //        MuleEvent event = getTestEvent(data, endpoint);
 //        RequestContext.setEvent(event);
-//        
+//
 //        assertEquals("MuleEvent data should equal " + data, data, event.getMessage().getPayload());
 //        assertEquals("MuleEvent data should equal " + data, data, event.getMessageAsString());
 //        assertEquals("MuleEvent data should equal 'Transformed Test Data'", "Transformed Test Data", event
@@ -79,6 +89,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 //            .transformMessageToBytes().length);
 //    }
 //
+//    @Test
 //    public void testEventRewrite() throws Exception
 //    {
 //        String data = "Test Data";
@@ -105,6 +116,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 //
 //    }
 //
+//    @Test
 //    public void testProperties() throws Exception
 //    {
 //        MuleEvent prevEvent;
@@ -161,6 +173,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
     /*
      * See http://mule.mulesoft.org/jira/browse/MULE-384 for details.
      */
+    @Test
     public void testNoPasswordNoNullPointerException() throws Exception
     {
         // provide the username, but not the password, as is the case for SMTP
@@ -172,6 +185,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertNull("Credentials must not be created for endpoints without a password.", credentials);
     }
 
+    @Test
     public void testEventSerialization() throws Exception
     {
         Transformer trans1 = new TestEventTransformer();
@@ -184,8 +198,8 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         transformers.add(trans1);
         transformers.add(trans2);
 
-        InboundEndpoint endpoint = getTestInboundEndpoint("Test", null, transformers, 
-            new PayloadTypeFilter(Object.class), null);
+        InboundEndpoint endpoint = getTestInboundEndpoint("Test", null, transformers,
+            new PayloadTypeFilter(Object.class), null, null);
 
         MuleEvent event = RequestContext.setEvent(getTestEvent("payload", endpoint));
         Serializable serialized = (Serializable) new SerializableToByteArray().transform(event);
@@ -193,7 +207,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         ByteArrayToObject trans = new ByteArrayToObject();
         trans.setMuleContext(muleContext);
         MuleEvent deserialized = (MuleEvent) trans.transform(serialized);
-        
+
         // Assert that deserialized event is not null and has muleContext
         assertNotNull(deserialized);
         assertNotNull(deserialized.getMuleContext());
@@ -208,22 +222,23 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertSame(event.getSession().getFlowConstruct(), deserialized.getSession().getFlowConstruct());
 
         // Assert that deserialized event has endpoint and that the endpoint is the same instance
-        assertNotNull(deserialized.getEndpoint());    
+        assertNotNull(deserialized.getEndpoint());
         assertEquals(endpoint, deserialized.getEndpoint());
 
-        List deserializedTransformers = deserialized.getEndpoint().getTransformers();
+        List<Transformer> deserializedTransformers = deserialized.getEndpoint().getTransformers();
         assertEquals(2, deserializedTransformers.size());
-        assertEquals(trans1.getName(), ((Transformer) deserializedTransformers.get(0)).getName());
-        assertEquals(trans2.getName(), ((Transformer) deserializedTransformers.get(1)).getName());
+        assertEquals(trans1.getName(), deserializedTransformers.get(0).getName());
+        assertEquals(trans2.getName(), deserializedTransformers.get(1).getName());
         assertEquals(PayloadTypeFilter.class, deserialized.getEndpoint().getFilter().getClass());
     }
-    
+
+    @Test
     public void testEventSerializationRestart() throws Exception
     {
         // Create and register artifacts
         MuleEvent event = createEventToSerialize();
         muleContext.start();
-        List transformers = event.getEndpoint().getTransformers();
+        List<Transformer> transformers = event.getEndpoint().getTransformers();
         ImmutableEndpoint endpoint = event.getEndpoint();
 
         //Serialize
@@ -257,14 +272,14 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 
         Service service = (Service) event.getSession().getFlowConstruct();
         Service deserializedService = (Service) deserialized.getSession().getFlowConstruct();
-        
+
         // Unable to test services for equality because of need for equals() everywhere.  See MULE-3720
         // assertEquals(event.getSession().getService(), deserialized.getSession().getService());
         assertEquals(service.getName(), deserializedService.getName());
         assertEquals(service.getInitialState(), deserializedService.getInitialState());
         assertEquals(service.getExceptionListener().getClass(), deserializedService.getExceptionListener().getClass());
         assertEquals(service.getComponent().getClass(), deserializedService.getComponent().getClass());
-        
+
         // Assert that deserialized event has endpoint and that the endpoint is the
         // same instance
         assertNotNull(deserialized.getEndpoint());
@@ -277,16 +292,15 @@ public class MuleEventTestCase extends AbstractMuleTestCase
         assertEquals(endpoint.getProtocol(), deserialized.getEndpoint().getProtocol());
         assertEquals(endpoint.getResponseTimeout(), deserialized.getEndpoint().getResponseTimeout());
         assertEquals(endpoint.getConnector().getClass(), deserialized.getEndpoint().getConnector().getClass());
-        
-        List deserializedTransformers = deserialized.getEndpoint().getTransformers();
+
+        List<Transformer> deserializedTransformers = deserialized.getEndpoint().getTransformers();
         assertEquals(2, deserializedTransformers.size());
-        assertEquals(((Transformer) transformers.get(0)).getName(),
-            ((Transformer) deserializedTransformers.get(0)).getName());
-        assertEquals(((Transformer) transformers.get(1)).getName(),
-            ((Transformer) deserializedTransformers.get(1)).getName());
+        assertEquals(transformers.get(0).getName(), deserializedTransformers.get(0).getName());
+        assertEquals(transformers.get(1).getName(), deserializedTransformers.get(1).getName());
         assertEquals(PayloadTypeFilter.class, deserialized.getEndpoint().getFilter().getClass());
     }
-    
+
+    @Test
     public void testMuleCredentialsSerialization() throws Exception
     {
         String username = "mule";
@@ -302,13 +316,13 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 
         MuleEvent deserialized = (MuleEvent) trans.transform(serialized);
         assertNotNull(deserialized);
-        
+
         Credentials credentials = deserialized.getCredentials();
         assertNotNull(credentials);
         assertEquals(username, credentials.getUsername());
         assertTrue(Arrays.equals(password.toCharArray(), credentials.getPassword()));
     }
-    
+
     private MuleEvent createEventToSerialize() throws Exception
     {
         createAndRegisterTransformersEndpointBuilderService();
@@ -345,6 +359,7 @@ public class MuleEventTestCase extends AbstractMuleTestCase
 
     private static class TestEventTransformer extends AbstractTransformer
     {
+        @Override
         public Object doTransform(Object src, String encoding) throws TransformerException
         {
             return "Transformed Test Data";

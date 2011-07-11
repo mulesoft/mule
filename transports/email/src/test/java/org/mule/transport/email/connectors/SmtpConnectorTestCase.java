@@ -37,6 +37,15 @@ import com.icegreen.greenmail.util.ServerSetup;
 import javax.mail.URLName;
 import javax.mail.internet.MimeMessage;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Send a message via SMTP to a (greenmail) server.
  */
@@ -48,7 +57,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         setStartContext(true);
     } 
     
-    public SmtpConnectorTestCase(boolean initialEmail, String protocol)
+    protected SmtpConnectorTestCase(boolean initialEmail, String protocol)
     {
         super(initialEmail, protocol);
     }
@@ -77,7 +86,8 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
     {
         // do nothing
     }
-    
+
+    @Test
     public void testSmtpDoesNotSupportOutboundEndpoints() throws MuleException
     {
         EndpointBuilder builder = new EndpointURIEndpointBuilder(getTestEndpointURI(), muleContext);
@@ -94,6 +104,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         }
     }
 
+    @Test
     public void testSend() throws Exception
     {
         //muleContext.getRegistry().registerConnector(createConnector(false));
@@ -123,6 +134,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
 
 
     // MULE-2130 (Impossible to re-initialise SMTP connector)
+    @Test
     public void testConnectorRestart() throws Exception
     {
         Connector c = getConnector();
@@ -138,6 +150,7 @@ public class SmtpConnectorTestCase extends AbstractMailConnectorFunctionalTestCa
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testNullUsernameAndPassword() throws Exception
     {
         OutboundEndpoint endpoint = muleContext.getEndpointFactory().getOutboundEndpoint("smtp://localhost:23");

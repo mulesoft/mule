@@ -23,6 +23,8 @@ import javax.xml.bind.JAXBContext;
 
 import org.custommonkey.xmlunit.XMLUnit;
 
+import static org.junit.Assert.fail;
+
 public class JaxbRoundtripTestCase extends AbstractTransformerTestCase
 {
     private JAXBContext ctx;
