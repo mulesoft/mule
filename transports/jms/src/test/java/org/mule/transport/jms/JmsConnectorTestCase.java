@@ -11,22 +11,24 @@
 package org.mule.transport.jms;
 
 import org.mule.api.transaction.Transaction;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transaction.TransactionCoordination;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Session;
 
+import org.junit.Test;
 import org.mockito.Matchers;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class JmsConnectorTestCase extends AbstractMuleTestCase
+public class JmsConnectorTestCase extends AbstractMuleContextTestCase
 {
     private static final String CLIENT_ID1 = "client1";
     private static final String CLIENT_ID2 = "client2";
@@ -34,6 +36,7 @@ public class JmsConnectorTestCase extends AbstractMuleTestCase
     /**
      * Tests that client ID is set on the connection if it is originally null.
      */
+    @Test
     public void testSetClientIDInConnectorForFirstTime() throws Exception
     {
         final Connection connection = mock(Connection.class);
@@ -56,6 +59,7 @@ public class JmsConnectorTestCase extends AbstractMuleTestCase
     /**
      * Tests that client ID is set on the connection if it has a different client ID.
      */
+    @Test
     public void testSetClientIDInConnectorForSecondTime() throws Exception
     {
         final Connection connection = mock(Connection.class);
@@ -79,6 +83,7 @@ public class JmsConnectorTestCase extends AbstractMuleTestCase
      * Tests that client ID is not set on the connection if it has the same client
      * ID.
      */
+    @Test
     public void testSetClientIDInConnectionForFirstTime() throws Exception
     {
         final Connection connection = mock(Connection.class);
@@ -97,6 +102,7 @@ public class JmsConnectorTestCase extends AbstractMuleTestCase
         verify(connection, times(0)).setClientID(Matchers.anyString());
     }
 
+    @Test
     public void testClosesSessionIfThereIsNoActiveTransaction() throws Exception
     {
         JmsConnector connector = new JmsConnector(muleContext);
@@ -106,6 +112,7 @@ public class JmsConnectorTestCase extends AbstractMuleTestCase
         verify(session, times(1)).close();
     }
 
+    @Test
     public void testDoNotClosesSessionIfThereIsAnActiveTransaction() throws Exception
     {
         Transaction transaction = mock(Transaction.class);

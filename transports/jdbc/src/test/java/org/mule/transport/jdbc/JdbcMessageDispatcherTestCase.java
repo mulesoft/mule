@@ -11,7 +11,7 @@
 package org.mule.transport.jdbc;
 
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.jdbc.test.TestDataSource;
 
 import java.sql.Connection;
@@ -20,9 +20,14 @@ import java.sql.SQLException;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.junit.Test;
 
-public class JdbcMessageDispatcherTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertTrue;
+
+public class JdbcMessageDispatcherTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testCustomResultSetHandlerIsNotIgnored() throws Exception
     {
         muleContext.start();

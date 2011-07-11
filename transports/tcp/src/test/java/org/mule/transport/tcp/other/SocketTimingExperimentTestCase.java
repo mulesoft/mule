@@ -10,12 +10,16 @@
 
 package org.mule.transport.tcp.other;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * This was an attempt to understand the issue we saw with HTTP closing early.
@@ -28,6 +32,7 @@ public class SocketTimingExperimentTestCase extends AbstractMuleTestCase
     private static int SERVER_PORT = 60323;
     private static String LOCALHOST = "localhost";
 
+    @Test
     public void testSocketTiming() throws IOException, InterruptedException
     {
         try

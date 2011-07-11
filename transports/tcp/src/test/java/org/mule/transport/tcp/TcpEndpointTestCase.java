@@ -12,11 +12,18 @@ package org.mule.transport.tcp;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class TcpEndpointTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+public class TcpEndpointTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testHostPortUrl() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("tcp://localhost:7856", muleContext);
@@ -30,6 +37,7 @@ public class TcpEndpointTestCase extends AbstractMuleTestCase
         assertEquals(0, url.getParams().size());
     }
 
+    @Test
     public void testQueryParams1() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("tcp://localhost:7856?param=1", muleContext);
@@ -45,6 +53,7 @@ public class TcpEndpointTestCase extends AbstractMuleTestCase
         assertEquals("1", url.getParams().getProperty("param"));
     }
 
+    @Test
     public void testQueryParams2() throws Exception
     {
         EndpointURI url = new MuleEndpointURI(

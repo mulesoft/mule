@@ -21,7 +21,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.http.HttpsConnector;
 import org.mule.transport.http.HttpsMessageReceiver;
 import org.mule.transport.ssl.MockHandshakeCompletedEvent;
@@ -39,6 +39,11 @@ import javax.net.ssl.HandshakeCompletedEvent;
 import javax.resource.spi.work.Work;
 
 import edu.emory.mathcs.backport.java.util.Collections;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test for SSL handshake timeouts. Unfortunately, there is no easy way to blackbox-test this
@@ -49,8 +54,10 @@ import edu.emory.mathcs.backport.java.util.Collections;
  * work. Yes, this is hacky and fragile but this seems to be the only reasonable alternative
  * for now.
  */
-public class HttpsHandshakeTimingTestCase extends AbstractMuleTestCase
+public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testHttpsHandshakeExceedsTimeout() throws Exception
     {
         MockHttpsMessageReceiver messageReceiver = setupMockHttpsMessageReceiver();
@@ -74,6 +81,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testHttpsHandshakeCompletesBeforeProcessingMessage() throws Exception
     {
         MockHttpsMessageReceiver messageReceiver = setupMockHttpsMessageReceiver();

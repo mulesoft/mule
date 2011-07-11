@@ -11,10 +11,18 @@
 package org.mule.transport.sftp;
 
 import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class SftpConnectorFactoryTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class SftpConnectorFactoryTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testCreateFromFactory() throws Exception
     {
         InboundEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(

@@ -11,7 +11,7 @@
 package org.mule.transport.jms.jndi;
 
 import org.mule.api.MuleException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Hashtable;
 
@@ -19,8 +19,10 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 
+import org.junit.Test;
 import org.mockito.Mockito;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -32,6 +34,7 @@ public class CachedJndiNameResolverTestCase extends AbstractMuleTestCase
     private static final String RESOLVED_NAME = "resolvedName";
     private static final String NAME = "name";
 
+    @Test
     public void testResolvesWithCache() throws NamingException, MuleException
     {
 

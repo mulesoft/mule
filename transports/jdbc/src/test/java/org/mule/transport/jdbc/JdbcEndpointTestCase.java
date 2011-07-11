@@ -12,11 +12,17 @@ package org.mule.transport.jdbc;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class JdbcEndpointTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class JdbcEndpointTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testWithoutEndpointName() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jdbc:/?sql=SELECT * FROM TABLE", muleContext);
@@ -28,6 +34,7 @@ public class JdbcEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jdbc:/?sql=SELECT%20*%20FROM%20TABLE", url.toString());
     }
 
+    @Test
     public void testWithoutEndpointName2() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jdbc://?sql=SELECT * FROM TABLE", muleContext);
@@ -39,6 +46,7 @@ public class JdbcEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jdbc://?sql=SELECT%20*%20FROM%20TABLE", url.toString());
     }
 
+    @Test
     public void testWithEndpointName() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jdbc://writeTests?type=2", muleContext);

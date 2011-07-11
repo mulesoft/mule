@@ -12,11 +12,18 @@ package org.mule.transport.jms;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class JmsEndpointTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+public class JmsEndpointTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testWithoutFullUrl() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms:/my.queue", muleContext);
@@ -27,6 +34,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms:/my.queue", url.toString());
     }
 
+    @Test
     public void testFullUrlWithSlashes() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms://my/queue", muleContext);
@@ -37,6 +45,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms://my/queue", url.toString());
     }
 
+    @Test
     public void testWithoutFullUrlAndEndpointName() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms:/my.queue?endpointName=jmsProvider", muleContext);
@@ -48,6 +57,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms:/my.queue?endpointName=jmsProvider", url.toString());
     }
 
+    @Test
     public void testJmsUrl() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms://queue1?endpointName=jmsProvider", muleContext);
@@ -59,6 +69,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
     }
 
 
+    @Test
     public void testJmsTopic() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms://topic:topic1", muleContext);
@@ -70,6 +81,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms://topic:topic1", url.toString());
     }
 
+    @Test
     public void testJmsTopicWithProvider() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms://topic:topic1?endpointName=jmsProvider", muleContext);
@@ -81,6 +93,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms://topic:topic1?endpointName=jmsProvider", url.toString());
     }
 
+    @Test
     public void testJmsTopicWithUserInfo() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms://user:password@topic:topic1", muleContext);
@@ -94,6 +107,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms://user:****@topic:topic1", url.toString());
     }
 
+    @Test
     public void testJmsTopicWithUserInfoAndProvider() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms://user:password@topic:topic1?endpointName=jmsProvider", muleContext);
@@ -108,6 +122,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms://user:****@topic:topic1?endpointName=jmsProvider", url.toString());
     }
 
+    @Test
     public void testJmsDestWithSlashesAndUserInfoUsingAddressParam() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms://user:password@?address=/myQueues/myQueue", muleContext);
@@ -120,6 +135,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms://user:****@?address=/myQueues/myQueue", url.toString());
     }
 
+    @Test
     public void testJmsDestWithSlashesAndUserInfo() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms://user:password@myQueues/myQueue", muleContext);
@@ -132,6 +148,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms://user:****@myQueues/myQueue", url.toString());
     }
 
+    @Test
     public void testJmsTopicDestinationsWithAddressParam() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms:topic://?address=[[testgroup]]test.topic", muleContext);
@@ -142,6 +159,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms://?address=[[testgroup]]test.topic", url.toString());
     }
 
+    @Test
     public void testJmsQueueDestinationsWithAddressParam() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms://?address=[[testgroup]]test.queue", muleContext);
@@ -152,6 +170,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms://?address=[[testgroup]]test.queue", url.toString());
     }
 
+    @Test
     public void testJmsQueueDestinationsWithEncoding() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms://%5B%5Btestgroup%5D%5Dtest.queue", muleContext);
@@ -162,6 +181,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms://%5B%5Btestgroup%5D%5Dtest.queue", url.toString());
     }
 
+    @Test
     public void testJmsTopicDestinationsWithEncoding() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms:topic://%5B%5Btestgroup%5D%5Dtest.topic", muleContext);
@@ -172,6 +192,7 @@ public class JmsEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jms://%5B%5Btestgroup%5D%5Dtest.topic", url.toString());
     }
 
+    @Test
     public void testJmsLegacyTopicDestinationsWithEncoding() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("jms://topic:%5B%5Btestgroup%5D%5Dtest.topic", muleContext);

@@ -13,8 +13,7 @@ package org.mule.transport.jms;
 import org.mule.api.DefaultMuleException;
 import org.mule.config.ExceptionHelper;
 import org.mule.config.i18n.MessageFactory;
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.jms.JmsExceptionReader;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,14 +21,23 @@ import java.util.Map;
 
 import javax.jms.JMSException;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 public class JmsExceptionReaderTestCase extends AbstractMuleTestCase
 {
 
-    protected void doSetUp() throws Exception
+    @Before
+    public void registerExceptionReader()
     {
         ExceptionHelper.registerExceptionReader(new JmsExceptionReader());
     }
 
+    @Test
     public void testNestedExceptionRetrieval() throws Exception
     {
         Exception testException = getException();

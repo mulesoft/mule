@@ -10,12 +10,17 @@
 
 package org.mule.transport.tcp.protocols;
 
-import org.mule.tck.AbstractMuleTestCase;
-import org.mule.transport.tcp.protocols.XmlMessageProtocol;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Test by reading characters from a fixed StringBuffer instead of a TCP port.
@@ -44,6 +49,7 @@ public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
         xmp = null;
     }
 
+    @Test
     public void testSingleMessage() throws Exception
     {
         String msgData = "<?xml version=\"1.0\"?><data>hello</data>";
@@ -57,6 +63,7 @@ public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
         assertNull(read(bais));
     }
 
+    @Test
     public void testTwoMessages() throws Exception
     {
         String[] msgData = {"<?xml version=\"1.0\"?><data>hello</data>",
@@ -75,6 +82,7 @@ public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
         assertNull(read(bais));
     }
 
+    @Test
     public void testMultipleMessages() throws Exception
     {
         String[] msgData = {"<?xml version=\"1.0\"?><data>1</data>",
@@ -113,6 +121,7 @@ public class XmlMessageProtocolTestCase extends AbstractMuleTestCase
         assertNull(read(bais));
     }
 
+    @Test
     public void testSlowStream() throws Exception
     {
         String msgData = "<?xml version=\"1.0\"?><data>hello</data>";

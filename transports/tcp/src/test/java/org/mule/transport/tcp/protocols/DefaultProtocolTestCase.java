@@ -10,8 +10,12 @@
 
 package org.mule.transport.tcp.protocols;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.transport.tcp.TcpProtocol;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class DefaultProtocolTestCase extends AbstractMuleTestCase
 {
@@ -33,7 +37,7 @@ public class DefaultProtocolTestCase extends AbstractMuleTestCase
         this.expectedLength = expectedLength;
     }
 
-
+    @Test
     public void testRead() throws Exception
     {
         byte[] result = (byte[]) protocol.read(new SlowInputStream());

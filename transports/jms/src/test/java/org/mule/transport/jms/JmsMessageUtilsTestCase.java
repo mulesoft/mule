@@ -10,13 +10,7 @@
 
 package org.mule.transport.jms;
 
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.BananaFactory;
 import org.mule.tck.testmodels.fruit.Orange;
 
@@ -50,11 +44,26 @@ import org.apache.activemq.command.ActiveMQStreamMessage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.collections.iterators.IteratorEnumeration;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
 {
+
     public static final String ENCODING = "UTF-8";
 
+    @Test
     public void testHeaders()
     {
         // already valid headers are returned as-is, so we can assertSame
@@ -70,43 +79,47 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         assertEquals("_ident_ifier_", JmsMessageUtils.encodeHeader("-ident-ifier-"));
     }
 
+    @Test
     public void testTextMessageNullContent() throws Exception
     {
         TextMessage mockMessage = mock(TextMessage.class);
         when(mockMessage.getText()).thenReturn(null);
 
         byte[] result = JmsMessageUtils.toByteArray(mockMessage, JmsConstants.JMS_SPECIFICATION_102B,
-            ENCODING);
+                                                    ENCODING);
         assertNotNull(result);
         assertEquals("Should return an empty byte array.", 0, result.length);
 
         verify(mockMessage).getText();
     }
 
+    @Test
     public void testByteMessageNullContentInJmsVersion_1_0_1() throws Exception
     {
         BytesMessage mockMessage1 = mock(BytesMessage.class);
         when(mockMessage1.readBytes((byte[]) anyObject())).thenReturn(-1);
 
         byte[] result1 = JmsMessageUtils.toByteArray(mockMessage1, JmsConstants.JMS_SPECIFICATION_102B,
-            ENCODING);
+                                                     ENCODING);
         assertNotNull(result1);
         assertEquals("Should return an empty byte array.", 0, result1.length);
         verify(mockMessage1).reset();
     }
 
+    @Test
     public void testByteMessageNullContentInJmsVersion_1_1() throws Exception
     {
         BytesMessage mockMessage2 = mock(BytesMessage.class);
         when(mockMessage2.getBodyLength()).thenReturn(Long.valueOf(0));
 
         byte[] result2 = JmsMessageUtils.toByteArray(mockMessage2, JmsConstants.JMS_SPECIFICATION_11,
-            ENCODING);
+                                                     ENCODING);
         assertNotNull(result2);
         assertEquals("Should return an empty byte array.", 0, result2.length);
         verify(mockMessage2).reset();
     }
 
+    @Test
     public void testStreamMessageSerialization() throws Exception
     {
         Session session = mock(Session.class);
@@ -125,7 +138,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         data.add(new Double("7"));
         data.add(new String("8"));
         data.add(null);
-        data.add(new byte[]{9, 10});        
+        data.add(new byte[] {9, 10});
 
         StreamMessage result = (StreamMessage) JmsMessageUtils.toMessage(data, session);
 
@@ -142,9 +155,10 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         assertEquals(new Double("7"), result.readObject());
         assertEquals(new String("8"), result.readObject());
         assertNull(result.readObject());
-        assertTrue(Arrays.equals(new byte[]{9, 10}, (byte[]) result.readObject()));
+        assertTrue(Arrays.equals(new byte[] {9, 10}, (byte[]) result.readObject()));
     }
 
+    @Test(expected = MessageFormatException.class)
     public void testStreamMessageSerializationWithInvalidType() throws Exception
     {
         Session session = null;
@@ -155,20 +169,13 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         List data = new ArrayList();
         data.add(new Object());
 
-        try
-        {
-            JmsMessageUtils.toMessage(data, session);
-            fail("Should've failed with MessageFormatException");
-        }
-        catch (MessageFormatException e)
-        {
-            // expected
-        }
+        JmsMessageUtils.toMessage(data, session);
     }
 
+    @Test
     public void testMapMessageWithNullValue() throws Exception
     {
-        String[] keys = new String[]{"key", "null"};
+        String[] keys = new String[] {"key", "null"};
         Iterator<String> keyIterator = IteratorUtils.arrayIterator(keys);
         Enumeration<String> keyEnumeration = new IteratorEnumeration(keyIterator);
 
@@ -189,6 +196,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
      * Tests that is able to convert a Map which only contains simple values into a
      * MapMessage.
      */
+    @Test
     public void testConvertsValidMapWithSimpleValuesToMapMessage() throws JMSException
     {
         Session session = mock(Session.class);
@@ -197,7 +205,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         // Creates a test Map with data
         Map data = new HashMap();
         data.put("value1", new Float(4));
-        data.put("value2", new byte[]{1, 2, 3});
+        data.put("value2", new byte[] {1, 2, 3});
         data.put("value3", "value3");
         data.put("value4", new Double(67.9));
         data.put("value5", true);
@@ -207,10 +215,10 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         assertTrue(message instanceof MapMessage);
 
         MapMessage mapMessage = (MapMessage) message;
-        assertEquals(new Float(4), mapMessage.getFloat("value1"));
-        assertTrue(Arrays.equals(new byte[]{1, 2, 3}, mapMessage.getBytes("value2")));
+        assertEquals(new Float(4), mapMessage.getFloat("value1"), 0);
+        assertTrue(Arrays.equals(new byte[] {1, 2, 3}, mapMessage.getBytes("value2")));
         assertEquals("value3", mapMessage.getString("value3"));
-        assertEquals(new Double(67.9), mapMessage.getDouble("value4"));
+        assertEquals(new Double(67.9), mapMessage.getDouble("value4"), 0);
         assertTrue(mapMessage.getBoolean("value5"));
         assertNull(mapMessage.getObject("value6"));
     }
@@ -219,6 +227,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
      * Tests that is able to convert a Map which contains a serializable value into
      * an ObjectMessage.
      */
+    @Test
     public void testConvertsMapWithSerializableValueIntoObjectMessage() throws Exception
     {
         Session session = mock(Session.class);
@@ -240,6 +249,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
      * Tests that trying to convert a Map which contains a non valid non serializable
      * value throws an exception.
      */
+    @Test
     public void testConvertingMapIncludingNotValidNotSerializableValueThrowsException() throws Exception
     {
         Session session = mock(Session.class);
@@ -260,6 +270,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testConvertingStringToTextMessage() throws JMSException
     {
         String text = "Hello world";
@@ -274,12 +285,13 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         verify(session, times(1)).createTextMessage(text);
     }
 
+    @Test
     public void testConvertingByteArrayToBytesMessage() throws JMSException
     {
         Session session = mock(Session.class);
         when(session.createBytesMessage()).thenReturn(new ActiveMQBytesMessage());
 
-        byte[] bytesArray = new byte[]{1, 2};
+        byte[] bytesArray = new byte[] {1, 2};
         BytesMessage message = (BytesMessage) JmsMessageUtils.toMessage(bytesArray, session);
 
         // Makes the message readable
@@ -291,6 +303,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         assertEquals(bytesArray[1], bytesArrayResult[1]);
     }
 
+    @Test
     public void testConvertingSerializableToObjectMessage() throws JMSException
     {
         Session session = mock(Session.class);
@@ -298,13 +311,14 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
 
         final String OBJECT_ID = "id1234";
         ObjectMessage message = (ObjectMessage) JmsMessageUtils.toMessage(new SerializableObject(OBJECT_ID),
-            session);
+                                                                          session);
 
         Serializable serializable = message.getObject();
         assertTrue(serializable instanceof SerializableObject);
         assertEquals(OBJECT_ID, ((SerializableObject) serializable).id);
     }
 
+    @Test
     public void testConvertingMessageToMessageReturnsSameObject() throws JMSException
     {
         Message original = mock(Message.class);
@@ -312,17 +326,10 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
         assertSame(original, result);
     }
 
+    @Test(expected = JMSException.class)
     public void testConvertingInvalidTypeThrowsException() throws JMSException
     {
-        try
-        {
-            JmsMessageUtils.toMessage(new Object(), null);
-            fail("Able to convert to message an invalid type");
-        }
-        catch (JMSException e)
-        {
-            // Expected
-        }
+        JmsMessageUtils.toMessage(new Object(), null);
     }
 
     /**
@@ -331,6 +338,7 @@ public class JmsMessageUtilsTestCase extends AbstractMuleTestCase
      */
     private static class SerializableObject implements Serializable
     {
+
         private static final long serialVersionUID = -4865136673252075014L;
         private String id;
 

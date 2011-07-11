@@ -12,10 +12,16 @@ package org.mule.transport.vm;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class VMEndpointTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class VMEndpointTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testUrlWithProvider() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("vm://some.queue?endpointName=vmProvider", muleContext);

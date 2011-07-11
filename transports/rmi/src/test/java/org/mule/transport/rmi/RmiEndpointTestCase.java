@@ -13,11 +13,18 @@ package org.mule.transport.rmi;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class RmiEndpointTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+public class RmiEndpointTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testHostPortUrl() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("rmi://localhost:1099", muleContext);
@@ -31,6 +38,7 @@ public class RmiEndpointTestCase extends AbstractMuleTestCase
         assertEquals(0, url.getParams().size());
     }
 
+    @Test
     public void testQueryParams1() throws Exception
     {
         EndpointURI url = new MuleEndpointURI("rmi://localhost:1099/BeeShirtsRmiServer?method=testMethod", muleContext);
@@ -46,6 +54,7 @@ public class RmiEndpointTestCase extends AbstractMuleTestCase
         assertEquals("testMethod", url.getParams().getProperty(MuleProperties.MULE_METHOD_PROPERTY));
     }
 
+    @Test
     public void testQueryParams2() throws Exception
     {
         EndpointURI url = new MuleEndpointURI(

@@ -14,7 +14,7 @@ import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.NullPayload;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
@@ -24,8 +24,12 @@ import org.mule.transport.http.RequestLine;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Test;
 
-public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleContextTestCase
 {
     private MuleMessage setupRequestContext(String url) throws Exception
     {
@@ -55,6 +59,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         RequestContext.setEvent(null);
     }
 
+    @Test
     public void testUrlWithoutQuery() throws Exception
     {
         MuleMessage message = setupRequestContext("http://localhost:8080/services");
@@ -70,6 +75,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         assertEquals(null, httpMethod.getQueryString());
     }
 
+    @Test
     public void testUrlWithQuery() throws Exception
     {
         MuleMessage message = setupRequestContext("http://localhost:8080/services?method=echo");
@@ -85,6 +91,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         assertEquals("method=echo", httpMethod.getQueryString());
     }
 
+    @Test
     public void testUrlWithUnescapedQuery() throws Exception
     {
         MuleMessage message = setupRequestContext("http://mycompany.com/test?fruits=apple%20orange");
@@ -100,6 +107,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         assertEquals("fruits=apple%20orange", httpMethod.getQueryString());
     }
 
+    @Test
     public void testAppendedUrl() throws Exception
     {
         MuleMessage message = setupRequestContext("http://mycompany.com/test?fruits=apple%20orange");
@@ -116,6 +124,7 @@ public class ObjectToHttpClientMethodRequestTestCase extends AbstractMuleTestCas
         assertEquals("fruits=apple%20orange&body=test", httpMethod.getQueryString());
     }
 
+    @Test
     public void testEncodingOfParamValueTriggeredByMessageProperty() throws Exception
     {
         // the payload is already encoded, switch off encoding it in the transformer

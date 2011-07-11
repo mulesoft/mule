@@ -10,7 +10,7 @@
 
 package org.mule.transport.jms;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.constraint.Constraint;
 import com.mockobjects.dynamic.C;
@@ -22,9 +22,14 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.Topic;
 
-public class Jms11SupportTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class Jms11SupportTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testNoLocalCalledForDurableTopic() throws Exception
     {
         Jms11Support jmsSupport = new Jms11Support(new JmsConnector(muleContext));
@@ -47,6 +52,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
         mockSession.verify();
     }
 
+    @Test
     public void testNoLocalCalledForNonDurableTopic() throws Exception
     {
         Jms11Support jmsSupport = new Jms11Support(new JmsConnector(muleContext));
@@ -68,6 +74,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
         mockSession.verify();
     }
 
+    @Test
     public void testNoLocalNotCalledForQueue() throws Exception
     {
         Jms11Support jmsSupport = new Jms11Support(new JmsConnector(muleContext));
@@ -88,6 +95,7 @@ public class Jms11SupportTestCase extends AbstractMuleTestCase
         mockSession.verify();
     }
 
+    @Test
     public void testDurableWithQueueThrowsException() throws Exception
     {
         Jms11Support jmsSupport = new Jms11Support(new JmsConnector(muleContext));
