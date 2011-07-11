@@ -10,23 +10,24 @@
 
 package org.mule.test.integration.spring;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.junit4.rule.DynamicPort;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public class MuleAdminTestCase extends AbstractServiceAndFlowTestCase
 {
     @Rule
     public DynamicPort port1 = new DynamicPort("port1");
-    
+
     public MuleAdminTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -36,10 +37,9 @@ public class MuleAdminTestCase extends AbstractServiceAndFlowTestCase
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/test/integration/spring/mule-admin-spring.xml"}
-
-        });
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/spring/mule-admin-spring-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/spring/mule-admin-spring-flow.xml"}});
     }
 
     @Test
@@ -51,5 +51,4 @@ public class MuleAdminTestCase extends AbstractServiceAndFlowTestCase
         assertNotNull(result);
     }
 
-    
 }

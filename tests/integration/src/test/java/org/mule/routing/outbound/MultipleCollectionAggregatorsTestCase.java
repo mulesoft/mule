@@ -10,17 +10,31 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class MultipleCollectionAggregatorsTestCase extends FunctionalTestCase
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class MultipleCollectionAggregatorsTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    @Override
-    protected String getConfigResources()
+    public MultipleCollectionAggregatorsTestCase(ConfigVariant variant, String configResources)
     {
-        return "multiple-collection-aggregators-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "multiple-collection-aggregators-config-service.xml"},
+            {ConfigVariant.FLOW, "multiple-collection-aggregators-config-flow.xml"}
+        });
+    }      
+    
+    @Test
     public void testStartsCorrectly()
     {
         assertTrue(muleContext.isStarted());

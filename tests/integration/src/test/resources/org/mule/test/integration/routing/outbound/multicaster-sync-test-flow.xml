@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:test="http://www.mulesoft.org/schema/mule/test"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/3.2/mule-test.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
+
+    <vm:connector name="vm"/>
+
+    <flow name="Distributor">
+        <vm:inbound-endpoint path="distributor.queue" exchange-pattern="request-response"/>
+        <all>
+            <vm:outbound-endpoint path="service1.queue" exchange-pattern="request-response"/>
+            <vm:outbound-endpoint path="service2.queue" exchange-pattern="request-response"/>
+            <vm:outbound-endpoint path="service3.queue" exchange-pattern="request-response"/>
+        </all>
+    </flow>
+
+    <flow name="ServiceOne">
+        <vm:inbound-endpoint path="service1.queue" exchange-pattern="request-response"/>
+        <test:component>
+            <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
+        </test:component>
+    </flow>
+
+    <flow name="ServiceTwo">
+        <vm:inbound-endpoint path="service2.queue" exchange-pattern="request-response"/>
+        <test:component>
+            <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
+        </test:component>
+    </flow>
+
+    <flow name="ServiceThree">
+        <vm:inbound-endpoint path="service3.queue" exchange-pattern="request-response"/>
+        <test:component>
+            <test:return-data>#[function:shortPayloadClass] Received in #[mule:context.serviceName]</test:return-data>
+        </test:component>
+    </flow>
+
+</mule>

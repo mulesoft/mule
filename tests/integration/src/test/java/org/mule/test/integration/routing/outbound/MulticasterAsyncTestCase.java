@@ -12,20 +12,34 @@ package org.mule.test.integration.routing.outbound;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
-public class MulticasterAsyncTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class MulticasterAsyncTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public MulticasterAsyncTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/routing/outbound/multicaster-async-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/multicaster-async-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/multicaster-async-test-flow.xml"}
+        });
+    }      
+    
+    @Test
     public void testSplitter() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

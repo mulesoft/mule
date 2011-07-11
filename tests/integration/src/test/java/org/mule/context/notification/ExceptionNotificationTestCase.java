@@ -12,14 +12,27 @@ package org.mule.context.notification;
 
 import org.mule.module.client.MuleClient;
 
-public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
-{
+import java.util.Arrays;
+import java.util.Collection;
 
-    protected String getConfigResources()
+import org.junit.runners.Parameterized.Parameters;
+
+public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
+{    
+    public ExceptionNotificationTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/notifications/exception-notification-test.xml";
+        super(variant, configResources); 
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/notifications/exception-notification-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/notifications/exception-notification-test-flow.xml"}
+        });
+    }      
+    
     public void doTest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

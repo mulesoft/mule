@@ -13,28 +13,42 @@ package org.mule.api.annotations.param;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.StringDataSource;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.activation.DataHandler;
 
-public class MixedAnnotationsTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class MixedAnnotationsTestCase extends AbstractServiceAndFlowTestCase
 {
     private MuleMessage muleMessage;
-
-    public MixedAnnotationsTestCase()
-    {
-        setDisposeManagerPerSuite(true);
-    }
 
     @Override
     protected String getConfigResources()
     {
-        return "org/mule/test/annotations/mixed-annotations.xml";
+        return "org/mule/test/annotations/mixed-annotations-flow.xml";
+    }
+
+    public MixedAnnotationsTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+        setDisposeManagerPerSuite(true);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/annotations/mixed-annotations-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/annotations/mixed-annotations-flow.xml"}});
     }
 
     @Override
@@ -62,6 +76,7 @@ public class MixedAnnotationsTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testProcessAllAnnotated() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -71,28 +86,29 @@ public class MixedAnnotationsTestCase extends FunctionalTestCase
         Map<?, ?> result = (Map<?, ?>) message.getPayload();
         assertEquals(3, result.size());
 
-        //Payload
+        // Payload
         assertEquals("test", result.get("payload"));
 
-        //Headers
+        // Headers
         assertNotNull(result.get("inboundHeaders"));
-        Map<?, ?> headers = (Map<?, ?>)result.get("inboundHeaders");
+        Map<?, ?> headers = (Map<?, ?>) result.get("inboundHeaders");
         assertEquals(2, headers.size());
         assertEquals("fooValue", headers.get("foo"));
         assertEquals("barValue", headers.get("bar"));
 
-        //Attachments
+        // Attachments
         assertNotNull(result.get("inboundAttachments"));
-        Map<?, ?> attachments = (Map<?, ?>)result.get("inboundAttachments");
+        Map<?, ?> attachments = (Map<?, ?>) result.get("inboundAttachments");
         assertEquals(3, attachments.size());
         assertNotNull(attachments.get("foo"));
         assertNotNull(attachments.get("bar"));
         assertNotNull(attachments.get("baz"));
     }
 
+    @Test
     public void testPayloadNotAnnotated() throws Exception
     {
-        //When using param annotations every param needs t obe annotated
+        // When using param annotations every param needs t obe annotated
         try
         {
             muleContext.getClient().send("vm://someAnnotated", muleMessage);

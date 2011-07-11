@@ -44,11 +44,11 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
-            "org/mule/issues/multicast-router-mule-2136-test.xml"}
-
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/issues/multicast-router-mule-2136-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/issues/multicast-router-mule-2136-test-flow.xml"}
         });
-    }
+    }      
 
     protected MuleClient sendObject() throws MuleException
     {
@@ -66,6 +66,7 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
     }
 
     @Test
+    
     public void testObjectXmlOut() throws MuleException
     {
         String xml = (String) request(sendObject(), "object-xml-out", String.class);

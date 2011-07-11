@@ -13,17 +13,32 @@ package org.mule.test.integration.routing;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
-public class InboundAggregationNoTimeoutTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class InboundAggregationNoTimeoutTestCase extends AbstractServiceAndFlowTestCase
 {
-    protected String getConfigResources()
+    public InboundAggregationNoTimeoutTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/routing/multi-inbound-aggregator-no-timeout.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/multi-inbound-aggregator-no-timeout-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/routing/multi-inbound-aggregator-no-timeout-flow.xml"}
+        });
+    }      
+
+    @Test
     public void testAggregatorWithNoTimeout() throws Exception
     {
         String message = "test";

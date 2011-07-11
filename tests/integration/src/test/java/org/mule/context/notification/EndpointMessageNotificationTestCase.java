@@ -12,19 +12,32 @@ package org.mule.context.notification;
 
 import org.mule.module.client.MuleClient;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.runners.Parameterized.Parameters;
+
 public class EndpointMessageNotificationTestCase extends AbstractNotificationTestCase
 {
+
+    public EndpointMessageNotificationTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources); 
+    }
 
     public static final String NO_ID = null;
     public static final String SERVICE_1_ID = "service-1";
     public static final String SERVICE_2_ID = "service-2";
     public static final String CLIENT_ID = "MuleClient";
 
-    @Override
-    protected String getConfigResources()
+    
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "org/mule/test/integration/notifications/endpoint-message-notification-test.xml";
-    }
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/notifications/endpoint-message-notification-test.xml"},            
+        });
+    }         
 
     @Override
     public void doTest() throws Exception

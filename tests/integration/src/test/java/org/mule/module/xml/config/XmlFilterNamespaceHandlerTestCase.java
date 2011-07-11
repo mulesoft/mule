@@ -10,14 +10,8 @@
 
 package org.mule.module.xml.config;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
+import org.mule.api.processor.MessageProcessor;
+import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.construct.Flow;
@@ -27,6 +21,16 @@ import org.mule.routing.MessageFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
 {
@@ -46,13 +50,17 @@ public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTes
 
     /**
      * IsXmlFilter doesn't have any properties to test, so just check it is created
+     * 
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws NoSuchFieldException
+     * @throws SecurityException
      */
     @Test
     public void testIsXmlFilter()
+        throws IllegalArgumentException, IllegalAccessException, SecurityException, NoSuchFieldException
     {
-        Object serviceFlow = null;
-
-        serviceFlow = muleContext.getRegistry().lookupObject("test for xml");
+        Object serviceFlow =  muleContext.getRegistry().lookupObject("test for xml");        
 
         if (serviceFlow instanceof Service)
         {
@@ -68,9 +76,18 @@ public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTes
         }
         else if (serviceFlow instanceof Flow)
         {
+            Object notXmlSubFlowWrapper;
+            Field f;
+            MessageProcessorChain notXmlSubFlow;
             List outEndpoints = new ArrayList(2);
+            
             outEndpoints.add(((Flow) serviceFlow).getMessageProcessors().get(0));
-            outEndpoints.add(((Flow) serviceFlow).getMessageProcessors().get(2));
+            notXmlSubFlowWrapper = muleContext.getRegistry().lookupObject("notXml");
+
+            f = notXmlSubFlowWrapper.getClass().getDeclaredField("delegate");
+            f.setAccessible(true);
+            notXmlSubFlow = (MessageProcessorChain) f.get(notXmlSubFlowWrapper);            
+            outEndpoints.add((notXmlSubFlow.getMessageProcessors().get(0)));
 
             assertEquals(2, outEndpoints.size());
             assertTrue(outEndpoints.get(0).getClass().getName(), outEndpoints.get(0) instanceof MessageFilter);

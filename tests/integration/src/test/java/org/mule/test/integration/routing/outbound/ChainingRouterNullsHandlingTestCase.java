@@ -14,7 +14,6 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.util.ExceptionUtils;
 
 import java.util.Arrays;
@@ -30,16 +29,14 @@ public class ChainingRouterNullsHandlingTestCase extends AbstractServiceAndFlowT
     {
         super(variant, configResources);
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/chaining-router-null-handling-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/chaining-router-null-handling-flow.xml"}
-        });
-    }      
-    
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+            "org/mule/test/integration/routing/outbound/chaining-router-null-handling-service.xml"}});
+    }
+
     @Test
     public void testNoComponentFails() throws Exception
     {

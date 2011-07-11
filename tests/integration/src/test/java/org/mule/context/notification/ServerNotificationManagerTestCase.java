@@ -13,6 +13,13 @@ package org.mule.context.notification;
 import org.mule.api.service.Service;
 import org.mule.module.client.MuleClient;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Ignore;
+import org.junit.runners.Parameterized.Parameters;
+
+@Ignore
 public class ServerNotificationManagerTestCase extends AbstractNotificationTestCase
 {
 
@@ -20,11 +27,19 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
     public static final String MODEL = "the-model";
     public static final String SERVICE = "the-service";
 
-    protected String getConfigResources()
+    public ServerNotificationManagerTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/notifications/server-notification-manager-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/notifications/server-notification-manager-test.xml"},            
+        });
+    }     
+    
     public void doTest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

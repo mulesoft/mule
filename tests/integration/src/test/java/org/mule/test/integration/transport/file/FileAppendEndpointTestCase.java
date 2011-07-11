@@ -14,27 +14,45 @@ import org.mule.module.client.MuleClient;
 import org.mule.util.FileUtils;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 public class FileAppendEndpointTestCase extends FileAppendConnectorTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public FileAppendEndpointTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config.xml";
-    }    
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config-service.xml"},
+            {ConfigVariant.FLOW,
+                "org/mule/test/integration/providers/file/mule-fileappend-endpoint-config-flow.xml"}});
+    }
 
     @Override
+    @Test
     public void testBasic() throws Exception
     {
         File myDir = FileUtils.newFile(OUTPUT_DIR);
 
-        // output directory may not exist before dispatching to the endpoint with invalid
+        // output directory may not exist before dispatching to the endpoint with
+        // invalid
         // configuration
         File outputFile = FileUtils.newFile(myDir, OUTPUT_FILE);
         assertFalse(outputFile.exists());
-        
-        // this should throw java.lang.IllegalArgumentException: Configuring 'outputAppend' on a 
-        // file endpoint is no longer supported. You may configure it on a file connector instead.
+
+        // this should throw java.lang.IllegalArgumentException: Configuring
+        // 'outputAppend' on a
+        // file endpoint is no longer supported. You may configure it on a file
+        // connector instead.
         MuleClient client = new MuleClient(muleContext);
         client.dispatch("vm://fileappend", "Hello1", null);
 

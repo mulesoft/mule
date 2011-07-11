@@ -11,28 +11,32 @@
 package org.mule.context.notification;
 
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 import java.util.Iterator;
+
+import org.junit.Test;
 
 /**
  * Tests must define a "notificationLogger" listener
  */
-public abstract class AbstractNotificationTestCase extends FunctionalTestCase
+public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlowTestCase
 {
 
     private AbstractNotificationLogger notifications;
 
-    public AbstractNotificationTestCase()
+    public AbstractNotificationTestCase(ConfigVariant variant, String configResources)
     {
-        super();
+        super(variant, configResources);
         setDisposeManagerPerSuite(true);
     }
-    
+
+    @Test
     public final void testNotifications() throws Exception
     {
         doTest();
-        notifications = (AbstractNotificationLogger) muleContext.getRegistry().lookupObject("notificationLogger");
+        notifications = (AbstractNotificationLogger) muleContext.getRegistry().lookupObject(
+            "notificationLogger");
     }
 
     public abstract void doTest() throws Exception;
@@ -45,7 +49,8 @@ public abstract class AbstractNotificationTestCase extends FunctionalTestCase
     {
         // Need to explicitly dispose manager here to get disposal notifications
         muleContext.dispose();
-        // allow shutdown to complete (or get concurrent mod errors and/or miss notifications)
+        // allow shutdown to complete (or get concurrent mod errors and/or miss
+        // notifications)
         Thread.sleep(2000L);
         logNotifications();
         RestrictedNode spec = getSpecification();
@@ -71,15 +76,15 @@ public abstract class AbstractNotificationTestCase extends FunctionalTestCase
         for (Iterator iterator = notifications.getNotifications().iterator(); iterator.hasNext();)
         {
             ServerNotification notification = (ServerNotification) iterator.next();
-                switch (spec.match(notification))
+            switch (spec.match(notification))
             {
-            case Node.SUCCESS:
-                break;
-            case Node.FAILURE:
-                fail("Could not match " + notification);
-                break;
-            case Node.EMPTY:
-                fail("Extra notification: " + notification);
+                case Node.SUCCESS :
+                    break;
+                case Node.FAILURE :
+                    fail("Could not match " + notification);
+                    break;
+                case Node.EMPTY :
+                    fail("Extra notification: " + notification);
             }
         }
         if (!spec.isExhausted())

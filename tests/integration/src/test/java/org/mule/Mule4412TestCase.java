@@ -13,21 +13,34 @@ package org.mule;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.test.filters.FilterCounter;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test for MULE-4412 : selective-consumer filter is applied twice. We test that the
  * filter is only applied once in the positive case, plus make sure it doesn't get
  * filtered at all when the message does not meet the filter criteria
  */
-public class Mule4412TestCase extends FunctionalTestCase
+public class Mule4412TestCase extends AbstractServiceAndFlowTestCase
 {
     private int RECEIVE_TIMEOUT_MS = 3000;
-    
-    protected String getConfigResources()
+
+    public Mule4412TestCase(ConfigVariant variant, String configResources)
     {
-        return "mule-4412.xml";
+        super(variant, configResources);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-4412-service.xml"},
+            {ConfigVariant.FLOW, "mule-4412-flow.xml"}});
     }
 
     @Override
@@ -51,6 +64,7 @@ public class Mule4412TestCase extends FunctionalTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testFilterOnce() throws Exception
     {
         DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -74,6 +88,7 @@ public class Mule4412TestCase extends FunctionalTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testWrongPropertyKey() throws Exception
     {
         DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -91,6 +106,7 @@ public class Mule4412TestCase extends FunctionalTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testWrongPropertyValue() throws Exception
     {
         DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -108,6 +124,7 @@ public class Mule4412TestCase extends FunctionalTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testNoProperty() throws Exception
     {
         DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);

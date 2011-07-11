@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:util="http://www.springframework.org/schema/util"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd">
+
+    <flow name="mixed1">
+        <inbound-endpoint address="vm://allAnnotated?method=processAllAnnotated" exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.MixedAnnotationsComponent"/>
+    </flow>
+
+    <flow name="mixed2">
+        <inbound-endpoint address="vm://someAnnotated?method=processPayloadNotAnnotated"
+            exchange-pattern="request-response"/>
+        <component class="org.mule.api.annotations.param.MixedAnnotationsComponent"/>
+    </flow>
+
+</mule>

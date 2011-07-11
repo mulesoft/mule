@@ -12,16 +12,27 @@ package org.mule.context.notification;
 
 import org.mule.module.client.MuleClient;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.runners.Parameterized.Parameters;
+
 /**
  * Test ComponentNotifications/Listeners by sending events to a component. A pre and
  * post notification should be received by listeners.
  */
 public class ComponentMessageNotificationTestCase extends AbstractNotificationTestCase
 {
-
-    protected String getConfigResources()
+    @Parameters
+    public static Collection<Object[]> parameters()
     {
-        return "org/mule/test/integration/notifications/component-message-notification-test.xml";
+        return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE,
+            "org/mule/test/integration/notifications/component-message-notification-test.xml"}});
+    }
+
+    public ComponentMessageNotificationTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     public void doTest() throws Exception

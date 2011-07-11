@@ -13,19 +13,34 @@ package org.mule.test.integration.routing;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase.ConfigVariant;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class InboundAggregationWithTimeoutTestCase extends FunctionalTestCase
-{
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-    protected String getConfigResources()
+public class InboundAggregationWithTimeoutTestCase extends AbstractServiceAndFlowTestCase
+{
+    public InboundAggregationWithTimeoutTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/routing/multi-inbound-aggregator-with-timeout.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/multi-inbound-aggregator-with-timeout-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/routing/multi-inbound-aggregator-with-timeout-flow.xml"}
+        });
+    }      
+    
+    @Test
     public void testAggregatorTimeout() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);

@@ -13,19 +13,33 @@ package org.mule.test.integration.routing.outbound;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
-public class MulticasterMixedSyncAsyncTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class MulticasterMixedSyncAsyncTestCase extends AbstractServiceAndFlowTestCase
 {
-    @Override
-    protected String getConfigResources()
+    public MulticasterMixedSyncAsyncTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/routing/outbound/multicaster-mixed-sync-async-test.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/routing/outbound/multicaster-mixed-sync-async-test-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/routing/outbound/multicaster-mixed-sync-async-test-flow.xml"}
+        });
+    } 
+    
+    @Test
     public void testMixedMulticast() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

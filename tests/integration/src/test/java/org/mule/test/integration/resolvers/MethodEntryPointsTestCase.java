@@ -15,20 +15,35 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.model.resolvers.EntryPointNotFoundException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.ExceptionUtils;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MethodEntryPointsTestCase extends FunctionalTestCase
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
+public class MethodEntryPointsTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    protected String getConfigResources()
+    public MethodEntryPointsTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/resolvers/method-entrypoints-config.xml";
+        super(variant, configResources);
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/resolvers/method-entrypoints-config-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/integration/resolvers/method-entrypoints-config-flow.xml"}
+        });
+    }      
+    
+    @Test
     public void testTooManySatisfiableMethods() throws Exception
     {
         try
@@ -43,6 +58,7 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testBadMethodName() throws Exception
     {
         try
@@ -56,6 +72,7 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testValidCallToReverse() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -66,6 +83,7 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
         assertEquals("olleh", message.getPayloadAsString());
     }
 
+    @Test
     public void testValidCallToUpperCase() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -76,7 +94,7 @@ public class MethodEntryPointsTestCase extends FunctionalTestCase
         assertEquals("HELLO", message.getPayloadAsString());
     }
 
-
+    @Test
     public void testValidCallToReverseMethodSetOnEndpoint() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

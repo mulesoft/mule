@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:spring="http://www.springframework.org/schema/beans" 
+      xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+       http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd">
+
+    <vm:connector name="default"/>
+    <vm:connector name="queue"/>
+
+    <mxml:object-to-xml-transformer name="objectToXml"/>
+    <mxml:xml-to-object-transformer name="xmlToObject"/>
+
+    <vm:endpoint name="xml-in" path="xml-in" connector-ref="default" exchange-pattern="one-way"/>
+    <vm:endpoint name="object-in" address="vm://object-in" connector-ref="default" exchange-pattern="one-way"/>
+    <vm:endpoint name="xml-object-out" address="vm://xml-object-out" connector-ref="queue" exchange-pattern="one-way"/>
+    <vm:endpoint name="object-out" path="object-out" connector-ref="queue" exchange-pattern="one-way"/>
+    <vm:endpoint name="object-xml-out" address="vm://object-xml-out" connector-ref="queue" exchange-pattern="one-way"/>
+
+    <flow name="xml to ...">
+        <inbound-endpoint ref="xml-in"/>
+        <all>
+            <vm:outbound-endpoint ref="xml-object-out">
+                <transformer ref="xmlToObject"/>
+            </vm:outbound-endpoint>
+        </all>
+    </flow>
+
+    <flow name="object to xml">
+        <inbound-endpoint ref="object-in"/>
+        <all>
+            <vm:outbound-endpoint ref="object-out"/>
+            <vm:outbound-endpoint ref="object-xml-out">
+                <transformer ref="objectToXml"/>
+            </vm:outbound-endpoint>
+            <vm:outbound-endpoint ref="xml-in">
+                <transformer ref="objectToXml"/>
+            </vm:outbound-endpoint>
+        </all>
+    </flow>
+
+</mule>

@@ -10,22 +10,52 @@
 
 package org.mule.test.integration.transport.file;
 
+import org.mule.api.context.notification.EndpointMessageNotificationListener;
+import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.AssertionFailedError;
 
-public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
-{
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
-    protected String getConfigResources()
+public class OutputPatternFromEndpointTestCase extends AbstractServiceAndFlowTestCase
+    implements EndpointMessageNotificationListener<EndpointMessageNotification>
+{
+    protected CountDownLatch fileReceiveLatch;
+
+    public OutputPatternFromEndpointTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/integration/providers/file/mule-file-output-pattern-from-endpoint.xml";
+        super(variant, configResources);
     }
 
+    @Override
+    protected void doSetUp() throws Exception
+    {
+        super.doSetUp();
+        muleContext.registerListener(this);
+        fileReceiveLatch = new CountDownLatch(2);
+    }
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE,
+                "org/mule/test/integration/providers/file/mule-file-output-pattern-from-endpoint-service.xml"},
+            {ConfigVariant.FLOW,
+                "org/mule/test/integration/providers/file/mule-file-output-pattern-from-endpoint-flow.xml"}});
+    }
+
+    @Test
     public void testBasic() throws Exception
     {
         String myFirstDirName = "FirstWrite";
@@ -68,6 +98,8 @@ public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
             MuleClient client = new MuleClient(muleContext);
             client.send("vm://filesend", "Hello", null);
 
+            assertTrue(fileReceiveLatch.await(30, TimeUnit.SECONDS));
+
             // the output file should exist now
             // check that the files with the correct output pattern were generated
             assertTrue(FileUtils.newFile(myDir, myFileName1).exists());
@@ -75,7 +107,8 @@ public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
         }
         catch (AssertionFailedError e1)
         {
-            //The original assertion was getting masked by a failure in the finally block
+            // The original assertion was getting masked by a failure in the finally
+            // block
             e1.printStackTrace();
         }
         finally
@@ -84,6 +117,18 @@ public class OutputPatternFromEndpointTestCase extends FunctionalTestCase
             FileUtils.newFile(myDir2, myFileName2).delete();
             myDir.delete();
             myDir2.delete();
+        }
+    }
+
+    public void onNotification(EndpointMessageNotification notification)
+    {
+        if (notification.getEndpoint().contains("SecondWrite"))
+        {
+            fileReceiveLatch.countDown();
+        }
+        else if (notification.getEndpoint().contains("FirstWrite"))
+        {
+            fileReceiveLatch.countDown();
         }
     }
 }
