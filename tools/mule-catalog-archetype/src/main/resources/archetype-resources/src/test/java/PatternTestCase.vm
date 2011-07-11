@@ -15,6 +15,10 @@ import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.Connector;
 #end
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class ${patternClassName}TestCase extends AbstractFlowConstuctTestCase
 {
     private ${patternClassName} ${patternVariableName};
@@ -36,7 +40,7 @@ public class ${patternClassName}TestCase extends AbstractFlowConstuctTestCase
         testConnector = testOutboundEndpoint.getConnector();
         muleContext.getRegistry().registerConnector(testConnector);
         testConnector.start();
-        
+
         ${patternVariableName} = new ${patternClassName}("${patternTagName}-test", muleContext, directInboundMessageSource, testOutboundEndpoint);
 #end
     }
@@ -49,6 +53,7 @@ public class ${patternClassName}TestCase extends AbstractFlowConstuctTestCase
 
 #if($patternType != "mp")
 
+    @Test
     public void testMessageSource() throws Exception
     {
         ${patternVariableName}.initialise();
