@@ -25,7 +25,7 @@
                                           requestEvents="true" retries="true"
                                           transactions="true" transactionTypes="client ack, local, XA"
                                           streaming="false">
-                <schemadoc:MEPs supported="one-way" default="one-way"/>
+                <schemadoc:MEPs supported="one-way, request-response" default="one-way"/>
             </schemadoc:transport-features>
         </xsd:appinfo>
     </xsd:annotation>
