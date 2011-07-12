@@ -41,10 +41,9 @@ public class BindingInvocationHandler implements InvocationHandler
 
     protected MuleContext muleContext;
 
-    @SuppressWarnings("unchecked")
     public BindingInvocationHandler(InterfaceBinding router)
     {
-        routers = new ConcurrentHashMap();
+        routers = new ConcurrentHashMap<String, InterfaceBinding>();
         addRouterForInterface(router);
     }
 
@@ -68,6 +67,7 @@ public class BindingInvocationHandler implements InvocationHandler
         muleContext = router.getEndpoint().getConnector().getMuleContext();
     }
 
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
     {
         if (method.getName().equals("toString"))
@@ -111,7 +111,7 @@ public class BindingInvocationHandler implements InvocationHandler
             return null;
         }
     }
-    
+
     private MuleMessage createMuleMessage(Object[] args)
     {
         if (args == null)
@@ -129,30 +129,30 @@ public class BindingInvocationHandler implements InvocationHandler
     }
 
     /**
-     * Return the causing exception instead of the general "container" exception (typically 
+     * Return the causing exception instead of the general "container" exception (typically
      * UndeclaredThrowableException) if the cause is known and the type matches one of the
      * exceptions declared in the given method's "throws" clause.
      */
-    private Throwable findDeclaredMethodException(Method method, Throwable throwable) throws Throwable 
-    {       
+    private Throwable findDeclaredMethodException(Method method, Throwable throwable) throws Throwable
+    {
         Throwable cause = throwable.getCause();
         if (cause != null)
         {
             // Try to find a matching exception type from the method's "throws" clause, and if so
             // return that exception.
-            Class[] exceptions = method.getExceptionTypes();         
+            Class<?>[] exceptions = method.getExceptionTypes();
             for (int i = 0; i < exceptions.length; i++)
             {
                 if (cause.getClass().equals(exceptions[i]))
                 {
-                    return cause; 
-                }                       
-            }   
+                    return cause;
+                }
+            }
         }
-        
+
         return throwable;
     }
-    
+
     private Object determineReply(MuleMessage reply, Method bindingMethod)
     {
         if (MuleMessage.class.isAssignableFrom(bindingMethod.getReturnType()))
@@ -164,7 +164,7 @@ public class BindingInvocationHandler implements InvocationHandler
             return reply.getPayload();
         }
     }
-    
+
     @Override
     public String toString()
     {
@@ -174,5 +174,5 @@ public class BindingInvocationHandler implements InvocationHandler
         sb.append('}');
         return sb.toString();
     }
-    
+
 }

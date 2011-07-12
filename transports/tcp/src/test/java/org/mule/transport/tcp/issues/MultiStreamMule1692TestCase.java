@@ -22,28 +22,25 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class MultiStreamMule1692TestCase extends DynamicPortTestCase
 {
-
-    private static final Log logger = LogFactory.getLog(MultiStreamMule1692TestCase.class);
     public static final int TIMEOUT = 3000;
     public static final String TEST_MESSAGE = "Test TCP Request";
     public static final String TEST_MESSAGE_2 = "Second test TCP Request";
     public static final String RESULT = "Received stream; length: 16; 'Test...uest'";
-    public static final String RESULT_2 = "Received stream; length: 23; 'Seco...uest'"; 
-    
+    public static final String RESULT_2 = "Received stream; length: 23; 'Seco...uest'";
+
+    @Override
     protected String getConfigResources()
     {
         return "tcp-streaming-test.xml";
     }
 
-    private EventCallback newCallback(final CountDownLatch latch, final AtomicReference message)
+    private EventCallback newCallback(final CountDownLatch latch, final AtomicReference<String> message)
     {
         return new EventCallback()
         {
+            @Override
             public synchronized void eventReceived(MuleEventContext context, Object component)
             {
                 try
@@ -63,7 +60,7 @@ public class MultiStreamMule1692TestCase extends DynamicPortTestCase
             }
         };
     }
-    
+
     public void testSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -75,7 +72,7 @@ public class MultiStreamMule1692TestCase extends DynamicPortTestCase
 
 
         final CountDownLatch latch = new CountDownLatch(1);
-        final AtomicReference message = new AtomicReference();
+        final AtomicReference<String> message = new AtomicReference<String>();
         ((FunctionalStreamingTestComponent) ftc).setEventCallback(newCallback(latch, message), TEST_MESSAGE.length());
         client.dispatch(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("testInbound")).getAddress(),
             TEST_MESSAGE, new HashMap());
@@ -83,7 +80,7 @@ public class MultiStreamMule1692TestCase extends DynamicPortTestCase
         assertEquals(RESULT, message.get());
 
         final CountDownLatch latch2 = new CountDownLatch(1);
-        final AtomicReference message2 = new AtomicReference();
+        final AtomicReference<String> message2 = new AtomicReference<String>();
         ((FunctionalStreamingTestComponent) ftc).setEventCallback(newCallback(latch2, message2), TEST_MESSAGE_2.length());
         client.dispatch(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("testInbound")).getAddress(),
             TEST_MESSAGE_2, new HashMap());

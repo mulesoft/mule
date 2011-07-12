@@ -19,18 +19,18 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-
 public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "ftp-functional-test.xml";
     }
-   
+
     public void testSendAndRequest() throws Exception
     {
         CountDownLatch latch = new CountDownLatch(1);
-        AtomicReference message = new AtomicReference();
+        AtomicReference<String> message = new AtomicReference<String>();
 
         Object component = getComponent("testComponent");
         assertNotNull(component);
@@ -40,34 +40,35 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
 
         MuleClient client = new MuleClient(muleContext);
         client.dispatch(getMuleFtpEndpoint(), TEST_MESSAGE, null);
-        
+
         // TODO DZ: need a reliable way to check the file once it's been written to
         // the ftp server. Currently, once mule processes the ftp'd file, it
         // auto-deletes it, so we can't check it
         //assertTrue(getFtpClient().expectFileCount("/", 1, 10000));
-        
+
         latch.await(getTimeout(), TimeUnit.MILLISECONDS);
-        assertEquals(TEST_MESSAGE, message.get());                
+        assertEquals(TEST_MESSAGE, message.get());
     }
 
     protected static class FunctionalEventCallback implements EventCallback
     {
         private CountDownLatch latch;
-        private AtomicReference message;
+        private AtomicReference<String> message;
 
-        public FunctionalEventCallback(CountDownLatch latch, AtomicReference message)
+        public FunctionalEventCallback(CountDownLatch latch, AtomicReference<String> message)
         {
             super();
             this.latch = latch;
             this.message = message;
         }
-        
+
+        @Override
         public synchronized void eventReceived(MuleEventContext context, Object component)
         {
             try
             {
                 FunctionalTestComponent ftc = (FunctionalTestComponent) component;
-                
+
                 // without this we may have problems with the many repeats
                 if (1 == latch.getCount())
                 {

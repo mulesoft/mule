@@ -23,24 +23,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>LargeFileReceiveFunctionalTestCase</code> tests receiving a large file
  * message from an sftp service.
- * 
+ *
  * @author Lennart Häggkvist
  */
 public class SftpIdentityFileFunctionalTestCase extends AbstractSftpTestCase
 {
-    private static final Log logger = LogFactory.getLog(SftpIdentityFileFunctionalTestCase.class);
-
     private static final int DEFAULT_TIMEOUT = 10000;
 
     // Increase this to be a little larger than expected download time
     private static final String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-sftp-identity-file-config.xml";
@@ -50,7 +47,6 @@ public class SftpIdentityFileFunctionalTestCase extends AbstractSftpTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-
         initEndpointDirectory(INBOUND_ENDPOINT_NAME);
     }
 
@@ -58,11 +54,12 @@ public class SftpIdentityFileFunctionalTestCase extends AbstractSftpTestCase
     public void testIdentityFile() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);
-        final AtomicReference message = new AtomicReference();
+        final AtomicReference<String> message = new AtomicReference<String>();
         final AtomicInteger loopCount = new AtomicInteger(0);
 
         EventCallback callback = new EventCallback()
         {
+            @Override
             public synchronized void eventReceived(MuleEventContext context, Object component)
             {
                 try
@@ -88,7 +85,7 @@ public class SftpIdentityFileFunctionalTestCase extends AbstractSftpTestCase
         // Ensure that no other files exists
         // cleanupRemoteFtpDirectory(client, INBOUND_ENDPOINT_NAME);
 
-        Map properties = new HashMap();
+        Map<?, ?> properties = new HashMap<Object, Object>();
         // properties.put("filename", "foo.bar");
 
         Object component = getComponent("testComponent");
@@ -108,5 +105,4 @@ public class SftpIdentityFileFunctionalTestCase extends AbstractSftpTestCase
 
         assertEquals(TEST_MESSAGE, message.get());
     }
-
 }

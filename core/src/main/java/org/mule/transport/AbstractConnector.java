@@ -136,7 +136,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     public static final int DEFAULT_NUM_CONCURRENT_TX_RECEIVERS = 4;
 
     private static final long SCHEDULER_FORCED_SHUTDOWN_TIMEOUT = 5000l;
-    
+
     public static final String PROPERTY_POLLING_FREQUENCY = "pollingFrequency";
 
     /**
@@ -182,8 +182,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     /**
      * The collection of listeners on this connector. Keyed by entrypoint
      */
-    @SuppressWarnings("unchecked")
-    protected final Map<Object, MessageReceiver> receivers = new ConcurrentHashMap/* <Object, MessageReceiver> */();
+    protected final Map<Object, MessageReceiver> receivers = new ConcurrentHashMap<Object, MessageReceiver>();
 
     /**
      * Defines the dispatcher threading profile
@@ -225,17 +224,17 @@ public abstract class AbstractConnector implements Connector, WorkListener
     /**
      * A shared work manager for all receivers registered with this connector.
      */
-    private final AtomicReference/* <WorkManager> */receiverWorkManager = new AtomicReference();
+    private final AtomicReference<WorkManager> receiverWorkManager = new AtomicReference<WorkManager>();
 
     /**
      * A shared work manager for all requesters created for this connector.
      */
-    private final AtomicReference/* <WorkManager> */dispatcherWorkManager = new AtomicReference();
+    private final AtomicReference<WorkManager> dispatcherWorkManager = new AtomicReference<WorkManager>();
 
     /**
      * A shared work manager for all requesters created for this connector.
      */
-    private final AtomicReference/* <WorkManager> */requesterWorkManager = new AtomicReference();
+    private final AtomicReference<WorkManager> requesterWorkManager = new AtomicReference<WorkManager>();
 
     /**
      * A generic scheduling service for tasks that need to be performed periodically.
@@ -309,11 +308,13 @@ public abstract class AbstractConnector implements Connector, WorkListener
         requesters.setTestOnReturn(true);
     }
 
+    @Override
     public String getName()
     {
         return name;
     }
 
+    @Override
     public void setName(String newName)
     {
         if (newName == null)
@@ -338,17 +339,20 @@ public abstract class AbstractConnector implements Connector, WorkListener
         return lifecycleManager;
     }
 
+    @Override
     public LifecycleState getLifecycleState()
     {
         return lifecycleManager.getState();
     }
 
+    @Override
     public final synchronized void initialise() throws InitialisationException
     {
         try
         {
             lifecycleManager.fireInitialisePhase(new LifecycleCallback<Connector>()
             {
+                @Override
                 public void onTransition(String phaseName, Connector object) throws MuleException
                 {
                     if (retryPolicyTemplate == null)
@@ -400,6 +404,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     }
 
     // Start (but we might not be connected yet).
+    @Override
     public final synchronized void start() throws MuleException
     {
         if (isInitialStateStopped())
@@ -427,7 +432,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
             }
         }
         else
-        {        
+        {
             startAfterConnect();
         }
     }
@@ -437,13 +442,13 @@ public abstract class AbstractConnector implements Connector, WorkListener
     {
         // Reset this flag if it was set
         startOnConnect = false;
-        
+
         // This breaks ConnectorLifecycleTestCase.testDoubleStartConnector()
         //if (isStarted())
         //{
         //    return;
         //}
-        
+
         if (logger.isInfoEnabled())
         {
             logger.info("Starting: " + this);
@@ -451,12 +456,13 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
         lifecycleManager.fireStartPhase(new LifecycleCallback<Connector>()
         {
+            @Override
             public void onTransition(String phaseName, Connector object) throws MuleException
             {
-                initWorkManagers();        
+                initWorkManagers();
                 scheduler = createScheduler();
                 doStart();
-                
+
                 if (receivers != null)
                 {
                     for (MessageReceiver receiver : receivers.values())
@@ -490,11 +496,12 @@ public abstract class AbstractConnector implements Connector, WorkListener
                             throw errors.get(0);
                         }
                     }
-                }                
+                }
             }
         });
     }
 
+    @Override
     public final synchronized void stop() throws MuleException
     {
         // This breaks ConnectorLifecycleTestCase.testDoubleStopConnector()
@@ -502,9 +509,10 @@ public abstract class AbstractConnector implements Connector, WorkListener
         //{
         //    return;
         //}
-        
+
         lifecycleManager.fireStopPhase(new LifecycleCallback<Connector>()
         {
+            @Override
             public void onTransition(String phaseName, Connector object) throws MuleException
             {
                  // shutdown our scheduler service
@@ -539,6 +547,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         });
     }
 
+    @Override
     public final synchronized void dispose()
     {
         try
@@ -556,11 +565,12 @@ public abstract class AbstractConnector implements Connector, WorkListener
         {
             logger.warn(e.getMessage(), e);
         }
-        
+
         try
         {
             lifecycleManager.fireDisposePhase(new LifecycleCallback<Connector>()
             {
+                @Override
                 public void onTransition(String phaseName, Connector object) throws MuleException
                 {
                     doDispose();
@@ -574,6 +584,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
+    @Override
     public final boolean isStarted()
     {
         return lifecycleManager.getState().isStarted();
@@ -635,6 +646,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      * @see MessageReceiver#createMuleMessage(Object)
      * @see MessageReceiver#createMuleMessage(Object, String)
      */
+    @Override
     public MuleMessageFactory createMuleMessageFactory() throws CreateException
     {
         try
@@ -744,7 +756,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         WorkManager workManager;
 
         logger.debug("Disposing dispatcher work manager");
-        workManager = (WorkManager) dispatcherWorkManager.get();
+        workManager = dispatcherWorkManager.get();
         if (workManager != null)
         {
             workManager.dispose();
@@ -752,7 +764,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         dispatcherWorkManager.set(null);
 
         logger.debug("Disposing requester work manager");
-        workManager = (WorkManager) requesterWorkManager.get();
+        workManager = requesterWorkManager.get();
         if (workManager != null)
         {
             workManager.dispose();
@@ -760,7 +772,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         requesterWorkManager.set(null);
 
         logger.debug("Disposing receiver work manager");
-        workManager = (WorkManager) receiverWorkManager.get();
+        workManager = receiverWorkManager.get();
         if (workManager != null)
         {
             workManager.dispose();
@@ -815,6 +827,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
+    @Override
     public boolean isDisposed()
     {
         return lifecycleManager.getState().isDisposed();
@@ -823,6 +836,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     /**
      * @return Returns the dispatcherFactory.
      */
+    @Override
     public MessageDispatcherFactory getDispatcherFactory()
     {
         return dispatcherFactory;
@@ -831,6 +845,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     /**
      * @param dispatcherFactory The dispatcherFactory to set.
      */
+    @Override
     public void setDispatcherFactory(MessageDispatcherFactory dispatcherFactory)
     {
         KeyedPoolableObjectFactory poolFactory = getWrappedDispatcherFactory(dispatcherFactory);
@@ -863,6 +878,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     /**
      * @return Returns the requesterFactory.
      */
+    @Override
     public MessageRequesterFactory getRequesterFactory()
     {
         return requesterFactory;
@@ -871,6 +887,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     /**
      * @param requesterFactory The requesterFactory to set.
      */
+    @Override
     public void setRequesterFactory(MessageRequesterFactory requesterFactory)
     {
         KeyedPoolableObjectFactory poolFactory;
@@ -1189,6 +1206,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
     }
 
+    @Override
     public void registerListener(InboundEndpoint endpoint,
                                  MessageProcessor messageProcessorChain,
                                  FlowConstruct flowConstruct) throws Exception
@@ -1250,6 +1268,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 endpoint.getEndpointURI().getAddress());
     }
 
+    @Override
     public final void unregisterListener(InboundEndpoint endpoint, FlowConstruct flowConstruct) throws Exception
     {
         if (endpoint == null)
@@ -1434,6 +1453,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         cachedNotificationHandler.fireNotification(notification);
     }
 
+    @Override
     public boolean isResponseEnabled()
     {
         return false;
@@ -1499,6 +1519,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         return CollectionUtils.toArrayOfComponentType(found, MessageReceiver.class);
     }
 
+    @Override
     public void connect() throws Exception
     {
         if (lifecycleManager.getState().isDisposed())
@@ -1513,12 +1534,13 @@ public abstract class AbstractConnector implements Connector, WorkListener
 
         RetryCallback callback = new RetryCallback()
         {
+            @Override
             public void doWork(RetryContext context) throws Exception
             {
                 // Try validateConnection() rather than connect() which may be a less expensive operation while we're retrying.
                 if (validateConnections && context.getLastFailure() instanceof ConnectException)
                 {
-                    Connectable failed = ((ConnectException) context.getLastFailure()).getFailed();                    
+                    Connectable failed = ((ConnectException) context.getLastFailure()).getFailed();
                     if (!failed.validateConnection(context).isOk())
                     {
                         throw new ConnectException(
@@ -1558,17 +1580,18 @@ public abstract class AbstractConnector implements Connector, WorkListener
                         }
                     }
                 }
-                
+
                 setConnected(true);
                 setConnecting(false);
                 logger.info("Connected: " + getWorkDescription());
-                
+
                 if (startOnConnect && !isStarted() && !isStarting())
                 {
                     startAfterConnect();
                 }
             }
 
+            @Override
             public String getWorkDescription()
             {
                 return getConnectionDescription();
@@ -1594,12 +1617,14 @@ public abstract class AbstractConnector implements Connector, WorkListener
      * @see RetryContext#isOk()
      * @see RetryContext#getLastFailure()
      */
+    @Override
     public RetryContext validateConnection(RetryContext retryContext)
     {
         retryContext.setOk();
         return retryContext;
     }
 
+    @Override
     public void disconnect() throws Exception
     {
         if (isStarted())
@@ -1624,7 +1649,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 catch (Exception e)
                 {
                     logger.error(e.getMessage(), e);
-                }                
+                }
             }
         }
         try
@@ -1644,18 +1669,20 @@ public abstract class AbstractConnector implements Connector, WorkListener
         catch (Exception e)
         {
             logger.error(e.getMessage());
-        }                
+        }
         finally
         {
             connected.set(false);
         }
     }
 
+    @Override
     public String getConnectionDescription()
     {
         return this.toString();
     }
 
+    @Override
     public final boolean isConnected()
     {
         return connected.get();
@@ -1843,6 +1870,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
     /**
      * @return true if the protocol is supported by this connector.
      */
+    @Override
     public boolean supportsProtocol(String protocol)
     {
         return supportedProtocols.contains(protocol.toLowerCase());
@@ -1877,7 +1905,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     protected WorkManager getReceiverWorkManager() throws MuleException
     {
-        return (WorkManager) receiverWorkManager.get();
+        return receiverWorkManager.get();
     }
 
     /**
@@ -1887,7 +1915,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     protected WorkManager getDispatcherWorkManager() throws MuleException
     {
-        return (WorkManager) dispatcherWorkManager.get();
+        return dispatcherWorkManager.get();
     }
 
     /**
@@ -1897,7 +1925,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      */
     protected WorkManager getRequesterWorkManager() throws MuleException
     {
-        return (WorkManager) requesterWorkManager.get();
+        return requesterWorkManager.get();
     }
 
     /**
@@ -1927,6 +1955,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
      *
      * @return Value for property 'sessionHandler'.
      */
+    @Override
     public SessionHandler getSessionHandler()
     {
         return sessionHandler;
@@ -1942,21 +1971,25 @@ public abstract class AbstractConnector implements Connector, WorkListener
         this.sessionHandler = sessionHandler;
     }
 
+    @Override
     public void workAccepted(WorkEvent event)
     {
         handleWorkException(event, "workAccepted");
     }
 
+    @Override
     public void workRejected(WorkEvent event)
     {
         handleWorkException(event, "workRejected");
     }
 
+    @Override
     public void workStarted(WorkEvent event)
     {
         handleWorkException(event, "workStarted");
     }
 
+    @Override
     public void workCompleted(WorkEvent event)
     {
         handleWorkException(event, "workCompleted");
@@ -2039,12 +2072,14 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
+    @Override
     public MuleMessage request(String uri, long timeout) throws Exception
     {
         return request(getMuleContext().getEndpointFactory().getInboundEndpoint(uri),
                 timeout);
     }
 
+    @Override
     public MuleMessage request(InboundEndpoint endpoint, long timeout) throws Exception
     {
         MessageRequester requester = null;
@@ -2279,11 +2314,13 @@ public abstract class AbstractConnector implements Connector, WorkListener
      * @return the output stream to use for this request
      * @throws MuleException in case of any error
      */
+    @Override
     public OutputStream getOutputStream(OutboundEndpoint endpoint, MuleEvent event) throws MuleException
     {
         throw new UnsupportedOperationException(CoreMessages.streamingNotSupported(this.getProtocol()).toString());
     }
 
+    @Override
     public MuleContext getMuleContext()
     {
         return muleContext;
@@ -2333,6 +2370,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         return sb.toString();
     }
 
+    @Override
     public RetryPolicyTemplate getRetryPolicyTemplate()
     {
         return retryPolicyTemplate;
@@ -2435,6 +2473,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
             builder.setName("dispatcher processor chain for '" + endpoint.getAddress() + "'");
             OptionalAsyncInterceptingMessageProcessor async = new OptionalAsyncInterceptingMessageProcessor(new WorkManagerSource()
             {
+                @Override
                 public WorkManager getWorkManager() throws MuleException
                 {
                     return getDispatcherWorkManager();
@@ -2446,7 +2485,8 @@ public abstract class AbstractConnector implements Connector, WorkListener
             return builder.build();
         }
     }
-    
+
+    @Override
     public MessageExchangePattern getDefaultExchangePattern()
     {
         try
@@ -2458,7 +2498,8 @@ public abstract class AbstractConnector implements Connector, WorkListener
             throw new MuleRuntimeException(tse);
         }
     }
-    
+
+    @Override
     public List<MessageExchangePattern> getInboundExchangePatterns()
     {
         try
@@ -2471,6 +2512,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
         }
     }
 
+    @Override
     public List<MessageExchangePattern> getOutboundExchangePatterns()
     {
         try
@@ -2482,7 +2524,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
             throw new MuleRuntimeException(tse);
         }
     }
-    
+
     class DispatcherMessageProcessor implements MessageProcessor
     {
         private MessageProcessor notificationMessageProcessor;
@@ -2492,7 +2534,8 @@ public abstract class AbstractConnector implements Connector, WorkListener
         {
            this.endpoint = endpoint;
         }
-        
+
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             MessageDispatcher dispatcher = null;
@@ -2523,7 +2566,7 @@ public abstract class AbstractConnector implements Connector, WorkListener
                 returnDispatcher(endpoint, dispatcher);
             }
         }
-        
+
         @Override
         public String toString()
         {

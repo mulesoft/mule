@@ -69,13 +69,11 @@ import net.sf.cglib.proxy.Enhancer;
  */
 public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
 {
-
     private AtomicBoolean cacheBuilt = new AtomicBoolean(false);
 
+    private Map<Method, Transformer> transformerCache = new ConcurrentHashMap<Method, Transformer>();
 
-    @SuppressWarnings("unchecked")
-    private Map<Method, Transformer> transformerCache = new ConcurrentHashMap();
-
+    @Override
     public InvocationResult invoke(Object component, MuleEventContext context) throws Exception
     {
         try
@@ -89,8 +87,8 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
             return result;
         }
 
-        ConcurrentHashMap methodCache = getMethodCache(component);
-        if(methodCache.size()==0)
+        ConcurrentHashMap<String, Method> methodCache = getMethodCache(component);
+        if (methodCache.size() == 0)
         {
             InvocationResult result = new InvocationResult(this, InvocationResult.State.NOT_SUPPORTED);
             result.setErrorMessage("Component: " + component + " doesn't have any annotated methods, skipping.");
@@ -131,7 +129,7 @@ public class AnnotatedEntryPointResolver extends AbstractEntryPointResolver
         }
         else if (methodCache.size() == 1)
         {
-            method = (Method) methodCache.values().iterator().next();
+            method = methodCache.values().iterator().next();
             payload = getPayloadForMethod(method, component, context);
         }
         else

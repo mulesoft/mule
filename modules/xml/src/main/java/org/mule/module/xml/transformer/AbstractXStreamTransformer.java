@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class AbstractXStreamTransformer extends AbstractMessageTransformer
 {
-    private final AtomicReference/* XStream */xstream = new AtomicReference();
+    private final AtomicReference<XStream> xstream = new AtomicReference<XStream>();
     private volatile String driverClass = XStreamFactory.XSTREAM_XPP_DRIVER;
     private volatile Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
     private volatile Set<Class <? extends Converter>> converters = new HashSet<Class <? extends Converter>>();
@@ -55,7 +55,7 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
 
     public final XStream getXStream() throws TransformerException
     {
-        XStream instance = (XStream) xstream.get();
+        XStream instance = xstream.get();
 
         if (instance == null)
         {
@@ -64,7 +64,7 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
                 instance = new XStreamFactory(driverClass, aliases, converters).getInstance();
                 if (!xstream.compareAndSet(null, instance))
                 {
-                    instance = (XStream)xstream.get();
+                    instance = xstream.get();
                 }
             }
             catch (Exception e)

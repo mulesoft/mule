@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * TODO - check that we have sufficient control via XML (what about empty strings?)
  *
  * Not called EndpointURIBuilder because of {@link org.mule.api.endpoint.EndpointURIBuilder}
- * 
+ *
  */
 public class URIBuilder
 {
@@ -83,7 +83,7 @@ public class URIBuilder
     private Map queryMap;
     private MuleContext muleContext;
 
-    private AtomicReference cache = new AtomicReference();
+    private AtomicReference<EndpointURI> cache = new AtomicReference<EndpointURI>();
 
     public URIBuilder()
     {
@@ -215,7 +215,7 @@ public class URIBuilder
                 throw (IllegalStateException)new IllegalStateException("Bad endpoint configuration").initCause(e);
             }
         }
-        return (EndpointURI)cache.get();
+        return cache.get();
     }
 
     /**
@@ -373,11 +373,13 @@ public class URIBuilder
         }
     }
 
+    @Override
     public String toString()
     {
         return getConstructor();
     }
 
+    @Override
     public boolean equals(Object other)
     {
         if (null == other || !getClass().equals(other.getClass())) return false;
@@ -400,6 +402,7 @@ public class URIBuilder
         return ClassUtils.equal(a, b);
     }
 
+    @Override
     public int hashCode()
     {
         return ClassUtils.hash(new Object[]{address, meta, protocol, user, password, host, port, path, queryMap});
@@ -419,7 +422,7 @@ public class URIBuilder
         /**
          * Replace the first instance of the given parameter. This method does not make sense under the assumption that
          * a given parameter name can have multiple values, so here we simply preserve the existing semantics.
-         * @param map A map off the name/value pairs to add/replace in the query string 
+         * @param map A map off the name/value pairs to add/replace in the query string
          */
         public void override(Map map)
         {
@@ -431,15 +434,15 @@ public class URIBuilder
                 {
                     String name = (String) mapNames.next();
                     String value = (String) map.get(name);
-                    
+
                     int pos = names.indexOf(name);
                     if (pos >= 0)
                     {
                         // Found, so replace
                         values.set(pos, value);
                     }
-                    else 
-                    {       
+                    else
+                    {
                         // Append new value
                         names.add(name);
                         values.add(value);
@@ -448,6 +451,7 @@ public class URIBuilder
             }
         }
 
+        @Override
         public String toString()
         {
             StringBuffer buffer = new StringBuffer();
@@ -465,10 +469,10 @@ public class URIBuilder
                 {
                     buffer.append(AND);
                 }
-                
+
                 buffer.append(names.get(i));
                 String value = values.get(i);
- 
+
                 if (null != value)
                 {
                     buffer.append(EQUALS);

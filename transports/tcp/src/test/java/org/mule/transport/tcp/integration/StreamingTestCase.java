@@ -32,7 +32,8 @@ public class StreamingTestCase extends DynamicPortTestCase
     public static final int TIMEOUT = 300000;
     public static final String TEST_MESSAGE = "Test TCP Request";
     public static final String RESULT = "Received stream; length: 16; 'Test...uest'";
-    
+
+    @Override
     protected String getConfigResources()
     {
         return "tcp-streaming-test.xml";
@@ -41,11 +42,12 @@ public class StreamingTestCase extends DynamicPortTestCase
     public void testSend() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);
-        final AtomicReference message = new AtomicReference();
+        final AtomicReference<String> message = new AtomicReference<String>();
         final AtomicInteger loopCount = new AtomicInteger(0);
 
         EventCallback callback = new EventCallback()
         {
+            @Override
             public synchronized void eventReceived(MuleEventContext context, Object component)
             {
                 try
@@ -77,7 +79,7 @@ public class StreamingTestCase extends DynamicPortTestCase
         ((FunctionalStreamingTestComponent) ftc).setEventCallback(callback, TEST_MESSAGE.length());
 
         client.dispatch(((InboundEndpoint) client.getMuleContext().getRegistry().lookupObject("testInbound")).getAddress(),
-            TEST_MESSAGE, new HashMap());
+            TEST_MESSAGE, new HashMap<Object, Object>());
 
         latch.await(10, TimeUnit.SECONDS);
         assertEquals(RESULT, message.get());

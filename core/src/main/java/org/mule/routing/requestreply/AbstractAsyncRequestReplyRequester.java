@@ -45,14 +45,14 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     protected FlowConstruct flowConstruct;
     private final MessageProcessor internalAsyncReplyMessageProcessor = new InternalAsyncReplyMessageProcessor();
 
-    @SuppressWarnings("unchecked")
-    protected final Map<String, Latch> locks = new ConcurrentHashMap();
-    
-    protected final ConcurrentMap responseEvents = new ConcurrentHashMap();
+    protected final Map<String, Latch> locks = new ConcurrentHashMap<String, Latch>();
+
+    protected final ConcurrentMap<String, MuleEvent> responseEvents = new ConcurrentHashMap<String, MuleEvent>();
     protected final Object processedLock = new Object();
     // @GuardedBy processedLock
     protected final BoundedFifoBuffer processed = new BoundedFifoBuffer(MAX_PROCESSED_GROUPS);
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         if (replyMessageSource == null)
@@ -79,6 +79,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         this.failOnTimeout = failOnTimeout;
     }
 
+    @Override
     public void setReplySource(MessageSource messageSource)
     {
         verifyReplyMessageSource(messageSource);
@@ -107,7 +108,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     {
         processNext(event);
     }
-    
+
     protected MuleEvent receiveAsyncReply(MuleEvent event) throws MessagingException
     {
         String asyncReplyCorrelationId = getAsyncReplyCorrelationId(event);
@@ -147,7 +148,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
         finally
         {
             locks.remove(asyncReplyCorrelationId);
-            result = (MuleEvent) responseEvents.remove(asyncReplyCorrelationId);
+            result = responseEvents.remove(asyncReplyCorrelationId);
             if (interruptedWhileWaiting)
             {
                 Thread.currentThread().interrupt();
@@ -220,6 +221,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
 
     class InternalAsyncReplyMessageProcessor implements MessageProcessor
     {
+        @Override
         public MuleEvent process(MuleEvent event) throws MuleException
         {
             String messageId = getAsyncReplyCorrelationId(event);
@@ -241,7 +243,7 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
             }
 
             addProcessed(messageId);
-            MuleEvent previousResult = (MuleEvent) responseEvents.putIfAbsent(messageId, event);
+            MuleEvent previousResult = responseEvents.putIfAbsent(messageId, event);
             if (previousResult != null)
             {
                 // this would indicate that we need a better way to prevent
@@ -268,7 +270,8 @@ public abstract class AbstractAsyncRequestReplyRequester extends AbstractInterce
     {
         return ObjectUtils.toString(this);
     }
-    
+
+    @Override
     public void setFlowConstruct(FlowConstruct flowConstruct)
     {
         this.flowConstruct = flowConstruct;

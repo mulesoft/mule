@@ -22,9 +22,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * IMPORTANT - DO NOT RUN THIS TEST IN AN IDE WITH LOG LEVEL OF DEBUG. USE INFO TO
  * SEE DIAGNOSTICS. OTHERWISE THE CONSOLE OUTPUT WILL BE SIMILAR SIZE TO DATA
@@ -32,15 +29,13 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractStreamingCapacityTestCase extends DynamicPortTestCase
 {
-
     public static final long ONE_KB = 1024;
     public static final long ONE_MB = ONE_KB * ONE_KB;
     public static final long ONE_GB = ONE_KB * ONE_MB;
     public static final int MESSAGES = 21;
 
-    protected final Log logger = LogFactory.getLog(getClass());
     private long size;
-   
+
     public AbstractStreamingCapacityTestCase(long size)
     {
         this.size = size;
@@ -49,10 +44,11 @@ public abstract class AbstractStreamingCapacityTestCase extends DynamicPortTestC
     public void testSend() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);
-        final AtomicReference message = new AtomicReference();
+        final AtomicReference<String> message = new AtomicReference<String>();
 
         EventCallback callback = new EventCallback()
         {
+            @Override
             public synchronized void eventReceived(MuleEventContext context, Object component)
             {
                 try

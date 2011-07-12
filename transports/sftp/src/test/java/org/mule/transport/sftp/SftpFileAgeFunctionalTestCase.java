@@ -23,23 +23,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <code>SftpFileAgeFunctionalTestCase</code> tests the fileAge functionality.
- * 
+ *
  * @author Lennart Häggkvist
  */
 
 public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
 {
-    private static final Log logger = LogFactory.getLog(SftpFileAgeFunctionalTestCase.class);
-
     private static final String INBOUND_ENDPOINT_NAME = "inboundEndpoint";
 
     protected static final long TIMEOUT = 10000 * 6;
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-sftp-file-age-config.xml";
@@ -56,11 +53,12 @@ public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
     public void testFileAge() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);
-        final AtomicReference message = new AtomicReference();
+        final AtomicReference<String> message = new AtomicReference<String>();
         final AtomicInteger loopCount = new AtomicInteger(0);
 
         EventCallback callback = new EventCallback()
         {
+            @Override
             public synchronized void eventReceived(MuleEventContext context, Object component)
             {
                 try
@@ -94,7 +92,7 @@ public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
         ftc.setEventCallback(callback);
 
         // Use one specific filename so that the file is overwritten if necessarily
-        Map properties = new HashMap();
+        Map<?, ?> properties = new HashMap<Object, Object>();
         // properties.put("filename", "fileage-test.tmp");
 
         long startTime = System.currentTimeMillis();
@@ -122,5 +120,4 @@ public class SftpFileAgeFunctionalTestCase extends AbstractSftpTestCase
 
         assertEquals(TEST_MESSAGE, message.get());
     }
-
 }

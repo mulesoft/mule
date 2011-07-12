@@ -40,7 +40,8 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
     private boolean synchronizeCall = false;
 
     // @GuardedBy(itself)
-    private final ConcurrentHashMap methodCache = new ConcurrentHashMap(4);
+    private final ConcurrentHashMap<Class<?>, ConcurrentHashMap<String, Method>> methodCache =
+        new ConcurrentHashMap<Class<?>, ConcurrentHashMap<String, Method>>(4);
 
     public boolean isAcceptVoidMethods()
     {
@@ -52,38 +53,38 @@ public abstract class AbstractEntryPointResolver implements EntryPointResolver
         this.acceptVoidMethods = acceptVoidMethods;
     }
 
-    protected ConcurrentHashMap getMethodCache(Object component)
+    protected ConcurrentHashMap<String, Method> getMethodCache(Object component)
     {
         Class<?> componentClass = component.getClass();
-        ConcurrentHashMap cache = (ConcurrentHashMap) methodCache.get(componentClass);
+        ConcurrentHashMap<String, Method> cache = methodCache.get(componentClass);
         if (cache == null)
         {
-            methodCache.putIfAbsent(componentClass, new ConcurrentHashMap(4));
+            methodCache.putIfAbsent(componentClass, new ConcurrentHashMap<String, Method>(4));
         }
-        return (ConcurrentHashMap) methodCache.get(componentClass);
+        return methodCache.get(componentClass);
     }
 
     protected Method getMethodByName(Object component, String methodName, MuleEventContext context)
     {
-        return (Method) getMethodCache(component).get(methodName);
+        return getMethodCache(component).get(methodName);
     }
 
     protected Method addMethodByName(Object component, Method method, MuleEventContext context)
     {
-        Method previousMethod = (Method) getMethodCache(component).putIfAbsent(method.getName(), method);
+        Method previousMethod = getMethodCache(component).putIfAbsent(method.getName(), method);
         return (previousMethod != null ? previousMethod : method);
     }
 
     protected Method addMethodByArguments(Object component, Method method, Object[] payload)
     {
-        Method previousMethod = (Method) getMethodCache(component).putIfAbsent(getCacheKeyForPayload(component, payload), method);
+        Method previousMethod = getMethodCache(component).putIfAbsent(getCacheKeyForPayload(component, payload), method);
         return (previousMethod != null ? previousMethod : method);
     }
 
 
     protected Method getMethodByArguments(Object component, Object[] payload)
     {
-        Method method = (Method) getMethodCache(component).get(getCacheKeyForPayload(component, payload));
+        Method method = getMethodCache(component).get(getCacheKeyForPayload(component, payload));
         return method;
     }
 

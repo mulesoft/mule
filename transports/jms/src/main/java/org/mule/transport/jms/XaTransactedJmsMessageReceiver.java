@@ -42,13 +42,13 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
 {
     public static final long DEFAULT_JMS_POLL_FREQUENCY = 100;
     public static final TimeUnit DEFAULT_JMS_POLL_TIMEUNIT = TimeUnit.MILLISECONDS;
-    
+
     protected final JmsConnector connector;
     protected boolean reuseConsumer;
     protected boolean reuseSession;
     protected final ThreadContextLocal context = new ThreadContextLocal();
     protected final long timeout;
-    private final AtomicReference/*<RedeliveryHandler>*/ redeliveryHandler = new AtomicReference();
+    private final AtomicReference<RedeliveryHandler> redeliveryHandler = new AtomicReference<RedeliveryHandler>();
 
     /**
      * Holder receiving the session and consumer for this thread.
@@ -62,15 +62,15 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     /**
      * Strongly typed ThreadLocal for ThreadContext.
      */
-    protected static class ThreadContextLocal extends ThreadLocal
+    protected static class ThreadContextLocal extends ThreadLocal<JmsThreadContext>
     {
         public JmsThreadContext getContext()
         {
-            return (JmsThreadContext)get();
+            return get();
         }
 
         @Override
-        protected Object initialValue()
+        protected JmsThreadContext initialValue()
         {
             return new JmsThreadContext();
         }
@@ -97,7 +97,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             this.reuseSession = false;
         }
 
-        // User may override reuse strategy if necessary. This is available for legacy reasons, 
+        // User may override reuse strategy if necessary. This is available for legacy reasons,
         // but this approach is not recommended and should never be set when using XA.
         this.reuseConsumer = MapUtils.getBooleanValue(endpoint.getProperties(), "reuseConsumer",
             this.reuseConsumer);
@@ -136,7 +136,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     {
         if (redeliveryHandler.compareAndSet(null, connector.getRedeliveryHandlerFactory().create()))
         {
-            ((RedeliveryHandler) redeliveryHandler.get()).setConnector(this.connector);
+            redeliveryHandler.get().setConnector(this.connector);
         }
     }
 
@@ -157,12 +157,13 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
     public void poll() throws Exception
     {
         logger.debug("Polling...");
-        
+
         TransactionTemplate<Void> tt = new TransactionTemplate<Void>(
                                                 endpoint.getTransactionConfig(),
                                                 connector.getMuleContext());
         TransactionCallback<Void> cb = new TransactionCallback<Void>()
         {
+            @Override
             public Void doInTransaction() throws Exception
             {
                 try
@@ -180,7 +181,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
                 catch (Exception e)
                 {
                     // There is not a need to close resources here,
-                    // they will be close by XaTransaction,  
+                    // they will be close by XaTransaction,
                     JmsThreadContext ctx = context.getContext();
                     ctx.consumer = null;
                     Transaction tx = TransactionCoordination.getInstance().getTransaction();
@@ -200,7 +201,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
                 }
             }
         };
-        
+
         tt.execute(cb);
     }
 
@@ -229,7 +230,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
                 throw e;
             }
         }
-        
+
         if (message == null)
         {
             if (tx != null)
@@ -265,7 +266,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
                 logger.debug("Message with correlationId: " + message.getJMSCorrelationID()
                              + " is redelivered. handing off to Exception Handler");
             }
-            ((RedeliveryHandler) redeliveryHandler.get()).handleRedelivery(message, (InboundEndpoint) endpoint, flowConstruct);
+            redeliveryHandler.get().handleRedelivery(message, (InboundEndpoint) endpoint, flowConstruct);
         }
 
         MuleMessage messageToRoute = createMuleMessage(message, endpoint.getEncoding());
@@ -290,26 +291,26 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
         {
             return;
         }
-        
+
         // Close consumer
         if (force || !reuseSession || !reuseConsumer)
         {
             connector.closeQuietly(ctx.consumer);
             ctx.consumer = null;
         }
-            
+
         // Do not close session if a transaction is in progress
         // the session will be closed by the transaction
         if (force || !reuseSession)
         {
             connector.closeQuietly(ctx.session);
             ctx.session = null;
-        }        
+        }
     }
 
     /**
      * Create a consumer for the jms destination
-     * 
+     *
      * @throws Exception
      */
     protected MessageConsumer createConsumer() throws Exception
@@ -324,7 +325,7 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
             {
                 ctx = new JmsThreadContext();
             }
-            
+
             Session session;
             Transaction tx = TransactionCoordination.getInstance().getTransaction();
             if (this.reuseSession && ctx.session != null)
@@ -347,12 +348,12 @@ public class XaTransactedJmsMessageReceiver extends TransactedPollingMessageRece
                     }
                 }
             }
-            
+
             if (reuseSession)
             {
                 ctx.session = session;
             }
-            
+
             // TODO How can I verify that the consumer is active?
             if (this.reuseConsumer && ctx.consumer != null)
             {

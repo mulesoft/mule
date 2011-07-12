@@ -68,7 +68,7 @@ public class WrapperManagerAgent extends AbstractAgent
     private JmxSupport jmxSupport = jmxSupportFactory.getJmxSupport();
 
     // atomic reference to avoid unnecessary construction calls
-    private final AtomicReference/*<WrapperManagerMBean>*/ wrapperManagerRef = new AtomicReference();
+    private final AtomicReference<WrapperManagerMBean> wrapperManagerRef = new AtomicReference<WrapperManagerMBean>();
 
 
     public WrapperManagerAgent()
@@ -76,6 +76,7 @@ public class WrapperManagerAgent extends AbstractAgent
         super("wrapper-manager");
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         try
@@ -111,7 +112,7 @@ public class WrapperManagerAgent extends AbstractAgent
             else
             {
                 lazyInitWrapperManager();
-                launchedByWrapper = ((WrapperManagerMBean) wrapperManagerRef.get()).isControlledByNativeWrapper();
+                launchedByWrapper = wrapperManagerRef.get().isControlledByNativeWrapper();
             }
 
             if (!launchedByWrapper)
@@ -152,17 +153,19 @@ public class WrapperManagerAgent extends AbstractAgent
         }
     }
 
+    @Override
     public void start() throws MuleException
     {
         // nothing to do
     }
 
+    @Override
     public void stop() throws MuleException
     {
         // nothing to do
     }
 
-    /* @see org.mule.api.lifecycle.Disposable#dispose() */
+    @Override
     public void dispose()
     {
         try
@@ -181,11 +184,10 @@ public class WrapperManagerAgent extends AbstractAgent
     // Getters and setters
     // /////////////////////////////////////////////////////////////////////////
 
-    /* @see org.mule.api.context.Agent#getDescription() */
     @Override
     public String getDescription()
     {
-        WrapperManagerMBean wm = (WrapperManagerMBean) wrapperManagerRef.get();
+        WrapperManagerMBean wm = wrapperManagerRef.get();
         if (wm == null)
         {
             return "Wrapper Manager";
@@ -240,7 +242,7 @@ public class WrapperManagerAgent extends AbstractAgent
 
     protected void lazyInitWrapperManager()
     {
-        WrapperManagerMBean wm = (WrapperManagerMBean) wrapperManagerRef.get();
+        WrapperManagerMBean wm = wrapperManagerRef.get();
 
         if (wm != null)
         {

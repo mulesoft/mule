@@ -98,14 +98,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * Collection of attachments that were attached to the incoming message
      */
-    @SuppressWarnings("unchecked")
-    private Map<String, DataHandler> inboundAttachments = new ConcurrentHashMap();
+    private Map<String, DataHandler> inboundAttachments = new ConcurrentHashMap<String, DataHandler>();
 
     /**
      * Collection of attachments that will be sent out with this message
      */
-    @SuppressWarnings("unchecked")
-    private Map<String, DataHandler> outboundAttachments = new ConcurrentHashMap();
+    private Map<String, DataHandler> outboundAttachments = new ConcurrentHashMap<String, DataHandler>();
 
     private transient List<Integer> appliedTransformerHashCodes;
     private transient byte[] cache;
@@ -113,7 +111,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 
     // these are transient because serialisation generates a new instance
     // so we allow mutation again (and we can't serialize threads anyway)
-    private transient AtomicReference ownerThread = null;
+    private transient AtomicReference<Thread> ownerThread = null;
     private transient AtomicBoolean mutable = null;
 
     private DataType<?> dataType;
@@ -288,10 +286,9 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         muleContext = context;
     }
 
-    @SuppressWarnings("unchecked")
     private void initAppliedTransformerHashCodes()
     {
-        appliedTransformerHashCodes = new CopyOnWriteArrayList();
+        appliedTransformerHashCodes = new CopyOnWriteArrayList<Integer>();
     }
 
     /**
@@ -1481,7 +1478,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     {
         if (null == ownerThread)
         {
-            ownerThread = new AtomicReference();
+            ownerThread = new AtomicReference<Thread>();
         }
         if (null == mutable)
         {

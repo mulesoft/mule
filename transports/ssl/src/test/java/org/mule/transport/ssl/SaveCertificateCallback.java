@@ -18,8 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class SaveCertificateCallback implements EventCallback
 {
-
-    private AtomicReference certificates;
+    private AtomicReference<Object> certificates;
     private AtomicBoolean called;
 
     public SaveCertificateCallback()
@@ -27,6 +26,7 @@ public class SaveCertificateCallback implements EventCallback
         clear();
     }
 
+    @Override
     public void eventReceived(MuleEventContext context, Object component) throws Exception
     {
         certificates.set(context.getMessage().getOutboundProperty(SslConnector.LOCAL_CERTIFICATES));
@@ -35,7 +35,7 @@ public class SaveCertificateCallback implements EventCallback
 
     public void clear()
     {
-        certificates = new AtomicReference();
+        certificates = new AtomicReference<Object>();
         called = new AtomicBoolean(false);
     }
 
@@ -48,5 +48,4 @@ public class SaveCertificateCallback implements EventCallback
     {
         return certificates.get();
     }
-
 }

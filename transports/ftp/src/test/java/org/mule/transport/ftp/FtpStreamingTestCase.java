@@ -31,10 +31,11 @@ public class FtpStreamingTestCase extends AbstractFtpServerTestCase
     public void testRequest() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);
-        final AtomicReference messageHolder = new AtomicReference();
+        final AtomicReference<MuleMessage> messageHolder = new AtomicReference<MuleMessage>();
 
         EventCallback callback = new EventCallback()
         {
+            @Override
             public synchronized void eventReceived(MuleEventContext context, Object component)
             {
                 try
@@ -53,17 +54,17 @@ public class FtpStreamingTestCase extends AbstractFtpServerTestCase
         };
 
         Object component = getComponent("testComponent");
-        assertTrue("FunctionalStreamingTestComponent expected", 
+        assertTrue("FunctionalStreamingTestComponent expected",
             component instanceof FunctionalStreamingTestComponent);
         FunctionalStreamingTestComponent ftc = (FunctionalStreamingTestComponent) component;
         ftc.setEventCallback(callback, TEST_MESSAGE.length());
-       
+
         createFileOnFtpServer("input.txt");
-               
+
         // poll and pull back through test service
         assertTrue(latch.await(getTimeout(), TimeUnit.MILLISECONDS));
 
-        MuleMessage message = (MuleMessage) messageHolder.get();
+        MuleMessage message = messageHolder.get();
         assertNotNull(message);
         assertTrue(message.getPayload() instanceof InputStream);
     }
