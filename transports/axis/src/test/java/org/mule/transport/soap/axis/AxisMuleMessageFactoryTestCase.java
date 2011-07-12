@@ -19,6 +19,9 @@ import org.mule.transport.soap.axis.mock.MockEngineConfiguration;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.Message;
 import org.apache.axis.MessageContext;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class AxisMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
@@ -65,7 +68,8 @@ public class AxisMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTe
     {
         return new Message(XML_WITH_HEADERS);
     }
-    
+
+    @Test
     public void testSoapHeaders() throws Exception
     {
         MuleMessageFactory factory = createMuleMessageFactory();

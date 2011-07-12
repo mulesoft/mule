@@ -25,6 +25,12 @@ import java.util.Vector;
 
 import javax.servlet.http.HttpSession;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -75,6 +81,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertEquals(REQUEST_URI, message.getPayload());
     }
 
+    @Test
     public void testGetPayloadWithQueryParameter() throws Exception
     {
         MockHttpServletRequestBuilder builder = new MockHttpServletRequestBuilder();
@@ -87,6 +94,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertEquals(expected, message.getPayload());
     }
 
+    @Test
     public void testPostPayload() throws Exception
     {
         Object payload = buildPostRequest();
@@ -95,6 +103,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertTrue(message.getPayload() instanceof InputStream);
     }
 
+    @Test
     public void testRequestParametersAreConvertedToMessageProperties() throws Exception
     {
         Object payload = buildPostRequest();
@@ -108,6 +117,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertEquals("bar-value", parameters.get("bar"));
     }
 
+    @Test
     public void testContentEncodingWithCharsetLast() throws Exception
     {
         String contentType = "text/plain;charset=UTF-21";
@@ -117,6 +127,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertInboundScopedProperty(contentType, message, CONTENT_TYPE_PROPERTY_KEY);
     }
 
+    @Test
     public void testContentEncodingWithCharsetFirst() throws Exception
     {
         String contentType = "charset=UTF-21;text/plain";
@@ -126,6 +137,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertInboundScopedProperty(contentType, message, CONTENT_TYPE_PROPERTY_KEY);
     }
 
+    @Test
     public void testMessageIdFromHttpSession() throws Exception
     {
         String sessionId = UUID.getUUID();
@@ -137,6 +149,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
     /**
      * Test for MULE-5101
      */
+    @Test
     public void testUniqueMessageId() throws Exception
     {
         String sessionId = UUID.getUUID();
@@ -150,6 +163,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertFalse(message.getUniqueId().equals(message2.getUniqueId()));
     }
 
+    @Test
     public void testCharacterEncodingFromHttpRequest() throws Exception
     {
         MockHttpServletRequestBuilder builder = new MockHttpServletRequestBuilder();
@@ -160,6 +174,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertInboundScopedProperty(builder.characterEncoding, message, CHARACTER_ENCODING_PROPERTY_KEY);
     }
 
+    @Test
     public void testRequestPropertiesAreConvertedToMessageProperties() throws Exception
     {
         Object payload = buildGetRequestWithParameterValue("foo-param", "foo-value");
@@ -167,6 +182,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertInboundScopedProperty("foo-value", message, "foo-param");
     }
 
+    @Test
     public void testRequestAttributesAreConvertedToMessageProperties() throws Exception
     {
         Object payload = buildGetRequestWithAttributeValue("foo-attribute", "foo-value");
@@ -174,6 +190,7 @@ public class ServletMuleMessageFactoryTestCase extends AbstractMuleMessageFactor
         assertInboundScopedProperty("foo-value", message, "foo-attribute");
     }
 
+    @Test
     public void testRequestHeadersAreConvertedToMessageProperties() throws Exception
     {
         Object payload = buildGetRequestWithHeaders();

@@ -16,6 +16,8 @@ import org.mule.tck.testmodels.fruit.Banana;
 
 import java.io.Serializable;
 
+import static org.junit.Assert.fail;
+
 public class SimpleMemoryObjectStoreContractTestCase extends AbstractObjectStoreContractTestCase
 {
     @Override

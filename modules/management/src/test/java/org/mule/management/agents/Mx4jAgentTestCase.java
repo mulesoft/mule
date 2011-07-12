@@ -14,12 +14,14 @@ import org.mule.management.AbstractMuleJmxTestCase;
 import org.mule.module.management.agent.Mx4jAgent;
 
 import mx4j.tools.adaptor.http.HttpAdaptor;
+import org.junit.Test;
 
 /**
  * Test that the lifecycle is properly managed.
  */
 public class Mx4jAgentTestCase extends AbstractMuleJmxTestCase
 {
+    @Test
     public void testRedeploy() throws Exception
     {
         final String name = jmxSupport.getDomainName(muleContext) +

@@ -12,7 +12,7 @@ package org.mule.transport.http.transformers;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
@@ -20,8 +20,12 @@ import org.mule.transport.http.ResponseWriter;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
+import org.junit.Test;
 
-public class HttpResponseToStringTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class HttpResponseToStringTestCase extends AbstractMuleContextTestCase
 {
     private final String _statusLine = "HTTP/1.1 200 OK";
     private final String _headerCT = "Content-Type: text/plain";
@@ -55,6 +59,7 @@ public class HttpResponseToStringTestCase extends AbstractMuleTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testTransformChunked() throws Exception
     {
         HttpResponseToString trasf = new HttpResponseToString();
@@ -75,6 +80,7 @@ public class HttpResponseToStringTestCase extends AbstractMuleTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testTransformNotChunked() throws Exception
     {
         HttpResponseToString trasf = new HttpResponseToString();
@@ -90,6 +96,7 @@ public class HttpResponseToStringTestCase extends AbstractMuleTestCase
     /**
      * Expect a {@link TransformerException} when the encoding is not supported.
      */
+    @Test
     public void testTransformException()
     {
         try

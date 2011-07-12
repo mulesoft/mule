@@ -11,24 +11,25 @@ package org.mule.transport.ajax;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.NullPayload;
 import org.mule.transport.servlet.JarResourceServlet;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
 
-public class ResourceLoaderServletTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertFalse;
+
+public class ResourceLoaderServletTestCase extends AbstractMuleContextTestCase
 {
     private Server httpServer;
 
-    public ResourceLoaderServletTestCase()
-    {
-        super();
-        // use dynamic ports outside of a FunctionalTestCase 
-        numPorts = 1;
-    }
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected void doSetUp() throws Exception
@@ -36,7 +37,7 @@ public class ResourceLoaderServletTestCase extends AbstractMuleTestCase
         super.doSetUp();
         httpServer = new Server();
         SelectChannelConnector conn = new SelectChannelConnector();
-        conn.setPort(getPorts().get(0));
+        conn.setPort(dynamicPort.getNumber());
         httpServer.addConnector(conn);
 
         ServletHandler handler = new ServletHandler();
@@ -59,12 +60,13 @@ public class ResourceLoaderServletTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testRetriveJSFromClasspath() throws Exception
     {
         muleContext.start();
         MuleClient client = new MuleClient(muleContext);
 
-        MuleMessage m = client.request("http://localhost:" + getPorts().get(0) + "/mule-resource/js/mule.js", 3000);
+        MuleMessage m = client.request("http://localhost:" + dynamicPort.getNumber() + "/mule-resource/js/mule.js", 3000);
         assertFalse(m.getPayload() instanceof NullPayload);
     }
 }

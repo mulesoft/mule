@@ -12,12 +12,18 @@ package org.mule.transport.http.transformers;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.List;
 import java.util.Map;
 
-public class FormTransformerTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public class FormTransformerTestCase extends AbstractMuleContextTestCase
 {
     private FormTransformer transformer;
 
@@ -29,6 +35,7 @@ public class FormTransformerTestCase extends AbstractMuleTestCase
         transformer = new FormTransformer();
     }
 
+    @Test
     public void testFormTransformer() throws TransformerException
     {
         DefaultMuleMessage msg = new DefaultMuleMessage("test1=value1&test2=value2&test3", muleContext);
@@ -41,7 +48,7 @@ public class FormTransformerTestCase extends AbstractMuleTestCase
         assertNull(m.get("test3"));
     }
 
-
+    @Test
     public void testMultipleValues() throws TransformerException
     {
         DefaultMuleMessage msg = new DefaultMuleMessage("test1=value1&test1=value2", muleContext);

@@ -10,15 +10,21 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class StringMessageUtilsTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testToString() throws Exception
     {
         Object test = "Oscar";
@@ -79,6 +85,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testFormattedString() throws Exception
     {
         String result;
@@ -95,6 +102,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
         assertEquals("There should be a variable here, there and everywhere", result);
     }
 
+    @Test
     public void testBoilerPlateSingleLine()
     {
         String plate = StringMessageUtils.getBoilerPlate("Single message.", '*', 12);
@@ -103,6 +111,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
                      + SystemUtils.LINE_SEPARATOR + "************", plate);
     }
 
+    @Test
     public void testBoilerPlate() throws Exception
     {
         List msgs = new ArrayList();
@@ -118,6 +127,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testBoilerPlate2() throws Exception
     {
         List msgs = new ArrayList();
@@ -140,6 +150,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase
                      + "************", plate);
     }
 
+    @Test
     public void testTruncate()
     {
         String msg = "this is a test message for truncating";

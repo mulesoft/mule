@@ -23,8 +23,19 @@ import org.mule.util.pool.AbstractPoolingTestCase;
 
 import java.util.NoSuchElementException;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
 {    
+    @Test
     public void testComponentCreation() throws Exception
     {
         PrototypeObjectFactory objectFactory = getDefaultObjectFactory();
@@ -42,6 +53,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
         assertEquals(pp, component.getPoolingProfile());
     }
 
+    @Test
     public void testPoolManagement() throws Exception
     {
         PooledJavaComponent component = new PooledJavaComponent(getDefaultObjectFactory(), createDefaultPoolingProfile());
@@ -59,6 +71,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
         assertNull(component.lifecycleAdapterPool);
     }
 
+    @Test
     public void testStartStop() throws Exception
     {
         PooledJavaComponent component = createPooledComponent();
@@ -72,6 +85,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
         assertNotSame(la1, la2);
     }
 
+    @Test
     public void testCreateLifecycleAdapters() throws Exception
     {
         PooledJavaComponent component = createPooledComponent();
@@ -93,6 +107,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
         assertEquals(2, component.lifecycleAdapterPool.getNumActive());
     }
 
+    @Test
     public void testFailOnExhaust() throws Exception
     {
         PoolingProfile pp = createDefaultPoolingProfile();
@@ -112,6 +127,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
         }
     }
 
+    @Test
     public void testBlockExpiryOnExhaust() throws Exception
     {
         PoolingProfile pp = createDefaultPoolingProfile();
@@ -135,6 +151,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
         }
     }
 
+    @Test
     public void testBlockOnExhaust() throws Exception
     {
         PoolingProfile pp = createDefaultPoolingProfile();
@@ -175,6 +192,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
         assertTrue(totalTime >= borrowerWait);
     }
     
+    @Test
     public void testGrowOnExhaust() throws Exception
     {
         PoolingProfile pp = createDefaultPoolingProfile();
@@ -190,6 +208,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
         assertEquals(MAX_ACTIVE + 1, component.lifecycleAdapterPool.getNumActive());
     }
 
+    @Test
     public void testClearPool() throws Exception
     {
         PoolingProfile pp = createDefaultPoolingProfile();
@@ -207,6 +226,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
         assertEquals(0, component.lifecycleAdapterPool.getNumActive());
     }
 
+    @Test
     public void testObjectUniqueness() throws Exception
     {
         PrototypeObjectFactory objectFactory = new PrototypeObjectFactory(UniqueComponent.class);
@@ -222,6 +242,7 @@ public class PooledJavaComponentTestCase extends AbstractPoolingTestCase
         assertFalse("Service IDs " + id1 + " and " + id3 + " should be different", id1.equals(id3));
     }
     
+    @Test
     public void testDisposingFactoryDisposesObject() throws Exception
     {
         PrototypeObjectFactory objectFactory = new PrototypeObjectFactory(WaterMelon.class);

@@ -14,14 +14,19 @@ import org.mule.api.config.ThreadingProfile;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.config.ImmutableThreadingProfile;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
+import org.junit.Test;
 
-public class DispatcherPoolTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+public class DispatcherPoolTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testDefaultDispatcherPoolConfiguration() throws Exception
     {
         final TestConnector connector = createConnectorWithSingleObjectDispatcherPool(ThreadingProfile.WHEN_EXHAUSTED_RUN);
@@ -38,6 +43,7 @@ public class DispatcherPoolTestCase extends AbstractMuleTestCase
         assertEquals(-1, connector.dispatchers.getMaxWait());
     }
 
+    @Test
     public void testDefaultDispatcherPoolConfigurationThreadingProfileWait() throws Exception
     {
         final TestConnector connector = createConnectorWithSingleObjectDispatcherPool(ThreadingProfile.WHEN_EXHAUSTED_WAIT);
@@ -51,6 +57,7 @@ public class DispatcherPoolTestCase extends AbstractMuleTestCase
         assertEquals(-1, connector.dispatchers.getMaxWait());
     }
 
+    @Test
     public void testDispatcherPoolDefaultBlockExhaustedAction() throws Exception
     {
         final TestConnector connector = createConnectorWithSingleObjectDispatcherPool(ThreadingProfile.WHEN_EXHAUSTED_WAIT);
@@ -85,6 +92,7 @@ public class DispatcherPoolTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testDispatcherPoolBlockTimeoutExhaustedAction() throws Exception
     {
         final TestConnector connector = createConnectorWithSingleObjectDispatcherPool(ThreadingProfile.WHEN_EXHAUSTED_WAIT);
@@ -125,6 +133,7 @@ public class DispatcherPoolTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testDispatcherPoolGrowExhaustedAction() throws Exception
     {
         final TestConnector connector = createConnectorWithSingleObjectDispatcherPool(ThreadingProfile.WHEN_EXHAUSTED_WAIT);
@@ -140,6 +149,7 @@ public class DispatcherPoolTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testDispatcherPoolFailExhaustedAction() throws Exception
     {
         final TestConnector connector = createConnectorWithSingleObjectDispatcherPool(ThreadingProfile.WHEN_EXHAUSTED_WAIT);

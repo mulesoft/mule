@@ -10,11 +10,18 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class SplashScreenTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class SplashScreenTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testMuleContextSplashScreenRendering() throws Exception
     {
         SplashScreen serverStartupSplashScreen = new ServerStartupSplashScreen();

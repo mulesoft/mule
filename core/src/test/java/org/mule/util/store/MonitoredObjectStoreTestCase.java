@@ -13,14 +13,20 @@ package org.mule.util.store;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.store.ObjectStoreException;
 import org.mule.api.store.ObjectStoreNotAvaliableException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.Serializable;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class MonitoredObjectStoreTestCase extends AbstractMuleTestCase
 {
     private static final int EXPIRATION_INTERVAL = 500;
     
+    @Test
     public void testShutdownWithHangingExpireThread() throws Exception
     {        
         ExpiringStore store = createExpiringStore();

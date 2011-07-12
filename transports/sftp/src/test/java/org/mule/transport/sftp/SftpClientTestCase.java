@@ -10,7 +10,11 @@
 
 package org.mule.transport.sftp;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * JUnit test for SftpClient
@@ -19,6 +23,8 @@ import org.mule.tck.AbstractMuleTestCase;
  */
 public class SftpClientTestCase extends AbstractMuleTestCase
 {
+
+    @Test
     public void testGetAbsolutePath()
     {
         SftpClient client = new SftpClient("hostName");

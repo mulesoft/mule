@@ -9,12 +9,17 @@
  */
 package org.mule.util.store;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
 
-public class TextFileStoreTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class TextFileStoreTestCase extends AbstractMuleContextTestCase
 {
     public static final String DIR = ".mule/temp";
     TextFileObjectStore store;
@@ -24,7 +29,6 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
     {
         super.doSetUp();
         FileUtils.deleteTree(new File(DIR));
-
     }
 
     @Override
@@ -36,9 +40,9 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         }
         FileUtils.deleteTree(new File(DIR));
         super.doTearDown();
-
     }
 
+    @Test
     public void testTimedExpiry() throws Exception
     {
         // entryTTL=3 and expiryInterval=1 will cause background expiry
@@ -68,9 +72,9 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         assertFalse(store.contains("1"));
         assertFalse(store.contains("2"));
         assertFalse(store.contains("3"));
-
     }
 
+    @Test
     public void testTimedExpiryWithRestart() throws Exception
     {
         // entryTTL=3 and expiryInterval=1 will cause background expiry
@@ -131,10 +135,9 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         assertFalse(store.contains("1"));
         assertFalse(store.contains("2"));
         assertFalse(store.contains("3"));
-
-
     }
 
+    @Test
     public void testTimedExpiryWithObjects() throws Exception
     {
         // entryTTL=3 and expiryInterval=1 will cause background expiry
@@ -148,6 +151,7 @@ public class TextFileStoreTestCase extends AbstractMuleTestCase
         store.initialise();
     }
 
+    @Test
     public void testMaxSize() throws Exception
     {
         // entryTTL=-1 means we will have to expire manually

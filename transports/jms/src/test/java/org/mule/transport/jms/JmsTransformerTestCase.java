@@ -14,8 +14,8 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.MuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.jms.transformers.ObjectToJMSMessage;
 
 import com.mockobjects.constraint.Constraint;
@@ -28,10 +28,15 @@ import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import org.apache.commons.collections.IteratorUtils;
+import org.junit.Test;
 
-public class JmsTransformerTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class JmsTransformerTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testCustomJMSProperty() throws Exception
     {
         // Warning: this test is REALLY complicated :)

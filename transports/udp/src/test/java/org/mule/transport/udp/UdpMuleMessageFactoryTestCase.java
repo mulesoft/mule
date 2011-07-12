@@ -18,6 +18,10 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.Arrays;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class UdpMuleMessageFactoryTestCase extends AbstractMuleMessageFactoryTestCase
 {
     private static final int PORT = 4242;

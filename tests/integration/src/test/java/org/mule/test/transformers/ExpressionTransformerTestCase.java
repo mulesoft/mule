@@ -14,12 +14,16 @@ import org.mule.api.transformer.TransformerException;
 import org.mule.expression.ExpressionConfig;
 import org.mule.expression.transformers.ExpressionArgument;
 import org.mule.expression.transformers.ExpressionTransformer;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import groovyjarjarasm.asm.ClassWriter;
 import groovyjarjarasm.asm.Opcodes;
+import org.junit.Test;
 
-public class ExpressionTransformerTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
+public class ExpressionTransformerTestCase extends AbstractMuleContextTestCase
 {
 
     /**
@@ -28,6 +32,7 @@ public class ExpressionTransformerTestCase extends AbstractMuleTestCase
      * 
      * @throws TransformerException
      */
+    @Test
     public void testExpressionEvaluationClassLoader() throws ClassNotFoundException, TransformerException
     {
         ExpressionTransformer transformer = new ExpressionTransformer();

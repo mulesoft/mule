@@ -12,10 +12,17 @@ package org.mule.transport.http;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class HttpEndpointTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+public class HttpEndpointTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testHostPortOnlyUrl() throws Exception
     {
         EndpointURI endpointUri = new MuleEndpointURI("http://localhost:8080", muleContext);
@@ -29,6 +36,7 @@ public class HttpEndpointTestCase extends AbstractMuleTestCase
         assertEquals(0, endpointUri.getParams().size());
     }
 
+    @Test
     public void testHostPortOnlyUrlAndUserInfo() throws Exception
     {
         EndpointURI endpointUri = new MuleEndpointURI("http://admin:pwd@localhost:8080", muleContext);
@@ -46,6 +54,7 @@ public class HttpEndpointTestCase extends AbstractMuleTestCase
         assertEquals("http://admin:****@localhost:8080", endpointUri.toString());
     }
 
+    @Test
     public void testHostPortAndPathUrl() throws Exception
     {
         EndpointURI endpointUri = new MuleEndpointURI("http://localhost:8080/app/path", muleContext);
@@ -60,6 +69,7 @@ public class HttpEndpointTestCase extends AbstractMuleTestCase
         assertEquals(0, endpointUri.getParams().size());
     }
 
+    @Test
     public void testHostPortAndPathUrlAndUserInfo() throws Exception
     {
         EndpointURI endpointUri = new MuleEndpointURI("http://admin:pwd@localhost:8080/app/path", muleContext);
@@ -79,6 +89,7 @@ public class HttpEndpointTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testHostPortAndPathUrlUserInfoAndQuery() throws Exception
     {
         EndpointURI endpointUri = new MuleEndpointURI("http://admin:pwd@localhost:8080/app/path?${foo}", muleContext);

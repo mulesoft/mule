@@ -13,21 +13,21 @@ package org.mule.transformers.xml;
 import org.mule.api.transformer.Transformer;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.xml.transformer.XsltTransformer;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.IOUtils;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.custommonkey.xmlunit.XMLAssert;
+import org.junit.Test;
 
-public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
+public class ParallelXsltTransformerTestCase extends AbstractMuleContextTestCase
 {
     private String srcData;
     private String resultData;
-    private Collection actualResults = new ConcurrentLinkedQueue();
+    private Collection<Object> actualResults = new ConcurrentLinkedQueue<Object>();
 
     @Override
     protected void doSetUp() throws Exception
@@ -59,6 +59,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
         if (--running == 0) this.notify();
     }
 
+    @Test
     public void testParallelTransformation() throws Exception
     {
         final Transformer transformer = getTransformer();
@@ -69,6 +70,7 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
         {
             new Thread(new Runnable()
             {
+                @Override
                 public void run()
                 {
                     signalStarted();
@@ -108,10 +110,12 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
     {
         Object expectedResult = resultData;
 
-        for (Iterator it = actualResults.iterator(); it.hasNext();)
+        for (Object result : actualResults)
         {
-            Object result = it.next();
-            if (result instanceof Exception) throw (Exception) result;
+            if (result instanceof Exception)
+            {
+                throw (Exception) result;
+            }
 
             if (expectedResult instanceof String && result instanceof String)
             {
@@ -133,5 +137,4 @@ public class ParallelXsltTransformerTestCase extends AbstractMuleTestCase
     {
         return 100;
     }
-
 }

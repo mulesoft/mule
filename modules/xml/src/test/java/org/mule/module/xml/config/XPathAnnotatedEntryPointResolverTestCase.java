@@ -15,19 +15,27 @@ import org.mule.api.expression.RequiredValueException;
 import org.mule.api.model.InvocationResult;
 import org.mule.api.transport.PropertyScope;
 import org.mule.impl.model.resolvers.AnnotatedEntryPointResolver;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Map;
 
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class XPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class XPathAnnotatedEntryPointResolverTestCase extends AbstractMuleContextTestCase
 {
+
     public static final String TEST_PAYLOAD = "<foo><bar>4</bar><bar>8</bar></foo>";
 
+    @Test
     public void testAnnotatedMethod() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -38,13 +46,14 @@ public class XPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTestCa
         InvocationResult result = resolver.invoke(component, context);
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
         assertTrue(result.getResult() instanceof Map);
-        Map<?, ?> map = (Map<?, ?>)result.getResult();
+        Map<?, ?> map = (Map<?, ?>) result.getResult();
         assertEquals(3, map.size());
         assertTrue(map.get("foo") instanceof Element);
-        assertTrue((Boolean)map.get("isBarValue"));
+        assertTrue((Boolean) map.get("isBarValue"));
         assertEquals("4", map.get("bar"));
     }
 
+    @Test
     public void testAnnotatedMethod2() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -55,13 +64,14 @@ public class XPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTestCa
         InvocationResult result = resolver.invoke(component, context);
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
         assertTrue(result.getResult() instanceof Map);
-        Map<?, ?> map = (Map<?, ?>)result.getResult();
+        Map<?, ?> map = (Map<?, ?>) result.getResult();
         assertEquals(3, map.size());
         assertTrue(map.get("foo") instanceof Document);
-        assertTrue((Boolean)map.get("isBarValue"));
+        assertTrue((Boolean) map.get("isBarValue"));
         assertEquals(new Double(8), map.get("bar"));
     }
 
+    @Test
     public void testAnnotatedMethod3() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -72,13 +82,14 @@ public class XPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTestCa
         InvocationResult result = resolver.invoke(component, context);
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
         assertTrue(result.getResult() instanceof Map);
-        Map<?, ?> map = (Map<?, ?>)result.getResult();
+        Map<?, ?> map = (Map<?, ?>) result.getResult();
         assertEquals(2, map.size());
         assertTrue(map.get("foo") instanceof Node);
         assertTrue(map.get("bar") instanceof NodeList);
-        assertEquals(2, ((NodeList)map.get("bar")).getLength());
+        assertEquals(2, ((NodeList) map.get("bar")).getLength());
     }
 
+    @Test(expected = RequiredValueException.class)
     public void testAnnotatedMethodRequiredMissing() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -86,17 +97,11 @@ public class XPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTestCa
         MuleEventContext context = getTestEventContext(TEST_PAYLOAD);
         //Since AnnotatedComponent2 has two annotated methods we need to set the method to call
         context.getMessage().setProperty(MuleProperties.MULE_METHOD_PROPERTY, "doStuff4", PropertyScope.INVOCATION);
-        try
-        {
-            resolver.invoke(component, context);
-            fail("The xpath expression returned null, nbut a value was required");
-        }
-        catch (RequiredValueException e)
-        {
-            //expected
-        }
+
+        resolver.invoke(component, context);
     }
 
+    @Test
     public void testAnnotatedMethodMissingNotRequired() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
@@ -107,24 +112,18 @@ public class XPathAnnotatedEntryPointResolverTestCase extends AbstractMuleTestCa
         InvocationResult result = resolver.invoke(component, context);
         assertEquals(result.getState(), InvocationResult.State.SUCCESSFUL);
         assertTrue(result.getResult() instanceof Map);
-        Map<?, ?> map = (Map<?, ?>)result.getResult();
+        Map<?, ?> map = (Map<?, ?>) result.getResult();
         assertEquals(1, map.size());
         assertNull(map.get("foo"));
     }
 
+    @Test(expected = IllegalArgumentException.class)
     public void testIllegalAnnotatedMethod() throws Exception
     {
         AnnotatedEntryPointResolver resolver = new AnnotatedEntryPointResolver();
         IllegalAnnotatedComponent component = new IllegalAnnotatedComponent();
         MuleEventContext context = getTestEventContext(TEST_PAYLOAD);
-        try
-        {
-            resolver.invoke(component, context);
-            fail("Annotated parameter has an illegal return type argument");
-        }
-        catch (IllegalArgumentException e)
-        {
-            //expected
-        }
+
+        resolver.invoke(component, context);
     }
 }

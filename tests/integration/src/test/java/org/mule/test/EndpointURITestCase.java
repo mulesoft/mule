@@ -19,13 +19,19 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.endpoint.DynamicOutboundEndpoint;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class EndpointURITestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class EndpointURITestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testEndpoints() throws Exception
     {
         Client client = new Client(muleContext);

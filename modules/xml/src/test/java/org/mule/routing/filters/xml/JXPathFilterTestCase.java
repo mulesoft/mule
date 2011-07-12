@@ -13,7 +13,7 @@ package org.mule.routing.filters.xml;
 import org.mule.DefaultMuleMessage;
 import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.module.xml.util.XMLTestUtils;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.InputStream;
 import java.io.StringReader;
@@ -27,9 +27,14 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.DocumentHelper;
+import org.junit.Test;
 import org.xml.sax.InputSource;
 
-public class JXPathFilterTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JXPathFilterTestCase extends AbstractMuleContextTestCase
 {
     private String xmlStringInput = null;
     private String xmlStringInputNS = null;
@@ -73,6 +78,7 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         muleContext.start();
     }
 
+    @Test
     public void testBogusExpression() throws Exception
     {
         try
@@ -127,6 +133,7 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         assertTrue(nsAwareFilter.accept(new DefaultMuleMessage(xmlData, muleContext)));
     }
 
+    @Test
     public void testFilterOnObject() throws Exception
     {
         Dummy d = new Dummy();
@@ -137,101 +144,121 @@ public class JXPathFilterTestCase extends AbstractMuleTestCase
         assertTrue(simpleFilter.accept(new DefaultMuleMessage(d, muleContext)));
     }
 
+    @Test
     public void testExpectedValueFilterXmlString() throws Exception
     {
         doTestExpectedValueFilter(xmlStringInput);
     }
 
+    @Test
     public void testExpectedValueFilterXmlByteArray() throws Exception
     {
         doTestExpectedValueFilter(xmlStringInput.getBytes());
     }
 
+    @Test
     public void testBooleanFilter1XmlString() throws Exception
     {
         doTestBooleanFilter1(xmlStringInput);
     }
 
+    @Test
     public void testBooleanFilter2XmlString() throws Exception
     {
         doTestBooleanFilter2(xmlStringInput);
     }
 
+    @Test
     public void testExpectedValueFilterDom4JDocument() throws Exception
     {
         doTestExpectedValueFilter(dom4jDocumentInput);
     }
 
+    @Test
     public void testBooleanFilter1Dom4JDocument() throws Exception
     {
         doTestBooleanFilter1(dom4jDocumentInput);
     }
 
+    @Test
     public void testBooleanFilter2Dom4JDocument() throws Exception
     {
         doTestBooleanFilter2(dom4jDocumentInput);
     }
 
+    @Test
     public void testExpectedValueFilterW3cDocument() throws Exception
     {
         doTestExpectedValueFilter(w3cDocumentInput);
     }
 
+    @Test
     public void testBooleanFilter1W3cDocument() throws Exception
     {
         doTestBooleanFilter1(w3cDocumentInput);
     }
 
+    @Test
     public void testBooleanFilter2W3cDocument() throws Exception
     {
         doTestBooleanFilter2(w3cDocumentInput);
     }
 
+    @Test
     public void testExpectedValueFilterXmlStringNS() throws Exception
     {
         doTestExpectedValueFilterNS(xmlStringInputNS);
     }
 
+    @Test
     public void testBooleanFilter1XmlStringNS() throws Exception
     {
         doTestBooleanFilter1NS(xmlStringInputNS);
     }
 
+    @Test
     public void testBooleanFilter2XmlStringNS() throws Exception
     {
         doTestBooleanFilter2NS(xmlStringInputNS);
     }
 
+    @Test
     public void testExpectedValueFilterDom4JDocumentNS() throws Exception
     {
         doTestExpectedValueFilterNS(dom4jDocumentInputNS);
     }
 
+    @Test
     public void testBooleanFilter1Dom4JDocumentNS() throws Exception
     {
         doTestBooleanFilter1NS(dom4jDocumentInputNS);
     }
 
+    @Test
     public void testBooleanFilter2Dom4JDocumentNS() throws Exception
     {
         doTestBooleanFilter2NS(dom4jDocumentInputNS);
     }
 
+    @Test
     public void testExpectedValueFilterW3cDocumentNS() throws Exception
     {
         doTestExpectedValueFilterNS(w3cDocumentInputNS);
     }
 
+    @Test
     public void testBooleanFilter1W3cDocumentNS() throws Exception
     {
         doTestBooleanFilter1NS(w3cDocumentInputNS);
     }
 
+    @Test
     public void testBooleanFilter2W3cDocumentNS() throws Exception
     {
         doTestBooleanFilter2NS(w3cDocumentInputNS);
     }
 
+    @Test
     public void testSimpleFilterXmlMessageVariants() throws Exception
     {
         simpleFilter.setPattern("catalog/cd[3]/title");

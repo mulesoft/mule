@@ -12,12 +12,18 @@ package org.mule.transport.soap.axis;
 
 import org.mule.api.MuleEvent;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import javax.xml.namespace.QName;
 
-public class SoapActionTemplateTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class SoapActionTemplateTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testHostInfoReplace() throws Exception
     {
         OutboundEndpoint ep = muleContext.getEndpointFactory().getOutboundEndpoint(
@@ -30,6 +36,7 @@ public class SoapActionTemplateTestCase extends AbstractMuleTestCase
         assertEquals("http://mycompany.com:8080/foo", result);
     }
 
+    @Test
     public void testHostReplace() throws Exception
     {
         OutboundEndpoint ep = muleContext.getEndpointFactory().getOutboundEndpoint(

@@ -10,13 +10,20 @@
 
 package org.mule.transport.http;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.httpclient.Cookie;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class CookieHelperTestCase extends AbstractMuleTestCase
 {
@@ -26,6 +33,7 @@ public class CookieHelperTestCase extends AbstractMuleTestCase
     private static final String COOKIE_2_VALUE = "value2";
     private static final String COOKIE_1_NEW_VALUE = "newValue1 That Overrides Previous One";
 
+    @Test
     public void testPutAndMergeCookieObjectMapOfStringString_CookiesInMap_NewCookiesInMap()
     {
         Map<String, String> cookiesObject = new HashMap<String, String>();
@@ -48,6 +56,7 @@ public class CookieHelperTestCase extends AbstractMuleTestCase
         assertEquals(2, cookiesObject.size());
     }
 
+    @Test
     public void testPutAndMergeCookieObjectMapOfStringString_CookiesInArray_NewCookiesInMap()
     {
         Cookie[] cookiesObject = new Cookie[]{new Cookie(null, COOKIE_1_NAME, COOKIE_1_ORIGINAL_VALUE)};
@@ -73,6 +82,7 @@ public class CookieHelperTestCase extends AbstractMuleTestCase
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testPutAndMergeCookieObjectCookieArray_CookiesInMap_NewCookiesInArray()
     {
         Map<String, String> cookiesObject = new HashMap<String, String>();
@@ -95,6 +105,7 @@ public class CookieHelperTestCase extends AbstractMuleTestCase
         assertEquals(2, cookiesObject.size());
     }
 
+    @Test
     public void testPutAndMergeCookieObjectCookieArray_CookiesInArray_NewCookiesInArray()
     {
         Cookie[] cookiesObject = new Cookie[]{new Cookie(null, COOKIE_1_NAME, COOKIE_1_ORIGINAL_VALUE)};
@@ -120,6 +131,7 @@ public class CookieHelperTestCase extends AbstractMuleTestCase
         assertEquals(2, cookiesObject.length);
     }
 
+    @Test
     public void testAsArrayOfCookies_CookiesInArray() throws Exception
     {
         Cookie[] cookiesObject = new Cookie[]{new Cookie()};
@@ -130,6 +142,7 @@ public class CookieHelperTestCase extends AbstractMuleTestCase
         assertEquals(0, emptyArray.length);
     }
 
+    @Test
     public void testAsArrayOfCookies_CookiesInMap() throws Exception
     {
         Map<String, String> cookiesObject = new LinkedHashMap<String, String>();
@@ -149,6 +162,7 @@ public class CookieHelperTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testResolveCookieStorageType() throws Exception
     {
         assertSame(CookieStorageType.MAP_STRING_STRING,

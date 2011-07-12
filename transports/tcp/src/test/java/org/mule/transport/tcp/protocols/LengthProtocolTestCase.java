@@ -10,9 +10,11 @@
 
 package org.mule.transport.tcp.protocols;
 
-import org.mule.transport.tcp.protocols.LengthProtocol;
-
 import java.io.ByteArrayInputStream;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class LengthProtocolTestCase extends DefaultProtocolTestCase
 {
@@ -22,6 +24,7 @@ public class LengthProtocolTestCase extends DefaultProtocolTestCase
         super(new LengthProtocol(), 1);
     }
 
+    @Test
     public void testFinalValue() throws Exception
     {
         byte[] result = (byte[]) getProtocol().read(new SlowInputStream());
@@ -30,6 +33,7 @@ public class LengthProtocolTestCase extends DefaultProtocolTestCase
 
     // try also with a "generous" input stream (ie one that will return all data
     // without delay) to make sure reset logic is ok
+    @Test
     public void testGenerous() throws Exception
     {
         byte[] bytes = new byte[SlowInputStream.FULL_LENGTH];

@@ -17,8 +17,15 @@ import org.mule.tck.testmodels.fruit.BananaFactory;
 
 import java.util.NoSuchElementException;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class CommonsPoolObjectPoolTestCase extends AbstractPoolingTestCase
 {
+    @Test
     public void testPoolExhaustedFail() throws Exception
     {
         ObjectPool pool = createPoolWithExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_FAIL);
@@ -38,6 +45,7 @@ public class CommonsPoolObjectPoolTestCase extends AbstractPoolingTestCase
         }
     }
     
+    @Test
     public void testPoolExhaustedGrow() throws Exception
     {
         ObjectPool pool = createPoolWithExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_GROW);
@@ -50,6 +58,7 @@ public class CommonsPoolObjectPoolTestCase extends AbstractPoolingTestCase
         assertEquals(MAX_ACTIVE + 1, pool.getNumActive());
     }
     
+    @Test
     public void testPoolExhaustedWait() throws Exception
     {
         ObjectPool pool = createPoolWithExhaustedAction(PoolingProfile.WHEN_EXHAUSTED_WAIT);
@@ -71,6 +80,7 @@ public class CommonsPoolObjectPoolTestCase extends AbstractPoolingTestCase
         }
     }
     
+    @Test
     public void testInitPoolNone() throws Exception
     {
         ObjectPool pool = createPoolWithInitialisationPolicy(PoolingProfile.INITIALISE_NONE);
@@ -78,6 +88,7 @@ public class CommonsPoolObjectPoolTestCase extends AbstractPoolingTestCase
         assertEquals(0, objectFactory.getInstanceCount());
     }
     
+    @Test
     public void testInitPoolOne() throws Exception
     {
         ObjectPool pool = createPoolWithInitialisationPolicy(PoolingProfile.INITIALISE_ONE);
@@ -85,6 +96,7 @@ public class CommonsPoolObjectPoolTestCase extends AbstractPoolingTestCase
         assertEquals(1, objectFactory.getInstanceCount());
     }
     
+    @Test
     public void testInitPoolAll() throws Exception
     {   
         ObjectPool pool = createPoolWithInitialisationPolicy(PoolingProfile.INITIALISE_ALL);

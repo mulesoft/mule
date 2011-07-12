@@ -10,13 +10,21 @@
 
 package org.mule.util.concurrent;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 public class WaitableBooleanTestCase extends AbstractMuleTestCase
 {
     protected final WaitableBoolean TRUE = new WaitableBoolean(true);
     protected final WaitableBoolean FALSE = new WaitableBoolean(false);
 
+    @Test
     public void testCompareToBoolean()
     {
         assertEquals(0, TRUE.compareTo(true));
@@ -25,6 +33,7 @@ public class WaitableBooleanTestCase extends AbstractMuleTestCase
         assertEquals(-1, FALSE.compareTo(true));
     }
 
+    @Test
     public void testCompareToWaitableBoolean()
     {
         assertEquals(0, TRUE.compareTo(new WaitableBoolean(true)));
@@ -34,11 +43,13 @@ public class WaitableBooleanTestCase extends AbstractMuleTestCase
         assertEquals(0, TRUE.compareTo((Object)TRUE));
     }
 
+    @Test
     public void testCompareToObject()
     {
         assertEquals(0, TRUE.compareTo((Object)TRUE));
     }
 
+    @Test
     public void testEquals()
     {
         assertTrue(TRUE.equals(TRUE));
@@ -49,6 +60,7 @@ public class WaitableBooleanTestCase extends AbstractMuleTestCase
         assertFalse(TRUE.equals(":-)"));
     }
 
+    @Test
     public void testHashCode()
     {
         assertTrue(TRUE.hashCode() != FALSE.hashCode());
@@ -56,18 +68,21 @@ public class WaitableBooleanTestCase extends AbstractMuleTestCase
         assertEquals(FALSE.hashCode(), (new WaitableBoolean(false)).hashCode());
     }
 
+    @Test
     public void testToString()
     {
         assertEquals("true", TRUE.toString());
         assertEquals("false", FALSE.toString());
     }
 
+    @Test
     public void testGet()
     {
         assertTrue(TRUE.get());
         assertFalse(FALSE.get());
     }
 
+    @Test
     public void testSet()
     {
         assertTrue(TRUE.set(true));
@@ -78,6 +93,7 @@ public class WaitableBooleanTestCase extends AbstractMuleTestCase
         assertTrue(FALSE.set(true));
     }
 
+    @Test
     public void testCommit()
     {
         assertTrue(TRUE.compareAndSet(true, true));
@@ -89,6 +105,7 @@ public class WaitableBooleanTestCase extends AbstractMuleTestCase
         assertTrue(TRUE.get());
     }
 
+    @Test
     public void testComplement()
     {
         assertFalse(TRUE.complement());
@@ -98,6 +115,7 @@ public class WaitableBooleanTestCase extends AbstractMuleTestCase
         assertTrue(FALSE.get());
     }
 
+    @Test
     public void testAnd()
     {
         assertTrue((new WaitableBoolean(true)).and(true));
@@ -111,6 +129,7 @@ public class WaitableBooleanTestCase extends AbstractMuleTestCase
         assertFalse(TRUE.get());
     }
 
+    @Test
     public void testOr()
     {
         assertTrue((new WaitableBoolean(true)).or(true));
@@ -124,6 +143,7 @@ public class WaitableBooleanTestCase extends AbstractMuleTestCase
         assertTrue(TRUE.get());
     }
 
+    @Test
     public void testXor()
     {
         assertFalse((new WaitableBoolean(true)).xor(true));
@@ -132,6 +152,7 @@ public class WaitableBooleanTestCase extends AbstractMuleTestCase
         assertTrue((new WaitableBoolean(false)).xor(true));
     }
 
+    @Test
     public void testWhenFalse() throws InterruptedException
     {
         final WaitableBoolean blocker = new WaitableBoolean(true);
@@ -169,6 +190,7 @@ public class WaitableBooleanTestCase extends AbstractMuleTestCase
         assertTrue(actionPerformed.get());
     }
 
+    @Test
     public void testWhenFalseAlreadyFalse() throws InterruptedException
     {
         final WaitableBoolean blocker = new WaitableBoolean(false);
@@ -187,6 +209,7 @@ public class WaitableBooleanTestCase extends AbstractMuleTestCase
         assertTrue(actionPerformed.get());
     }
 
+    @Test
     public void testWhenTrue() throws InterruptedException
     {
         final WaitableBoolean blocker = new WaitableBoolean(false);
@@ -223,6 +246,7 @@ public class WaitableBooleanTestCase extends AbstractMuleTestCase
         assertTrue(actionPerformed.get());
     }
 
+    @Test
     public void testWhenTrueAlreadyTrue() throws InterruptedException
     {
         final WaitableBoolean blocker = new WaitableBoolean(true);
@@ -241,6 +265,7 @@ public class WaitableBooleanTestCase extends AbstractMuleTestCase
         assertTrue(actionPerformed.get());
     }
 
+    @Test
     public void testGetLock()
     {
         WaitableBoolean b = new WaitableBoolean(true);

@@ -19,6 +19,10 @@ import java.util.Set;
 
 import javax.management.ObjectName;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 {
 
@@ -33,6 +37,7 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
 
     }
 
+    @Test
     public void testUndeploy() throws Exception
     {
         final Connector connector = new TestConnector(muleContext);

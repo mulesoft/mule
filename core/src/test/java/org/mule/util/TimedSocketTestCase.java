@@ -10,7 +10,7 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -18,6 +18,13 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Note:
@@ -36,6 +43,7 @@ public class TimedSocketTestCase extends AbstractMuleTestCase
     private static final int TEST_TIMEOUT = 1000;
     private static final int TEST_TIMEOUT_DELTA = 300;    
         
+    @Test
     public void testWorkingConnection() throws Exception
     {
         Socket client = null;
@@ -90,6 +98,7 @@ public class TimedSocketTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testConnectionTimeoutInterruptionOnReachableHostnameAndUnreachablePort() throws Exception
     {
         Socket client = null;
@@ -131,6 +140,7 @@ public class TimedSocketTestCase extends AbstractMuleTestCase
         }
     }
     
+    @Test
     public void testConnectionTimeoutInterruptionOnUnreachableHostnameAndPost() throws Exception
     {
         Socket client = null;

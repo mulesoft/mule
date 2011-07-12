@@ -11,22 +11,28 @@
 package org.mule.util.store;
 
 import org.mule.api.lifecycle.InitialisationException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import org.junit.After;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class InMemoryStoreTestCase extends AbstractMuleTestCase
 {
     private InMemoryObjectStore<String> store = null;
-    
-    @Override
-    protected void doTearDown() throws Exception
+
+    @After
+    public void disposeStore()
     {
         store.dispose();
-        super.doTearDown();
     }
 
+    @Test
     public void testSimpleTimedExpiry() throws Exception
     {
         int entryTTL = 3000;
@@ -44,7 +50,8 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
         // make sure all values are gone
         assertObjectsExpired("1", "2", "3");
     }
-    
+
+    @Test
     public void testComplexTimedExpiry() throws Exception
     {
         int entryTTL = 3000;
@@ -66,6 +73,7 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
         assertObjectsInStore("2");
     }
 
+    @Test
     public void testStoreAndRetrieve() throws Exception
     {
         String key = "key";
@@ -82,7 +90,8 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
         store.remove(key);        
         assertObjectsExpired(key);
     }
-    
+
+    @Test
     public void testExpiringUnboundedStore() throws Exception
     {
         createUnboundedObjectStore();
@@ -95,7 +104,8 @@ public class InMemoryStoreTestCase extends AbstractMuleTestCase
         
         assertObjectsInStore("1", "2", "3");
     }
-        
+
+    @Test
     public void testMaxSize() throws Exception
     {
         int maxEntries = 3;

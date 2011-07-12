@@ -10,15 +10,14 @@
 
 package org.mule.module.pgp;
 
-import org.mule.security.MuleHeaderCredentialsAccessor;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.Cipher;
 
-public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleTestCase
+public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleContextTestCase
 {
     protected KeyBasedEncryptionStrategy kbStrategy;
     protected PGPKeyRing keyManager;
@@ -37,7 +36,7 @@ public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleTes
             throw new AssertionError(e);
         }
     }
-    
+
     @Override
     protected boolean isDisabledInThisEnvironment()
     {
@@ -49,22 +48,22 @@ public abstract class AbstractEncryptionStrategyTestCase extends AbstractMuleTes
     {
         PGPKeyRingImpl keyM = new PGPKeyRingImpl();
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        
+
         URL url = loader.getResource("./serverPublic.gpg");
         keyM.setPublicKeyRingFileName(url.getFile());
-    
+
         url = loader.getResource("./serverPrivate.gpg");
         keyM.setSecretKeyRingFileName(url.getFile());
-    
+
         keyM.setSecretAliasId("6247672658342245276");
         keyM.setSecretPassphrase("TestingPassphrase");
         keyM.initialise();
-    
+
         kbStrategy = new KeyBasedEncryptionStrategy();
         kbStrategy.setKeyManager(keyM);
         kbStrategy.setCredentialsAccessor(new FakeCredentialAccessor("Mule server <mule_server@mule.com>"));
         kbStrategy.initialise();
-        
+
         keyManager = keyM;
     }
 

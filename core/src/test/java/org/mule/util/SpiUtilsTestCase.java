@@ -10,11 +10,14 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
 
 public class SpiUtilsTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testThisIsJustAnEmptyPlaceholder() {
         // needed to avoid triggering false TestSuite failures with no test methods.
     }

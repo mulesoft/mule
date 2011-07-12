@@ -10,13 +10,21 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ObjectUtilsTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testIdentityToShortString()
     {
         assertEquals("null", ObjectUtils.identityToShortString(null));
@@ -31,6 +39,7 @@ public class ObjectUtilsTestCase extends AbstractMuleTestCase
         assertEquals(Integer.toHexString(System.identityHashCode(source)), components[1]);
     }
 
+    @Test
     public void testBooleanConversion() throws Exception
     {
         Object value = "true";
@@ -55,6 +64,7 @@ public class ObjectUtilsTestCase extends AbstractMuleTestCase
         assertFalse(ObjectUtils.getBoolean(value, false));
     }
 
+    @Test
     public void testShortConversion() throws Exception
     {
         Object value = "123";
@@ -77,6 +87,7 @@ public class ObjectUtilsTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testByteConversion() throws Exception
     {
         Object value = "123";
@@ -98,6 +109,7 @@ public class ObjectUtilsTestCase extends AbstractMuleTestCase
         assertEquals((byte) -1, ObjectUtils.getByte(value, (byte) -1));
     }
 
+    @Test
     public void testIntConversion() throws Exception
     {
         Object value = "123";
@@ -119,6 +131,7 @@ public class ObjectUtilsTestCase extends AbstractMuleTestCase
         assertEquals(-1, ObjectUtils.getInt(value, -1));
     }
 
+    @Test
     public void testLongConversion() throws Exception
     {
         Object value = "123";
@@ -140,6 +153,7 @@ public class ObjectUtilsTestCase extends AbstractMuleTestCase
         assertEquals(-1, ObjectUtils.getLong(value, -1));
     }
 
+    @Test
     public void testFloatConversion() throws Exception
     {
         Object value = "123.34";
@@ -161,6 +175,7 @@ public class ObjectUtilsTestCase extends AbstractMuleTestCase
         assertEquals(-1, ObjectUtils.getFloat(value, -1), 0.1f);
     }
 
+    @Test
     public void testDoubleConversion() throws Exception
     {
         Object value = "123.34";
@@ -182,6 +197,7 @@ public class ObjectUtilsTestCase extends AbstractMuleTestCase
         assertEquals(-1, ObjectUtils.getDouble(value, -1), 0.1d);
     }
 
+    @Test
     public void testStringConversion() throws Exception
     {
         Object value = "hello";

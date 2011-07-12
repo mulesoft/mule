@@ -13,14 +13,19 @@ package org.mule.transport;
 import org.mule.api.context.WorkManager;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transport.Connectable;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class ConnectableTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
+
+public class ConnectableTestCase extends AbstractMuleContextTestCase
 {
 
     /**
      * MULE-4531
      */
+    @Test
     public void testDoNotConnectIfConnected() throws Exception
     {
         Connectable connectable = new TestConnectable(getTestInboundEndpoint("test"), true);

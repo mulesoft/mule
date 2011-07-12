@@ -16,14 +16,21 @@ import org.mule.api.context.notification.ComponentMessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.service.Service;
 import org.mule.component.simple.EchoComponent;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test ComponentNotifications/Listeners by sending events to a component. A pre and
  * post notification should be received by listeners.
  */
-public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleTestCase
+public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleContextTestCase
 {
 
     protected Service service;
@@ -32,7 +39,7 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleTestC
 
     public ComponentMessageNotificationNoXMLTestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     protected void configureMuleContext(MuleContextBuilder contextBuilder)
@@ -44,14 +51,16 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleTestC
         contextBuilder.setNotificationManager(notificationManager);
     }
 
+    @Override
     protected void doSetUp() throws Exception
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
         componentListener = new ComponentListener();
         service = getTestService("seda", EchoComponent.class);
         if(!muleContext.isStarted()) muleContext.start();
     }
 
+    @Test
     public void testComponentNotificationNotRegistered() throws Exception
     {
         assertFalse(componentListener.isNotified());
@@ -63,6 +72,7 @@ public class ComponentMessageNotificationNoXMLTestCase extends AbstractMuleTestC
         assertFalse(componentListener.isAfter());
     }
 
+    @Test
     public void testComponentNotification() throws Exception
     {
         // Need to configure NotificationManager as "dynamic" in order to do this.

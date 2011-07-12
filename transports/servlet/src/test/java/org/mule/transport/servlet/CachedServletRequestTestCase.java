@@ -14,7 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.endpoint.EndpointException;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 
@@ -23,11 +23,14 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CachedServletRequestTestCase extends AbstractMuleTestCase
+public class CachedServletRequestTestCase extends AbstractMuleContextTestCase
 {
     private static final String CONNECTOR_NAME = "ServletConnector";
 
@@ -47,6 +50,7 @@ public class CachedServletRequestTestCase extends AbstractMuleTestCase
         when(mockServletConfig.getInitParameter(eq(AbstractReceiverServlet.SERVLET_CONNECTOR_NAME_PROPERTY))).thenReturn(CONNECTOR_NAME);
     }
 
+    @Test
     public void testReceiverServletUsingCachedServletRequest() throws Exception
     {
         registerServletConnector();

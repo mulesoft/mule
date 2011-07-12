@@ -33,10 +33,15 @@ import javax.naming.InitialContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This is a UNIT TEST case, not a functional test case.
- * 
+ *
  * @author Yuen-Chi Lian
  */
 public class RmiMessageReceiverTestCase extends AbstractMessageReceiverTestCase
@@ -63,7 +68,48 @@ public class RmiMessageReceiverTestCase extends AbstractMessageReceiverTestCase
         super.doSetUp();
     }
 
-    @SuppressWarnings("unchecked")
+    private void registerRmi() throws Exception
+    {
+        if (null == rmiRegistry)
+        {
+            rmiRegistry = LocateRegistry.createRegistry(11099);
+            Naming.rebind("//localhost:11099/TestMatchingMethodsComponent",
+                new SerializedMatchingMethodsComponent());
+
+            Hashtable<String, String> env = new Hashtable<String, String>();
+            env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.rmi.registry.RegistryContextFactory");
+
+            Context context = new InitialContext(env);
+            SerializedMatchingMethodsComponent obj =
+                (SerializedMatchingMethodsComponent) context.lookup("rmi://localhost:11099/TestMatchingMethodsComponent");
+
+            if (obj == null)
+            {
+                throw new RuntimeException("Could not start RMI properly");
+            }
+        }
+    }
+
+    @Override
+    protected void doTearDown() throws Exception
+    {
+        try
+        {
+            messageReceiver.disconnect();   // the message receiver is disposed by its connector
+
+            connector.disconnect();
+            connector.dispose();
+
+            UnicastRemoteObject.unexportObject(rmiRegistry, true);
+        }
+        catch (Exception e)
+        {
+            LOGGER.warn(e.toString(), e);
+        }
+
+        super.doTearDown();
+    }
+
     @Override
     public InboundEndpoint getEndpoint() throws Exception
     {
@@ -79,7 +125,7 @@ public class RmiMessageReceiverTestCase extends AbstractMessageReceiverTestCase
             }
             builder.setConnector(connector);
 
-            Map properties = new HashMap();
+            Map<Object, Object> properties = new HashMap<Object, Object>();
             properties.put("methodArgumentTypes", "java.lang.String");
             properties.put("methodArgumentsList", Arrays.asList(new String[]{"test"}));
 
@@ -108,67 +154,26 @@ public class RmiMessageReceiverTestCase extends AbstractMessageReceiverTestCase
 
             };
             messageReceiver.initialise();
+            messageReceiver.setListener(getSensingNullMessageProcessor());
         }
         return messageReceiver;
     }
 
+    @Test
     public void testReceive() throws Exception
     {
-        RmiMessageReceiver messageReceiver = this.getMessageReceiver();
+        RmiMessageReceiver rmiMessageReceiver = getMessageReceiver();
 
         // Before connect(), let's do some assertion
-        assertNull(messageReceiver.invokeMethod);
-        messageReceiver.connect();
+        assertNull(rmiMessageReceiver.invokeMethod);
+        rmiMessageReceiver.connect();
 
         // Make sure that the transport could find the method
-        assertNotNull(messageReceiver.invokeMethod);
+        assertNotNull(rmiMessageReceiver.invokeMethod);
 
         // Poll once
         callbackCalled = new Latch();
-        messageReceiver.poll();
+        rmiMessageReceiver.poll();
         assertTrue(callbackCalled.await(1000, TimeUnit.MILLISECONDS));
-    }
-
-    private void registerRmi() throws Exception
-    {
-        if (null == rmiRegistry)
-        {
-            rmiRegistry = LocateRegistry.createRegistry(11099);
-            Naming.rebind("//localhost:11099/TestMatchingMethodsComponent",
-                new SerializedMatchingMethodsComponent());
-
-            Hashtable<String, String> env = new Hashtable<String, String>();
-            env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.rmi.registry.RegistryContextFactory");
-
-            Context context = new InitialContext(env);
-            SerializedMatchingMethodsComponent obj = 
-                (SerializedMatchingMethodsComponent)context.lookup("rmi://localhost:11099/TestMatchingMethodsComponent");
-
-            if (obj == null)
-            {
-                throw new RuntimeException("Could not start RMI properly");
-            }
-        }
-    }
-
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        try
-        {
-            messageReceiver.disconnect();
-            messageReceiver.dispose();
-
-            connector.disconnect();
-            connector.dispose();
-
-            UnicastRemoteObject.unexportObject(rmiRegistry, true);
-        }
-        catch (Exception e)
-        {
-            LOGGER.warn(e.toString(), e);
-        }
-
-        super.doTearDown();
     }
 }

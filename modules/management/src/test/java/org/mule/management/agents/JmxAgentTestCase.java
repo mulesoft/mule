@@ -16,7 +16,7 @@ import org.mule.config.DefaultMuleConfiguration;
 import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
 import org.mule.module.management.agent.JmxAgent;
 import org.mule.module.management.agent.RmiRegistryAgent;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,7 +33,12 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.management.remote.rmi.RMIConnectorServer;
 
-public class JmxAgentTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JmxAgentTestCase extends AbstractMuleContextTestCase
 {
     private static final String[] VALID_AUTH_TOKEN = {"mule", "mulepassword"};
     private static final String DOMAIN = "JmxAgentTest";
@@ -64,15 +69,20 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
     @Override
     protected void doTearDown()
     {
-        jmxAgent.dispose();
+        if (jmxAgent != null)
+        {
+            jmxAgent.dispose();
+        }
     }
 
+    @Test
     public void testDefaultProperties() throws Exception
     {
         jmxAgent.setCredentials(getValidCredentials());
         muleContext.start();
     }
 
+    @Test
     public void testSuccessfulRemoteConnection() throws Exception
     {
         configureProperties();
@@ -98,6 +108,7 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testNoCredentialsProvided() throws Exception
     {
         configureProperties();
@@ -123,6 +134,7 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testNonRestrictedAccess() throws Exception
     {
         configureProperties();
@@ -164,6 +176,7 @@ public class JmxAgentTestCase extends AbstractMuleTestCase
         jmxAgent.setConnectorServerProperties(props);
     }
 
+    @Test
     public void testServiceNameContainsColon() throws Exception
     {
         // create a service with an invalid name. It is registered in the registry as side effect

@@ -10,7 +10,7 @@
 
 package org.mule.transport.udp.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -25,7 +25,7 @@ public class UdpClient
 
     private int port;
     private InetAddress host;
-    private int soTimeout = AbstractMuleTestCase.RECEIVE_TIMEOUT;
+    private int soTimeout = AbstractMuleContextTestCase.RECEIVE_TIMEOUT;
     private int receiveBufferSize = DEFAULT_RECEIVE_BUFFER_SIZE;
     private DatagramSocket socket;
 

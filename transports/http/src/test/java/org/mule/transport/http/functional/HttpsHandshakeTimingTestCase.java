@@ -21,7 +21,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.Connector;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.http.HttpsConnector;
 import org.mule.transport.http.HttpsMessageReceiver;
 import org.mule.transport.ssl.MockHandshakeCompletedEvent;
@@ -39,6 +39,12 @@ import java.util.Map;
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.resource.spi.work.Work;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Test for SSL handshake timeouts. Unfortunately, there is no easy way to blackbox-test this
  * as it would require a SSLSocket implementation that could actually add arbitrary delays to
@@ -48,8 +54,10 @@ import javax.resource.spi.work.Work;
  * work. Yes, this is hacky and fragile but this seems to be the only reasonable alternative
  * for now.
  */
-public class HttpsHandshakeTimingTestCase extends AbstractMuleTestCase
+public class HttpsHandshakeTimingTestCase extends AbstractMuleContextTestCase
 {
+
+    @Test
     public void testHttpsHandshakeExceedsTimeout() throws Exception
     {
         MockHttpsMessageReceiver messageReceiver = setupMockHttpsMessageReceiver();
@@ -73,6 +81,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testHttpsHandshakeCompletesBeforeProcessingMessage() throws Exception
     {
         MockHttpsMessageReceiver messageReceiver = setupMockHttpsMessageReceiver();
@@ -110,7 +119,7 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleTestCase
         HttpsConnector httpsConnector = new HttpsConnector(muleContext);
         httpsConnector.setSslHandshakeTimeout(1000);
 
-        Map properties = Collections.emptyMap();
+        Map<?, ?> properties = Collections.emptyMap();
 
         Mock mockEndpoint = new Mock(InboundEndpoint.class);
         mockEndpoint.expectAndReturn("getConnector", httpsConnector);
@@ -145,5 +154,4 @@ public class HttpsHandshakeTimingTestCase extends AbstractMuleTestCase
             return super.createWork(socket);
         }
     }
-
 }

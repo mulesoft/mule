@@ -9,7 +9,7 @@
  */
 package org.mule.util.scan;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.BloodOrange;
 import org.mule.tck.testmodels.fruit.Fruit;
@@ -24,9 +24,16 @@ import org.mule.util.scan.annotations.SampleClassWithAnnotations;
 
 import java.util.Set;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class ClasspathScannerTestCase extends AbstractMuleTestCase
 {
     //This is slow
+    @Test
     public void testSearchInterfaceScanClasspathAndJars() throws Exception
     {
         ClasspathScanner scanner = new ClasspathScanner("org");
@@ -41,6 +48,7 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
         assertTrue(set.contains(SeedlessGrape.class));
     }
 
+    @Test
     public void testSearchInterfaceScanClasspathAndJarsWithInterfaceFlag() throws Exception
     {
         ClasspathScanner scanner = new ClasspathScanner("org/mule");
@@ -56,6 +64,7 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
     }
 
     //This will be a lot more efficient
+    @Test
     public void testInterfaceScanClasspathAndJarsMultipleBasePaths() throws Exception
     {
         ClasspathScanner scanner = new ClasspathScanner("org/mule");
@@ -71,7 +80,7 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
         assertTrue(set.contains(MadridOrange.class));
     }
 
-
+    @Test
     public void testImplementationScanClasspathAndJarsMultipleBasePaths() throws Exception
     {
         ClasspathScanner scanner = new ClasspathScanner("org/mule");
@@ -85,6 +94,7 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
         assertTrue(set.contains(MadridOrange.class));
     }
 
+    @Test
     public void testAnnotationMetaScanClasspathAndJarsMultipleBasePaths() throws Exception
     {
         ClasspathScanner scanner = new ClasspathScanner("org/mule/util");
@@ -96,6 +106,7 @@ public class ClasspathScannerTestCase extends AbstractMuleTestCase
         assertTrue(set.contains(SubscribeBean.class));
     }
 
+    @Test
     public void testAnnotationScanClasspathAndJarsMultipleBasePaths() throws Exception
     {
         ClasspathScanner scanner = new ClasspathScanner("org/mule");

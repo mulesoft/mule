@@ -11,9 +11,9 @@
 package org.mule.util.pool;
 
 import org.mule.config.PoolingProfile;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public abstract class AbstractPoolingTestCase extends AbstractMuleTestCase
+public abstract class AbstractPoolingTestCase extends AbstractMuleContextTestCase
 {
     protected static final int DEFAULT_EXHAUSTED_ACTION = PoolingProfile.WHEN_EXHAUSTED_FAIL;
     protected static final int DEFAULT_INITIALISATION_POLICY = PoolingProfile.INITIALISE_NONE;

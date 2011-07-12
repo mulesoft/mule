@@ -11,7 +11,7 @@
 package org.mule.test.firewall;
 
 import org.mule.config.factories.HostNameFactory;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -24,6 +24,10 @@ import java.security.SecureRandom;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 
 public class FirewallTestCase extends AbstractMuleTestCase
 {
@@ -35,6 +39,7 @@ public class FirewallTestCase extends AbstractMuleTestCase
 
     private SecureRandom random = new SecureRandom();
 
+    @Test
     public void testLoopback() throws Exception
     {
         // this gives localhost.localdomain on sourceforge
@@ -43,6 +48,7 @@ public class FirewallTestCase extends AbstractMuleTestCase
 //        assertEquals("Strange name for loopback", LOCALHOST, InetAddress.getByName(LOCALADDR).getCanonicalHostName());
     }
 
+    @Test
     public void testLocalHost() throws Exception
     {
         InetAddress aLocalAddress = InetAddress.getLocalHost();
@@ -52,6 +58,7 @@ public class FirewallTestCase extends AbstractMuleTestCase
         assertEquals("Inconsistent hostname", aLocalAddress.getHostName(), new HostNameFactory().create(null));
     }
 
+    @Test
     public void testCanonicalHost() throws Exception
     {
         InetAddress aLocalAddress = InetAddress.getLocalHost();
@@ -91,6 +98,7 @@ public class FirewallTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testLocalhostTcp() throws Exception
     {
         for (int i = 0; i < TEST_COUNT; ++i)
@@ -99,6 +107,7 @@ public class FirewallTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testHostnameTcp() throws Exception
     {
         for (int i = 0; i < TEST_COUNT; ++i)
@@ -107,6 +116,7 @@ public class FirewallTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testLocalhostUdp() throws Exception
     {
         for (int i = 0; i < TEST_COUNT; ++i)
@@ -115,6 +125,7 @@ public class FirewallTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testHostnameUdp() throws Exception
     {
         for (int i = 0; i < TEST_COUNT; ++i)

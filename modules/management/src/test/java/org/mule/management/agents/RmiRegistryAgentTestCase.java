@@ -11,11 +11,16 @@
 package org.mule.management.agents;
 
 import org.mule.module.management.agent.RmiRegistryAgent;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class RmiRegistryAgentTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testHostSetOnly() throws Exception
     {
         RmiRegistryAgent agent = new RmiRegistryAgent();
@@ -24,6 +29,7 @@ public class RmiRegistryAgentTestCase extends AbstractMuleTestCase
         assertEquals("rmi://www.example.com:1099", agent.getServerUri());
     }
 
+    @Test
     public void testPortSetOnly() throws Exception
     {
         RmiRegistryAgent agent = new RmiRegistryAgent();
@@ -32,6 +38,7 @@ public class RmiRegistryAgentTestCase extends AbstractMuleTestCase
         assertEquals("rmi://localhost:1095", agent.getServerUri());
     }
 
+    @Test
     public void testHostAndPortSet() throws Exception
     {
         RmiRegistryAgent agent = new RmiRegistryAgent();
@@ -41,6 +48,7 @@ public class RmiRegistryAgentTestCase extends AbstractMuleTestCase
         assertEquals("rmi://www.example.com:1095", agent.getServerUri());
     }
   
+    @Test
     public void testStart() throws Exception
     {
         RmiRegistryAgent agent = new RmiRegistryAgent();

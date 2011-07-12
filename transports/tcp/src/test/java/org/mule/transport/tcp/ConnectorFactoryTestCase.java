@@ -11,10 +11,16 @@
 package org.mule.transport.tcp;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class ConnectorFactoryTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class ConnectorFactoryTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testCreate() throws Exception
     {
         ImmutableEndpoint endpoint = 

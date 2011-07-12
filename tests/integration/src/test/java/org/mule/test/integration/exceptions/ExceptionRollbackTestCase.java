@@ -15,13 +15,18 @@ import org.mule.api.transaction.Transaction;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.exception.DefaultSystemExceptionStrategy;
 import org.mule.routing.filters.WildcardFilter;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.transaction.TransactionCoordination;
 
 import java.io.FileNotFoundException;
 
-public class ExceptionRollbackTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class ExceptionRollbackTestCase extends AbstractMuleContextTestCase
 {
     private DefaultSystemExceptionStrategy strategy;
     private Transaction tx;
@@ -44,6 +49,7 @@ public class ExceptionRollbackTestCase extends AbstractMuleTestCase
         TransactionCoordination.getInstance().unbindTransaction(tx);
     }
 
+    @Test
     public void testCommit() throws Exception
     {
         strategy.handleException(new FileNotFoundException());
@@ -52,6 +58,7 @@ public class ExceptionRollbackTestCase extends AbstractMuleTestCase
         //assertTrue(tx.isCommitted());
     }
 
+    @Test
     public void testRollback() throws Exception
     {
         strategy.handleException(new DefaultMuleException(CoreMessages.agentsRunning()));
@@ -60,6 +67,7 @@ public class ExceptionRollbackTestCase extends AbstractMuleTestCase
         assertFalse(tx.isCommitted());
     }
 
+    @Test
     public void testRollbackByDefault() throws Exception
     {
         strategy.handleException(new IllegalAccessException());

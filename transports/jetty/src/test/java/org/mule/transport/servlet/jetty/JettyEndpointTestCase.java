@@ -12,10 +12,15 @@ package org.mule.transport.servlet.jetty;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class JettyEndpointTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class JettyEndpointTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testHostPortOnlyUrl() throws Exception
     {
         EndpointURI endpointUri = new MuleEndpointURI("jetty:http://localhost:8080", muleContext);
@@ -29,6 +34,7 @@ public class JettyEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jetty", endpointUri.getSchemeMetaInfo());
     }
 
+    @Test
     public void testHostPortOnlyUrlAndUserInfo() throws Exception
     {
         EndpointURI endpointUri = new MuleEndpointURI("jetty:http://admin:pwd@localhost:8080", muleContext);
@@ -45,6 +51,7 @@ public class JettyEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jetty", endpointUri.getSchemeMetaInfo());
     }
 
+    @Test
     public void testHostPortAndPathUrl() throws Exception
     {
         EndpointURI endpointUri = new MuleEndpointURI("jetty:http://localhost:8080/app/path", muleContext);
@@ -59,6 +66,7 @@ public class JettyEndpointTestCase extends AbstractMuleTestCase
         assertEquals("jetty", endpointUri.getSchemeMetaInfo());
     }
 
+    @Test
     public void testHostPortAndPathUrlAndUserInfo() throws Exception
     {
         EndpointURI endpointUri = new MuleEndpointURI("jetty:http://admin:pwd@localhost:8080/app/path", muleContext);

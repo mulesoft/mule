@@ -10,9 +10,13 @@
 
 package org.mule.util.concurrent;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class NamedThreadFactoryTestCase extends AbstractMuleTestCase
 {
@@ -29,6 +33,7 @@ public class NamedThreadFactoryTestCase extends AbstractMuleTestCase
         }
     };
 
+    @Test
     public void testNameContextClassloader() throws InterruptedException
     {
         NamedThreadFactory threadFactory = new NamedThreadFactory(testThreadName, testClassLoader);
@@ -46,6 +51,7 @@ public class NamedThreadFactoryTestCase extends AbstractMuleTestCase
         assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
     }
 
+    @Test
     public void testNameIncrement() throws InterruptedException
     {
         NamedThreadFactory threadFactory = new NamedThreadFactory(testThreadName);

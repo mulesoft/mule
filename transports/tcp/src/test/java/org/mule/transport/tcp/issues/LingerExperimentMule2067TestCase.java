@@ -10,7 +10,7 @@
 
 package org.mule.transport.tcp.issues;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -19,6 +19,7 @@ import java.net.Socket;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 /**
  * Are the "address already in use" errors coming from lingering sockets?
@@ -38,6 +39,7 @@ public class LingerExperimentMule2067TestCase extends AbstractMuleTestCase
 
     private Log logger = LogFactory.getLog(getClass());
 
+    @Test
     public void testInoffensive() throws IOException
     {
         // this shows it's not simple open/close that causes a problem
@@ -45,6 +47,7 @@ public class LingerExperimentMule2067TestCase extends AbstractMuleTestCase
         openCloseClientServer(1000, PORT, NO_LINGER, NO_LINGER); // ok
     }
 
+    @Test
     public void testThisShowsTheProblem() throws IOException
     {
         // this shows a problem with repeated open/close with a client/server pair
@@ -56,6 +59,7 @@ public class LingerExperimentMule2067TestCase extends AbstractMuleTestCase
         repeatOpenCloseClientServer(10, 10, PORT, NO_WAIT); // intermittent
     }
 
+    @Test
     public void testWithClientLinger() throws IOException
     {
         // this shows it's not simple client linger time, or the later tests would always fail
@@ -69,6 +73,7 @@ public class LingerExperimentMule2067TestCase extends AbstractMuleTestCase
         repeatOpenCloseClientServer(10, 10, PORT, NO_WAIT, HARD_CLOSE); // intermittent
     }
 
+    @Test
     public void testWithServerLinger() throws IOException
     {
         // server linger seems to improve things(?!), but still have problems
@@ -79,6 +84,7 @@ public class LingerExperimentMule2067TestCase extends AbstractMuleTestCase
         repeatOpenCloseClientServer(10, 10, PORT, NO_WAIT, NO_LINGER, 1); // intermittent
     }
 
+    @Test
     public void testHardClose() throws IOException
     {
         // this gives (very?) occasional "already in use" and also a "connection reset by peer"

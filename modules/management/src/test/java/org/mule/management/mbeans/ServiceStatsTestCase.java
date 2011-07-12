@@ -19,8 +19,13 @@ import java.util.Set;
 
 import javax.management.ObjectName;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class ServiceStatsTestCase extends AbstractMuleJmxTestCase
 {
+    @Test
     public void testUndeploy() throws Exception
     {
         final String domainOriginal = "TEST_DOMAIN_1";

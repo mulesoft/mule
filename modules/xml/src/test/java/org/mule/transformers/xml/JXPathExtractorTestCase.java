@@ -11,13 +11,18 @@
 package org.mule.transformers.xml;
 
 import org.mule.module.xml.transformer.JXPathExtractor;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.List;
 
 import org.dom4j.Node;
+import org.junit.Test;
 
-public class JXPathExtractorTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class JXPathExtractorTestCase extends AbstractMuleContextTestCase
 {
 
     protected static final String TEST_XML_MULTI_RESULTS = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
@@ -40,6 +45,7 @@ public class JXPathExtractorTestCase extends AbstractMuleTestCase
     protected static final String TEST_XML_SINGLE_RESULT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
                                                            + "<root>" + "<node>value1</node>" + "</root>";
 
+    @Test
     public void testSingeResult() throws Exception
     {
         final JXPathExtractor extractor = createObject(JXPathExtractor.class);
@@ -53,6 +59,7 @@ public class JXPathExtractorTestCase extends AbstractMuleTestCase
         assertEquals("Wrong value extracted.", "value1", result);
     }
 
+    @Test
     public void testMultipleResults() throws Exception
     {
         JXPathExtractor extractor = createObject(JXPathExtractor.class);
@@ -67,6 +74,7 @@ public class JXPathExtractorTestCase extends AbstractMuleTestCase
         assertEquals("Wrong value returned.", "value3", results.get(2));
     }
 
+    @Test
     public void testMultipleResultsAsNode() throws Exception
     {
         JXPathExtractor extractor = createObject(JXPathExtractor.class);
@@ -84,6 +92,7 @@ public class JXPathExtractorTestCase extends AbstractMuleTestCase
      * This xpath expression will internally have DefaultText returned, test there
      * are no ClassCastExceptions.
      */
+    @Test
     public void testMultipleResultsNested() throws Exception
     {
         JXPathExtractor extractor = createObject(JXPathExtractor.class);

@@ -15,15 +15,22 @@ import org.mule.OptimizedRequestContext;
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.ThreadSafeAccess;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test case to reproduce issue described in MULE-4407 and validate fix.
  */
-public class MuleEventWorkTestCase extends AbstractMuleTestCase
+public class MuleEventWorkTestCase extends AbstractMuleContextTestCase
 {
 
     protected MuleEvent originalEvent;
@@ -40,6 +47,7 @@ public class MuleEventWorkTestCase extends AbstractMuleTestCase
         OptimizedRequestContext.unsafeSetEvent(originalEvent);
     }
 
+    @Test
     public void testScheduleMuleEventWork() throws Exception
     {
         muleContext.getWorkManager().scheduleWork(new TestMuleEventWork(originalEvent));
@@ -61,6 +69,7 @@ public class MuleEventWorkTestCase extends AbstractMuleTestCase
         }
     }
 
+    @Test
     public void testRunMuleEventWork() throws Exception
     {
         new TestMuleEventWork(originalEvent).run();

@@ -12,11 +12,16 @@ package org.mule.transport.soap.axis;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class AxisEndpointMule2164TestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class AxisEndpointMule2164TestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testAxisHttpEndpointURICopy() throws Exception
     {
 
@@ -38,6 +43,7 @@ public class AxisEndpointMule2164TestCase extends AbstractMuleTestCase
         assertEquals(endpointUri, newEndpointUri);
     }
 
+    @Test
     public void testAxisJmsEndpointURICopy() throws Exception
     {
 

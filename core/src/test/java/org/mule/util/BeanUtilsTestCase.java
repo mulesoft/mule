@@ -9,7 +9,7 @@
  */
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.tck.testmodels.fruit.OrangeInterface;
 
@@ -19,15 +19,21 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class BeanUtilsTestCase extends AbstractMuleTestCase
 {
     private Map<String, String> map;
 
-    @Override
-    protected void doSetUp() throws Exception
+    @Before
+    public void createTestData()
     {
-        super.doSetUp();
-
         map = new HashMap<String, String>();
         map.put("brand", "Juicy!");
         map.put("radius", "2.32");
@@ -35,6 +41,7 @@ public class BeanUtilsTestCase extends AbstractMuleTestCase
         map.put("trombones", "3");
     }
 
+    @Test
     public void testBeanPropertiesOnAProxy() throws Exception
     {
         OrangeInterface o = (OrangeInterface)Proxy.newProxyInstance(getClass().getClassLoader(),
@@ -48,6 +55,7 @@ public class BeanUtilsTestCase extends AbstractMuleTestCase
         assertEquals(new Integer(22), o.getSegments());
     }
 
+    @Test
     public void testBeanPropertiesWithoutFail() throws Exception
     {
         Orange o = new Orange();
@@ -60,6 +68,7 @@ public class BeanUtilsTestCase extends AbstractMuleTestCase
         assertEquals(new Integer(22), o.getSegments());
     }
 
+    @Test
     public void testBeanPropertiesWithFail() throws Exception
     {
         try

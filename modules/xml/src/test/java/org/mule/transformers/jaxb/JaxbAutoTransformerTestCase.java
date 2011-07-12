@@ -13,15 +13,21 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.jaxb.model.Item;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.tck.AbstractMuleTestCase;
-
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
+
+import org.junit.Test;
 import org.w3c.dom.Document;
 
-public class JaxbAutoTransformerTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class JaxbAutoTransformerTestCase extends AbstractMuleContextTestCase
 {
     public static final String ITEM_XML = "<item><code>1234</code><description>Vacuum Cleaner</description><in-stock>true</in-stock></item>";
 
+    @Test
     public void testCustomTransform() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(ITEM_XML, muleContext);

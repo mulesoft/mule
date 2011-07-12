@@ -10,13 +10,21 @@
 
 package org.mule.util.compression;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Arrays;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class CompressionTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testCompressDefaultGZip() throws Exception
     {
         String temp = "This is a compressed string";
@@ -48,24 +56,28 @@ public class CompressionTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testNullIsCompressed() throws Exception
     {
         CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
         assertFalse(strategy.isCompressed(null));
     }
 
+    @Test
     public void testEmptyIsCompressed() throws Exception
     {
         CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
         assertFalse(strategy.isCompressed(new byte[0]));
     }
 
+    @Test
     public void testCompressNullBytes() throws Exception
     {
         CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
         assertNull(strategy.compressByteArray(null));
     }
 
+    @Test
     public void testCompressEmptyBytes() throws Exception
     {
         CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
@@ -75,12 +87,14 @@ public class CompressionTestCase extends AbstractMuleTestCase
         assertTrue(strategy.isCompressed(result));
     }
 
+    @Test
     public void testUncompressNullBytes() throws Exception
     {
         CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();
         assertNull(strategy.uncompressByteArray(null));
     }
 
+    @Test
     public void testUncompressEmptyBytes() throws Exception
     {
         CompressionStrategy strategy = CompressionHelper.getDefaultCompressionStrategy();

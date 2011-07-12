@@ -14,7 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.wire.WireFormat;
 import org.mule.module.client.remoting.notification.RemoteDispatcherNotification;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformer.wire.SerializationWireFormat;
 
@@ -23,7 +23,13 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RemoteDispatcherSerializationTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class RemoteDispatcherSerializationTestCase extends AbstractMuleContextTestCase
 {
     protected RemoteDispatcherNotification getNotification()
     {
@@ -40,12 +46,14 @@ public class RemoteDispatcherSerializationTestCase extends AbstractMuleTestCase
         return notification;
     }
     
+    @Test
     public void testNotificationJavaSerialization() throws Exception
     {
         doTestNotificationSerialization(createObject(SerializationWireFormat.class));
     }
 
     // TODO MULE-3118
+//    @Test
 //    public void testNotificationXmlSerialization() throws Exception
 //    {
 //        XStreamWireFormat wireFormat = new XStreamWireFormat();

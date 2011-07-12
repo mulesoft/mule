@@ -12,8 +12,8 @@ package org.mule.transport.xmpp;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.concurrent.Latch;
 
 import junit.framework.Assert;
@@ -40,7 +40,7 @@ public class XmppCallback implements EventCallback
         
         Message xmppMessage = (Message) payload;
         XmppMessageSyncTestCase.assertEquals(expectedMessageType, xmppMessage.getType());
-        XmppMessageSyncTestCase.assertEquals(AbstractMuleTestCase.TEST_MESSAGE, xmppMessage.getBody());
+        XmppMessageSyncTestCase.assertEquals(AbstractMuleContextTestCase.TEST_MESSAGE, xmppMessage.getBody());
         
         latch.countDown();
     }

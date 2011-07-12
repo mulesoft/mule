@@ -10,7 +10,7 @@
 
 package org.mule.transport.tcp.issues;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;
 import java.net.BindException;
@@ -20,6 +20,7 @@ import java.net.Socket;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 
 /**
  * Can we avoid the "address already in use" errors by using SO_REUSEADDR?
@@ -58,12 +59,14 @@ public class ReuseExperimentMule2067TestCase extends AbstractMuleTestCase
 
     private Log logger = LogFactory.getLog(getClass());
 
+    @Test
     public void testReuse() throws IOException
     {
         repeatOpenCloseClientServer(1000, 10, PORT, 1, REUSE, false); // fails, but less often?
         repeatOpenCloseClientServer(100, 10, PORT, 1, NO_REUSE, false); // intermittent
     }
 
+    @Test
     public void testMeasureImprovement() throws IOException
     {
         measureMeanRunLength(10, 100, 10, PORT, 100, NO_REUSE);

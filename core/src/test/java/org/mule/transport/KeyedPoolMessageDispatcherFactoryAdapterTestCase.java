@@ -10,11 +10,16 @@
 
 package org.mule.transport;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 public class KeyedPoolMessageDispatcherFactoryAdapterTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testNullFactory()
     {
         try

@@ -11,15 +11,24 @@
 package org.mule.module.xml.filters;
 
 import org.mule.DefaultMuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.api.MuleContext;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 
 public class SchemaValidationTestCase extends AbstractMuleTestCase
 {
+    MuleContext muleContext = mock(MuleContext.class);
 
     /**
      * tests validation
      */
+    @Test
     public void testValidate() throws Exception
     {
         SchemaValidationFilter filter = new SchemaValidationFilter();

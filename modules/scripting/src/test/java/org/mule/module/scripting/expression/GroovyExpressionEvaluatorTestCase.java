@@ -11,7 +11,7 @@ package org.mule.module.scripting.expression;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
@@ -20,10 +20,20 @@ import java.util.Arrays;
 
 import groovyjarjarasm.asm.ClassWriter;
 import groovyjarjarasm.asm.Opcodes;
+import org.junit.Test;
 
-public class GroovyExpressionEvaluatorTestCase extends AbstractMuleTestCase
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class GroovyExpressionEvaluatorTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testWithExpressions()
     {
         Apple apple = new Apple();
@@ -48,6 +58,7 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertNull(value);
     }
 
+    @Test
     public void testRegistrySyntax() throws Exception
     {
         Apple apple = new Apple();
@@ -75,6 +86,7 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleTestCase
         assertEquals(false, result);
     }
 
+    @Test
     public void testComplexExpressionLowLevelParsing() throws Exception
     {
         final GroovyExpressionEvaluator evaluator = new GroovyExpressionEvaluator();
@@ -94,6 +106,7 @@ public class GroovyExpressionEvaluatorTestCase extends AbstractMuleTestCase
      * See: MULE-4797 GroovyExpressionEvaluator script is unable to load user classes
      * when used with hot deployment See:
      */
+    @Test
     public void testUseContextClassLoaderToResolveClasses() throws ClassNotFoundException
     {
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();

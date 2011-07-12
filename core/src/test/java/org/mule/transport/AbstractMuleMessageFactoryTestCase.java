@@ -13,9 +13,15 @@ package org.mule.transport;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.MessageTypeNotSupportedException;
 import org.mule.api.transport.MuleMessageFactory;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleContextTestCase
 {
     protected String encoding;
     
@@ -38,6 +44,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleTes
         encoding = muleContext.getConfiguration().getDefaultEncoding();
     }
     
+    @Test
     public void testNullPayload() throws Exception
     {
         MuleMessageFactory factory = createMuleMessageFactory();
@@ -47,6 +54,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleTes
         assertEquals(NullPayload.getInstance(), message.getPayload());
     }
 
+    @Test
     public void testValidPayload() throws Exception
     {
         MuleMessageFactory factory = createMuleMessageFactory();
@@ -57,6 +65,7 @@ public abstract class AbstractMuleMessageFactoryTestCase extends AbstractMuleTes
         assertEquals(payload, message.getPayload());
     }
     
+    @Test
     public void testUnsupportedPayloadType() throws Exception
     {
         if (runUnsuppoprtedTransportMessageTest == false)

@@ -15,8 +15,14 @@ import org.mule.config.PoolingProfile;
 import org.mule.object.PrototypeObjectFactory;
 import org.mule.tck.testmodels.fruit.WaterMelon;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class DefaultLifecycleEnabledObjectPoolTestCase extends AbstractPoolingTestCase
 {
+
+    @Test
     public void testPoolStart() throws Exception
     {
         DefaultLifecycleEnabledObjectPool pool = createObjectPool();
@@ -29,6 +35,7 @@ public class DefaultLifecycleEnabledObjectPoolTestCase extends AbstractPoolingTe
         assertEquals("started", borrowed.getState());
     }
     
+    @Test
     public void testPoolStop() throws Exception
     {
         DefaultLifecycleEnabledObjectPool pool = createObjectPool();

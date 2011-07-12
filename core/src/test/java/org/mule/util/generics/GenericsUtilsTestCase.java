@@ -9,7 +9,7 @@
  */
 package org.mule.util.generics;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -18,6 +18,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class GenericsUtilsTestCase extends AbstractMuleTestCase
 {
@@ -28,8 +33,8 @@ public class GenericsUtilsTestCase extends AbstractMuleTestCase
 
     protected Type expectedResults[];
 
-    @Override
-    protected void doSetUp() throws Exception
+    @Before
+    public void createTestData()
     {
         this.targetClass = Foo.class;
         this.methods = new String[]{"a", "b", "b2", "b3", "c", "d", "d2", "d3", "e", "e2", "e3"};
@@ -43,61 +48,73 @@ public class GenericsUtilsTestCase extends AbstractMuleTestCase
         return GenericsUtils.getMapValueReturnType(method);
     }
 
+    @Test
     public void testA() throws Exception
     {
         executeTest();
     }
 
+    @Test
     public void testB() throws Exception
     {
         executeTest();
     }
 
+    @Test
     public void testB2() throws Exception
     {
         executeTest();
     }
 
+    @Test
     public void testB3() throws Exception
     {
         executeTest();
     }
 
+    @Test
     public void testC() throws Exception
     {
         executeTest();
     }
 
+    @Test
     public void testD() throws Exception
     {
         executeTest();
     }
 
+    @Test
     public void testD2() throws Exception
     {
         executeTest();
     }
 
+    @Test
     public void testD3() throws Exception
     {
         executeTest();
     }
 
+    @Test
     public void testE() throws Exception
     {
         executeTest();
     }
 
+    @Test
     public void testE2() throws Exception
     {
         executeTest();
     }
 
+    @Test
     public void testE3() throws Exception
     {
         executeTest();
     }
 
+    @Test
     public void testProgrammaticListIntrospection() throws Exception
     {
         Method setter = GenericBean.class.getMethod("setResourceList", List.class);
@@ -149,7 +166,7 @@ public class GenericsUtilsTestCase extends AbstractMuleTestCase
 
     protected void executeTest() throws NoSuchMethodException
     {
-        String methodName = getName().trim().replaceFirst("test", "").toLowerCase();
+        String methodName = name.getMethodName().trim().replaceFirst("test", "").toLowerCase();
         for (int i = 0; i < this.methods.length; i++)
         {
             if (methodName.equals(this.methods[i]))

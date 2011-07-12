@@ -11,11 +11,16 @@
 package org.mule.test.integration.util;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class ObjectNameHelperTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class ObjectNameHelperTestCase extends AbstractMuleContextTestCase
 {
     
+    @Test
     public void testEndpointAutomaticNames() throws Exception
     {
         ImmutableEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(
@@ -34,6 +39,7 @@ public class ObjectNameHelperTestCase extends AbstractMuleTestCase
         assertEquals("endpoint.pop3.ross.mycompany.com", ep.getName());
     }
 
+    @Test
     public void testEndpointNames() throws Exception
     {
         ImmutableEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(
@@ -55,6 +61,7 @@ public class ObjectNameHelperTestCase extends AbstractMuleTestCase
         assertEquals("this.is.another.Wierd.Name.x", ep.getName());
     }
 
+    @Test
     public void testTestEndpoint() throws Exception
     {
         ImmutableEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(

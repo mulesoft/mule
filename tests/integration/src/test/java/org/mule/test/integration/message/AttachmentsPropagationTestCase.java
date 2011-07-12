@@ -13,15 +13,22 @@ package org.mule.test.integration.message;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.email.transformers.PlainTextDataSource;
 
 import javax.activation.DataHandler;
 
-public class AttachmentsPropagationTestCase extends AbstractMuleTestCase implements EventCallback
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+public class AttachmentsPropagationTestCase extends AbstractMuleContextTestCase implements EventCallback
 {
+    @Test
     public void testSanity()
     {
         fail("Convert this test to an XML-based configuration");
@@ -66,6 +73,7 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
         fc.setReturnData(message.getAttachmentNames().toString());
     }
 
+    @Test
     public void testSingleComponentKnowsAttachments() throws Exception
     {
 
@@ -77,6 +85,7 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
         assertEquals("[SINGLE]", result.getPayloadAsString());
     }
 
+    @Test
     public void testChainedComponentKnowsAttachments() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -88,6 +97,7 @@ public class AttachmentsPropagationTestCase extends AbstractMuleTestCase impleme
         assertEquals("[SINGLE, CHAINED]", result.getPayloadAsString());
     }
 
+    @Test
     public void testClientReceivesAttachments() throws Exception
     {
         // a MuleClient should be able to receive attachments

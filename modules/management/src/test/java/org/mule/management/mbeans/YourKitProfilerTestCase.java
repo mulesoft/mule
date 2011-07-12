@@ -14,6 +14,10 @@ import org.mule.module.management.mbean.YourKitProfilerServiceMBean;
 
 import java.lang.reflect.Method;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
 
 public class YourKitProfilerTestCase extends AbstractMuleJmxTestCase
 {
@@ -24,6 +28,7 @@ public class YourKitProfilerTestCase extends AbstractMuleJmxTestCase
      *
      * @throws Exception
      */
+    @Test
     public void testMethodLenght() throws Exception
     {
         Method[] methods = YourKitProfilerServiceMBean.class.getMethods();

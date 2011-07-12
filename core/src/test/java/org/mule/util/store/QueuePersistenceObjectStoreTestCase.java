@@ -27,8 +27,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,7 +41,9 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
 {
     private static final String QUEUE_NAME = "the-queue";
 
-    private TemporaryFolder tempFolder;
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
     private File persistenceFolder;
     private MuleContext mockMuleContext;
 
@@ -44,14 +51,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        initTemporaryFolder();
         initMockMuleContext();
-    }
-
-    private void initTemporaryFolder() throws IOException
-    {
-        tempFolder = new TemporaryFolder();
-        tempFolder.create();
     }
 
     private void initMockMuleContext()
@@ -64,13 +64,6 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         mockMuleContext = mock(MuleContext.class);
         when(mockMuleContext.getConfiguration()).thenReturn(mockConfig);
         when(mockMuleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
-    }
-
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        tempFolder.delete();
-        super.doTearDown();
     }
 
     @Override
@@ -94,6 +87,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         return new QueueKey("theQueue", UUID.getUUID());
     }
 
+    @Test
     public void testCreatingTheObjectStoreThrowsMuleRuntimeException()
     {
         MuleRuntimeException muleRuntimeException = new MuleRuntimeException(CoreMessages.createStaticMessage("boom"));
@@ -115,6 +109,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         }
     }
 
+    @Test
     public void testAllKeysOnNotYetOpenedStore() throws ObjectStoreException
     {
         QueuePersistenceObjectStore<Serializable> store =
@@ -124,6 +119,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         assertEquals(0, allKeys.size());
     }
 
+    @Test
     public void testListExistingFiles() throws Exception
     {
         String id = UUID.getUUID();
@@ -139,6 +135,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         assertEquals(id, key.id);
     }
 
+    @Test
     public void testRetrieveFileFromDisk() throws Exception
     {
         // create the store first so that the queuestore directory is created as a side effect
@@ -152,6 +149,7 @@ public class QueuePersistenceObjectStoreTestCase extends AbstractObjectStoreCont
         assertEquals(TEST_MESSAGE, value);
     }
 
+    @Test
     public void testRemove() throws Exception
     {
         // create the store first so that the queuestore directory is created as a side effect

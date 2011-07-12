@@ -10,7 +10,7 @@
 
 package org.mule.util.concurrent;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.util.StringUtils;
 
 import java.util.ArrayList;
@@ -26,26 +26,34 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 public class WaitPolicyTestCase extends AbstractMuleTestCase
 {
     private ExceptionCollectingThreadGroup threadGroup;
     ThreadPoolExecutor executor;
     ReentrantLock executorLock;
 
-    @Override
-    protected void doSetUp() throws Exception
+    @Before
+    public void startExecutor()
     {
-        super.doSetUp();
-
         // allow 1 active & 1 queued Thread
-        executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue(1));
+        executor = new ThreadPoolExecutor(1, 1, 10000L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(1));
         executor.prestartAllCoreThreads();
 
         // the lock must be fair to guarantee FIFO access to the executor;
         // 'synchronized' on a monitor is not good enough.
         executorLock = new ReentrantLock(true);
 
-        // this is a Threadgroup that collects uncaught exceptions. Necessary for JDK
+        // this is a ThreadGroup that collects uncaught exceptions. Necessary for JDK
         // 1.4.x only.
         threadGroup = new ExceptionCollectingThreadGroup();
 
@@ -53,12 +61,11 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
         SleepyTask.activeTasks.set(0);
     }
 
-    @Override
-    protected void doTearDown() throws Exception
+    @After
+    public void shutDownExecutor()
     {
         executor.shutdown();
         threadGroup.destroy();
-        super.doTearDown();
     }
 
     // Submit the given Runnables to an ExecutorService, but do so in separate
@@ -85,6 +92,7 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
 
             Runnable submitterAction = new Runnable()
             {
+                @Override
                 public void run()
                 {
                     // the lock is important because otherwise two submitters might
@@ -118,6 +126,7 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
         return submitters;
     }
 
+    @Test
     public void testWaitPolicyWithShutdownExecutor() throws Exception
     {
         assertEquals(0, SleepyTask.activeTasks.get());
@@ -146,6 +155,7 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
         assertEquals(0, SleepyTask.activeTasks.get());
     }
 
+    @Test
     public void testWaitPolicyForever() throws Exception
     {
         assertEquals(0, SleepyTask.activeTasks.get());
@@ -174,6 +184,7 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
         assertEquals(0, SleepyTask.activeTasks.get());
     }
 
+    @Test
     public void testWaitPolicyWithTimeout() throws Exception
     {
         assertEquals(0, SleepyTask.activeTasks.get());
@@ -201,6 +212,7 @@ public class WaitPolicyTestCase extends AbstractMuleTestCase
         assertEquals(0, SleepyTask.activeTasks.get());
     }
 
+    @Test
     public void testWaitPolicyWithTimeoutFailure() throws Exception
     {
         assertEquals(0, SleepyTask.activeTasks.get());
@@ -296,6 +308,7 @@ class SleepyTask extends Object implements Runnable
         return this.getClass().getName() + '{' + name + ", " + sleepTime + '}';
     }
 
+    @Override
     public void run()
     {
         activeTasks.incrementAndGet();

@@ -16,7 +16,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.service.Service;
 import org.mule.config.DefaultMuleConfiguration;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import com.mockobjects.dynamic.Mock;
 
@@ -25,14 +25,21 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Whitebox test for the SSL latch in SslMessageReceiver. The use of reflection here is hacky
  * but the alternative would be stubbing large parts of the JSSE classes in order to influence
  * timing while establishing the SSL handshake (wich sounds even hackier than this test).
  */
-public class SslHandshakeTimingTestCase extends AbstractMuleTestCase
+public class SslHandshakeTimingTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testSslHandshakeTimeout() throws Exception
     {
         SslMessageReceiver receiver = setupMockSslMessageReciever();
@@ -52,6 +59,7 @@ public class SslHandshakeTimingTestCase extends AbstractMuleTestCase
         }
     }
     
+    @Test
     public void testSslHandshakeSuccessful() throws Exception
     {
         SslMessageReceiver receiver = setupMockSslMessageReciever();

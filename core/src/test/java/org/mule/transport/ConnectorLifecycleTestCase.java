@@ -19,19 +19,27 @@ import org.mule.api.service.Service;
 import org.mule.api.source.CompositeMessageSource;
 import org.mule.api.transport.MessageDispatcher;
 import org.mule.api.transport.MessageRequester;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkException;
 
 import junit.framework.Assert;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests that lifecycle methods on a connector are not processed more than once. (@see MULE-3062)
  * Also test lifecycle of a connector dispatchers, receivers, workManagers and scheduler.
  */
-public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
+public class ConnectorLifecycleTestCase extends AbstractMuleContextTestCase
 {
     private TestConnector connector;
 
@@ -55,6 +63,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
      *
      * @throws Exception if things go pear-shaped
      */
+    @Test
     public void testDoubleInitialiseConnector() throws Exception
     {
         // Note: the connector was already initialized once during doSetUp()
@@ -85,6 +94,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
      *
      * @throws Exception if things go pear-shaped
      */
+    @Test
     public void testDoubleStartConnector() throws Exception
     {
         // Starting the connector should leave it uninitialised,
@@ -121,6 +131,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
      *
      * @throws Exception if things go pear-shaped
      */
+    @Test
     public void testDoubleStopConnector() throws Exception
     {
         // Starting the connector should leave it uninitialised,
@@ -170,6 +181,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
      *
      * @throws Exception if things go pear-shaped
      */
+    @Test
     public void testDoubleDisposeConnectorStartStop() throws Exception
     {
         connector.start();
@@ -210,6 +222,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
      *
      * @throws Exception if things go pear-shaped
      */
+    @Test
     public void testDoubleDisposeConnectorStartOnly() throws Exception
     {
         connector.start();
@@ -249,6 +262,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
      *
      * @throws Exception if things go pear-shaped
      */
+    @Test
     public void testDoubleDisposeConnector() throws Exception
     {
         // Disposing the connector should leave it uninitialised.
@@ -277,6 +291,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         assertEquals(1, connector.getDisposeCount());
     }
 
+    @Test
     public void testReceiversLifecycle() throws Exception
     {
         Service service=getTestService();
@@ -324,6 +339,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testReceiversServiceLifecycle() throws Exception
     {
         Service service = getTestService();
@@ -362,6 +378,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         assertEquals(0, connector.receivers.size());
     }
 
+    @Test
     public void testDispatchersLifecycle() throws Exception
     {
         //using sync endpoint so that any calls to 'process()' will be blocking and avoid timing issues
@@ -421,6 +438,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testDispatcherFullLifecycle() throws Exception
     {
         OutboundEndpoint out = getTestOutboundEndpoint("out", "test://out", null, null, null, connector);
@@ -446,6 +464,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testRequestersLifecycle() throws Exception
     {
         InboundEndpoint in = getTestInboundEndpoint("in", "test://in", null, null, null, connector);
@@ -503,6 +522,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testRequesterFullLifecycle() throws Exception
     {
         InboundEndpoint in = getTestInboundEndpoint("out", "test://out", null, null, null, connector);
@@ -529,6 +549,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
 
     }
 
+    @Test
     public void testWorkManagerLifecycle() throws MuleException, WorkException
     {
         //ConnectorLifecycleTestCase These are now created in the "initialize" phase
@@ -563,6 +584,7 @@ public class ConnectorLifecycleTestCase extends AbstractMuleTestCase
         assertNull(connector.getRequesterWorkManager());
     }
 
+    @Test
     public void testSchedulerLifecycle() throws MuleException, WorkException
     {
         assertNull(connector.getScheduler());

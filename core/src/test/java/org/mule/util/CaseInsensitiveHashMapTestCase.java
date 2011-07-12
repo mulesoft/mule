@@ -9,10 +9,14 @@
  */
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class CaseInsensitiveHashMapTestCase extends AbstractMuleTestCase
 {

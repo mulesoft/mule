@@ -11,7 +11,7 @@
 package org.mule.transport.email.transformers;
 
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.transport.email.GreenMailUtilities;
 
 import java.io.StringReader;
@@ -25,25 +25,31 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class EmailMessageToStringTestCase extends AbstractMuleTestCase
 {
     private EmailMessageToString transformer;
     private static String TEXT = "text";
     private static String TO = "me@me.com";
 
-    @Override
-    protected void doSetUp() throws Exception
+    @Before
+    public void createTransformer()
     {
-        super.doSetUp();
         transformer = new EmailMessageToString();
     }
 
+    @Test
     public void testSimpleStringMessage() throws MessagingException, TransformerException
     {
         Message msg = GreenMailUtilities.toMessage(TEXT, TO, null);
         assertEquals(TEXT, transformer.transform(msg));
     }
 
+    @Test
     public void testSimpleNonTextMessage() throws MessagingException, TransformerException
     {
         MimeMessage message = new MimeMessage(Session.getDefaultInstance(new Properties()));
@@ -52,6 +58,7 @@ public class EmailMessageToStringTestCase extends AbstractMuleTestCase
         assertEquals("", transformer.transform(message));
     }
 
+    @Test
     public void testMultipartFirstPartTextMessage() throws MessagingException, TransformerException
     {
         MimeMessage message = new MimeMessage(Session.getDefaultInstance(new Properties()));
@@ -64,6 +71,7 @@ public class EmailMessageToStringTestCase extends AbstractMuleTestCase
         assertEquals(TEXT, transformer.transform(message));
     }
 
+    @Test
     public void testMultipartMessage2() throws MessagingException, TransformerException
     {
         MimeMessage message = new MimeMessage(Session.getDefaultInstance(new Properties()));

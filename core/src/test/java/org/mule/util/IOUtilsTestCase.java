@@ -10,13 +10,19 @@
 
 package org.mule.util;
 
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.InputStream;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class IOUtilsTestCase extends AbstractMuleTestCase
 {
 
+    @Test
     public void testLoadingResourcesAsStream() throws Exception
     {
         InputStream is = IOUtils.getResourceAsStream("log4j.properties", getClass(), false, false);

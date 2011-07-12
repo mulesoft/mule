@@ -13,14 +13,19 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.jaxb.model.EmailAddress;
 import org.mule.jaxb.model.Person;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transformer.types.ListDataType;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
-public class JaxbTransformerTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class JaxbTransformerTestCase extends AbstractMuleContextTestCase
 {
     public static final String PERSON_XML = "<person><name>John Doe</name><dob>01/01/1970</dob><emailAddresses><emailAddress><type>home</type><address>john.doe@gmail.com</address></emailAddress><emailAddress><type>work</type><address>jdoe@bigco.com</address></emailAddress></emailAddresses></person>";
 
@@ -30,6 +35,7 @@ public class JaxbTransformerTestCase extends AbstractMuleTestCase
         muleContext.getRegistry().registerObject("trans", new JAXBTestTransformers());
     }
 
+    @Test
     public void testCustomTransform() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(PERSON_XML, muleContext);
@@ -44,6 +50,7 @@ public class JaxbTransformerTestCase extends AbstractMuleTestCase
         assertEquals("jdoe@bigco.com", person.getEmailAddresses().get(1).getAddress());
     }
 
+    @Test
     public void testCustomTransformWithMuleMessage() throws Exception
     {
         ByteArrayInputStream in = new ByteArrayInputStream(PERSON_XML.getBytes());

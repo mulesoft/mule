@@ -9,11 +9,6 @@
  */
 package org.mule.module.spring.security.filters.http;
 
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
 import org.mule.RequestContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
@@ -21,13 +16,24 @@ import org.mule.api.security.Authentication;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.security.UnauthorisedException;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.filters.HttpBasicAuthenticationFilter;
 
-public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
+public class HttpBasicAuthenticationFilterTestCase extends AbstractMuleContextTestCase
 {
 
+    @Test
     public void testAuthenticationHeaderFailure() throws Exception
     {
         MuleEvent oldEvent = RequestContext.getEvent();

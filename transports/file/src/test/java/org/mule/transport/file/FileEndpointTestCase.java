@@ -12,9 +12,14 @@ package org.mule.transport.file;
 
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-public class FileEndpointTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class FileEndpointTestCase extends AbstractMuleContextTestCase
 {
 
     private EndpointURI newMuleEndpointURI(String text) throws Exception
@@ -24,6 +29,7 @@ public class FileEndpointTestCase extends AbstractMuleTestCase
         return uri;
     }
 
+    @Test
     public void testFileUrl() throws Exception
     {
         EndpointURI url = newMuleEndpointURI("file:///C:/temp?endpointName=fileEndpoint");
@@ -37,6 +43,7 @@ public class FileEndpointTestCase extends AbstractMuleTestCase
         assertEquals(1, url.getParams().size());
     }
 
+    @Test
     public void testFileUrlWithoutDrive() throws Exception
     {
         EndpointURI url = newMuleEndpointURI("file://temp?endpointName=fileEndpoint");
@@ -50,6 +57,7 @@ public class FileEndpointTestCase extends AbstractMuleTestCase
         assertEquals(1, url.getParams().size());
     }
 
+    @Test
     public void testRelativeFileUriParentDir() throws Exception
     {
         String muleURI = "file://../test-data/in";
@@ -58,6 +66,7 @@ public class FileEndpointTestCase extends AbstractMuleTestCase
         assertEquals("../test-data/in", url.getAddress());
     }
 
+    @Test
     public void testRelativeFileUriCurrentDir() throws Exception
     {
         String muleURI = "file://./test-data/in";
@@ -66,6 +75,7 @@ public class FileEndpointTestCase extends AbstractMuleTestCase
         assertEquals("./test-data/in", url.getAddress());
     }
 
+    @Test
     public void testWinNetworkUri() throws Exception
     {
         String muleURI = "file:////192.168.0.1/test/";
@@ -74,6 +84,7 @@ public class FileEndpointTestCase extends AbstractMuleTestCase
         assertEquals("//192.168.0.1/test/", url.getAddress());
     }
 
+    @Test
     public void testRelativeFileUriAsParameter() throws Exception
     {
         EndpointURI url = newMuleEndpointURI("file://?address=./temp&endpointName=fileEndpoint");

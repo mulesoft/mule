@@ -15,13 +15,14 @@ import org.mule.api.model.Model;
 import org.mule.api.transport.Connector;
 import org.mule.config.PoolingProfile;
 import org.mule.model.seda.SedaModel;
-import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.util.MuleDerbyTestUtils;
 import org.mule.transport.jdbc.JdbcConnector;
 import org.mule.transport.jdbc.JdbcUtils;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,8 +32,10 @@ import javax.sql.XADataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayHandler;
 import org.enhydra.jdbc.standard.StandardDataSource;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
-public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCase
+public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleContextTestCase
 {
 
     public static final String DEFAULT_IN_URI = "jdbc://getTest?type=1";
@@ -55,8 +58,9 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
     protected DataSource dataSource;
     
     private static boolean derbySetupDone = false;
-    
-    protected void suitePreSetUp() throws Exception
+
+    @BeforeClass
+    public static void startDatabase() throws Exception
     {
         if (!derbySetupDone)
         {
@@ -67,9 +71,15 @@ public abstract class AbstractJdbcFunctionalTestCase extends AbstractMuleTestCas
             CLIENT_CONNECTION_STRING = "jdbc:derby://localhost:1527/"+ dbName +";create=true";
             derbySetupDone = true;
         }
-        super.suitePreSetUp();
     }
 
+    @AfterClass
+    public static void stopDatabase() throws SQLException
+    {
+        MuleDerbyTestUtils.stopDatabase();
+    }
+
+    @Override
     protected void doSetUp() throws Exception
     {
         SedaModel model = new SedaModel();

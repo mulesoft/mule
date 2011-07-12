@@ -25,17 +25,21 @@ public class JdbcTransactionalXaFunctionalTestCase extends AbstractJdbcTransacti
 {
     private TransactionManager txManager;
 
+    @Override
     protected void doSetUp() throws Exception
     {
         txManager = new JBossArjunaTransactionManagerFactory().create(muleContext.getConfiguration());
         super.doSetUp();
         muleContext.setTransactionManager(txManager);
     }
+
+    @Override
     protected TransactionFactory getTransactionFactory()
     {
         return new XaTransactionFactory();
     }
 
+    @Override
     protected DataSource createDataSource() throws Exception
     {
         StandardXADataSource ds = new StandardXADataSource();

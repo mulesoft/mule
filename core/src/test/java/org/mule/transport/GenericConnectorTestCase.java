@@ -11,17 +11,23 @@
 package org.mule.transport;
 
 import org.mule.api.MuleRuntimeException;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import javax.resource.spi.work.Work;
 import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * The test is not there in AbstractConnector, because we need to call a protected
  * method, and the latter class is in a different package.
  */
-public class GenericConnectorTestCase extends AbstractMuleTestCase
+public class GenericConnectorTestCase extends AbstractMuleContextTestCase
 {
 
     /**
@@ -29,6 +35,7 @@ public class GenericConnectorTestCase extends AbstractMuleTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testSpiWorkThrowableHandling() throws Exception
     {
         try

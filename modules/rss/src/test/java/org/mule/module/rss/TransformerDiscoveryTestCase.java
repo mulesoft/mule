@@ -10,15 +10,20 @@
 package org.mule.module.rss;
 
 import org.mule.api.transformer.Transformer;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 
 import com.sun.syndication.feed.synd.SyndFeed;
 
 import java.io.DataInputStream;
 
-public class TransformerDiscoveryTestCase extends AbstractMuleTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+
+public class TransformerDiscoveryTestCase extends AbstractMuleContextTestCase
 {
+    @Test
     public void testLookup() throws Exception
     {
         Transformer t = muleContext.getRegistry().lookupTransformer(DataTypeFactory.create(DataInputStream.class), DataTypeFactory.create(SyndFeed.class));
