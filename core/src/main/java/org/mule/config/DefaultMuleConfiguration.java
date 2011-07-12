@@ -120,7 +120,7 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     private String id;
 
     /** If this node is part of a cluster then this is the shared cluster Id */
-    private String clusterId;
+    private String clusterId = "";
 
     /** The domain name that this instance belongs to. */
     private String domainId;
@@ -169,11 +169,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         if (id == null)
         {
             id = UUID.getUUID();
-        }
-
-        if (clusterId == null)
-        {
-            clusterId = CoreMessages.notClustered().getMessage();
         }
 
         if (domainId == null)
@@ -273,11 +268,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         if (p != null)
         {
             id = p;
-        }
-        p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clusterId");
-        if (p != null)
-        {
-            clusterId = p;
         }
         p = System.getProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "domainId");
         if (p != null)
@@ -463,17 +453,9 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         }
     }
 
-    public String getClusterId()
-    {
-        return clusterId;
-    }
-
     public void setClusterId(String clusterId)
     {
-        if (verifyContextNotInitialized())
-        {
-            this.clusterId = clusterId;
-        }
+        this.clusterId = clusterId;
     }
 
     public String getDomainId()
@@ -670,7 +652,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         result = prime * result + (cacheMessageAsBytes ? 1231 : 1237);
         result = prime * result + (cacheMessageOriginalPayload ? 1231 : 1237);
         result = prime * result + (clientMode ? 1231 : 1237);
-        result = prime * result + ((clusterId == null) ? 0 : clusterId.hashCode());
         result = prime * result + defaultQueueTimeout;
         result = prime * result + defaultTransactionTimeout;
         result = prime * result + ((domainId == null) ? 0 : domainId.hashCode());
@@ -697,11 +678,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
         if (cacheMessageAsBytes != other.cacheMessageAsBytes) return false;
         if (cacheMessageOriginalPayload != other.cacheMessageOriginalPayload) return false;
         if (clientMode != other.clientMode) return false;
-        if (clusterId == null)
-        {
-            if (other.clusterId != null) return false;
-        }
-        else if (!clusterId.equals(other.clusterId)) return false;
         if (defaultQueueTimeout != other.defaultQueueTimeout) return false;
         if (defaultTransactionTimeout != other.defaultTransactionTimeout) return false;
         if (domainId == null)

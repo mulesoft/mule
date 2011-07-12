@@ -209,6 +209,25 @@ public abstract class AbstractPollingMessageReceiver extends AbstractMessageRece
         return Math.max(1, Math.min(available, ((maxThreads / 2) - 1)));
     }
 
-    public abstract void poll() throws Exception;
+    /**
+     * Check whether polling should take place on this instance.
+     */
+    public final void performPoll() throws Exception
+    {
+        if (!pollOnPrimaryInstanceOnly() || flowConstruct.getMuleContext().isPrimaryPollingInstance())
+        {
+            poll();   
+        }
+    }
 
+    /**
+     * If this returns true for a transport, polling for that transport takes place only on the primary instance.
+     */
+    protected boolean pollOnPrimaryInstanceOnly()
+    {
+        return false;
+    }
+
+
+    protected abstract void poll() throws Exception;
 }

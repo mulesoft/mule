@@ -60,7 +60,7 @@ public class MuleContextNotification extends ServerNotification implements Block
         super(generateId(context), action);
         this.muleContext = context;
         this.resourceIdentifier = context.getConfiguration().getId();
-        this.clusterId = context.getConfiguration().getClusterId();
+        this.clusterId = context.getClusterId();
         this.domain = context.getConfiguration().getDomainId();
     }
 

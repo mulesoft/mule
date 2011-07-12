@@ -10,6 +10,7 @@
 
 package org.mule.module.jca;
 
+import org.mule.DefaultMuleContext;
 import org.mule.MessageExchangePattern;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
@@ -386,7 +387,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
 
     public void setClusterId(String clusterId)
     {
-        muleConfiguration.setClusterId(clusterId);
+        ((DefaultMuleContext)muleContext).setClusterId(clusterId);
     }
 
     public void setDefaultEncoding(String encoding)
@@ -479,7 +480,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     
     public String getClusterId()
     {
-        return muleConfiguration.getClusterId();
+        return muleContext.getClusterId();
     }
 
     public String getDefaultEncoding()

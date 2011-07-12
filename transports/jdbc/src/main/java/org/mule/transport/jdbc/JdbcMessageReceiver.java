@@ -256,6 +256,10 @@ public class JdbcMessageReceiver extends TransactedPollingMessageReceiver
     @Override
     public List getMessages() throws Exception
     {
+        if (!flowConstruct.getMuleContext().isPrimaryPollingInstance())
+        {
+            return null;
+        }
         Connection con = null;
         try
         {

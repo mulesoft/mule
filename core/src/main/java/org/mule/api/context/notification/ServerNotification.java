@@ -108,7 +108,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
         MuleConfiguration conf = context.getConfiguration();
         return String.format("%s.%s.%s",
                              conf.getDomainId(),
-                             conf.getClusterId(),
+                             context.getClusterId(),
                              conf.getId());
     }
 

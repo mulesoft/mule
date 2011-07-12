@@ -30,8 +30,6 @@ public interface MuleConfiguration
 
     String getId();
 
-    String getClusterId();
-
     String getDomainId();
 
     String getSystemModelType();

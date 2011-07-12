@@ -60,7 +60,6 @@ public class MuleConfigurationTestCase extends TestCase
         config.setClientMode(true);
         ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(false);
         config.setId("MY_SERVER");
-        config.setClusterId("MY_CLUSTER");
         config.setDomainId("MY_DOMAIN");
         config.setCacheMessageAsBytes(false);
         config.setCacheMessageOriginalPayload(false);
@@ -97,7 +96,6 @@ public class MuleConfigurationTestCase extends TestCase
         ThreadSafeAccess.AccessControl.setFailOnMessageScribbling(false);
         
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "serverId", "MY_SERVER");
-        System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clusterId", "MY_CLUSTER");
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "domainId", "MY_DOMAIN");
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheBytes", "false");
         System.setProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal", "false");
@@ -120,7 +118,6 @@ public class MuleConfigurationTestCase extends TestCase
         System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clientMode");
         System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "disable.threadsafemessages");
         System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "serverId");
-        System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "clusterId");
         System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "domainId");
         System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheBytes");
         System.clearProperty(MuleProperties.SYSTEM_PROPERTY_PREFIX + "message.cacheOriginal");
@@ -147,7 +144,6 @@ public class MuleConfigurationTestCase extends TestCase
         mutableConfig.setDefaultEncoding("UTF-16");
         mutableConfig.setWorkingDirectory(workingDirectory);
         mutableConfig.setId("MY_SERVER");
-        mutableConfig.setClusterId("MY_CLUSTER");
         mutableConfig.setDomainId("MY_DOMAIN");
 
         MuleConfiguration config = muleContext.getConfiguration();
@@ -162,7 +158,6 @@ public class MuleConfigurationTestCase extends TestCase
         assertFalse("UTF-16".equals(config.getDefaultEncoding()));
         assertFalse(workingDirectory.equals(config.getWorkingDirectory()));
         assertFalse("MY_SERVER".equals(config.getId()));
-        assertFalse("MY_CLUSTER".equals(config.getClusterId()));
         assertFalse("MY_DOMAIN".equals(config.getDomainId()));
     }
 
@@ -198,7 +193,6 @@ public class MuleConfigurationTestCase extends TestCase
         assertTrue(config.isClientMode());
         assertFalse(ThreadSafeAccess.AccessControl.isFailOnMessageScribbling());
         assertEquals("MY_SERVER", config.getId());
-        assertEquals("MY_CLUSTER", config.getClusterId());
         assertEquals("MY_DOMAIN", config.getDomainId());
         assertFalse(config.isCacheMessageAsBytes());
         assertFalse(config.isCacheMessageOriginalPayload());

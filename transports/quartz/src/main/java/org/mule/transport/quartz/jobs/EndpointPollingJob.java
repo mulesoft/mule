@@ -41,25 +41,15 @@ import org.quartz.SchedulerException;
 /**
  * Will receive on an endpoint and dispatch it to the component set via the Receiver information.
  */
-public class EndpointPollingJob implements Job
+public class EndpointPollingJob extends AbstractJob
 {
     /**
      * The logger used for this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException
+    protected void doExecute(JobExecutionContext jobExecutionContext) throws JobExecutionException
     {
-        MuleContext muleContext;
-        try
-        {
-            muleContext = (MuleContext)jobExecutionContext.getScheduler().getContext().get(MuleProperties.MULE_CONTEXT_PROPERTY);
-        }
-        catch (SchedulerException e)
-        {
-            throw new JobExecutionException("Failed to retrieve Mulecontext from the Scheduler Context: " + e.getMessage(), e);
-        }
-
         final JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
 
         String receiverKey = (String) jobDataMap.get(QuartzMessageReceiver.QUARTZ_RECEIVER_PROPERTY);

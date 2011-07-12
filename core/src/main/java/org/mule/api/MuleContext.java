@@ -244,4 +244,16 @@ public interface MuleContext extends Lifecycle
     void handleException(Exception e, RollbackMethod rollbackMethod);
 
     void handleException(Exception e);
+
+    /**
+     * @return the ID of the cluster the current instance belongs to.  Returns the empty string if this instance
+     * isn't part of a cluster.
+     */
+    String getClusterId();
+
+    /**
+     * @return true if this instance in the designated poller.  This will always be true unless the instance is part of
+     * a cluster.
+     */
+    boolean isPrimaryPollingInstance();
 }

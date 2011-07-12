@@ -95,6 +95,12 @@ public class SftpMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
+    @Override
+    protected boolean pollOnPrimaryInstanceOnly()
+    {
+        return true;
+    }
+
     protected void routeFile(String path) throws Exception
     {
         // A bit tricky initialization of the notifier in this case since we don't

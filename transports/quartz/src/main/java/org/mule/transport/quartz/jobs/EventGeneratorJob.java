@@ -35,7 +35,7 @@ import org.quartz.SchedulerException;
  *
  * We may want to extend this but allowing the payload to be generated using a factory.
  */
-public class EventGeneratorJob implements Job
+public class EventGeneratorJob extends AbstractJob
 {
 
     /**
@@ -43,18 +43,8 @@ public class EventGeneratorJob implements Job
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException
+    protected void doExecute(JobExecutionContext jobExecutionContext) throws JobExecutionException
     {
-        MuleContext muleContext;
-        try
-        {
-            muleContext = (MuleContext)jobExecutionContext.getScheduler().getContext().get(MuleProperties.MULE_CONTEXT_PROPERTY);
-        }
-        catch (SchedulerException e)
-        {
-            throw new JobExecutionException("Failed to retrieve Mulecontext from the Scheduler Context: " + e.getMessage(), e);
-        }
-
         JobDataMap map = jobExecutionContext.getJobDetail().getJobDataMap();
 
         String receiverKey = (String)map.get(QuartzMessageReceiver.QUARTZ_RECEIVER_PROPERTY);

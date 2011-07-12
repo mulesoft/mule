@@ -357,6 +357,13 @@ public class RetrieveMessageReceiver extends AbstractPollingMessageReceiver impl
         }
     }
 
+
+    @Override
+    protected boolean pollOnPrimaryInstanceOnly()
+    {
+        return true;
+    }
+
     @Override
     protected void doDispose()
     {

@@ -60,7 +60,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
             // the key is built in way to prevent UntilSuccessful workers across a cluster to compete for the same
             // events over a shared object store
             return new EventStoreKey(muleEvent.getFlowConstruct() + "@"
-                                     + muleEvent.getMuleContext().getConfiguration().getClusterId() + ":"
+                                     + muleEvent.getMuleContext().getClusterId() + ":"
                                      + muleEvent.getId());
         }
 
@@ -159,7 +159,7 @@ public class UntilSuccessful extends AbstractOutboundRouter
                                                                                  + ackExpression), this);
         }
 
-        eventKeyPrefix = flowConstruct.getName() + "@" + muleContext.getConfiguration().getClusterId() + ":";
+        eventKeyPrefix = flowConstruct.getName() + "@" + muleContext.getClusterId() + ":";
     }
 
     @Override

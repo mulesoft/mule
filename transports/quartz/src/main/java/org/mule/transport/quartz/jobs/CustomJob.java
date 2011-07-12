@@ -31,12 +31,10 @@ import org.quartz.SchedulerException;
  * 
  * @see org.mule.transport.NullPayload
  */
-public class CustomJob implements Job
+public class CustomJob extends AbstractJob
 {
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException
+    protected void doExecute(JobExecutionContext jobExecutionContext) throws JobExecutionException
     {
-        MuleContext muleContext = lookupMuleContext(jobExecutionContext);
-        
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         Object tempJob = jobDataMap.get(QuartzConnector.PROPERTY_JOB_OBJECT);
         if (tempJob == null)
@@ -64,18 +62,5 @@ public class CustomJob implements Job
             throw new JobExecutionException(QuartzMessages.invalidJobObject().toString());
         }
         ((Job)tempJob).execute(jobExecutionContext);
-    }
-
-    private MuleContext lookupMuleContext(JobExecutionContext jobExecutionContext) throws JobExecutionException
-    {
-        try
-        {
-            SchedulerContext schedulerContext = jobExecutionContext.getScheduler().getContext();
-            return (MuleContext) schedulerContext.get(MuleProperties.MULE_CONTEXT_PROPERTY);
-        }
-        catch (SchedulerException e)
-        {
-            throw new JobExecutionException("Failed to retrieve Mulecontext from the Scheduler Context: " + e.getMessage(), e);
-        }
     }
 }

@@ -82,7 +82,7 @@ public class PollingReceiverWorker implements Work
 
     protected void poll() throws Exception
     {
-        receiver.poll();
+        receiver.performPoll();
     }
 
     @Override

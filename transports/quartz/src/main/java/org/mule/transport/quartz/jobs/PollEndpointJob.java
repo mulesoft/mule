@@ -22,22 +22,21 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-public class PollEndpointJob implements Job, Lifecycle, MuleContextAware
+public class PollEndpointJob extends AbstractJob implements Lifecycle, MuleContextAware
 {
     private String inboundPollingEndpointName;
     private AbstractPollingMessageReceiver receiver;
-    private MuleContext muleContext;
     
     public PollEndpointJob(String inboundPollingEndpointName)
     {
         this.inboundPollingEndpointName = inboundPollingEndpointName;
     }
 
-    public void execute(JobExecutionContext context) throws JobExecutionException
+    protected void doExecute(JobExecutionContext context) throws JobExecutionException
     {
         try
         {
-            receiver.poll();
+            receiver.performPoll();
         }
         catch (Exception e)
         {
@@ -69,7 +68,14 @@ public class PollEndpointJob implements Job, Lifecycle, MuleContextAware
         //DO NOTHING
     }
 
-    public void setMuleContext(MuleContext context) {
+    @Override
+    protected MuleContext getMuleContext(JobExecutionContext jobExecutionContext) throws JobExecutionException
+    {
+        return muleContext;
+    }
+
+    public void setMuleContext(MuleContext context)
+    {
         this.muleContext = context;
     }
 }

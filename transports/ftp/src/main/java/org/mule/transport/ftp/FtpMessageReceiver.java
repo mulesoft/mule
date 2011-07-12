@@ -99,6 +99,12 @@ public class FtpMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
+    @Override
+    protected boolean pollOnPrimaryInstanceOnly()
+    {
+        return true;
+    }
+
     protected FTPFile[] listFiles() throws Exception
     {
         FTPClient client = null;

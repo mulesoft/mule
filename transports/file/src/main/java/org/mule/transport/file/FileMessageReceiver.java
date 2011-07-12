@@ -195,6 +195,12 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
     }
 
+    @Override
+    protected boolean pollOnPrimaryInstanceOnly()
+    {
+        return true;
+    }
+
     public void processFile(File file) throws MuleException
     {
         //TODO RM*: This can be put in a Filter. Also we can add an AndFileFilter/OrFileFilter to allow users to

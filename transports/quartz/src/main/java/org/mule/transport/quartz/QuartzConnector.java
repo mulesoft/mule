@@ -43,6 +43,7 @@ public class QuartzConnector extends AbstractConnector
 
     public static final String PROPERTY_JOB_REF = "jobRef";
     public static final String PROPERTY_JOB_OBJECT = "jobObject";
+    public static final String PROPERTY_JOB_DYNAMIC = "jobDynamic";
 
     public static final String DEFAULT_GROUP_NAME = "mule";
 

@@ -93,4 +93,9 @@ public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessa
         }
     }
 
+    @Override
+    protected boolean pollOnPrimaryInstanceOnly()
+    {
+        return true;    //To change body of overridden methods use File | Settings | File Templates.
+    }
 }

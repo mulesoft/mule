@@ -67,6 +67,7 @@ public class QuartzMessageDispatcher extends AbstractMessageDispatcher
         jobDetail.setName(endpoint.getEndpointURI().getAddress() + "-" + event.getId());
 
         JobDataMap jobDataMap = new JobDataMap();
+        jobDataMap.put(QuartzConnector.PROPERTY_JOB_DYNAMIC, Boolean.TRUE);
         MuleMessage msg = event.getMessage();
         // populate from invocation and outbound scopes only
         for (String key : msg.getInvocationPropertyNames())

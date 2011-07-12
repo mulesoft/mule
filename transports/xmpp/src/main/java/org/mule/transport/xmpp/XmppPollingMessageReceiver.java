@@ -69,6 +69,12 @@ public class XmppPollingMessageReceiver extends AbstractPollingMessageReceiver
         processMessage(xmppMessage);
     }
 
+    @Override
+    protected boolean pollOnPrimaryInstanceOnly()
+    {
+        return true;
+    }
+
     protected void processMessage(Message xmppMessage) throws MuleException
     {
         MuleMessage muleMessage = createMuleMessage(xmppMessage);        

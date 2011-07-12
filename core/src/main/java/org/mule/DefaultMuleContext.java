@@ -50,6 +50,8 @@ import org.mule.lifecycle.MuleContextLifecycleManager;
 import org.mule.management.stats.AllStatistics;
 import org.mule.registry.DefaultRegistryBroker;
 import org.mule.registry.MuleRegistryHelper;
+import org.mule.transport.DefaultPollingController;
+import org.mule.transport.PollingController;
 import org.mule.util.ApplicationShutdownSplashScreen;
 import org.mule.util.ApplicationStartupSplashScreen;
 import org.mule.util.ServerShutdownSplashScreen;
@@ -115,6 +117,10 @@ public class DefaultMuleContext implements MuleContext
 
     /** Global exception handler which handles "system" exceptions (i.e., when no message is involved). */
     protected SystemExceptionHandler exceptionListener;
+
+    private String clusterId = "";
+
+    private PollingController pollingController = new DefaultPollingController();
 
     public DefaultMuleContext(MuleConfiguration config,
                               WorkManager workManager,
@@ -680,5 +686,26 @@ public class DefaultMuleContext implements MuleContext
     {
         checkLifecycleForPropertySet(name, Initialisable.PHASE_NAME);
         registryBroker.registerObject(name, store);
+    }
+
+    public String getClusterId()
+    {
+        return clusterId;
+    }
+
+    public void setClusterId(String clusterId)
+    {
+        this.clusterId = clusterId;
+    }
+
+    public void setPollingController(PollingController pollingController)
+    {
+        this.pollingController = pollingController;
+    }
+
+    @Override
+    public boolean isPrimaryPollingInstance()
+    {
+        return pollingController.isPrimaryPollingInstance();
     }
 }

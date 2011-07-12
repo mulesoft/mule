@@ -78,7 +78,7 @@ public class MuleContextExpressionEvaluator implements ExpressionEvaluator, Mule
         }
         else if (expression.equals("clusterId"))
         {
-            return getMuleContext().getConfiguration().getClusterId();
+            return getMuleContext().getClusterId();
         }
         else if (expression.equals("domainId"))
         {

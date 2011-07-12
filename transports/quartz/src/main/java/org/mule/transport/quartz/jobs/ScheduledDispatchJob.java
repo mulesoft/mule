@@ -33,14 +33,14 @@ import org.quartz.SchedulerException;
  * Will dispatch the current message to a Mule endpoint at a later time.
  * This job can be used to fire time based events.
  */
-public class ScheduledDispatchJob implements Job, Serializable
+public class ScheduledDispatchJob extends AbstractJob implements Serializable
 {
     /**
      * The logger used for this class
      */
     protected transient Log logger = LogFactory.getLog(getClass());
 
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException
+    protected void doExecute(JobExecutionContext jobExecutionContext) throws JobExecutionException
     {
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         Object payload = jobDataMap.get(QuartzConnector.PROPERTY_PAYLOAD);
@@ -59,9 +59,6 @@ public class ScheduledDispatchJob implements Job, Serializable
 
         try
         {
-            SchedulerContext schedulerContext = jobExecutionContext.getScheduler().getContext();
-            MuleContext muleContext = (MuleContext) schedulerContext.get(MuleProperties.MULE_CONTEXT_PROPERTY);
-
             String endpointRef = config.getEndpointRef();
             if (jobDataMap.containsKey("endpointRef"))
             {
@@ -74,10 +71,6 @@ public class ScheduledDispatchJob implements Job, Serializable
             client.dispatch(endpointRef, payload, jobDataMap);
         }
         catch (MuleException e)
-        {
-            throw new JobExecutionException(e);
-        }
-        catch (SchedulerException e)
         {
             throw new JobExecutionException(e);
         }
