@@ -14,16 +14,19 @@
     <url>http://www.muleforge.org/projects/${ModuleName.toUpperCase()}</url>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
         <mule.version>${MuleVersion}</mule.version>
-#if($license.id)
-        <licenseId>${license.id}</licenseId>
-        <licenseUrl>${license.url}</licenseUrl>
-#end
         <!-- Tools properties -->
         <eclipsePluginVersion>2.5</eclipsePluginVersion>
         <vmtype>org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType</vmtype>
         <jdk5Name>J2SE-1.5</jdk5Name>
         <jdk.version>1.5</jdk.version>
+#if($license.id)
+        <licenseId>${license.id}</licenseId>
+        <licenseUrl>${license.url}</licenseUrl>
+#end
     </properties>
 
 #if($license.id)
