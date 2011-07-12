@@ -10,6 +10,8 @@
 
 package org.mule.transport.email.functional;
 
+import org.junit.Test;
+
 public class SmtpMimeFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
@@ -18,6 +20,7 @@ public class SmtpMimeFunctionalTestCase extends AbstractEmailFunctionalTestCase
         super(MIME_MESSAGE, "smtp", "smtp-mime-functional-test.xml");
     }
 
+    @Test
     public void testSend() throws Exception
     {
         doSend();

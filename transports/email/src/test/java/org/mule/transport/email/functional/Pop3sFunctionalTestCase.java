@@ -11,15 +11,20 @@
 package org.mule.transport.email.functional;
 
 
+import org.junit.Test;
+
 public class Pop3sFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
+
     public Pop3sFunctionalTestCase()
     {
         super(STRING_MESSAGE, "pop3s");
     }
 
+    @Test
     public void testRequest() throws Exception
     {
         doRequest();
     }
+
 }

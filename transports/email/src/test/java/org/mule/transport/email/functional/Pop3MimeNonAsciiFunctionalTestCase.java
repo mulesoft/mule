@@ -12,6 +12,8 @@ package org.mule.transport.email.functional;
 
 import java.util.Locale;
 
+import org.junit.Test;
+
 public class Pop3MimeNonAsciiFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
@@ -20,6 +22,7 @@ public class Pop3MimeNonAsciiFunctionalTestCase extends AbstractEmailFunctionalT
         super(MIME_MESSAGE, "pop3", "pop3-mime-functional-test.xml", Locale.JAPAN, "iso-2022-jp");
     }
 
+    @Test
     public void testRequest() throws Exception
     {
         doRequest();
