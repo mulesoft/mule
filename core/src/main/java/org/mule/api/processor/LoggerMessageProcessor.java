@@ -68,22 +68,22 @@ public class LoggerMessageProcessor implements MessageProcessor, Initialisable, 
     {
         if (event == null)
         {
-            logWithLevel(null, level);
+            logWithLevel(null);
         }
         else
         {
             if (StringUtils.isEmpty(message))
             {
-                logWithLevel(event.getMessage(), level);
+                logWithLevel(event.getMessage());
             }
             else
             {
-                logWithLevel(expressionManager.parse(message, event.getMessage()), level);
+                logWithLevel(expressionManager.parse(message, event.getMessage()));
             }
         }
     }
 
-    protected void logWithLevel(Object object, String level)
+    protected void logWithLevel(Object object)
     {
         if ("ERROR".equals(level))
         {
