@@ -11,21 +11,27 @@ package org.mule.module.atom;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class FilterTest extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "filter-conf.xml";
     }
 
+    @Test
     public void testAcceptFilter() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
@@ -38,6 +44,7 @@ public class FilterTest extends FunctionalTestCase
         assertEquals("test received", result.getPayloadAsString());
     }
 
+    @Test
     public void testUnAcceptFilter() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();

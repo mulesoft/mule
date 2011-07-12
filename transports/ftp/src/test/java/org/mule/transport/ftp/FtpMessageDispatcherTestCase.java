@@ -17,6 +17,9 @@ import java.io.File;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
 {  
@@ -34,6 +37,7 @@ public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
         return "ftp-message-requester-test.xml";
     }
 
+    @Test
     public void testDispatch() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

@@ -16,6 +16,11 @@ import org.mule.util.FileUtils;
 
 import java.io.File;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class FtpEncodingFunctionalTestCase extends AbstractFtpServerTestCase
 {
 
@@ -31,6 +36,7 @@ public class FtpEncodingFunctionalTestCase extends AbstractFtpServerTestCase
         return "ftp-encoding-functional-config.xml";
     }
 
+    @Test
     public void testReadingFileWithEucJpEncodingGetsTheRightText() throws Exception
     {
         File tmpDir = new File(FTP_SERVER_BASE_DIR);

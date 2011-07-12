@@ -12,17 +12,25 @@ package org.mule.module.acegi;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class PlainTextFunctionalTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "encryption-test.xml";
     }
 
+    @Test
     public void testAuthenticationFailureNoContext() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -32,6 +40,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
         assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
     }
 
+    @Test
     public void testAuthenticationFailureBadCredentials() throws Exception
     {
         MuleClient client = new MuleClient("anonX", "anonX");
@@ -41,6 +50,7 @@ public class PlainTextFunctionalTestCase extends FunctionalTestCase
         assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
     }
 
+    @Test
     public void testAuthenticationAuthorised() throws Exception
     {
         MuleClient client = new MuleClient("anon", "anon");

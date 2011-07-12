@@ -18,6 +18,11 @@ import org.mule.tck.functional.FunctionalTestComponent;
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
@@ -27,6 +32,7 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
         return "ftp-functional-test.xml";
     }
    
+    @Test
     public void testSendAndRequest() throws Exception
     {
         CountDownLatch latch = new CountDownLatch(1);

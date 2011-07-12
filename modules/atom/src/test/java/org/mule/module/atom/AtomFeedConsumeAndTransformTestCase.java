@@ -13,19 +13,24 @@ package org.mule.module.atom;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import java.io.InputStream;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
-
 import org.apache.abdera.model.Feed;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class AtomFeedConsumeAndTransformTestCase extends FunctionalTestCase
 {
+
     private Latch receiveLatch = new Latch();
     private MuleMessage message = null;
 
@@ -49,6 +54,7 @@ public class AtomFeedConsumeAndTransformTestCase extends FunctionalTestCase
         });
     }
     
+    @Test
     public void testSendFeed() throws Exception
     {
         InputStream input = getFeedInput();

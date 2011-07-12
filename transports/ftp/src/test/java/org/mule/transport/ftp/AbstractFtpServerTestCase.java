@@ -10,24 +10,28 @@
 
 package org.mule.transport.ftp;
 
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
+import org.mule.transport.ftp.server.FTPTestClient;
+import org.mule.transport.ftp.server.MuleFtplet;
+import org.mule.transport.ftp.server.Server;
+import org.mule.util.FileUtils;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
 import org.apache.ftpserver.ftplet.Ftplet;
-import org.mule.tck.DynamicPortTestCase;
-import org.mule.transport.ftp.server.FTPTestClient;
-import org.mule.transport.ftp.server.MuleFtplet;
-import org.mule.transport.ftp.server.Server;
-import org.mule.util.FileUtils;
+import org.junit.Rule;
+
+import static org.junit.Assert.assertFalse;
 
 /**
  * Abstract FTP test class. Sets up the ftp server and starts/stops it during the
  * test lifecycle.
  */
-public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase 
-    implements MuleFtplet.Callback
+public abstract class AbstractFtpServerTestCase extends FunctionalTestCase implements MuleFtplet.Callback
 {
 	public static final String TEST_MESSAGE = "Test FTP message";
     
@@ -53,6 +57,9 @@ public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase
      * Subclasses can overwrite Ftplet that will be registered when creating the server.
      */
     protected Ftplet ftplet = new MuleFtplet(this);
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
     
     public AbstractFtpServerTestCase(String ftpHost, int timeout)
     {        
@@ -95,7 +102,7 @@ public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        this.ftpPort = getPorts().get(0);
+        this.ftpPort = dynamicPort.getNumber();
         ftpClient = new FTPTestClient(this.ftpHost, this.ftpPort, this.ftpUser, this.ftpPassword);
         // make sure we start out with a clean ftp server base
         createFtpServerBaseDir();
@@ -171,9 +178,4 @@ public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase
     {
         // subclasses can override this method
     }
-    
-    @Override
-	protected int getNumPortsToFind() {
-		return 1;
-	}
 }

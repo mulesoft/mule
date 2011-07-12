@@ -10,15 +10,13 @@
 
 package org.mule.transport.tcp.protocols;
 
-import org.junit.Before;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class XmlMessageEOFProtocolTestCase extends XmlMessageProtocolTestCase
 {
 
-    @Before
+    @Override
     public void doSetUp()
     {
         setProtocol(new XmlMessageEOFProtocol());

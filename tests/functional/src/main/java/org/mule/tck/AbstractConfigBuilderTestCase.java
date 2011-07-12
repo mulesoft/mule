@@ -50,6 +50,13 @@ import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.transport.AbstractConnector;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
 
@@ -110,6 +117,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(service);
     }
 
+    @Test
     public void testExceptionStrategy2()
     {
         Service service = muleContext.getRegistry().lookupService("appleComponent");
@@ -137,6 +145,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(muleContext.getRegistry().lookupService("appleComponent2"));
     }
 
+    @Test
     public void testOutboundRouterConfig2()
     {
         // test outbound message router
@@ -180,6 +189,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     }
 
 
+    @Test
     public void testInboundRouterConfig2()
     {
         Service service = muleContext.getRegistry().lookupService("appleComponent");
@@ -201,6 +211,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertTrue(router2 instanceof IdempotentMessageFilter);
     }
 
+    @Test
     public void testThreadingConfig() throws DefaultMuleException
     {
         // expected default values from the configuration;
@@ -263,6 +274,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(defaultThreadTTL, tp.getThreadTTL());
     }
 
+    @Test
     public void testPoolingConfig()
     {
 //        //TODO RM* test config
@@ -285,6 +297,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(PoolingProfile.INITIALISE_ALL, pp.getInitialisationPolicy());
     }
 
+    @Test
     public void testQueueProfileConfig()
     {
 //        // test config
@@ -306,6 +319,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
 //        assertFalse(qp.isPersistent());
     }
 
+    @Test
     public void testEndpointProperties() throws Exception
     {
         // test transaction config
@@ -317,6 +331,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals("Prop1", inEndpoint.getProperties().get("testEndpointProperty"));
     }
 
+    @Test
     public void testTransactionConfig() throws Exception
     {
         // test transaction config
@@ -334,6 +349,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertNotNull(outEndpoint);
     }
 
+    @Test
     public void testEnvironmentProperties()
     {
         assertEquals("true", muleContext.getRegistry().lookupObject("doCompression"));
@@ -342,6 +358,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
     }
 
 
+    @Test
     public void testBindngProxyCreation()
     {
         //Test that the proxy object was created and set on the service object
@@ -354,6 +371,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         //TODO Grab an instance of the service object itself and test that the proxy has been injected
     }
     
+    @Test
     public void testMuleConfiguration()
     {
         assertEquals(10,muleContext.getConfiguration().getDefaultResponseTimeout());
@@ -361,6 +379,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(30,muleContext.getConfiguration().getShutdownTimeout());
     }
 
+    @Test
     public void testGlobalInterceptorStack()
     {
         InterceptorStack interceptorStack = (InterceptorStack) muleContext.getRegistry().lookupObject(
@@ -372,6 +391,7 @@ public abstract class AbstractConfigBuilderTestCase extends AbstractScriptConfig
         assertEquals(LoggingInterceptor.class, interceptorStack.getInterceptors().get(2).getClass());
     }
 
+    @Test
     public void testInterceptors()
     {
         Service service = muleContext.getRegistry().lookupService("orangeComponent");

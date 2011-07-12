@@ -20,15 +20,22 @@ import java.io.InputStream;
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicReference;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class FtpStreamingTestCase extends AbstractFtpServerTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "ftp-streaming-test.xml";
     }
 
+    @Test
     public void testRequest() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);

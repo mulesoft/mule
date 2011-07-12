@@ -21,18 +21,27 @@ import org.mule.module.atom.routing.FeedSplitter;
 import org.mule.module.atom.transformers.ObjectToFeed;
 import org.mule.routing.MessageFilter;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.text.SimpleDateFormat;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class AtomNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "namespace-config.xml";
     }
 
+    @Test
     public void testEndpointConfig() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("test");
@@ -46,6 +55,7 @@ public class AtomNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(sdf.parse("2009-10-01"), ep.getLastUpdate());
     }
 
+    @Test
     public void testFlowConfig() throws Exception
     {
         SimpleFlowConstruct flowConstruct = muleContext.getRegistry().lookupObject("flowTest");
@@ -63,6 +73,7 @@ public class AtomNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(sdf.parse("2009-10-01"), ((EntryLastUpdatedFilter)((MessageFilter)mp).getFilter()).getLastUpdate());
     }
 
+    @Test
     public void testGlobalFilterConfig() throws Exception 
     {
         FeedLastUpdatedFilter filter = muleContext.getRegistry().lookupObject("feedFilter");
@@ -74,10 +85,12 @@ public class AtomNamespaceHandlerTestCase extends FunctionalTestCase
         assertFalse(filter.isAcceptWithoutUpdateDate());
     }
     
+    @Test
     public void testObjectToFeedTransformer() throws Exception
     {
         Transformer transformer = muleContext.getRegistry().lookupTransformer("ObjectToFeed");
         assertNotNull(transformer);
         assertTrue(transformer instanceof ObjectToFeed);
     }
+
 }

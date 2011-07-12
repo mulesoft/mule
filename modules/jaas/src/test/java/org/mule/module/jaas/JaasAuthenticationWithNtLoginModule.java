@@ -15,20 +15,33 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.security.MuleCredentials;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.SystemUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JaasAuthenticationWithNtLoginModule extends FunctionalTestCase
 {
 
+    @Override
+    protected String getConfigResources()
+    {
+        return "mule-conf-with-NTLoginModule.xml";
+    }
+
+    @Override
     protected boolean isDisabledInThisEnvironment()
     {
         return SystemUtils.IS_OS_UNIX;
     }
 
+    @Test
     public void testCaseAuthentication() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -46,8 +59,4 @@ public class JaasAuthenticationWithNtLoginModule extends FunctionalTestCase
         assertTrue(m.getPayloadAsString().equals("Test Received"));
     }
 
-    protected String getConfigResources()
-    {
-        return "mule-conf-with-NTLoginModule.xml";
-    }
 }

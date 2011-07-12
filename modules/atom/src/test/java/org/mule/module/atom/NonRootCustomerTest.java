@@ -9,14 +9,18 @@
  */
 package org.mule.module.atom;
 
+import org.junit.Test;
+
 public class NonRootCustomerTest extends AbstractCustomerTest
 {
+
     @Override
     protected String getConfigResources()
     {
         return "customer-nonroot-conf.xml";
     }
 
+    @Test
     public void testCustomerProvider() throws Exception
     {
         testCustomerProvider("/base");

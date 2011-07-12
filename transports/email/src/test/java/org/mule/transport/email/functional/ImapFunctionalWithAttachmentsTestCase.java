@@ -24,6 +24,11 @@ import java.io.InputStream;
 
 import javax.mail.Message;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class ImapFunctionalWithAttachmentsTestCase extends AbstractEmailFunctionalTestCase
 {
     private static final String CONFIG_FILE = "email-attachment-save.xml";
@@ -47,20 +52,12 @@ public class ImapFunctionalWithAttachmentsTestCase extends AbstractEmailFunction
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
+        
+        // clear out destination directory
+        FileUtils.deleteTree(new File(System.getProperty("mail.save.dir")));
     }
-    
-    @Override
-    protected void doTearDown() throws Exception
-    {
-        super.doTearDown();
-        clearAttachmentsSaveDirectory();
-    }
-
-    private void clearAttachmentsSaveDirectory()
-    {
-        FileUtils.deleteTree(saveDir);
-    }
-    
+        
+    @Test
     public void testRequest() throws Exception
     {
         // we do this since we need to set system mail properties before starting

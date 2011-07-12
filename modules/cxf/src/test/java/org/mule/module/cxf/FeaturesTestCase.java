@@ -14,12 +14,16 @@ import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.module.cxf.builder.WebServiceMessageProcessorBuilder;
 import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.List;
 
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.LoggingFeature;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class FeaturesTestCase extends FunctionalTestCase
 {
@@ -30,6 +34,7 @@ public class FeaturesTestCase extends FunctionalTestCase
         return "features-test.xml";
     }
 
+    @Test
     public void testFeatures() throws Exception
     {
         ImmutableEndpoint endpoint = muleContext.getRegistry().lookupEndpointBuilder("endpoint").buildInboundEndpoint();

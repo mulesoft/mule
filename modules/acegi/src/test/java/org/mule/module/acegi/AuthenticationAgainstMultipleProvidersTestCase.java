@@ -10,7 +10,7 @@
 
 package org.mule.module.acegi;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
@@ -19,15 +19,20 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class AuthenticationAgainstMultipleProvidersTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "mule-multiple-providers-config.xml";
     }
 
+    @Test
     public void testProvider1() throws Exception
     {
         HttpClient httpClient = new HttpClient();
@@ -51,6 +56,7 @@ public class AuthenticationAgainstMultipleProvidersTestCase extends FunctionalTe
         assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod)); 
     }    
     
+    @Test
     public void testProvider2() throws Exception
     {
         HttpClient httpClient = new HttpClient();
@@ -74,6 +80,7 @@ public class AuthenticationAgainstMultipleProvidersTestCase extends FunctionalTe
         assertEquals(HttpStatus.SC_UNAUTHORIZED, httpClient.executeMethod(postMethod)); 
     }
     
+    @Test
     public void testMultipleProviders() throws Exception
     {
         HttpClient httpClient = new HttpClient();

@@ -9,6 +9,8 @@
  */
 package org.mule.module.atom;
 
+import org.junit.Test;
+
 public class RootCustomerTest extends AbstractCustomerTest
 {
 
@@ -18,6 +20,7 @@ public class RootCustomerTest extends AbstractCustomerTest
         return "customer-conf.xml";
     }
 
+    @Test
     public void testCustomerProvider() throws Exception
     {
         testCustomerProvider("");

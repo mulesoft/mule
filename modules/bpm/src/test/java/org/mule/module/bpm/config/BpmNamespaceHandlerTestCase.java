@@ -12,7 +12,13 @@ package org.mule.module.bpm.config;
 import org.mule.module.bpm.BPMS;
 import org.mule.module.bpm.ProcessComponent;
 import org.mule.module.bpm.test.TestBpms;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 
 /**
@@ -20,11 +26,14 @@ import org.mule.tck.FunctionalTestCase;
  */
 public class BpmNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "bpm-namespace-config.xml";
     }
 
+    @Test
     public void testDefaultsComponent() throws Exception
     {
         ProcessComponent c = (ProcessComponent) muleContext.getRegistry().lookupService("Service1").getComponent();
@@ -40,6 +49,7 @@ public class BpmNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("bar", ((TestBpms) bpms).getFoo());
     }
     
+    @Test
     public void testConfigComponent() throws Exception
     {
         ProcessComponent c = (ProcessComponent) muleContext.getRegistry().lookupService("Service2").getComponent();

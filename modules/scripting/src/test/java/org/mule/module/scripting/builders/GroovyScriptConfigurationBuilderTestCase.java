@@ -14,8 +14,11 @@ import org.mule.api.MuleException;
 import org.mule.api.config.ConfigurationBuilder;
 import org.mule.tck.AbstractScriptConfigBuilderTestCase;
 
+import static org.junit.Assert.fail;
+
 public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
+
     @Override
     public String getConfigResources()
     {

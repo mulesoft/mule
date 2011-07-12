@@ -15,17 +15,24 @@ import org.mule.api.config.ConfigurationBuilder;
 import org.mule.api.transport.DispatchException;
 import org.mule.module.ibeans.config.IBeanHolderConfigurationBuilder;
 import org.mule.module.xml.util.XMLUtils;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.List;
 
+import org.junit.Test;
 import org.w3c.dom.Document;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class IBeansHostIpFunctionalTestCase extends FunctionalTestCase
 {
+
     public IBeansHostIpFunctionalTestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override
@@ -41,6 +48,7 @@ public class IBeansHostIpFunctionalTestCase extends FunctionalTestCase
         builders.add(0, builder);
     }
 
+    @Test
     public void testHostIp() throws Exception
     {
         if (isOffline(getClass().getName() + ".testHostIp"))
@@ -57,6 +65,7 @@ public class IBeansHostIpFunctionalTestCase extends FunctionalTestCase
         assertEquals("-117.136,32.8149", XMLUtils.selectValue("//gml:coordinates", result));
     }
 
+    @Test
     public void testHostIpFromClient() throws Exception
     {
         if (isOffline(getClass().getName() + ".testHostIpFromClient"))
@@ -73,6 +82,7 @@ public class IBeansHostIpFunctionalTestCase extends FunctionalTestCase
         assertEquals("-117.136,32.8149", XMLUtils.selectValue("//gml:coordinates", result));
     }
 
+    @Test
     public void testHostIpWrongNumberOfArguments() throws Exception
     {
         Object[] params = new Object[]{"192.215.42.198", new Integer(12)};
@@ -83,6 +93,7 @@ public class IBeansHostIpFunctionalTestCase extends FunctionalTestCase
         assertTrue(response.getExceptionPayload().getRootException() instanceof NoSuchMethodException);
     }
 
+    @Test
     public void testHostIpBadArgumentType() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -92,6 +103,7 @@ public class IBeansHostIpFunctionalTestCase extends FunctionalTestCase
         assertTrue(response.getExceptionPayload().getRootException() instanceof NoSuchMethodException);
     }
 
+    @Test
     public void testHostIpWrongNumberOfArgumentsDirectClient() throws Exception
     {
         Object[] params = new Object[]{"192.215.42.198", new Integer(12)};
@@ -107,6 +119,7 @@ public class IBeansHostIpFunctionalTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testHostIpBadArgumentTypeDirectClient() throws Exception
     {
         try

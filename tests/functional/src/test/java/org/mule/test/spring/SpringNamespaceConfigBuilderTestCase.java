@@ -13,10 +13,11 @@ import org.mule.tck.AbstractConfigBuilderTestCase;
 
 public class SpringNamespaceConfigBuilderTestCase extends AbstractConfigBuilderTestCase
 {
+
     public SpringNamespaceConfigBuilderTestCase()
     {
         super(false);
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override

@@ -18,21 +18,29 @@ import org.mule.api.security.UnauthorisedException;
 import org.mule.config.ExceptionHelper;
 import org.mule.module.client.MuleClient;
 import org.mule.security.MuleCredentials;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 public class EncryptionFunctionalTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "encryption-test.xml";
     }
 
+    @Test
     public void testAuthenticationFailureNoContext() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -43,6 +51,7 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
             .getCode());
     }
 
+    @Test
     public void testAuthenticationFailureBadCredentials() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -60,6 +69,7 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
             .getCode());
     }
 
+    @Test
     public void testAuthenticationAuthorised() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -76,6 +86,7 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
         assertNull(m.getExceptionPayload());
     }
 
+    @Test
     public void testAuthenticationFailureBadCredentialsHttp() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -93,6 +104,7 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
         assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
     }
 
+    @Test
     public void testAuthenticationAuthorisedHttp() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

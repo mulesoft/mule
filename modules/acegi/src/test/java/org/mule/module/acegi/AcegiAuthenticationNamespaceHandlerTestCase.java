@@ -17,18 +17,25 @@ import org.mule.api.service.Service;
 import org.mule.module.acegi.filters.http.HttpBasicAuthenticationFilter;
 import org.mule.security.MuleSecurityManager;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Collection;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class AcegiAuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "acegi-authentication-config.xml";
     }
 
+    @Test
     public void testSecurityManagerConfigured()
     {
         MuleSecurityManager securityManager = 
@@ -41,6 +48,7 @@ public class AcegiAuthenticationNamespaceHandlerTestCase extends FunctionalTestC
         assertEquals(AcegiProviderAdapter.class, provider.getClass());
     }
     
+    @Test
     public void testEndpointConfiguration()
     {
         Service service = muleContext.getRegistry().lookupService("echo");

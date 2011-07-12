@@ -12,20 +12,26 @@ package org.mule.module.acegi;
 
 import org.mule.api.security.SecurityManager;
 import org.mule.api.security.SecurityProvider;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Iterator;
 
 import org.acegisecurity.providers.dao.DaoAuthenticationProvider;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class AcegiNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "acegi-namespace-config.xml";
     }
 
+    @Test
     public void testAcegi()
     {
         knownProperties(getProvider("memory-dao"));
@@ -37,6 +43,7 @@ public class AcegiNamespaceHandlerTestCase extends FunctionalTestCase
         return securityManager.getProvider(name);
     }
 
+    @Test
     public void testCustom()
     {
         Iterator providers = muleContext.getSecurityManager().getProviders().iterator();

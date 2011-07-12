@@ -9,14 +9,17 @@
  */
 package org.mule.module.ibeans;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.ibean.IBeansConnector;
 
-/**
- * TODO
- */
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class IBeansNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
@@ -24,6 +27,7 @@ public class IBeansNamespaceHandlerTestCase extends FunctionalTestCase
         return "ibeans-namespace-config.xml";
     }
 
+    @Test
     public void testIbeansConfig() throws Exception
     {
         IBeansConnector c = (IBeansConnector) muleContext.getRegistry().lookupConnector("ibeansConnector");
@@ -33,4 +37,5 @@ public class IBeansNamespaceHandlerTestCase extends FunctionalTestCase
 
         //TODO Assert specific properties are configured correctly
     }
+
 }

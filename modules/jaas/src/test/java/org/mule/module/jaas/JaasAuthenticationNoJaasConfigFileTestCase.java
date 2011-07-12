@@ -16,22 +16,28 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.security.MuleCredentials;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCase
 {
-    
-    public void assertExceptionPayload(MuleMessage message, String exceptionMessage)
+
+    @Override
+    protected String getConfigResources()
     {
-        assertNotNull(message.getExceptionPayload());
-        ExceptionPayload exceptionPayload = message.getExceptionPayload();
-        assertNotNull(exceptionPayload);
-        assertEquals(exceptionMessage, exceptionPayload.getMessage());
+        return "mule-conf-with-no-jaas-config-file.xml";
     }
 
+    @Test
     public void testCaseGoodAuthentication() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -49,6 +55,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         assertEquals("Test Received", m.getPayloadAsString());
     }
 
+    @Test
     public void testCaseDifferentGoodAuthentication() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -66,6 +73,7 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         assertEquals("Test Received", m.getPayloadAsString());
     }
 
+    @Test
     public void testCaseWrongCombinationOfCorrectUsernameAndPassword() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -81,11 +89,11 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
         assertFalse(m.getPayloadAsString().equals("Test Received"));
-        
+
         assertExceptionPayload(m, "Authentication failed for principal Marie.Rizzo. Message payload is of type: String");
-        
     }
 
+    @Test
     public void testCaseBadUserName() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -100,10 +108,11 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
         assertFalse(m.getPayloadAsString().equals("Test Received"));
-        
+
         assertExceptionPayload(m, "Authentication failed for principal Evil. Message payload is of type: String");
     }
 
+    @Test
     public void testCaseBadPassword() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -118,12 +127,15 @@ public class JaasAuthenticationNoJaasConfigFileTestCase extends FunctionalTestCa
         assertNotNull(m);
         assertTrue(m.getPayload() instanceof String);
         assertFalse(m.getPayloadAsString().equals("Test Received"));
-        
+
         assertExceptionPayload(m, "Authentication failed for principal Marie.Rizzo. Message payload is of type: String");
     }
 
-    protected String getConfigResources()
+    public void assertExceptionPayload(MuleMessage message, String exceptionMessage)
     {
-        return "mule-conf-with-no-jaas-config-file.xml";
+        assertNotNull(message.getExceptionPayload());
+        ExceptionPayload exceptionPayload = message.getExceptionPayload();
+        assertNotNull(exceptionPayload);
+        assertEquals(exceptionMessage, exceptionPayload.getMessage());
     }
 }

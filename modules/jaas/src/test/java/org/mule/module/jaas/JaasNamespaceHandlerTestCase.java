@@ -16,19 +16,24 @@ import org.mule.api.security.SecurityProvider;
 import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.tck.FunctionalTestCase;
 
+import org.junit.Test;
+
 public class JaasNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "jaas-namespace-config.xml";
     }
     
+    @Test
     public void testJaasProvider()
     {
         knownProperties(getProvider("jaasSecurityProvider"));
     }
     
+    @Test
     public void testPasswordBasedEncryption()
     {
         knownProperties(getEncryptionStrategy("PBE"));
