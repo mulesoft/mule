@@ -10,18 +10,33 @@
 
 package org.mule.test.usecases.sync;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
-public class TcpJmsResponseTestCase extends FunctionalTestCase
+public class TcpJmsResponseTestCase extends AbstractServiceAndFlowTestCase
 {
 
-    protected String getConfigResources()
+    public TcpJmsResponseTestCase(ConfigVariant variant, String configResources)
     {
-        return "org/mule/test/usecases/sync/tcp-jms-response.xml";
+        super(variant, configResources);
+
     }
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/usecases/sync/tcp-jms-response-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/usecases/sync/tcp-jms-response-flow.xml"}});
+    }
+
+    @Test
     public void testSyncResponse() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
