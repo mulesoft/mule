@@ -9,7 +9,7 @@
  */
 package org.mule.module.rss;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -18,16 +18,20 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.junit.Test;
+
 import static org.mule.module.rss.SampleFeed.ENTRIES_IN_RSS_FEED;
 
 public class FileRssFeedConsumeTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "file-rss-consume.xml";
     }
 
+    @Test
     public void testConsumeFeedEntries() throws Exception
     {
         createSampleFeedFileInWorkDirectory();
@@ -57,4 +61,5 @@ public class FileRssFeedConsumeTestCase extends FunctionalTestCase
         fos.write(feed.getBytes());
         fos.close();
     }
+
 }

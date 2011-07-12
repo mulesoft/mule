@@ -9,11 +9,13 @@
  */
 package org.mule.management;
 
+import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
+import org.mule.tck.junit4.FunctionalTestCase;
+
 import java.net.ConnectException;
 import java.net.Socket;
 
-import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
-import org.mule.tck.FunctionalTestCase;
+import org.junit.Test;
 
 public class JmxAgentEmptyConfigurationTestCase extends FunctionalTestCase
 {
@@ -24,18 +26,11 @@ public class JmxAgentEmptyConfigurationTestCase extends FunctionalTestCase
         return "empty-management-config.xml";
     }
 
+    @Test(expected = ConnectException.class)
     public void testDefaultJmxAgent() throws Exception
     {
         FixedHostRmiClientSocketFactory rmiSocketFactory = new FixedHostRmiClientSocketFactory();
-        try
-        {
-            Socket socket = rmiSocketFactory.createSocket("localhost", 1099);
-            socket.close();
-            fail("Should not connect");
-        }
-        catch (ConnectException e)
-        {
-            // expected behavior
-        }
+        Socket socket = rmiSocketFactory.createSocket("localhost", 1099);
+        socket.close();
     }
 }

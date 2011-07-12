@@ -15,16 +15,24 @@ import org.mule.module.json.transformers.FruitCollection;
 import org.mule.module.json.transformers.JsonBeanRoundTripTestCase;
 import org.mule.module.json.transformers.JsonToObject;
 import org.mule.module.json.transformers.ObjectToJson;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "json-namespace-config.xml";
     }
 
+    @Test
     public void testJsonConfig() throws Exception
     {
         // This test fails under Java 1.6 on Windows, because the Java fields are serialized in a different order.
@@ -61,4 +69,5 @@ public class JsonNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(result2);
         assertEquals(fc, result2);
     }
+
 }

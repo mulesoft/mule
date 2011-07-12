@@ -10,16 +10,22 @@
 package org.mule.module.rss;
 
 import org.mule.api.client.LocalMuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class JmsRssFeedConsumeTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "jms-rss-consume.xml";
     }
 
+    @Test
     public void testConsumeFeed() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();
@@ -30,6 +36,7 @@ public class JmsRssFeedConsumeTestCase extends FunctionalTestCase
         assertEquals(25, component.getCount());
     }
 
+    @Test
     public void testConsumeSplitFeed() throws Exception
     {
         LocalMuleClient client = muleContext.getClient();

@@ -10,16 +10,22 @@
 
 package org.mule.module.rss;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class RssFunctionalTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "rss-test-config.xml";
     }
 
+    @Test
     public void testRSS() throws Exception
     {
         if (isOffline(getClass().getName() + ".testRSS"))

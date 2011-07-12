@@ -12,14 +12,19 @@ package org.mule.module.scripting.transformer;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCase
 {
     public GroovyScriptTransformerFunctionalTestCase()
     {
         //Groovy really hammers the startup time since it needs to create the interpreter on every start
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override
@@ -28,6 +33,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
         return "groovy-transformer-config.xml";
     }
 
+    @Test
     public void testInlineScript() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -37,6 +43,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
         assertEquals("hexxo", response.getPayload());
     }
 
+    @Test
     public void testFileBasedScript() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -46,6 +53,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
         assertEquals("hexxo", response.getPayload());
     }
 
+    @Test
     public void testReferencedTransformer() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -55,6 +63,7 @@ public class GroovyScriptTransformerFunctionalTestCase extends FunctionalTestCas
         assertEquals("hexxo", response.getPayload());
     }
 
+    @Test
     public void testReferencedTransformerWithParameters() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

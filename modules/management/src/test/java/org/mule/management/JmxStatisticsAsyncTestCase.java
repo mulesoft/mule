@@ -15,12 +15,19 @@ import org.mule.management.stats.ApplicationStatistics;
 import org.mule.management.stats.FlowConstructStatistics;
 import org.mule.management.stats.ServiceStatistics;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Iterator;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
 {
+    
     @Override
     protected String getConfigResources()
     {
@@ -52,12 +59,14 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
         super.doTearDown();
     }
 
+    @Test
     public void testCorrectAverageQueueSize() throws Exception
     {
         ServiceStatistics stats = getServiceStatistics();
         assertEquals(1, stats.getAverageQueueSize());
     }
 
+    @Test
     public void testCorrectAsynchEventsReceived() throws Exception
     {
         ServiceStatistics stats = getServiceStatistics();
@@ -68,24 +77,28 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
         assertEquals(3, astats.getAsyncEventsReceived());
     }
 
+    @Test
     public void testCorrectMaxQueueSize() throws Exception
     {
         ServiceStatistics stats = getServiceStatistics();
         assertEquals(1, stats.getMaxQueueSize());
     }
 
+    @Test
     public void testCorrectAsynchEventsSent() throws Exception
     {
         ServiceStatistics stats = getServiceStatistics();
         assertEquals(1, stats.getAsyncEventsSent());
     }
 
+    @Test
     public void testCorrectTotalEventsSent() throws Exception
     {
         ServiceStatistics stats = getServiceStatistics();
         assertEquals(1, stats.getTotalEventsSent());
     }
 
+    @Test
     public void testCorrectTotalEventsReceived() throws Exception
     {
         ServiceStatistics stats = getServiceStatistics();
@@ -135,4 +148,5 @@ public class JmxStatisticsAsyncTestCase extends FunctionalTestCase
         while (!(stat1 instanceof ApplicationStatistics));
         return (ApplicationStatistics)stat1;
     }
+
 }

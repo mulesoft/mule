@@ -13,9 +13,9 @@ package org.mule.module.rss;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -23,9 +23,14 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import java.io.InputStream;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class RssFeedConsumeAndTransformTestCase extends FunctionalTestCase
 {
+
     private Latch receiveLatch = new Latch();
     private MuleMessage message = null;
 
@@ -49,6 +54,7 @@ public class RssFeedConsumeAndTransformTestCase extends FunctionalTestCase
         });
     }
 
+    @Test
     public void testSendFeed() throws Exception
     {
         InputStream input = SampleFeed.feedAsStream();

@@ -10,22 +10,25 @@
 
 package org.mule.module.jersey;
 
-public class RootServletTestCase extends AbstractServletTestCase 
+import org.junit.Test;
+
+public class RootServletTestCase extends AbstractServletTestCase
 {
+
     public RootServletTestCase() 
     {
         super("/*");
     }
 
-    public void testBasic() throws Exception
-    {
-        testBasic("http://localhost:63088/base");
-    }
-    
     @Override
-    protected String getConfigResources() 
+    protected String getConfigResources()
     {
         return "servlet-conf.xml";
     }
 
+    @Test
+    public void testBasic() throws Exception
+    {
+        doTestBasic("http://localhost:63088/base");
+    }
 }

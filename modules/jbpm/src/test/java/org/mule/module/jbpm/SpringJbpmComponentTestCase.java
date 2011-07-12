@@ -14,21 +14,31 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.bpm.BPMS;
 import org.mule.module.bpm.Process;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests jBPM component with a simple process.  The ProcessEngine is built by Spring and injected into the Mule wrapper.
  */
 public class SpringJbpmComponentTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "spring-jbpm-component.xml";
     }
 
+    @Test
     public void testSimpleProcess() throws Exception 
     {
         MuleClient client = muleContext.getClient();
@@ -53,4 +63,5 @@ public class SpringJbpmComponentTestCase extends FunctionalTestCase
         // The process should have ended.
         assertTrue(bpms.hasEnded(process));
     }
+
 }

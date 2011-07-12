@@ -11,13 +11,17 @@
 package org.mule.management.agents;
 
 import org.mule.module.management.mbean.MBeanServerFactory;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Set;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class MuleContextRestartTestCase extends FunctionalTestCase
 {
@@ -28,6 +32,7 @@ public class MuleContextRestartTestCase extends FunctionalTestCase
         return "mule-context-restart-config.xml";
     }
 
+    @Test
     public void testContextRestart() throws Exception
     {
         muleContext.stop();

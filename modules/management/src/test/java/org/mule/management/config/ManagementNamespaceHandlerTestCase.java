@@ -18,14 +18,22 @@ import org.mule.module.management.agent.JmxAgent;
 import org.mule.module.management.agent.JmxServerNotificationAgent;
 import org.mule.module.management.agent.Log4jAgent;
 import org.mule.module.management.agent.Mx4jAgent;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestAgent;
 
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
     private static final int CHAINSAW_PORT = 8080;
     
     public ManagementNamespaceHandlerTestCase()
@@ -41,6 +49,7 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
         return "management-namespace-config.xml";
     }
 
+    @Test
     public void testSimpleJmxAgentConfig() throws Exception
     {
         Agent agent = muleContext.getRegistry().lookupObject(JmxAgent.class);
@@ -94,6 +103,7 @@ public class ManagementNamespaceHandlerTestCase extends FunctionalTestCase
 //        assertEquals(YourKitProfilerAgent.class, agent.getClass());
     }
 
+    @Test
     public void testAgentsOrder() throws Exception
     {
         Registry registry = muleContext.getRegistry();

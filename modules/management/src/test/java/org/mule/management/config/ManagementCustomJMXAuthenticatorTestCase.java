@@ -13,20 +13,27 @@ package org.mule.management.config;
 import org.mule.api.agent.Agent;
 import org.mule.module.management.agent.ConfigurableJMXAuthenticator;
 import org.mule.module.management.agent.JmxAgent;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Map;
 
 import javax.security.auth.Subject;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class ManagementCustomJMXAuthenticatorTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "management-custom-jmx-authenticator-config.xml";
     }
 
+    @Test
     public void testCustomJMXAuthenticatorConfig() throws Exception
     {
         Agent agent = muleContext.getRegistry().lookupAgent("jmx-agent");
@@ -48,4 +55,5 @@ public class ManagementCustomJMXAuthenticatorTestCase extends FunctionalTestCase
             return null;
         }
     }
+
 }

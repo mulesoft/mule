@@ -10,7 +10,7 @@
 
 package org.mule.management;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +21,14 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class JmxDuplicateEndpointNamesTestCase extends FunctionalTestCase
 {
+
     private List<ObjectInstance> endpointMBeans = new ArrayList<ObjectInstance>();
     
     @Override
@@ -31,6 +37,7 @@ public class JmxDuplicateEndpointNamesTestCase extends FunctionalTestCase
         return "duplicate-endpoint-addesses.xml";
     }
 
+    @Test
     public void testDuplicateNames()
     {
         List<?> mBeanServers = MBeanServerFactory.findMBeanServer(null);
@@ -70,6 +77,7 @@ public class JmxDuplicateEndpointNamesTestCase extends FunctionalTestCase
         ObjectName name = instance.getObjectName();
         return name.getCanonicalName().contains("vmInbound");    
     }
+
 }
 
 

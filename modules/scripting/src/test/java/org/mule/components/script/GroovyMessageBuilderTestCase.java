@@ -12,16 +12,23 @@ package org.mule.components.script;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class GroovyMessageBuilderTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "groovy-messagebuilder-config.xml";
     }
 
+    @Test
     public void testFunctionBehaviour() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

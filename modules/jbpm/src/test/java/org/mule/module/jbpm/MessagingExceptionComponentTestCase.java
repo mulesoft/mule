@@ -13,17 +13,26 @@ package org.mule.module.jbpm;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
 import org.mule.util.ExceptionUtils;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class MessagingExceptionComponentTestCase extends FunctionalTestCase
 {
+    
+    @Override
     protected String getConfigResources()
     {
         return "jbpm-component-functional-test.xml";
     }
 
+    @Test
     public void testNoException() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -34,6 +43,7 @@ public class MessagingExceptionComponentTestCase extends FunctionalTestCase
         assertNotNull(client.request("vm://queueD", 1000));            
     }
 
+    @Test
     public void testExceptionInService() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -47,6 +57,7 @@ public class MessagingExceptionComponentTestCase extends FunctionalTestCase
         assertNull(client.request("vm://queueD", 1000));            
     }
 
+    @Test
     public void testExceptionInTransformer() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -59,4 +70,5 @@ public class MessagingExceptionComponentTestCase extends FunctionalTestCase
         assertNotNull(client.request("vm://queueC", 1000));            
         assertNull(client.request("vm://queueD", 1000));            
     }
+
 }

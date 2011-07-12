@@ -13,7 +13,7 @@ package org.mule.module.jersey;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.servlet.MuleReceiverServlet;
@@ -27,8 +27,12 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 
+import static org.junit.Assert.assertEquals;
+
 public abstract class AbstractServletTestCase extends FunctionalTestCase
 {
+
+    //TODO(pablo.kraan): replace with a dynamic endpoint
     public static final int HTTP_PORT = 63088;
 
     private Server httpServer;
@@ -55,8 +59,6 @@ public abstract class AbstractServletTestCase extends FunctionalTestCase
         context.setAttribute(MuleProperties.MULE_CONTEXT_PROPERTY, muleContext);
         
         httpServer.start();
-        
-
     }
 
     @Override
@@ -69,7 +71,7 @@ public abstract class AbstractServletTestCase extends FunctionalTestCase
         }
     }
 
-    public void testBasic(String root) throws Exception
+    public void doTestBasic(String root) throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
 

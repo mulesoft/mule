@@ -14,7 +14,7 @@ import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.config.MuleProperties;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
 import java.io.FileInputStream;
@@ -22,6 +22,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class PGPSecurityFilterTestCase extends FunctionalTestCase
 {
@@ -41,6 +47,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         return "test-pgp-encrypt-config.xml";
     }
 
+    @Test
     public void testAuthenticationAuthorised() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -55,6 +62,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         assertEquals("This is a test message.\r\nThis is another line.\r\n", message.getPayloadAsString());
     }
 
+    @Test
     public void testAuthenticationNotAuthorised() throws Exception
     {
         Map<String, Object> props = createMessageProperties();
@@ -82,4 +90,5 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         props.put(MuleProperties.MULE_USER_PROPERTY, "Mule server <mule_server@mule.com>");
         return props;
     }
+
 }

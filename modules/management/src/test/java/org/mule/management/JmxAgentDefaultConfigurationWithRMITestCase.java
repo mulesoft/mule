@@ -9,11 +9,15 @@
  */
 package org.mule.management;
 
+import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
+import org.mule.tck.junit4.FunctionalTestCase;
+
 import java.net.ConnectException;
 import java.net.Socket;
 
-import org.mule.module.management.agent.FixedHostRmiClientSocketFactory;
-import org.mule.tck.FunctionalTestCase;
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 public class JmxAgentDefaultConfigurationWithRMITestCase extends FunctionalTestCase
 {
@@ -24,6 +28,7 @@ public class JmxAgentDefaultConfigurationWithRMITestCase extends FunctionalTestC
         return "default-with-rmi-management-config.xml";
     }
 
+    @Test
     public void testDefaultJmxAgent() throws Exception
     {
         FixedHostRmiClientSocketFactory rmiSocketFactory = new FixedHostRmiClientSocketFactory();
@@ -49,4 +54,5 @@ public class JmxAgentDefaultConfigurationWithRMITestCase extends FunctionalTestC
             fail("Should connect");
         }
     }
+
 }

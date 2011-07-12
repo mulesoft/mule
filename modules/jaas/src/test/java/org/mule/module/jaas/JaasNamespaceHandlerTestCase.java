@@ -14,9 +14,13 @@ import org.mule.api.EncryptionStrategy;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.security.SecurityProvider;
 import org.mule.security.PasswordBasedEncryptionStrategy;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JaasNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -32,7 +36,7 @@ public class JaasNamespaceHandlerTestCase extends FunctionalTestCase
     {
         knownProperties(getProvider("jaasSecurityProvider"));
     }
-    
+
     @Test
     public void testPasswordBasedEncryption()
     {

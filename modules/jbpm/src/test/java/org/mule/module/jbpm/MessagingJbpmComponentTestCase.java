@@ -14,10 +14,17 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.bpm.BPMS;
 import org.mule.module.bpm.Process;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the connector against jBPM with a process which generates 
@@ -25,11 +32,14 @@ import java.util.Map;
  */
 public class MessagingJbpmComponentTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "jbpm-component-functional-test.xml";
     }
 
+    @Test
     public void testSendMessageProcess() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -55,4 +65,5 @@ public class MessagingJbpmComponentTestCase extends FunctionalTestCase
         // The process should have ended.
         assertTrue(bpms.hasEnded(process));
     }
+
 }

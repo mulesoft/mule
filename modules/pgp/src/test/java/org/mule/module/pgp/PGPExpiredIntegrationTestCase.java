@@ -13,7 +13,12 @@ package org.mule.module.pgp;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class PGPExpiredIntegrationTestCase extends FunctionalTestCase
 {
@@ -24,6 +29,7 @@ public class PGPExpiredIntegrationTestCase extends FunctionalTestCase
         return "pgp-expired-integration-mule-config.xml";
     }
 
+    @Test
     public void testEncryptDecrypt() throws Exception
     {
         String payload = "this is a super simple test. Hope it works!!!";
@@ -36,4 +42,5 @@ public class PGPExpiredIntegrationTestCase extends FunctionalTestCase
         MuleMessage message = client.request("vm://out", 1000);
         assertNull(message);
     }
+
 }

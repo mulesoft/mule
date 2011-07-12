@@ -9,12 +9,17 @@
  */
 package org.mule.module.rss;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
 public class FeedConsumeNoSplitTestCase extends FunctionalTestCase
 {
+
     private final CounterCallback counter = new CounterCallback();
 
     @Override
@@ -30,6 +35,7 @@ public class FeedConsumeNoSplitTestCase extends FunctionalTestCase
         comp.setEventCallback(counter);
     }
 
+    @Test
     public void testConsume() throws Exception {
 
         Thread.sleep(1500);
@@ -38,4 +44,5 @@ public class FeedConsumeNoSplitTestCase extends FunctionalTestCase
         assertTrue(count < 3);
 
     }
+
 }

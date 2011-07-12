@@ -11,6 +11,8 @@
 package org.mule.components.script.refreshable;
 
 
+import org.junit.Test;
+
 public class GroovyRefreshableBeanTestCase extends AbstractRefreshableBeanTestCase
 {
 
@@ -25,41 +27,49 @@ public class GroovyRefreshableBeanTestCase extends AbstractRefreshableBeanTestCa
     public static final String RECEIVE_RECEIVED = "public class GroovyDynamicScript { public String receive(String src) { return src + \"" + RECEIVED + "\"; }}";
     public static final String RECEIVE_RECEIVED2 = RECEIVE_RECEIVED.replaceAll(RECEIVED, RECEIVED2);
 
+    @Override
     protected String getConfigResources()
     {
         return "groovy-refreshable-config.xml";
     }
 
+    @Test
     public void testFirstOnCallRefresh() throws Exception
     {
         runScriptTest(ON_CALL_RECEIVED, NAME_CALLABLE, "vm://groovy_refresh_callable", PAYLOAD, RECEIVED);
     }
     
+    @Test
     public void testCallFirstTest() throws Exception
     {
         testFirstOnCallRefresh();
     }
     
+    @Test
     public void testSecondOnCallRefresh() throws Exception
     {
         runScriptTest(ON_CALL_RECEIVED2, NAME_CALLABLE, "vm://groovy_refresh_callable", PAYLOAD, RECEIVED2);
     }
 
+    @Test
     public void testFirstPojoRefresh() throws Exception
     {
         runScriptTest(RECEIVE_RECEIVED, NAME_BEAN, "vm://groovy_refresh_bean", PAYLOAD, RECEIVED);
     }
     
+    @Test
     public void testSecondPojoRefresh() throws Exception
     {
         runScriptTest(RECEIVE_RECEIVED2, NAME_BEAN, "vm://groovy_refresh_bean", PAYLOAD, RECEIVED2);
     }
     
+    @Test
     public void testFirstChangeInterfaces() throws Exception
     {
         runScriptTest(ON_CALL_RECEIVED, NAME_CHANGE_INTERFACE, "vm://groovy_refresh_changeInterfaces", PAYLOAD, RECEIVED);
     }
     
+    @Test
     public void testSecondChangeInterfaces() throws Exception
     {
         runScriptTest(RECEIVE_RECEIVED2, NAME_CHANGE_INTERFACE, "vm://groovy_refresh_changeInterfaces", PAYLOAD, RECEIVED2);
