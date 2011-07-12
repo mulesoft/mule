@@ -28,7 +28,6 @@ import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +63,7 @@ public abstract class AbstractOutboundMessageProcessorBuilder
     protected String operation;
     protected String decoupledEndpoint;
     
-    @SuppressWarnings("unchecked")
+    @Override
     public CxfOutboundMessageProcessor build() throws MuleException
     {
         if (muleContext == null) 
@@ -168,15 +167,13 @@ public abstract class AbstractOutboundMessageProcessorBuilder
         return client;
     }
 
-    @SuppressWarnings("unchecked")
     private void addInterceptors(List<Interceptor<? extends Message>> col, List<Interceptor<? extends Message>> supplied)
     {
         if (supplied != null) 
         {
-            col.addAll((Collection<? extends Interceptor<? extends Message>>) supplied);
+            col.addAll(supplied);
         }
     }
-    
     
     protected String getAddress()
     {
@@ -195,6 +192,7 @@ public abstract class AbstractOutboundMessageProcessorBuilder
 
     protected void createClientFromLocalServer() throws Exception
     {
+        // template method
     }
 
     protected void addMuleInterceptors()
@@ -349,9 +347,9 @@ public abstract class AbstractOutboundMessageProcessorBuilder
         this.decoupledEndpoint = decoupledEndpoint;
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         muleContext = context;
     }
-    
 }

@@ -63,7 +63,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
     protected Object object;
     protected Class<?> objectType;
     protected String methodName;
-    protected List<?> arguments = new ArrayList<Object>();;
+    protected List<?> arguments = new ArrayList<Object>();
     protected Class<?>[] argumentTypes;
     protected String name;
     protected PatternInfo patternInfo = TemplateParser.createMuleStyleParser().getStyle();
@@ -72,6 +72,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
     protected ExpressionManager expressionManager;
     protected MuleContext muleContext;
 
+    @Override
     public void initialise() throws InitialisationException
     {
         if (object == null)
@@ -151,6 +152,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
         }
     }
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         MuleEvent resultEvent = event;
@@ -345,6 +347,7 @@ public class InvokerMessageProcessor implements MessageProcessor, Initialisable,
             name, object, methodName, arguments, argumentTypes);
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;

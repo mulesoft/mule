@@ -26,12 +26,12 @@ import org.apache.commons.lang.BooleanUtils;
 public class ReplyToPropertyRequestReplyReplier extends AbstractInterceptingMessageProcessor
     implements RequestReplyReplierMessageProcessor
 {
-
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         Object replyTo = event.getMessage().getReplyTo();
         ReplyToHandler replyToHandler = getReplyToHandler(event.getMessage(),
-            (InboundEndpoint) event.getEndpoint());
+            event.getEndpoint());
         // Do not propagate REPLY_TO
         event.getMessage().setReplyTo(null);
 

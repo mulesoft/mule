@@ -35,6 +35,7 @@ import org.mule.transformer.simple.ResponseAppendTransformer;
 import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -192,7 +193,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
             listener.messageNotification.getEndpoint());
         assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
         assertEquals(outboundEvent.getMessage().getPayload(),
-            ((MuleMessage) listener.messageNotification.getSource()).getPayload());
+            listener.messageNotification.getSource().getPayload());
     }
 
     @Test
@@ -212,7 +213,7 @@ public class DynamicOutboundEndpointTestCase extends AbstractMessageProcessorTes
             listener.messageNotification.getEndpoint());
         assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
         assertEquals(outboundEvent.getMessage().getPayload(),
-            ((MuleMessage) listener.messageNotification.getSource()).getPayload());
+            (listener.messageNotification.getSource()).getPayload());
     }
 
     @Test

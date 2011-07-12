@@ -21,8 +21,7 @@ import org.springframework.context.ApplicationContextAware;
 
 public class FlowRefFactoryBean implements FactoryBean<MessageProcessor>, ApplicationContextAware
 {
-
-    private String refName;;
+    private String refName;
     private ApplicationContext applicationContext;
 
     public void setName(String name)
@@ -30,11 +29,13 @@ public class FlowRefFactoryBean implements FactoryBean<MessageProcessor>, Applic
         this.refName = name;
     }
 
+    @Override
     public MessageProcessor getObject() throws Exception
     {
         // Create new message processor to decouple lifecycle
         return new MessageProcessor()
         {
+            @Override
             public MuleEvent process(MuleEvent event) throws MuleException
             {
                 return ((MessageProcessor) applicationContext.getBean(refName)).process(event);
@@ -42,16 +43,19 @@ public class FlowRefFactoryBean implements FactoryBean<MessageProcessor>, Applic
         };
     }
 
+    @Override
     public boolean isSingleton()
     {
         return false;
     }
 
+    @Override
     public Class<?> getObjectType()
     {
         return MessageProcessor.class;
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
     {
         this.applicationContext = applicationContext;

@@ -70,6 +70,7 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
      */
     protected transient final Log logger = LogFactory.getLog(JsonExpressionEvaluator.class);
 
+    @Override
     public Object evaluate(String expression, MuleMessage message)
     {
         String compareTo = null;
@@ -158,8 +159,8 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
         }
         else if (result instanceof ArrayNode)
         {
-            List parts = new ArrayList();
-            for (Iterator<JsonNode> i = ((JsonNode) result).getElements(); i.hasNext();)
+            List<Object> parts = new ArrayList<Object>();
+            for (Iterator<JsonNode> i = result.getElements(); i.hasNext();)
             {
                 JsonNode arrayNode = i.next();
                 parts.add(extractResultFromNode(arrayNode));
@@ -172,11 +173,13 @@ public class JsonExpressionEvaluator implements ExpressionEvaluator
         }
     }
     
+    @Override
     public void setName(String name)
     {
         throw new UnsupportedOperationException("setName");
     }
 
+    @Override
     public String getName()
     {
         return "json";

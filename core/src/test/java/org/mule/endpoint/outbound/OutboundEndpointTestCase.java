@@ -37,6 +37,7 @@ import org.mule.transport.AbstractMessageDispatcher;
 import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -126,7 +127,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
         RequestContext.setEvent(testOutboundEvent);
         try
         {
-            MuleEvent result = endpoint.process(testOutboundEvent);
+            endpoint.process(testOutboundEvent);
             fail("Exception expected");
         }
         catch (TestSecurityFilter.StaticMessageUnauthorisedException e)
@@ -160,7 +161,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
             listener.messageNotification.getEndpoint());
         assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
         assertEquals(outboundEvent.getMessage().getPayload(),
-            ((MuleMessage) listener.messageNotification.getSource()).getPayload());
+            listener.messageNotification.getSource().getPayload());
     }
 
     @Test
@@ -180,7 +181,7 @@ public class OutboundEndpointTestCase extends AbstractMessageProcessorTestCase
             listener.messageNotification.getEndpoint());
         assertTrue(listener.messageNotification.getSource() instanceof MuleMessage);
         assertEquals(outboundEvent.getMessage().getPayload(),
-            ((MuleMessage) listener.messageNotification.getSource()).getPayload());
+            (listener.messageNotification.getSource()).getPayload());
     }
 
     @Test

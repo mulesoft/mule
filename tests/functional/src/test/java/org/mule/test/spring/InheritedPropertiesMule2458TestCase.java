@@ -17,7 +17,7 @@ import org.mule.tck.FunctionalTestCase;
 
 public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/spring/inherited-properties-mule-2458-test.xml";
@@ -27,7 +27,7 @@ public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
     {
         Service service = muleContext.getRegistry().lookupService("service");
         assertNotNull(service);
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
+        ImmutableEndpoint endpoint = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
         assertNotNull(endpoint);
 
         assertProperty(endpoint, "global-only", "global");
@@ -48,5 +48,4 @@ public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
         String actual = property.toString();
         assertEquals("Unexpected value for " + name + ": " + actual + ", not " + value, value, actual);
     }
-
 }

@@ -75,7 +75,7 @@ public class JXPathExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
         Object value = e.evaluate("/address/street", msg);
 
         assertTrue(value instanceof String);
-        assertEquals("Orchard Road", (String) value);
+        assertEquals("Orchard Road", value);
     }
 
     @Test
@@ -96,7 +96,7 @@ public class JXPathExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
         Object value = e.evaluate("//f:table/f:name", msg);
 
         assertTrue(value instanceof String);
-        assertEquals("African Coffee Table", (String) value);
+        assertEquals("African Coffee Table", value);
     }
 
     @Test
@@ -127,6 +127,6 @@ public class JXPathExpressionEvaluatorTestCase extends AbstractMuleContextTestCa
 
         Object value = e.evaluate("//f:table/f:name", msg);
         assertTrue(value instanceof String);
-        assertEquals("African Coffee Table", (String) value);
+        assertEquals("African Coffee Table", value);
     }
 }

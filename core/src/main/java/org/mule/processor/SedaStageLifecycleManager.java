@@ -80,7 +80,7 @@ public class SedaStageLifecycleManager extends SimpleLifecycleManager<SedaStageI
         }
         catch (LifecycleException e)
         {
-            throw new InitialisationException(e, (Initialisable) object);
+            throw new InitialisationException(e, object);
         }
     }
 

@@ -24,6 +24,7 @@ public class AsyncReplyTimeoutTestCase extends FunctionalTestCase
 {
     private CountDownLatch latch;
     
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/multi-async-repy-timeout.xml";
@@ -35,12 +36,13 @@ public class AsyncReplyTimeoutTestCase extends FunctionalTestCase
 
         muleContext.registerListener(new RoutingNotificationListener<RoutingNotification>() 
         {
+            @Override
             public void onNotification(RoutingNotification notification)
             {
                 if (notification.getAction() == RoutingNotification.MISSED_AGGREGATION_GROUP_EVENT)
                 {
                     latch.countDown();
-                    assertEquals("test Received Late!", ((MuleMessage)((RoutingNotification)notification).getSource()).getPayload());
+                    assertEquals("test Received Late!", ((MuleMessage)notification.getSource()).getPayload());
                 }
             }
         });

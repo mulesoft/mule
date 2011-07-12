@@ -767,7 +767,7 @@ public class MuleClient implements Disposable
         }
     
         // as we are bypassing the message transport layer we need to check that
-        InboundEndpoint endpoint = (InboundEndpoint) ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
+        InboundEndpoint endpoint = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
         if (endpoint != null)
         {
             if (endpoint.getTransformers() != null)
@@ -925,6 +925,7 @@ public class MuleClient implements Disposable
      * Will dispose the MuleManager instance <b>if</b> a new instance was created for this
      * client. Otherwise this method only cleans up resources no longer needed
      */
+    @Override
     public void dispose()
     {
         synchronized (dispatchers)

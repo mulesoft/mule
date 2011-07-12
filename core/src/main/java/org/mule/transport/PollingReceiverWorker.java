@@ -40,6 +40,7 @@ public class PollingReceiverWorker implements Work
 
     // the run() method will exit after each poll() since it will be invoked again
     // by the scheduler
+    @Override
     public void run()
     {
         // Make sure we start with a clean slate.
@@ -65,7 +66,7 @@ public class PollingReceiverWorker implements Work
             }
             catch (MessagingException e)
             {
-                MuleEvent event = ((MessagingException) e).getEvent();
+                MuleEvent event = (e).getEvent();
                 event.getFlowConstruct().getExceptionListener().handleException(e, event);
             }
             catch (Exception e)
@@ -84,9 +85,9 @@ public class PollingReceiverWorker implements Work
         receiver.poll();
     }
 
+    @Override
     public void release()
     {
         // nop
     }
-
 }

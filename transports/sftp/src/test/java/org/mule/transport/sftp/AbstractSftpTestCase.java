@@ -13,13 +13,11 @@ package org.mule.transport.sftp;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
-import org.mule.api.component.Component;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.EndpointURI;
 import org.mule.api.endpoint.ImmutableEndpoint;
-import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.exception.MessagingExceptionHandler;
 import org.mule.api.exception.SystemExceptionHandler;
 import org.mule.api.model.Model;
@@ -325,6 +323,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
 
         EventCallback callback = new EventCallback()
         {
+            @Override
             public void eventReceived(MuleEventContext context, Object component) throws Exception
             {
 
@@ -367,6 +366,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
             // and count down the latch after saving the thrown exception
             muleContext.setExceptionListener(new SystemExceptionHandler()
             {
+                @Override
                 public void handleException(Exception e, RollbackMethod rollbackMethod)
                 {
                     if (logger.isInfoEnabled()) logger.info("expected exception occurred: " + e, e);
@@ -374,6 +374,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                     latch.countDown();
                 }
 
+                @Override
                 public void handleException(Exception exception)
                 {
                     handleException(exception, null);
@@ -385,6 +386,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                 muleContext.getRegistry().lookupService(serviceName).setExceptionListener(
                     new MessagingExceptionHandler()
                     {
+                        @Override
                         public MuleEvent handleException(Exception e, MuleEvent event, RollbackMethod rollbackMethod)
                         {
                             if (logger.isInfoEnabled()) logger.info("expected exception occurred: " + e, e);
@@ -393,6 +395,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                             return event;
                         }
 
+                        @Override
                         public MuleEvent handleException(Exception exception, MuleEvent event)
                         {
                             return handleException(exception, event, null);
@@ -406,6 +409,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
         {
             int totSize = 0;
 
+            @Override
             public int read() throws IOException
             {
                 totSize++;
@@ -453,6 +457,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
      */
     protected void executeBaseAssertionsBeforeCall()
     {
+        // empty
     }
 
     /**
@@ -619,6 +624,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
             // outbound endpoint
             listener = new EndpointMessageNotificationListener()
             {
+                @Override
                 public void onNotification(ServerNotification notification)
                 {
 
@@ -735,6 +741,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
             // sftp-connector
             listener = new SystemExceptionHandler()
             {
+                @Override
                 public void handleException(Exception e, RollbackMethod rollbackMethod)
                 {
                     exceptionHolder.value = e;
@@ -744,6 +751,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                     latch.countDown();
                 }
 
+                @Override
                 public void handleException(Exception exception)
                 {
                     handleException(exception, null);
@@ -752,6 +760,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
 
             messagingListener = new MessagingExceptionHandler()
             {
+                @Override
                 public MuleEvent handleException(Exception e, MuleEvent event, RollbackMethod rollbackMethod)
                 {
                     exceptionHolder.value = e;
@@ -762,6 +771,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                     return event;
                 }
 
+                @Override
                 public MuleEvent handleException(Exception exception, MuleEvent event)
                 {
                     return handleException(exception, event, null);
@@ -829,7 +839,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
                 currentMessagingListener);
         }
 
-        return (Exception) exceptionHolder.value;
+        return exceptionHolder.value;
     }
 
     protected void recursiveDeleteInLocalFilesystem(File parent) throws IOException
@@ -869,8 +879,7 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
         if (parent.exists())
         {
             // FIXME DZ: since setWritable doesnt exist on jdk5, need to detect os to make dir writable
-            String os = System.getProperty("os.name").toLowerCase();
-            if(SystemUtils.IS_OS_WINDOWS)
+            if (SystemUtils.IS_OS_WINDOWS)
             {
                 Runtime.getRuntime().exec("attrib -r /D" + parent.getAbsolutePath());
             }
@@ -1272,33 +1281,28 @@ public abstract class AbstractSftpTestCase extends FunctionalTestCase
     {
         assertTrue("context is not started", muleContext.getLifecycleManager().getState().isStarted());
         Map<String, Connector> connectorMap = muleContext.getRegistry().lookupByType(Connector.class);
-        Map<String, InboundEndpoint> inboundMap = muleContext.getRegistry().lookupByType(
-            InboundEndpoint.class);
         Map<String, Service> serviceMap = muleContext.getRegistry().lookupByType(Service.class);
         Map<String, Model> modelMap = muleContext.getRegistry().lookupByType(Model.class);
-        Map<String, Component> componentMap = muleContext.getRegistry().lookupByType(Component.class);
-        // Map<String, OutboundEndpoint> outboundMap =
-        // muleContext.getRegistry().lookupByType(OutboundEndpoint.class);
 
-        Iterator it = connectorMap.entrySet().iterator();
-        while (it.hasNext())
+        Iterator<Map.Entry<String, Connector>> connectorItr = connectorMap.entrySet().iterator();
+        while (connectorItr.hasNext())
         {
-            Map.Entry<String, Connector> pairs = (Map.Entry<String, Connector>) it.next();
+            Map.Entry<String, Connector> pairs = connectorItr.next();
             logger.debug("checking connector : " + pairs.getKey());
             assertTrue(pairs.getKey() + " is not started", pairs.getValue().isStarted());
         }
 
-        it = serviceMap.entrySet().iterator();
-        while (it.hasNext())
+        Iterator<Map.Entry<String, Service>> serviceItr = serviceMap.entrySet().iterator();
+        while (serviceItr.hasNext())
         {
-            Map.Entry<String, Service> pairs = (Map.Entry<String, Service>) it.next();
+            Map.Entry<String, Service> pairs = serviceItr.next();
             assertTrue(pairs.getKey() + " is not started", pairs.getValue().isStarted());
         }
 
-        it = modelMap.entrySet().iterator();
-        while (it.hasNext())
+        Iterator<Map.Entry<String, Model>> modelItr = modelMap.entrySet().iterator();
+        while (modelItr.hasNext())
         {
-            Map.Entry<String, Model> pairs = (Map.Entry<String, Model>) it.next();
+            Map.Entry<String, Model> pairs = modelItr.next();
             assertTrue(pairs.getKey() + " is not started", pairs.getValue().getLifecycleState().isStarted());
         }
     }

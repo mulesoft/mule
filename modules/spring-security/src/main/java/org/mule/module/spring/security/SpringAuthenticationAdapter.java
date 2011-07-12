@@ -45,11 +45,13 @@ public class SpringAuthenticationAdapter implements Authentication
         this.event = event;
     }
 
+    @Override
     public void setAuthenticated(boolean b)
     {
         delegate.setAuthenticated(b);
     }
 
+    @Override
     public boolean isAuthenticated()
     {
         return delegate.isAuthenticated();
@@ -57,9 +59,10 @@ public class SpringAuthenticationAdapter implements Authentication
 
     public org.springframework.security.core.GrantedAuthority[] getAuthorities()    
     {
-        return (GrantedAuthority[]) delegate.getAuthorities().toArray(new GrantedAuthority[delegate.getAuthorities().size()]);        
+        return delegate.getAuthorities().toArray(new GrantedAuthority[delegate.getAuthorities().size()]);        
     }
 
+    @Override
     public Object getCredentials()
     {
         return delegate.getCredentials();
@@ -70,16 +73,19 @@ public class SpringAuthenticationAdapter implements Authentication
         return delegate.getDetails();
     }
 
+    @Override
     public Object getPrincipal()
     {
         return delegate.getPrincipal();
     }
 
+    @Override
     public int hashCode()
     {
         return delegate.hashCode();
     }
 
+    @Override
     public boolean equals(Object another)
     {
         return delegate.equals(another);
@@ -95,16 +101,19 @@ public class SpringAuthenticationAdapter implements Authentication
         return delegate;
     }
 
+    @Override
     public Map getProperties()
     {
         return properties;
     }
 
+    @Override
     public void setProperties(Map properties)
     {
         this.properties = properties;
     }
 
+    @Override
     public MuleEvent getEvent()
     {
         return event;

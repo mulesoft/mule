@@ -31,7 +31,7 @@ public class JaxbAutoTransformerTestCase extends AbstractMuleContextTestCase
     public void testCustomTransform() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(ITEM_XML, muleContext);
-        Item item = (Item) message.getPayload(DataTypeFactory.create(Item.class));
+        Item item = message.getPayload(DataTypeFactory.create(Item.class));
 
         assertNotNull(item);
         assertEquals("1234", item.getCode());
@@ -39,7 +39,7 @@ public class JaxbAutoTransformerTestCase extends AbstractMuleContextTestCase
         assertTrue(item.isInStock());
 
         //and back again
-        Document doc = (Document) message.getPayload(DataTypeFactory.create(Document.class));
+        Document doc = message.getPayload(DataTypeFactory.create(Document.class));
         
         assertNotNull(doc);
         assertEquals("1234", XMLUtils.selectValue("/item/code", doc));

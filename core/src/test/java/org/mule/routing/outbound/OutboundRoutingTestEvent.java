@@ -50,21 +50,25 @@ public class OutboundRoutingTestEvent implements MuleEvent
             muleContext);
     }
 
+    @Override
     public MuleMessage getMessage()
     {
         return message;
     }
 
+    @Override
     public MuleSession getSession()
     {
         return session;
     }
 
+    @Override
     public Credentials getCredentials()
     {
         return null;
     }
 
+    @Override
     public byte[] getMessageAsBytes() throws MuleException
     {
         try
@@ -77,6 +81,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
         }
     }
 
+    @Override
     public String getMessageAsString() throws MuleException
     {
         try
@@ -89,6 +94,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
         }
     }
 
+    @Override
     public String getMessageAsString(String encoding) throws MuleException
     {
         try
@@ -101,27 +107,32 @@ public class OutboundRoutingTestEvent implements MuleEvent
         }
     }
 
+    @Override
     public Object transformMessage() throws TransformerException
     {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public <T> T transformMessage(Class<T> outputType) throws TransformerException
     {
-        return (T)transformMessage(DataTypeFactory.create(outputType));
+        return transformMessage(DataTypeFactory.create(outputType));
     }
 
+    @Override
     public <T> T transformMessage(DataType<T> outputType) throws TransformerException
     {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     @Deprecated
     public byte[] transformMessageToBytes() throws TransformerException
     {
         return transformMessage(DataType.BYTE_ARRAY_DATA_TYPE);
     }
 
+    @Override
     public String transformMessageToString() throws TransformerException
     {
         try
@@ -134,71 +145,73 @@ public class OutboundRoutingTestEvent implements MuleEvent
         }
     }
 
+    @Override
     public String getId()
     {
         return id;
     }
 
+    @Override
     public Object getProperty(String name)
     {
         return null;
     }
 
+    @Override
     public Object getProperty(String name, Object defaultValue)
     {
         return defaultValue;
     }
 
+    @Override
     public InboundEndpoint getEndpoint()
     {
         return endpoint;
     }
 
-    public FlowConstruct getService()
-    {
-        return null;
-    }
-
+    @Override
     public boolean isStopFurtherProcessing()
     {
         return stopFurtherProcessing;
     }
 
+    @Override
     public void setStopFurtherProcessing(boolean stopFurtherProcessing)
     {
         this.stopFurtherProcessing = stopFurtherProcessing;
     }
 
-    public boolean isSynchronous()
-    {
-        return false;
-    }
-
+    @Override
     public int getTimeout()
     {
         return timeout;
     }
 
+    @Override
     public void setTimeout(int timeout)
     {
         this.timeout = timeout;
     }
 
+    @Override
     public OutputStream getOutputStream()
     {
         return null;
     }
 
+    @Override
     public String getEncoding()
     {
         return message.getEncoding();
     }
 
+    @Override
     public MuleContext getMuleContext()
     {
         return null;
     }
 
+    @Override
     public FlowConstruct getFlowConstruct()
     {
         try
@@ -213,6 +226,7 @@ public class OutboundRoutingTestEvent implements MuleEvent
         }
     }
 
+    @Override
     public ProcessingTime getProcessingTime()
     {
         return null;

@@ -70,7 +70,7 @@ public class PollingTcpMessageReceiver extends AbstractPollingMessageReceiver
         Socket socket = connector.getSocket(endpoint);
         try
         {
-            Object result = TcpMessageDispatcher.receiveFromSocket(socket, (int) timeout, endpoint);
+            Object result = TcpMessageDispatcher.receiveFromSocket(socket, timeout, endpoint);
             if (!(result == null))
             {
                 this.routeMessage(new DefaultMuleMessage(result, connector.getMuleContext()));

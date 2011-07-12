@@ -186,7 +186,7 @@ public class FileMessageReceiver extends AbstractPollingMessageReceiver
         }
         catch (MessagingException e)
         {
-            MuleEvent event = ((MessagingException) e).getEvent();
+            MuleEvent event = e.getEvent();
             event.getFlowConstruct().getExceptionListener().handleException(e, event);
         }
         catch (Exception e)

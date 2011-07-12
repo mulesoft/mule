@@ -67,7 +67,7 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceA
             {
                 MuleClient client = new MuleClient(muleContext);
                 
-                Map props = new HashMap();
+                Map<String, Object> props = new HashMap<String, Object>();
                 props.put("foo", "bar");
                 for (int i = 0; i < numMessages; ++i)
                 {
@@ -79,7 +79,5 @@ public class ExceptionStrategyMessagePropertiesTestCase extends AbstractServiceA
                 fail(e.getMessage());
             }
         }        
-    };
+    }
 }
-
-

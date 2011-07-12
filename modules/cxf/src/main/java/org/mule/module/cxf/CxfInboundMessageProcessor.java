@@ -84,6 +84,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
 
     private boolean onFaultInvokeStrategy = false;
     
+    @Override
     public void initialise() throws InitialisationException
     {
         if (bus == null)
@@ -94,6 +95,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
     }
 
+    @Override
     public void stop() throws MuleException
     {
         if (server != null)
@@ -102,6 +104,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
     }
 
+    @Override
     public void start() throws MuleException
     {
         // Start the CXF Server
@@ -111,10 +114,13 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
     }
 
+    @Override
     public void dispose()
     {
+        // nothing to do
     }
 
+    @Override
     public MuleEvent process(MuleEvent event) throws MuleException
     {
         // if http request
@@ -346,6 +352,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
     {
         OutputHandler outputHandler = new OutputHandler()
         {
+            @Override
             public void write(MuleEvent event, OutputStream out) throws IOException
             {
                 Message outFaultMessage = m.getExchange().getOutFaultMessage();
@@ -416,7 +423,7 @@ public class CxfInboundMessageProcessor extends AbstractInterceptingMessageProce
         }
         else
         {
-            InputStream is = (InputStream) ctx.transformMessage(DataTypeFactory.create(InputStream.class));
+            InputStream is = ctx.transformMessage(DataTypeFactory.create(InputStream.class));
             m.put(Message.ENCODING, ctx.getEncoding());
             m.setContent(InputStream.class, is);
         }

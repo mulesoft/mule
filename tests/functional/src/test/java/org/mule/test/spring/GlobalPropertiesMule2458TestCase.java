@@ -17,7 +17,7 @@ import org.mule.tck.FunctionalTestCase;
 
 public class GlobalPropertiesMule2458TestCase extends FunctionalTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/spring/global-properties-mule-2458-test.xml";
@@ -27,12 +27,11 @@ public class GlobalPropertiesMule2458TestCase extends FunctionalTestCase
     {
         Service service = muleContext.getRegistry().lookupService("service");
         assertNotNull(service);
-        ImmutableEndpoint ep = (ImmutableEndpoint) ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
+        ImmutableEndpoint ep = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
         assertNotNull(ep);
         assertEquals("local", ep.getProperties().get("local"));
         assertEquals("global", ep.getProperties().get("global"));
         assertEquals("local", ep.getProperties().get("override-me"));
         assertEquals(3, ep.getProperties().size());
     }
-
 }

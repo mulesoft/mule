@@ -20,7 +20,6 @@ import org.mule.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -178,10 +177,10 @@ public abstract class AbstractIBeansTestCase extends AbstractMuleContextTestCase
     protected <T> T getDataAs(InputStream data, DataType<T> as) throws TransformerException
     {
         org.mule.api.transformer.DataType muleDT;
-        if(as instanceof CollectionDataType)
+        if (as instanceof CollectionDataType)
         {
             muleDT = new org.mule.transformer.types.CollectionDataType(
-                    (Class<? extends Collection>)as.getType(),
+                    as.getType(),
                     ((CollectionDataType) as).getItemType(),
                     as.getMimeType());
         }
@@ -192,7 +191,7 @@ public abstract class AbstractIBeansTestCase extends AbstractMuleContextTestCase
                     as.getMimeType());
         }
         Transformer t = muleContext.getRegistry().lookupTransformer(org.mule.transformer.types.DataTypeFactory.create(data.getClass()), muleDT);
-        return (T)t.transform(data);
+        return (T) t.transform(data);
     }
 
 }

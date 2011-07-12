@@ -68,11 +68,9 @@ public abstract class ServerNotification extends EventObject implements MuleCont
 
     protected int action = NULL_ACTION;
 
-    @SuppressWarnings("unchecked")
-    private static Map<Integer, String> actionIdToName = new ConcurrentHashMap();
+    private static Map<Integer, String> actionIdToName = new ConcurrentHashMap<Integer, String>();
 
-    @SuppressWarnings("unchecked")
-    private static Map<String, Integer> actionNameToId = new ConcurrentHashMap();
+    private static Map<String, Integer> actionNameToId = new ConcurrentHashMap<String, Integer>();
 
     /**
      * The resourceIdentifier is used when firing inbound server notifications such
@@ -98,6 +96,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
         timestamp = System.currentTimeMillis();
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         muleContext = context;
@@ -207,7 +206,7 @@ public abstract class ServerNotification extends EventObject implements MuleCont
         String lowerCaseName = action.toLowerCase();
         if (actionNameToId.containsKey(lowerCaseName))
         {
-            return ((Integer) actionNameToId.get(lowerCaseName)).intValue();
+            return actionNameToId.get(lowerCaseName).intValue();
         }
         else
         {

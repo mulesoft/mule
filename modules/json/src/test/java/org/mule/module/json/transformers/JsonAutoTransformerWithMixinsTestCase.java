@@ -30,7 +30,6 @@ public class JsonAutoTransformerWithMixinsTestCase extends AbstractMuleContextTe
 {
     public static final String APPLE_JSON = "{\"washed\":false,\"bitten\":true}";
 
-
     @Override
     protected void doSetUp() throws Exception
     {
@@ -49,7 +48,7 @@ public class JsonAutoTransformerWithMixinsTestCase extends AbstractMuleContextTe
         //1) Mixins are recognised by the Transformer resolver
         //2) that we successfully marshal and marshal an object that is not annotated directly
         MuleMessage message = new DefaultMuleMessage(APPLE_JSON, muleContext);
-        Apple apple = (Apple) message.getPayload(DataTypeFactory.create(Apple.class));
+        Apple apple = message.getPayload(DataTypeFactory.create(Apple.class));
         assertNotNull(apple);
         assertFalse(apple.isWashed());
         assertTrue(apple.isBitten());

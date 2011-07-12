@@ -50,7 +50,7 @@ public class MulticastRouterTestCase extends FunctionalTestCase
     {
         ByteArrayInputStream bis = new ByteArrayInputStream("Hello, world".getBytes("UTF-8"));
         MuleClient client = new MuleClient(muleContext);
-        MuleMessage response = client.send("vm://inbound2", bis, null);;
+        MuleMessage response = client.send("vm://inbound2", bis, null);
         assertNotNull(response);
         Object payload = response.getPayload();
         assertNotNull(payload);
@@ -62,6 +62,7 @@ public class MulticastRouterTestCase extends FunctionalTestCase
 
     public static class Fail implements Callable
     {
+        @Override
         public Object onCall(MuleEventContext eventContext) throws Exception
         {
             errorCounter.incrementAndGet();

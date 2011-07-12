@@ -244,7 +244,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
         MuleMessage message = client.send("vm://attachmentsWildcard", muleMessage);
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
-        Map<?, ?> result = (Map<?, ?>) message.getPayload(DataTypeFactory.create(Map.class));
+        Map<?, ?> result = message.getPayload(DataTypeFactory.create(Map.class));
         //Will match on ba*
         assertEquals(2, result.size());
         assertNull(result.get("foo"));

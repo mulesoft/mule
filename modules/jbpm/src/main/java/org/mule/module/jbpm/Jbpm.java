@@ -107,6 +107,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
         this.processDefinitions = processDefinitions;
     }
 
+    @Override
     public void initialise()
     {
         if (processEngine == null)
@@ -135,6 +136,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
         }
     }
 
+    @Override
     public void dispose()
     {
         if (!containerManaged && processEngine != null)
@@ -144,6 +146,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
         }
     }
 
+    @Override
     public void setMessageService(MessageService msgService)
     {
         MuleMessageService serviceProxy = processEngine.get(MuleMessageService.class);
@@ -169,10 +172,11 @@ public class Jbpm implements BPMS, Initialisable, Disposable
      *
      * @return the newly-created ProcessInstance
      */
+    @Override
     public Object startProcess(Object processDefinitionKey, Object signalName, Map variables) throws Exception
     {
         ProcessInstance processInstance =
-            processEngine.getExecutionService().startProcessInstanceByKey((String) processDefinitionKey, (Map) variables);
+            processEngine.getExecutionService().startProcessInstanceByKey((String) processDefinitionKey, variables);
 
         if (processInstance == null)
         {
@@ -198,6 +202,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
      * @param variables - optional process variables/parameters to set
      * @return the updated ProcessInstance
      */
+    @Override
     public Object advanceProcess(Object executionId, Object signalName, Map variables) throws Exception
     {
         int waitTime = 0;
@@ -253,6 +258,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
      *
      * @return the updated ProcessInstance
      */
+    @Override
     public Object updateProcess(Object executionId, Map variables) throws Exception
     {
         // Get Process ID
@@ -290,6 +296,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
     /**
      * Delete a process instance.
      */
+    @Override
     public void abortProcess(Object processInstanceId) throws Exception
     {
         processEngine.getExecutionService().endProcessInstance((String) processInstanceId, Execution.STATE_ENDED);
@@ -299,16 +306,19 @@ public class Jbpm implements BPMS, Initialisable, Disposable
     // Process status / lookup
     // ///////////////////////////////////////////////////////////////////////////
 
+    @Override
     public boolean isProcess(Object obj) throws Exception
     {
         return (obj instanceof ProcessInstance);
     }
 
+    @Override
     public Object getId(Object process) throws Exception
     {
         return ((ProcessInstance) process).getId();
     }
 
+    @Override
     public Object getState(Object process) throws Exception
     {
         return getState((ProcessInstance) process);
@@ -338,6 +348,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
         return state;
     }
 
+    @Override
     public boolean hasEnded(Object process) throws Exception
     {
         return process == null ? true : ((ProcessInstance) process).isEnded();
@@ -348,6 +359,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
      *
      * @return the ProcessInstance
      */
+    @Override
     public Object lookupProcess(Object processId) throws Exception
     {
         return processEngine.getExecutionService().findProcessInstanceById((String) processId);
@@ -357,6 +369,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
     // Miscellaneous
     // ///////////////////////////////////////////////////////////////////////////
 
+    @Override
     public void deployProcess(String processDefinitionFile) throws IOException
     {
         deployProcessFromStream(processDefinitionFile, IOUtils.getResourceAsStream(processDefinitionFile,
@@ -371,6 +384,7 @@ public class Jbpm implements BPMS, Initialisable, Disposable
             .deploy();
     }
 
+    @Override
     public void undeployProcess(String resource) throws Exception
     {
         // empty
@@ -420,11 +434,13 @@ public class Jbpm implements BPMS, Initialisable, Disposable
         this.processDefinitions = processDefinitions;
     }
 
+    @Override
     public void setName(String name)
     {
         this.name = name;
     }
 
+    @Override
     public String getName()
     {
         return name;

@@ -10,12 +10,6 @@
 
 package org.mule.test.integration;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.MessageExchangePattern;
@@ -35,6 +29,13 @@ import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.MuleTestUtils;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.transport.vm.VMConnector;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test the creation of various targets from the service descriptor
@@ -119,13 +120,11 @@ public class MuleEndpointConfigurationTestCase extends AbstractServiceAndFlowTes
         {
             fail("Unexpected Object");
         }
-
     }
 
     @Test
     public void testComponent4InboundEndpoint() throws Exception
     {
-
         Object serviceFlow = muleContext.getRegistry().lookupObject("TestComponent4");
 
         if (serviceFlow instanceof Service)
@@ -147,7 +146,7 @@ public class MuleEndpointConfigurationTestCase extends AbstractServiceAndFlowTes
         else if (serviceFlow instanceof Flow)
         {
             assertNotNull(serviceFlow);
-            assertNotNull(((DefaultInboundEndpoint) ((Flow) serviceFlow).getMessageSource()));
+            assertNotNull(((Flow) serviceFlow).getMessageSource());
             assertEquals(1,
                 ((DefaultInboundEndpoint) ((Flow) serviceFlow).getMessageSource()).getMessageProcessors()
                     .size());
@@ -163,13 +162,11 @@ public class MuleEndpointConfigurationTestCase extends AbstractServiceAndFlowTes
         {
             fail("Unexpected Object");
         }
-
     }
 
     @Test
     public void testComponent4OutboundEndpoint() throws Exception
     {
-
         Object serviceFlow = muleContext.getRegistry().lookupObject("TestComponent4");
 
         if (serviceFlow instanceof Service)
@@ -207,7 +204,6 @@ public class MuleEndpointConfigurationTestCase extends AbstractServiceAndFlowTes
         {
             fail("Unexpected Object");
         }
-
     }
 
     @Test
@@ -250,7 +246,6 @@ public class MuleEndpointConfigurationTestCase extends AbstractServiceAndFlowTes
         {
             fail("Unexpected Object");
         }
-
     }
 
     @Test
@@ -275,5 +270,4 @@ public class MuleEndpointConfigurationTestCase extends AbstractServiceAndFlowTes
         // default event timeout set in the test config file
         assertEquals(1001, event.getTimeout());
     }
-
 }

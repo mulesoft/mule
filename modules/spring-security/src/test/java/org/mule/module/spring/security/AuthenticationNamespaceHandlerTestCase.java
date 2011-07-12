@@ -25,6 +25,7 @@ import java.util.Iterator;
 public class AuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "authentication-config.xml";
@@ -55,7 +56,7 @@ public class AuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(service);
         assertEquals(1, ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().size());
 
-        ImmutableEndpoint endpoint = (ImmutableEndpoint) ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
+        ImmutableEndpoint endpoint = ((ServiceCompositeMessageSource) service.getMessageSource()).getEndpoints().get(0);
         assertNotNull(endpoint.getSecurityFilter());
         assertEquals(HttpBasicAuthenticationFilter.class, endpoint.getSecurityFilter().getClass());
     }

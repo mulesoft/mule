@@ -13,7 +13,6 @@ package org.mule.test.integration.client;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.FunctionalTestCase;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -72,7 +71,5 @@ public class MuleClientInThreadTestCase extends AbstractServiceAndFlowTestCase
                 fail(e.getMessage());
             }
         }        
-    };
+    }
 }
-
-

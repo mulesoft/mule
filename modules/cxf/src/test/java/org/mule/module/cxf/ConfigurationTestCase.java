@@ -10,16 +10,17 @@
 
 package org.mule.module.cxf;
 
-import java.util.Iterator;
+import org.mule.api.endpoint.InboundEndpoint;
+import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
+import org.mule.module.cxf.config.ProxyServiceFactoryBean;
+import org.mule.tck.FunctionalTestCase;
+
 import java.util.List;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.mule.api.endpoint.InboundEndpoint;
-import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
-import org.mule.module.cxf.config.ProxyServiceFactoryBean;
-import org.mule.tck.FunctionalTestCase;
+import org.apache.cxf.message.Message;
 
 public class ConfigurationTestCase extends FunctionalTestCase
 {
@@ -27,11 +28,10 @@ public class ConfigurationTestCase extends FunctionalTestCase
     {
         CxfConfiguration config = muleContext.getRegistry().get("cxf");
 
-        Bus cxfBus = ((CxfConfiguration) config).getCxfBus();
+        Bus cxfBus = config.getCxfBus();
         boolean found = false;
-        for (Iterator itr2 = cxfBus.getInInterceptors().iterator(); itr2.hasNext();)
+        for (Interceptor<? extends Message> i : cxfBus.getInInterceptors())
         {
-            Interceptor i = (Interceptor) itr2.next();
             if (i instanceof LoggingInInterceptor)
             {
                 found = true;
@@ -46,14 +46,15 @@ public class ConfigurationTestCase extends FunctionalTestCase
     {
         InboundEndpoint endpoint = muleContext.getRegistry().get("clientEndpoint");
         FlowConfiguringMessageProcessor processor = (FlowConfiguringMessageProcessor) endpoint.getMessageProcessors().get(0);
-        List inInterceptors = ((ProxyServiceFactoryBean) processor.getMessageProcessorBuilder()).getInInterceptors();
+        List<Interceptor<? extends Message>> inInterceptors = 
+            ((ProxyServiceFactoryBean) processor.getMessageProcessorBuilder()).getInInterceptors();
         assertEquals(muleContext.getRegistry().get("foo1"), inInterceptors.get(0));
         assertEquals(muleContext.getRegistry().get("foo3"), inInterceptors.get(1));
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "configuration-conf.xml";
     }
-
 }

@@ -2529,5 +2529,5 @@ public abstract class AbstractConnector implements Connector, WorkListener
         {
             return ObjectUtils.toString(this);
         }
-    };
+    }
 }

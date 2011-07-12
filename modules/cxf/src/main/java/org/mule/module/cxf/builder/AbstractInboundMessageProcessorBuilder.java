@@ -28,7 +28,6 @@ import org.mule.module.cxf.support.MuleHeadersOutInterceptor;
 import org.mule.module.cxf.support.MuleServiceConfiguration;
 import org.mule.util.ClassUtils;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +73,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
     private boolean validationEnabled;
     private List<String> schemaLocations;
 
+    @Override
     public CxfInboundMessageProcessor build() throws MuleException
     {
         if (muleContext == null)
@@ -120,23 +120,22 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
 
         if (inInterceptors != null)
         {
-            sfb.getInInterceptors().addAll((Collection<? extends Interceptor<? extends Message>>) inInterceptors);
+            sfb.getInInterceptors().addAll(inInterceptors);
         }
-
 
         if (inFaultInterceptors != null)
         {
-            sfb.getInFaultInterceptors().addAll((Collection<? extends Interceptor<? extends Message>>) inFaultInterceptors);
+            sfb.getInFaultInterceptors().addAll(inFaultInterceptors);
         }
 
         if (outInterceptors != null)
         {
-            sfb.getOutInterceptors().addAll((Collection<? extends Interceptor<? extends Message>>) outInterceptors);
+            sfb.getOutInterceptors().addAll(outInterceptors);
         }
 
         if (outFaultInterceptors != null)
         {
-            sfb.getOutFaultInterceptors().addAll((Collection<? extends Interceptor<? extends Message>>) outFaultInterceptors);
+            sfb.getOutFaultInterceptors().addAll(outFaultInterceptors);
         }
 
         if (enableMuleSoapHeaders && !configuration.isEnableMuleSoapHeaders())
@@ -148,7 +147,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         }
 
         String address = getAddress();
-      //hack for CXF to work correctly with servlet and jetty urls
+        //hack for CXF to work correctly with servlet and jetty urls
         address = address.replace("servlet://", "http://localhost/");
         address = address.replace("jetty://", "http://localhost/");
         sfb.setAddress(address); // dummy URL for CXF
@@ -204,12 +203,14 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
 
     protected void configureServer(Server server2)
     {
+        // template method
     }
 
     protected abstract Class<?> getServiceClass();
 
     protected void configureMessageProcessor(ServerFactoryBean sfb, CxfInboundMessageProcessor processor)
     {
+        // template method
     }
 
     protected abstract ServerFactoryBean createServerFactory() throws Exception;
@@ -381,6 +382,7 @@ public abstract class AbstractInboundMessageProcessorBuilder implements MuleCont
         this.outFaultInterceptors = outFaultInterceptors;
     }
     
+    @Override
     public void setMuleContext(MuleContext muleContext)
     {
         this.muleContext = muleContext;

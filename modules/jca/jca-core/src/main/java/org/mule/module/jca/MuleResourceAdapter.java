@@ -84,6 +84,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     /**
      * @see javax.resource.spi.ResourceAdapter#start(javax.resource.spi.BootstrapContext)
      */
+    @Override
     public void start(BootstrapContext bootstrapContext) throws ResourceAdapterInternalException
     {
         this.bootstrapContext = bootstrapContext;
@@ -138,6 +139,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     /**
      * @see javax.resource.spi.ResourceAdapter#stop()
      */
+    @Override
     public void stop()
     {
         logger.info("Stopping Mule...");
@@ -158,6 +160,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
      * @see javax.resource.spi.ResourceAdapter#endpointActivation(javax.resource.spi.endpoint.MessageEndpointFactory,
      *      javax.resource.spi.ActivationSpec)
      */
+    @Override
     public void endpointActivation(MessageEndpointFactory endpointFactory, ActivationSpec activationSpec)
         throws ResourceException
     {
@@ -204,13 +207,14 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
      * @see javax.resource.spi.ResourceAdapter#endpointDeactivation(javax.resource.spi.endpoint.MessageEndpointFactory,
      *      javax.resource.spi.ActivationSpec)
      */
+    @Override
     public void endpointDeactivation(MessageEndpointFactory endpointFactory, ActivationSpec activationSpec)
     {
         if (activationSpec.getClass().equals(MuleActivationSpec.class))
         {
             MuleActivationSpec muleActivationSpec = (MuleActivationSpec) activationSpec;
             MuleEndpointKey key = new MuleEndpointKey(endpointFactory, (MuleActivationSpec) activationSpec);
-            Service service = (Service) endpoints.remove(key);
+            Service service = endpoints.remove(key);
             if (service == null)
             {
                 logger.warn("No endpoint was registered with key: " + key);
@@ -316,6 +320,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
      * 
      * @see javax.resource.spi.ResourceAdapter#getXAResources(javax.resource.spi.ActivationSpec[])
      */
+    @Override
     public XAResource[] getXAResources(ActivationSpec[] activationSpecs) throws ResourceException
     {
         return new XAResource[]{};

@@ -116,6 +116,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             // may have been started
             TransactionCallback<Object> cb = new TransactionCallback<Object>()
             {
+                @Override
                 public Object doInTransaction() throws Exception
                 {
                     // this is not ideal, but jdbc receiver returns a list of maps, not List<MuleMessage>
@@ -170,11 +171,13 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             this.latch = latch;
         }
 
+        @Override
         public void release()
         {
             // nothing to do
         }
 
+        @Override
         public void run()
         {
             try
@@ -183,7 +186,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             }
             catch (MessagingException e)
             {
-                MuleEvent event = ((MessagingException) e).getEvent();
+                MuleEvent event = e.getEvent();
                 event.getFlowConstruct().getExceptionListener().handleException(e, event);
             }
             catch (Exception e)
@@ -196,6 +199,7 @@ public abstract class TransactedPollingMessageReceiver extends AbstractPollingMe
             }
         }
 
+        @Override
         public Object doInTransaction() throws Exception
         {
             processMessage(message);

@@ -63,11 +63,13 @@ public class JdmkAgent extends AbstractAgent
                                            new Object[] {new Integer(port)}, this.getClass());
     }
 
+    @Override
     public String getDescription()
     {
         return "Jdmk Http adaptor: " + jmxAdaptorUrl;
     }
 
+    @Override
     public void start() throws MuleException
     {
         try
@@ -90,6 +92,7 @@ public class JdmkAgent extends AbstractAgent
         }
     }
 
+    @Override
     public void stop() throws MuleException
     {
         if (mBeanServer == null)
@@ -117,6 +120,7 @@ public class JdmkAgent extends AbstractAgent
         }
     }
 
+    @Override
     public void dispose()
     {
         try
@@ -129,11 +133,12 @@ public class JdmkAgent extends AbstractAgent
         }
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         try
         {
-            mBeanServer = (MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
+            mBeanServer = MBeanServerFactory.findMBeanServer(null).get(0);
             final Object adaptor = createAdaptor();
             if (StringUtils.isBlank(jmxAdaptorUrl))
             {

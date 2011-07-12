@@ -37,7 +37,7 @@ public class QueuedThreadPerProcessorProcessingStrategy extends QueuedAsynchrono
 
             if (processor instanceof MessageProcessor)
             {
-                builder.chain((MessageProcessor) processor);
+                builder.chain(processor);
             }
             else if (processor instanceof MessageProcessorBuilder)
             {

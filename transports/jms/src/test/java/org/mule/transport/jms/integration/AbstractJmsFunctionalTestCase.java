@@ -41,7 +41,6 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
 import javax.jms.TopicConnection;
-import javax.jms.TopicPublisher;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.RollbackException;
@@ -518,6 +517,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         assertNull(result);
     }
 
+    @Override
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
@@ -530,6 +530,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         }
     }
 
+    @Override
     protected void doTearDown() throws Exception
     {
         if (purgeQueuesOnTearDown)
@@ -766,7 +767,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         try
         {
             logger.debug("purging topic : " + topic);
-            c = (TopicConnection) getConnection(true, false);
+            c = getConnection(true, false);
             if (c == null)
             {
                 logger.debug("could not create a connection to topic : " + destination);
@@ -779,8 +780,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
             Topic dest = s.createTopic(destination);
             logger.debug("created topic destination");
 
-            TopicPublisher t;
-
             if (client != null)
             {
                 client.dispose();
@@ -790,7 +789,7 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
             try
             {
-                consumer = s.createDurableSubscriber((Topic) dest, topic);
+                consumer = s.createDurableSubscriber(dest, topic);
                 logger.debug("created consumer");
                 while (consumer.receiveNoWait() != null)
                 {
@@ -877,47 +876,56 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
         private String outputQueue = getOutboundQueueName();
         private boolean persistent = false;
 
+        @Override
         public boolean isPersistent()
         {
             return persistent;
         }
 
+        @Override
         public void setPersistent(boolean persistent)
         {
             this.persistent = persistent;
         }
 
+        @Override
         public String getInputDestinationName()
         {
             return inputQueue;
         }
 
+        @Override
         public String getOutputDestinationName()
         {
             return outputQueue;
         }
 
+        @Override
         public void setInputDestinationName(String inputQueue)
         {
             this.inputQueue = inputQueue;
         }
 
+        @Override
         public void setOutputDestinationName(String outputQueue)
         {
             this.outputQueue = outputQueue;
         }
 
+        @Override
         public int getAcknowledge()
         {
             return Session.AUTO_ACKNOWLEDGE;
         }
 
+        @Override
         public void send(Session session, MessageProducer producer) throws JMSException
         {
             producer.send(session.createTextMessage(DEFAULT_INPUT_MESSAGE));
             applyTransaction(session);
         }
 
+        @Override
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
             Message message = consumer.receive(getTimeout());
@@ -933,12 +941,13 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected class NonTransactedScenario extends AbstractScenario
     {
-
+        @Override
         public boolean isTransacted()
         {
             return false;
         }
 
+        @Override
         protected void applyTransaction(Session session) throws JMSException
         {
             // do nothing
@@ -947,12 +956,13 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected class ScenarioCommit extends AbstractScenario
     {
-
+        @Override
         public boolean isTransacted()
         {
             return true;
         }
 
+        @Override
         protected void applyTransaction(Session session) throws JMSException
         {
             session.commit();
@@ -961,12 +971,13 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected class ScenarioRollback extends AbstractScenario
     {
-
+        @Override
         public boolean isTransacted()
         {
             return true;
         }
 
+        @Override
         protected void applyTransaction(Session session) throws JMSException
         {
             session.rollback();
@@ -975,7 +986,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected class ScenarioNotReceive extends NonTransactedScenario
     {
-
         @Override
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {
@@ -987,7 +997,6 @@ public abstract class AbstractJmsFunctionalTestCase extends FunctionalTestCase
 
     protected class ScenarioReceive extends NonTransactedScenario
     {
-
         @Override
         public Message receive(Session session, MessageConsumer consumer) throws JMSException
         {

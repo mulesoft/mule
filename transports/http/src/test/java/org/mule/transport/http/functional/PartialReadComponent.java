@@ -18,9 +18,10 @@ import java.io.InputStream;
 
 public class PartialReadComponent implements Callable
 {
+    @Override
     public Object onCall(MuleEventContext eventContext) throws Exception
     {
-        InputStream stream = (InputStream) eventContext.getMessage().getPayload(DataTypeFactory.create(InputStream.class));
+        InputStream stream = eventContext.getMessage().getPayload(DataTypeFactory.create(InputStream.class));
 
         stream.read();
         return "Hello";

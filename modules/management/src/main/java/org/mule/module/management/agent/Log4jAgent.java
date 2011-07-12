@@ -18,7 +18,6 @@ import org.mule.module.management.support.AutoDiscoveryJmxSupportFactory;
 import org.mule.module.management.support.JmxSupport;
 import org.mule.module.management.support.JmxSupportFactory;
 
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.management.InstanceNotFoundException;
@@ -53,11 +52,12 @@ public class Log4jAgent extends AbstractAgent
         return "JMX Log4J Agent";
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         try
         {
-            mBeanServer = (MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
+            mBeanServer = MBeanServerFactory.findMBeanServer(null).get(0);
             final ObjectName objectName = jmxSupport.getObjectName(JMX_OBJECT_NAME);
             // unregister existing Log4j MBean first if required
             unregisterMBeansIfNecessary();
@@ -78,26 +78,28 @@ public class Log4jAgent extends AbstractAgent
         if (mBeanServer.isRegistered(jmxSupport.getObjectName(JMX_OBJECT_NAME)))
         {
             // unregister all log4jMBeans and loggers
-            Set log4jMBeans = mBeanServer.queryMBeans(jmxSupport.getObjectName("log4j*:*"), null);
-            for (Iterator it = log4jMBeans.iterator(); it.hasNext();)
+            Set<ObjectInstance> log4jMBeans = mBeanServer.queryMBeans(jmxSupport.getObjectName("log4j*:*"), null);
+            for (ObjectInstance objectInstance : log4jMBeans)
             {
-                ObjectInstance objectInstance = (ObjectInstance)it.next();
                 ObjectName theName = objectInstance.getObjectName();
                 mBeanServer.unregisterMBean(theName);
             }
         }
     }
 
+    @Override
     public void start() throws MuleException
     {
         // nothing to do
     }
 
+    @Override
     public void stop() throws MuleException
     {
         // nothing to do
     }
 
+    @Override
     public void dispose()
     {
         try
@@ -109,5 +111,4 @@ public class Log4jAgent extends AbstractAgent
             // ignore
         }
     }
-
 }

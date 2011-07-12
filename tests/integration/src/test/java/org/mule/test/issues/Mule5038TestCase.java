@@ -19,7 +19,6 @@ import org.mule.tck.FunctionalTestCase;
 
 public class Mule5038TestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
@@ -49,9 +48,9 @@ public class Mule5038TestCase extends FunctionalTestCase
     public void testCustomProcessorOnGlobalEndpoint()
     {
         Flow flow1 = muleContext.getRegistry().lookupObject("flow1");
-        MessageProcessor flow1Processor = (MessageProcessor) flow1.getMessageProcessors().get(3);
+        MessageProcessor flow1Processor = flow1.getMessageProcessors().get(3);
         Flow flow2 = muleContext.getRegistry().lookupObject("flow2");
-        MessageProcessor flow2Processor = (MessageProcessor) flow2.getMessageProcessors().get(3);
+        MessageProcessor flow2Processor = flow2.getMessageProcessors().get(3);
 
         assertNotSame(flow1Processor, flow2Processor);
     }
@@ -59,11 +58,10 @@ public class Mule5038TestCase extends FunctionalTestCase
     public void testCompositeProcessorOnGlobalEndpoint()
     {
         Flow flow1 = muleContext.getRegistry().lookupObject("flow1");
-        MessageProcessor flow1Processor = (MessageProcessor) flow1.getMessageProcessors().get(2);
+        MessageProcessor flow1Processor = flow1.getMessageProcessors().get(2);
         Flow flow2 = muleContext.getRegistry().lookupObject("flow2");
-        MessageProcessor flow2Processor = (MessageProcessor) flow2.getMessageProcessors().get(2);
+        MessageProcessor flow2Processor = flow2.getMessageProcessors().get(2);
 
         assertNotSame(flow1Processor, flow2Processor);
     }
-
 }

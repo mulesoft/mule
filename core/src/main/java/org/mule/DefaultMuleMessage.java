@@ -300,7 +300,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     @Override
     public <T> T getPayload(Class<T> outputType) throws TransformerException
     {
-        return (T) getPayload(DataTypeFactory.create(outputType), getEncoding());
+        return getPayload(DataTypeFactory.create(outputType), getEncoding());
     }
 
 
@@ -818,7 +818,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         }
         else if (defaultValue instanceof String)
         {
-            result = (T) (String) ObjectUtils.getString(getProperty(name, scope), (String) defaultValue);
+            result = (T) ObjectUtils.getString(getProperty(name, scope), (String) defaultValue);
         }
         else
         {

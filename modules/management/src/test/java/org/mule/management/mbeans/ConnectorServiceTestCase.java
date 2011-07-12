@@ -17,6 +17,7 @@ import org.mule.tck.testmodels.mule.TestConnector;
 
 import java.util.Set;
 
+import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
 import org.junit.Test;
@@ -33,7 +34,7 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        jmxAgent = (JmxAgent) muleContext.getRegistry().lookupObject(JmxAgent.class);
+        jmxAgent = muleContext.getRegistry().lookupObject(JmxAgent.class);
 
     }
 
@@ -48,7 +49,7 @@ public class ConnectorServiceTestCase extends AbstractMuleJmxTestCase
         domainName = jmxSupport.getDomainName(muleContext);
         final String query = domainName + ":*";
         final ObjectName objectName = jmxSupport.getObjectName(query);
-        Set mbeans = mBeanServer.queryMBeans(objectName, null);
+        Set<ObjectInstance> mbeans = mBeanServer.queryMBeans(objectName, null);
 
         // Expecting following mbeans to be registered:
         // 1) org.mule.management.mbeans.StatisticsService@Mule.ConnectorServiceTest:type=org.mule.Statistics,name=AllStatistics

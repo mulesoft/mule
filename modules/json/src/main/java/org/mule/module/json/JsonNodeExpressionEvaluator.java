@@ -30,7 +30,7 @@ import org.codehaus.jackson.node.ValueNode;
  */
 public class JsonNodeExpressionEvaluator extends JsonExpressionEvaluator
 {
-
+    @Override
     protected Object extractResultFromNode(JsonNode result)
     {
         if (result instanceof ValueNode)
@@ -39,8 +39,8 @@ public class JsonNodeExpressionEvaluator extends JsonExpressionEvaluator
         }
         if (result instanceof ArrayNode)
         {
-            List parts = new ArrayList<String>();
-            for (Iterator<JsonNode> i = ((JsonNode) result).getElements(); i.hasNext();)
+            List<Object> parts = new ArrayList<Object>();
+            for (Iterator<JsonNode> i = (result).getElements(); i.hasNext();)
             {
                 JsonNode arrayNode = i.next();
                 parts.add(extractResultFromNode(arrayNode));
@@ -53,6 +53,7 @@ public class JsonNodeExpressionEvaluator extends JsonExpressionEvaluator
         }
     }
 
+    @Override
     public String getName()
     {
         return "json-node";

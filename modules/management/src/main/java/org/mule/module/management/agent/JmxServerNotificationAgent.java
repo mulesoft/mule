@@ -53,15 +53,13 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
         super(DEFAULT_AGENT_NAME);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     protected void doInitialise() throws InitialisationException
     {
         try
         {
             jmxSupport = jmxSupportFactory.getJmxSupport();
-            mBeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
+            mBeanServer = MBeanServerFactory.findMBeanServer(null).get(0);
             broadcasterObjectName = ObjectName.getInstance(jmxSupport.getDomainName(muleContext) + ":" + BROADCASTER_JMX_OBJECT_NAME);
             broadcastNotificationMbean = new BroadcastNotificationService();
             mBeanServer.registerMBean(broadcastNotificationMbean, broadcasterObjectName);
@@ -83,6 +81,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
     /**
      * {@inheritDoc}
      */
+    @Override
     public void dispose()
     {
         if (listenerObjectName != null && mBeanServer.isRegistered(listenerObjectName))
@@ -113,6 +112,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void logEvent(ServerNotification e)
     {
         broadcastNotificationMbean.sendNotification(new Notification(e.getClass().getName(), e, e.getTimestamp(), e.toString()));
@@ -123,6 +123,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
      *
      * @return description
      */
+    @Override
     public String getDescription()
     {
         return DEFAULT_AGENT_NAME + (registerListenerMbean ? " (Listener MBean registered)" : "");
@@ -192,6 +193,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
         /**
          * {@inheritDoc}
          */
+        @Override
         public void handleNotification(Notification notification, Object o)
         {
             if (getList().size() == listSize)
@@ -212,6 +214,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
         /**
          * {@inheritDoc}
          */
+        @Override
         public int getListSize()
         {
             return listSize;
@@ -220,6 +223,7 @@ public class JmxServerNotificationAgent extends AbstractNotificationLoggerAgent
         /**
          * {@inheritDoc}
          */
+        @Override
         public void setListSize(int listSize)
         {
             this.listSize = listSize;

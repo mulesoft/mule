@@ -32,7 +32,7 @@ public class JsonAutoTransformerTestCase extends AbstractMuleContextTestCase
     {
         MuleMessage message = new DefaultMuleMessage(ITEM_JSON, muleContext);
 
-        Item item = (Item) message.getPayload(DataTypeFactory.create(Item.class));
+        Item item = message.getPayload(DataTypeFactory.create(Item.class));
         assertNotNull(item);
         assertEquals("1234", item.getCode());
         assertEquals("Vacuum Cleaner", item.getDescription());

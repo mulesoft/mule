@@ -80,7 +80,7 @@ public class FileMessageDispatcher extends AbstractMessageDispatcher
             }
             else
             {
-                InputStream is = (InputStream) event.transformMessage(DataTypeFactory.create(InputStream.class));
+                InputStream is = event.transformMessage(DataTypeFactory.create(InputStream.class));
                 IOUtils.copyLarge(is, fos);
                 is.close();
             }

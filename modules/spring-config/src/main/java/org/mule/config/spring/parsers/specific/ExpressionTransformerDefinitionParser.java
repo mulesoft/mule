@@ -86,7 +86,7 @@ public class ExpressionTransformerDefinitionParser extends ParentContextDefiniti
             addExpressionArgumentFromAttributes(element, builder);
             super.parseChild(element, parserContext, builder);
         }
-    };
+    }
 
     static class ExpressionTransformerOrphanDefinitionParser extends MuleOrphanDefinitionParser
     {
@@ -102,6 +102,5 @@ public class ExpressionTransformerDefinitionParser extends ParentContextDefiniti
             addExpressionArgumentFromAttributes(element, builder);
             super.doParse(element, context, builder);
         }
-    };
-
+    }
 }

@@ -53,9 +53,10 @@ public class JmxRegistrationContext
             // Mule JMX domains with ever increasing suffix.
             context.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
             {
+                @Override
                 public void onNotification(MuleContextNotification notification)
                 {
-                    MuleContextNotification mn = (MuleContextNotification) notification;
+                    MuleContextNotification mn = notification;
                     if (MuleContextNotification.CONTEXT_DISPOSED == mn.getAction())
                     {
                         // just in case someone is holding a ref to the context instance
@@ -65,7 +66,8 @@ public class JmxRegistrationContext
                     }
                 }
             });
-        } catch (NotificationException e)
+        } 
+        catch (NotificationException e)
         {
             logger.warn("Did not cleanup properly.", e);
         }

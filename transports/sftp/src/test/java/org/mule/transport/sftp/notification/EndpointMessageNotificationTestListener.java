@@ -10,20 +10,21 @@
 
 package org.mule.transport.sftp.notification;
 
-import java.util.Date;
-
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.EndpointMessageNotification;
+
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EndpointMessageNotificationTestListener implements EndpointMessageNotificationListener
 {
-
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Override
     public void onNotification(ServerNotification notification)
     {
 
@@ -40,7 +41,7 @@ public class EndpointMessageNotificationTestListener implements EndpointMessageN
             return;
         }
 
-        MuleMessage message = (MuleMessage) endpointNotification.getSource();
+        MuleMessage message = endpointNotification.getSource();
         String msgType = message.getPayload().getClass().getName();
         String correlationId = (String) message.getProperty("MULE_CORRELATION_ID", "?");
         // String endpointUri =
@@ -59,5 +60,4 @@ public class EndpointMessageNotificationTestListener implements EndpointMessageN
                          "\nCorrelationId=" + correlationId + "");
         }
     }
-
 }

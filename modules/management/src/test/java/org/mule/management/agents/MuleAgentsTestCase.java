@@ -35,7 +35,7 @@ public class MuleAgentsTestCase extends AbstractMuleContextTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        jmxAgent = (JmxAgent) muleContext.getRegistry().lookupObject(JmxAgent.class);
+        jmxAgent = muleContext.getRegistry().lookupObject(JmxAgent.class);
     }
 
     @Test
@@ -71,7 +71,7 @@ public class MuleAgentsTestCase extends AbstractMuleContextTestCase
     @Test
     public void testJmxAgentInjectedMBeanServer() throws Exception
     {
-        List servers = MBeanServerFactory.findMBeanServer(null);
+        List<MBeanServer> servers = MBeanServerFactory.findMBeanServer(null);
         MBeanServer server;
         server = servers == null || servers.isEmpty()
                 ? MBeanServerFactory.createMBeanServer()

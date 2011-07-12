@@ -23,6 +23,7 @@ import org.mule.context.notification.MuleContextNotification;
 import org.mule.module.xml.i18n.XmlMessages;
 import org.mule.module.xml.stax.MapNamespaceContext;
 import org.mule.module.xml.util.NamespaceManager;
+import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -34,7 +35,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.mule.transformer.types.DataTypeFactory;
 import org.w3c.dom.Node;
 
 /**
@@ -60,19 +60,22 @@ public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initia
 
     public JaxpXPathExpressionEvaluator()
     {
-
+        super();
     }
 
+    @Override
     public String getName()
     {
         return "xpath2";
     }
 
+    @Override
     public void setMuleContext(MuleContext context)
     {
         this.muleContext = context;
     }
 
+    @Override
     public void initialise() throws InitialisationException
     {
         try
@@ -88,8 +91,9 @@ public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initia
                 RM*: Update: I'm hesistant to include support for @Inject since MUle isn't a DI container and
                 having this annotation (and associated @Named) sends a confusing message
              */
-            this.muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>(){
-
+            this.muleContext.registerListener(new MuleContextNotificationListener<MuleContextNotification>()
+            {
+                @Override
                 public void onNotification(MuleContextNotification notification)
                 {
                     // CONTEXT_INITIALIZED fires too soon, before registry is inited, thus using this one
@@ -116,6 +120,7 @@ public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initia
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object evaluate(String expression, MuleMessage message)
     {
         QName retType = returnType;
@@ -155,7 +160,7 @@ public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initia
         }
         try
         {
-            Node payload = (Node) message.getPayload(DataTypeFactory.create(Node.class));
+            Node payload = message.getPayload(DataTypeFactory.create(Node.class));
 
             XPathExpression xpath = getXPath(expression);
 
@@ -167,9 +172,7 @@ public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initia
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public final void setName(String name)
     {
         throw new UnsupportedOperationException("setName");
@@ -201,6 +204,7 @@ public class JaxpXPathExpressionEvaluator implements ExpressionEvaluator, Initia
      * exception is thrown it should just be logged and processing should continue.
      * This method should not throw Runtime exceptions.
      */
+    @Override
     public void dispose()
     {
         cache.clear();

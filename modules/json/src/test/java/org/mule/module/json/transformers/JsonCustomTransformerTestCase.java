@@ -45,7 +45,7 @@ public class JsonCustomTransformerTestCase extends AbstractMuleContextTestCase
     {
         MuleMessage message = new DefaultMuleMessage(PERSON_JSON, muleContext);
 
-        Person person = (Person) message.getPayload(DataTypeFactory.create(Person.class));
+        Person person = message.getPayload(DataTypeFactory.create(Person.class));
         assertNotNull(person);
         assertEquals("John Doe", person.getName());
         assertEquals("01/01/1970", person.getDob());

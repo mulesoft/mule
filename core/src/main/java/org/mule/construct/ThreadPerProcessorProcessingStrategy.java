@@ -35,7 +35,7 @@ public class ThreadPerProcessorProcessingStrategy extends AsynchronousProcessing
 
             if (processor instanceof MessageProcessor)
             {
-                builder.chain((MessageProcessor) processor);
+                builder.chain(processor);
             }
             else if (processor instanceof MessageProcessorBuilder)
             {
