@@ -21,6 +21,10 @@ public class MuleProperties
      */
     public static final String PROPERTY_PREFIX = "MULE_";
 
+    /**
+     * The prefix for endpoint properties that should not be propagated to messages
+     */
+    public static final String ENDPOINT_PROPERTY_PREFIX = PROPERTY_PREFIX + "ENDPOINT__";
     // End System properties
 
     /**

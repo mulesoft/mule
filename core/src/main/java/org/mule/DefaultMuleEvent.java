@@ -253,11 +253,12 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
             for (Iterator<?> iterator = endpoint.getProperties().keySet().iterator(); iterator.hasNext();)
             {
                 String prop = (String) iterator.next();
-                Object value = endpoint.getProperties().get(prop);
+
                 // don't overwrite property on the message
                 if (!ignoreProperty(prop))
                 {
                     //inbound endpoint properties are in the invocation scope
+                    Object value = endpoint.getProperties().get(prop);
                     message.setInvocationProperty(prop, value);
                 }
             }
@@ -280,7 +281,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
      */
     protected boolean ignoreProperty(String key)
     {
-        if (key == null)
+        if (key == null || key.startsWith(MuleProperties.ENDPOINT_PROPERTY_PREFIX))
         {
             return true;
         }

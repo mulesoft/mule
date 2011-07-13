@@ -14,6 +14,7 @@ import org.mule.DefaultMuleEvent;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleMessage;
+import org.mule.api.config.MuleProperties;
 import org.mule.api.construct.FlowConstruct;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.endpoint.InboundEndpoint;
@@ -32,7 +33,7 @@ import java.util.Map;
 
 public class MessageProcessorPollingMessageReceiver extends AbstractPollingMessageReceiver
 {
-    public static final String SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME = "sourceMessageProcessor";
+    public static final String SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME = MuleProperties.ENDPOINT_PROPERTY_PREFIX + "sourceMessageProcessor";
 
     protected MessageProcessor sourceMessageProcessor;
 
