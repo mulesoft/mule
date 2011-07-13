@@ -9,12 +9,14 @@
  */
 package org.mule.module.rss;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
+
+import org.junit.Test;
 
 import static org.mule.module.rss.SampleFeed.ENTRIES_IN_RSS_FEED;
 
@@ -35,6 +37,7 @@ public class FeedConsumeAndSplitExplicitNonHttpTestCase extends FunctionalTestCa
         comp.setEventCallback(counter);
     }
 
+    @Test
     public void testConsume() throws Exception
     {
         String feed = SampleFeed.feedAsString();
@@ -55,4 +58,5 @@ public class FeedConsumeAndSplitExplicitNonHttpTestCase extends FunctionalTestCa
             }
         });
     }
+
 }

@@ -9,12 +9,18 @@
  */
 package org.mule.module.atom;
 
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class HttpOnlyFeedConsumeAndSplitTestCase extends FunctionalTestCase
 {
+
     private static final long SLEEP_TIME = 10000;
 
     private final CounterCallback counter = new CounterCallback();
@@ -32,6 +38,7 @@ public class HttpOnlyFeedConsumeAndSplitTestCase extends FunctionalTestCase
         comp.setEventCallback(counter);
     }
 
+    @Test
     public void testConsume() throws Exception
     {
         // wait until the polling kicks in
@@ -45,4 +52,5 @@ public class HttpOnlyFeedConsumeAndSplitTestCase extends FunctionalTestCase
         //We should only receive entries once
         assertEquals(count, counter.getCallbackCount());
     }
+
 }

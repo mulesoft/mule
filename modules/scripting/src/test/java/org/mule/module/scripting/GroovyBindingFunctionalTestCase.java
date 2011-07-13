@@ -12,17 +12,24 @@ package org.mule.module.scripting;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 public class GroovyBindingFunctionalTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "groovy-binding-config.xml";
     }
 
+    @Test
     public void testBindingCallout() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -31,6 +38,5 @@ public class GroovyBindingFunctionalTestCase extends FunctionalTestCase
         assertNotNull(response);
         assertEquals("Important Message Received by Callout1 Received by Callout2", response.getPayloadAsString());
     }
-
 
 }

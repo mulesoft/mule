@@ -12,14 +12,20 @@ package org.mule.module.scripting;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class GroovyScriptFunctionalTestCase extends FunctionalTestCase
 {
+    
     public GroovyScriptFunctionalTestCase()
     {
         //Groovy really hammers the startup time since it needs to create the interpreter on every start
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override
@@ -28,6 +34,7 @@ public class GroovyScriptFunctionalTestCase extends FunctionalTestCase
         return "groovy-component-config.xml";
     }
 
+    @Test
     public void testInlineScript() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -37,6 +44,7 @@ public class GroovyScriptFunctionalTestCase extends FunctionalTestCase
         assertEquals("Important Message Received", response.getPayloadAsString());
     }
     
+    @Test
     public void testFileBasedScript() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -46,6 +54,7 @@ public class GroovyScriptFunctionalTestCase extends FunctionalTestCase
         assertEquals("Important Message Received", response.getPayloadAsString());
     }
     
+    @Test
     public void testReferencedScript() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -55,6 +64,7 @@ public class GroovyScriptFunctionalTestCase extends FunctionalTestCase
         assertEquals("Important Message Received", response.getPayloadAsString());
     }    
 
+    @Test
     public void testScriptVariables() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

@@ -12,12 +12,16 @@ package org.mule.module.jersey;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests that the jersey:resources component can handle multiple components
@@ -26,6 +30,13 @@ import java.util.Map;
 public class MultipleResourcesTestCase extends FunctionalTestCase
 {
 
+    @Override
+    protected String getConfigResources()
+    {
+        return "multiple-resources-conf.xml";
+    }
+
+    @Test
     public void testParams() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -39,12 +50,6 @@ public class MultipleResourcesTestCase extends FunctionalTestCase
         result = client.send("http://localhost:63081/anotherworld/sayHelloWithUri/Dan", "", props);
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals("Bonjour Dan", result.getPayloadAsString());
-    }
-
-    @Override
-    protected String getConfigResources()
-    {
-        return "multiple-resources-conf.xml";
     }
 
 }

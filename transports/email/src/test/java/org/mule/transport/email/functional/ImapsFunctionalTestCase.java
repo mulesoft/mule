@@ -11,13 +11,17 @@
 package org.mule.transport.email.functional;
 
 
+import org.junit.Test;
+
 public class ImapsFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
+
     public ImapsFunctionalTestCase()
     {
         super(STRING_MESSAGE, "imaps");
     }
 
+    @Test
     public void testRequest() throws Exception
     {
         doRequest();

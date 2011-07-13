@@ -29,6 +29,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * This is an extended version of the same test covered in
  * {@link org.mule.test.spring.SpringNamespaceConfigBuilderTestCase}.  Both are translations of an
@@ -45,9 +52,10 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
     public SpringNamespaceConfigBuilderV2TestCase()
     {
         super(true);
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
+    @Override
     public String getConfigResources()
     {
         return "org/mule/test/spring/config2/test-xml-mule2-config.xml," +
@@ -61,6 +69,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         return new SpringXmlConfigurationBuilder(getConfigResources());
     }
 
+    @Test
     public void testMessageInfoMappingConfig() throws Exception
     {
         Service d = muleContext.getRegistry().lookupService("msgInfoMappingTestComponent");
@@ -77,6 +86,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         assertEquals("myCorrelationID456",mapping.getCorrelationId(msg));
     }
 
+    @Test
     public void testPropertyTypesConfig() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("testPropertiesComponent");
@@ -88,6 +98,7 @@ public class SpringNamespaceConfigBuilderV2TestCase extends AbstractConfigBuilde
         assertTrue(((Apple) obj).isWashed()); 
     }
 
+    @Test
     public void testEndpointURIParamsConfig()
     {
         Service d = muleContext.getRegistry().lookupService("testPropertiesComponent");

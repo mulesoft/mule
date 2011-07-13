@@ -23,6 +23,11 @@ import java.util.List;
 import javax.mail.Flags;
 import javax.mail.internet.MimeMessage;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ImapCustomSeenHandlingTestCase extends AbstractEmailFunctionalTestCase
 {
     private CountdownCallback messageReceived = new CountdownCallback(1);
@@ -41,6 +46,7 @@ public class ImapCustomSeenHandlingTestCase extends AbstractEmailFunctionalTestC
         return "imap-custom-seen-flag.xml";
     }
 
+    @Test
     public void testMessagesMatchingFilterGetCustomFlagSet() throws Exception
     {
         putMailMessageMatchingFilterIntoImapServer();

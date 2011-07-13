@@ -16,16 +16,23 @@ import org.mule.module.management.agent.JmxServerNotificationAgent;
 import org.mule.module.management.agent.Log4jAgent;
 import org.mule.module.management.agent.Mx4jAgent;
 import org.mule.module.management.support.SimplePasswordJmxAuthenticator;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ManagementDefaultNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "management-default-namespace-config.xml";
     }
 
+    @Test
     public void testDefaultJmxAgentConfig() throws Exception
     {
         Agent agent = muleContext.getRegistry().lookupAgent("jmx-agent");

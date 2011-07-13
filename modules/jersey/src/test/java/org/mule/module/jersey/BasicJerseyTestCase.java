@@ -12,21 +12,27 @@ package org.mule.module.jersey;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class BasicJerseyTestCase extends FunctionalTestCase
 {
+    
     @Override
     protected String getConfigResources()
     {
         return "basic-conf.xml";
     }
 
+    @Test
     public void testBasic() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -50,6 +56,7 @@ public class BasicJerseyTestCase extends FunctionalTestCase
         assertEquals((Integer)200, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
     }
 
+    @Test
     public void testParams() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -76,6 +83,7 @@ public class BasicJerseyTestCase extends FunctionalTestCase
         assertEquals("Dan", result.getInboundProperty("X-ResponseName"));
     }
 
+    @Test
     public void testThrowException() throws Exception
     {
         callThrowException(500, "Failed to invoke JerseyResourcesComponent{helloWorldResource.commponent}. Component that caused exception is: JerseyResourcesComponent{helloWorldResource.commponent}. Message payload is of type: String");
@@ -91,4 +99,5 @@ public class BasicJerseyTestCase extends FunctionalTestCase
         assertEquals(expectedErrorCode, result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0));
         assertEquals(expectedData, result.getPayloadAsString());
     }
+
 }

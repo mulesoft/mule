@@ -17,15 +17,13 @@ import java.io.File;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
 public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
-{  
-    private CountDownLatch latch;
-    
-    public FtpMessageDispatcherTestCase()
-    {
-        super();        
-        latch = new CountDownLatch(1);
-    }
+{
+    private CountDownLatch latch = new CountDownLatch(1);
 
     @Override
     protected String getConfigResources()
@@ -33,18 +31,19 @@ public class FtpMessageDispatcherTestCase extends AbstractFtpServerTestCase
         return "ftp-message-requester-test.xml";
     }
 
+    @Test
     public void testDispatch() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         client.dispatch(getMuleFtpEndpoint(), new DefaultMuleMessage(TEST_MESSAGE, muleContext));
-        
+
         // check that the message arrived on the FTP server
         assertTrue(latch.await(getTimeout(), TimeUnit.MILLISECONDS));
 
         String[] filesOnServer = new File(FTP_SERVER_BASE_DIR).list();
         assertTrue(filesOnServer.length > 0);
     }
-    
+
     @Override
     public void fileUploadCompleted()
     {

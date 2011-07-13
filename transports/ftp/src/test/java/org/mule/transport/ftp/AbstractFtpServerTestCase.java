@@ -10,7 +10,8 @@
 
 package org.mule.transport.ftp;
 
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.ftp.server.FTPTestClient;
 import org.mule.transport.ftp.server.MuleFtplet;
 import org.mule.transport.ftp.server.Server;
@@ -22,46 +23,51 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.apache.ftpserver.ftplet.Ftplet;
+import org.junit.Rule;
+
+import static org.junit.Assert.assertFalse;
 
 /**
  * Abstract FTP test class. Sets up the ftp server and starts/stops it during the
  * test lifecycle.
  */
-public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase 
-    implements MuleFtplet.Callback
+public abstract class AbstractFtpServerTestCase extends FunctionalTestCase implements MuleFtplet.Callback
 {
     public static final String TEST_MESSAGE = "Test FTP message";
-    
+
     private static final String DEFAULT_FTP_HOST = "localhost";
     private static int DEFAULT_TIMEOUT = 10000;
     public static final String FTP_SERVER_BASE_DIR = "target/ftpserver";
-        
+
     /**
      * We only test against an embedded server, but you can test against remote
      * servers by changing this value. Some tests may start/stop the ftp server so
      * you will have to implement remote start/stop as well.
      */
     private String ftpHost;
-    
+
     private int ftpPort;
     private String ftpUser = "anonymous";
     private String ftpPassword = "password";
     private int timeout;
     private Server server = null;
     private FTPTestClient ftpClient = null;
-    
+
     /**
      * Subclasses can overwrite Ftplet that will be registered when creating the server.
      */
     protected Ftplet ftplet = new MuleFtplet(this);
-    
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     public AbstractFtpServerTestCase(String ftpHost, int timeout)
-    {        
+    {
         super();
         this.ftpHost = ftpHost;
         this.timeout = timeout;
     }
-    
+
     public AbstractFtpServerTestCase(int timeout)
     {
         this(DEFAULT_FTP_HOST, timeout);
@@ -96,7 +102,7 @@ public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        this.ftpPort = getPorts().get(0);
+        this.ftpPort = dynamicPort.getNumber();
         ftpClient = new FTPTestClient(this.ftpHost, this.ftpPort, this.ftpUser, this.ftpPassword);
         // make sure we start out with a clean ftp server base
         createFtpServerBaseDir();
@@ -113,12 +119,12 @@ public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase
     {
         // give Mule some time to disconnect from the FTP server
         Thread.sleep(500);
-        
+
         ftpClient.disconnect(); // we dont need the connection anymore for this test
         stopServer();
 
         deleteFtpServerBaseDir();
-        
+
         super.doTearDown();
     }
 
@@ -150,47 +156,43 @@ public abstract class AbstractFtpServerTestCase extends DynamicPortTestCase
     {
         return ftpClient;
     }
-    
+
     /**
      * Return the endpoint denoted by the ftp configuration
      */
     public String getMuleFtpEndpoint()
     {
-        return "ftp://" + ftpUser + ":" + ftpPassword + "@" + ftpHost + ":" + ftpPort;       
+        return "ftp://" + ftpUser + ":" + ftpPassword + "@" + ftpHost + ":" + ftpPort;
     }
 
     protected void createFileOnFtpServer(String fileName) throws IOException
-    {        
+    {
         File outFile = new File(FTP_SERVER_BASE_DIR, fileName);
         assertFalse(outFile.exists());
-        
+
         Writer outWriter = new FileWriter(outFile);
         outWriter.write(TEST_MESSAGE);
         outWriter.close();
     }
 
-    protected boolean fileExists(String fileName) 
-    {        
+    protected boolean fileExists(String fileName)
+    {
         File file = new File(FTP_SERVER_BASE_DIR, fileName);
         return file.exists();
     }
 
     //
     // callback methods from MuleFtplet
-    // 
+    //
+    @Override
     public void fileUploadCompleted()
     {
         // subclasses can override this method
     }
 
+    @Override
     public void fileMoveCompleted()
     {
         // subclasses can override this method
-    }
-    
-    @Override
-    protected int getNumPortsToFind() 
-    {
-        return 1;
     }
 }

@@ -14,32 +14,43 @@ import org.mule.api.EncryptionStrategy;
 import org.mule.api.security.SecurityManager;
 import org.mule.api.security.SecurityProvider;
 import org.mule.security.PasswordBasedEncryptionStrategy;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JaasNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "jaas-namespace-config.xml";
     }
-    
+
+    @Test
     public void testJaasProvider()
     {
         knownProperties(getProvider("jaasSecurityProvider"));
     }
-    
+
+    @Test
     public void testPasswordBasedEncryption()
     {
         knownProperties(getEncryptionStrategy("PBE"));
     }
-    
-    protected SecurityProvider getProvider(String name)
+
+    protected void knownProperties(EncryptionStrategy encryptionStrategy)
     {
-        SecurityManager securityManager = muleContext.getSecurityManager();
-        return securityManager.getProvider(name);
+        assertNotNull(encryptionStrategy);
+        assertTrue(encryptionStrategy instanceof PasswordBasedEncryptionStrategy);
+        PasswordBasedEncryptionStrategy pbe = (PasswordBasedEncryptionStrategy) encryptionStrategy;
+        assertNotNull(pbe.getName());
+        assertEquals("PBE", pbe.getName());
     }
-    
+
     protected void knownProperties(SecurityProvider provider)
     {
         assertNotNull(provider);
@@ -50,22 +61,16 @@ public class JaasNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(jaasProvider.getLoginConfig());
         assertEquals("jaas.conf", jaasProvider.getLoginConfig());
     }
-    
-    protected EncryptionStrategy getEncryptionStrategy(String name)
+
+    protected SecurityProvider getProvider(String providerName)
     {
         SecurityManager securityManager = muleContext.getSecurityManager();
-        return securityManager.getEncryptionStrategy(name);
+        return securityManager.getProvider(providerName);
     }
-    
-    protected void knownProperties(EncryptionStrategy encryptionStrategy)
+
+    protected EncryptionStrategy getEncryptionStrategy(String strategyName)
     {
-        assertNotNull(encryptionStrategy);
-        assertTrue(encryptionStrategy instanceof PasswordBasedEncryptionStrategy);
-        PasswordBasedEncryptionStrategy pbe = (PasswordBasedEncryptionStrategy) encryptionStrategy;
-        assertNotNull(pbe.getName());
-        assertEquals("PBE", pbe.getName());
+        SecurityManager securityManager = muleContext.getSecurityManager();
+        return securityManager.getEncryptionStrategy(strategyName);
     }
-
 }
-
-

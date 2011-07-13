@@ -14,14 +14,21 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.module.bpm.BPMS;
 import org.mule.module.bpm.Process;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class VariablesComponentTestCase extends FunctionalTestCase
 {
+
     private final int TIMEOUT = 10000;
     
     @Override
@@ -30,6 +37,7 @@ public class VariablesComponentTestCase extends FunctionalTestCase
         return "jbpm-component-functional-test.xml";
     }
 
+    @Test
     public void testVariables() throws Exception
     {
         MuleClient client = muleContext.getClient();
@@ -62,4 +70,5 @@ public class VariablesComponentTestCase extends FunctionalTestCase
         final Object o = response.getInboundProperty("time");
         assertTrue(o instanceof Date);
     }
+
 }

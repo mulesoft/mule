@@ -14,7 +14,7 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.xml.stax.StaxSource;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.InputStream;
 
@@ -24,20 +24,33 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class DirectXmlTestCase extends FunctionalTestCase
 {
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "direct/direct-xml-conf.xml";
+    }
+
+    @Test
     public void testInputStream() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
         assertNotNull(xml);
-        
+
         test(client, xml);
     }
-    
+
+    @Test
     public void testInputStreamWithXslt() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -48,17 +61,18 @@ public class DirectXmlTestCase extends FunctionalTestCase
         String resultStr = result.getPayloadAsString();
         assertTrue("echoResponse not found in result: " + resultStr, resultStr.indexOf("echoResponse") != -1);
     }
-    
+
     private void test(MuleClient client, Object xml) throws MuleException, Exception
     {
-        MuleMessage result = client.send("vm://echo", 
+        MuleMessage result = client.send("vm://echo",
             xml,
             null);
-        
-//        System.out.println(result.getPayloadAsString()); 
+
+//        System.out.println(result.getPayloadAsString());
         assertTrue(result.getPayloadAsString().indexOf("echoResponse") != -1);
     }
-    
+
+    @Test
     public void testDom() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -67,6 +81,7 @@ public class DirectXmlTestCase extends FunctionalTestCase
         test(client, dom);
     }
 
+    @Test
     public void testDomSource() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -75,6 +90,7 @@ public class DirectXmlTestCase extends FunctionalTestCase
         test(client, new DOMSource(dom));
     }
 
+    @Test
     public void testSAXSource() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -82,16 +98,18 @@ public class DirectXmlTestCase extends FunctionalTestCase
         SAXSource source = new SAXSource(new InputSource(xml));
         test(client, source);
     }
-    
+
+    @Test
     public void testStaxSource() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         InputStream xml = getClass().getResourceAsStream("/direct/direct-request.xml");
-        
+
         XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(xml);
         test(client, new StaxSource(reader));
     }
-    
+
+    @Test
     public void testXMLStreamReader() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -99,11 +117,6 @@ public class DirectXmlTestCase extends FunctionalTestCase
 
         XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(xml);
         test(client, reader);
-    }
-
-    protected String getConfigResources()
-    {
-        return "direct/direct-xml-conf.xml";
     }
 
 }

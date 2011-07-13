@@ -19,6 +19,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
 {
     @Override
@@ -27,6 +33,7 @@ public class FtpFunctionalTestCase extends AbstractFtpServerTestCase
         return "ftp-functional-test.xml";
     }
 
+    @Test
     public void testSendAndRequest() throws Exception
     {
         CountDownLatch latch = new CountDownLatch(1);

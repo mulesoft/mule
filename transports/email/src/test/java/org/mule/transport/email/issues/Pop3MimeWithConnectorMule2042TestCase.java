@@ -12,6 +12,8 @@ package org.mule.transport.email.issues;
 
 import org.mule.transport.email.functional.AbstractEmailFunctionalTestCase;
 
+import org.junit.Test;
+
 public class Pop3MimeWithConnectorMule2042TestCase extends AbstractEmailFunctionalTestCase
 {
 
@@ -20,6 +22,7 @@ public class Pop3MimeWithConnectorMule2042TestCase extends AbstractEmailFunction
         super(MIME_MESSAGE, "pop3", "pop3-mime-with-connector-mule-2042-test.xml");
     }
 
+    @Test
     public void testRequest() throws Exception
     {
         doRequest();

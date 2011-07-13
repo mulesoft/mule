@@ -10,22 +10,25 @@
 
 package org.mule.module.jersey;
 
-public class NonRootServletTestCase extends AbstractServletTestCase 
+import org.junit.Test;
+
+public class NonRootServletTestCase extends AbstractServletTestCase
 {
-    public NonRootServletTestCase() 
+
+    public NonRootServletTestCase()
     {
         super("/context/*");
     }
-    
-    public void testBasic() throws Exception
-    {
-        testBasic("http://localhost:63088/context/base");
-    }
-    
+
     @Override
-    protected String getConfigResources() 
+    protected String getConfigResources()
     {
         return "non-root-servlet-conf.xml";
     }
 
+    @Test
+    public void testBasic() throws Exception
+    {
+        doTestBasic("http://localhost:63088/context/base");
+    }
 }

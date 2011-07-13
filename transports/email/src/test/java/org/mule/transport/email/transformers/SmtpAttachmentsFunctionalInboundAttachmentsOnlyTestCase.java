@@ -19,14 +19,21 @@ import javax.activation.MimeType;
 import javax.mail.BodyPart;
 import javax.mail.internet.MimeMultipart;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class SmtpAttachmentsFunctionalInboundAttachmentsOnlyTestCase extends AbstractEmailFunctionalTestCase
 {
+
     public SmtpAttachmentsFunctionalInboundAttachmentsOnlyTestCase()
     {
         super(STRING_MESSAGE, "smtp", "smtp-functional-test-inbound-attachments-only.xml");
         setAddAttachments(true);
     }
 
+    @Test
     public void testSend() throws Exception
     {
         doSend();

@@ -12,6 +12,8 @@ package org.mule.transport.email.functional;
 
 import java.util.Locale;
 
+import org.junit.Test;
+
 public class SmtpNonAsciiFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
@@ -20,6 +22,7 @@ public class SmtpNonAsciiFunctionalTestCase extends AbstractEmailFunctionalTestC
         super(STRING_MESSAGE, "smtp", Locale.JAPAN, "iso-2022-jp");
     }
 
+    @Test
     public void testSend() throws Exception
     {
         doSend();

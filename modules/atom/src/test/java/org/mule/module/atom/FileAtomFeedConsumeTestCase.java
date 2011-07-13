@@ -10,19 +10,25 @@
 package org.mule.module.atom;
 
 import org.mule.module.atom.event.EntryReceiver;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.File;
 import java.io.FileOutputStream;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class FileAtomFeedConsumeTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "file-atom-consume.xml";
     }
 
+    @Test
     public void testConsumeFeedEntries() throws Exception
     {
         FileOutputStream fos = new FileOutputStream(new File(muleContext.getConfiguration().getWorkingDirectory(), "sample-feed.atom"));
@@ -35,6 +41,5 @@ public class FileAtomFeedConsumeTestCase extends FunctionalTestCase
         EntryReceiver component = (EntryReceiver)getComponent("feedSplitterConsumer");
         assertEquals(25, component.getCount());
     }
-
 
 }

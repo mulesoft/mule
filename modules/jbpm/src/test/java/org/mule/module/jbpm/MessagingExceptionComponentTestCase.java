@@ -12,49 +12,60 @@ package org.mule.module.jbpm;
 
 import org.mule.api.client.MuleClient;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.ExceptionUtils;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class MessagingExceptionComponentTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "jbpm-component-functional-test.xml";
     }
 
+    @Test
     public void testNoException() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        client.send("vm://exception", "testNoException", null);                                  
+        client.send("vm://exception", "testNoException", null);
 
         // Both messages should have been sent.
-        assertNotNull(client.request("vm://queueC", 1000));            
-        assertNotNull(client.request("vm://queueD", 1000));            
+        assertNotNull(client.request("vm://queueC", 1000));
+        assertNotNull(client.request("vm://queueD", 1000));
     }
 
+    @Test
     public void testExceptionInService() throws Exception
     {
-        MuleClient client = muleContext.getClient();        
+        MuleClient client = muleContext.getClient();
         try
         {
-            client.send("vm://exception", "testExceptionInService", null);                      
+            client.send("vm://exception", "testExceptionInService", null);
             fail("Should have thrown an exception");
         }
         catch (Exception e)
         {
             assertTrue(ExceptionUtils.getRootCause(e) instanceof FunctionalTestException);
         }
-        
+
         // The first message should have been sent, but not the second one.
-        assertNotNull(client.request("vm://queueC", 1000));            
-        assertNull(client.request("vm://queueD", 1000));            
+        assertNotNull(client.request("vm://queueC", 1000));
+        assertNull(client.request("vm://queueD", 1000));
     }
 
+    @Test
     public void testExceptionInTransformer() throws Exception
     {
         MuleClient client = muleContext.getClient();
-        
+
         try
         {
             client.send("vm://exception", "testExceptionInTransformer", null);
@@ -64,9 +75,9 @@ public class MessagingExceptionComponentTestCase extends FunctionalTestCase
         {
             assertTrue(ExceptionUtils.getRootCause(e) instanceof TransformerException);
         }
-        
+
         // The first message should have been sent, but not the second one.
-        assertNotNull(client.request("vm://queueC", 1000));            
-        assertNull(client.request("vm://queueD", 1000));            
+        assertNotNull(client.request("vm://queueC", 1000));
+        assertNull(client.request("vm://queueD", 1000));
     }
 }

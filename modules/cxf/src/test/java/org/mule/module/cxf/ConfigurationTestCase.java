@@ -21,9 +21,17 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.message.Message;
+import org.junit.Test;
 
 public class ConfigurationTestCase extends FunctionalTestCase
 {
+    @Override
+    protected String getConfigResources()
+    {
+        return "configuration-conf.xml";
+    }
+
+    @Test
     public void testBusConfiguration() throws Exception
     {
         CxfConfiguration config = muleContext.getRegistry().get("cxf");
@@ -41,20 +49,15 @@ public class ConfigurationTestCase extends FunctionalTestCase
 
         assertTrue("Did not find logging interceptor.", found);
     }
-    
+
+    @Test
     public void testSpringRefs() throws Exception
     {
         InboundEndpoint endpoint = muleContext.getRegistry().get("clientEndpoint");
         FlowConfiguringMessageProcessor processor = (FlowConfiguringMessageProcessor) endpoint.getMessageProcessors().get(0);
-        List<Interceptor<? extends Message>> inInterceptors = 
+        List<Interceptor<? extends Message>> inInterceptors =
             ((ProxyServiceFactoryBean) processor.getMessageProcessorBuilder()).getInInterceptors();
         assertEquals(muleContext.getRegistry().get("foo1"), inInterceptors.get(0));
         assertEquals(muleContext.getRegistry().get("foo3"), inInterceptors.get(1));
-    }
-
-    @Override
-    protected String getConfigResources()
-    {
-        return "configuration-conf.xml";
     }
 }

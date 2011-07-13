@@ -12,15 +12,22 @@ package org.mule.module.scripting.filter;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class GroovyScriptFilterFunctionalTestCase extends FunctionalTestCase
 {
+
     public GroovyScriptFilterFunctionalTestCase()
     {
         // Groovy really hammers the startup time since it needs to create the
         // interpreter on every start
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override
@@ -29,6 +36,7 @@ public class GroovyScriptFilterFunctionalTestCase extends FunctionalTestCase
         return "groovy-filter-config.xml";
     }
 
+    @Test
     public void testFilterScript() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

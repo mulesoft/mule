@@ -13,7 +13,11 @@ package org.mule.module.pgp;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class PGPIntegrationTestCase extends FunctionalTestCase
 {
@@ -24,6 +28,7 @@ public class PGPIntegrationTestCase extends FunctionalTestCase
         return "pgp-integration-mule-config.xml";
     }
 
+    @Test
     public void testEncryptDecrypt() throws Exception
     {
         String payload = "this is a super simple test. Hope it works!!!";
@@ -33,4 +38,5 @@ public class PGPIntegrationTestCase extends FunctionalTestCase
         MuleMessage message = client.request("vm://out", 5000);
         assertEquals(payload, message.getPayloadAsString());
     }
+
 }

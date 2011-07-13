@@ -12,6 +12,7 @@ package org.mule.module.jersey;
 
 public class BasicJerseyWithExceptionMapperTestCase extends BasicJerseyTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
@@ -23,4 +24,5 @@ public class BasicJerseyWithExceptionMapperTestCase extends BasicJerseyTestCase
     {
         callThrowException(503, "This is an exception");
     }
+
 }

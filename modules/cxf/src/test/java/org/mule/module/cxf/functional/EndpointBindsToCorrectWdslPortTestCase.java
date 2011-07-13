@@ -17,16 +17,23 @@ import org.mule.endpoint.DefaultInboundEndpoint;
 import org.mule.module.cxf.CxfInboundMessageProcessor;
 import org.mule.module.cxf.config.FlowConfiguringMessageProcessor;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 import java.util.List;
 
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class EndpointBindsToCorrectWdslPortTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertEquals;
+
+public class EndpointBindsToCorrectWdslPortTestCase extends FunctionalTestCase
 {
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
 
     @Override
     protected String getConfigResources()
@@ -34,6 +41,7 @@ public class EndpointBindsToCorrectWdslPortTestCase extends DynamicPortTestCase
         return "org/mule/module/cxf/functional/endpoint-binds-to-correct-wdsl-port.xml";
     }
 
+    @Test
     public void testThatTheCorrectSoapPortIsChosen() throws Exception
     {
         final Service service = muleContext.getRegistry().lookupService("CXFProxyService");
@@ -52,9 +60,4 @@ public class EndpointBindsToCorrectWdslPortTestCase extends DynamicPortTestCase
             "ListsSoap", endpointInfo.getName().getLocalPart());
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
 }

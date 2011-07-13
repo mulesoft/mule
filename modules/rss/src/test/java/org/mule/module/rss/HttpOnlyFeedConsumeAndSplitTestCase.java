@@ -9,12 +9,18 @@
  */
 package org.mule.module.rss;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class HttpOnlyFeedConsumeAndSplitTestCase extends FunctionalTestCase
 {
+
     private final CounterCallback counter = new CounterCallback();
 
     @Override
@@ -26,11 +32,13 @@ public class HttpOnlyFeedConsumeAndSplitTestCase extends FunctionalTestCase
     @Override
     protected void doSetUp() throws Exception
     {
-        FunctionalTestComponent comp = (FunctionalTestComponent)getComponent("feedConsumer");
+        FunctionalTestComponent comp = (FunctionalTestComponent) getComponent("feedConsumer");
         comp.setEventCallback(counter);
     }
 
-    public void testConsume() throws Exception {
+    @Test
+    public void testConsume() throws Exception
+    {
 
         Thread.sleep(4000);
         int count = counter.getCallbackCount();
@@ -38,6 +46,5 @@ public class HttpOnlyFeedConsumeAndSplitTestCase extends FunctionalTestCase
         Thread.sleep(3000);
         //We should only receive entries once
         assertEquals(count, counter.getCallbackCount());
-
     }
 }

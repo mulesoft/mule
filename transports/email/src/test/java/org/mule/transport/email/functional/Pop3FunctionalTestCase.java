@@ -10,6 +10,8 @@
 
 package org.mule.transport.email.functional;
 
+import org.junit.Test;
+
 public class Pop3FunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
@@ -18,6 +20,7 @@ public class Pop3FunctionalTestCase extends AbstractEmailFunctionalTestCase
         super(STRING_MESSAGE, "pop3");
     }
 
+    @Test
     public void testRequest() throws Exception
     {
         doRequest();

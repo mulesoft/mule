@@ -10,116 +10,94 @@
 
 package org.mule.module.jaas;
 
-import org.mule.api.EncryptionStrategy;
 import org.mule.api.MuleMessage;
-import org.mule.api.config.MuleProperties;
-import org.mule.module.client.MuleClient;
-import org.mule.security.MuleCredentials;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.api.security.UnauthorisedException;
+import org.mule.util.ExceptionUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class JaasAutenticationWithJaasConfigFileTestCase extends FunctionalTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class JaasAutenticationWithJaasConfigFileTestCase extends AbstractJaasFunctionalTestCase
 {
-
-    public void testCaseGoodAuthentication() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-
-        Map props = new HashMap();
-        EncryptionStrategy strategy = muleContext
-            .getSecurityManager()
-            .getEncryptionStrategy("PBE");
-        String header = MuleCredentials.createHeader("Marie.Rizzo", "dragon", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        MuleMessage m = client.send("vm://test", "Test", props);
-
-        assertNotNull(m);
-        assertTrue(m.getPayload() instanceof String);
-        assertEquals("Test Received", m.getPayloadAsString());
-    }
-
-    public void testCaseDifferentGoodAuthentication() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-
-        Map props = new HashMap();
-        EncryptionStrategy strategy = muleContext
-            .getSecurityManager()
-            .getEncryptionStrategy("PBE");
-        String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        MuleMessage m = client.send("vm://test", "Test", props);
-
-        assertNotNull(m);
-        assertTrue(m.getPayload() instanceof String);
-        assertEquals("Test Received", m.getPayloadAsString());
-    }
-
-    public void testCaseWrongCombinationOfCorrectUsernameAndPassword() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-
-        Map props = new HashMap();
-        EncryptionStrategy strategy = muleContext
-            .getSecurityManager()
-            .getEncryptionStrategy("PBE");
-        String header = MuleCredentials.createHeader("Marie.Rizzo", "anon", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        try
-        {
-            client.send("vm://test", "Test", props);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
-    }
-
-    public void testCaseBadUserName() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
-        EncryptionStrategy strategy = muleContext
-            .getSecurityManager()
-            .getEncryptionStrategy("PBE");
-        String header = MuleCredentials.createHeader("Evil", "dragon", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        try
-        {
-            client.send("vm://test", "Test", props);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
-    }
-
-    public void testCaseBadPassword() throws Exception
-    {
-        MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
-        EncryptionStrategy strategy = muleContext
-            .getSecurityManager()
-            .getEncryptionStrategy("PBE");
-        String header = MuleCredentials.createHeader("Marie.Rizzo", "evil", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);
-        try
-        {
-            client.send("vm://test", "Test", props);
-            fail("Exception expected");
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
-    }
-
+    @Override
     protected String getConfigResources()
     {
         return "mule-conf-for-jaas-conf-file.xml";
+    }
+
+    @Test
+    public void goodAuthentication() throws Exception
+    {
+        Map<String, Object> props = createMessagePropertiesWithCredentials("Marie.Rizzo", "dragon");
+        MuleMessage m = muleContext.getClient().send("vm://test", "Test", props);
+
+        assertNotNull(m);
+        assertTrue(m.getPayload() instanceof String);
+        assertEquals("Test Received", m.getPayloadAsString());
+    }
+
+    @Test
+    public void anotherGoodAuthentication() throws Exception
+    {
+        Map<String, Object> props = createMessagePropertiesWithCredentials("anon", "anon");
+        MuleMessage m = muleContext.getClient().send("vm://test", "Test", props);
+
+        assertNotNull(m);
+        assertTrue(m.getPayload() instanceof String);
+        assertEquals("Test Received", m.getPayloadAsString());
+    }
+
+    @Test
+    public void wrongCombinationOfCorrectUsernameAndPassword() throws Exception
+    {
+        Map<String, Object> props = createMessagePropertiesWithCredentials("Marie.Rizzo", "anon");
+
+        try
+        {
+            muleContext.getClient().send("vm://test", "Test", props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.containsType(e, UnauthorisedException.class));
+        }
+    }
+
+    @Test
+    public void badUserName() throws Exception
+    {
+        Map<String, Object> props = createMessagePropertiesWithCredentials("Evil", "dragon");
+
+        try
+        {
+            muleContext.getClient().send("vm://test", "Test", props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.containsType(e, UnauthorisedException.class));
+        }
+    }
+
+    @Test
+    public void badPassword() throws Exception
+    {
+        Map<String, Object> props = createMessagePropertiesWithCredentials("Marie.Rizzo", "evil");
+
+        try
+        {
+            muleContext.getClient().send("vm://test", "Test", props);
+            fail("Exception expected");
+        }
+        catch (Exception e)
+        {
+            assertTrue(ExceptionUtils.containsType(e, UnauthorisedException.class));
+        }
     }
 }

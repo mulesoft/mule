@@ -20,6 +20,8 @@ import org.mule.util.store.SimpleMemoryObjectStore;
 import java.io.Serializable;
 import java.util.Properties;
 
+import static org.junit.Assert.fail;
+
 public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConfigBuilderTestCase
 {
     @Override
@@ -41,6 +43,7 @@ public class GroovyScriptConfigurationBuilderTestCase extends AbstractScriptConf
             return null;
         }
     }
+
     @Override
     protected Properties getStartUpProperties()
     {

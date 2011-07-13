@@ -11,10 +11,12 @@
 package org.mule.transport.email.functional;
 
 import org.mule.DefaultMuleMessage;
+import org.mule.api.MuleContext;
 import org.mule.api.MuleMessage;
 import org.mule.config.i18n.LocaleMessageHandler;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.transport.email.GreenMailUtilities;
 import org.mule.transport.email.ImapConnector;
 import org.mule.transport.email.MailProperties;
@@ -35,7 +37,14 @@ import javax.mail.Message;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCase
+import org.junit.Rule;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public abstract class AbstractEmailFunctionalTestCase extends FunctionalTestCase
 {
     public static final long DELIVERY_DELAY_MS = 10000;
 
@@ -64,6 +73,13 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
     protected ServerSetup smtpSetup = null;
     private int smtpPort;
     private boolean addSmtp = false;
+
+    @Rule
+    public DynamicPort dynamicPort1 = new DynamicPort("port1");
+
+    @Rule
+    public DynamicPort dynamicPort2 = new DynamicPort("port2");
+
 
     protected AbstractEmailFunctionalTestCase(boolean isMimeMessage, String protocol)
     {
@@ -112,12 +128,14 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
     }
 
     @Override
-    protected void suitePreSetUp() throws Exception
+    protected MuleContext createMuleContext() throws Exception
     {
-        this.port = getPorts().get(0);
-        this.smtpPort = getPorts().get(1);
+        this.port = dynamicPort1.getNumber();
+        this.smtpPort = dynamicPort2.getNumber();
         startServer();
         initDefaultCommandMap();
+
+        return super.createMuleContext();
     }
 
     /**
@@ -135,9 +153,9 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
     }
 
     @Override
-    protected void suitePostTearDown() throws Exception
+    public void doTearDown()
     {
-        stopServer();
+        server.stop();
     }
 
     protected void doSend() throws Exception
@@ -264,13 +282,6 @@ public abstract class AbstractEmailFunctionalTestCase extends DynamicPortTestCas
     private static String getMessage(Locale locale)
     {
         return LocaleMessageHandler.getString("test-data", locale, "AbstractEmailFunctionalTestCase.getMessage", new Object[] {});
-    }
-
-    @Override
-    protected int getNumPortsToFind()
-    {
-        // add extra port in case we need to add an smtp server as wll 
-        return 2;
     }
 
     public void setAddAttachments(boolean addAttachments)

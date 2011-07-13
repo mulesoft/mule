@@ -14,7 +14,7 @@ import org.mule.api.ExceptionPayload;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
@@ -27,6 +27,14 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class PGPSecurityFilterTestCase extends FunctionalTestCase
 {
     protected static final String TARGET = "/encrypted.txt";
@@ -38,12 +46,14 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
     {
         return (AbstractEncryptionStrategyTestCase.isCryptographyExtensionInstalled() == false);
     }
-    
+
+    @Override
     protected String getConfigResources()
     {
         return "test-pgp-encrypt-config.xml";
     }
 
+    @Test
     public void testAuthenticationAuthorised() throws Exception
     {
         byte[] msg = loadEncryptedMessage();
@@ -55,7 +65,7 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         MuleClient client = new MuleClient(muleContext);
         MuleMessage reply = client.send("vm://echo", new String(msg), props);
         assertNull(reply.getExceptionPayload());
-        
+
         //poll for the output file; wait for a max of 5 seconds
         File pollingFile = null;
         for(int i = 0; i < 5; i++)
@@ -67,17 +77,17 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
             }
         }
         pollingFile = null;
-        
+
         try
         {
             // check if file exists
             FileReader outputFile = new FileReader(DIRECTORY + TARGET);
             String fileContents = IOUtils.toString(outputFile);
             outputFile.close();
-            
+
             // see the GenerateTestMessage class for the content of the message
-            assertTrue(fileContents.contains("This is a test message")); 
-            
+            assertTrue(fileContents.contains("This is a test message"));
+
             // delete file not to be confused with tests to be performed later
             File f = FileUtils.newFile(DIRECTORY + TARGET);
             assertTrue("Deleting the output file failed", f.delete());
@@ -87,7 +97,6 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
             fail("File not successfully created");
         }
     }
-    
     private byte[] loadEncryptedMessage() throws IOException
     {
         URL url = Thread.currentThread().getContextClassLoader().getResource("./encrypted-signed.asc");
@@ -95,17 +104,18 @@ public class PGPSecurityFilterTestCase extends FunctionalTestCase
         FileInputStream in = new FileInputStream(url.getFile());
         byte[] msg = IOUtils.toByteArray(in);
         in.close();
-        
+
         return msg;
     }
 
     // see MULE-3672
+    @Test
     public void testAuthenticationNotAuthorised() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
 
         MuleMessage reply = client.send("vm://echo", "An unsigned message", null);
-        
+
         assertNotNull(reply.getExceptionPayload());
         ExceptionPayload excPayload = reply.getExceptionPayload();
         assertEquals(MESSAGE_EXCEPTION, excPayload.getMessage());

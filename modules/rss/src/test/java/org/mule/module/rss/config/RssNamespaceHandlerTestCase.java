@@ -18,9 +18,16 @@ import org.mule.module.rss.routing.FeedLastUpdatedFilter;
 import org.mule.module.rss.routing.FeedSplitter;
 import org.mule.module.rss.transformers.ObjectToRssFeed;
 import org.mule.routing.MessageFilter;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.text.SimpleDateFormat;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class RssNamespaceHandlerTestCase extends FunctionalTestCase
 {
@@ -30,6 +37,7 @@ public class RssNamespaceHandlerTestCase extends FunctionalTestCase
         return "namespace-config.xml";
     }
 
+    @Test
     public void testFlowConfig() throws Exception
     {
         Flow flowConstruct = muleContext.getRegistry().lookupObject("flowTest");
@@ -47,6 +55,7 @@ public class RssNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(sdf.parse("2009-10-01"), ((EntryLastUpdatedFilter)((MessageFilter)mp).getFilter()).getLastUpdate());
     }
 
+    @Test
     public void testGlobalFilterConfig() throws Exception
     {
         FeedLastUpdatedFilter filter = muleContext.getRegistry().lookupObject("feedFilter");
@@ -58,6 +67,7 @@ public class RssNamespaceHandlerTestCase extends FunctionalTestCase
         assertFalse(filter.isAcceptWithoutUpdateDate());
     }
 
+    @Test
     public void testObjectToFeedTransformer() throws Exception
     {
         Transformer transformer = muleContext.getRegistry().lookupTransformer("ObjectToFeed");

@@ -13,14 +13,21 @@ package org.mule.transport.ftp;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class FtpMessageRequesterTestCase extends AbstractFtpServerTestCase
-{   
+{
+
     @Override
     protected String getConfigResources()
     {
         return "ftp-message-requester-test.xml";
     }
 
+    @Test
     public void testMessageRequester() throws Exception
     {
         createFileOnFtpServer("test.txt");

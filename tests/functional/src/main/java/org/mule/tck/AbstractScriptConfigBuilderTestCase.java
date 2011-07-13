@@ -41,7 +41,15 @@ import org.mule.transformer.types.DataTypeFactory;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTestCase
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+public abstract class AbstractScriptConfigBuilderTestCase extends org.mule.tck.junit4.FunctionalTestCase
 {
 
     // use legacy entry point resolver?
@@ -57,6 +65,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         this.legacy = legacy;
     }
 
+    @Test
     public void testManagerConfig() throws Exception
     {
         assertEquals("true", muleContext.getRegistry().lookupObject("doCompression"));
@@ -64,6 +73,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
     }
 
 
+    @Test
     public void testConnectorConfig() throws Exception
     {
         MessagingExceptionHandler es = muleContext.getRegistry().lookupModel("main").getExceptionListener();
@@ -71,6 +81,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertTrue(es.getClass().getName(), es instanceof TestExceptionStrategy);
     }
 
+    @Test
     public void testGlobalEndpointConfig() throws MuleException
     {
         ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
@@ -86,6 +97,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(ep);
     }
 
+    @Test
     public void testEndpointConfig() throws MuleException
     {
         // test that targets have been resolved on targets
@@ -105,6 +117,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertTrue(responseTransformer instanceof TestCompressionTransformer);
     }
 
+    @Test
     public void testExceptionStrategy()
     {
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
@@ -117,6 +130,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals("test://orange.exceptions", ep.getEndpointURI().toString());
     }
 
+    @Test
     public void testTransformerConfig()
     {
         Transformer t = muleContext.getRegistry().lookupTransformer("TestCompressionTransformer");
@@ -126,6 +140,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(((TestCompressionTransformer) t).getContainerProperty());
     }
 
+    @Test
     public void testModelConfig() throws Exception
     {
         Model model = muleContext.getRegistry().lookupModel("main");
@@ -153,6 +168,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
      * Since MULE-1933, Service no longer has properties and most properties are set on endpoint.
      * So lets continue to test properties, but on targets instead.
      */
+    @Test
     public void testEndpointPropertiesConfig() throws Exception
     {
         ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
@@ -186,6 +202,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(6, endpoint.getProperties().size());
     }
 
+    @Test
     public void testOutboundRouterConfig()
     {
         // test outbound message router
@@ -200,6 +217,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(1, route1.getRoutes().size());
     }
 
+    @Test
     public void testBindingConfig()
     {
         // test outbound message router
@@ -222,6 +240,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertNotNull(route1.getEndpoint());
     }
 
+    @Test
     public void testDescriptorEndpoints()
     {
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
@@ -251,6 +270,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertTrue(TransformerUtils.firstOrNull(endpoint.getTransformers()) instanceof TestCompressionTransformer);
     }
 
+    @Test
     public void testInboundRouterConfig()
     {
         Service service = muleContext.getRegistry().lookupService("orangeComponent");
@@ -262,6 +282,7 @@ public abstract class AbstractScriptConfigBuilderTestCase extends FunctionalTest
         assertEquals(2, messageRouter.getEndpoints().size());
     }
 
+    @Test
     public void testResponseRouterConfig()
     {
         Service service = muleContext.getRegistry().lookupService("orangeComponent");

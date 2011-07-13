@@ -12,18 +12,25 @@ package org.mule.module.jbpm;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.bpm.BPMS;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.jbpm.api.ProcessInstance;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ForkedProcessComponentTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "jbpm-component-functional-test.xml";
     }
 
+    @Test
     public void testForkedProcess() throws Exception 
     {
         BPMS bpms = muleContext.getRegistry().lookupObject(BPMS.class);
@@ -53,4 +60,5 @@ public class ForkedProcessComponentTestCase extends FunctionalTestCase
         assertTrue("Process should have ended, but is in state " + bpms.getState(process), 
                 bpms.hasEnded(process));
     }
+
 }

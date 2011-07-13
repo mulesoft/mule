@@ -9,7 +9,7 @@
  */
 package org.mule.module.atom;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.io.IOException;
 import java.util.Date;
@@ -27,10 +27,12 @@ import org.apache.abdera.protocol.client.ClientResponse;
 import org.apache.abdera.protocol.client.RequestOptions;
 import org.apache.abdera.writer.Writer;
 
+import static org.junit.Assert.assertEquals;
+
 public abstract class AbstractCustomerTest extends FunctionalTestCase
 {
 
-    public void testCustomerProvider(String basePath) throws Exception
+    protected void testCustomerProvider(String basePath) throws Exception
     {
         Abdera abdera = new Abdera();
         Factory factory = abdera.getFactory();

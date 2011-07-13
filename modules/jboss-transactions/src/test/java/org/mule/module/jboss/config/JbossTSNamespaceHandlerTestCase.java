@@ -9,12 +9,25 @@
  */
 package org.mule.module.jboss.config;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JbossTSNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
+    @Override
+    protected String getConfigResources()
+    {
+        return "jbossts-namespacehandler.xml";
+    }
+
+    @Test
     public void testNamespaceHandler()
     {
         assertNotNull(muleContext.getTransactionManager());
@@ -23,8 +36,4 @@ public class JbossTSNamespaceHandlerTestCase extends FunctionalTestCase
         //assertEquals(arjPropertyManager.propertyManager.getProperty("test"),"TEST");
     }
 
-    protected String getConfigResources()
-    {
-        return "jbossts-namespacehandler.xml";
-    }
 }

@@ -10,6 +10,8 @@
 
 package org.mule.transport.email.functional;
 
+import org.junit.Test;
+
 public class ImapFunctionalTestCase extends AbstractEmailFunctionalTestCase
 {
 
@@ -18,6 +20,7 @@ public class ImapFunctionalTestCase extends AbstractEmailFunctionalTestCase
         super(STRING_MESSAGE, "imap");
     }
 
+    @Test
     public void testRequest() throws Exception
     {
         doRequest();

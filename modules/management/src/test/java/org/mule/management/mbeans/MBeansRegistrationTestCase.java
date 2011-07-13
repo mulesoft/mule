@@ -21,7 +21,7 @@ import org.mule.module.management.mbean.RouterStats;
 import org.mule.module.management.mbean.ServiceService;
 import org.mule.module.management.mbean.StatisticsService;
 import org.mule.module.management.support.JmxSupport;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,11 +32,17 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectInstance;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Verify that expected MBeans are registered based on the config.
  */
 public class MBeansRegistrationTestCase extends FunctionalTestCase
 {
+
     private MBeanServer mBeanServer;
     private String domainName;
     private JmxSupport jmxSupport;
@@ -51,6 +57,7 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
         mBeanServer = jmxAgent.getMBeanServer();
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "mbeans-test.xml";
@@ -59,6 +66,7 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
     /**
      * Verify that all expected MBeans are registered for a default config
      */
+    @Test
     public void testDefaultMBeansRegistration() throws Exception
     {
         List<String> mbeanClasses = getMBeanClasses();
@@ -77,6 +85,7 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
     /**
      * Verify that all expected MBeans are registered for connectors, services, routers, and endpoints.
      */
+    @Test
     public void testServiceMBeansRegistration() throws Exception
     {
         List<String> mbeanClasses = getMBeanClasses();
@@ -91,6 +100,7 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
     /**
      * Verify that all MBeans were unregistered during disposal phase.
      */
+    @Test
     public void testMBeansUnregistration() throws Exception
     {
         muleContext.dispose();
@@ -113,4 +123,5 @@ public class MBeansRegistrationTestCase extends FunctionalTestCase
     {
         return mBeanServer.queryMBeans(jmxSupport.getObjectName(domainName + ":*"), null);        
     }
+
 }
