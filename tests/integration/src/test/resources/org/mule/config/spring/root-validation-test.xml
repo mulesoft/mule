@@ -26,4 +26,13 @@
             </component>
         </service>
     </model>
+    
+    <flow name="service">
+        <inbound-endpoint ref="endpoint" />
+
+        <component>
+            <spring-object bean="poot" />
+        </component>
+    </flow>
+    
 </mule>
