@@ -36,6 +36,7 @@ import org.mule.util.StringUtils;
 import org.mule.util.UUID;
 import org.mule.util.store.DeserializationPostInitialisable;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -71,7 +72,7 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
 {
     protected static final String NOT_SET = "<not set>";
 
-    private static final long serialVersionUID = 1541720810851984844L;
+    private static final long serialVersionUID = 1541720810851984845L;
     private static final Log logger = LogFactory.getLog(DefaultMuleMessage.class);
     private static final List<Class<?>> consumableClasses = new ArrayList<Class<?>>();
 
@@ -98,12 +99,12 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
     /**
      * Collection of attachments that were attached to the incoming message
      */
-    private Map<String, DataHandler> inboundAttachments = new ConcurrentHashMap<String, DataHandler>();
+    private transient Map<String, DataHandler> inboundAttachments = new ConcurrentHashMap<String, DataHandler>();
 
     /**
      * Collection of attachments that will be sent out with this message
      */
-    private Map<String, DataHandler> outboundAttachments = new ConcurrentHashMap<String, DataHandler>();
+    private transient Map<String, DataHandler> outboundAttachments = new ConcurrentHashMap<String, DataHandler>();
 
     private transient List<Integer> appliedTransformerHashCodes;
     private transient byte[] cache;
@@ -1570,10 +1571,61 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
         return isConsumedFromAdditional(this.getPayload().getClass());
     }
 
+    public static class SerializedDataHandler implements Serializable
+    {
+        private static final long serialVersionUID = 1L;
+
+        private DataHandler handler;
+        private String contentType;
+        private Object contents;
+
+        public SerializedDataHandler(String name, DataHandler handler, MuleContext muleContext) throws IOException
+        {
+            if (handler != null && !(handler instanceof Serializable))
+            {
+                contentType = handler.getContentType();
+                Object theContent = handler.getContent();
+                if (theContent instanceof Serializable)
+                {
+                    contents = theContent;
+                }
+                else
+                {
+                    try
+                    {
+                        DataType source = DataTypeFactory.createFromObject(theContent);
+                        Transformer transformer = muleContext.getRegistry().lookupTransformer(source, DataType.BYTE_ARRAY_DATA_TYPE);
+                        if (transformer == null)
+                        {
+                            throw new TransformerException(CoreMessages.noTransformerFoundForMessage(source, DataType.BYTE_ARRAY_DATA_TYPE));
+                        }
+                        contents = transformer.transform(theContent);
+                    }
+                    catch(TransformerException ex)
+                    {
+                        String message = String.format(
+                                "Unable to serialize the attachment %s, which is of type %s with contents of type %s",
+                                name, handler.getClass(), theContent.getClass());
+                        logger.error(message);
+                        throw new IOException(message);
+                    }
+                }
+            }
+            else
+            {
+                this.handler = handler;
+            }
+        }
+
+        public DataHandler getHandler()
+        {
+            return contents != null ? new DataHandler(contents, contentType) : handler;
+        }
+    }
+
     private void writeObject(ObjectOutputStream out) throws Exception
     {
         out.defaultWriteObject();
-
         if (payload instanceof Serializable)
         {
             out.writeBoolean(true);
@@ -1586,8 +1638,49 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             out.writeInt(serializablePayload.length);
             out.write(serializablePayload);
         }
+        out.writeObject(serializeAttachments(inboundAttachments));
+        out.writeObject(serializeAttachments(outboundAttachments));
 
         // TODO: we don't serialize the originalPayload for now
+    }
+
+    private Map<String, SerializedDataHandler> serializeAttachments(Map<String, DataHandler> attachments) throws IOException
+    {
+        Map<String, SerializedDataHandler> toWrite;
+        if (attachments == null)
+        {
+            toWrite = null;
+        }
+        else
+        {
+            toWrite = new HashMap<String, SerializedDataHandler>(attachments.size());
+            for (Map.Entry<String, DataHandler> entry : attachments.entrySet())
+            {
+                String name = entry.getKey();
+                toWrite.put(name, new SerializedDataHandler(name, entry.getValue(), muleContext));
+            }
+        }
+
+        return toWrite;
+    }
+
+    private Map<String, DataHandler> deserializeAttachments(Map<String, SerializedDataHandler> attachments) throws IOException
+    {
+        Map<String, DataHandler> toReturn;
+        if (attachments == null)
+        {
+            toReturn = null;
+        }
+        else
+        {
+            toReturn = new HashMap<String, DataHandler>(attachments.size());
+            for (Map.Entry<String, SerializedDataHandler> entry : attachments.entrySet())
+            {
+                toReturn.put(entry.getKey(), entry.getValue().getHandler());
+            }
+        }
+
+        return toReturn;
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
@@ -1606,6 +1699,8 @@ public class DefaultMuleMessage implements MuleMessage, ThreadSafeAccess, Deseri
             in.read(serializedPayload);
             payload = serializedPayload;
         }
+        inboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>)in.readObject());
+        outboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>)in.readObject());
     }
 
     /**

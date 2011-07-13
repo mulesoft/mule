@@ -20,6 +20,10 @@ import org.mule.transformer.types.MimeTypes;
 import org.mule.transport.NullPayload;
 import org.mule.util.IOUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -267,14 +271,24 @@ public class DefaultMuleMessageTestCase extends AbstractMuleContextTestCase
     {
         Map<String, DataHandler> attachments = new HashMap<String, DataHandler>();
 
-        DataHandler dh = new DataHandler("this is the attachment", "text/plain");
+        String attachmentData = "this is the attachment";
+        DataHandler dh = new DataHandler(attachmentData, "text/plain");
         attachments.put("attachment", dh);
         MuleMessage message = new DefaultMuleMessage(TEST_MESSAGE, null, attachments, muleContext);
 
         assertTrue(message.getInboundAttachmentNames().contains("attachment"));
         assertEquals(dh, message.getInboundAttachment("attachment"));
-
         assertEquals(0, message.getOutboundAttachmentNames().size());
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(message);
+        oos.flush();
+        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
+        MuleMessage message2 = (MuleMessage) ois.readObject();
+        assertTrue(message2.getInboundAttachmentNames().contains("attachment"));
+        assertEquals(message2.getInboundAttachment("attachment").getContent(), attachmentData);
+        assertEquals(0, message2.getOutboundAttachmentNames().size());
 
     }
 

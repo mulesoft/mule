@@ -16,6 +16,7 @@ import org.mule.util.CaseInsensitiveHashMap;
 import org.mule.util.MapUtils;
 import org.mule.util.ObjectUtils;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -395,5 +396,27 @@ public class MessagePropertiesContext implements Serializable
         }
         buf.append("}");
         return buf.toString();
+    }
+
+    /**
+     * Check for properties that can't be serialized
+     */
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException
+    {
+        for (Map.Entry<PropertyScope, Map<String, Object>> context : scopedMap.entrySet())
+        {
+            for (Map.Entry<String, Object> entry : context.getValue().entrySet())
+            {
+                Object value = entry.getValue();
+                if (value != null && !(value instanceof Serializable))
+                {
+                    String message = String.format("Unable to serialize the %s message property %s, which is of type %s ",
+                                                   context.getKey(), entry.getKey(), value);
+                    logger.error(message);
+                    throw new IOException(message);
+                }
+            }
+        }
+        out.defaultWriteObject();
     }
 }
