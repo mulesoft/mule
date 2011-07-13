@@ -12,13 +12,15 @@ package org.mule.transport.ftp.reliability;
 
 import org.mule.tck.probe.Probe;
 
+import org.junit.Test;
+
 
 /**
- * Verify that no inbound messages are lost when exceptions occur.  
- * The message must either make it all the way to the SEDA queue (in the case of 
+ * Verify that no inbound messages are lost when exceptions occur.
+ * The message must either make it all the way to the SEDA queue (in the case of
  * an asynchronous inbound endpoint), or be restored/rolled back at the source.
- * 
- * In the case of FTP, this will cause the postProcess() method to not be executed 
+ *
+ * In the case of FTP, this will cause the postProcess() method to not be executed
  * and therefore the source file will not be deleted.
  */
 public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
@@ -28,13 +30,15 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
     {
         return "reliability/inbound-message-loss-flow.xml";
     }
-    
+
     @Override
+    @Test
     public void testTransformerException() throws Exception
     {
         createFileOnFtpServer("transformerException/test1");
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
@@ -44,19 +48,22 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
                 return !fileExists("transformerException/test1");
             }
 
+            @Override
             public String describeFailure()
             {
                 return "File should be gone";
             }
         });
     }
-    
+
     @Override
+    @Test
     public void testRouterException() throws Exception
     {
         createFileOnFtpServer("routerException/test1");
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 // Exception occurs after the SEDA queue for an asynchronous request, so from the client's
@@ -66,6 +73,7 @@ public class InboundMessageLossFlowTestCase extends InboundMessageLossTestCase
                 return !fileExists("routerException/test1");
             }
 
+            @Override
             public String describeFailure()
             {
                 return "File should be gone";

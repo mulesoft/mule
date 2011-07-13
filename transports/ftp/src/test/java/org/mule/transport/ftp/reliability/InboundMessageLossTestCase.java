@@ -17,19 +17,21 @@ import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
 import org.mule.transport.ftp.AbstractFtpServerTestCase;
 
+import org.junit.Test;
+
 /**
- * Verify that no inbound messages are lost when exceptions occur.  
- * The message must either make it all the way to the SEDA queue (in the case of 
+ * Verify that no inbound messages are lost when exceptions occur.
+ * The message must either make it all the way to the SEDA queue (in the case of
  * an asynchronous inbound endpoint), or be restored/rolled back at the source.
- * 
- * In the case of FTP, this will cause the postProcess() method to not be executed 
+ *
+ * In the case of FTP, this will cause the postProcess() method to not be executed
  * and therefore the source file will not be deleted.
  */
 public class InboundMessageLossTestCase extends AbstractFtpServerTestCase
 {
     /** Polling mechanism to replace Thread.sleep() for testing a delayed result. */
     protected Prober prober = new PollingProber(10000, 100);
-        
+
     @Override
     protected String getConfigResources()
     {
@@ -40,7 +42,7 @@ public class InboundMessageLossTestCase extends AbstractFtpServerTestCase
     protected void doSetUp() throws Exception
     {
         super.doSetUp();
-        
+
         // Set SystemExceptionStrategy to redeliver messages (this can only be configured programatically for now)
         ((DefaultSystemExceptionStrategy) muleContext.getExceptionListener()).setRollbackTxFilter(new WildcardFilter("*"));
 
@@ -51,65 +53,76 @@ public class InboundMessageLossTestCase extends AbstractFtpServerTestCase
         createFtpServerDir("componentException");
     }
 
+    @Test
     public void testNoException() throws Exception
     {
         createFileOnFtpServer("noException/test1");
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 // Delivery was successful so message should be gone
                 return !fileExists("noException/test1");
             }
 
+            @Override
             public String describeFailure()
             {
                 return "File should be gone";
             }
         });
     }
-    
+
+    @Test
     public void testTransformerException() throws Exception
     {
         createFileOnFtpServer("transformerException/test1");
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 // Delivery failed so message should have been restored at the source
                 return fileExists("transformerException/test1");
             }
 
+            @Override
             public String describeFailure()
             {
                 return "File should have been restored";
             }
         });
     }
-    
+
+    @Test
     public void testRouterException() throws Exception
     {
         createFileOnFtpServer("routerException/test1");
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 // Delivery failed so message should have been restored at the source
                 return fileExists("routerException/test1");
             }
 
+            @Override
             public String describeFailure()
             {
                 return "File should have been restored";
             }
         });
     }
-    
+
+    @Test
     public void testComponentException() throws Exception
     {
         createFileOnFtpServer("componentException/test1");
         prober.check(new Probe()
         {
+            @Override
             public boolean isSatisfied()
             {
                 // Component exception occurs after the SEDA queue for an asynchronous request, so from the client's
@@ -117,10 +130,11 @@ public class InboundMessageLossTestCase extends AbstractFtpServerTestCase
                 return !fileExists("componentException/test1");
             }
 
+            @Override
             public String describeFailure()
             {
                 return "File should be gone";
             }
         });
-    }    
+    }
 }
