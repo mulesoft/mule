@@ -282,6 +282,12 @@ public class RequestContextTestCase extends AbstractMuleTestCase
         {
             return null;
         }
+        
+        @Override
+        public boolean isTransacted()
+        {
+            return false;
+        }
     }
 
 }

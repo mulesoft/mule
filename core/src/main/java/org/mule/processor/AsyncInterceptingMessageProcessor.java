@@ -128,7 +128,7 @@ public class AsyncInterceptingMessageProcessor extends AbstractInterceptingMessa
     protected boolean isProcessAsync(MuleEvent event) throws MessagingException
     {
         // We do not support transactions and async
-        if (event.getEndpoint().getTransactionConfig().isTransacted())
+        if (event.isTransacted())
         {
             throw new MessagingException(CoreMessages.asyncDoesNotSupportTransactions(), event);
         }

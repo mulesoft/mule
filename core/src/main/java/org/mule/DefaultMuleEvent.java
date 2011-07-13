@@ -112,6 +112,8 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     
     private final MessageExchangePattern exchangePattern;
 
+    private final boolean transacted;
+
     /**
      * Properties cache that only reads properties once from the inbound message and
      * merges them with any properties on the endpoint. The message properties take
@@ -137,6 +139,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
         this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
         this.exchangePattern = endpoint.getExchangePattern();
+        transacted = endpoint.getTransactionConfig().isTransacted();
         fillProperties();
     }
 
@@ -154,6 +157,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.outputStream = (ResponseOutputStream) previousEvent.getOutputStream();
         this.processingTime = ProcessingTime.newInstance(this.session, message.getMuleContext());
         this.exchangePattern = endpoint.getExchangePattern();
+        transacted = endpoint.getTransactionConfig().isTransacted();
         fillProperties();
     }
 
@@ -207,6 +211,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.id = generateEventId();
         this.outputStream = outputStream;
         this.exchangePattern = endpoint.getExchangePattern();
+        transacted = endpoint.getTransactionConfig().isTransacted();
         fillProperties();
         this.processingTime = time != null ? time : ProcessingTime.newInstance(this.session, message.getMuleContext());
     }
@@ -228,6 +233,7 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
         this.timeout = rewriteEvent.getTimeout();
         this.outputStream = (ResponseOutputStream) rewriteEvent.getOutputStream();
         this.exchangePattern = endpoint.getExchangePattern();
+        transacted = endpoint.getTransactionConfig().isTransacted();
         if (rewriteEvent instanceof DefaultMuleEvent)
         {
             this.transformedMessage = ((DefaultMuleEvent) rewriteEvent).getCachedMessage();
@@ -816,5 +822,11 @@ public class DefaultMuleEvent extends EventObject implements MuleEvent, ThreadSa
     public MessageExchangePattern getExchangePattern()
     {
         return exchangePattern;
+    }
+
+    @Override
+    public boolean isTransacted()
+    {
+        return transacted;
     }
 }

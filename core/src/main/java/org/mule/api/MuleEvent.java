@@ -266,4 +266,9 @@ public interface MuleEvent extends Serializable
      * Returns the message exchange pattern for this event
      */
     MessageExchangePattern getExchangePattern();
+    
+    /**
+     * Returns true is this event is being processed in a transaction
+     */
+    boolean isTransacted();
 }

@@ -53,17 +53,15 @@ public class OptionalAsyncInterceptingMessageProcessor extends AsyncIntercepting
         boolean forceSync = Boolean.TRUE.equals(messageProperty);
         
         boolean hasResponse;
-        boolean isTransacted ;
+        boolean isTransacted = event.isTransacted();
 
         if (endpoint != null)
         {
             hasResponse = endpoint.getExchangePattern().hasResponse();
-            isTransacted = endpoint.getTransactionConfig().isTransacted();
         }
         else
         {
             hasResponse = event.getExchangePattern().hasResponse();
-            isTransacted = event.getEndpoint().getTransactionConfig().isTransacted();
         }
         
         return !forceSync && doThreading && !hasResponse && !isTransacted;

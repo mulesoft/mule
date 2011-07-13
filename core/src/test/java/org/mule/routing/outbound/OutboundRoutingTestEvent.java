@@ -237,4 +237,10 @@ public class OutboundRoutingTestEvent implements MuleEvent
     {
         return endpoint.getExchangePattern();
     }
+
+    @Override
+    public boolean isTransacted()
+    {
+        return false;
+    }
 }
