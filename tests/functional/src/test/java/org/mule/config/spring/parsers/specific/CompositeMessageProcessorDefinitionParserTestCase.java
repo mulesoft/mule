@@ -10,12 +10,15 @@
 
 package org.mule.config.spring.parsers.specific;
 
-import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.processor.NullMessageProcessor;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class CompositeMessageProcessorDefinitionParserTestCase extends FunctionalTestCase
 {
@@ -26,19 +29,22 @@ public class CompositeMessageProcessorDefinitionParserTestCase extends Functiona
         return "org/mule/config/spring/parsers/specific/composite-message-processor.xml";
     }
 
-    public void testInterceptingComposite() throws MuleException, Exception
+    @Test
+    public void testInterceptingComposite() throws Exception
     {
         MessageProcessor composite = muleContext.getRegistry().lookupObject("composite1");
         assertEquals("0123", composite.process(getTestEvent("0")).getMessageAsString());
     }
 
-    public void testInterceptingNestedComposite() throws MuleException, Exception
+    @Test
+    public void testInterceptingNestedComposite() throws Exception
     {
         MessageProcessor composite = muleContext.getRegistry().lookupObject("composite2");
         assertEquals("01abc2", composite.process(getTestEvent("0")).getMessageAsString());
     }
 
-    public void testInterceptingCompositeOnEndpoint() throws MuleException, Exception
+    @Test
+    public void testInterceptingCompositeOnEndpoint() throws Exception
     {
         EndpointBuilder endpointBuilder = muleContext.getRegistry().lookupEndpointBuilder("endpoint");
         InboundEndpoint endpoint = endpointBuilder.buildInboundEndpoint();

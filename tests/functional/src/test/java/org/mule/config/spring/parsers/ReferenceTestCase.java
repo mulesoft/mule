@@ -13,9 +13,14 @@ package org.mule.config.spring.parsers;
 import org.mule.config.spring.parsers.beans.ChildBean;
 import org.mule.config.spring.parsers.beans.OrphanBean;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class ReferenceTestCase extends AbstractNamespaceTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/reference-test.xml";
@@ -28,16 +33,19 @@ public class ReferenceTestCase extends AbstractNamespaceTestCase
         assertEquals("child" + index, child.getName());
     }
 
+    @Test
     public void testNamed()
     {
         testChildRef(1);
     }
 
+    @Test
     public void testOrphan()
     {
         testChildRef(2);
     }
 
+    @Test
     public void testParent()
     {
         testChildRef(3);

@@ -19,12 +19,17 @@ import org.mule.transport.file.AbstractFileFunctionalTestCase;
 
 import java.io.File;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+
 /**
  * This used to be part of FileFunctionalTest; moved here to allow isolation of individual case.
  */
 public class IndirectReceiveMule1842TestCase extends AbstractFileFunctionalTestCase
 {
 
+    @Test
     public void testIndirectRequest() throws Exception
     {
         File target = initForRequest();

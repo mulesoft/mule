@@ -14,9 +14,15 @@ import org.mule.config.spring.parsers.beans.AbstractBean;
 import org.mule.config.spring.parsers.beans.ChildBean;
 import org.mule.config.spring.parsers.beans.OrphanBean;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class AliasTestCase extends AbstractNamespaceTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/alias-test.xml";
@@ -36,16 +42,19 @@ public class AliasTestCase extends AbstractNamespaceTestCase
         assertEquals(value, bean.getFoo());
     }
 
+    @Test
     public void testNamed()
     {
         assertFooExists(1);
     }
 
+    @Test
     public void testOrphan()
     {
         assertFooExists(2);
     }
 
+    @Test
     public void testParent()
     {
         assertFooExists(3);

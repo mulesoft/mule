@@ -13,9 +13,14 @@ package org.mule.config.spring.parsers;
 import org.mule.config.spring.parsers.beans.ChildBean;
 import org.mule.config.spring.parsers.beans.OrphanBean;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
 public class IgnoredTestCase extends AbstractNamespaceTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/ignored-test.xml";
@@ -29,16 +34,19 @@ public class IgnoredTestCase extends AbstractNamespaceTestCase
         assertTrue("child" + index, child.isIgnored());
     }
 
+    @Test
     public void testNamed()
     {
         assertIgnoredFlagUnset(1);
     }
 
+    @Test
     public void testOrphan()
     {
         assertIgnoredFlagUnset(2);
     }
 
+    @Test
     public void testParent()
     {
         assertIgnoredFlagUnset(3);

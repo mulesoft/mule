@@ -13,14 +13,18 @@ package org.mule.config.spring.parsers;
 import org.mule.config.spring.parsers.beans.ChildBean;
 import org.mule.config.spring.parsers.beans.OrphanBean;
 
+import org.junit.Test;
+
 public class NamedSimpleTestCase extends AbstractNamespaceTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/named-simple-test.xml";
     }
 
+    @Test
     public void testNamed1()
     {
         OrphanBean orphan1 = (OrphanBean) assertBeanExists("orphan1", OrphanBean.class);
@@ -29,6 +33,7 @@ public class NamedSimpleTestCase extends AbstractNamespaceTestCase
         assertBeanPopulated(child1, "child1");
     }
 
+    @Test
     public void testNamed2()
     {
         OrphanBean orphan2 = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);

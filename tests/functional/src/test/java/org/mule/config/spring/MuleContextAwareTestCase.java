@@ -10,7 +10,9 @@
 
 package org.mule.config.spring;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
 
 /**
  * This tests that we can have references to management context aware objects within a config
@@ -18,11 +20,13 @@ import org.mule.tck.FunctionalTestCase;
 public class MuleContextAwareTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "management-context-aware-test.xml";
     }
 
+    @Test
     public void testStartup()
     {
         // only want startup to succeed

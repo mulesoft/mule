@@ -12,15 +12,21 @@ package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.beans.OrphanBean;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ListElementTestCase extends AbstractNamespaceTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/list-element-test.xml";
     }
 
+    @Test
     public void testListElement1()
     {
         OrphanBean orphan = (OrphanBean) assertBeanExists("orphan1", OrphanBean.class);
@@ -30,6 +36,7 @@ public class ListElementTestCase extends AbstractNamespaceTestCase
         assertTrue(orphan.getKids().contains("kid2"));
     }
 
+    @Test
     public void testListElement2()
     {
         OrphanBean orphan = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
@@ -40,6 +47,7 @@ public class ListElementTestCase extends AbstractNamespaceTestCase
     }
 
     // simpler list element parser doesn't support dynamic attribute
+//    @Test
 //    public void testListElement3()
 //    {
 //        OrphanBean orphan = (OrphanBean) assertBeanExists("orphan3", OrphanBean.class);

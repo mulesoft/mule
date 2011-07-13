@@ -21,19 +21,26 @@ import org.mule.module.xml.transformer.JXPathExtractor;
 import org.mule.module.xml.transformer.jaxb.JAXBMarshallerTransformer;
 import org.mule.module.xml.transformer.jaxb.JAXBUnmarshallerTransformer;
 import org.mule.module.xml.util.NamespaceManager;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.junit.Test;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class XmlNamespaceTestCase extends FunctionalTestCase
 {
+
     public XmlNamespaceTestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override
@@ -42,6 +49,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         return "xml-namespace-config.xml";
     }
 
+    @Test
     public void testGlobalNamespaces() throws Exception
     {
         NamespaceManager manager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
@@ -50,6 +58,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         assertEquals(5, manager.getNamespaces().size());
     }
 
+    @Test
     public void testJXPathFilterConfig() throws Exception
     {
         EndpointBuilder epb = muleContext.getRegistry().lookupEndpointBuilder("test.ep1");
@@ -63,6 +72,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         assertEquals("http://bar.com", filter.getNamespaces().get("bar"));
     }
 
+    @Test
     public void testJaxenFilterConfig() throws Exception
     {
         EndpointBuilder epb = muleContext.getRegistry().lookupEndpointBuilder("test.ep2");
@@ -76,6 +86,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         assertEquals("http://car.com", filter.getNamespaces().get("car"));
     }
 
+    @Test
     public void testJXPathExtractor() throws Exception
     {
         JXPathExtractor transformer = (JXPathExtractor) lookupTransformer("jxpath-extractor");
@@ -85,6 +96,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         assertNotNull(transformer.getNamespaces().get("bar"));
     }
 
+    @Test
     public void testJaxbConfig() throws Exception
     {
         JAXBMarshallerTransformer t = (JAXBMarshallerTransformer) lookupTransformer("ObjectToXml");
@@ -95,6 +107,7 @@ public class XmlNamespaceTestCase extends FunctionalTestCase
         assertNotNull(t2.getJaxbContext());
     }
     
+    @Test
     public void testSchemaValidationFilterWithCustomResourceResolver()
     {
         SchemaValidationFilter filter = (SchemaValidationFilter) lookupFilter("SchemaValidationWithResourceResolver");

@@ -10,22 +10,28 @@
 
 package org.mule.module.spring.security;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConstants;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class HttpFilterFunctionalTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "http-filter-test.xml";
     }
 
+    @Test
     public void testAuthenticationFailureNoContext() throws Exception
     {
         HttpClient client = new HttpClient();
@@ -46,6 +52,7 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testAuthenticationFailureBadCredentials() throws Exception
     {
         doRequest(null, "localhost", "anonX", "anonX", getUrl(), true, false, 401);
@@ -56,21 +63,25 @@ public class HttpFilterFunctionalTestCase extends FunctionalTestCase
         return "http://localhost:4567/authenticate";
     }
 
+    @Test
     public void testAuthenticationAuthorised() throws Exception
     {
         doRequest(null, "localhost", "anon", "anon", getUrl(), false, true, 200);
     }
 
+    @Test
     public void testAuthenticationAuthorisedWithHandshake() throws Exception
     {
         doRequest(null, "localhost", "anon", "anon", getUrl(), true, false, 200);
     }
 
+    @Test
     public void testAuthenticationAuthorisedWithHandshakeAndBadRealm() throws Exception
     {
         doRequest("blah", "localhost", "anon", "anon", getUrl(), true, false, 401);
     }
 
+    @Test
     public void testAuthenticationAuthorisedWithHandshakeAndRealm() throws Exception
     {
         doRequest("mule-realm", "localhost", "ross", "ross", getUrl(), true, false, 200);

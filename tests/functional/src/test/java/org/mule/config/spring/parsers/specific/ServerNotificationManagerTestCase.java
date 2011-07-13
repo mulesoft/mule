@@ -21,10 +21,16 @@ import org.mule.config.i18n.CoreMessages;
 import org.mule.context.notification.ListenerSubscriptionPair;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.context.notification.ServerNotificationManager;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
 import java.util.Collection;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ServerNotificationManagerTestCase extends FunctionalTestCase
 {
@@ -35,12 +41,14 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         return "org/mule/config/spring/parsers/specific/server-notification-manager-test.xml";
     }
 
+    @Test
     public void testDynamicAttribute()
     {
         ServerNotificationManager manager = muleContext.getNotificationManager();
         assertTrue(manager.isNotificationDynamic());
     }
 
+    @Test
     public void testRoutingConfiguration()
     {
         ServerNotificationManager manager = muleContext.getNotificationManager();
@@ -55,6 +63,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         assertTrue(((Collection) ifaces).contains(SecurityNotification.class));
     }
 
+    @Test
     public void testSimpleNotification() throws InterruptedException
     {
         ServerNotificationManager manager = muleContext.getNotificationManager();
@@ -69,6 +78,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         assertTrue(listener.isCalled());
     }
 
+    @Test
     public void testExplicitlyConiguredNotificationListenerRegistration() throws InterruptedException
     {
         ServerNotificationManager manager = muleContext.getNotificationManager();
@@ -86,6 +96,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
                 "listener3"), "*")));
     }
 
+    @Test
     public void testAdhocNotificationListenerRegistrations() throws InterruptedException
     {
         ServerNotificationManager manager = muleContext.getNotificationManager();
@@ -102,6 +113,7 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
                 "listener4"), null)));
     }
 
+    @Test
     public void testDisabledNotification() throws InterruptedException
     {
         ServerNotificationManager manager = muleContext.getNotificationManager();
@@ -147,41 +159,8 @@ public class ServerNotificationManagerTestCase extends FunctionalTestCase
         }
 
     }
+
     protected static class TestListener2 implements TestInterface2
-    {
-
-        private boolean called = false;
-
-        public boolean isCalled()
-        {
-            return called;
-        }
-
-        public void onNotification(ServerNotification notification)
-        {
-            called = true;
-        }
-
-    }
-
-    protected static class TestListener3 implements TestInterface2
-    {
-
-        private boolean called = false;
-
-        public boolean isCalled()
-        {
-            return called;
-        }
-
-        public void onNotification(ServerNotification notification)
-        {
-            called = true;
-        }
-
-    }
-
-    protected static class TestListener4 implements TestInterface2
     {
 
         private boolean called = false;

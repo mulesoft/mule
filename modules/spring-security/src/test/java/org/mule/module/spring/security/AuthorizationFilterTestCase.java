@@ -10,26 +10,32 @@
 
 package org.mule.module.spring.security;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class AuthorizationFilterTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "http-filter-test.xml";
     }
 
+    @Test
     public void testAuthenticatedButNotAuthorized() throws Exception
     {
         doRequest(null, "localhost", "anon", "anon", getUrl(), true, false, 405);
     }
     
+    @Test
     public void testAuthorized() throws Exception
     {
         doRequest(null, "localhost", "ross", "ross", getUrl(), true, false, 200);

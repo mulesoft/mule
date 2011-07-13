@@ -19,7 +19,7 @@ import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestInboundTransformer;
 import org.mule.tck.testmodels.mule.TestResponseTransformer;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
@@ -27,18 +27,25 @@ import org.mule.transformer.simple.StringAppendTransformer;
 
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/endpoint/endpoint-attribute-transformers.xml";
     }
 
+    @Test
     public void testGlobalEndpoint1() throws MuleException
     {
-        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
-            "ep1");
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("ep1");
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
@@ -61,10 +68,10 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);
     }
 
+    @Test
     public void testGlobalEndpoint2() throws MuleException
     {
-        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint(
-            "ep2");
+        ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("ep2");
 
         List<MessageProcessor> processors = endpoint.getMessageProcessors();
         assertNotNull(processors);
@@ -91,6 +98,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
         assertTrue(transformers.get(1) instanceof TestResponseTransformer);
     }
 
+    @Test
     public void testGlobalEndpoints() throws MuleException
     {
         Service service = muleContext.getRegistry().lookupService("globalEndpoints");
@@ -146,6 +154,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
         assertTrue(transformers.get(1) instanceof TestResponseTransformer);
     }
 
+    @Test
     public void testLocalEndpoints() throws MuleException
     {
         Service service = muleContext.getRegistry().lookupService("localEndpoints");
@@ -197,6 +206,7 @@ public class EndpointTranformersInAttributesTestCase extends FunctionalTestCase
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);
     }
 
+    @Test
     public void testTransformerRefsWithChildProcessors() throws MuleException
     {
         Service service = muleContext.getRegistry().lookupService("transformerRefsWithChildProcessors");

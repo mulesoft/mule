@@ -11,22 +11,30 @@ package org.mule.transport.ftp;
 
 import org.mule.api.endpoint.EndpointException;
 import org.mule.endpoint.MuleEndpointURI;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.file.DummyFilenameParser;
 import org.mule.transport.file.FilenameParser;
 
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Load a mule config and verify that the parameters are set as expected
  */
 public class FtpNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "ftp-namespace-config.xml";
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         FtpConnector c = (FtpConnector)muleContext.getRegistry().lookupConnector("ftpConnector");
@@ -46,6 +54,7 @@ public class FtpNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
     
+    @Test
     public void testReceiverFtpConnector() throws EndpointException 
     {
         FtpConnector c = (FtpConnector)muleContext.getRegistry().lookupConnector("receiverFtpConnector");

@@ -30,9 +30,16 @@ import org.mule.util.concurrent.Latch;
 import java.io.File;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCase
 {
+
     @Override
     protected void doSetUp() throws Exception
     {
@@ -42,6 +49,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         muleContext.getRegistry().unregisterTransformer("_ObjectToByteArray");
     }
 
+    @Test
     public void testMoveAndDeleteStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -52,6 +60,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, true);
     }
 
+    @Test
     public void testMoveAndDeleteWorkDirStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -62,6 +71,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, true);
     }
 
+    @Test
     public void testMoveOnlyStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -72,6 +82,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, false);
     }
 
+    @Test
     public void testMoveOnlyWorkDirStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -82,6 +93,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, false);
     }
 
+    @Test
     public void testDeleteOnlyStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -92,6 +104,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, false, true);
     }
 
+    @Test
     public void testNoMoveNoDeleteStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -102,6 +115,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, false, false);
     }
 
+    @Test
     public void testMoveAndDelete() throws Exception
     {
         File inFile = initForRequest();
@@ -112,6 +126,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, true);
     }
 
+    @Test
     public void testMoveOnly() throws Exception
     {
         File inFile = initForRequest();
@@ -122,6 +137,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, false);
     }
 
+    @Test
     public void testDeleteOnly() throws Exception
     {
         File inFile = initForRequest();
@@ -132,6 +148,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, false, true);
     }
 
+    @Test
     public void testNoMoveNoDelete() throws Exception
     {
         File inFile = initForRequest();
@@ -142,6 +159,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, false, false);
     }
 
+    @Test
     public void testMoveAndDeleteFilePayload() throws Exception
     {
         File inFile = initForRequest();
@@ -152,6 +170,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, true);
     }
 
+    @Test
     public void testMoveOnlyFilePayload() throws Exception
     {
         File inFile = initForRequest();
@@ -162,6 +181,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, false);
     }
 
+    @Test
     public void testDeleteOnlyFilePayload() throws Exception
     {
         File inFile = initForRequest();
@@ -176,6 +196,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         //assertFiles(inFile, moveToDir, false, true);
     }
 
+    @Test
     public void testNoMoveNoDeleteFilePayload() throws Exception
     {
         File inFile = initForRequest();

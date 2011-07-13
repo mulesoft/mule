@@ -11,15 +11,22 @@
 package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.beans.AbstractBean;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.ClassUtils;
 
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public abstract class AbstractNamespaceTestCase extends FunctionalTestCase
 {
 
+    @Test
     public void testParse()
     {
         // just parse the config

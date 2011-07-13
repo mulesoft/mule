@@ -12,14 +12,18 @@ package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.beans.OrphanBean;
 
+import org.junit.Test;
+
 public class MapCombinerTestCase extends AbstractNamespaceTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/map-combiner-test.xml";
     }
 
+    @Test
     public void testProperties()
     {
         OrphanBean bean = (OrphanBean) assertBeanExists("checkProps", OrphanBean.class);
@@ -27,6 +31,7 @@ public class MapCombinerTestCase extends AbstractNamespaceTestCase
         assertMapEntryExists(bean.getMap(), "0", 0);
     }
 
+    @Test
     public void testCombinedMap()
     {
         OrphanBean bean = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
@@ -37,6 +42,7 @@ public class MapCombinerTestCase extends AbstractNamespaceTestCase
         }
     }
 
+    @Test
     public void testReverersedOrder()
     {
         OrphanBean bean = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);

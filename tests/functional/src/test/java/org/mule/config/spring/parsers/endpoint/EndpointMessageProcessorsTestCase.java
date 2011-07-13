@@ -17,19 +17,27 @@ import org.mule.api.processor.MessageProcessorChain;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestMessageProcessor;
 
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/endpoint/endpoint-message-processors.xml";
     }
 
+    @Test
     public void testGlobalEndpoint1() throws MuleException
     {
         ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("ep1");
@@ -45,6 +53,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         assertTrue(processors.get(0) instanceof MessageProcessorChain);
     }
 
+    @Test
     public void testGlobalEndpoint2() throws MuleException
     {
         ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("ep2");
@@ -65,6 +74,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         assertEquals("4", ((TestMessageProcessor) chain.getMessageProcessors().get(1)).getLabel());
     }
     
+    @Test
     public void testLocalEndpoints() throws MuleException
     {
         ImmutableEndpoint endpoint = 

@@ -18,20 +18,28 @@ import org.mule.api.service.Service;
 import org.mule.api.transformer.Transformer;
 import org.mule.routing.outbound.OutboundPassThroughRouter;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestInboundTransformer;
 import org.mule.tck.testmodels.mule.TestResponseTransformer;
 
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class EndpointTranformersInUriTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/endpoint/endpoint-uri-transformers.xml";
     }
 
+    @Test
     public void testGlobalEndpoint1() throws MuleException
     {
         ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("ep1");
@@ -57,6 +65,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertTrue(transformers.get(0) instanceof TestResponseTransformer);
     }
 
+    @Test
     public void testGlobalEndpoint2() throws MuleException
     {
         ImmutableEndpoint endpoint = muleContext.getEndpointFactory().getInboundEndpoint("ep2");
@@ -86,6 +95,7 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertTrue(transformers.get(1) instanceof TestResponseTransformer);
     }
     
+    @Test
     public void testGlobalEndpoints() throws MuleException
     {
         Service service = muleContext.getRegistry().lookupService("globalEndpoints");
@@ -140,7 +150,8 @@ public class EndpointTranformersInUriTestCase extends FunctionalTestCase
         assertTrue(transformers.get(1) instanceof TestResponseTransformer);
     }
     
-   public void testLocalEndpoints() throws MuleException
+   @Test
+    public void testLocalEndpoints() throws MuleException
     {
         Service service = muleContext.getRegistry().lookupService("localEndpoints");
        

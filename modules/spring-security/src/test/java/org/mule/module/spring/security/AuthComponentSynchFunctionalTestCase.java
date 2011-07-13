@@ -15,19 +15,25 @@ import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.module.client.MuleClient;
 import org.mule.security.MuleCredentials;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "auth-component-synch-test.xml";
@@ -40,6 +46,7 @@ public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
         SecurityContextHolder.setContext(new SecurityContextImpl());
     }
 
+    @Test
     public void testCaseGoodAuthenticationGoodAuthorisation() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -55,6 +62,7 @@ public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
         assertTrue(m.getPayload().equals("Marie"));
     }
 
+    @Test
     public void testCaseGoodAuthenticationBadAuthorisation() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -69,6 +77,7 @@ public class AuthComponentSynchFunctionalTestCase extends FunctionalTestCase
         assertEquals(NullPayload.getInstance(), m.getPayload());
     }
 
+    @Test
     public void testCaseBadAuthentication() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

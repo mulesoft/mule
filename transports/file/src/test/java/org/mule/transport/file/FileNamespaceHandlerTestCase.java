@@ -13,7 +13,7 @@ import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.routing.filter.Filter;
 import org.mule.api.service.Service;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.file.filters.FilenameRegexFilter;
 import org.mule.transport.file.transformers.FileToByteArray;
 import org.mule.transport.file.transformers.FileToString;
@@ -22,8 +22,17 @@ import org.mule.util.FileUtils;
 import java.io.File;
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class FileNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "file-namespace-config.xml";
@@ -38,6 +47,7 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
         super.doTearDown();
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         FileConnector c = (FileConnector)muleContext.getRegistry().lookupConnector("fileConnector");
@@ -69,6 +79,7 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(c.isStarted());
     }
 
+    @Test
     public void testThirdConnector() throws Exception
     {
         FileConnector c = (FileConnector)muleContext.getRegistry().lookupConnector("thirdConnector");
@@ -82,6 +93,7 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
         assertFalse(c.isRecursive());
     }
 
+    @Test
     public void testTransformersOnEndpoints() throws Exception
     {
         Object transformer1 = muleContext.getEndpointFactory().getInboundEndpoint("ep1").getTransformers().get(0);
@@ -93,6 +105,7 @@ public class FileNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(FileToString.class, transformer2.getClass());
     }
     
+    @Test
     public void testFileFilter() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("Test");

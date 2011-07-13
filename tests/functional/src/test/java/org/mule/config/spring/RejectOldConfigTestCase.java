@@ -11,21 +11,29 @@
 package org.mule.config.spring;
 
 import org.mule.api.MuleContext;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class RejectOldConfigTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "old-config.xml";
     }
 
+    @Test
     public void testParse()
     {
         // see overloaded methods
     }
 
+    @Override
     protected MuleContext createMuleContext() throws Exception
     {
         try {

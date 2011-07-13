@@ -13,14 +13,21 @@ package org.mule.config.spring.parsers.endpoint;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.ImmutableEndpoint;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class ComplexEndpointTestCase extends AbstractEndpointTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/endpoint/complex-endpoint-test.xml";
     }
 
+    @Test
     public void testComplex() throws MuleException
     {
         ImmutableEndpoint endpoint = doTest("complex");

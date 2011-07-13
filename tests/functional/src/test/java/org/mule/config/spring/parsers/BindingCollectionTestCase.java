@@ -14,14 +14,20 @@ import org.mule.config.spring.parsers.beans.OrphanBean;
 
 import java.util.Collection;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class BindingCollectionTestCase extends AbstractNamespaceTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/nested-collection-test.xml";
     }
 
+    @Test
     public void testAll()
     {
         OrphanBean orphan = (OrphanBean) assertBeanExists("orphan1", OrphanBean.class);

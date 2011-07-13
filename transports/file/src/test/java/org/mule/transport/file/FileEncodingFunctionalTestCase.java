@@ -16,6 +16,11 @@ import org.mule.util.FileUtils;
 
 import java.io.File;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCase
 {
 
@@ -31,6 +36,7 @@ public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCa
         return "file-encoding-test.xml";
     }
 
+    @Test
     public void testReadingFileWithEucJpEncodingGetsTheRightText() throws Exception
     {
         tmpDir = createFolder(".mule/mule-file-test-EUC-JP");

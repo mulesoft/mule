@@ -11,18 +11,30 @@
 package org.mule.transport.file.filters;
 
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.Test;
+
+import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class FilterOnGlobalFileEndpointTestCase extends FunctionalTestCase
 {
     private static final String TEXT_FILE = "sample.txt";
     private static final String XML_FILE = "sample.xml";
-    
+
     private File pollDirectory;
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "global-file-ep-with-filter.xml";
+    }
 
     @Override
     protected void doSetUp() throws Exception
@@ -30,13 +42,13 @@ public class FilterOnGlobalFileEndpointTestCase extends FunctionalTestCase
         createPollDirectoryAndInputFiles();
         super.doSetUp();
     }
-    
+
     @Override
     protected void doTearDown() throws Exception
     {
         // discard the test directory structure
         assertTrue(FileUtils.deleteTree(pollDirectory.getParentFile()));
-        
+
         super.doTearDown();
     }
 
@@ -48,7 +60,7 @@ public class FilterOnGlobalFileEndpointTestCase extends FunctionalTestCase
         createFileInPollDirectory(TEXT_FILE);
         createFileInPollDirectory(XML_FILE);
     }
-    
+
     private File createDirectory(String path)
     {
         File directory = new File(path);
@@ -59,26 +71,21 @@ public class FilterOnGlobalFileEndpointTestCase extends FunctionalTestCase
                 fail("could not create poll directory");
             }
         }
-        
+
         return directory;
     }
-    
+
     private void createFileInPollDirectory(String filename) throws IOException
     {
         File file  = FileUtils.newFile(pollDirectory, filename);
-        
+
         String path = file.getCanonicalPath();
-        
+
         File newFile = FileUtils.createFile(path);
         newFile.deleteOnExit();
     }
 
-    @Override
-    protected String getConfigResources()
-    {
-        return "global-file-ep-with-filter.xml";
-    }
-
+    @Test
     public void testMoveFiles() throws Exception
     {
         File txtFile = new File(pollDirectory, TEXT_FILE);

@@ -11,21 +11,27 @@
 package org.mule.config.spring;
 
 import org.mule.api.model.Model;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class DefaultModelNames extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "default-model-names.xml";
     }
 
+    @Test
     public void testNames()
     {
         Collection models = muleContext.getRegistry().lookupObjects(Model.class);

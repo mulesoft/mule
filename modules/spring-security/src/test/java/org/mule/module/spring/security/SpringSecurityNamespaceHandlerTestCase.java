@@ -12,18 +12,25 @@ package org.mule.module.spring.security;
 
 import org.mule.api.security.SecurityManager;
 import org.mule.api.security.SecurityProvider;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Iterator;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class SpringSecurityNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "spring-security-namespace-config.xml";
     }
 
+    @Test
     public void testProvider()
     {
         knownProperties(getProvider("memory-dao"));
@@ -35,6 +42,7 @@ public class SpringSecurityNamespaceHandlerTestCase extends FunctionalTestCase
         return securityManager.getProvider(name);
     }
 
+    @Test
     public void testCustom()
     {
         Iterator providers = muleContext.getSecurityManager().getProviders().iterator();

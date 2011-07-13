@@ -10,16 +10,25 @@
 package org.mule.transformers.xml.xstream;
 
 import org.mule.module.xml.transformer.AbstractXStreamTransformer;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class XStreamConfigurationTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "xstream-transformer-config.xml";
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         AbstractXStreamTransformer transformer = 

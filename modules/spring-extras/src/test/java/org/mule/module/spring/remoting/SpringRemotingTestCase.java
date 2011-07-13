@@ -10,19 +10,26 @@
 
 package org.mule.module.spring.remoting;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.junit.Test;
 import org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class SpringRemotingTestCase extends FunctionalTestCase
 {
+
     private static final String SPRING_HTTP_ENDPOINT = "http://localhost:8003/springService";
 
+    @Override
     protected String getConfigResources()
     {
         return "spring-remoting-mule-config.xml";
     }
 
+    @Test
     public void testHttpInvokeSpringService() throws Exception
     {
         ComplexData cd = new ComplexData("Foo", new Integer(13));
