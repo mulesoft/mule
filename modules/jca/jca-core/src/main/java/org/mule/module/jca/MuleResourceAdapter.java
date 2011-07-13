@@ -112,7 +112,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
                 muleConfiguration.setSystemModelType(JcaModel.JCA_MODEL_TYPE);
                 contextBuilder.setMuleConfiguration(muleConfiguration);
                 muleContext = new DefaultMuleContextFactory().createMuleContext(configBuilder, contextBuilder);
-                
+
                 // Make single shared application server instance of mule context
                 // available to DeployableMuleXmlContextListener to support hot
                 // deployment of Mule configurations in web applications.
@@ -318,7 +318,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     /**
      * We only connect to one resource manager per ResourceAdapter instance, so any
      * ActivationSpec will return the same XAResource.
-     * 
+     *
      * @see javax.resource.spi.ResourceAdapter#getXAResources(javax.resource.spi.ActivationSpec[])
      */
     @Override
@@ -387,7 +387,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
 
     public void setClusterId(String clusterId)
     {
-        ((DefaultMuleContext)muleContext).setClusterId(clusterId);
+        ((DefaultMuleContext) muleContext).setClusterId(clusterId);
     }
 
     public void setDefaultEncoding(String encoding)
@@ -452,7 +452,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
 
     // Although get methods for config properties aren't really required we need to
     // include them otherwise Geronimo does not consider them valid properties
-    
+
     public String getConfigurationBuilder()
     {
         return configurationBuilder;
@@ -477,7 +477,7 @@ public class MuleResourceAdapter implements ResourceAdapter, Serializable
     {
         return defaultJcaModelName;
     }
-    
+
     public String getClusterId()
     {
         return muleContext.getClusterId();

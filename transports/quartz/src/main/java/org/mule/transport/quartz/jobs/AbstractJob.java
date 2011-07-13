@@ -12,6 +12,7 @@ package org.mule.transport.quartz.jobs;
 import org.mule.api.MuleContext;
 import org.mule.api.config.MuleProperties;
 import org.mule.transport.quartz.QuartzConnector;
+
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -41,9 +42,6 @@ public abstract class AbstractJob implements Job
      */
     protected abstract void doExecute(JobExecutionContext jobExecutionContext) throws JobExecutionException;
 
-    /**
-     * Get the Mule context
-     */
     protected MuleContext getMuleContext(JobExecutionContext jobExecutionContext) throws JobExecutionException
     {
         try
@@ -53,7 +51,7 @@ public abstract class AbstractJob implements Job
         }
         catch (SchedulerException e)
         {
-            throw new JobExecutionException("Failed to retrieve Mulecontext from the Scheduler Context: " + e.getMessage(), e);
+            throw new JobExecutionException("Failed to retrieve MuleContext from the Scheduler Context: " + e.getMessage(), e);
         }
     }
 }

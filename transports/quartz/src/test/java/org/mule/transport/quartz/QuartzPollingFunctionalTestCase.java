@@ -12,7 +12,6 @@ package org.mule.transport.quartz;
 
 import org.mule.DefaultMuleContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.context.MuleContextBuilder;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CountdownCallback;
@@ -27,10 +26,9 @@ public class QuartzPollingFunctionalTestCase extends FunctionalTestCase
         return "quartz-polling-functional-test.xml";
     }
 
-
-public void testMuleReceiverJob() throws Exception
+    public void testMuleReceiverJob() throws Exception
     {
-        ((DefaultMuleContext)muleContext).setPollingController(new PollingController()
+        ((DefaultMuleContext) muleContext).setPollingController(new PollingController()
         {
             @Override
             public boolean isPrimaryPollingInstance()
@@ -64,10 +62,10 @@ public void testMuleReceiverJob() throws Exception
         assertTrue(count1.getCount() < 1000);
         assertTrue(count2.getCount() < 1000);
     }
-    
+
     public void testMuleSenderJob() throws Exception
     {
-        ((DefaultMuleContext)muleContext).setPollingController(new PollingController()
+        ((DefaultMuleContext) muleContext).setPollingController(new PollingController()
         {
             @Override
             public boolean isPrimaryPollingInstance()
