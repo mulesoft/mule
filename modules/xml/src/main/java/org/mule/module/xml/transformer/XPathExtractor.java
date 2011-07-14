@@ -10,14 +10,21 @@
 
 package org.mule.module.xml.transformer;
 
+import org.mule.api.MuleContext;
+import org.mule.api.context.MuleContextAware;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.lifecycle.InitialisationException;
+import org.mule.api.registry.RegistrationException;
 import org.mule.api.transformer.TransformerException;
+import org.mule.config.i18n.CoreMessages;
 import org.mule.config.i18n.MessageFactory;
+import org.mule.module.xml.util.NamespaceManager;
 import org.mule.transformer.AbstractTransformer;
 import org.mule.transformer.types.DataTypeFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -33,12 +40,11 @@ import org.xml.sax.InputSource;
 /**
  * Simple transformer for using the JAXP XPath library to extract an XPath value from
  * an XPath expression.
- * 
+ *
  * @author Ryan Heaton
  */
-public class XPathExtractor extends AbstractTransformer
+public class XPathExtractor extends AbstractTransformer implements MuleContextAware
 {
-
     /**
      * Result type.
      */
@@ -55,11 +61,26 @@ public class XPathExtractor extends AbstractTransformer
     private volatile Map<String, String> prefixToNamespaceMap = null;
     private volatile String expression;
     private volatile ResultType resultType = ResultType.STRING;
+    private NamespaceManager namespaceManager;
 
     public XPathExtractor()
     {
         registerSourceType(DataTypeFactory.create(org.w3c.dom.Node.class));
         registerSourceType(DataTypeFactory.create(InputSource.class));
+    }
+
+    @Override
+    public void setMuleContext(MuleContext context)
+    {
+        this.muleContext = context;
+        try
+        {
+            namespaceManager = muleContext.getRegistry().lookupObject(NamespaceManager.class);
+        }
+        catch (RegistrationException e)
+        {
+            throw new ExpressionRuntimeException(CoreMessages.failedToLoad("NamespaceManager"), e);
+        }
     }
 
     @Override
@@ -74,44 +95,55 @@ public class XPathExtractor extends AbstractTransformer
                 this);
         }
 
-        final Map<String, String> prefixToNamespaceMap = this.prefixToNamespaceMap;
-        if (prefixToNamespaceMap != null)
+        if (namespaceManager != null)
         {
-            getXpath().setNamespaceContext(new NamespaceContext()
+            if (prefixToNamespaceMap == null)
             {
-                public String getNamespaceURI(String prefix)
-                {
-                    return prefixToNamespaceMap.get(prefix);
-                }
-
-                public String getPrefix(String namespaceURI)
-                {
-
-                    for (Map.Entry<String, String> entry : prefixToNamespaceMap.entrySet())
-                    {
-                        if (namespaceURI.equals(entry.getValue()))
-                        {
-                            return entry.getKey();
-                        }
-                    }
-
-                    return null;
-                }
-
-                public Iterator getPrefixes(String namespaceURI)
-                {
-                    String prefix = getPrefix(namespaceURI);
-                    if (prefix == null)
-                    {
-                        return Collections.emptyList().iterator();
-                    }
-                    else
-                    {
-                        return Arrays.asList(prefix).iterator();
-                    }
-                }
-            });
+            	prefixToNamespaceMap = new HashMap<String, String>(namespaceManager.getNamespaces());
+            }
+            else
+            {
+            	prefixToNamespaceMap.putAll(namespaceManager.getNamespaces());
+            }
         }
+
+        getXpath().setNamespaceContext(new NamespaceContext()
+        {
+        	@Override
+            public String getNamespaceURI(String prefix)
+        	{
+        		return prefixToNamespaceMap.get(prefix);
+        	}
+
+        	@Override
+            public String getPrefix(String namespaceURI)
+        	{
+
+        		for (Map.Entry<String, String> entry : prefixToNamespaceMap.entrySet())
+        		{
+        			if (namespaceURI.equals(entry.getValue()))
+        			{
+        				return entry.getKey();
+        			}
+        		}
+
+        		return null;
+        	}
+
+        	@Override
+            public Iterator<?> getPrefixes(String namespaceURI)
+        	{
+        		String prefix = getPrefix(namespaceURI);
+        		if (prefix == null)
+        		{
+        			return Collections.emptyList().iterator();
+        		}
+        		else
+        		{
+        			return Arrays.asList(prefix).iterator();
+        		}
+        	}
+        });
     }
 
     @Override
@@ -172,7 +204,7 @@ public class XPathExtractor extends AbstractTransformer
 
     /**
      * Result type from this transformer.
-     * 
+     *
      * @return Result type from this transformer.
      */
     public ResultType getResultType()
@@ -182,7 +214,7 @@ public class XPathExtractor extends AbstractTransformer
 
     /**
      * Result type from this transformer.
-     * 
+     *
      * @param resultType Result type from this transformer.
      */
     public void setResultType(ResultType resultType)
@@ -192,7 +224,7 @@ public class XPathExtractor extends AbstractTransformer
 
     /**
      * The XPath evaluator.
-     * 
+     *
      * @return The XPath evaluator.
      */
     public XPath getXpath()
@@ -202,7 +234,7 @@ public class XPathExtractor extends AbstractTransformer
 
     /**
      * The XPath evaluator.
-     * 
+     *
      * @param xPath The XPath evaluator.
      */
     public void setXpath(XPath xPath)
@@ -212,7 +244,7 @@ public class XPathExtractor extends AbstractTransformer
 
     /**
      * The prefix-to-namespace map.
-     * 
+     *
      * @return The prefix-to-namespace map.
      */
     public Map<String, String> getNamespaces()
@@ -222,7 +254,7 @@ public class XPathExtractor extends AbstractTransformer
 
     /**
      * The prefix-to-namespace map.
-     * 
+     *
      * @param prefixToNamespaceMap The prefix-to-namespace map.
      */
     public void setNamespaces(Map<String, String> prefixToNamespaceMap)
