@@ -147,9 +147,10 @@ public abstract class AbstractRegistry implements Registry
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T get(String key)
     {
-        return lookupObject(key);
+        return (T) lookupObject(key); // do not remove this cast, the CI server fails to compile the code without it
     }
 
     @Override
