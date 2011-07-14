@@ -13,17 +13,24 @@ package org.mule.test.integration.routing.inbound;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 public class InboundRouterSyncAsyncClientTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/inbound/inbound-router-sync-async-client-test.xml";
     }
     
+    @Test
     public void testSync() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -33,6 +40,7 @@ public class InboundRouterSyncAsyncClientTestCase extends FunctionalTestCase
         assertEquals("testSync OK", result.getPayload());
     }
 
+    @Test
     public void testAsync() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

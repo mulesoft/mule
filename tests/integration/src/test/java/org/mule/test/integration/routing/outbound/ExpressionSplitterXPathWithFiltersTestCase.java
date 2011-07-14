@@ -12,15 +12,17 @@ package org.mule.test.integration.routing.outbound;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class ExpressionSplitterXPathWithFiltersTestCase extends FunctionalTestCase
 {
-    MuleClient client;
-
-    private final String MESSAGE = "<Foo>\n" +
+    private static final String MESSAGE = "<Foo>\n" +
             "    <Bar>\n" +
             "        <One>One</One>\n" +
             "        <Three>Three</Three>\n" +
@@ -31,18 +33,20 @@ public class ExpressionSplitterXPathWithFiltersTestCase extends FunctionalTestCa
             "    </Bar>    \n" +
             "</Foo>";
 
-
+    private MuleClient client;
 
     public ExpressionSplitterXPathWithFiltersTestCase()
     {
         XMLUnit.setIgnoreWhitespace(true);
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/expression-splitter-xpath-with-filters-test.xml";
     }
 
+    @Test
     public void testRecipientList() throws Exception
     {
         client = new MuleClient(muleContext);

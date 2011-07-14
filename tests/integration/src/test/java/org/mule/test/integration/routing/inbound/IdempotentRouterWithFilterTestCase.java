@@ -14,11 +14,25 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 public class IdempotentRouterWithFilterTestCase extends FunctionalTestCase
 {
 
+    @Override
+    protected String getConfigResources()
+    {
+        return "org/mule/test/integration/routing/inbound/idempotent-router-with-filter.xml";
+    }
+
+    @Test
     public void testWithValidData()
     {
         /*
@@ -45,6 +59,7 @@ public class IdempotentRouterWithFilterTestCase extends FunctionalTestCase
         assertEquals("Mule is the best!", response.getPayload());
     }
 
+    @Test
     public void testWithInvalidData()
     {
         /*
@@ -67,12 +82,6 @@ public class IdempotentRouterWithFilterTestCase extends FunctionalTestCase
         }
 
         assertNull(response);
-    }
-
-    @Override
-    protected String getConfigResources()
-    {
-        return "org/mule/test/integration/routing/inbound/idempotent-router-with-filter.xml";
     }
 
 }

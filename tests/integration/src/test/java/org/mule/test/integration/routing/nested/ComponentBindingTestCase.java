@@ -12,10 +12,16 @@ package org.mule.test.integration.routing.nested;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
 import java.util.Date;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class ComponentBindingTestCase extends FunctionalTestCase
 {
@@ -49,31 +55,37 @@ public class ComponentBindingTestCase extends FunctionalTestCase
         assertEquals(NullPayload.getInstance(), reply.getPayload());
     }
 
+    @Test
     public void testVmBinding() throws Exception
     {
         internalTest("vm://");
     }
 
+    @Test
     public void testJmsQueueBinding() throws Exception
     {
         internalTest("jms://");
     }
 
+    @Test
     public void testJmsTopicBinding() throws Exception
     {
         internalTest("jms://topic:t");
     }
 
+    @Test
     public void testVmBindingReturnNull() throws Exception
     {
         internalNullTest("vm://");
     }
 
+    @Test
     public void testJmsQueueBindingReturnNull() throws Exception
     {
         internalNullTest("jms://");
     }
 
+    @Test
     public void testJmsTopicBindingReturnNull() throws Exception
     {
         internalNullTest("jms://topic:t");

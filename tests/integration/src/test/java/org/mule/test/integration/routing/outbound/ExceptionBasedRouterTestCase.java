@@ -12,21 +12,28 @@ package org.mule.test.integration.routing.outbound;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class ExceptionBasedRouterTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/exception-based-router.xml";
     }
 
+    @Test
     public void testStaticEndpointsByName() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -36,6 +43,7 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
         assertEquals("success", reply.getPayload());
     }
 
+    @Test
     public void testStaticEndpointsByURI() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -45,6 +53,7 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
         assertEquals("success", reply.getPayload());
     }
 
+    @Test
     public void testDynamicEndpointsByName() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -56,6 +65,7 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
         assertEquals("success", reply.getPayload());
     }
 
+    @Test
     public void testDynamicEndpointsByURI() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -74,6 +84,7 @@ public class ExceptionBasedRouterTestCase extends FunctionalTestCase
     /**
      * Test endpoints which generate a natural exception because they don't even exist.
      */
+    @Test
     public void testIllegalEndpoint() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

@@ -13,20 +13,25 @@ package org.mule.test.integration.routing;
 
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class WireTapTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/wire-tap.xml";
     }
 
+    @Test
     public void testWireTap() throws Exception
     {
         final Latch receiverLatch = new Latch();

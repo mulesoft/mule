@@ -12,20 +12,26 @@ package org.mule.test.integration.messaging.meps;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @see MULE-4512
  */
 public class SynchronousResponseExceptionTestCase extends FunctionalTestCase
 {
+    
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/messaging/meps/synchronous-response-exception.xml";
     }
 
+    @Test
     public void testComponentException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -33,6 +39,7 @@ public class SynchronousResponseExceptionTestCase extends FunctionalTestCase
         assertTrue("Response should be null but is " + reply.getPayload(), reply.getPayload() instanceof NullPayload);
     }
 
+    @Test
     public void testOutboundRoutingException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -40,6 +47,7 @@ public class SynchronousResponseExceptionTestCase extends FunctionalTestCase
         assertTrue("Response should be null but is " + reply.getPayload(), reply.getPayload() instanceof NullPayload);
     }
 
+    @Test
     public void testInboundTransformerException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -47,6 +55,7 @@ public class SynchronousResponseExceptionTestCase extends FunctionalTestCase
         assertTrue("Response should be null but is " + reply.getPayload(), reply.getPayload() instanceof NullPayload);
     }
 
+    @Test
     public void testOutboundTransformerException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -54,6 +63,7 @@ public class SynchronousResponseExceptionTestCase extends FunctionalTestCase
         assertTrue("Response should be null but is " + reply.getPayload(), reply.getPayload() instanceof NullPayload);
     }
 
+    @Test
     public void testResponseTransformerException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

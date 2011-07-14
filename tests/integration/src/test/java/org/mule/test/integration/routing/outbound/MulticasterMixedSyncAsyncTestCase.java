@@ -13,19 +13,27 @@ package org.mule.test.integration.routing.outbound;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class MulticasterMixedSyncAsyncTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/multicaster-mixed-sync-async-test.xml";
     }
 
+    @Test
     public void testMixedMulticast() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

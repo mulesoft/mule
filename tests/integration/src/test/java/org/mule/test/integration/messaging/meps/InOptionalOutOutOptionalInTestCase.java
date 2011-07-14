@@ -12,22 +12,29 @@ package org.mule.test.integration.messaging.meps;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
 import java.util.HashMap;
 import java.util.Map;
 
-// START SNIPPET: full-class
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class InOptionalOutOutOptionalInTestCase extends FunctionalTestCase
 {
+
     public static final long TIMEOUT = 3000;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Optional-In.xml";
     }
 
+    @Test
     public void testExchange() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -47,4 +54,3 @@ public class InOptionalOutOutOptionalInTestCase extends FunctionalTestCase
         assertEquals("Received", result.getInboundProperty("externalApp"));
     }
 }
-// END SNIPPET: full-class

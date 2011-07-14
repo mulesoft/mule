@@ -12,40 +12,48 @@ package org.mule.test.integration.messaging.meps;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.activemq.broker.BrokerService;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-// START SNIPPET: full-class
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase
 {
+
     public static final long TIMEOUT = 3000;
 
-    private BrokerService broker;
+    private static BrokerService broker;
 
     @Override
-    protected void suitePreSetUp() throws Exception
-    {
-        broker = new BrokerService();
-        broker.addConnector("tcp://localhost:61616");
-        broker.start();
-    }
-    
-    @Override
-    protected void suitePostTearDown() throws Exception
-    {
-        broker.stop();
-    }
-
     protected String getConfigResources()
     {
         return "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only_JMS.xml";
     }
 
+    @BeforeClass
+    public static void startBroker() throws Exception
+    {
+        broker = new BrokerService();
+        broker.addConnector("tcp://localhost:61616");
+        broker.start();
+    }
+
+    @AfterClass
+    public static void stopBroker() throws Exception
+    {
+        broker.stop();
+    }
+
+    @Test
     public void testExchange() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -70,4 +78,3 @@ public class InOptionalOutOutOnlyJMSTestCase extends FunctionalTestCase
         assertEquals("foo header received", result.getPayload());
     }
 }
-// END SNIPPET: full-class

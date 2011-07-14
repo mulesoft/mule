@@ -15,14 +15,18 @@ import org.mule.api.context.notification.EndpointMessageNotificationListener;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.context.notification.EndpointMessageNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestNotification;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang.SerializationUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class MessageChunkingTestCase extends FunctionalTestCase
 {
@@ -32,16 +36,19 @@ public class MessageChunkingTestCase extends FunctionalTestCase
         return "org/mule/test/integration/routing/message-chunking.xml";
     }
 
+    @Test
     public void testMessageChunkingWithEvenSplit() throws Exception
     {
         doMessageChunking("0123456789", 5);
     }
 
+    @Test
     public void testMessageChunkingWithOddSplit() throws Exception
     {
         doMessageChunking("01234567890", 6);
     }
 
+    @Test
     public void testMessageChunkingWith100Splits() throws Exception
     {
         doMessageChunking("0123456789012345678901234567890123456789012345678901234567890123456789"
@@ -49,11 +56,13 @@ public class MessageChunkingTestCase extends FunctionalTestCase
                           + "01234567890123456789012345678901234567890123456789", 100);
     }
 
+    @Test
     public void testMessageChunkingOneChunk() throws Exception
     {
         doMessageChunking("x", 1);
     }
 
+    @Test
     public void testMessageChunkingObject() throws Exception
     {
         final AtomicInteger messagePartsCount = new AtomicInteger(0);

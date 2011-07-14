@@ -13,19 +13,24 @@ package org.mule.test.integration.routing;
 import org.mule.api.context.notification.RoutingNotificationListener;
 import org.mule.context.notification.RoutingNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class InboundAggregationWithTimeoutTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/multi-inbound-aggregator-with-timeout.xml";
     }
 
+    @Test
     public void testAggregatorTimeout() throws Exception
     {
         final CountDownLatch latch = new CountDownLatch(1);

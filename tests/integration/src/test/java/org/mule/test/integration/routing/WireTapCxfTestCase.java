@@ -13,17 +13,27 @@ package org.mule.test.integration.routing;
 import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.ServerNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.DynamicPortTestCase;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.FunctionalTestNotificationListener;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class WireTapCxfTestCase extends DynamicPortTestCase
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class WireTapCxfTestCase extends FunctionalTestCase
 {
-    static final Latch tapLatch = new Latch();
-    
+
+    private static final Latch tapLatch = new Latch();
+
+    @Rule
+    public DynamicPort dynamicPort = new DynamicPort("port1");
+
     @Override
     protected void doSetUp() throws Exception
     {
@@ -44,15 +54,10 @@ public class WireTapCxfTestCase extends DynamicPortTestCase
         return "org/mule/test/integration/routing/wire-tap-cxf.xml";
     }
 
-    @Override
-    protected int getNumPortsToFind()
-    {
-        return 1;
-    }
-
+    @Test
     public void testWireTap() throws Exception
     {
-        String url = "http://localhost:" + getPorts().get(0) +"/services/EchoUMO";
+        String url = "http://localhost:" + dynamicPort.getNumber() +"/services/EchoUMO";
         String msg = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
             + "<soap:Body><echo><text>foo</text></echo></soap:Body></soap:Envelope>";
 

@@ -12,22 +12,28 @@ package org.mule.test.integration.messaging.meps;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-// START SNIPPET: full-class
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class BindingInOnlyInOutOutOnlyTestCase extends FunctionalTestCase
 {
+
     public static final long TIMEOUT = 3000;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/messaging/meps/pattern_binding-In-Only_In-Out_Out-Only.xml";
     }
 
+    @Test
     public void testExchange() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-
 
         client.dispatch("inboundEndpoint", new int[]{1,2,3,4,5}, null);
 
@@ -36,4 +42,3 @@ public class BindingInOnlyInOutOutOnlyTestCase extends FunctionalTestCase
         assertEquals("Total: 15", result.getPayloadAsString());
     }
 }
-// END SNIPPET: full-class

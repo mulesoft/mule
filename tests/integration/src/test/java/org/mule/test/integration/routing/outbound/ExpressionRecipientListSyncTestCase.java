@@ -13,19 +13,27 @@ package org.mule.test.integration.routing.outbound;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class ExpressionRecipientListSyncTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/expression-recipient-list-sync-test.xml";
     }
 
+    @Test
     public void testRecipientList() throws Exception
     {
         String message = "test";

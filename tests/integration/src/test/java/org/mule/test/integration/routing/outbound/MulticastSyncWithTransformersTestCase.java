@@ -13,7 +13,7 @@ package org.mule.test.integration.routing.outbound;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 import org.mule.tck.testmodels.fruit.FruitBowl;
@@ -21,14 +21,22 @@ import org.mule.tck.testmodels.fruit.Orange;
 
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class MulticastSyncWithTransformersTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/outbound/multicaster-sync-with-transformers-test.xml";
     }
 
+    @Test
     public void testSyncMulticast() throws Exception
     {
         FruitBowl fruitBowl = new FruitBowl(new Apple(), new Banana());

@@ -15,8 +15,15 @@ import org.mule.api.MuleMessage;
 import org.mule.api.component.Component;
 import org.mule.component.ComponentException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
 {
@@ -27,6 +34,7 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
         return "org/mule/test/integration/routing/outbound/chaining-router-null-handling.xml";
     }
 
+    @Test
     public void testNoComponentFails() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);
@@ -36,6 +44,7 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
         assertEquals("thePayload Received component1 Received component2Pass", result.getPayloadAsString());
     }
 
+    @Test
     public void testLastComponentFails() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);
@@ -52,6 +61,7 @@ public class ChainingRouterNullsHandlingTestCase extends FunctionalTestCase
             "component2Fail").getComponent(), component);
     }
 
+    @Test
     public void testFirstComponentFails() throws Exception
     {
         MuleClient muleClient = new MuleClient(muleContext);

@@ -13,11 +13,16 @@ package org.mule.test.integration.routing.outbound;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.List;
 
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
 {
@@ -64,6 +69,7 @@ public class ExpressionSplitterXPathTestCase extends FunctionalTestCase
         return "org/mule/test/integration/routing/outbound/expression-splitter-xpath-test.xml";
     }
 
+    @Test
     public void testRecipientList() throws Exception
     {
 

@@ -14,7 +14,12 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ChoiceRouterTestCase extends FunctionalTestCase
 {
@@ -22,11 +27,15 @@ public class ChoiceRouterTestCase extends FunctionalTestCase
     private static final String WITHOUT_DEFAULT_ROUTE_CHANNEL = "vm://without-default-route.in";
 
     private MuleClient muleClient;
+    
+    public ChoiceRouterTestCase()
+    {
+        setDisposeContextPerClass(true);
+    }
 
     @Override
     protected void doSetUp() throws Exception
     {
-        super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         muleClient = new MuleClient(muleContext);
     }
@@ -37,6 +46,7 @@ public class ChoiceRouterTestCase extends FunctionalTestCase
         return "org/mule/test/integration/routing/outbound/choice-router-test.xml";
     }
 
+    @Test
     public void testNoRouteFound() throws Exception
     {
         final MuleMessage result = muleClient.send(WITHOUT_DEFAULT_ROUTE_CHANNEL, "bad", null);
@@ -46,6 +56,7 @@ public class ChoiceRouterTestCase extends FunctionalTestCase
         assertNotNull(result.getExceptionPayload().getRootException() instanceof RoutePathNotFoundException);
     }
 
+    @Test
     public void testRoutesFound() throws Exception
     {
         String result = muleClient.send(WITHOUT_DEFAULT_ROUTE_CHANNEL, "apple", null).getPayloadAsString();
@@ -58,6 +69,7 @@ public class ChoiceRouterTestCase extends FunctionalTestCase
         assertEquals("turnip:veggie:veggie", result);
     }
 
+    @Test
     public void testWhenExpressionRouteFound() throws Exception
     {
         final String result = muleClient.send(WITH_DEFAULT_ROUTE_CHANNEL, "blueberry", null)
@@ -65,6 +77,7 @@ public class ChoiceRouterTestCase extends FunctionalTestCase
         assertEquals("blueberry:fruit:fruit", result);
     }
 
+    @Test
     public void testDefaultRoute() throws Exception
     {
         final String result = muleClient.send(WITH_DEFAULT_ROUTE_CHANNEL, "car", null).getPayloadAsString();

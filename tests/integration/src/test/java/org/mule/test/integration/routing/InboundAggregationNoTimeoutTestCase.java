@@ -13,17 +13,26 @@ package org.mule.test.integration.routing;
 import org.mule.api.MuleMessage;
 import org.mule.api.MuleMessageCollection;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class InboundAggregationNoTimeoutTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/routing/multi-inbound-aggregator-no-timeout.xml";
     }
 
+    @Test
     public void testAggregatorWithNoTimeout() throws Exception
     {
         String message = "test";

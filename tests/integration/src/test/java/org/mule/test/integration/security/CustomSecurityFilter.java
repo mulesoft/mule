@@ -20,15 +20,10 @@ import org.mule.api.security.UnauthorisedException;
 import org.mule.api.security.UnknownAuthenticationTypeException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.security.AbstractEndpointSecurityFilter;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 public class CustomSecurityFilter extends AbstractEndpointSecurityFilter
 {
-
-    public CustomSecurityFilter()
-    {
-
-    }
 
     @Override
     protected void authenticateInbound(MuleEvent event)

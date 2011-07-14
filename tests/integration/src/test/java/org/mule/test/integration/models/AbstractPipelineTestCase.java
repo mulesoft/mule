@@ -12,11 +12,16 @@ package org.mule.test.integration.models;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public abstract class AbstractPipelineTestCase extends FunctionalTestCase
 {
@@ -26,6 +31,7 @@ public abstract class AbstractPipelineTestCase extends FunctionalTestCase
         return 100;
     }
 
+    @Test
     public void testPipelineSynchronous() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -45,6 +51,7 @@ public abstract class AbstractPipelineTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testPipelineAsynchronous() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -68,7 +75,4 @@ public abstract class AbstractPipelineTestCase extends FunctionalTestCase
             assertEquals("request received by service 3", message.getPayloadAsString());
         }
     }
-
-
-
 }

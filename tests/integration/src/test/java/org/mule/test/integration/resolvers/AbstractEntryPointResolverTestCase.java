@@ -12,9 +12,11 @@ package org.mule.test.integration.resolvers;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractEntryPointResolverTestCase extends FunctionalTestCase
 {

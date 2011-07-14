@@ -14,19 +14,27 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.service.Service;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 
-// START SNIPPET: full-class
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 public class InOptionalOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase
 {
+
     public static final long TIMEOUT = 3000;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/messaging/meps/pattern_In-Optional-Out_Out-Only-Async-Router.xml";
     }
 
+    @Test
     public void testExchange() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -49,4 +57,3 @@ public class InOptionalOutOutOnlyAsyncRouterTestCase extends FunctionalTestCase
         assertEquals(1, external.getStatistics().getProcessedEvents());
     }
 }
-// END SNIPPET: full-class

@@ -10,19 +10,24 @@
 
 package org.mule.test.integration.resolvers;
 
+import org.junit.Test;
+
 public class NoArgsEntryPointResolverTestCase extends AbstractEntryPointResolverTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/resolvers/no-args-entry-point-resolver-test.xml";
     }
 
+    @Test
     public void testIgnored() throws Exception
     {
         doTest("not-ignored", new Object(), "notIgnored");
     }
 
+    @Test
     public void testSelected() throws Exception
     {
         doTest("selected", new Object(), "selected");

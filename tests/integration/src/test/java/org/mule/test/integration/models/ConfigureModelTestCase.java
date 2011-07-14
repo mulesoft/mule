@@ -12,16 +12,23 @@ package org.mule.test.integration.models;
 
 
 import org.mule.model.seda.SedaModel;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ConfigureModelTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/models/direct-pipeline-test-config.xml";
     }
 
+    @Test
     public void testConfigure()
     {
         assertTrue(muleContext.getRegistry().lookupModel("main") instanceof SedaModel);

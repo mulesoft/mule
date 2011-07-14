@@ -14,7 +14,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.MuleRuntimeException;
 import org.mule.config.i18n.MessageFactory;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class BindingExceptionOnInterfaceMethodTestCase extends FunctionalTestCase
 {
@@ -26,7 +31,8 @@ public class BindingExceptionOnInterfaceMethodTestCase extends FunctionalTestCas
     {
         return "org/mule/test/integration/routing/nested/binding-exception-on-interface-method.xml";
     }
-    
+
+    @Test
     public void testExceptionOnBinding() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

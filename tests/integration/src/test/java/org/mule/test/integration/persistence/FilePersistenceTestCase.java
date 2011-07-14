@@ -12,19 +12,27 @@ package org.mule.test.integration.persistence;
 
 
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 public class FilePersistenceTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/persistence/file-persistence-config.xml";
     }
 
+    @Test
     public void testFilesStored() throws Exception
     {
         // Note that the FunctionalTestCase will remove the working directory after

@@ -12,7 +12,14 @@ package org.mule.test.integration.routing.nested;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class BindingReturnTypeTestCase extends FunctionalTestCase
 {
@@ -26,6 +33,7 @@ public class BindingReturnTypeTestCase extends FunctionalTestCase
         return "org/mule/test/integration/routing/nested/binding-returns-message.xml";
     }
 
+    @Test
     public void testInvokeBinding() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
