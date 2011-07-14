@@ -10,23 +10,27 @@
 
 package org.mule.routing;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.ByteArrayInputStream;
-
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.OutboundEndpoint;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.store.ListableObjectStore;
-import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.util.store.SimpleMemoryObjectStore;
 
-public class UntilSuccessfulTestCase extends AbstractMuleTestCase
+import java.io.ByteArrayInputStream;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+public class UntilSuccessfulTestCase extends AbstractMuleContextTestCase
 {
     public static class ConfigurableMessageProcessor implements MessageProcessor
     {
@@ -34,15 +38,16 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         private volatile MuleEvent event;
         private volatile int numberOfFailuresToSimulate;
 
-        public MuleEvent process(final MuleEvent event) throws MuleException
+        @Override
+        public MuleEvent process(final MuleEvent evt) throws MuleException
         {
             eventCount++;
             if (numberOfFailuresToSimulate-- > 0)
             {
                 throw new RuntimeException("simulated problem");
             }
-            this.event = event;
-            return event;
+            this.event = evt;
+            return evt;
         }
 
         public MuleEvent getEventReceived()
@@ -90,6 +95,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         untilSuccessful.stop();
     }
 
+    @Test
     public void testSuccessfulDelivery() throws Exception
     {
         untilSuccessful.initialise();
@@ -100,6 +106,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         ponderUntilEventProcessed(testEvent);
     }
 
+    @Test
     public void testSuccessfulDeliveryStreamPayload() throws Exception
     {
         untilSuccessful.initialise();
@@ -110,6 +117,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         ponderUntilEventProcessed(testEvent);
     }
 
+    @Test
     public void testSuccessfulDeliveryAckExpression() throws Exception
     {
         untilSuccessful.setAckExpression("#[string:ACK]");
@@ -121,6 +129,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         ponderUntilEventProcessed(testEvent);
     }
 
+    @Test
     public void testSuccessfulDeliveryFailureExpression() throws Exception
     {
         untilSuccessful.setFailureExpression("#[regex:(?i)error]");
@@ -132,6 +141,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         ponderUntilEventProcessed(testEvent);
     }
 
+    @Test
     public void testPermanentDeliveryFailure() throws Exception
     {
         targetMessageProcessor.setNumberOfFailuresToSimulate(Integer.MAX_VALUE);
@@ -144,6 +154,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         ponderUntilEventAborted(testEvent);
     }
 
+    @Test
     public void testPermanentDeliveryFailureExpression() throws Exception
     {
         untilSuccessful.setFailureExpression("#[regex:(?i)error]");
@@ -155,6 +166,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         ponderUntilEventAborted(testEvent);
     }
 
+    @Test
     public void testPermanentDeliveryFailureDLQ() throws Exception
     {
         targetMessageProcessor.setNumberOfFailuresToSimulate(Integer.MAX_VALUE);
@@ -172,6 +184,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         verify(dlqEndpoint).process(any(MuleEvent.class));
     }
 
+    @Test
     public void testTemporaryDeliveryFailure() throws Exception
     {
         targetMessageProcessor.setNumberOfFailuresToSimulate(untilSuccessful.getMaxRetries());
@@ -185,6 +198,7 @@ public class UntilSuccessfulTestCase extends AbstractMuleTestCase
         assertEquals(targetMessageProcessor.getEventCount(), untilSuccessful.getMaxRetries() + 1);
     }
 
+    @Test
     public void testPreExistingEvents() throws Exception
     {
         final MuleEvent testEvent = getTestEvent("test_data");
