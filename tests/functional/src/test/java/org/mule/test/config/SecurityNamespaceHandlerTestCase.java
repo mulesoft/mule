@@ -14,20 +14,27 @@ import org.mule.api.EncryptionStrategy;
 import org.mule.api.security.SecurityManager;
 import org.mule.security.PasswordBasedEncryptionStrategy;
 import org.mule.security.SecretKeyEncryptionStrategy;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.security.MockEncryptionStrategy;
 import org.mule.tck.security.TestSingleUserSecurityProvider;
 
 import java.util.Iterator;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class SecurityNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "security-namespace-config.xml";
     }
 
+    @Test
     public void testSecurity()
     {
         SecurityManager securityManager = muleContext.getSecurityManager();

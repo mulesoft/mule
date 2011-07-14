@@ -11,16 +11,23 @@
 package org.mule.test.spring;
 
 import org.mule.api.config.ThreadingProfile;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class DefaultThreadingProfileTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "";
     }
-    
+
+    @Test
     public void testDefaultThreadingProfile(){
         assertNotNull(muleContext.getDefaultThreadingProfile());
         assertEquals(ThreadingProfile.DEFAULT_MAX_THREADS_ACTIVE, muleContext.getDefaultThreadingProfile().getMaxThreadsActive());

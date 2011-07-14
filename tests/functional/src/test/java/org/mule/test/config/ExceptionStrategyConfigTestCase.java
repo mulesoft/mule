@@ -12,15 +12,25 @@ package org.mule.test.config;
 
 import org.mule.api.service.Service;
 import org.mule.exception.DefaultServiceExceptionStrategy;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ExceptionStrategyConfigTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/exceptions/exception-strategy-config.xml";
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         Service service = muleContext.getRegistry().lookupService("testService1");
@@ -35,6 +45,5 @@ public class ExceptionStrategyConfigTestCase extends FunctionalTestCase
 
         assertNotNull(es.getRollbackTxFilter());
         assertEquals("org.mule.*, javax.*", es.getRollbackTxFilter().getPattern());
-
     }
 }

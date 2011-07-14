@@ -15,7 +15,7 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.api.transport.PropertyScope;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.simple.MessagePropertiesTransformer;
 
 import java.util.HashMap;
@@ -23,8 +23,16 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "message-properties-transformer-config.xml";
@@ -157,6 +165,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         assertEquals(PropertyScope.OUTBOUND, transformer.getScope());
     }
 
+    @Test
     public void testDeleteUsingPropertyName() throws Exception
     {
         final String expression = "badProperty";
@@ -166,6 +175,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         doTestMessageTransformationWithExpression(expression, validProperties, invalidProperties);
     }
 
+    @Test
     public void testDeletePropertiesStartingWithExpression() throws Exception
     {
         final String expression = "^bad.*";
@@ -175,6 +185,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         doTestMessageTransformationWithExpression(expression, validProperties, invalidProperties);
     }
 
+    @Test
     public void testDeletePropertiesCaseInsensitiveRegex() throws Exception
     {
         final String expression = "(?i)^BAD.*";
@@ -184,6 +195,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         doTestMessageTransformationWithExpression(expression, validProperties, invalidProperties);
     }
 
+    @Test
     public void testDeletePropertiesEndingWithExpression() throws Exception
     {
         final String expression = ".*bad$";
@@ -193,6 +205,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         doTestMessageTransformationWithExpression(expression, validProperties, invalidProperties);
     }
 
+    @Test
     public void testDeletePropertiesContainingExpression() throws Exception
     {
         final String expression = ".*bad.*";
@@ -202,6 +215,7 @@ public class MessagePropertiesTransformerTestCase extends FunctionalTestCase
         doTestMessageTransformationWithExpression(expression, validProperties, invalidProperties);
     }
 
+    @Test
     public void testDeletePropertiesUsingWildcard() throws Exception
     {
         final String expression = "bad*";

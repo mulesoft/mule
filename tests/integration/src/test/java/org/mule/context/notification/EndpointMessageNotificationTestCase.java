@@ -12,6 +12,8 @@ package org.mule.context.notification;
 
 import org.mule.module.client.MuleClient;
 
+import static org.junit.Assert.assertNotNull;
+
 public class EndpointMessageNotificationTestCase extends AbstractNotificationTestCase
 {
 

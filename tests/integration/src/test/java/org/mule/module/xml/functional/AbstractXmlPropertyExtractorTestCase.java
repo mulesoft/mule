@@ -12,8 +12,13 @@ package org.mule.module.xml.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTestCase
 {
@@ -24,15 +29,17 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
         this.matchSingle = matchSingle;
     }
 
-    protected abstract Object getMatchMessage() throws Exception;
-
-    protected abstract Object getErrorMessage() throws Exception;
-
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/module/xml/property-extractor-test.xml";
     }
 
+    protected abstract Object getMatchMessage() throws Exception;
+
+    protected abstract Object getErrorMessage() throws Exception;
+
+    @Test
     public void testMatch() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -48,8 +55,8 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends FunctionalTes
             assertFalse(message.getPayload() instanceof NullPayload);
         }
     }
-    
 
+    @Test
     public void testError() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

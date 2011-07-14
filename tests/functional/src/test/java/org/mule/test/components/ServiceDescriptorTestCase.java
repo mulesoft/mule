@@ -11,16 +11,25 @@
 package org.mule.test.components;
 
 import org.mule.api.service.Service;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ServiceDescriptorTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/components/service-factory-functional-test.xml";
     }
 
+    @Test
     public void testGenericObjectFactory() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("orange1");
@@ -31,6 +40,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
         assertEquals(new Integer(10), ((Orange) service).getSegments());
     }
     
+    @Test
     public void testGenericObjectFactoryWithProperties() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("orange2");
@@ -48,6 +58,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
         assertEquals("Florida Sunny", ((Orange) service).getBrand());
     }
     
+    @Test
     public void testSingletonObjectFactory() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("orange3");
@@ -57,6 +68,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
         assertEquals(new Integer(10), ((Orange) service).getSegments());
     }
     
+    @Test
     public void testSpringSingleton() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("orange4");
@@ -66,6 +78,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
         assertEquals(new Integer(10), ((Orange) service).getSegments());
     }
     
+    @Test
     public void testSpringFactoryBean() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("orange5");
@@ -76,6 +89,7 @@ public class ServiceDescriptorTestCase extends FunctionalTestCase
         assertEquals("Florida Sunny", ((Orange) service).getBrand());
     }
 
+    @Test
     public void testPojoAsFactoryBean() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("orange6");

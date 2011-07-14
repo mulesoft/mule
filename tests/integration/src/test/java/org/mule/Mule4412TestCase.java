@@ -13,8 +13,15 @@ package org.mule;
 import org.mule.api.MuleMessage;
 import org.mule.api.transport.PropertyScope;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.test.filters.FilterCounter;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test for MULE-4412 : selective-consumer filter is applied twice. We test that the
@@ -24,7 +31,8 @@ import org.mule.test.filters.FilterCounter;
 public class Mule4412TestCase extends FunctionalTestCase
 {
     private int RECEIVE_TIMEOUT_MS = 3000;
-    
+
+    @Override
     protected String getConfigResources()
     {
         return "mule-4412.xml";
@@ -51,6 +59,7 @@ public class Mule4412TestCase extends FunctionalTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testFilterOnce() throws Exception
     {
         DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -74,6 +83,7 @@ public class Mule4412TestCase extends FunctionalTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testWrongPropertyKey() throws Exception
     {
         DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -91,6 +101,7 @@ public class Mule4412TestCase extends FunctionalTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testWrongPropertyValue() throws Exception
     {
         DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);
@@ -108,6 +119,7 @@ public class Mule4412TestCase extends FunctionalTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testNoProperty() throws Exception
     {
         DefaultMuleMessage msg = new DefaultMuleMessage(TEST_MESSAGE, muleContext);

@@ -12,6 +12,8 @@ package org.mule.context.notification;
 
 import org.mule.module.client.MuleClient;
 
+import static org.junit.Assert.assertNotNull;
+
 /**
  * Test ComponentNotifications/Listeners by sending events to a component. A pre and
  * post notification should be received by listeners.
@@ -19,11 +21,13 @@ import org.mule.module.client.MuleClient;
 public class ComponentMessageNotificationTestCase extends AbstractNotificationTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/notifications/component-message-notification-test.xml";
     }
 
+    @Override
     public void doTest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -32,6 +36,7 @@ public class ComponentMessageNotificationTestCase extends AbstractNotificationTe
         assertNotNull(client.request("vm://out-2?connector=queue", 5000));
     }
 
+    @Override
     public RestrictedNode getSpecification()
     {
         return new Node().parallel(
@@ -47,6 +52,7 @@ public class ComponentMessageNotificationTestCase extends AbstractNotificationTe
                     ComponentMessageNotification.COMPONENT_POST_INVOKE));
     }
 
+    @Override
     public void validateSpecification(RestrictedNode spec) throws Exception
     {
         verifyAllNotifications(spec, ComponentMessageNotification.class,

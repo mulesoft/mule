@@ -15,6 +15,12 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.module.xml.functional.AbstractXmlFunctionalTestCase;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * This is a simplified version of {@link org.mule.module.xml.functional.XmlTransformerFunctionalTestCase}
@@ -41,6 +47,7 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
         return client;
     }
 
+    @Test
     public void testObjectOut() throws MuleException, InterruptedException
     {
         request(sendObject(), "object-out", Parent.class);
@@ -48,17 +55,20 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
         Thread.sleep(3000);
     }
 
+    @Test
     public void testObjectXmlOut() throws MuleException
     {
         String xml = (String) request(sendObject(), "object-xml-out", String.class);
         assertEquals(SERIALIZED, xml);
     }
 
+    @Test
     public void testXmlObjectOut() throws MuleException
     {
         request(sendObject(), "xml-object-out", Parent.class);
     }
 
+    @Test
     public void testStress() throws MuleException
     {
         int tenth = TEST_COUNT / 10;

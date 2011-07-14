@@ -10,15 +10,20 @@
 
 package org.mule.test.config;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
 
 public class MultipleNamedConnectorsTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "multiple-named-connectors-test.xml";
     }
 
+    @Test
     public void testMultipleNamedConnectors() throws Exception
     {
         // no-op, the initialization must not fail.   

@@ -13,14 +13,18 @@ package org.mule.config.spring;
 import org.mule.module.client.MuleClient;
 import org.mule.api.MuleException;
 
+import org.junit.Test;
+
 public class NamedInterceptorTestCase extends AbstractInterceptorTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/named-interceptor-test.xml";
     }
 
+    @Test
     public void testInterceptor() throws MuleException, InterruptedException
     {
         MuleClient client = new MuleClient(muleContext);

@@ -15,17 +15,24 @@ import org.mule.module.client.MuleClient;
 
 import java.util.Random;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
 
     public static final int MAX_COUNT = 100;
     public static final String STRING_MESSAGE = "Hello world";
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/module/xml/xml-filter-functional-test.xml";
     }
 
+    @Test
     public void testNotXml() throws Exception
     {
         logger.debug("not xml");
@@ -37,12 +44,14 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
         assertEquals(STRING_MESSAGE, response.getPayloadAsString());
     }
 
+    @Test
     public void testOther() throws Exception
     {
         logger.debug("other");
         doTestXml("other", getResourceAsString("org/mule/issues/many-sends-mule-1758-test.xml"));
     }
 
+    @Test
     public void testSelf() throws Exception
     {
         logger.debug("self");
@@ -59,6 +68,7 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
         assertEquals(xml, response.getPayloadAsString());
     }
 
+    @Test
     public void testMany() throws Exception
     {
         Random random = new Random();

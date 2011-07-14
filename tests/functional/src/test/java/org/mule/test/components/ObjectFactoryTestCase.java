@@ -10,16 +10,25 @@
 package org.mule.test.components;
 
 import org.mule.api.registry.Registry;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.services.UniqueComponent;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public class ObjectFactoryTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/components/object-factory-functional-test.xml";
     }
 
+    @Test
     public void testDefaultScope() throws Exception
     {
         Registry registry = muleContext.getRegistry();
@@ -35,6 +44,7 @@ public class ObjectFactoryTestCase extends FunctionalTestCase
         assertEquals(id1, id2);
     }
 
+    @Test
     public void testSingletonScope() throws Exception
     {
         Registry registry = muleContext.getRegistry();
@@ -50,6 +60,7 @@ public class ObjectFactoryTestCase extends FunctionalTestCase
         assertEquals(id1, id2);
     }
 
+    @Test
     public void testPrototypeScope() throws Exception
     {
         Registry registry = muleContext.getRegistry();

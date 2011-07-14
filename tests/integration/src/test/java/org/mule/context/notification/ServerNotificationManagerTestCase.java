@@ -13,6 +13,8 @@ package org.mule.context.notification;
 import org.mule.api.service.Service;
 import org.mule.module.client.MuleClient;
 
+import static org.junit.Assert.assertNotNull;
+
 public class ServerNotificationManagerTestCase extends AbstractNotificationTestCase
 {
 
@@ -20,11 +22,13 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
     public static final String MODEL = "the-model";
     public static final String SERVICE = "the-service";
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/notifications/server-notification-manager-test.xml";
     }
 
+    @Override
     public void doTest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -34,6 +38,7 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
         service.resume();
     }
 
+    @Override
     public RestrictedNode getSpecification()
     {
         return new Node()
@@ -113,6 +118,7 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
 //                          .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_DISPOSED)));
 //    }
 
+    @Override
     public void validateSpecification(RestrictedNode spec) throws Exception
     {
         verifyNotification(spec, ModelNotification.class, ModelNotification.MODEL_INITIALISED);

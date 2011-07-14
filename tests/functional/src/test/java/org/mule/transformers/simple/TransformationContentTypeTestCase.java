@@ -13,19 +13,26 @@ package org.mule.transformers.simple;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class TransformationContentTypeTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "content-type-setting-transformer-configs.xml";
     }
 
+    @Test
     public void testReturnType() throws Exception
     {
         Transformer trans = muleContext.getRegistry().lookupTransformer("testTransformer");
@@ -38,6 +45,5 @@ public class TransformationContentTypeTestCase extends FunctionalTestCase
         message.applyTransformers(null, transformers);
         assertEquals("text/plain", message.getDataType().getMimeType());
         assertEquals("iso-8859-1", message.getEncoding());
-
     }
 }

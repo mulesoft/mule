@@ -23,6 +23,7 @@ public class JXPathExpressionWithNamespaceTestCase extends AbstractXmlPropertyEx
         super(true);
     }
 
+    @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
@@ -32,11 +33,13 @@ public class JXPathExpressionWithNamespaceTestCase extends AbstractXmlPropertyEx
         return p;
     }
 
+    @Override
     protected Object getMatchMessage() throws Exception
     {
         return documentFor("matchingEndpoint1");
     }
 
+    @Override
     protected Object getErrorMessage() throws Exception
     {
         return documentFor("missingEndpoint");

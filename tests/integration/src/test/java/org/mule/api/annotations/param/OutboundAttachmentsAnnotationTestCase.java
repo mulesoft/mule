@@ -12,7 +12,7 @@ package org.mule.api.annotations.param;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Map;
 
@@ -20,11 +20,15 @@ import javax.activation.DataHandler;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class OutboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 {
     public OutboundAttachmentsAnnotationTestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override

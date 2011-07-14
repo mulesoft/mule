@@ -16,14 +16,21 @@ import org.mule.module.xml.filters.IsXmlFilter;
 import org.mule.module.xml.filters.JXPathFilter;
 import org.mule.routing.filters.logic.NotFilter;
 import org.mule.routing.outbound.FilteringOutboundRouter;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class XmlFilterNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/module/xml/xml-filter-functional-test.xml";
@@ -32,6 +39,7 @@ public class XmlFilterNamespaceHandlerTestCase extends FunctionalTestCase
     /**
      * IsXmlFilter doesn't have any properties to test, so just check it is created
      */
+    @Test
     public void testIsXmlFilter()
     {
         Service service = muleContext.getRegistry().lookupService("test for xml");
@@ -44,6 +52,7 @@ public class XmlFilterNamespaceHandlerTestCase extends FunctionalTestCase
         assertTrue(((NotFilter) ((FilteringOutboundRouter) routers.get(1)).getFilter()).getFilter() instanceof IsXmlFilter);
     }
 
+    @Test
     public void testJXPathFilter()
     {
         Service service = muleContext.getRegistry().lookupService("filter xml for content");

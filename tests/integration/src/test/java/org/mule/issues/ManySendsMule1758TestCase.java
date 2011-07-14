@@ -12,17 +12,25 @@ package org.mule.issues;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ManySendsMule1758TestCase extends FunctionalTestCase
 {
+
     private static int NUM_MESSAGES = 3000;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/issues/many-sends-mule-1758-test.xml";
     }
 
+    @Test
     public void testSingleSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -31,6 +39,7 @@ public class ManySendsMule1758TestCase extends FunctionalTestCase
         assertEquals("Polo", response.getPayload());
     }
 
+    @Test
     public void testManySends() throws Exception
     {
         long then = System.currentTimeMillis();

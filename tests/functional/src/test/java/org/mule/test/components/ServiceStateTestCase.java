@@ -14,21 +14,32 @@ import org.mule.api.MuleException;
 import org.mule.api.lifecycle.LifecycleException;
 import org.mule.api.service.Service;
 import org.mule.api.transport.MessageReceiver;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.AbstractConnector;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ServiceStateTestCase extends FunctionalTestCase
 {
-    protected String getConfigResources()
-    {
-        return "org/mule/test/components/component-initial-state.xml";
-    }
 
     public ServiceStateTestCase()
     {
         setStartContext(true);
     }
-    
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "org/mule/test/components/component-initial-state.xml";
+    }
+
+    @Test
     public void testDefaultInitialState() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("defaultComponent");
@@ -47,6 +58,7 @@ public class ServiceStateTestCase extends FunctionalTestCase
     }
 
     // MULE-494
+    @Test
     public void testInitialStateStopped() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("stoppedComponent");
@@ -77,6 +89,7 @@ public class ServiceStateTestCase extends FunctionalTestCase
     }
 
     // MULE-503
+    @Test
     public void testStoppingComponentStopsEndpoints() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("startedComponent");
@@ -104,6 +117,7 @@ public class ServiceStateTestCase extends FunctionalTestCase
         assertEquals(0, receivers.length);
     }
     
+    @Test
     public void testSendToStoppedComponent() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("stoppedComponent");
@@ -133,6 +147,7 @@ public class ServiceStateTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testInitialStatePaused() throws Exception
     {
         Service c = muleContext.getRegistry().lookupService("pausedComponent");
@@ -150,6 +165,7 @@ public class ServiceStateTestCase extends FunctionalTestCase
         assertTrue(receivers[0].isConnected());
     }
 
+    @Test
     public void testSendToPausedComponent() throws Exception
     {
         // TODO MULE-1995

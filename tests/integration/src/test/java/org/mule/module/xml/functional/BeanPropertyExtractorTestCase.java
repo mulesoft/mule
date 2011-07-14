@@ -19,6 +19,7 @@ public class BeanPropertyExtractorTestCase extends AbstractXmlPropertyExtractorT
         super(true);
     }
 
+    @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
@@ -28,12 +29,14 @@ public class BeanPropertyExtractorTestCase extends AbstractXmlPropertyExtractorT
         return p;
     }
 
+    @Override
     protected Object getMatchMessage()
     {
         //Model a simple bean graph. Path is: childBean.value
         return new TestRootBean(new TestValueBean("matchingEndpoint1"));
     }
 
+    @Override
     protected Object getErrorMessage()
     {
         return new TestRootBean(new TestValueBean("missingEndpoint"));

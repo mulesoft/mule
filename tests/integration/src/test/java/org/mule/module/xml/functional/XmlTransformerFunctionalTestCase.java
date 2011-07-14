@@ -15,7 +15,12 @@ import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
 import org.custommonkey.xmlunit.XMLAssert;
+import org.junit.Test;
 import org.w3c.dom.Document;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
@@ -26,6 +31,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
             "  <child/>\n" +
             "</org.mule.module.xml.functional.XmlTransformerFunctionalTestCase_-Parent>";
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/module/xml/xml-transformer-functional-test.xml";
@@ -50,35 +56,41 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
         return client;
     }
 
+    @Test
     public void testXmlOut() throws Exception
     {
         String xml = (String) request(sendXml(), "xml-out", String.class);
         XMLAssert.assertXMLEqual(SIMPLE_XML, xml);
     }
 
+    @Test
     public void testXmlDomOut() throws MuleException
     {
         Document dom = (Document) request(sendXml(), "xml-dom-out", Document.class);
         assertEquals("parent", dom.getDocumentElement().getLocalName());
     }
 
+    @Test
     public void testXmlXsltOut() throws Exception
     {
         String xml = (String) request(sendXml(), "xml-xslt-out-string", String.class);
         XMLAssert.assertXMLEqual(CHILDLESS_XML, xml);
     }
 
+    @Test
     public void testDomXmlOut() throws Exception
     {
         String xml = (String) request(sendXml(), "dom-xml-out", String.class);
         XMLAssert.assertXMLEqual(SIMPLE_XML, xml);
     }
 
+    @Test
     public void testObjectOut() throws Exception
     {
         request(sendObject(), "object-out", Parent.class);
     }
 
+    @Test
     public void testObjectXmlOut() throws Exception
     {
         String xml = (String) request(sendObject(), "object-xml-out", String.class);
@@ -87,17 +99,18 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
     }
 
     // MULE-5038
+    //@Test
     //public void testXmlObjectOut() throws MuleException
     //{
     //    request(sendObject(), "xml-object-out", Parent.class);
     //}
 
+    @Test
     public void testXmlJxpathOut() throws Exception
     {
         String xml = (String) request(sendXml(), "xml-jxpath-out", String.class);
         assertEquals("1", xml);
     }
-
 
     protected Object request(MuleClient client, String endpoint, Class clazz) throws MuleException
     {
@@ -107,7 +120,6 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
         assertTrue(message.getPayload().getClass().getName(), clazz.isAssignableFrom(message.getPayload().getClass()));
         return message.getPayload();
     }
-
 
     public static class Parent
     {

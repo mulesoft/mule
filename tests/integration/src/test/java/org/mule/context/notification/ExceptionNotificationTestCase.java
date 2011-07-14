@@ -12,25 +12,31 @@ package org.mule.context.notification;
 
 import org.mule.module.client.MuleClient;
 
+import static org.junit.Assert.assertNotNull;
+
 public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/notifications/exception-notification-test.xml";
     }
 
+    @Override
     public void doTest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         assertNotNull(client.send("vm://in-1", "hello world", null));
     }
 
+    @Override
     public RestrictedNode getSpecification()
     {
         return new Node(ExceptionNotification.class, ExceptionNotification.EXCEPTION_ACTION);
     }
 
+    @Override
     public void validateSpecification(RestrictedNode spec) throws Exception
     {
         verifyAllNotifications(spec, ExceptionNotification.class,

@@ -24,6 +24,7 @@ public class Dom4jPropertyExtractorMultipleEndpointsTestCase extends AbstractXml
         super(false);
     }
 
+    @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
@@ -33,6 +34,7 @@ public class Dom4jPropertyExtractorMultipleEndpointsTestCase extends AbstractXml
         return p;
     }
 
+    @Override
     protected Object getMatchMessage()
     {
         Document document = DocumentHelper.createDocument();
@@ -42,6 +44,7 @@ public class Dom4jPropertyExtractorMultipleEndpointsTestCase extends AbstractXml
         return document;
     }
 
+    @Override
     protected Object getErrorMessage()
     {
         Document document = DocumentHelper.createDocument();

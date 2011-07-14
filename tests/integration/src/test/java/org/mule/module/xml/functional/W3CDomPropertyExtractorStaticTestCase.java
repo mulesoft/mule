@@ -25,16 +25,19 @@ public class W3CDomPropertyExtractorStaticTestCase extends AbstractXmlPropertyEx
         super(true);
     }
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/module/xml/property-extractor-static-test.xml";
     }
 
+    @Override
     protected Object getMatchMessage() throws ParserConfigurationException
     {
         return documentFor("matchingEndpoint1");
     }
 
+    @Override
     protected Object getErrorMessage() throws ParserConfigurationException
     {
         return documentFor("missingEndpoint");

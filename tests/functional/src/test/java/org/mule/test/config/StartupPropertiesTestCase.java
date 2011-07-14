@@ -10,9 +10,14 @@
 
 package org.mule.test.config;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Properties;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class StartupPropertiesTestCase extends FunctionalTestCase
 {
@@ -22,12 +27,13 @@ public class StartupPropertiesTestCase extends FunctionalTestCase
     private String STARTUP_PROPERTY_1_VALUE = "startupProperty1Value";
     private String STARTUP_PROPERTY_2_VALUE = "startupProperty2Value";
     
-    
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/config/startup-properties-test.xml";
     }
-    
+
+    @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
@@ -35,7 +41,8 @@ public class StartupPropertiesTestCase extends FunctionalTestCase
         p.setProperty(STARTUP_PROPERTY_2_KEY, STARTUP_PROPERTY_2_VALUE);
         return p;
     }
-    
+
+    @Test
     public void testStartProperties()
     {
         Object property1 = muleContext.getRegistry().lookupObject(STARTUP_PROPERTY_1_KEY);

@@ -13,15 +13,24 @@ package org.mule.test.spring;
 import org.mule.api.service.Service;
 import org.mule.component.PooledJavaComponent;
 import org.mule.config.PoolingProfile;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class PoolingProfileTestCase  extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "pooling-profile-test.xml";
     }
 
+    @Test
     public void testDefault()
     {
         doTest("default", PoolingProfile.DEFAULT_POOL_EXHAUSTED_ACTION,
@@ -31,18 +40,21 @@ public class PoolingProfileTestCase  extends FunctionalTestCase
                 PoolingProfile.DEFAULT_MAX_POOL_WAIT);
     }
 
+    @Test
     public void testFailAll()
     {
         doTest("fail_all", PoolingProfile.WHEN_EXHAUSTED_FAIL,
                 PoolingProfile.INITIALISE_ALL, 1, 2, 3);
     }
 
+    @Test
     public void testGrowOne()
     {
         doTest("grow_one", PoolingProfile.WHEN_EXHAUSTED_GROW,
                 PoolingProfile.INITIALISE_ONE, 2, 3, 4);
     }
 
+    @Test
     public void testWaitNone()
     {
         doTest("wait_none", PoolingProfile.WHEN_EXHAUSTED_WAIT,

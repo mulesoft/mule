@@ -10,12 +10,13 @@
 
 package org.mule.transformers.simple;
 
-import org.mule.api.transformer.Transformer;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+import org.springframework.beans.factory.BeanCreationException;
 
 public class BadTransformationContentTypeTestCase extends FunctionalTestCase
 {
-
 
     public BadTransformationContentTypeTestCase()
     {
@@ -28,18 +29,10 @@ public class BadTransformationContentTypeTestCase extends FunctionalTestCase
         return "bad-content-type-setting-transformer-configs.xml";
     }
 
+    @Test(expected = BeanCreationException.class)
     public void testReturnType() throws Exception
     {
-        try
-        {
-            muleContext.start();
-            Transformer trans = muleContext.getRegistry().lookupTransformer("testTransformer");
-            fail("config should fail with bad content type");
-        }
-        catch (Exception ex)
-        {
-            System.err.println("Caught " + ex.getClass() + " (as expected)");
-        }
-
+        muleContext.start();
+        muleContext.getRegistry().lookupTransformer("testTransformer");
     }
 }

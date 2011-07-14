@@ -21,6 +21,7 @@ public class JXPathPropertyExtractorMultipleEndpointsTestCase extends AbstractXm
         super(true);
     }
 
+    @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
@@ -30,11 +31,13 @@ public class JXPathPropertyExtractorMultipleEndpointsTestCase extends AbstractXm
         return p;
     }
 
+    @Override
     protected Object getMatchMessage()
     {
         return "<endpoints><endpoint>matchingEndpoint1</endpoint><endpoint>matchingEndpoint2</endpoint></endpoints>";
     }
 
+    @Override
     protected Object getErrorMessage()
     {
         return "<endpoint>missingEndpoint</endpoint>";

@@ -14,18 +14,26 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.module.xml.routing.XmlMessageSplitter;
 import org.mule.routing.CorrelationMode;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class XmlOutboundNamespaceHandlerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/module/xml/xml-outbound-namespace-test.xml";
     }
 
+    @Test
     public void testMessageSplitter()
     {
         XmlMessageSplitter splitter =
@@ -40,7 +48,6 @@ public class XmlOutboundNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals(1, namespaces.size());
         assertEquals("foo", namespaces.get("bar"));
     }
-
 
     protected Object getRouter(String name, Class clazz)
     {

@@ -13,6 +13,8 @@ package org.mule.module.xml.functional;
 
 public abstract class AbstractXmlExpressionSplitterOutboundFunctionalTestCase extends AbstractXmlSplitterOutboundFunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/module/xml/xml-outbound-expression-functional-test.xml";

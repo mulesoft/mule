@@ -13,13 +13,18 @@ import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.api.transformer.Transformer;
 
+import org.junit.Test;
+
 public class TransformerArraysTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "transformer-arrays-config.xml";
     }
 
+    @Test
     public void testArrayReturnType() throws Exception
     {
 

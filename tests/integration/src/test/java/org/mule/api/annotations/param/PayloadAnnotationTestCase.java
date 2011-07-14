@@ -13,18 +13,22 @@ package org.mule.api.annotations.param;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.IOUtils;
 
 import java.io.InputStream;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class PayloadAnnotationTestCase extends FunctionalTestCase
 {
     public PayloadAnnotationTestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override

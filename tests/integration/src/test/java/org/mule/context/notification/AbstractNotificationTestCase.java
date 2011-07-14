@@ -11,9 +11,13 @@
 package org.mule.context.notification;
 
 import org.mule.api.context.notification.ServerNotification;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Iterator;
+
+import org.junit.Test;
+
+import static org.junit.Assert.fail;
 
 /**
  * Tests must define a "notificationLogger" listener
@@ -26,23 +30,15 @@ public abstract class AbstractNotificationTestCase extends FunctionalTestCase
     public AbstractNotificationTestCase()
     {
         super();
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
-    
+
+    @Test
     public final void testNotifications() throws Exception
     {
         doTest();
         notifications = (AbstractNotificationLogger) muleContext.getRegistry().lookupObject("notificationLogger");
-    }
 
-    public abstract void doTest() throws Exception;
-
-    public abstract RestrictedNode getSpecification();
-
-    public abstract void validateSpecification(RestrictedNode spec) throws Exception;
-
-    protected void suitePostTearDown() throws Exception
-    {
         // Need to explicitly dispose manager here to get disposal notifications
         muleContext.dispose();
         // allow shutdown to complete (or get concurrent mod errors and/or miss notifications)
@@ -52,6 +48,12 @@ public abstract class AbstractNotificationTestCase extends FunctionalTestCase
         validateSpecification(spec);
         assertExpectedNotifications(spec);
     }
+
+    public abstract void doTest() throws Exception;
+
+    public abstract RestrictedNode getSpecification();
+
+    public abstract void validateSpecification(RestrictedNode spec) throws Exception;
 
     protected void logNotifications()
     {

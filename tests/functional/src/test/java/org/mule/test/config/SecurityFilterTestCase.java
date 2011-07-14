@@ -18,21 +18,28 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.processor.SecurityFilterMessageProcessor;
 import org.mule.security.AbstractAuthenticationFilter;
 import org.mule.security.filters.MuleEncryptionEndpointSecurityFilter;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.List;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test configuration of security filters
  */
 public class SecurityFilterTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/config/security-filter-config.xml";
     }
 
+    @Test
     public void testConfig() throws Exception
     {
         EndpointBuilder epb = muleContext.getRegistry().lookupEndpointBuilder("testEndpoint1");

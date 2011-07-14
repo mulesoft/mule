@@ -14,7 +14,7 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.expression.RequiredValueException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.StringDataSource;
 
@@ -24,13 +24,21 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 {
     private MuleMessage muleMessage;
 
     public InboundAttachmentsAnnotationTestCase()
     {
-        setDisposeManagerPerSuite(true);
+        setDisposeContextPerClass(true);
     }
 
     @Override
@@ -76,6 +84,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         return message;
     }
 
+    @Test
     public void testSingleAttachment() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -85,7 +94,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals("fooValue", ((DataHandler)message.getPayload()).getContent());
     }
 
-
+    @Test
     public void testSingleAttachmentWithType() throws Exception
     {
         //These should really be in core, but the @Transformer annotation is not in core
@@ -98,6 +107,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals("fooValue", message.getPayload());
     }
 
+    @Test
     public void testSingleAttachmentOptional() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -106,6 +116,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals("faz not set", message.getPayload());
     }
 
+    @Test
     public void testSingleAttachmentWithTypeNoMatchingTransform() throws Exception
     {
         //TODO this test still works because
@@ -116,6 +127,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals("fooValue", message.getPayload());
     }
 
+    @Test
     public void testMapAttachments() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -129,6 +141,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertNull(result.get("baz"));
     }
     
+    @Test
     public void testMapAttachmentsMissing() throws Exception
     {
         //clear attachments
@@ -141,6 +154,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertTrue(message.getExceptionPayload().getRootException() instanceof RequiredValueException);
     }
 
+    @Test
     public void testMapSingleAttachment() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -154,6 +168,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertNull(result.get("baz"));
     }
 
+    @Test
     public void testMapAttachmentsOptional() throws Exception
     {
         //clear baz attachment
@@ -173,6 +188,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertNull(result.get("baz"));
     }
 
+    @Test
     public void testMapAttachmentsAllOptional() throws Exception
     {
         //clear attachments
@@ -186,6 +202,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals(0, result.size());
     }
 
+    @Test
     public void testMapAttachmentsUnmodifiable() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -195,6 +212,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertTrue(message.getExceptionPayload().getRootException() instanceof UnsupportedOperationException);
     }
 
+    @Test
     public void testMapAttachmentsAll() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -209,6 +227,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals("bazValue", result.get("baz").getContent());
     }
 
+    @Test
     public void testMapAttachmentsWildcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -223,6 +242,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertNotNull(result.get("baz"));
     }
 
+    @Test
     public void testMapAttachmentsMultiWildcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -238,6 +258,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertNotNull(result.get("baz"));
     }
 
+    @Test
     public void testListAttachments() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -251,6 +272,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.contains("bazValue"));
     }
 
+    @Test
     public void testListAttachmentsWithOptional() throws Exception
     {
         //clear baz attachment
@@ -269,6 +291,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.contains("barValue"));
     }
 
+    @Test
     public void testListAttachmentsWithAllOptional() throws Exception
     {
         //clear attachments
@@ -282,6 +305,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertEquals(0, result.size());
     }
 
+    @Test
     public void testListAttachmentsWithMissing() throws Exception
     {
         //clear bar attachment
@@ -296,6 +320,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertTrue(message.getExceptionPayload().getRootException() instanceof RequiredValueException);
     }
 
+    @Test
     public void testSingleListAttachment() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -307,6 +332,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.contains("fooValue"));
     }
 
+    @Test
     public void testListAttachmentsUnmodifiable() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -316,6 +342,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertTrue(message.getExceptionPayload().getRootException() instanceof UnsupportedOperationException);
     }
 
+    @Test
     public void testListAttachmentsAll() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -330,6 +357,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
         assertTrue(result.contains("bazValue"));
     }
 
+    @Test
     public void testListAttachmentsWilcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -345,6 +373,7 @@ public class InboundAttachmentsAnnotationTestCase extends FunctionalTestCase
 
     }
 
+    @Test
     public void testListAttachmentsMultiWilcard() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

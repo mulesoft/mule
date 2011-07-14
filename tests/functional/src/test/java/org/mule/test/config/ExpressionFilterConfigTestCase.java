@@ -12,15 +12,26 @@ package org.mule.test.config;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.routing.filters.ExpressionFilter;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ExpressionFilterConfigTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/config/expression-filter-config.xml";
     }
 
+    @Test
     public void testConfig1() throws Exception
     {
         EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("endpoint1");
@@ -37,6 +48,7 @@ public class ExpressionFilterConfigTestCase extends FunctionalTestCase
         assertFalse(filter.isNullReturnsTrue());
     }
 
+    @Test
     public void testConfig2() throws Exception
     {
         EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("endpoint2");
@@ -53,6 +65,7 @@ public class ExpressionFilterConfigTestCase extends FunctionalTestCase
         assertTrue(filter.isNullReturnsTrue());
     }
 
+    @Test
     public void testConfig3() throws Exception
     {
         EndpointBuilder eb = muleContext.getRegistry().lookupEndpointBuilder("endpoint3");

@@ -24,6 +24,7 @@ public class W3CDomPropertyExtractorMultipleEndpointsTestCase extends AbstractXm
         super(false);
     }
 
+    @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
@@ -33,6 +34,7 @@ public class W3CDomPropertyExtractorMultipleEndpointsTestCase extends AbstractXm
         return p;
     }
 
+    @Override
     protected Object getMatchMessage() throws ParserConfigurationException
     {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -48,6 +50,7 @@ public class W3CDomPropertyExtractorMultipleEndpointsTestCase extends AbstractXm
         return doc;
     }
 
+    @Override
     protected Object getErrorMessage() throws ParserConfigurationException
     {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -57,15 +60,4 @@ public class W3CDomPropertyExtractorMultipleEndpointsTestCase extends AbstractXm
         doc.appendChild(endpoint);
         return doc;
     }
-
-    protected org.w3c.dom.Document documentFor(String name) throws ParserConfigurationException
-    {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        org.w3c.dom.Document doc = builder.newDocument();
-        org.w3c.dom.Element endpoint = doc.createElement("endpoint");
-        endpoint.appendChild(doc.createTextNode(name));
-        doc.appendChild(endpoint);
-        return doc;
-    }
-
 }

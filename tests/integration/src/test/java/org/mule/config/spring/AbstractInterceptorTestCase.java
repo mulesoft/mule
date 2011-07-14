@@ -10,8 +10,11 @@
 
 package org.mule.config.spring;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.api.MuleException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public abstract class AbstractInterceptorTestCase extends FunctionalTestCase
 {

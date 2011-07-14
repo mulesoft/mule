@@ -22,6 +22,10 @@ import java.util.List;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public abstract class AbstractXmlSplitterOutboundFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
 
@@ -32,6 +36,7 @@ public abstract class AbstractXmlSplitterOutboundFunctionalTestCase extends Abst
     public static final String ROUND_ROBIN_ENDPOINT_PREFIX = "robin";
     public static final String NAME = "name";
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/module/xml/xml-outbound-functional-test.xml";
