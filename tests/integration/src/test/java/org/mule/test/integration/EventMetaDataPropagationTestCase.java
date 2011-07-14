@@ -21,7 +21,7 @@ import org.mule.api.lifecycle.Callable;
 import org.mule.api.service.Service;
 import org.mule.service.ServiceCompositeMessageSource;
 import org.mule.session.DefaultMuleSession;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
@@ -34,14 +34,22 @@ import java.util.Map;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class EventMetaDataPropagationTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/event-metadata-propagation-config.xml";
     }
 
+    @Test
     public void testEventMetaDataPropagation() throws MuleException
     {
         Service service = muleContext.getRegistry().lookupService("component1");

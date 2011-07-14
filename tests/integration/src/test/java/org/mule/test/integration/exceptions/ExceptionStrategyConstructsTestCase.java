@@ -10,16 +10,22 @@
 
 package org.mule.test.integration.exceptions;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.processor.MessageProcessor;
 import org.mule.message.ExceptionMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ExceptionStrategyConstructsTestCase extends FunctionalTestCase
 {
@@ -31,6 +37,7 @@ public class ExceptionStrategyConstructsTestCase extends FunctionalTestCase
         return "org/mule/test/integration/exceptions/exception-strategy-constructs-config.xml";
     }
 
+    @Test
     public void testDefaultExceptionStrategySingleEndpoint() throws Exception
     {
         MuleClient mc = new MuleClient(muleContext);

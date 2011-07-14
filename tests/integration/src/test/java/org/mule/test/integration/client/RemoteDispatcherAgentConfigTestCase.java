@@ -11,16 +11,24 @@
 package org.mule.test.integration.client;
 
 import org.mule.module.client.remoting.RemoteDispatcherAgent;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.wire.SerializedMuleMessageWireFormat;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class RemoteDispatcherAgentConfigTestCase extends FunctionalTestCase
 {
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/client/mule-admin-agent.xml";
     }
 
+    @Test
     public void testNonEmptyProperties() throws Exception
     {
         RemoteDispatcherAgent agent = (RemoteDispatcherAgent) muleContext.getRegistry().lookupAgent("remote-dispatcher-agent");

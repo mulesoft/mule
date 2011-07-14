@@ -10,11 +10,15 @@
 
 package org.mule.test.cookbook.quartz;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.module.client.MuleClient;
 import org.mule.api.MuleMessage;
 
-// START SNIPPET: documentation
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 /**
  * The Quartz transport can be used to trigger an event to be received by the component based on the endpoint
  * configuration.  In Mule an event is usually expected, however in this example we have a service component who's
@@ -22,15 +26,16 @@ import org.mule.api.MuleMessage;
  * and by not specifying a 'payload' element there is no data to try and match to the service method, so Mule will
  * match a method with no arguments.
  */
-// END SNIPPET: documentation
-// START SNIPPET: full-class
 public class TriggerNoArgsServiceMethodTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/cookbook/quartz/trigger-no-args-method-config.xml";
     }
 
+    @Test
     public void testTrigger() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -45,4 +50,3 @@ public class TriggerNoArgsServiceMethodTestCase extends FunctionalTestCase
         assertEquals("Bullseye!", result.getPayloadAsString());
     }
 }
-// END SNIPPET: full-class

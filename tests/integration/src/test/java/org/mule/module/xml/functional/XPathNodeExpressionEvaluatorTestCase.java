@@ -12,9 +12,10 @@ package org.mule.module.xml.functional;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.custommonkey.xmlunit.XMLAssert;
+import org.junit.Test;
 
 public class XPathNodeExpressionEvaluatorTestCase extends FunctionalTestCase
 {
@@ -38,6 +39,7 @@ public class XPathNodeExpressionEvaluatorTestCase extends FunctionalTestCase
         return "org/mule/module/xml/xpath-node-config.xml";
     }
 
+    @Test
     public void testExpressionTransformerUsingXpathNode() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

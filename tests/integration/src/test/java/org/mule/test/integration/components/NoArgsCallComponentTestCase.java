@@ -12,7 +12,13 @@ package org.mule.test.integration.components;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * This test re-written to use entry point resolvers.  As a consequence, some tests, which verified
@@ -29,19 +35,15 @@ public class NoArgsCallComponentTestCase extends FunctionalTestCase
     public static final String DEFAULT_INPUT_MESSAGE = "test";
     public static final String DEFUALT_OUTPUT_MESSAGE = "Just an apple.";
 
-    public static final String SERVICE_DC_NAME="WORMS";
-    public static final String SERVICE_DI_NAME="TIRANA";
-
-    public static final String DELEGATE_DC_METHOD_NAME="toString";
-    public static final String DELEGATE_DI_METHOD_NAME="wash";
-
     public static final int TIMEOUT = 5000;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/components/no-args-call-component-functional-test.xml";
     }
 
+    @Test
     public void testDelegateClass() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -50,9 +52,9 @@ public class NoArgsCallComponentTestCase extends FunctionalTestCase
         assertNotNull(message);
         assertEquals(message.getPayload(), DEFUALT_OUTPUT_MESSAGE);
         client.dispose();
-
     }
 
+    @Test
     public void testWithInjectedDelegate() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -63,7 +65,5 @@ public class NoArgsCallComponentTestCase extends FunctionalTestCase
         // same as original input
         assertEquals(DEFAULT_INPUT_MESSAGE, reply.getPayload());
     }
-
-
 
 }

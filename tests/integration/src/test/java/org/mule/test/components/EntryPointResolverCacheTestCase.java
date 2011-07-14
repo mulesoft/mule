@@ -13,21 +13,29 @@ package org.mule.test.components;
 import org.mule.api.MuleMessage;
 import org.mule.message.DefaultExceptionPayload;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test an entry-point resolver used for multiple classes
  */
 public class EntryPointResolverCacheTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/components/entry-point-resolver-cache.xml";
     }
 
+    @Test
     public void testCache() throws Exception
     {
         MuleClient clt = new MuleClient(muleContext);

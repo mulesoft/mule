@@ -12,14 +12,20 @@ package org.mule.test.integration.exceptions;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 public class ExceptionStrategyMessagePropertiesTestCase extends FunctionalTestCase
 {
-    int numMessages = 100;
+    private final int numMessages = 100;
     
     @Override
     protected String getConfigResources()
@@ -27,6 +33,7 @@ public class ExceptionStrategyMessagePropertiesTestCase extends FunctionalTestCa
         return "org/mule/test/integration/exceptions/exception-strategy-message-properties.xml";
     }
 
+    @Test
     public void testException() throws Exception
     {
         Thread tester1 = new Tester();

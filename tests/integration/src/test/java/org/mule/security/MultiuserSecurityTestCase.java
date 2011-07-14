@@ -16,10 +16,15 @@ import org.mule.api.config.MuleProperties;
 import org.mule.api.transport.SessionHandler;
 import org.mule.module.client.MuleClient;
 import org.mule.session.MuleSessionHandler;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests multi-user security against a security provider which only authenticates 
@@ -30,11 +35,14 @@ import java.util.Map;
  */
 public class MultiuserSecurityTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "multiuser-security-test.xml, singleuser-security-provider.xml";
     }
 
+    @Test
     public void testMultipleAuthentications() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

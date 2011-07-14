@@ -12,10 +12,18 @@ package org.mule.test.integration.endpoints;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
 {
+
     private static final int TIMEOUT = 5000;
 
     @Override
@@ -24,6 +32,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         return "org/mule/test/integration/endpoints/endpoint-message-processors.xml";
     }
 
+    @Test
     public void testSynchronousOutbound() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -33,6 +42,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         assertEquals("input:A:B:service1:E:F:service2:G:H:C:D", response.getPayload());
     }
 
+    @Test
     public void testAsynchronousOutbound() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -46,6 +56,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         assertEquals("input:A:B:service1:E:F", response.getPayload());
     }
 
+    @Test
     public void testLegacyAttributes() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -55,6 +66,7 @@ public class EndpointMessageProcessorsTestCase extends FunctionalTestCase
         assertEquals("input:A:B:service1:E:F:service2:G:H:C:D", response.getPayload());
     }
 
+    @Test
     public void testRouters() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

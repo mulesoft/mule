@@ -12,14 +12,26 @@ package org.mule.test.integration.config;
 
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.transformer.Transformer;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 public class ResponseTransformerTestCase extends FunctionalTestCase
 {
 
+    @Override
+    protected String getConfigResources()
+    {
+        return "org/mule/test/integration/config/response-transformer-test.xml";
+    }
+
+    @Test
     public void testTransformers()
     {
         ImmutableEndpoint endpoint = (ImmutableEndpoint) muleContext.getRegistry().lookupObject("endpoint");
@@ -40,11 +52,6 @@ public class ResponseTransformerTestCase extends FunctionalTestCase
             logger.debug(transformer);
             assertEquals(prefix + count, transformer.getName());
         }
-    }
-
-    protected String getConfigResources()
-    {
-        return "org/mule/test/integration/config/response-transformer-test.xml";
     }
 
 }

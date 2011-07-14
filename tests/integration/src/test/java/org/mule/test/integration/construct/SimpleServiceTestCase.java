@@ -10,26 +10,36 @@
 
 package org.mule.test.integration.construct;
 
+import org.mule.api.MuleException;
+import org.mule.api.client.LocalMuleClient;
+import org.mule.construct.SimpleService;
+import org.mule.tck.junit4.FunctionalTestCase;
+import org.mule.test.integration.tck.WeatherForecaster;
+import org.mule.util.StringUtils;
+
 import java.io.InputStream;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.math.RandomUtils;
-import org.mule.api.MuleException;
-import org.mule.api.client.LocalMuleClient;
-import org.mule.construct.SimpleService;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.test.integration.tck.WeatherForecaster;
-import org.mule.util.StringUtils;
+import org.junit.Test;
 import org.springframework.util.FileCopyUtils;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 public class SimpleServiceTestCase extends FunctionalTestCase
 {
     private LocalMuleClient muleClient;
 
+    public SimpleServiceTestCase()
+    {
+        setDisposeContextPerClass(true);
+    }
+
     @Override
     protected void doSetUp() throws Exception
     {
-        super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         muleClient = muleContext.getClient();
     }
@@ -40,62 +50,74 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         return "org/mule/test/integration/construct/simple-service-config.xml";
     }
 
+    @Test
     public void testPureAttributes() throws Exception
     {
         doTestMathsService("vm://maths1.in");
     }
 
+    @Test
     public void testAbstractInheritence() throws Exception
     {
         doTestMathsService("vm://maths2.in");
     }
 
+    @Test
     public void testEndpointReference() throws Exception
     {
         doTestMathsService("vm://maths3.in");
     }
 
+    @Test
     public void testComponentReference() throws Exception
     {
         doTestMathsService("vm://maths4.in");
     }
 
+    @Test
     public void testChildComponent() throws Exception
     {
         doTestMathsService("vm://maths5.in");
     }
 
+    @Test
     public void testTransformerReferences() throws Exception
     {
         doTestStringMassager("vm://bam1.in");
     }
 
+    @Test
     public void testConcreteInheritence() throws Exception
     {
         doTestStringMassager("vm://bam2.in");
     }
 
+    @Test
     public void testComponentWithEntryPointResolver() throws Exception
     {
         doTestMathsService("vm://maths6.in");
     }
 
+    @Test
     public void testChildEndpoint() throws Exception
     {
         doTestMathsService("vm://maths7.in");
     }
 
+    @Test
     public void testInheritedExceptionStrategy() throws Exception
     {
         final String result = muleClient.send("vm://iexst.in", "ignored", null).getPayloadAsString();
         assertEquals("Ka-boom!", result);
     }
 
+    @Test
     public void testJaxWsService() throws Exception
     {
         doTestJaxWsService(6099);
     }
 
+    @Test
     public void testJaxbConsumer() throws Exception
     {
         final String result = muleClient.send(
@@ -106,6 +128,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         assertTrue(StringUtils.isNotBlank(result));
     }
 
+    @Test
     public void testXpathConsumer() throws Exception
     {
         final String result = muleClient.send(
@@ -116,11 +139,13 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         assertTrue(StringUtils.isNotBlank(result));
     }
 
+    @Test
     public void testFunctionalTestComponent() throws Exception
     {
         doTestFunctionalTestComponent("vm://ftc1.in", "functional-test-component-1");
     }
 
+    @Test
     public void testInheritedType() throws Exception
     {
         doTestJaxWsService(6098);
@@ -164,6 +189,7 @@ public class SimpleServiceTestCase extends FunctionalTestCase
         assertEquals(new WeatherForecaster().getByZipCode("95050"), weatherForecast);
     }
     
+    @Test
     public void testInheritedElementsUnique() throws Exception
     {
         SimpleService child1 = (SimpleService) getFlowConstruct("child-service-1");

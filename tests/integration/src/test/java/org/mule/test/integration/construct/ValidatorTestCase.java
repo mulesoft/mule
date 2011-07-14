@@ -10,25 +10,32 @@
 
 package org.mule.test.integration.construct;
 
-import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.apache.commons.lang.math.RandomUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class ValidatorTestCase extends FunctionalTestCase
 {
     private MuleClient muleClient;
 
+    public ValidatorTestCase()
+    {
+        setDisposeContextPerClass(true);
+    }
+    
     @Override
     protected void doSetUp() throws Exception
     {
-        super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         muleClient = new MuleClient(muleContext);
     }
@@ -39,21 +46,25 @@ public class ValidatorTestCase extends FunctionalTestCase
         return "org/mule/test/integration/construct/validator-config.xml";
     }
 
+    @Test
     public void testChildFilter() throws Exception
     {
         doTestValidator("validator");
     }
 
+    @Test
     public void testFilterAndEndpointReferences() throws Exception
     {
         doTestValidator("validator-with-refs");
     }
 
+    @Test
     public void testChildEndpoints() throws Exception
     {
         doTestValidator("validator-with-child-endpoints");
     }
 
+    @Test
     public void testExceptionStrategy() throws Exception
     {
         doTestValidMessage("validator-with-exception-strategy");
@@ -63,11 +74,13 @@ public class ValidatorTestCase extends FunctionalTestCase
             .getPayload());
     }
 
+    @Test
     public void testInheritance() throws Exception
     {
         doTestValidator("concrete-validator");
     }
 
+    @Test
     public void testDispatchError() throws Exception
     {
         doTestValidMessageError("dispatch-error");

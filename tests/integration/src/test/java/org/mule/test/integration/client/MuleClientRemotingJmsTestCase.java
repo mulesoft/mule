@@ -15,12 +15,14 @@ package org.mule.test.integration.client;
 public class MuleClientRemotingJmsTestCase extends AbstractClientRemotingTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/client/client-remote-dispatcher-common-config.xml, " +
                 "org/mule/test/integration/client/test-client-mule-config-remote-jms.xml";
     }
 
+    @Override
     public String getRemoteEndpointUri()
     {
         return "jms://mule.sys.queue";

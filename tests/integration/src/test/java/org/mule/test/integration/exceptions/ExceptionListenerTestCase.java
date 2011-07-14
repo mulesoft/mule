@@ -14,10 +14,17 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.message.ExceptionMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ExceptionListenerTestCase extends FunctionalTestCase
 {
+
     private MuleClient client;
 
     @Override
@@ -33,6 +40,7 @@ public class ExceptionListenerTestCase extends FunctionalTestCase
         client = new MuleClient(muleContext);
     }
 
+    @Test
     public void testExceptionStrategyFromComponent() throws Exception
     {
         assertQueueIsEmpty("vm://error.queue");

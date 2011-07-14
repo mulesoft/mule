@@ -9,11 +9,14 @@
  */
 package org.mule.transformers.simple;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.api.transformer.Transformer;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TransformerArraysTestCase extends FunctionalTestCase
 {

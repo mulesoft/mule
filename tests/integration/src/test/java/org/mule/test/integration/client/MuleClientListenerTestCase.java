@@ -16,11 +16,19 @@ import org.mule.api.service.Service;
 import org.mule.api.transport.DispatchException;
 import org.mule.api.transport.NoReceiverForEndpointException;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 public class MuleClientListenerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/client/mule-client-listener-config.xml";
@@ -68,11 +76,13 @@ public class MuleClientListenerTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testRegisterListenerVm() throws Exception
     {
         doTestRegisterListener("vmComponent", "vm://test.queue", false);
     }
 
+    @Test
     public void testRegisterListenerTcp() throws Exception
     {
         doTestRegisterListener("tcpComponent", "tcp://localhost:56324", true);

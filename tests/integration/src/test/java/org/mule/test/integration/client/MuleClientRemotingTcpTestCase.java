@@ -14,12 +14,14 @@ package org.mule.test.integration.client;
 public class MuleClientRemotingTcpTestCase extends AbstractClientRemotingTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/client/client-remote-dispatcher-common-config.xml, " +
                 "org/mule/test/integration/client/test-client-mule-config-remote-tcp.xml";
     }
 
+    @Override
     public String getRemoteEndpointUri()
     {
         return "tcp://localhost:60504";

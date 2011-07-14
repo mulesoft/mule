@@ -12,17 +12,25 @@ package org.mule.test.components;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ComponentReturningNullFlowTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/components/component-returned-null.xml";
     }
 
+    @Test
     public void testNullReturnStopsFlow() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

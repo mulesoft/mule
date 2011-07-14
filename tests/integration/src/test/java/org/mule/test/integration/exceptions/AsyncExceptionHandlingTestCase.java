@@ -13,24 +13,28 @@ package org.mule.test.integration.exceptions;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Map;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 public class AsyncExceptionHandlingTestCase extends FunctionalTestCase
 {
 
-    String request = "Hello World";
-
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/exceptions/async-exception-handling.xml";
     }
 
+    @Test
     public void testAsyncExceptionHandlingTestCase() throws Exception
     {
         MuleClient client1 = new MuleClient(muleContext);
-        DefaultMuleMessage msg1 = new DefaultMuleMessage(request, (Map) null, muleContext);
+        DefaultMuleMessage msg1 = new DefaultMuleMessage("Hello World", (Map) null, muleContext);
         MuleMessage response1 = client1.send("search.inbound.endpoint", msg1, 300000);
         assertNotNull(response1);
     }

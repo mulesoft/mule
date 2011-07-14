@@ -16,19 +16,27 @@ import org.mule.api.endpoint.MalformedEndpointException;
 import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.module.client.MuleClient;
 import org.mule.module.client.RemoteDispatcher;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Date;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class RemoteExceptionTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/client/remote-exception-config.xml";
     }
 
+    @Test
     public void testClientTransformerException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -41,6 +49,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
         assertTrue(exceptionPayload.getRootException() instanceof Exception);
     }
 
+    @Test
     public void testClientMalformedEndpointException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -52,6 +61,7 @@ public class RemoteExceptionTestCase extends FunctionalTestCase
         assertTrue(exceptionPayload.getRootException() instanceof MalformedEndpointException);
     }
 
+    @Test
     public void testClientComponentException() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

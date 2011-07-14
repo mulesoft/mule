@@ -13,11 +13,14 @@ package org.mule.test.integration.exceptions;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 public class MessageContextTestCase extends FunctionalTestCase 
 {
-    String request = "Hello World";
 
     @Override
     protected String getConfigResources() 
@@ -28,13 +31,12 @@ public class MessageContextTestCase extends FunctionalTestCase
     /**
      * Test for MULE-4361
      */
+    @Test
     public void testAlternateExceptionStrategy() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
-        DefaultMuleMessage msg = new DefaultMuleMessage(request, client.getMuleContext());
+        DefaultMuleMessage msg = new DefaultMuleMessage("Hello World", client.getMuleContext());
         MuleMessage response = client.send("testin", msg, 200000);
         assertNotNull(response);
-        Thread.sleep(10000); // Wait for test to finish
-
     }
 }

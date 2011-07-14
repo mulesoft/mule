@@ -10,28 +10,36 @@
 
 package org.mule.test.integration.construct;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.math.RandomUtils;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.NullPayload;
 import org.mule.util.concurrent.Latch;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.math.RandomUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class BridgeTestCase extends FunctionalTestCase
 {
+    
     private MuleClient muleClient;
+
+    public BridgeTestCase()
+    {
+        setDisposeContextPerClass(true);
+    }
 
     @Override
     protected void doSetUp() throws Exception
     {
-        super.setDisposeManagerPerSuite(true);
         super.doSetUp();
         muleClient = new MuleClient(muleContext);
     }
@@ -42,52 +50,62 @@ public class BridgeTestCase extends FunctionalTestCase
         return "org/mule/test/integration/construct/bridge-config.xml";
     }
 
+    @Test
     public void testSynchronous() throws Exception
     {
         doTestMathsService("vm://synchronous-bridge.in");
     }
 
+    @Test
     public void testAsynchronous() throws Exception
     {
         final MuleMessage result = muleClient.send("vm://asynchronous-bridge.in", "foobar", null);
         assertEquals(NullPayload.getInstance(), result.getPayload());
     }
 
+    @Test
     public void testTransformers() throws Exception
     {
         doTestStringMassager("vm://transforming-bridge.in");
     }
 
+    @Test
     public void testEndpointReferences() throws Exception
     {
         doTestMathsService("vm://endpoint-ref-bridge.in");
     }
 
+    @Test
     public void testChildEndpoints() throws Exception
     {
         doTestMathsService("vm://child-endpoint-bridge.in");
     }
 
+    @Test
     public void testExceptionHandler() throws Exception
     {
         doTestMathsService("vm://exception-bridge.in");
     }
 
+    @Test
     public void testVmTransacted() throws Exception
     {
         doTestMathsService("vm://transacted-bridge.in");
     }
 
+    @Test
     public void testInheritance() throws Exception
     {
         doTestMathsService("vm://concrete-child-bridge.in");
     }
 
+    @Test
     public void testHeterogeneousTransports() throws Exception
     {
         doJmsBasedTest("jms://myDlq", "dlq-file-picker");
     }
 
+    @Test
     public void testJmsTransactions() throws Exception
     {
         doJmsBasedTest("jms://myQueue", "topic-listener");

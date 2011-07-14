@@ -12,10 +12,16 @@ package org.mule.test.integration.client;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class MuleClientInThreadTestCase extends FunctionalTestCase
 {
+
     int numMessages = 100000;
     
     @Override
@@ -24,6 +30,7 @@ public class MuleClientInThreadTestCase extends FunctionalTestCase
         return "org/mule/test/integration/client/client-in-thread.xml";
     }
 
+    @Test
     public void testException() throws Exception
     {
         Thread tester1 = new Tester();

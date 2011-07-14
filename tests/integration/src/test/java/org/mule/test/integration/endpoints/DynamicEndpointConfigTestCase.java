@@ -13,11 +13,14 @@ package org.mule.test.integration.endpoints;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.DataType;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
-/**
- *
- */
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 public class DynamicEndpointConfigTestCase extends FunctionalTestCase
 {
 
@@ -27,6 +30,7 @@ public class DynamicEndpointConfigTestCase extends FunctionalTestCase
         return "org/mule/test/integration/endpoints/dynamic-endpoint-config.xml";
     }
 
+    @Test
     public void testName() throws Exception
     {
 

@@ -13,18 +13,24 @@ package org.mule.module.xml.functional;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.Transformer;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 public class XsltWithParamsTransformerTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/module/xml/xml-namespace-test.xml";
     }
 
+    @Test
     public void testTransformWithParameter() throws Exception
     {
         Transformer trans = muleContext.getRegistry().lookupTransformer("test1");

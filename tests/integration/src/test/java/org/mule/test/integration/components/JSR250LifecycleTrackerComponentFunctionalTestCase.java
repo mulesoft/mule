@@ -12,7 +12,12 @@ package org.mule.test.integration.components;
 
 import org.mule.lifecycle.JSR250LifecycleTrackerComponent;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class JSR250LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestCase
 {
@@ -29,6 +34,7 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends Functiona
      * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
      * @throws Exception
      */
+    @Test
     public void testSingletonServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MuleSingletonService",
@@ -41,6 +47,7 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends Functiona
      * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
      * @throws Exception
      */
+    @Test
     public void testMulePrototypeServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MulePrototypeService",
@@ -53,6 +60,7 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends Functiona
      * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
      * @throws Exception
      */
+    @Test
     public void testMulePooledPrototypeServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MulePooledPrototypeService", "[setProperty, setService, setMuleContext, jsr250 initialise, start, stop, jsr250 dispose]");
@@ -64,6 +72,7 @@ public class JSR250LifecycleTrackerComponentFunctionalTestCase extends Functiona
      * - Service and muleContext injected each time singleton is used to create new object in pool (Component implements ServiceAware/MuleContextAware)
      * @throws Exception
      */
+    @Test
     public void testMulePooledSingletonServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MulePooledSingletonService", "[setProperty, setService, setMuleContext, jsr250 initialise, jsr250 initialise, jsr250 initialise, start, start, start, stop, stop, stop, jsr250 dispose, jsr250 dispose, jsr250 dispose]");

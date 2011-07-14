@@ -14,16 +14,24 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.routing.filter.Filter;
 import org.mule.message.ExceptionMessage;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ExceptionStrategyFilterMule5342TestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/exceptions/exception-strategy-filter-mule-5342.xml";
     }
 
+    @Test
     public void testExceptionThrownFromMessageFilterIsHandledByExceptionHandler() throws Exception
     {
         MuleClient client = muleContext.getClient();

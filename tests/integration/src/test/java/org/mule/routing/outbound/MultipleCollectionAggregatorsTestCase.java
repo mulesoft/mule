@@ -10,7 +10,11 @@
 
 package org.mule.routing.outbound;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class MultipleCollectionAggregatorsTestCase extends FunctionalTestCase
 {
@@ -21,6 +25,7 @@ public class MultipleCollectionAggregatorsTestCase extends FunctionalTestCase
         return "multiple-collection-aggregators-config.xml";
     }
 
+    @Test
     public void testStartsCorrectly()
     {
         assertTrue(muleContext.isStarted());

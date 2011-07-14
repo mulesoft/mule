@@ -16,16 +16,22 @@ import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.interceptor.Interceptor;
 import org.mule.processor.AbstractInterceptingMessageProcessor;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class SharedInterceptorStackTestCase extends FunctionalTestCase
 {
+    
     @Override
     protected String getConfigResources()
     {
         return "shared-interceptor-stack.xml";
     }
     
+    @Test
     public void testSharedInterceptorOnServiceOne() throws MuleException
     {
         MuleClient client = muleContext.getClient();
@@ -34,6 +40,7 @@ public class SharedInterceptorStackTestCase extends FunctionalTestCase
         assertEquals(TEST_MESSAGE + " CustomInterceptor ComponentOne", response.getPayload());
     }
 
+    @Test
     public void testSharedInterceptorOnServiceTwo() throws MuleException
     {
         MuleClient client = muleContext.getClient();

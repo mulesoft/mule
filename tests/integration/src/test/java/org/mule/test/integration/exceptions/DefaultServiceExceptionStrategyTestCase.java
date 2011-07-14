@@ -19,8 +19,8 @@ import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.message.ExceptionMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.routing.outbound.MulticastingRouter;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.exceptions.FunctionalTestException;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 import org.mule.tck.probe.Prober;
@@ -28,14 +28,24 @@ import org.mule.tck.probe.Prober;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/exceptions/default-service-exception-strategy-config.xml";
     }
 
+    @Test
     public void testDefaultExceptionStrategySingleEndpoint() throws MuleException
     {
         Service service = muleContext.getRegistry().lookupService("testService1");
@@ -51,6 +61,7 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         assertNull(mc.request("vm://out1", RECEIVE_TIMEOUT));
     }
 
+    @Test
     public void testDefaultExceptionStrategyMultipleEndpoints() throws MuleException
     {
         Service service = muleContext.getRegistry().lookupService("testService2");
@@ -73,6 +84,7 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         assertEquals(out2.getPayload(), out3.getPayload());
     }
     
+    @Test
     public void testDefaultExceptionStrategyNonEndpoint() throws Exception
     {
         LocalMuleClient mc = muleContext.getClient();
@@ -83,6 +95,7 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         assertEquals("ERROR!", out4.getPayloadAsString());
     }
 
+    @Test
     public void testSerializablePayload() throws MuleException
     {
         Map<String, String> map = new HashMap<String, String>();
@@ -102,6 +115,7 @@ public class DefaultServiceExceptionStrategyTestCase extends FunctionalTestCase
         assertEquals("value2", payloadMap.get("key2"));
     }
 
+    @Test
     public void testStopsServiceOnException() throws MuleException, InterruptedException
     {
         final Service service = muleContext.getRegistry().lookupService("testService5");

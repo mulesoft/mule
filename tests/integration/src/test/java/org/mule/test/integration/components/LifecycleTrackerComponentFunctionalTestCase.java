@@ -12,7 +12,12 @@ package org.mule.test.integration.components;
 
 import org.mule.lifecycle.AbstractLifecycleTracker;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author David Dossot (david@dossot.net)
@@ -36,6 +41,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
      * NOTE: muleContext is injected twice, once by registry and once by lifecycleAdaptor
      * @throws Exception
      */
+    @Test
     public void testSpringBeanServiceLifecycle() throws Exception
     {
         testComponentLifecycle(
@@ -52,6 +58,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
      * NOTE: muleContext is injected twice, once by registry and once by lifecycleAdaptor
      * @throws Exception
      */
+    @Test
     public void testSpringBeanService2Lifecycle() throws Exception
     {
         testComponentLifecycle(
@@ -65,6 +72,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
      * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
      * @throws Exception
      */
+    @Test
     public void testSingletonServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MuleSingletonService",
@@ -77,6 +85,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
      * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
      * @throws Exception
      */
+    @Test
     public void testMulePrototypeServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MulePrototypeService",
@@ -89,6 +98,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
      * - Service and muleContext injected (Component implements ServiceAware/MuleContextAware)
      * @throws Exception
      */
+    @Test
     public void testMulePooledPrototypeServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MulePooledPrototypeService", "[setProperty, setService, setMuleContext, initialise, start, stop, dispose]");
@@ -100,6 +110,7 @@ public class LifecycleTrackerComponentFunctionalTestCase extends FunctionalTestC
      * - Service and muleContext injected each time singleton is used to create new object in pool (Component implements ServiceAware/MuleContextAware)
      * @throws Exception
      */
+    @Test
     public void testMulePooledSingletonServiceLifecycle() throws Exception
     {
         testComponentLifecycle("MulePooledSingletonService", "[setProperty, setService, setMuleContext, initialise, initialise, initialise, start, start, start, stop, stop, stop, dispose, dispose, dispose]");

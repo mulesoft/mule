@@ -12,17 +12,24 @@ package org.mule.test.components;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.RequestContext;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ComponentStoppingEventFlowTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/components/component-stopped-processing.xml";
     }
 
+    @Test
     public void testNullReturnStopsFlow() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -36,7 +43,6 @@ public class ComponentStoppingEventFlowTestCase extends FunctionalTestCase
 
     public static final class ComponentStoppingFlow
     {
-
 
         public String process(String input)
         {

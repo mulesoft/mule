@@ -12,22 +12,32 @@ package org.mule.module.xml.functional;
 
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
+import org.mule.api.expression.ExpressionRuntimeException;
 import org.mule.api.transformer.Transformer;
 import org.mule.expression.RegistryExpressionEvaluator;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.FruitBasket;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class RegistryExpressionEvaluatorTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/registry-expressions-test-config.xml";
     }
 
+    @Test
     public void testSimpleRegistryLookup() throws Exception
     {
-
         MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);
         RegistryExpressionEvaluator eval = new RegistryExpressionEvaluator();
         eval.setMuleContext(muleContext);
@@ -37,10 +47,9 @@ public class RegistryExpressionEvaluatorTestCase extends FunctionalTestCase
 
         o = eval.evaluate("XXbowlToBasket*", message);
         assertNull(o);
-
-
     }
 
+    @Test(expected = ExpressionRuntimeException.class)
     public void testRegistryLookupWithProperties() throws Exception
     {
         MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);
@@ -61,21 +70,13 @@ public class RegistryExpressionEvaluatorTestCase extends FunctionalTestCase
         o = eval.evaluate("bowlToBasket.returnClass.xname*", message);
         assertNull(o);
 
-        try
-        {
-            o = eval.evaluate("bowlToBasket.returnClass.xname", message);
-            fail("property xname is not valid and is not optional");
-        }
-        catch (Exception e)
-        {
-            //Expected
-        }
 
+        o = eval.evaluate("bowlToBasket.returnClass.xname", message);
     }
 
+    @Test
     public void testGlobalEndpointRegistryLookupWithProperties() throws Exception
     {
-
         MuleMessage message = new DefaultMuleMessage(new Apple(), muleContext);
         RegistryExpressionEvaluator eval = new RegistryExpressionEvaluator();
         eval.setMuleContext(muleContext);
@@ -96,6 +97,7 @@ public class RegistryExpressionEvaluatorTestCase extends FunctionalTestCase
 
     }
 
+    @Test(expected = ExpressionRuntimeException.class)
     public void testLookUpbyType() throws Exception
     {
         Apple apple = new Apple();
@@ -107,16 +109,7 @@ public class RegistryExpressionEvaluatorTestCase extends FunctionalTestCase
         assertNotNull(o);
         assertEquals(apple, o);
 
-
-        try
-        {
-            o = eval.evaluate("banana", message);
-            fail("No banana in the registry");
-        }
-        catch (Exception e)
-        {
-            //Expected
-        }
+        o = eval.evaluate("banana", message);
     }
 
 }

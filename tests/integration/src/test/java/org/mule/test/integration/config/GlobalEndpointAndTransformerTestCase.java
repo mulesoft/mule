@@ -14,24 +14,30 @@ import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 /*
  * This test has been added due to MULE-610
  */
 public class GlobalEndpointAndTransformerTestCase extends FunctionalTestCase
 {
-    
+
+    @Override
+    protected String getConfigResources()
+    {
+        return "org/mule/test/integration/config/globalendpointandtransformer-mule-config.xml";
+    }
+
+    @Test
     public void testNormal() throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);
         MuleMessage msg=client.send("vm://in",new DefaultMuleMessage("HELLO!", muleContext));
-        assertTrue(msg.getPayload() instanceof byte[]);        
-    }
-
-    protected String getConfigResources()
-    {        
-        return "org/mule/test/integration/config/globalendpointandtransformer-mule-config.xml";
+        assertTrue(msg.getPayload() instanceof byte[]);
     }
 }
 

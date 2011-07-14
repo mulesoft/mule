@@ -22,10 +22,17 @@ import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.MuleTestUtils;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.tcp.TcpConnector;
 import org.mule.transport.vm.VMConnector;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test the creation of various targets from the service descriptor
@@ -39,6 +46,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         return "org/mule/test/integration/test-endpoints-config.xml";
     }
 
+    @Test
     public void testComponent3RouterEndpoints() throws Exception
     {
         // test inbound
@@ -67,9 +75,9 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertEquals("test", endpoint.getConnector().getProtocol().toLowerCase());
         assertEquals("test.queue2", endpoint.getEndpointURI().getAddress());
         assertTrue(endpoint instanceof OutboundEndpoint);
-
     }
 
+    @Test
     public void testComponent4Endpoints() throws Exception
     {
         // test inbound
@@ -86,6 +94,7 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         assertTrue(endpoint instanceof InboundEndpoint);
     }
 
+    @Test
     public void testComponent4RouterEndpoints() throws Exception
     {
         // test inbound
@@ -104,9 +113,9 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         // (axis seems to use undefined transformers in some strange way)
 //        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint instanceof OutboundEndpoint);
-
     }
 
+    @Test
     public void testComponent5RouterEndpoints() throws Exception
     {
         // test inbound
@@ -125,9 +134,9 @@ public class MuleEndpointConfigurationTestCase extends FunctionalTestCase
         // (axis seems to use undefined transformers in some strange way)
 //        assertTrue(TransformerUtils.isDefined(endpoint.getTransformers()));
         assertTrue(endpoint instanceof OutboundEndpoint);
-
     }
 
+    @Test
     public void testEndpointFromURI() throws Exception
     {
         ImmutableEndpoint ep = muleContext.getEndpointFactory().getInboundEndpoint(

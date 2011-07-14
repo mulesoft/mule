@@ -12,21 +12,30 @@ package org.mule.test.integration.client;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.jms.JmsConstants;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class MuleClientJmsTestCase extends FunctionalTestCase
 {
+
     public static final int INTERATIONS = 1;
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/client/test-client-jms-mule-config.xml";
     }
 
+    @Test
     public void testClientSendDirect() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -36,6 +45,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
         assertEquals("Received: Test Client Send message", message.getPayload());
     }
 
+    @Test
     public void testClientDispatchDirect() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -43,6 +53,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
         client.dispatchDirect("TestReceiverUMO", "Test Client dispatch message", null);
     }
 
+    @Test
     public void testClientSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -52,6 +63,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
         assertEquals("Received: Test Client Send message", message.getPayload());
     }
 
+    @Test
     public void testClientMultiSend() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -64,6 +76,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testClientMultiDispatch() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -81,6 +94,7 @@ public class MuleClientJmsTestCase extends FunctionalTestCase
         Thread.sleep(1000);
     }
 
+    @Test
     public void testClientDispatchAndReceiveOnReplyTo() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

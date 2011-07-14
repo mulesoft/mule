@@ -16,8 +16,13 @@ import org.mule.api.processor.MessageProcessor;
 import org.mule.api.transaction.TransactionException;
 import org.mule.exception.DefaultServiceExceptionStrategy;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transaction.TransactionCoordination;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 /**
  * When exception strategies are used with transactions it should be possible to send
@@ -34,6 +39,7 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase
         return "org/mule/test/integration/exceptions/exception-strategy-transaction-test.xml";
     }
 
+    @Test
     public void testRequestReply() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -48,6 +54,7 @@ public class ExceptionStrategyTransactionTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testNoInfiniteLoop() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);

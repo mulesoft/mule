@@ -13,15 +13,21 @@ package org.mule.test.integration.exceptions;
 import org.mule.api.MuleMessage;
 
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExceptionStrategyTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/integration/exceptions/synch-messaging-exception-strategy.xml";
     }
 
+    @Test
     public void testInboundTransformer() throws Exception
     {
         client.send("vm://in1", TEST_MESSAGE, null);
@@ -30,6 +36,7 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
         assertEquals(0, systemExceptionCounter.get());
     }
     
+    @Test
     public void testInboundResponseTransformer() throws Exception
     {
         client.send("vm://in2", TEST_MESSAGE, null);
@@ -38,6 +45,7 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
         assertEquals(0, systemExceptionCounter.get());
     }
     
+    @Test
     public void testOutboundTransformer() throws Exception
     {
         client.send("vm://in3", TEST_MESSAGE, null);
@@ -48,6 +56,7 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
         assertNull(response);
     }
     
+    @Test
     public void testOutboundResponseTransformer() throws Exception
     {
         client.send("vm://in4", TEST_MESSAGE, null);
@@ -58,6 +67,7 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
         assertNull(response);
     }
     
+    @Test
     public void testComponent() throws Exception
     {
         client.send("vm://in5", TEST_MESSAGE, null);
@@ -66,6 +76,7 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
         assertEquals(0, systemExceptionCounter.get());
     }
 
+    @Test
     public void testInboundRouter() throws Exception
     {
         client.send("vm://in6", TEST_MESSAGE, null);
@@ -74,6 +85,7 @@ public class SynchronousMessagingExceptionStrategyTestCase extends AbstractExcep
         assertEquals(0, systemExceptionCounter.get());
     }
     
+    @Test
     public void testOutboundRouter() throws Exception
     {
         client.send("vm://in7", TEST_MESSAGE, null);

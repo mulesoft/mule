@@ -13,9 +13,13 @@ package org.mule.module.xml.functional;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
+import org.junit.Test;
 import org.w3c.dom.Node;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class W3CDocumentXPathNodeEvaluatorTestCase extends FunctionalTestCase
 {
@@ -34,6 +38,7 @@ public class W3CDocumentXPathNodeEvaluatorTestCase extends FunctionalTestCase
         return "org/mule/module/xml/w3c-dom-xpath-node-config.xml";
     }
 
+    @Test
     public void testW3CDocument() throws Exception
     {
         MuleClient client = muleContext.getClient();

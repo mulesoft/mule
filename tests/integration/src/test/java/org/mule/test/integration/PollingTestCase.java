@@ -9,13 +9,19 @@
  */
 package org.mule.test.integration;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class PollingTestCase extends FunctionalTestCase
 {
+
     private static List<String> foo = new ArrayList<String>();
     private static List<String> bar = new ArrayList<String>();
     
@@ -25,6 +31,7 @@ public class PollingTestCase extends FunctionalTestCase
         return "org/mule/test/integration/polling-config.xml";
     }
 
+    @Test
     public void testPolling() throws Exception
     {
         Thread.sleep(5000);

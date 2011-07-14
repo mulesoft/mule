@@ -12,9 +12,9 @@ package org.mule.module.xml.functional;
 
 import org.mule.api.MuleEventContext;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import com.thoughtworks.xstream.converters.extended.ISO8601DateConverter;
 
@@ -22,6 +22,10 @@ import java.util.Date;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class XStreamAdditionalConvertersTestCase extends FunctionalTestCase
 {
@@ -43,6 +47,7 @@ public class XStreamAdditionalConvertersTestCase extends FunctionalTestCase
         return "org/mule/module/xml/xstream-additional-converters.xml";
     }
 
+    @Test
     public void testAdditionalConverters() throws Exception
     {
         ISO8601DateConverter converter = new ISO8601DateConverter();

@@ -12,7 +12,12 @@ package org.mule.test.integration.message;
 
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class MessagePropertyScopesTestCase extends FunctionalTestCase {
 
@@ -22,6 +27,7 @@ public class MessagePropertyScopesTestCase extends FunctionalTestCase {
         return "org/mule/test/integration/messaging/message-property-scopes-config.xml";
     }
 
+    @Test
     public void testSessionProperty() throws Exception {
 
         MuleClient client = new MuleClient(muleContext);
@@ -33,6 +39,7 @@ public class MessagePropertyScopesTestCase extends FunctionalTestCase {
     }
 
     /* Test fails
+    @Test
     public void testInvocationProperty() throws Exception {
         
         MuleClient client = new MuleClient();
