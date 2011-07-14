@@ -4,7 +4,6 @@ import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.MuleClient;
 import org.mule.api.expression.ExpressionEvaluator;
-import org.mule.api.transformer.TransformerMessagingException;
 import org.mule.message.ExceptionMessage;
 import org.mule.tck.FunctionalTestCase;
 
@@ -20,7 +19,8 @@ public class ExceptionStrategyWithCustomExpressionEvaluatorTestCase extends Func
     }
 
     @Test
-    public void testCustomExpressionEvaluatorExceptionStrategy() throws MuleException {
+    public void testCustomExpressionEvaluatorExceptionStrategy() throws MuleException
+    {
         MuleClient client = muleContext.getClient();
         client.send("vm://in", TEST_MESSAGE, null);
         MuleMessage message = client.request("vm://out", DEFAULT_MULE_TEST_TIMEOUT_SECS);
