@@ -23,7 +23,6 @@ import org.w3c.dom.Element;
 
 public class W3CDomPropertyExtractorStaticTestCase extends AbstractXmlPropertyExtractorTestCase
 {
-
     public W3CDomPropertyExtractorStaticTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources, true);
@@ -37,24 +36,25 @@ public class W3CDomPropertyExtractorStaticTestCase extends AbstractXmlPropertyEx
             {ConfigVariant.FLOW, "org/mule/module/xml/property-extractor-static-test-flow.xml"}});
     }
 
+    @Override
     protected Object getMatchMessage() throws ParserConfigurationException
     {
         return documentFor("matchingEndpoint1");
     }
 
+    @Override
     protected Object getErrorMessage() throws ParserConfigurationException
     {
         return documentFor("missingEndpoint");
     }
 
-    protected Document documentFor(String name) throws ParserConfigurationException
+    protected Document documentFor(String nodeName) throws ParserConfigurationException
     {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document doc = builder.newDocument();
         Element endpoint = doc.createElement("endpoint");
-        endpoint.appendChild(doc.createTextNode(name));
+        endpoint.appendChild(doc.createTextNode(nodeName));
         doc.appendChild(endpoint);
         return doc;
     }
-
 }

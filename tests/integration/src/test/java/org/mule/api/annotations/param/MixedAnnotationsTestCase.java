@@ -31,18 +31,18 @@ public class MixedAnnotationsTestCase extends AbstractServiceAndFlowTestCase
 {
     private MuleMessage muleMessage;
 
-    public MixedAnnotationsTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-        setDisposeManagerPerSuite(true);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/annotations/mixed-annotations-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/annotations/mixed-annotations-flow.xml"}});
+    }
+
+    public MixedAnnotationsTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+        setDisposeManagerPerSuite(true);
     }
 
     @Override

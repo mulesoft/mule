@@ -11,14 +11,20 @@
 package org.mule.module.xml.config;
 
 import org.mule.module.xml.transformer.XmlPrettyPrinter;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class XmlPrettyPrinterConfigurationTestCase extends FunctionalTestCase
 {
+
     public XmlPrettyPrinterConfigurationTestCase()
     {
-        super();
-        // no need to waste cycles starting the MuleContext
         setStartContext(false);
     }
 
@@ -28,6 +34,7 @@ public class XmlPrettyPrinterConfigurationTestCase extends FunctionalTestCase
         return "org/mule/module/xml/xml-prettyprinter-config.xml";
     }
 
+    @Test
     public void testPrettyPrinter()
     {
         XmlPrettyPrinter pp = (XmlPrettyPrinter) muleContext.getRegistry().lookupTransformer("MyXMLPrettyPrinter");

@@ -30,6 +30,13 @@ import org.mule.util.concurrent.Latch;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCase
 {
     @Override
@@ -41,6 +48,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         muleContext.getRegistry().unregisterTransformer("_ObjectToByteArray");
     }
 
+    @Test
     public void testMoveAndDeleteStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -51,6 +59,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, true);
     }
 
+    @Test
     public void testMoveAndDeleteWorkDirStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -61,6 +70,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, true);
     }
 
+    @Test
     public void testMoveOnlyStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -71,6 +81,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, false);
     }
 
+    @Test
     public void testMoveOnlyWorkDirStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -81,6 +92,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, false);
     }
 
+    @Test
     public void testDeleteOnlyStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -91,6 +103,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, false, true);
     }
 
+    @Test
     public void testNoMoveNoDeleteStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -101,6 +114,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, false, false);
     }
 
+    @Test
     public void testMoveAndDelete() throws Exception
     {
         File inFile = initForRequest();
@@ -111,6 +125,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, true);
     }
 
+    @Test
     public void testMoveOnly() throws Exception
     {
         File inFile = initForRequest();
@@ -121,6 +136,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, false);
     }
 
+    @Test
     public void testDeleteOnly() throws Exception
     {
         File inFile = initForRequest();
@@ -131,6 +147,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, false, true);
     }
 
+    @Test
     public void testNoMoveNoDelete() throws Exception
     {
         File inFile = initForRequest();
@@ -141,6 +158,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, false, false);
     }
 
+    @Test
     public void testMoveAndDeleteFilePayload() throws Exception
     {
         File inFile = initForRequest();
@@ -151,6 +169,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, true);
     }
 
+    @Test
     public void testMoveOnlyFilePayload() throws Exception
     {
         File inFile = initForRequest();
@@ -161,6 +180,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         assertFiles(inFile, moveToDir, true, false);
     }
 
+    @Test
     public void testDeleteOnlyFilePayload() throws Exception
     {
         File inFile = initForRequest();
@@ -175,6 +195,7 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
         //assertFiles(inFile, moveToDir, false, true);
     }
 
+    @Test
     public void testNoMoveNoDeleteFilePayload() throws Exception
     {
         File inFile = initForRequest();
@@ -214,31 +235,32 @@ public class FileReceiverMoveDeleteTestCase extends AbstractFileMoveDeleteTestCa
                 transformer = new FileMessageFactoryAssertingTransformer(byte[].class);
             }
         }
-        
+
         EndpointBuilder endpointBuilder = new EndpointURIEndpointBuilder(url, muleContext);
         endpointBuilder.addMessageProcessor(transformer);
         if (filePayload)
         {
             endpointBuilder.addMessageProcessor(new NoActionTransformer());
         }
-        InboundEndpoint endpoint = 
+        InboundEndpoint endpoint =
             muleContext.getEndpointFactory().getInboundEndpoint(endpointBuilder);
         ((CompositeMessageSource) service.getMessageSource()).addSource(endpoint);
-        
+
         final Latch latch = new Latch();
         FunctionalTestComponent testComponent = new FunctionalTestComponent();
         testComponent.setMuleContext(muleContext);
         testComponent.setEventCallback(new EventCallback()
         {
+            @Override
             public void eventReceived(final MuleEventContext context, final Object message) throws Exception
-            {                
+            {
                 assertEquals(1, latch.getCount());
                 assertEquals(TEST_MESSAGE, context.transformMessageToString());
                 latch.countDown();
             }
         });
         testComponent.initialise();
-        
+
         final DefaultJavaComponent component = new DefaultJavaComponent(new SingletonObjectFactory(testComponent));
         component.setMuleContext(muleContext);
         service.setComponent(component);

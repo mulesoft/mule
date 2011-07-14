@@ -10,22 +10,32 @@
 
 package org.mule.module.xml.functional;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.junit.Test;
-import org.junit.runners.Parameterized.Parameters;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.transport.NullPayload;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
+
 public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractServiceAndFlowTestCase
 {
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/module/xml/property-extractor-test.xml"}
+
+        });
+    }
+
     public AbstractXmlPropertyExtractorTestCase(ConfigVariant variant, String configResources, boolean matchSingle)
     {
         super(variant, configResources);
-        this.matchSingle = matchSingle;       
+        this.matchSingle = matchSingle;
     }
 
     private boolean matchSingle = true;
@@ -33,16 +43,6 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractServi
     protected abstract Object getMatchMessage() throws Exception;
 
     protected abstract Object getErrorMessage() throws Exception;
-    
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/module/xml/property-extractor-test.xml"}
-            
-        });
-    }
-    
 
     @Test
     public void testMatch() throws Exception
@@ -60,7 +60,7 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractServi
             assertFalse(message.getPayload() instanceof NullPayload);
         }
     }
-    
+
     @Test
     public void testError() throws Exception
     {
@@ -70,5 +70,4 @@ public abstract class AbstractXmlPropertyExtractorTestCase extends AbstractServi
         assertNotNull(message);
         assertFalse(message.getPayload() instanceof NullPayload);
     }
-    
 }

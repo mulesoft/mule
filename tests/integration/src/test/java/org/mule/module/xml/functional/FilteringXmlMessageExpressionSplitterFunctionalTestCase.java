@@ -14,15 +14,13 @@ import org.junit.Test;
 
 public class FilteringXmlMessageExpressionSplitterFunctionalTestCase extends AbstractXmlExpressionSplitterOutboundFunctionalTestCase
 {
-
     public FilteringXmlMessageExpressionSplitterFunctionalTestCase(ConfigVariant variant,
-                                                                   String configResources)
+       String configResources)
     {
         super(variant, configResources);
-        
+
     }
-    
-    
+
     @Test
     public void testSplit() throws Exception
     {
@@ -30,5 +28,4 @@ public class FilteringXmlMessageExpressionSplitterFunctionalTestCase extends Abs
         assertService(SPLITTER_ENDPOINT_PREFIX, 1, SERVICE_SPLITTER);
         assertService(SPLITTER_ENDPOINT_PREFIX, 2, ROUND_ROBIN_DET);
     }
-
 }

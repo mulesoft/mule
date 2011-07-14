@@ -13,14 +13,19 @@ package org.mule.module.sxc;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class SxcFilterTestCase extends FunctionalTestCase
 {
     int finished = 0;
 
+    @Test
     public void testBasicXPath() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
@@ -31,6 +36,7 @@ public class SxcFilterTestCase extends FunctionalTestCase
         assertEquals(Boolean.TRUE, res.getPayload());
     }
 
+    @Test
     public void testAndFilter() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
@@ -42,6 +48,7 @@ public class SxcFilterTestCase extends FunctionalTestCase
         assertEquals(Boolean.TRUE, res.getPayload());
     }
 
+    @Test
     public void testOrFilter() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);
@@ -53,6 +60,7 @@ public class SxcFilterTestCase extends FunctionalTestCase
         assertEquals(Boolean.TRUE, res.getPayload());
     }
 
+    @Test
     public void testNotFilter() throws Exception
     {
         final MuleClient client = new MuleClient(muleContext);

@@ -22,20 +22,28 @@ import org.mule.routing.IdempotentSecureHashMessageFilter;
 import org.mule.routing.MessageFilter;
 import org.mule.routing.outbound.AbstractOutboundRouter;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.store.InMemoryObjectStore;
 import org.mule.util.store.TextFileObjectStore;
 
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
 {
+    
     @Override
     public String getConfigResources()
     {
         return "core-namespace-routers.xml";
     }
 
+    @Test
     public void testIdempotentSecureHashReceiverRouter() throws Exception
     {
         MessageProcessor router = lookupInboundRouterFromService("IdempotentSecureHashReceiverRouter");
@@ -54,6 +62,7 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
         assertNotNull(store.getScheduler());
     }
 
+    @Test
     public void testIdempotentReceiverRouter() throws Exception
     {
         MessageProcessor router = lookupInboundRouterFromService("IdempotentReceiverRouter");
@@ -73,12 +82,14 @@ public class CoreNamespaceRoutersTestCase extends FunctionalTestCase
         assertNotNull(store.getScheduler());
     }
 
+    @Test
     public void testSelectiveConsumerRouter() throws Exception
     {
         MessageProcessor router = lookupInboundRouterFromService("SelectiveConsumerRouter");
         assertTrue(router instanceof MessageFilter);
     }
 
+    @Test
     public void testCustomRouter() throws Exception
     {
         MessageProcessor router = lookupOutboundRouterFromService("CustomRouter");

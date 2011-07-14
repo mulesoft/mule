@@ -12,10 +12,8 @@ package org.mule.module.xml.functional;
 
 import org.junit.Test;
 
-public class FilteringXmlMessageSplitterFunctionalTestCase extends
-    AbstractXmlSplitterOutboundFunctionalTestCase
+public class FilteringXmlMessageSplitterFunctionalTestCase extends AbstractXmlSplitterOutboundFunctionalTestCase
 {
-
     public FilteringXmlMessageSplitterFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -29,5 +27,4 @@ public class FilteringXmlMessageSplitterFunctionalTestCase extends
         assertService(SPLITTER_ENDPOINT_PREFIX, 1, SERVICE_SPLITTER);
         assertService(SPLITTER_ENDPOINT_PREFIX, 2, ROUND_ROBIN_DET);
     }
-
 }

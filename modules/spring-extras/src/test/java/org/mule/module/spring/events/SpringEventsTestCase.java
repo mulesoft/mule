@@ -14,8 +14,8 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleException;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.AbstractMessageTransformer;
 import org.mule.util.ExceptionUtils;
 import org.mule.util.concurrent.Latch;
@@ -25,13 +25,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class SpringEventsTestCase extends FunctionalTestCase
 {
+
     protected static final int DEFAULT_LATCH_TIMEOUT = 10000;
 
     private static final int NUMBER_OF_MESSAGES = 10;
@@ -52,6 +60,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         return "mule-events-app-context.xml";
     }
 
+    @Test
     public void testManagerIsInstanciated() throws Exception
     {
         assertTrue(muleContext.isInitialised());
@@ -60,6 +69,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
             AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME));
     }
 
+    @Test
     public void testRemovingListeners() throws Exception
     {
         TestSubscriptionEventBean subscriptionBean = (TestSubscriptionEventBean) muleContext.getRegistry()
@@ -94,6 +104,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         subscriptionBean.setEventCallback(null);
     }
 
+    @Test
     public void testReceivingANonSubscriptionMuleEvent() throws Exception
     {
         TestMuleEventBean bean = (TestMuleEventBean) muleContext.getRegistry().lookupObject(
@@ -111,6 +122,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         assertEquals(1, eventCounter1.get());
     }
 
+    @Test
     public void testReceivingASpringEvent() throws Exception
     {
         TestApplicationEventBean bean = (TestApplicationEventBean) muleContext.getRegistry().lookupObject(
@@ -143,6 +155,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         assertEquals(1, eventCounter1.get());
     }
 
+    @Test
     public void testReceivingAllEvents() throws Exception
     {
         TestAllEventBean bean = (TestAllEventBean) muleContext.getRegistry().lookupObject("testAllEventBean");
@@ -161,6 +174,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         assertEquals(2, eventCounter1.get());
     }
 
+    @Test
     public void testReceivingASubscriptionEvent() throws Exception
     {
         TestSubscriptionEventBean subscriptionBean = (TestSubscriptionEventBean) muleContext.getRegistry()
@@ -177,6 +191,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         assertEquals(1, eventCounter1.get());
     }
 
+    @Test
     public void testReceiveAndPublishEvent() throws Exception
     {
         TestSubscriptionEventBean bean1 = (TestSubscriptionEventBean) muleContext.getRegistry().lookupObject(
@@ -216,6 +231,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         assertEquals(NUMBER_OF_MESSAGES, eventCounter2.get());
     }
 
+    @Test
     public void testPublishOnly() throws Exception
     {
         final MuleApplicationEvent event = new MuleApplicationEvent("MuleEvent from a spring bean",
@@ -235,6 +251,7 @@ public class SpringEventsTestCase extends FunctionalTestCase
         assertEquals(NUMBER_OF_MESSAGES, eventCounter1.get());
     }
 
+    @Test
     public void testPublishWithEventAwareTransformer() throws Exception
     {
         CountDownLatch transformerLatch = new CountDownLatch(1);

@@ -10,19 +10,17 @@
 
 package org.mule.config.spring;
 
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.api.MuleException;
+import org.mule.tck.AbstractServiceAndFlowTestCase;
 
 public abstract class AbstractInterceptorTestCase extends AbstractServiceAndFlowTestCase
 {
+    public static final String MESSAGE = "boo";
 
     public AbstractInterceptorTestCase(ConfigVariant variant, String configResources)
     {
-        super(variant, configResources); 
+        super(variant, configResources);
     }
-
-    public static final String MESSAGE = "boo";
 
     public void assertMessageIntercepted() throws MuleException, InterruptedException
     {
@@ -31,5 +29,4 @@ public abstract class AbstractInterceptorTestCase extends AbstractServiceAndFlow
         String message = advice.getMessage(RECEIVE_TIMEOUT);
         assertEquals("Bad message", MESSAGE, message);
     }
-
 }

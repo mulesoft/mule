@@ -10,15 +10,16 @@
 
 package org.mule.issues;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+import org.mule.module.xml.functional.AbstractXmlFunctionalTestCase;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
-import org.mule.module.xml.functional.AbstractXmlFunctionalTestCase;
 
 /**
  * This is a simplified version of
@@ -27,13 +28,6 @@ import org.mule.module.xml.functional.AbstractXmlFunctionalTestCase;
  */
 public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCase
 {
-
-    public MulticastRouterMule2136TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-
-    }
-
     public static final int TEST_COUNT = 2000; // cut down from 10k messages, since
                                                // it seems a little much for the
                                                // continuous build
@@ -48,7 +42,12 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
             {ConfigVariant.SERVICE, "org/mule/issues/multicast-router-mule-2136-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/issues/multicast-router-mule-2136-test-flow.xml"}
         });
-    }      
+    }
+
+    public MulticastRouterMule2136TestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
 
     protected MuleClient sendObject() throws MuleException
     {
@@ -66,7 +65,6 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
     }
 
     @Test
-    
     public void testObjectXmlOut() throws MuleException
     {
         String xml = (String) request(sendObject(), "object-xml-out", String.class);
@@ -142,5 +140,4 @@ public class MulticastRouterMule2136TestCase extends AbstractXmlFunctionalTestCa
     {
         // nothing here
     }
-
 }

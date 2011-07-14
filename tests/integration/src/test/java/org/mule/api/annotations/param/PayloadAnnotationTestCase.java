@@ -26,18 +26,18 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class PayloadAnnotationTestCase extends AbstractServiceAndFlowTestCase
 {
-    public PayloadAnnotationTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-        setDisposeManagerPerSuite(true);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/annotations/payload-annotation-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/annotations/payload-annotation-flow.xml"}});
+    }
+
+    public PayloadAnnotationTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+        setDisposeManagerPerSuite(true);
     }
 
     @Test

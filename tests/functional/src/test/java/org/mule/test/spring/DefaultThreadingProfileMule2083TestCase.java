@@ -10,16 +10,20 @@
 
 package org.mule.test.spring;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
 
 public class DefaultThreadingProfileMule2083TestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "default-threading-profile-1-mule-2083.xml, default-threading-profile-2-mule-2083.xml";
     }
 
+    @Test
     public void testStartup()
     {
         // no-op

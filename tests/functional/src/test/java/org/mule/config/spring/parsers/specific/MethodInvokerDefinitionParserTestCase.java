@@ -11,11 +11,16 @@
 package org.mule.config.spring.parsers.specific;
 
 import org.mule.construct.Flow;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class MethodInvokerDefinitionParserTestCase extends FunctionalTestCase
 {
 
+    @Test
     public void testPojoFlow() throws Exception
     {
         Flow flow = muleContext.getRegistry().lookupObject("pojoFlow");
@@ -26,7 +31,6 @@ public class MethodInvokerDefinitionParserTestCase extends FunctionalTestCase
 
         assertEquals("start nullmethod2Arg1Arg2null arg2Valmethod2Arg1Arg2null ", flow2.process(
             getTestEvent("start ")).getMessageAsString());
-
     }
 
     @Override

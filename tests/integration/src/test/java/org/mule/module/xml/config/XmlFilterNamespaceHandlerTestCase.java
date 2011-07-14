@@ -12,6 +12,7 @@ package org.mule.module.xml.config;
 
 import org.mule.api.processor.MessageProcessor;
 import org.mule.api.processor.MessageProcessorChain;
+import org.mule.api.routing.MatchableMessageProcessor;
 import org.mule.api.routing.OutboundRouterCollection;
 import org.mule.api.service.Service;
 import org.mule.construct.Flow;
@@ -34,12 +35,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    public XmlFilterNamespaceHandlerTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -48,9 +43,14 @@ public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTes
             {ConfigVariant.FLOW, "org/mule/module/xml/xml-filter-functional-test-flow.xml"}});
     }
 
+    public XmlFilterNamespaceHandlerTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     /**
      * IsXmlFilter doesn't have any properties to test, so just check it is created
-     * 
+     *
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      * @throws NoSuchFieldException
@@ -60,11 +60,12 @@ public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTes
     public void testIsXmlFilter()
         throws IllegalArgumentException, IllegalAccessException, SecurityException, NoSuchFieldException
     {
-        Object serviceFlow =  muleContext.getRegistry().lookupObject("test for xml");        
+        Object serviceFlow =  muleContext.getRegistry().lookupObject("test for xml");
 
         if (serviceFlow instanceof Service)
         {
-            List routers = ((OutboundRouterCollection) ((Service) serviceFlow).getOutboundMessageProcessor()).getRoutes();
+            List<MatchableMessageProcessor> routers =
+                ((OutboundRouterCollection) ((Service) serviceFlow).getOutboundMessageProcessor()).getRoutes();
 
             assertEquals(2, routers.size());
             assertTrue(routers.get(0).getClass().getName(), routers.get(0) instanceof FilteringOutboundRouter);
@@ -79,14 +80,14 @@ public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTes
             Object notXmlSubFlowWrapper;
             Field f;
             MessageProcessorChain notXmlSubFlow;
-            List outEndpoints = new ArrayList(2);
-            
+            List<MessageProcessor> outEndpoints = new ArrayList<MessageProcessor>(2);
+
             outEndpoints.add(((Flow) serviceFlow).getMessageProcessors().get(0));
             notXmlSubFlowWrapper = muleContext.getRegistry().lookupObject("notXml");
 
             f = notXmlSubFlowWrapper.getClass().getDeclaredField("delegate");
             f.setAccessible(true);
-            notXmlSubFlow = (MessageProcessorChain) f.get(notXmlSubFlowWrapper);            
+            notXmlSubFlow = (MessageProcessorChain) f.get(notXmlSubFlowWrapper);
             outEndpoints.add((notXmlSubFlow.getMessageProcessors().get(0)));
 
             assertEquals(2, outEndpoints.size());
@@ -100,7 +101,6 @@ public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTes
         {
             fail("Unexpected Object");
         }
-
     }
 
     @Test
@@ -113,7 +113,8 @@ public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTes
         if (serviceFlow instanceof Service)
         {
 
-            List routers = ((OutboundRouterCollection) ((Service) serviceFlow).getOutboundMessageProcessor()).getRoutes();
+            List<MatchableMessageProcessor> routers =
+                ((OutboundRouterCollection) ((Service) serviceFlow).getOutboundMessageProcessor()).getRoutes();
             assertEquals(1, routers.size());
             assertTrue(routers.get(0).getClass().getName(), routers.get(0) instanceof FilteringOutboundRouter);
             assertTrue(((FilteringOutboundRouter) routers.get(0)).getFilter() instanceof JXPathFilter);
@@ -121,7 +122,7 @@ public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTes
             assertEquals("filter xml for content", filter.getExpectedValue());
             assertEquals("/mule:mule/mule:model/mule:service[2]/@name", filter.getPattern());
             assertNotNull(filter.getNamespaces());
-            Map namespaces = filter.getNamespaces();
+            Map<?, ?> namespaces = filter.getNamespaces();
             assertEquals(2, namespaces.size());
             assertEquals("http://www.springframework.org/schema/beans", namespaces.get("spring"));
             assertTrue(namespaces.get("mule")
@@ -132,7 +133,7 @@ public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTes
         else if (serviceFlow instanceof Flow)
         {
 
-            List outEndpoints = new ArrayList(1);
+            List<MessageProcessor> outEndpoints = new ArrayList<MessageProcessor>(1);
             outEndpoints.add(((Flow) serviceFlow).getMessageProcessors().get(0));
 
             assertEquals(1, outEndpoints.size());
@@ -143,19 +144,16 @@ public class XmlFilterNamespaceHandlerTestCase extends AbstractServiceAndFlowTes
             assertEquals("filter xml for content", filter.getExpectedValue());
             assertEquals("/mule:mule/mule:model/mule:service[2]/@name", filter.getPattern());
             assertNotNull(filter.getNamespaces());
-            Map namespaces = filter.getNamespaces();
+            Map<?, ?> namespaces = filter.getNamespaces();
             assertEquals(2, namespaces.size());
             assertEquals("http://www.springframework.org/schema/beans", namespaces.get("spring"));
             assertTrue(namespaces.get("mule")
                 .toString()
                 .startsWith("http://www.mulesoft.org/schema/mule/core"));
-
         }
         else
         {
             fail("Unexpected Object");
         }
-
     }
-
 }

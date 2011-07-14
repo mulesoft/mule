@@ -13,6 +13,11 @@ package org.mule.transport.file;
 import org.mule.api.MuleMessage;
 import org.mule.module.client.MuleClient;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCase
 {
     private static final String TEST_MESSAGE_EUC_JP_ENCODED = "\u3053";
@@ -25,6 +30,7 @@ public class FileEncodingFunctionalTestCase extends AbstractFileFunctionalTestCa
         return "file-encoding-test.xml";
     }
 
+    @Test
     public void testReadingFileWithEucJpEncodingGetsTheRightText() throws Exception
     {
         tmpDir = createFolder(".mule/mule-file-test-EUC-JP");

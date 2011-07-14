@@ -12,11 +12,16 @@ package org.mule.transformers.simple;
 import org.mule.api.lifecycle.Disposable;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Highlights the issue: MULE-4599 where dispose cannot be called on a transformer since it is a 
@@ -30,6 +35,7 @@ public class RegistryTransformerLifecycleTestCase extends FunctionalTestCase
         return "simple-transformer-config.xml";
     }
 
+    @Test
     public void testLifecycleInSpring() throws Exception
     {
         TransformerLifecycleTracker transformer = 
@@ -40,6 +46,7 @@ public class RegistryTransformerLifecycleTestCase extends FunctionalTestCase
         assertLifecycle(transformer);
     }
 
+    @Test
     public void testLifecycleInTransientRegistry() throws Exception
     {
         TransformerLifecycleTracker transformer = new TransformerLifecycleTracker();

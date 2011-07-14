@@ -22,24 +22,24 @@ import org.junit.runners.Parameterized.Parameters;
 @Ignore
 public class ServerNotificationManagerTestCase extends AbstractNotificationTestCase
 {
-
     public static final String MULE_SYSTEM_MODEL = "_muleSystemModel";
     public static final String MODEL = "the-model";
     public static final String SERVICE = "the-service";
+
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/integration/notifications/server-notification-manager-test.xml"},
+        });
+    }
 
     public ServerNotificationManagerTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{
-            {ConfigVariant.SERVICE, "org/mule/test/integration/notifications/server-notification-manager-test.xml"},            
-        });
-    }     
-    
+    @Override
     public void doTest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -49,6 +49,7 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
         service.resume();
     }
 
+    @Override
     public RestrictedNode getSpecification()
     {
         return new Node()
@@ -128,6 +129,7 @@ public class ServerNotificationManagerTestCase extends AbstractNotificationTestC
 //                          .serial(new Node(MuleContextNotification.class, MuleContextNotification.CONTEXT_DISPOSED)));
 //    }
 
+    @Override
     public void validateSpecification(RestrictedNode spec) throws Exception
     {
         verifyNotification(spec, ModelNotification.class, ModelNotification.MODEL_INITIALISED);

@@ -9,7 +9,7 @@
  */
 package org.mule.config.spring.parsers;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionManagerFactory;
 
 import java.lang.reflect.Proxy;
@@ -17,13 +17,21 @@ import java.util.Map;
 
 import javax.transaction.TransactionManager;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 public class CustomTransactionManagerTestCase extends FunctionalTestCase
 {
+
+    @Override
     public String getConfigResources()
     {
         return "test-custom-transaction-manager.xml";
     }
 
+    @Test
     public void testCustomTransactionManager() throws Exception
     {
         TransactionManager transactionManager = muleContext.getTransactionManager();
@@ -44,7 +52,8 @@ public class CustomTransactionManagerTestCase extends FunctionalTestCase
      * Attention: this test only runs successful when it's the only one. As soon
      * as the test above is added, muleContext contains more than one transaction
      * manager and all kinds of havoc happen here.
-     
+
+    @Test
     public void testWeblogicTransactionManager() throws Exception
     {
         TransactionManager transactionManager = muleContext.getTransactionManager();

@@ -13,7 +13,12 @@ package org.mule.test.spring;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class GlobalPropertiesMule2458TestCase extends FunctionalTestCase
 {
@@ -23,6 +28,7 @@ public class GlobalPropertiesMule2458TestCase extends FunctionalTestCase
         return "org/mule/test/spring/global-properties-mule-2458-test.xml";
     }
 
+    @Test
     public void testProperties()
     {
         Service service = muleContext.getRegistry().lookupService("service");

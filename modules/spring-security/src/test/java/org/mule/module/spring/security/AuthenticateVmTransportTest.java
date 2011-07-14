@@ -12,38 +12,45 @@ package org.mule.module.spring.security;
 
 import org.mule.api.MuleMessage;
 import org.mule.client.DefaultLocalMuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.HashMap;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
 public class AuthenticateVmTransportTest extends FunctionalTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "auth-vm-transport-config.xml";
     }
 
+    @Test
     public void testExplicitAttributes() throws Exception
     {
         testVM("vm://test");
     }
 
+    @Test
     public void testDefaultAttributes() throws Exception
     {
         testVM("vm://default-attributes");
     }
-    
-    public void testVM(String endpoint) throws Exception
+
+    protected void testVM(String endpoint) throws Exception
     {
         DefaultLocalMuleClient client = new DefaultLocalMuleClient(muleContext);
-        
+
         HashMap<String, Object> props = new HashMap<String,Object>();
         props.put("username", "ross");
         props.put("password", "ross");
         MuleMessage result = client.send(endpoint, "hi", props);
         assertNull(result.getExceptionPayload());
-        
+
         props.put("password", "badpass");
         try
         {
@@ -53,6 +60,6 @@ public class AuthenticateVmTransportTest extends FunctionalTestCase
         catch (Exception e)
         {
             // expected
-        }        
+        }
     }
 }

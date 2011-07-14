@@ -10,16 +10,20 @@
 
 package org.mule.test.spring;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
 
 public class NestExampleTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "nest-example.xml";
     }
 
+    @Test
     public void testParse()
     {
         // empty

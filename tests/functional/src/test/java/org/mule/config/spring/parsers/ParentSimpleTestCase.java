@@ -13,14 +13,18 @@ package org.mule.config.spring.parsers;
 import org.mule.config.spring.parsers.beans.ChildBean;
 import org.mule.config.spring.parsers.beans.OrphanBean;
 
+import org.junit.Test;
+
 public class ParentSimpleTestCase extends AbstractNamespaceTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/parent-simple-test.xml";
     }
 
+    @Test
     public void testParent3()
     {
         OrphanBean orphan3 = (OrphanBean) assertBeanExists("orphan3", OrphanBean.class);

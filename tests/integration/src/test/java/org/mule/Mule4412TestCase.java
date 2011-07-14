@@ -31,16 +31,16 @@ public class Mule4412TestCase extends AbstractServiceAndFlowTestCase
 {
     private int RECEIVE_TIMEOUT_MS = 3000;
 
-    public Mule4412TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{{ConfigVariant.SERVICE, "mule-4412-service.xml"},
             {ConfigVariant.FLOW, "mule-4412-flow.xml"}});
+    }
+
+    public Mule4412TestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class Mule4412TestCase extends AbstractServiceAndFlowTestCase
 
     /**
      * Make sure that the message only gets filtered once
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -85,7 +85,7 @@ public class Mule4412TestCase extends AbstractServiceAndFlowTestCase
 
     /**
      * Make sure the message does not get filtered when the property key is incorrect
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -103,7 +103,7 @@ public class Mule4412TestCase extends AbstractServiceAndFlowTestCase
     /**
      * Make sure the message does not get filtered when the property value is not as
      * expected
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -121,7 +121,7 @@ public class Mule4412TestCase extends AbstractServiceAndFlowTestCase
     /**
      * Make sure the message does not get filtered at all when the expected property
      * is not defined
-     * 
+     *
      * @throws Exception
      */
     @Test

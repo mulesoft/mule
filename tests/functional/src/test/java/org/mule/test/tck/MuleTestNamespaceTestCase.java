@@ -10,10 +10,10 @@
 package org.mule.test.tck;
 
 import org.mule.api.transport.Connector;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.CounterCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
 import org.mule.tck.functional.ResponseWriterCallback;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.transport.ConfigurableKeyedObjectPool;
 import org.mule.transport.ConfigurableKeyedObjectPoolFactory;
@@ -21,6 +21,14 @@ import org.mule.transport.DefaultConfigurableKeyedObjectPool;
 import org.mule.transport.DefaultConfigurableKeyedObjectPoolFactory;
 
 import java.io.IOException;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class MuleTestNamespaceTestCase extends FunctionalTestCase
 {
@@ -30,6 +38,7 @@ public class MuleTestNamespaceTestCase extends FunctionalTestCase
         return "test-namespace-config.xml";
     }
 
+    @Test
     public void testComponent1Config() throws Exception
     {
         Object object = getComponent("testService1");
@@ -45,6 +54,7 @@ public class MuleTestNamespaceTestCase extends FunctionalTestCase
         assertTrue(ftc.getEventCallback() instanceof CounterCallback);
     }
 
+    @Test
     public void testComponent2Config() throws Exception
     {
         String testData = loadResourceAsString("test-data.txt");
@@ -67,6 +77,7 @@ public class MuleTestNamespaceTestCase extends FunctionalTestCase
         assertTrue(ftc.getEventCallback() instanceof ResponseWriterCallback);
     }
 
+    @Test
     public void testComponent3Config() throws Exception
     {
         Object object = getComponent("testService3");
@@ -81,6 +92,7 @@ public class MuleTestNamespaceTestCase extends FunctionalTestCase
         assertNull(ftc.getEventCallback());
     }
 
+    @Test
     public void testConnectorUsingDefaultDispatcherPoolFactory()
     {
         Connector connector = muleContext.getRegistry().lookupConnector("testConnectorWithDefaultFactory");
@@ -91,6 +103,7 @@ public class MuleTestNamespaceTestCase extends FunctionalTestCase
         assertEquals(DefaultConfigurableKeyedObjectPool.class, testConnector.getDispatchers().getClass());
     }
 
+    @Test
     public void testConnectorUsingOverriddenDispatcherPoolFactory()
     {
         Connector connector = muleContext.getRegistry().lookupConnector("testConnectorWithOverriddenFactory");

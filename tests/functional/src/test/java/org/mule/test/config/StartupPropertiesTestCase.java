@@ -10,9 +10,14 @@
 
 package org.mule.test.config;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Properties;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class StartupPropertiesTestCase extends FunctionalTestCase
 {
@@ -36,6 +41,7 @@ public class StartupPropertiesTestCase extends FunctionalTestCase
         return p;
     }
 
+    @Test
     public void testStartProperties()
     {
         Object property1 = muleContext.getRegistry().lookupObject(STARTUP_PROPERTY_1_KEY);

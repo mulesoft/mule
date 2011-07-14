@@ -14,7 +14,7 @@ import org.mule.MessageExchangePattern;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transport.MessageReceiver;
 import org.mule.api.transport.MuleMessageFactory;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestConnector;
 import org.mule.tck.testmodels.mule.TestMessageReceiver;
 import org.mule.transaction.MuleTransactionConfig;
@@ -24,14 +24,21 @@ import org.mule.transport.service.TransportServiceDescriptor;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 {
+
     @Override
     protected String getConfigResources()
     {
         return "org/mule/test/spring/service-overrides.xml";
     }
 
+    @Test
     public void testOverrideMessageReceiver() throws Exception
     {
         TestConnector connector = lookupDummyConnector();
@@ -57,6 +64,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         return connector;
     }
     
+    @Test
     public void testOverrideMuleMessageFactory() throws Exception
     {
         TestConnector connector = lookupDummyConnector();
@@ -67,6 +75,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         assertEquals(MockMuleMessageFactory.class, messageFactory.getClass());
     }
 
+    @Test
     public void testOverrideInbounExchangePatterns() throws Exception
     {
         TestConnector connector = lookupDummyConnector();
@@ -78,6 +87,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         assertEquals(expected, meps);
     }
     
+    @Test
     public void testOverrideOutboundExchangePatterns() throws Exception
     {
         TestConnector connector = lookupDummyConnector();
@@ -89,6 +99,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         assertEquals(expected, meps);
     }
 
+    @Test
     public void testOverrideDefaultExchangePattern() throws Exception
     {
         TestConnector connector = lookupDummyConnector();

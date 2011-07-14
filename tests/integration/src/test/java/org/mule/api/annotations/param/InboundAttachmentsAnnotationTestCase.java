@@ -34,22 +34,22 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
 {
     private MuleMessage muleMessage;
 
+    @Parameters
+    public static Collection<Object[]> parameters()
+    {
+        return Arrays.asList(new Object[][]{
+            {ConfigVariant.SERVICE, "org/mule/test/annotations/inbound-attachments-annotation-service.xml"},
+            {ConfigVariant.FLOW, "org/mule/test/annotations/inbound-attachments-annotation-flow.xml"}
+
+        });
+    }
+
     public InboundAttachmentsAnnotationTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
         setDisposeManagerPerSuite(true);
     }
 
-    @Parameters
-    public static Collection<Object[]> parameters()
-    {
-        return Arrays.asList(new Object[][]{          
-            {ConfigVariant.SERVICE, "org/mule/test/annotations/inbound-attachments-annotation-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/annotations/inbound-attachments-annotation-flow.xml"}
-        
-        });
-    }      
-    
     @Override
     public void doSetUp() throws Exception
     {
@@ -99,7 +99,6 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
         assertEquals("fooValue", ((DataHandler)message.getPayload()).getContent());
     }
 
-
     @Test
     public void testSingleAttachmentWithType() throws Exception
     {
@@ -143,7 +142,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
         assertEquals("barValue", result.get("bar").getContent());
         assertNull(result.get("baz"));
     }
-    
+
     @Test
     public void testMapAttachmentsMissing() throws Exception
     {
@@ -405,7 +404,7 @@ public class InboundAttachmentsAnnotationTestCase extends AbstractServiceAndFlow
         assertTrue(result.contains("barValue"));
         assertTrue(result.contains("bazValue"));
     }
-    
+
     @SuppressWarnings("unchecked")
     private Map<String, DataHandler> getMapPayload(MuleMessage message)
     {

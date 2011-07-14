@@ -11,16 +11,22 @@
 package org.mule.config.spring;
 
 import org.mule.expression.CustomExpressionEvaluatorTestCase;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class DeclarativeCustomExpressionEvaluatorTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/declarative-custom-expression-evaluator-test.xml";
     }
 
+    @Test
     public void testCustomEvalutorRegistered()
     {
         CustomExpressionEvaluatorTestCase.FooExpressionEvaluator customEvaluator =

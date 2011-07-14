@@ -10,32 +10,31 @@
 
 package org.mule.module.xml.functional;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
 import org.w3c.dom.Document;
 
 public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
-
 	public static final String SIMPLE_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<parent><child name=\"poot\"/></parent>";
     public static final String CHILDLESS_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<parent/>";
     public static final String SERIALIZED = "<org.mule.module.xml.functional.XmlTransformerFunctionalTestCase_-Parent>\n" +
             "  <child/>\n" +
             "</org.mule.module.xml.functional.XmlTransformerFunctionalTestCase_-Parent>";
 
-    public XmlTransformerFunctionalTestCase(ConfigVariant variant,
-			String configResources) {
+    public XmlTransformerFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
 		super(variant, configResources);
-		
 	}
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -44,8 +43,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
             {ConfigVariant.FLOW, "org/mule/module/xml/xml-transformer-functional-test-flow.xml"}
         });
     }
-    
-    
+
     protected MuleClient sendXml() throws MuleException
     {
         MuleClient client = new MuleClient(muleContext);
@@ -108,6 +106,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
     }
 
     // MULE-5038
+    //@Test
     //public void testXmlObjectOut() throws MuleException
     //{
     //    request(sendObject(), "xml-object-out", Parent.class);
@@ -120,8 +119,7 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
         assertEquals("1", xml);
     }
 
-
-    protected Object request(MuleClient client, String endpoint, Class clazz) throws MuleException
+    protected Object request(MuleClient client, String endpoint, Class<?> clazz) throws MuleException
     {
         MuleMessage message = client.request(endpoint, TIMEOUT);
         assertNotNull(message);
@@ -129,7 +127,6 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
         assertTrue(message.getPayload().getClass().getName(), clazz.isAssignableFrom(message.getPayload().getClass()));
         return message.getPayload();
     }
-
 
     public static class Parent
     {
@@ -160,5 +157,4 @@ public class XmlTransformerFunctionalTestCase extends AbstractXmlFunctionalTestC
     {
         // nothing here
     }
-
 }

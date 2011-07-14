@@ -10,6 +10,9 @@
 
 package org.mule.module.spring.security;
 
+import org.mule.tck.AbstractServiceAndFlowTestCase;
+import org.mule.transport.http.HttpConstants;
+
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -17,29 +20,25 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.tck.AbstractServiceAndFlowTestCase;
-import org.mule.transport.http.HttpConstants;
 
 public class HttpFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
 {
-
-    public HttpFilterFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-        
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
-            
             {ConfigVariant.FLOW, "http-filter-test.xml"}
         });
-    }   
+    }
 
+    public HttpFilterFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+
+    }
 
     protected String getUrl()
     {
@@ -73,11 +72,12 @@ public class HttpFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
         doRequest(null, "localhost", "anonX", "anonX", getUrl(), false, 401);
     }
 
-    // TODO Realm validataion seems to be completely ignored
-    //public void testAuthenticationFailureBadRealm() throws Exception
-    //{
-    //    doRequest("blah", "localhost", "anon", "anon", getUrl(), false, 401);
-    //}
+    @Ignore // TODO Realm validataion seems to be completely ignored
+    @Test
+    public void testAuthenticationFailureBadRealm() throws Exception
+    {
+        doRequest("blah", "localhost", "anon", "anon", getUrl(), false, 401);
+    }
 
     @Test
     public void testAuthenticationAuthorised() throws Exception
@@ -91,11 +91,12 @@ public class HttpFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
         doRequest(null, "localhost", "anon", "anon", getUrl(), true, 200);
     }
 
-    // TODO Realm validataion seems to be completely ignored
-    //public void testAuthenticationAuthorisedWithHandshakeAndBadRealm() throws Exception
-    //{
-    //    doRequest("blah", "localhost", "anon", "anon", getUrl(), true, 401);
-    //}
+    @Ignore // TODO Realm validataion seems to be completely ignored
+    @Test
+    public void testAuthenticationAuthorisedWithHandshakeAndBadRealm() throws Exception
+    {
+        doRequest("blah", "localhost", "anon", "anon", getUrl(), true, 401);
+    }
 
     @Test
     public void testAuthenticationAuthorisedWithHandshakeAndRealm() throws Exception
@@ -123,7 +124,7 @@ public class HttpFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
             int status = client.executeMethod(get);
             if (status == HttpConstants.SC_UNAUTHORIZED && handshake == true)
             {
-                // doAuthentication = true means that if the request returns 401, 
+                // doAuthentication = true means that if the request returns 401,
                 // the HttpClient will resend the request with credentials
                 status = client.executeMethod(get);
             }
@@ -134,5 +135,4 @@ public class HttpFilterFunctionalTestCase extends AbstractServiceAndFlowTestCase
             get.releaseConnection();
         }
     }
-
 }

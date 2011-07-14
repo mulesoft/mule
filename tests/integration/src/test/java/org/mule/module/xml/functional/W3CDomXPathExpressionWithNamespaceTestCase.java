@@ -29,6 +29,7 @@ public class W3CDomXPathExpressionWithNamespaceTestCase extends AbstractXmlPrope
         super(variant, configResources, true);
     }
 
+    @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
@@ -38,11 +39,13 @@ public class W3CDomXPathExpressionWithNamespaceTestCase extends AbstractXmlPrope
         return p;
     }
 
+    @Override
     protected Object getMatchMessage() throws Exception
     {
         return documentFor("matchingEndpoint1");
     }
 
+    @Override
     protected Object getErrorMessage() throws Exception
     {
         return documentFor("missingEndpoint");

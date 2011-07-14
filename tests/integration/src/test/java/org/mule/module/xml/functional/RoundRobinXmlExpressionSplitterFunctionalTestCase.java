@@ -10,18 +10,17 @@
 
 package org.mule.module.xml.functional;
 
+import org.mule.api.MuleException;
+
 import java.io.IOException;
 
 import org.junit.Test;
-import org.mule.api.MuleException;
 
 public class RoundRobinXmlExpressionSplitterFunctionalTestCase extends AbstractXmlExpressionSplitterOutboundFunctionalTestCase
 {
-
     public RoundRobinXmlExpressionSplitterFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-        
     }
 
     @Test
@@ -57,5 +56,4 @@ public class RoundRobinXmlExpressionSplitterFunctionalTestCase extends AbstractX
         assertServices(ROUND_ROBIN_ENDPOINT_PREFIX, 2,  new String[]{SERVICE_SPLITTER, ROUND_ROBIN_INDET});
         assertService(ROUND_ROBIN_ENDPOINT_PREFIX, 1, ROUND_ROBIN_DET);
     }
-
 }

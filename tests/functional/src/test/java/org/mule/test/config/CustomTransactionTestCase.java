@@ -12,16 +12,25 @@ package org.mule.test.config;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.transaction.TransactionConfig;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class CustomTransactionTestCase extends FunctionalTestCase
 {
+
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/test/config/custom-transaction-config.xml";
     }
 
+    @Test
     public void testConfig1() throws Exception
     {
         EndpointBuilder epb = muleContext.getRegistry().lookupEndpointBuilder("testEndpoint1");
@@ -34,6 +43,7 @@ public class CustomTransactionTestCase extends FunctionalTestCase
         assertEquals(4004, iep.getTransactionConfig().getTimeout());
     }
 
+    @Test
     public void testConfig2() throws Exception
     {
         EndpointBuilder epb = muleContext.getRegistry().lookupEndpointBuilder("testEndpoint2");

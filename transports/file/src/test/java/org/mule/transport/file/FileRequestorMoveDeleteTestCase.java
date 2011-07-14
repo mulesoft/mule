@@ -23,9 +23,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestCase
 {
 
+    @Test
     public void testMoveAndDeleteStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -35,6 +42,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
         assertFiles(inFile, moveToDir, true, true);
     }
 
+    @Test
     public void testMoveOnlyStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -44,6 +52,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
         assertFiles(inFile, moveToDir, true, false);
     }
 
+    @Test
     public void testDeleteOnlyStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -53,6 +62,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
         assertFiles(inFile, moveToDir, false, true);
     }
 
+    @Test
     public void testNoMoveNoDeleteStreaming() throws Exception
     {
         File inFile = initForRequest();
@@ -62,6 +72,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
         assertFiles(inFile, moveToDir, false, false);
     }
 
+    @Test
     public void testMoveAndDelete() throws Exception
     {
         File inFile = initForRequest();
@@ -71,6 +82,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
         assertFiles(inFile, moveToDir, true, true);
     }
 
+    @Test
     public void testMoveOnly() throws Exception
     {
         File inFile = initForRequest();
@@ -80,6 +92,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
         assertFiles(inFile, moveToDir, true, false);
     }
 
+    @Test
     public void testDeleteOnly() throws Exception
     {
         File inFile = initForRequest();
@@ -89,6 +102,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
         assertFiles(inFile, moveToDir, false, true);
     }
 
+    @Test
     public void testNoMoveNoDelete() throws Exception
     {
         File inFile = initForRequest();
@@ -98,6 +112,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
         assertFiles(inFile, moveToDir, false, false);
     }
 
+    @Test
     public void testMoveAndDeleteFilePayload() throws Exception
     {
         File inFile = initForRequest();
@@ -109,6 +124,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
         // assertFiles(inFile, moveToDir, true, true);
     }
 
+    @Test
     public void testMoveOnlyFilePayload() throws Exception
     {
         File inFile = initForRequest();
@@ -120,6 +136,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
         // assertFiles(inFile, moveToDir, true, false);
     }
 
+    @Test
     public void testDeleteOnlyFilePayload() throws Exception
     {
         File inFile = initForRequest();
@@ -131,6 +148,7 @@ public class FileRequestorMoveDeleteTestCase extends AbstractFileMoveDeleteTestC
         // assertFiles(inFile, moveToDir, false, true);
     }
 
+    @Test
     public void testNoMoveNoDeleteFilePayload() throws Exception
     {
         File inFile = initForRequest();

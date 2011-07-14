@@ -16,7 +16,6 @@ import java.util.Properties;
 
 public class BeanPropertyExtractorMultipleEndpointsTestCase extends AbstractXmlPropertyExtractorTestCase
 {
-
     public BeanPropertyExtractorMultipleEndpointsTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources, false);

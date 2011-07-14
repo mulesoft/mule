@@ -24,11 +24,6 @@ public class ManySendsMule1758TestCase extends AbstractServiceAndFlowTestCase
 {
     private static int NUM_MESSAGES = 3000;
 
-    public ManySendsMule1758TestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-    }
-
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -36,8 +31,13 @@ public class ManySendsMule1758TestCase extends AbstractServiceAndFlowTestCase
             {ConfigVariant.SERVICE, "org/mule/issues/many-sends-mule-1758-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/issues/many-sends-mule-1758-test-flow.xml"}
         });
-    }      
-       
+    }
+
+    public ManySendsMule1758TestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
     @Test
     public void testSingleSend() throws Exception
     {
@@ -62,5 +62,4 @@ public class ManySendsMule1758TestCase extends AbstractServiceAndFlowTestCase
         long now = System.currentTimeMillis();
         logger.info("Total time " + ((now - then) / 1000.0) + "s; per message " + ((now - then) / (1.0 * NUM_MESSAGES)) + "ms");
     }
-
 }

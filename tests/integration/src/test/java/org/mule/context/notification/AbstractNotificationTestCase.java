@@ -22,13 +22,12 @@ import org.junit.Test;
  */
 public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlowTestCase
 {
-
     private AbstractNotificationLogger notifications;
 
     public AbstractNotificationTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-        setDisposeManagerPerSuite(true);
+//        setDisposeContextPerClass(true);
     }
 
     @Test
@@ -37,16 +36,7 @@ public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlo
         doTest();
         notifications = (AbstractNotificationLogger) muleContext.getRegistry().lookupObject(
             "notificationLogger");
-    }
 
-    public abstract void doTest() throws Exception;
-
-    public abstract RestrictedNode getSpecification();
-
-    public abstract void validateSpecification(RestrictedNode spec) throws Exception;
-
-    protected void suitePostTearDown() throws Exception
-    {
         // Need to explicitly dispose manager here to get disposal notifications
         muleContext.dispose();
         // allow shutdown to complete (or get concurrent mod errors and/or miss
@@ -57,6 +47,12 @@ public abstract class AbstractNotificationTestCase extends AbstractServiceAndFlo
         validateSpecification(spec);
         assertExpectedNotifications(spec);
     }
+
+    public abstract void doTest() throws Exception;
+
+    public abstract RestrictedNode getSpecification();
+
+    public abstract void validateSpecification(RestrictedNode spec) throws Exception;
 
     protected void logNotifications()
     {

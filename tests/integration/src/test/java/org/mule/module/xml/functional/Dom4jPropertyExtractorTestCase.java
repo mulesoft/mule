@@ -23,6 +23,7 @@ public class Dom4jPropertyExtractorTestCase extends AbstractXmlPropertyExtractor
         super(variant, configResources, true);
     }
 
+    @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
@@ -32,6 +33,7 @@ public class Dom4jPropertyExtractorTestCase extends AbstractXmlPropertyExtractor
         return p;
     }
 
+    @Override
     protected Object getMatchMessage()
     {
         Document document = DocumentHelper.createDocument();
@@ -39,6 +41,7 @@ public class Dom4jPropertyExtractorTestCase extends AbstractXmlPropertyExtractor
         return document;
     }
 
+    @Override
     protected Object getErrorMessage()
     {
         Document document = DocumentHelper.createDocument();

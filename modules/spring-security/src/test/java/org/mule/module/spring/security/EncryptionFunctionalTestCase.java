@@ -14,9 +14,9 @@ import org.mule.api.EncryptionStrategy;
 import org.mule.api.MuleMessage;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.security.CredentialsNotSetException;
-import org.mule.module.client.MuleClient;
+import org.mule.api.security.CryptoFailureException;
 import org.mule.security.MuleCredentials;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.util.ExceptionUtils;
@@ -24,16 +24,24 @@ import org.mule.util.ExceptionUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
 import org.springframework.security.authentication.BadCredentialsException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class EncryptionFunctionalTestCase extends FunctionalTestCase
 {
-
+    @Override
     protected String getConfigResources()
     {
         return "encryption-test.xml";
     }
 
+    @Test
     public void testAuthenticationFailureNoContext() throws Exception
     {
         try
@@ -47,15 +55,10 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testAuthenticationFailureBadCredentials() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
-        EncryptionStrategy strategy = muleContext
-            .getSecurityManager()
-            .getEncryptionStrategy("PBE");
-        String header = MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);
+        Map<String, Object> props = createMessagePropertiesWithCredentials("anonX", "anonX");
 
         try
         {
@@ -68,54 +71,42 @@ public class EncryptionFunctionalTestCase extends FunctionalTestCase
         }
     }
 
+    @Test
     public void testAuthenticationAuthorised() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-
-        Map props = new HashMap();
-        EncryptionStrategy strategy = muleContext
-            .getSecurityManager()
-            .getEncryptionStrategy("PBE");
-        String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);
-
-        MuleMessage m = client.send("vm://my.queue", "foo", props);
+        Map<String, Object> props = createMessagePropertiesWithCredentials("anon", "anon");
+        MuleMessage m = muleContext.getClient().send("vm://my.queue", "foo", props);
         assertNotNull(m);
         assertNull(m.getExceptionPayload());
     }
 
+    @Test
     public void testAuthenticationFailureBadCredentialsHttp() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-        Map props = new HashMap();
-        EncryptionStrategy strategy = muleContext
-            .getSecurityManager()
-            .getEncryptionStrategy("PBE");
-        String header = MuleCredentials.createHeader("anonX", "anonX", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);
-
-        MuleMessage m = client.send("http://localhost:4567/index.html", "", props);
+        Map<String, Object> props = createMessagePropertiesWithCredentials("anonX", "anonX");
+        MuleMessage m = muleContext.getClient().send("http://localhost:4567/index.html", "", props);
         assertNotNull(m);
 
         int status = m.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_UNAUTHORIZED, status);
     }
 
+    @Test
     public void testAuthenticationAuthorisedHttp() throws Exception
     {
-        MuleClient client = new MuleClient(muleContext);
-
-        Map props = new HashMap();
-        EncryptionStrategy strategy = muleContext
-            .getSecurityManager()
-            .getEncryptionStrategy("PBE");
-        String header = MuleCredentials.createHeader("anon", "anon", "PBE", strategy);
-        props.put(MuleProperties.MULE_USER_PROPERTY, header);
-
-        MuleMessage m = client.send("http://localhost:4567/index.html", "", props);
+        Map<String, Object> props = createMessagePropertiesWithCredentials("anon", "anon");
+        MuleMessage m = muleContext.getClient().send("http://localhost:4567/index.html", "", props);
         assertNotNull(m);
         int status = m.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, -1);
         assertEquals(HttpConstants.SC_OK, status);
     }
 
+    private Map<String, Object> createMessagePropertiesWithCredentials(String username, String password) throws CryptoFailureException
+    {
+        Map<String, Object> props = new HashMap<String, Object>();
+        EncryptionStrategy strategy = muleContext.getSecurityManager().getEncryptionStrategy("PBE");
+        String header = MuleCredentials.createHeader(username, password, "PBE", strategy);
+        props.put(MuleProperties.MULE_USER_PROPERTY, header);
+        return props;
+    }
 }

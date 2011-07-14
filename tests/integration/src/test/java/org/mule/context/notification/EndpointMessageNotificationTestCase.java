@@ -19,18 +19,11 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class EndpointMessageNotificationTestCase extends AbstractNotificationTestCase
 {
-
-    public EndpointMessageNotificationTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources); 
-    }
-
     public static final String NO_ID = null;
     public static final String SERVICE_1_ID = "service-1";
     public static final String SERVICE_2_ID = "service-2";
     public static final String CLIENT_ID = "MuleClient";
 
-    
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -38,7 +31,12 @@ public class EndpointMessageNotificationTestCase extends AbstractNotificationTes
             {ConfigVariant.SERVICE, "org/mule/test/integration/notifications/endpoint-message-notification-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/notifications/endpoint-message-notification-test-flow.xml"}
         });
-    }         
+    }
+
+    public EndpointMessageNotificationTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
 
     @Override
     public void doTest() throws Exception
@@ -80,5 +78,4 @@ public class EndpointMessageNotificationTestCase extends AbstractNotificationTes
         verifyAllNotifications(spec, EndpointMessageNotification.class,
             EndpointMessageNotification.MESSAGE_RECEIVED, EndpointMessageNotification.MESSAGE_REQUESTED);
     }
-
 }

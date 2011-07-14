@@ -10,24 +10,18 @@
 
 package org.mule.module.xml.functional;
 
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
 
 public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
-
-    public XmlFilterFunctionalTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources);
-
-    }
-
     public static final int MAX_COUNT = 100;
     public static final String STRING_MESSAGE = "Hello world";
 
@@ -38,6 +32,11 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
             "org/mule/module/xml/xml-filter-functional-test-service.xml"}
 
         });
+    }
+
+    public XmlFilterFunctionalTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
     }
 
     @Test
@@ -98,5 +97,4 @@ public class XmlFilterFunctionalTestCase extends AbstractXmlFunctionalTestCase
             }
         }
     }
-
 }

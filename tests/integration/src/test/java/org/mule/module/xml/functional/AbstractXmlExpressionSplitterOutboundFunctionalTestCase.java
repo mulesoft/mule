@@ -19,7 +19,7 @@ public abstract class AbstractXmlExpressionSplitterOutboundFunctionalTestCase ex
     AbstractXmlSplitterOutboundFunctionalTestCase
 {
     public AbstractXmlExpressionSplitterOutboundFunctionalTestCase(ConfigVariant variant,
-                                                                   String configResources)
+       String configResources)
     {
         super(variant, configResources);
 

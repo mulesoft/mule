@@ -11,7 +11,7 @@
 package org.mule.transport.file;
 
 import org.mule.api.MuleMessage;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 import org.mule.util.IOUtils;
 
@@ -21,6 +21,10 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.Writer;
 import java.net.MalformedURLException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * We are careful here to access the file system in a generic way. This means setting
@@ -67,23 +71,23 @@ public abstract class AbstractFileFunctionalTestCase extends FunctionalTestCase
         waitForFileSystem();
         return target;
     }
-    
+
     private void createTempDirectory() throws Exception
     {
         tmpDir = File.createTempFile("mule-file-test-", "-dir");
         tmpDir.delete();
         tmpDir.mkdir();
     }
-    
+
     protected File createAndPopulateTempFile(String prefix, String suffix) throws Exception
     {
         File target = File.createTempFile(prefix, suffix, tmpDir);
         logger.info("Created temporary file: " + target.getAbsolutePath());
-        
+
         Writer out = new FileWriter(target);
         out.write(TEST_MESSAGE);
         out.close();
-        
+
         target.deleteOnExit();
         return target;
     }

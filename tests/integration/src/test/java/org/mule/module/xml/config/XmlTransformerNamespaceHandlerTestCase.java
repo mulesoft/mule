@@ -19,24 +19,35 @@ import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToDomDocument;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.module.xml.transformer.XsltTransformer;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.AbstractTransformer;
 
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/module/xml/xml-transformer-namespace-test.xml";
     }
 
+    @Test
     public void testDomToXml()
     {
         getAndTestTransformer("domToXml", DomDocumentToXml.class);
     }
 
+    @Test
     public void testJXPathExtractor()
     {
         JXPathExtractor extractor = (JXPathExtractor) getAndTestTransformer("jxpathExtractor",
@@ -52,22 +63,26 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("http://foo.com", ns.get("foo2"));
     }
 
+    @Test
     public void testObjectToXml()
     {
         ObjectToXml objectToXml = (ObjectToXml) getAndTestTransformer("objectToXml", ObjectToXml.class);
         assertTrue(objectToXml.isAcceptMuleMessage());
     }
 
+    @Test
     public void testXmlToDom()
     {
         getAndTestTransformer("xmlToDom", XmlToDomDocument.class);
     }
 
+    @Test
     public void testXmlToObject()
     {
         getAndTestTransformer("xmlToObject", XmlToObject.class);
     }
 
+    @Test
     public void testXslt()
     {
         XsltTransformer xslt = (XsltTransformer) getAndTestTransformer("xslt", XsltTransformer.class);
@@ -82,11 +97,13 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
         assertEquals("#[header:foo]", xslt.getContextProperties().get("bar"));
     }
 
+    @Test
     public void testDomToXmlOnEndpoint() throws MuleException
     {
         getAndTestEndpointTransformer("ep1", DomDocumentToXml.class);
     }
 
+    @Test
     public void testJXPathExtractorOnEndpoint() throws MuleException
     {
         JXPathExtractor extractor = (JXPathExtractor) getAndTestEndpointTransformer("ep2",
@@ -95,22 +112,26 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
         assertFalse(extractor.isSingleResult());
     }
 
+    @Test
     public void testObjectToXmlOnEndpoint() throws MuleException
     {
         ObjectToXml objectToXml = (ObjectToXml) getAndTestEndpointTransformer("ep3", ObjectToXml.class);
         assertTrue(objectToXml.isAcceptMuleMessage());
     }
 
+    @Test
     public void testXmlToDomOnEndpoint() throws MuleException
     {
         getAndTestEndpointTransformer("ep4", XmlToDomDocument.class);
     }
 
+    @Test
     public void testXmlToObjectOnEndpoint() throws MuleException
     {
         getAndTestEndpointTransformer("ep5", XmlToObject.class);
     }
 
+    @Test
     public void testXsltOnEndpoint() throws MuleException
     {
         XsltTransformer xslt = (XsltTransformer) getAndTestEndpointTransformer("ep6", XsltTransformer.class);
@@ -123,6 +144,7 @@ public class XmlTransformerNamespaceHandlerTestCase extends FunctionalTestCase
 
         assertEquals("#[header:foo]", xslt.getContextProperties().get("bar"));
     }
+
     protected AbstractTransformer getAndTestTransformer(String name, Class clazz)
     {
         assertTrue(AbstractTransformer.class.isAssignableFrom(clazz));

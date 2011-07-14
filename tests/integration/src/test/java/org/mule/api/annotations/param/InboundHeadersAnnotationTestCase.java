@@ -46,15 +46,15 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/test/annotations/inbound-headers-annotation-service.xml"},
-            {ConfigVariant.FLOW, "org/mule/test/annotations/inbound-headers-annotation-flow.xml"}            
+            {ConfigVariant.FLOW, "org/mule/test/annotations/inbound-headers-annotation-flow.xml"}
         });
-    }      
-    
+    }
+
     @Override
     public void doSetUp() throws Exception
     {
         super.doSetUp();
-        
+
         props = new HashMap<String, Object>(3);
         props.put("foo", "fooValue");
         props.put("bar", "barValue");
@@ -228,7 +228,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a Map", message.getPayload() instanceof Map);
         Map<?, ?> result = (Map<?, ?>) message.getPayload();
-        printResult(result);        
+        printResult(result);
         //Will match all Mule headers
         assertEquals(5, result.size());
 
@@ -368,7 +368,7 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
         assertNotNull("return message from MuleClient.send() should not be null", message);
         assertTrue("Message payload should be a List", message.getPayload() instanceof List);
         List<?> result = (List<?>) message.getPayload();
-        printResult(result);        
+        printResult(result);
         //Will match all Mule headers
         assertEquals(3, result.size());
 
@@ -425,25 +425,25 @@ public class InboundHeadersAnnotationTestCase extends AbstractServiceAndFlowTest
         assertTrue(result.contains(orange));
         assertFalse(result.contains(banana));
     }
-    
+
     public void printResult(List<?> result)
     {
         for(int i = 0; i < result.size(); i++)
         {
             System.out.println("result #" + i + ": " + result.get(i));
         }
-    }    
-        
+    }
+
     public void printResult(Map<?, ?> result)
     {
-        Set keys = result.keySet();         // The set of keys in the map.
-        Iterator keyIter = keys.iterator();
+        Set<?> keys = result.keySet();         // The set of keys in the map.
+        Iterator<?> keyIter = keys.iterator();
         System.out.println("The map contains the following associations:");
         while (keyIter.hasNext())
         {
            Object key = keyIter.next();  // Get the next key.
            Object value = result.get(key);  // Get the value for that key.
            System.out.println( "   (" + key + "," + value + ")" );
-        }    
+        }
     }
 }

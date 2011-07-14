@@ -13,17 +13,23 @@ package org.mule.endpoints;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.InboundEndpoint;
 import org.mule.api.endpoint.OutboundEndpoint;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /** Test configuration of content-type in various endpoints */
 public class EndpointContentTypeTestCase  extends FunctionalTestCase
 {
+    
     @Override
     protected String getConfigResources()
     {
         return "content-type-setting-endpoint-configs.xml";
     }
 
+    @Test
     public void testContentType()  throws Exception
     {
         InboundEndpoint inbound = muleContext.getRegistry().lookupObject("inbound");

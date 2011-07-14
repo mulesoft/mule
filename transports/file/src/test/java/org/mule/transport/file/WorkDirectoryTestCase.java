@@ -11,9 +11,9 @@
 package org.mule.transport.file;
 
 import org.mule.api.MuleEventContext;
-import org.mule.tck.FunctionalTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.util.FileUtils;
 
 import java.io.File;
@@ -21,11 +21,17 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 public class WorkDirectoryTestCase extends FunctionalTestCase
 {
     
     private static final String TEST_FILENAME = "test.txt";
 
+    @Override
     protected String getConfigResources()
     {
         return "work-directory-config.xml";
@@ -41,6 +47,7 @@ public class WorkDirectoryTestCase extends FunctionalTestCase
         super.doTearDown();
     }
 
+    @Test
     public void testWorkDirectory() throws Exception
     {
         FunctionalTestComponent ftc = (FunctionalTestComponent) getComponent("relay");

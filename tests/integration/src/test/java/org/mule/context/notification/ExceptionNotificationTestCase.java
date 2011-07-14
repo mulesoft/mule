@@ -18,12 +18,7 @@ import java.util.Collection;
 import org.junit.runners.Parameterized.Parameters;
 
 public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
-{    
-    public ExceptionNotificationTestCase(ConfigVariant variant, String configResources)
-    {
-        super(variant, configResources); 
-    }
-
+{
     @Parameters
     public static Collection<Object[]> parameters()
     {
@@ -31,23 +26,30 @@ public class ExceptionNotificationTestCase extends AbstractNotificationTestCase
             {ConfigVariant.SERVICE, "org/mule/test/integration/notifications/exception-notification-test-service.xml"},
             {ConfigVariant.FLOW, "org/mule/test/integration/notifications/exception-notification-test-flow.xml"}
         });
-    }      
-    
+    }
+
+    public ExceptionNotificationTestCase(ConfigVariant variant, String configResources)
+    {
+        super(variant, configResources);
+    }
+
+    @Override
     public void doTest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
         assertNotNull(client.send("vm://in-1", "hello world", null));
     }
 
+    @Override
     public RestrictedNode getSpecification()
     {
         return new Node(ExceptionNotification.class, ExceptionNotification.EXCEPTION_ACTION);
     }
 
+    @Override
     public void validateSpecification(RestrictedNode spec) throws Exception
     {
         verifyAllNotifications(spec, ExceptionNotification.class,
                 ExceptionNotification.EXCEPTION_ACTION, ExceptionNotification.EXCEPTION_ACTION);
     }
-
 }

@@ -12,6 +12,8 @@ package org.mule.config.spring.parsers;
 
 import org.mule.config.spring.parsers.beans.OrphanBean;
 
+import org.junit.Test;
+
 /**
  * This constructs a <em>temporary</em> bean whose contents are injected into a parent map by
  * {@link org.mule.config.spring.parsers.assembly.DefaultBeanAssembler}.  Since this occurs
@@ -20,11 +22,13 @@ import org.mule.config.spring.parsers.beans.OrphanBean;
 public class MapEntryCombinerTestCase extends AbstractNamespaceTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/map-entry-combiner-test.xml";
     }
 
+    @Test
     public void testProperties()
     {
         OrphanBean bean = (OrphanBean) assertBeanExists("checkProps", OrphanBean.class);
@@ -32,6 +36,7 @@ public class MapEntryCombinerTestCase extends AbstractNamespaceTestCase
         assertMapEntryExists(bean.getMap(), "0", 0);
     }
 
+    @Test
     public void testCombinedMap()
     {
         OrphanBean bean = (OrphanBean) assertBeanExists("orphan", OrphanBean.class);
@@ -42,7 +47,8 @@ public class MapEntryCombinerTestCase extends AbstractNamespaceTestCase
         }
     }
 
-    public void testReverersedOrder()
+    @Test
+    public void testReversedOrder()
     {
         OrphanBean bean = (OrphanBean) assertBeanExists("orphan2", OrphanBean.class);
         logger.info("Map size: " + bean.getMap().size());

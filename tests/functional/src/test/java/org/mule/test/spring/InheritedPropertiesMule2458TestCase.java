@@ -13,7 +13,12 @@ package org.mule.test.spring;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.api.service.Service;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
 {
@@ -23,6 +28,7 @@ public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
         return "org/mule/test/spring/inherited-properties-mule-2458-test.xml";
     }
 
+    @Test
     public void testProperties()
     {
         Service service = muleContext.getRegistry().lookupService("service");
@@ -37,15 +43,15 @@ public class InheritedPropertiesMule2458TestCase extends FunctionalTestCase
         assertProperty(endpoint, "global-and-local", "local");
         assertProperty(endpoint, "global-and-url", "global");
         assertProperty(endpoint, "local-and-url", "local");
-        
+
         assertProperty(endpoint, "all", "local");
     }
 
-    protected void assertProperty(ImmutableEndpoint endpoint, String name, String value)
+    protected void assertProperty(ImmutableEndpoint endpoint, String key, String value)
     {
-        Object property = endpoint.getProperty(name);
-        assertNotNull("Property " + name + " is missing", property);
+        Object property = endpoint.getProperty(key);
+        assertNotNull("Property " + key + " is missing", property);
         String actual = property.toString();
-        assertEquals("Unexpected value for " + name + ": " + actual + ", not " + value, value, actual);
+        assertEquals("Unexpected value for " + key + ": " + actual + ", not " + value, value, actual);
     }
 }

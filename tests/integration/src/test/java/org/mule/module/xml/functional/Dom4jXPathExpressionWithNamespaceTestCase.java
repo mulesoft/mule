@@ -26,6 +26,7 @@ public class Dom4jXPathExpressionWithNamespaceTestCase extends AbstractXmlProper
         super(variant, configResources, true);
     }
 
+    @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
@@ -35,11 +36,13 @@ public class Dom4jXPathExpressionWithNamespaceTestCase extends AbstractXmlProper
         return p;
     }
 
+    @Override
     protected Object getMatchMessage() throws Exception
     {
         return documentFor("matchingEndpoint1");
     }
 
+    @Override
     protected Object getErrorMessage() throws Exception
     {
         return documentFor("missingEndpoint");

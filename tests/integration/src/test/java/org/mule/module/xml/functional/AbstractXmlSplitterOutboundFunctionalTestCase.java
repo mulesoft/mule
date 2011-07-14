@@ -10,6 +10,10 @@
 
 package org.mule.module.xml.functional;
 
+import org.mule.api.MuleException;
+import org.mule.api.MuleMessage;
+import org.mule.module.client.MuleClient;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,13 +23,9 @@ import java.util.List;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.junit.runners.Parameterized.Parameters;
-import org.mule.api.MuleException;
-import org.mule.api.MuleMessage;
-import org.mule.module.client.MuleClient;
 
 public abstract class AbstractXmlSplitterOutboundFunctionalTestCase extends AbstractXmlFunctionalTestCase
 {
-
     public static final String SERVICE_SPLITTER = "service splitter";
     public static final String ROUND_ROBIN_DET = "round robin deterministic";
     public static final String ROUND_ROBIN_INDET = "round robin indeterministic";
@@ -36,15 +36,14 @@ public abstract class AbstractXmlSplitterOutboundFunctionalTestCase extends Abst
     public AbstractXmlSplitterOutboundFunctionalTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
-
     }
-    
+
     @Parameters
     public static Collection<Object[]> parameters()
     {
         return Arrays.asList(new Object[][]{
             {ConfigVariant.SERVICE, "org/mule/module/xml/xml-outbound-functional-test.xml"}
-            
+
         });
     }
 

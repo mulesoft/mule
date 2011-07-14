@@ -35,6 +35,7 @@ public class ComponentMessageNotificationTestCase extends AbstractNotificationTe
         super(variant, configResources);
     }
 
+    @Override
     public void doTest() throws Exception
     {
         MuleClient client = new MuleClient(muleContext);
@@ -43,6 +44,7 @@ public class ComponentMessageNotificationTestCase extends AbstractNotificationTe
         assertNotNull(client.request("vm://out-2?connector=queue", 5000));
     }
 
+    @Override
     public RestrictedNode getSpecification()
     {
         return new Node().parallel(
@@ -58,6 +60,7 @@ public class ComponentMessageNotificationTestCase extends AbstractNotificationTe
                     ComponentMessageNotification.COMPONENT_POST_INVOKE));
     }
 
+    @Override
     public void validateSpecification(RestrictedNode spec) throws Exception
     {
         verifyAllNotifications(spec, ComponentMessageNotification.class,

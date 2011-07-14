@@ -13,20 +13,33 @@ import org.mule.api.MuleMessage;
 import org.mule.api.context.notification.SecurityNotificationListener;
 import org.mule.context.notification.SecurityNotification;
 import org.mule.module.client.MuleClient;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transport.http.HttpConnector;
 import org.mule.util.concurrent.Latch;
 
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase
 {
+    @Override
+    protected String getConfigResources()
+    {
+        return "secure-http-polling-server.xml,secure-http-polling-client.xml";
+    }
 
+    @Test
     public void testPollingHttpConnectorSentCredentials() throws Exception
     {
         final Latch latch = new Latch();
         muleContext.registerListener(new SecurityNotificationListener<SecurityNotification>()
         {
+            @Override
             public void onNotification(SecurityNotification notification)
             {
                 latch.countDown();
@@ -44,12 +57,5 @@ public class SecureHttpPollingFunctionalTestCase extends FunctionalTestCase
         final int status = result.getInboundProperty(HttpConnector.HTTP_STATUS_PROPERTY, 0);
         assertEquals(401, status);
         assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
-
     }
-
-    protected String getConfigResources()
-    {
-        return "secure-http-polling-server.xml,secure-http-polling-client.xml";
-    }
-    
 }

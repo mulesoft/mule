@@ -10,16 +10,23 @@
 
 package org.mule.config.spring.parsers;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class NameAndIdEqualMule2795TestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/name-id-equal-mule-2795-test.xml";
     }
 
+    @Test
     public void testNames()
     {
         assertNotNull(muleContext.getRegistry().lookupObject("id"));

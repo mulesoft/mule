@@ -10,11 +10,17 @@
 
 package org.mule.test.spring;
 
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class PropertyPlaceholderMule2150TestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         System.getProperties().put("systemProperty", "org");
@@ -29,16 +35,19 @@ public class PropertyPlaceholderMule2150TestCase extends FunctionalTestCase
         return value;
     }
 
+    @Test
     public void testMuleEnvironment()
     {
         assertEquals("value1", getProperty("prop1"));
     }
 
+    @Test
     public void testSpringPropertyPlaceholder()
     {
         assertEquals("value2", getProperty("prop2"));
     }
 
+    @Test
     public void testJavaEnvironment()
     {
         assertEquals(System.getProperty("java.version"), getProperty("prop3"));

@@ -27,6 +27,7 @@ public class W3CDomPropertyExtractorTestCase extends AbstractXmlPropertyExtracto
         super(variant, configResources, true);
     }
 
+    @Override
     protected Properties getStartUpProperties()
     {
         Properties p = new Properties();
@@ -36,11 +37,13 @@ public class W3CDomPropertyExtractorTestCase extends AbstractXmlPropertyExtracto
         return p;
     }
 
+    @Override
     protected Object getMatchMessage() throws ParserConfigurationException
     {
         return documentFor("matchingEndpoint1");
     }
 
+    @Override
     protected Object getErrorMessage() throws ParserConfigurationException
     {
         return documentFor("missingEndpoint");

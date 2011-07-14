@@ -10,8 +10,8 @@
 
 package org.mule.config.spring;
 
-import org.mule.module.client.MuleClient;
 import org.mule.api.MuleException;
+import org.mule.module.client.MuleClient;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,7 +21,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class ClassInterceptorTestCase extends AbstractInterceptorTestCase
 {
-
     public ClassInterceptorTestCase(ConfigVariant variant, String configResources)
     {
         super(variant, configResources);
@@ -42,5 +41,4 @@ public class ClassInterceptorTestCase extends AbstractInterceptorTestCase
         client.send("vm://in", MESSAGE, null);
         assertMessageIntercepted();
     }
-
 }

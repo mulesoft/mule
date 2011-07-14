@@ -14,9 +14,14 @@ import org.mule.config.spring.parsers.beans.OrphanBean;
 
 import java.util.Collection;
 
+import org.junit.Test;
+
+import static junit.framework.Assert.assertEquals;
+
 public class CollectionTestCase extends AbstractNamespaceTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "org/mule/config/spring/parsers/collection-test.xml";
@@ -29,16 +34,19 @@ public class CollectionTestCase extends AbstractNamespaceTestCase
         assertEquals(index + 1, kids.size());
     }
 
+    @Test
     public void testNamed()
     {
         assertKidsExist(1);
     }
 
+    @Test
     public void testOrphan()
     {
         assertKidsExist(2);
     }
 
+    @Test
     public void testParent()
     {
         assertKidsExist(3);

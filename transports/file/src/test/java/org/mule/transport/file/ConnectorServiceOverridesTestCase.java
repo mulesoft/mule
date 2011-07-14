@@ -14,21 +14,29 @@ import org.mule.api.MuleException;
 import org.mule.api.endpoint.EndpointBuilder;
 import org.mule.api.endpoint.ImmutableEndpoint;
 import org.mule.endpoint.EndpointURIEndpointBuilder;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.transformer.TransformerUtils;
 import org.mule.transformer.simple.ByteArrayToSerializable;
 import org.mule.transformer.simple.SerializableToByteArray;
 import org.mule.transport.AbstractConnector;
-import org.mule.transport.file.FileConnector;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
 {
 
+    @Override
     protected String getConfigResources()
     {
         return "test-connector-config.xml";
     }
 
+    @Test
     public void testServiceOverrides() throws InterruptedException
     {
         FileConnector c = (FileConnector) muleContext.getRegistry().lookupConnector("fileConnector2");
@@ -42,6 +50,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         assertTrue(TransformerUtils.firstOrNull(c.getDefaultOutboundTransformers(null)) instanceof SerializableToByteArray);
     }
 
+    @Test
     public void testServiceOverrides2() throws InterruptedException
     {
         FileConnector c = (FileConnector) muleContext.getRegistry().lookupConnector("fileConnector1");
@@ -57,6 +66,7 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         assertNull(c.getServiceOverrides());
     }
 
+    @Test
     public void testServiceOverrides3() throws InterruptedException, MuleException
     {
         // EndpointURI uri = new MuleEndpointURI("file:///temp?connector=fileConnector1");
@@ -88,6 +98,5 @@ public class ConnectorServiceOverridesTestCase extends FunctionalTestCase
         builder.setConnector(c);
         endpoint = muleContext.getEndpointFactory().getInboundEndpoint(builder3);
         assertNotNull(((AbstractConnector) endpoint.getConnector()).getServiceOverrides());
-
     }
 }

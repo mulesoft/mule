@@ -21,6 +21,11 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * We are careful here to access the file sstem in a generic way.  This means setting directories
  * dynamically.
@@ -28,6 +33,7 @@ import java.util.Map;
 public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
 {
 
+    @Test
     public void testSend() throws Exception
     {
         File target = File.createTempFile("mule-file-test-", ".txt");
@@ -47,6 +53,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
         assertEquals(TEST_MESSAGE, result);
     }
 
+    @Test
     public void testDirectRequest() throws Exception
     {
         File target = initForRequest();
@@ -57,6 +64,7 @@ public class FileFunctionalTestCase extends AbstractFileFunctionalTestCase
         checkReceivedMessage(message);
     }
     
+    @Test
     public void testRecursive() throws Exception
     {
         File directory = new File("./.mule/in");

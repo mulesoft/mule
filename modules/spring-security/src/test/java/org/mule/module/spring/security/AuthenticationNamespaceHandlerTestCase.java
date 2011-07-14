@@ -17,39 +17,45 @@ import org.mule.api.service.Service;
 import org.mule.module.spring.security.filters.http.HttpBasicAuthenticationFilter;
 import org.mule.security.MuleSecurityManager;
 import org.mule.service.ServiceCompositeMessageSource;
-import org.mule.tck.FunctionalTestCase;
+import org.mule.tck.junit4.FunctionalTestCase;
 
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 public class AuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
 {
-
     @Override
     protected String getConfigResources()
     {
         return "authentication-config.xml";
     }
 
+    @Test
     public void testSecurityManagerConfigured()
     {
-        MuleSecurityManager securityManager = 
+        MuleSecurityManager securityManager =
             (MuleSecurityManager) muleContext.getRegistry().lookupObject(MuleProperties.OBJECT_SECURITY_MANAGER);
         assertNotNull(securityManager);
-        
-        Collection providers = securityManager.getProviders();
+
+        Collection<SecurityProvider> providers = securityManager.getProviders();
         assertEquals(2, providers.size());
 
-        Iterator providersIterator = providers.iterator();
-        SecurityProvider provider = (SecurityProvider) providersIterator.next();
+        Iterator<SecurityProvider> providersIterator = providers.iterator();
+        SecurityProvider provider = providersIterator.next();
         assertEquals(SpringProviderAdapter.class, provider.getClass());
         assertEquals(UserAndPasswordAuthenticationProvider.class, ((SpringProviderAdapter) provider).getAuthenticationProvider().getClass());
 
-        provider = (SecurityProvider) providersIterator.next();
+        provider = providersIterator.next();
         assertEquals(SpringProviderAdapter.class, provider.getClass());
         assertEquals(PreAuthenticatedAuthenticationProvider.class, ((SpringProviderAdapter) provider).getAuthenticationProvider().getClass());
     }
-    
+
+    @Test
     public void testEndpointConfiguration()
     {
         Service service = muleContext.getRegistry().lookupService("echo");
@@ -60,5 +66,4 @@ public class AuthenticationNamespaceHandlerTestCase extends FunctionalTestCase
         assertNotNull(endpoint.getSecurityFilter());
         assertEquals(HttpBasicAuthenticationFilter.class, endpoint.getSecurityFilter().getClass());
     }
-
 }
